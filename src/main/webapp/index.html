@@ -1,0 +1,41 @@
+<html>
+
+<head>
+    <title>Pokerapp</title>
+    <link rel="stylesheet" type="text/css" href="/HeadsUpHelper/style.css" />
+    <script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="/HeadsUpHelper/script.js"></script>
+</head>
+<body>
+<p>Pokerapp</p>
+
+<div ng-app = "mainApp" ng-controller = "studentController">
+    <table>
+        <tr ng-repeat = "holecard in allHoleCardsWrapper.allHoleCards">
+            <td>
+                <button class="cardButton" ng-disabled="disabledS" ng-click="disabledS = true; setHoleCard(holecard.spades)">{{holecard.spades}}</button>
+            </td>
+            <td>
+                <button class="cardButton" ng-disabled="disabledC" ng-click="disabledC = true; setHoleCard(holecard.clubs)">{{holecard.clubs}}</button>
+            </td>
+            <td>
+                <button class="cardButton" ng-disabled="disabledD" ng-click="disabledD = true; setHoleCard(holecard.diamonds)">{{holecard.diamonds}}</button>
+            </td>
+            <td>
+                <button class="cardButton" ng-disabled="disabledH" ng-click="disabledH = true; setHoleCard(holecard.hearts)">{{holecard.hearts}}</button>
+            </td>
+        </tr>
+    </table>
+
+    <div id="selectedHoleCards">
+        <p>First holecard: {{firstHoleCard}} </p>
+        <p>Second holecard: {{secondHoleCard}} </p>
+    </div>
+
+    <div id="controlButtons">
+        <button class="proceedOrStayButton" ng-disabled="disableOkButton">OK</button>
+        <button class="proceedOrStayButton" ng-disabled="disableResetButton" ng-click="reset()">Reset</button>
+    </div>
+</div>
+</body>
+</html>
