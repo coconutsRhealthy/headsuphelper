@@ -1,6 +1,6 @@
 var mainApp = angular.module("mainApp", []);
 
- mainApp.controller('studentController', function($scope) {
+ mainApp.controller('studentController', function($scope, $http) {
     $scope.allHoleCardsWrapper = {
        allHoleCards:[
           {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
@@ -66,5 +66,9 @@ var mainApp = angular.module("mainApp", []);
         $scope.firstHoleCardSelected = false;
         $scope.disableOkButton = true;
         $scope.disableResetButton = true;
+
+        $http.get('/resource/').success(function(data) {
+          alert(data);
+        })
     }
  });
