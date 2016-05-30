@@ -68,7 +68,42 @@ var mainApp = angular.module("mainApp", []);
         $scope.disableResetButton = true;
 
         $http.get('/resource/').success(function(data) {
-          alert(data);
+          alert(JSON.stringify(data));
         })
     }
+
+
+
+
+
+    $scope.SendData = function () {
+       // use $.param jQuery function to serialize data from JSON
+        var data = $.param({
+            fName: "Lennart",
+            lName: "Popma"
+        });
+
+        var config = {
+            headers : {
+                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+            }
+        }
+
+        $http.post('/aappost/', data, config)
+        .success(function (data) {
+            alert("hallo");
+//            $scope.PostDataResponse = data;
+        })
+        .error(function (data, config) {
+            alert("error");
+//            $scope.ResponseDetails = "Data: " + data +
+//                "<hr />status: " + status +
+//                "<hr />headers: " + header +
+//                "<hr />config: " + config;
+        });
+    };
+
+
+
+
  });
