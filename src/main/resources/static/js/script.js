@@ -73,35 +73,46 @@ var mainApp = angular.module("mainApp", []);
     }
 
 
+    $scope.rs = {};
 
+    $scope.addNewRailwayStation = function(rs) {
 
+        alert(JSON.stringify(rs));
 
-    $scope.SendData = function () {
-       // use $.param jQuery function to serialize data from JSON
-        var data = $.param({
-            fName: "Lennart",
-            lName: "Popma"
-        });
-
-        var config = {
-            headers : {
-                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-            }
-        }
-
-        $http.post('/aappost/', data, config)
-        .success(function (data) {
-            alert("hallo");
-//            $scope.PostDataResponse = data;
-        })
-        .error(function (data, config) {
+        $http.post('/add/', rs).success(function() {
+            $scope.rs.name = '';
+        }).error(function() {
             alert("error");
-//            $scope.ResponseDetails = "Data: " + data +
-//                "<hr />status: " + status +
-//                "<hr />headers: " + header +
-//                "<hr />config: " + config;
         });
     };
+
+
+//    $scope.SendData = function () {
+//       // use $.param jQuery function to serialize data from JSON
+//        var data = $.param({
+//            fName: "Lennart",
+//            lName: "Popma"
+//        });
+//
+//        var config = {
+//            headers : {
+//                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
+//            }
+//        }
+//
+//        $http.post('/aappost/', data, config)
+//        .success(function (data) {
+//            alert("hallo");
+////            $scope.PostDataResponse = data;
+//        })
+//        .error(function (data, config) {
+//            alert("error");
+////            $scope.ResponseDetails = "Data: " + data +
+////                "<hr />status: " + status +
+////                "<hr />headers: " + header +
+////                "<hr />config: " + config;
+//        });
+//    };
 
 
 

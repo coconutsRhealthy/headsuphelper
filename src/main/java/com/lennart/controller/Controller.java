@@ -1,13 +1,12 @@
 package com.lennart.controller;
 
+import com.lennart.model.SjaakClass;
 import com.lennart.model.TestClass;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +49,22 @@ public class Controller {
 ////        return model;
 //        return testClass;
     }
+
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public @ResponseBody void addRailwayStation(@RequestBody SjaakClass sjaakClass) {
+        System.out.println("hallo");
+        System.out.println(sjaakClass.getName());
+        System.out.println(sjaakClass.getAchternaam());
+        System.out.println(sjaakClass.getAge());
+
+        int eije = sjaakClass.getAge() + 10;
+
+        System.out.println(eije);
+
+//        System.out.println(railwayStation.getName());
+//        railwayStationsService.addRailwayStation(railwayStation);
+    }
+
 
 
 

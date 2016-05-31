@@ -37,6 +37,38 @@
         <button class="proceedOrStayButton" ng-disabled="disableOkButton">OK</button>
         <button class="proceedOrStayButton" ng-disabled="disableResetButton" ng-click="SendData()">Reset</button>
     </div>
+
+
+
+
+
+    <div class="control-group">
+        <label class="control-label" for="rs_name">Railway Station Name</label>
+
+        <div class="controls">
+            <input type="text" id="rs_name" ng-model="rs.name"
+                   placeholder="Railway Name" required="required" min="2" />
+        </div>
+
+        <div class="controls">
+            <input type="text" id="rs_achternaam" ng-model="rs.achternaam"
+                   placeholder="Achternaam" required="required" min="2" />
+        </div>
+
+        <div class="controls">
+            <input type="text" id="rs_age" ng-model="rs.age"
+                   placeholder="age" required="required" min="2" />
+        </div>
+
+
+    </div>
+    <div class="controls">
+        <button type="button" class="btn btn-primary"
+                ng-hide="editMode"
+                ng-click="addNewRailwayStation(rs)">Add Railway Station</button>
+    </div>
+
+
 </div>
 </body>
 </html>
