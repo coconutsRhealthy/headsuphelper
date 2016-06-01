@@ -72,49 +72,18 @@ var mainApp = angular.module("mainApp", []);
         })
     }
 
+    $scope.rs1 = {};
+    $scope.rs2 = {};
+    $scope.eije = [];
 
-    $scope.rs = {};
-
-    $scope.addNewRailwayStation = function(rs) {
-
-        alert(JSON.stringify(rs));
-
-        $http.post('/add/', rs).success(function() {
-            $scope.rs.name = '';
+    $scope.addNewRailwayStation = function(rs1, rs2) {
+        $scope.eije = [rs1, rs2];
+        alert(JSON.stringify($scope.eije));
+        $http.post('/add/', $scope.eije).success(function(data) {
+            alert(JSON.stringify(data));
+            //$scope.rs.name = '';
         }).error(function() {
             alert("error");
         });
     };
-
-
-//    $scope.SendData = function () {
-//       // use $.param jQuery function to serialize data from JSON
-//        var data = $.param({
-//            fName: "Lennart",
-//            lName: "Popma"
-//        });
-//
-//        var config = {
-//            headers : {
-//                'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8;'
-//            }
-//        }
-//
-//        $http.post('/aappost/', data, config)
-//        .success(function (data) {
-//            alert("hallo");
-////            $scope.PostDataResponse = data;
-//        })
-//        .error(function (data, config) {
-//            alert("error");
-////            $scope.ResponseDetails = "Data: " + data +
-////                "<hr />status: " + status +
-////                "<hr />headers: " + header +
-////                "<hr />config: " + config;
-//        });
-//    };
-
-
-
-
  });

@@ -1,5 +1,6 @@
 package com.lennart.controller;
 
+import com.lennart.model.Employee;
 import com.lennart.model.SjaakClass;
 import com.lennart.model.TestClass;
 import org.springframework.boot.SpringApplication;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -51,26 +53,16 @@ public class Controller {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public @ResponseBody void addRailwayStation(@RequestBody SjaakClass sjaakClass) {
-        System.out.println("hallo");
-        System.out.println(sjaakClass.getName());
-        System.out.println(sjaakClass.getAchternaam());
-        System.out.println(sjaakClass.getAge());
+    public @ResponseBody List<SjaakClass> addRailwayStation(@RequestBody List<SjaakClass> testList) {
 
-        int eije = sjaakClass.getAge() + 10;
-
-        System.out.println(eije);
-
-//        System.out.println(railwayStation.getName());
-//        railwayStationsService.addRailwayStation(railwayStation);
+        System.out.println(testList.get(0).getName());
+        System.out.println(testList.get(0).getAchternaam());
+        System.out.println(testList.get(0).getAge());
+        System.out.println(testList.get(1).getName());
+        System.out.println(testList.get(1).getAchternaam());
+        System.out.println(testList.get(1).getAge());
+        return testList;
     }
-
-
-
-
-
-
-
 
     public static void main(String[] args) {
         SpringApplication.run(Controller.class, args);
