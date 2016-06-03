@@ -72,6 +72,48 @@ var mainApp = angular.module("mainApp", []);
         })
     }
 
+
+
+    $scope.submitHoleCardsToServer = function() {
+        var eije = $scope.firstHoleCard;
+        var hmm = eije.substring(0,1);
+        $scope.selectedHoleCard1.rank = hmm;
+
+        var bbb = $scope.secondHoleCard;
+        var ccc = bbb.substring(1,2);
+        $scope.selectedHoleCard1.suit = ccc;
+
+        alert(JSON.stringify($scope.selectedHoleCard1));
+
+
+        $http.post('/bertus/', $scope.selectedHoleCard1).success(function(data) {
+            alert(JSON.stringify(data));
+            //$scope.rs.name = '';
+        }).error(function() {
+            alert("error");
+        });
+    }
+
+
+    function getCardRank(card){
+        var rank = card.concat(0,1);
+    }
+
+    function getCardSuit(card) {
+        var suit = card.concat(1,1);
+    }
+
+
+
+
+    $scope.selectedHoleCard1 = {};
+    $scope.selectedHoleCard2 = {};
+
+
+
+
+
+
     $scope.rs1 = {};
     $scope.rs2 = {};
     $scope.eije = [];
