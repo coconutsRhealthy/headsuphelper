@@ -27,12 +27,15 @@ public class Controller {
     }
 
     @RequestMapping(value = "/bertus", method = RequestMethod.POST)
-    public @ResponseBody Card testje(@RequestBody Card card) {
+    public @ResponseBody List<Card> testje(@RequestBody List<Card> cardList) {
 
-        System.out.println(card.getSuit());
-        System.out.println(card.getRank());
+        System.out.println(cardList.get(0).getSuit());
+        System.out.println(cardList.get(0).getRank());
 
-        return card;
+        System.out.println(cardList.get(1).getSuit());
+        System.out.println(cardList.get(1).getRank());
+
+        return cardList;
     }
 
 

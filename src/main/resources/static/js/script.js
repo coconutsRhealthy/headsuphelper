@@ -75,18 +75,26 @@ var mainApp = angular.module("mainApp", []);
 
 
     $scope.submitHoleCardsToServer = function() {
-        var eije = $scope.firstHoleCard;
-        var hmm = eije.substring(0,1);
-        $scope.selectedHoleCard1.rank = hmm;
+        var rankCard1 = $scope.firstHoleCard.substring(0,1);
+        rankCard1 = getRankInteger(rankCard1);
+        $scope.selectedHoleCard1.rank = rankCard1;
 
-        var bbb = $scope.secondHoleCard;
-        var ccc = bbb.substring(1,2);
-        $scope.selectedHoleCard1.suit = ccc;
+        var suitCard1 = $scope.firstHoleCard.substring(1,2);
+        $scope.selectedHoleCard1.suit = suitCard1;
 
-        alert(JSON.stringify($scope.selectedHoleCard1));
+        var rankCard2 = $scope.secondHoleCard.substring(0,1);
+        rankCard2 = getRankInteger(rankCard2);
+        $scope.selectedHoleCard2.rank = rankCard2;
+
+        var suitCard2 = $scope.secondHoleCard.substring(1,2);
+        $scope.selectedHoleCard2.suit = suitCard2;
 
 
-        $http.post('/bertus/', $scope.selectedHoleCard1).success(function(data) {
+        $scope.holeCards = [$scope.selectedHoleCard1, $scope.selectedHoleCard2];
+
+        alert(JSON.stringify($scope.holeCards));
+
+        $http.post('/bertus/', $scope.holeCards).success(function(data) {
             alert(JSON.stringify(data));
             //$scope.rs.name = '';
         }).error(function() {
@@ -108,7 +116,7 @@ var mainApp = angular.module("mainApp", []);
 
     $scope.selectedHoleCard1 = {};
     $scope.selectedHoleCard2 = {};
-
+    $scope.holeCards = [];
 
 
 
@@ -128,4 +136,29 @@ var mainApp = angular.module("mainApp", []);
             alert("error");
         });
     };
+
+
+    function getRankInteger(rankCard1) {
+        switch(rankCard1) {
+            case 'A':
+                return 14;
+                break;
+            case 'K':
+                return 13;
+                break;
+            case 'Q':
+                return 12;
+                break;
+            case 'J':
+                return 11;
+                break;
+            case 'T':
+                return 10;
+                break;
+            default:
+                return rankCard1;
+        }
+    }
+
+
  });
