@@ -8,9 +8,9 @@
     <script src="/js/script.js"></script>
 </head>
 <body>
-<p>Pokerapp</p>
 
-<div ng-app = "mainApp" ng-controller = "studentController">
+<div ng-app = "mainApp" ng-controller = "pokerController">
+    <p>{{street}}</p>
     <table>
         <tr ng-repeat = "holecard in allHoleCardsWrapper.allHoleCards">
             <td>
@@ -28,25 +28,22 @@
         </tr>
     </table>
 
-    <div id="selectedHoleCards">
+    <div id="selectedHoleCards" ng-hide="hideHoleCardsDiv">
         <p>First holecard: {{firstHoleCard}} </p>
         <p>Second holecard: {{secondHoleCard}} </p>
     </div>
 
+    <div id="selectedFlopCards" ng-hide="hideFlopCardsDiv">
+        <p>First flopcard: {{firstFlopCard}} </p>
+        <p>Second flopcard: {{secondFlopCard}} </p>
+        <p>Third flopcard: {{thirdFlopCard}} </p>
+    </div>
+
+
+
     <div id="controlButtons">
         <button class="proceedOrStayButton" ng-disabled="disableOkButton" ng-click="submitHoleCardsToServer()">OK</button>
         <button class="proceedOrStayButton" ng-disabled="disableResetButton" ng-click="reset()">Reset</button>
-    </div>
-
-    <div>
-        <input type="text" ng-model="rs1.name" placeholder="Railway Name" required="required" />
-        <input type="text" ng-model="rs1.achternaam" placeholder="Achternaam" required="required" />
-        <input type="text" ng-model="rs1.age" placeholder="age" required="required" />
-        <input type="text" ng-model="rs2.name" placeholder="Railway Name" required="required" />
-        <input type="text" ng-model="rs2.achternaam" placeholder="Achternaam" required="required" />
-        <input type="text" ng-model="rs2.age" placeholder="age" required="required" />
-
-        <button type="button" ng-click="addNewRailwayStation(rs1, rs2)">Add Railway Station</button>
     </div>
 </div>
 </body>
