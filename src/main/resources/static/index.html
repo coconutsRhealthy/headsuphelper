@@ -14,35 +14,35 @@
     <table>
         <tr ng-repeat = "holecard in allHoleCardsWrapper.allHoleCards">
             <td>
-                <button class="cardButton" ng-disabled="disabledS" ng-click="disabledS = true; setHoleCard(holecard.spades)">{{holecard.spades}}</button>
+                <button class="cardButton" ng-disabled="disabledS" ng-click="disabledS = true; selectCard(holecard.spades)">{{holecard.spades}}</button>
             </td>
             <td>
-                <button class="cardButton" ng-disabled="disabledC" ng-click="disabledC = true; setHoleCard(holecard.clubs)">{{holecard.clubs}}</button>
+                <button class="cardButton" ng-disabled="disabledC" ng-click="disabledC = true; selectCard(holecard.clubs)">{{holecard.clubs}}</button>
             </td>
             <td>
-                <button class="cardButton" ng-disabled="disabledD" ng-click="disabledD = true; setHoleCard(holecard.diamonds)">{{holecard.diamonds}}</button>
+                <button class="cardButton" ng-disabled="disabledD" ng-click="disabledD = true; selectCard(holecard.diamonds)">{{holecard.diamonds}}</button>
             </td>
             <td>
-                <button class="cardButton" ng-disabled="disabledH" ng-click="disabledH = true; setHoleCard(holecard.hearts)">{{holecard.hearts}}</button>
+                <button class="cardButton" ng-disabled="disabledH" ng-click="disabledH = true; selectCard(holecard.hearts)">{{holecard.hearts}}</button>
             </td>
         </tr>
     </table>
 
     <div id="selectedHoleCards" ng-hide="hideHoleCardsDiv">
-        <p>First holecard: {{firstHoleCard}} </p>
-        <p>Second holecard: {{secondHoleCard}} </p>
+        <p>First holecard: {{firstCard}} </p>
+        <p>Second holecard: {{secondCard}} </p>
     </div>
 
     <div id="selectedFlopCards" ng-hide="hideFlopCardsDiv">
-        <p>First flopcard: {{firstFlopCard}} </p>
-        <p>Second flopcard: {{secondFlopCard}} </p>
-        <p>Third flopcard: {{thirdFlopCard}} </p>
+        <p>First flopcard: {{firstCard}} </p>
+        <p>Second flopcard: {{secondCard}} </p>
+        <p>Third flopcard: {{thirdCard}} </p>
     </div>
 
 
 
     <div id="controlButtons">
-        <button class="proceedOrStayButton" ng-disabled="disableOkButton" ng-click="submitHoleCardsToServer()">OK</button>
+        <button class="proceedOrStayButton" ng-disabled="disableOkButton" ng-click="submitCardsToServer()">OK</button>
         <button class="proceedOrStayButton" ng-disabled="disableResetButton" ng-click="reset()">Reset</button>
     </div>
 </div>

@@ -19,18 +19,31 @@ var mainApp = angular.module("mainApp", []);
        ]
     };
 
-    $scope.firstHoleCardSelected = false;
+    $scope.firstCardSelected = false;
+    $scope.secondCardSelected = false;
+
     $scope.disableResetButton = true;
     $scope.disableOkButton = true;
 
-    $scope.setHoleCard = function(id) {
-        if($scope.firstHoleCardSelected === false) {
-            $scope.firstHoleCard = id;
-            $scope.firstHoleCardSelected = true;
+    $scope.selectCard = function(id) {
+        if($scope.firstCardSelected === false) {
+            $scope.firstCard = id;
+            $scope.firstCardSelected = true;
             $scope.disableResetButton = false;
         }
+        else if($scope.secondCardSelected === false) {
+            $scope.secondCard = id;
+            if($scope.street === "Select holecards") {
+                $scope.disabledS = true;
+                $scope.disabledC = true;
+                $scope.disabledD = true;
+                $scope.disabledH = true;
+                $scope.disableOkButton = false;
+            }
+            $scope.secondCardSelected = true;
+        }
         else {
-            $scope.secondHoleCard = id;
+            $scope.thirdCard = id;
             $scope.disabledS = true;
             $scope.disabledC = true;
             $scope.disabledD = true;
@@ -40,8 +53,9 @@ var mainApp = angular.module("mainApp", []);
     }
 
     $scope.reset = function() {
-        $scope.firstHoleCard = "";
-        $scope.secondHoleCard = "";
+        $scope.firstCard = "";
+        $scope.secondCard = "";
+        $scope.thirdCard = "";
         $scope.allHoleCardsWrapper = {
            allHoleCards:[
               {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
@@ -63,28 +77,42 @@ var mainApp = angular.module("mainApp", []);
         $scope.disabledC = false;
         $scope.disabledD = false;
         $scope.disabledH = false;
-        $scope.firstHoleCardSelected = false;
+        $scope.firstCardSelected = false;
+        $scope.secondCardSelected = false;
         $scope.disableOkButton = true;
         $scope.disableResetButton = true;
 
-        $http.get('/resource/').success(function(data) {
-          alert(JSON.stringify(data));
-        })
+//        $http.get('/resource/').success(function(data) {
+//          alert(JSON.stringify(data));
+//        })
     }
 
-    $scope.submitHoleCardsToServer = function() {
-        var rankCard1 = $scope.firstHoleCard.substring(0,1);
+    $scope.submitCardsToServer = function() {
+        switch($scope.street) {
+            case "Select holecards":
+                $scope.submitHoleCards();
+                break;
+            case "Select flopcards":
+                alert("To implement, flop submit function");
+                break;
+            default:
+                alert("This is the default")
+        }
+    }
+
+    $scope.submitHoleCards = function() {
+        var rankCard1 = $scope.firstCard.substring(0,1);
         rankCard1 = getRankInteger(rankCard1);
         $scope.selectedHoleCard1.rank = rankCard1;
 
-        var suitCard1 = $scope.firstHoleCard.substring(1,2);
+        var suitCard1 = $scope.firstCard.substring(1,2);
         $scope.selectedHoleCard1.suit = suitCard1;
 
-        var rankCard2 = $scope.secondHoleCard.substring(0,1);
+        var rankCard2 = $scope.secondCard.substring(0,1);
         rankCard2 = getRankInteger(rankCard2);
         $scope.selectedHoleCard2.rank = rankCard2;
 
-        var suitCard2 = $scope.secondHoleCard.substring(1,2);
+        var suitCard2 = $scope.secondCard.substring(1,2);
         $scope.selectedHoleCard2.suit = suitCard2;
 
         $scope.holeCards = [$scope.selectedHoleCard1, $scope.selectedHoleCard2];
@@ -103,6 +131,7 @@ var mainApp = angular.module("mainApp", []);
 
         $scope.reset();
     }
+
 
     function getCardRank(card){
         var rank = card.concat(0,1);
