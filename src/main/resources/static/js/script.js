@@ -123,7 +123,10 @@ var mainApp = angular.module("mainApp", []);
         $scope.hideFlopCardsDiv = false;
 
         $http.post('/bertus/', $scope.holeCards).success(function(data) {
-            alert(JSON.stringify(data));
+            alert(JSON.stringify(data[0]));
+
+
+
             //$scope.rs.name = '';
         }).error(function() {
             alert("error");

@@ -11,22 +11,35 @@
 
 <div ng-app = "mainApp" ng-controller = "pokerController">
     <p>{{street}}</p>
-    <table>
-        <tr ng-repeat = "holecard in allHoleCardsWrapper.allHoleCards">
-            <td>
-                <button class="cardButton" ng-disabled="disabledS" ng-click="disabledS = true; selectCard(holecard.spades)">{{holecard.spades}}</button>
-            </td>
-            <td>
-                <button class="cardButton" ng-disabled="disabledC" ng-click="disabledC = true; selectCard(holecard.clubs)">{{holecard.clubs}}</button>
-            </td>
-            <td>
-                <button class="cardButton" ng-disabled="disabledD" ng-click="disabledD = true; selectCard(holecard.diamonds)">{{holecard.diamonds}}</button>
-            </td>
-            <td>
-                <button class="cardButton" ng-disabled="disabledH" ng-click="disabledH = true; selectCard(holecard.hearts)">{{holecard.hearts}}</button>
-            </td>
-        </tr>
-    </table>
+
+    <div>
+        <div class="button-table">
+            <table>
+                <tr ng-repeat = "holecard in allHoleCardsWrapper.allHoleCards">
+                    <td>
+                        <button class="cardButton" ng-disabled="disabledS" ng-click="disabledS = true; selectCard(holecard.spades)">{{holecard.spades}}</button>
+                    </td>
+                    <td>
+                        <button class="cardButton" ng-disabled="disabledC" ng-click="disabledC = true; selectCard(holecard.clubs)">{{holecard.clubs}}</button>
+                    </td>
+                    <td>
+                        <button class="cardButton" ng-disabled="disabledD" ng-click="disabledD = true; selectCard(holecard.diamonds)">{{holecard.diamonds}}</button>
+                    </td>
+                    <td>
+                        <button class="cardButton" ng-disabled="disabledH" ng-click="disabledH = true; selectCard(holecard.hearts)">{{holecard.hearts}}</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="handadvice">
+            <div id="first holecard">
+                {{selectedHoleCard1.rank}}{{selectedHoleCard1.suit}}
+            </div>
+            <div id="second holecard">
+                {{selectedHoleCard2.rank}}{{selectedHoleCard2.suit}}
+            </div>
+        </div>
+    </div>
 
     <div id="selectedHoleCards" ng-hide="hideHoleCardsDiv">
         <p>First holecard: {{firstCard}} </p>

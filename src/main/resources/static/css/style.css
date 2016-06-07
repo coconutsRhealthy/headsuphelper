@@ -7,3 +7,14 @@
   width: 55px;
   height: 25px;
 }
+
+.button-table {
+  height: 385px;
+  float: left;
+}
+
+.handadvice {
+  height: 385px;
+  margin-left: 40px;
+  display: inline-block;
+}
