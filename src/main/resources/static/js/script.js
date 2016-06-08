@@ -124,7 +124,8 @@ var mainApp = angular.module("mainApp", []);
 
         $http.post('/bertus/', $scope.holeCards).success(function(data) {
             alert(JSON.stringify(data[0]));
-
+            $scope.selectedHoleCard1 = data[0];
+            $scope.selectedHoleCard2 = data[1];
 
 
             //$scope.rs.name = '';

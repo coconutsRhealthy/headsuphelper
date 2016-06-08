@@ -19,6 +19,12 @@ public class Controller {
     @RequestMapping(value = "/bertus", method = RequestMethod.POST)
     public @ResponseBody List<Card> testje(@RequestBody List<Card> cardList) {
 
+        if(holeCards.size() > 2) {
+            System.out.println(holeCards.size());
+            holeCards.remove(0);
+            holeCards.remove(1);
+        }
+
         System.out.println(cardList.get(0).getSuit());
         System.out.println(cardList.get(0).getRank());
 
