@@ -16,24 +16,13 @@ public class Controller {
 
     private List<Card> holeCards = new ArrayList<Card>();
 
-    @RequestMapping(value = "/bertus", method = RequestMethod.POST)
-    public @ResponseBody List<Card> testje(@RequestBody List<Card> cardList) {
-
-        if(holeCards.size() > 2) {
-            System.out.println(holeCards.size());
-            holeCards.remove(0);
-            holeCards.remove(1);
+    @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
+    public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
+        if (holeCards.size() > 0) {
+            holeCards.clear();
         }
-
-        System.out.println(cardList.get(0).getSuit());
-        System.out.println(cardList.get(0).getRank());
-
-        System.out.println(cardList.get(1).getSuit());
-        System.out.println(cardList.get(1).getRank());
-
         holeCards.add(cardList.get(0));
         holeCards.add(cardList.get(1));
-
         return holeCards;
     }
 

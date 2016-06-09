@@ -122,10 +122,10 @@ var mainApp = angular.module("mainApp", []);
         $scope.hideHoleCardsDiv = true;
         $scope.hideFlopCardsDiv = false;
 
-        $http.post('/bertus/', $scope.holeCards).success(function(data) {
+        $http.post('/postHoleCards/', $scope.holeCards).success(function(data) {
             alert(JSON.stringify(data[0]));
-            $scope.selectedHoleCard1 = data[0];
-            $scope.selectedHoleCard2 = data[1];
+            $scope.selectedHoleCard1FromServer = data[0];
+            $scope.selectedHoleCard2FromServer = data[1];
 
 
             //$scope.rs.name = '';

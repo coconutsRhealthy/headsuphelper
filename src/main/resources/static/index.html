@@ -32,11 +32,12 @@
             </table>
         </div>
         <div class="handadvice">
-            <div id="first holecard" ng-cloak>
-                {{selectedHoleCard1.rank}}{{selectedHoleCard1.suit}}
+            <div>Holecards:</div>
+            <div id="first holecard">
+                {{selectedHoleCard1FromServer.rank}}{{selectedHoleCard1FromServer.suit}}
             </div>
-            <div id="second holecard" ng-cloak>
-                {{selectedHoleCard2.rank}}{{selectedHoleCard2.suit}}
+            <div id="second holecard">
+                {{selectedHoleCard2FromServer.rank}}{{selectedHoleCard2FromServer.suit}}
             </div>
         </div>
     </div>
