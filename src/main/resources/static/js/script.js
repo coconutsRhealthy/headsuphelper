@@ -116,22 +116,22 @@ var mainApp = angular.module("mainApp", []);
         $scope.selectedHoleCard2.suit = suitCard2;
 
         $scope.holeCards = [$scope.selectedHoleCard1, $scope.selectedHoleCard2];
-        alert(JSON.stringify($scope.holeCards));
-
-        $scope.street = "Select flopcards";
-        $scope.hideHoleCardsDiv = true;
-        $scope.hideFlopCardsDiv = false;
+//        alert(JSON.stringify($scope.holeCards));
 
         $http.post('/postHoleCards/', $scope.holeCards).success(function(data) {
-            alert(JSON.stringify(data[0]));
+//            alert(JSON.stringify(data[0]));
             $scope.selectedHoleCard1FromServer = data[0];
             $scope.selectedHoleCard2FromServer = data[1];
+            $scope.hideHoleCardsBeforeSentToServerDiv = true;
+            $scope.hideFlopCardsBeforeSentToServerDiv = false;
 
 
             //$scope.rs.name = '';
         }).error(function() {
             alert("error");
         });
+
+        $scope.street = "Select flopcards";
 
         $scope.reset();
     }
@@ -172,8 +172,8 @@ var mainApp = angular.module("mainApp", []);
     }
 
     $scope.street = "Select holecards";
-    $scope.hideHoleCardsDiv = false;
-    $scope.hideFlopCardsDiv = true;
+    $scope.hideHoleCardsBeforeSentToServerDiv = false;
+    $scope.hideFlopCardsBeforeSentToServerDiv = true;
 
 
  });
