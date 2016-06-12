@@ -35,6 +35,7 @@ var mainApp = angular.module("mainApp", []);
         else if($scope.secondCardSelected === false) {
             $scope.secondCard = id;
             if($scope.street === "Select holecards") {
+                $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(true);
                 $scope.disableOkButton = false;
             }
             $scope.secondCardSelected = true;
@@ -49,21 +50,9 @@ var mainApp = angular.module("mainApp", []);
         $scope.firstCard = "";
         $scope.secondCard = "";
         $scope.thirdCard = "";
-        $scope.allHoleCardsWrapper = [
-              {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
-              {spades:'Ks', clubs:'Kc', diamonds:'Kd', hearts:'Kh'},
-              {spades:'Qs', clubs:'Qc', diamonds:'Qd', hearts:'Qh'},
-              {spades:'Js', clubs:'Jc', diamonds:'Jd', hearts:'Jh'},
-              {spades:'Ts', clubs:'Tc', diamonds:'Td', hearts:'Th'},
-              {spades:'9s', clubs:'9c', diamonds:'9d', hearts:'9h'},
-              {spades:'8s', clubs:'8c', diamonds:'8d', hearts:'8h'},
-              {spades:'7s', clubs:'7c', diamonds:'7d', hearts:'7h'},
-              {spades:'6s', clubs:'6c', diamonds:'6d', hearts:'6h'},
-              {spades:'5s', clubs:'5c', diamonds:'5d', hearts:'5h'},
-              {spades:'4s', clubs:'4c', diamonds:'4d', hearts:'4h'},
-              {spades:'3s', clubs:'3c', diamonds:'3d', hearts:'3h'},
-              {spades:'2s', clubs:'2c', diamonds:'2d', hearts:'2h'},
-           ];
+
+        $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(false);
+
         $scope.firstCardSelected = false;
         $scope.secondCardSelected = false;
         $scope.disableOkButton = true;
@@ -72,6 +61,21 @@ var mainApp = angular.module("mainApp", []);
 //        $http.get('/resource/').success(function(data) {
 //          alert(JSON.stringify(data));
 //        })
+    }
+
+    $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse = function(trueOrFalse, selectedCardsInPreviousStreets) {
+        if (selectedCardsInPreviousStreets === undefined)
+            angular.forEach($scope.allHoleCardsWrapper, function(value, index){
+                var eijeS = "disable_" + value.spades;
+                var eijeC = "disable_" + value.clubs;
+                var eijeD = "disable_" + value.diamonds;
+                var eijeH = "disable_" + value.hearts;
+
+                $scope[eijeS] = trueOrFalse;
+                $scope[eijeC] = trueOrFalse;
+                $scope[eijeD] = trueOrFalse;
+                $scope[eijeH] = trueOrFalse;
+            })
     }
 
     $scope.submitCardsToServer = function() {
