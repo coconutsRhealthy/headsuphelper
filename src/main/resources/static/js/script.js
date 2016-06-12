@@ -1,8 +1,7 @@
 var mainApp = angular.module("mainApp", []);
 
  mainApp.controller('pokerController', function($scope, $http) {
-    $scope.allHoleCardsWrapper = {
-       allHoleCards:[
+    $scope.allHoleCardsWrapper = [
           {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
           {spades:'Ks', clubs:'Kc', diamonds:'Kd', hearts:'Kh'},
           {spades:'Qs', clubs:'Qc', diamonds:'Qd', hearts:'Qh'},
@@ -16,8 +15,7 @@ var mainApp = angular.module("mainApp", []);
           {spades:'4s', clubs:'4c', diamonds:'4d', hearts:'4h'},
           {spades:'3s', clubs:'3c', diamonds:'3d', hearts:'3h'},
           {spades:'2s', clubs:'2c', diamonds:'2d', hearts:'2h'},
-       ]
-    };
+       ];
 
     $scope.firstCardSelected = false;
     $scope.secondCardSelected = false;
@@ -26,6 +24,9 @@ var mainApp = angular.module("mainApp", []);
     $scope.disableOkButton = true;
 
     $scope.selectCard = function(id) {
+        var cardButtonToDisable = "disable_" + id;
+        $scope[cardButtonToDisable] = true;
+
         if($scope.firstCardSelected === false) {
             $scope.firstCard = id;
             $scope.firstCardSelected = true;
@@ -34,20 +35,12 @@ var mainApp = angular.module("mainApp", []);
         else if($scope.secondCardSelected === false) {
             $scope.secondCard = id;
             if($scope.street === "Select holecards") {
-                $scope.disabledS = true;
-                $scope.disabledC = true;
-                $scope.disabledD = true;
-                $scope.disabledH = true;
                 $scope.disableOkButton = false;
             }
             $scope.secondCardSelected = true;
         }
         else {
             $scope.thirdCard = id;
-            $scope.disabledS = true;
-            $scope.disabledC = true;
-            $scope.disabledD = true;
-            $scope.disabledH = true;
             $scope.disableOkButton = false;
         }
     }
@@ -56,8 +49,7 @@ var mainApp = angular.module("mainApp", []);
         $scope.firstCard = "";
         $scope.secondCard = "";
         $scope.thirdCard = "";
-        $scope.allHoleCardsWrapper = {
-           allHoleCards:[
+        $scope.allHoleCardsWrapper = [
               {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
               {spades:'Ks', clubs:'Kc', diamonds:'Kd', hearts:'Kh'},
               {spades:'Qs', clubs:'Qc', diamonds:'Qd', hearts:'Qh'},
@@ -71,12 +63,7 @@ var mainApp = angular.module("mainApp", []);
               {spades:'4s', clubs:'4c', diamonds:'4d', hearts:'4h'},
               {spades:'3s', clubs:'3c', diamonds:'3d', hearts:'3h'},
               {spades:'2s', clubs:'2c', diamonds:'2d', hearts:'2h'},
-           ]
-        };
-        $scope.disabledS = false;
-        $scope.disabledC = false;
-        $scope.disabledD = false;
-        $scope.disabledH = false;
+           ];
         $scope.firstCardSelected = false;
         $scope.secondCardSelected = false;
         $scope.disableOkButton = true;

@@ -15,18 +15,18 @@
     <div>
         <div class="button-table">
             <table>
-                <tr ng-repeat = "holecard in allHoleCardsWrapper.allHoleCards">
+                <tr ng-repeat = "holecard in allHoleCardsWrapper">
                     <td>
-                        <button class="cardButton" ng-disabled="disabledS" ng-click="disabledS = true; selectCard(holecard.spades)">{{holecard.spades}}</button>
+                        <button class="cardButton" ng-disabled="disable_{{holecard.spades}}" ng-click="selectCard(holecard.spades)">{{holecard.spades}}</button>
                     </td>
                     <td>
-                        <button class="cardButton" ng-disabled="disabledC" ng-click="disabledC = true; selectCard(holecard.clubs)">{{holecard.clubs}}</button>
+                        <button class="cardButton" ng-disabled="disable_{{holecard.clubs}}" ng-click="selectCard(holecard.clubs)">{{holecard.clubs}}</button>
                     </td>
                     <td>
-                        <button class="cardButton" ng-disabled="disabledD" ng-click="disabledD = true; selectCard(holecard.diamonds)">{{holecard.diamonds}}</button>
+                        <button class="cardButton" ng-disabled="disable_{{holecard.diamonds}}" ng-click="selectCard(holecard.diamonds)">{{holecard.diamonds}}</button>
                     </td>
                     <td>
-                        <button class="cardButton" ng-disabled="disabledH" ng-click="disabledH = true; selectCard(holecard.hearts)">{{holecard.hearts}}</button>
+                        <button class="cardButton" ng-disabled="disable_{{holecard.hearts}}" ng-click="selectCard(holecard.hearts)">{{holecard.hearts}}</button>
                     </td>
                 </tr>
             </table>
