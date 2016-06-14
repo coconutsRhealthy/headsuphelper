@@ -51,7 +51,13 @@ var mainApp = angular.module("mainApp", []);
         $scope.secondCard = "";
         $scope.thirdCard = "";
 
-        $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(false);
+        if($scope.listOfSelectedHoleCardsFromServer === undefined) {
+            $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(false);
+        }
+        else {
+            $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(false, $scope.listOfSelectedHoleCardsFromServer);
+        }
+
 
         $scope.firstCardSelected = false;
         $scope.secondCardSelected = false;
@@ -64,7 +70,7 @@ var mainApp = angular.module("mainApp", []);
     }
 
     $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse = function(trueOrFalse, selectedCardsInPreviousStreets) {
-        if (selectedCardsInPreviousStreets === undefined)
+        if (selectedCardsInPreviousStreets === undefined) {
             angular.forEach($scope.allHoleCardsWrapper, function(value, index){
                 var eijeS = "disable_" + value.spades;
                 var eijeC = "disable_" + value.clubs;
@@ -76,6 +82,21 @@ var mainApp = angular.module("mainApp", []);
                 $scope[eijeD] = trueOrFalse;
                 $scope[eijeH] = trueOrFalse;
             })
+        }
+        else {
+            alert("eije de list werkt");
+            angular.forEach($scope.allHoleCardsWrapper, function(value, index){
+                var eijeS = "disable_" + value.spades;
+                var eijeC = "disable_" + value.clubs;
+                var eijeD = "disable_" + value.diamonds;
+                var eijeH = "disable_" + value.hearts;
+
+                $scope[eijeS] = trueOrFalse;
+                $scope[eijeC] = trueOrFalse;
+                $scope[eijeD] = trueOrFalse;
+                $scope[eijeH] = trueOrFalse;
+            })
+        }
     }
 
     $scope.submitCardsToServer = function() {
@@ -113,18 +134,14 @@ var mainApp = angular.module("mainApp", []);
 //            alert(JSON.stringify(data[0]));
             $scope.selectedHoleCard1FromServer = data[0];
             $scope.selectedHoleCard2FromServer = data[1];
+            $scope.listOfSelectedHoleCardsFromServer = data;
             $scope.hideHoleCardsBeforeSentToServerDiv = true;
             $scope.hideFlopCardsBeforeSentToServerDiv = false;
-
-
-            //$scope.rs.name = '';
+            $scope.street = "Select flopcards";
+            $scope.reset();
         }).error(function() {
             alert("error");
         });
-
-        $scope.street = "Select flopcards";
-
-        $scope.reset();
     }
 
 
