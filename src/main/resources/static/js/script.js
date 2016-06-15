@@ -84,7 +84,26 @@ var mainApp = angular.module("mainApp", []);
             })
         }
         else {
-            alert("eije de list werkt");
+            var x = selectedCardsInPreviousStreets.length;
+            switch(x) {
+                case 2:
+                    var card1rank = selectedCardsInPreviousStreets[0].rank;
+                    var card1suit = selectedCardsInPreviousStreets[0].suit;
+                    var card2rank = selectedCardsInPreviousStreets[1].rank;
+                    var card2suit = selectedCardsInPreviousStreets[1].suit;
+
+                    var card1 = "disable_" + card1rank + card1suit;
+                    var card2 = "disable_" + card2rank + card2suit;
+                    break;
+                case 5:
+                    alert("to implement: flop selected");
+                    break;
+                case 6:
+                    alert("to implement: turn selected");
+                default:
+                    alert("List with weird number of cards");
+            }
+
             angular.forEach($scope.allHoleCardsWrapper, function(value, index){
                 var eijeS = "disable_" + value.spades;
                 var eijeC = "disable_" + value.clubs;
@@ -96,6 +115,9 @@ var mainApp = angular.module("mainApp", []);
                 $scope[eijeD] = trueOrFalse;
                 $scope[eijeH] = trueOrFalse;
             })
+
+            $scope[card1] = !trueOrFalse;
+            $scope[card2] = !trueOrFalse;
         }
     }
 
