@@ -15,7 +15,7 @@
     <div>
         <div class="button-table">
             <table>
-                <tr ng-repeat = "holecard in allHoleCardsWrapper">
+                <tr ng-repeat = "holecard in allHoleCards">
                     <td>
                         <button class="cardButton" ng-disabled="disable_{{holecard.spades}}" ng-click="selectCard(holecard.spades)">{{holecard.spades}}</button>
                     </td>
@@ -39,6 +39,23 @@
             <div id="second holecard">
                 {{selectedHoleCard2FromServer.rank}}{{selectedHoleCard2FromServer.suit}}
             </div>
+
+            <div>
+                Flopcards:
+            </div>
+
+            <div>
+                {{selectedFlopCard1FromServer.rank}}{{selectedFlopCard1FromServer.suit}}
+            </div>
+
+            <div>
+                {{selectedFlopCard2FromServer.rank}}{{selectedFlopCard2FromServer.suit}}
+            </div>
+
+            <div>
+                {{selectedFlopCard3FromServer.rank}}{{selectedFlopCard3FromServer.suit}}
+            </div>
+
         </div>
     </div>
 
@@ -51,6 +68,10 @@
         <p>First flopcard: {{firstCard}} </p>
         <p>Second flopcard: {{secondCard}} </p>
         <p>Third flopcard: {{thirdCard}} </p>
+    </div>
+
+    <div id="selectedTurnCardBeforeSentToServer" ng-hide="hideTurnCardBeforeSentToServerDiv">
+        <p>Turncard: {{firstCard}} </p>
     </div>
 
 
