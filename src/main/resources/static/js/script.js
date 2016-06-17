@@ -136,26 +136,26 @@ var mainApp = angular.module("mainApp", []);
 
     $scope.submitHoleCards = function() {
         var rankCard1 = $scope.firstCard.substring(0,1);
-        rankCard1 = getRankInteger(rankCard1);
+        rankCard1 = convertRankFromCharacterToInteger(rankCard1);
         $scope.selectedHoleCard1.rank = rankCard1;
 
         var suitCard1 = $scope.firstCard.substring(1,2);
         $scope.selectedHoleCard1.suit = suitCard1;
 
         var rankCard2 = $scope.secondCard.substring(0,1);
-        rankCard2 = getRankInteger(rankCard2);
+        rankCard2 = convertRankFromCharacterToInteger(rankCard2);
         $scope.selectedHoleCard2.rank = rankCard2;
 
         var suitCard2 = $scope.secondCard.substring(1,2);
         $scope.selectedHoleCard2.suit = suitCard2;
 
         $scope.holeCards = [$scope.selectedHoleCard1, $scope.selectedHoleCard2];
-//        alert(JSON.stringify($scope.holeCards));
 
         $http.post('/postHoleCards/', $scope.holeCards).success(function(data) {
-//            alert(JSON.stringify(data[0]));
             $scope.selectedHoleCard1FromServer = data[0];
+            $scope.selectedHoleCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
             $scope.selectedHoleCard2FromServer = data[1];
+            $scope.selectedHoleCard2FromServer.rank = convertRankFromIntegerToRank(data[1].rank);
             $scope.listOfSelectedHoleCardsFromServer = data;
             $scope.hideHoleCardsBeforeSentToServerDiv = true;
             $scope.hideFlopCardsBeforeSentToServerDiv = false;
@@ -165,7 +165,6 @@ var mainApp = angular.module("mainApp", []);
             alert("error");
         });
     }
-
 
     function getCardRank(card){
         var rank = card.concat(0,1);
@@ -179,7 +178,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.selectedHoleCard2 = {};
     $scope.holeCards = [];
 
-    function getRankInteger(rankCard1) {
+    function convertRankFromCharacterToInteger(rankCard1) {
         switch(rankCard1) {
             case 'A':
                 return 14;
@@ -201,9 +200,29 @@ var mainApp = angular.module("mainApp", []);
         }
     }
 
+    function convertRankFromIntegerToRank(rankCard1) {
+        switch(rankCard1) {
+            case 14:
+                return 'A';
+                break;
+            case 13:
+                return 'K';
+                break;
+            case 12:
+                return 'Q';
+                break;
+            case 11:
+                return 'J';
+                break;
+            case 10:
+                return 'T';
+                break;
+            default:
+                return rankCard1;
+        }
+    }
+
     $scope.street = "Select holecards";
     $scope.hideHoleCardsBeforeSentToServerDiv = false;
     $scope.hideFlopCardsBeforeSentToServerDiv = true;
-
-
  });
