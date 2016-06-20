@@ -17,6 +17,11 @@ var mainApp = angular.module("mainApp", []);
     $scope.hideHoleCardsBeforeSentToServerDiv = false;
     $scope.hideFlopCardsBeforeSentToServerDiv = true;
     $scope.hideTurnCardBeforeSentToServerDiv = true;
+
+    $scope.showSelectedHoleCardsFromServerInHandAdviceDiv = false;
+    $scope.showSelectedFlopCardsFromServerInHandAdviceDiv = false;
+    $scope.showSelectedTurnCardFromServerInHandAdviceDiv = false;
+
     $scope.allHoleCards = [
           {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
           {spades:'Ks', clubs:'Kc', diamonds:'Kd', hearts:'Kh'},
@@ -116,7 +121,22 @@ var mainApp = angular.module("mainApp", []);
                     var card2 = "disable_" + card2rank + card2suit;
                     break;
                 case 5:
-                    alert("to implement: flop selected");
+                    var card1rank = selectedCardsInPreviousStreets[0].rank;
+                    var card1suit = selectedCardsInPreviousStreets[0].suit;
+                    var card2rank = selectedCardsInPreviousStreets[1].rank;
+                    var card2suit = selectedCardsInPreviousStreets[1].suit;
+                    var card3rank = selectedCardsInPreviousStreets[2].rank;
+                    var card3suit = selectedCardsInPreviousStreets[2].suit;
+                    var card4rank = selectedCardsInPreviousStreets[3].rank;
+                    var card4suit = selectedCardsInPreviousStreets[3].suit;
+                    var card5rank = selectedCardsInPreviousStreets[4].rank;
+                    var card5suit = selectedCardsInPreviousStreets[4].suit;
+
+                    var card1 = "disable_" + card1rank + card1suit;
+                    var card2 = "disable_" + card2rank + card2suit;
+                    var card3 = "disable_" + card3rank + card3suit;
+                    var card4 = "disable_" + card4rank + card4suit;
+                    var card5 = "disable_" + card5rank + card5suit;
                     break;
                 case 6:
                     alert("to implement: turn selected");
@@ -138,6 +158,9 @@ var mainApp = angular.module("mainApp", []);
 
             $scope[card1] = !trueOrFalse;
             $scope[card2] = !trueOrFalse;
+            $scope[card3] = !trueOrFalse;
+            $scope[card4] = !trueOrFalse;
+            $scope[card5] = !trueOrFalse;
         }
     }
 
@@ -156,24 +179,8 @@ var mainApp = angular.module("mainApp", []);
     }
 
     $scope.submitHoleCards = function() {
-//        var rankCard1 = $scope.firstCard.substring(0,1);
-//        rankCard1 = convertRankFromCharacterToInteger(rankCard1);
-//        $scope.selectedCard1.rank = rankCard1;
-//
-//        var suitCard1 = $scope.firstCard.substring(1,2);
-//        $scope.selectedCard1.suit = suitCard1;
-//
-//        var rankCard2 = $scope.secondCard.substring(0,1);
-//        rankCard2 = convertRankFromCharacterToInteger(rankCard2);
-//        $scope.selectedCard2.rank = rankCard2;
-//
-//        var suitCard2 = $scope.secondCard.substring(1,2);
-//        $scope.selectedCard2.suit = suitCard2;
-
-        sjaakson();
-
+        setCorrectPropertiesForJsonToSendToServer();
         $scope.holeCards = [$scope.selectedCard1, $scope.selectedCard2];
-
         $http.post('/postHoleCards/', $scope.holeCards).success(function(data) {
             $scope.selectedHoleCard1FromServer = data[0];
             $scope.selectedHoleCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
@@ -182,6 +189,7 @@ var mainApp = angular.module("mainApp", []);
             $scope.listOfSelectedCardsFromServer = data;
             $scope.hideHoleCardsBeforeSentToServerDiv = true;
             $scope.hideFlopCardsBeforeSentToServerDiv = false;
+            $scope.showSelectedHoleCardsFromServerInHandAdviceDiv = true;
             $scope.street = "Select flopcards";
             $scope.reset();
         }).error(function() {
@@ -190,12 +198,13 @@ var mainApp = angular.module("mainApp", []);
     }
 
     $scope.submitFlopCards = function() {
-
-        sjaakson();
-
+        setCorrectPropertiesForJsonToSendToServer();
         $scope.flopCards = [$scope.selectedCard1, $scope.selectedCard2, $scope.selectedCard3];
-
         $http.post('/postFlopCards/', $scope.flopCards).success(function(data) {
+            $scope.selectedHoleCard1FromServer = data[0];
+            $scope.selectedHoleCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
+            $scope.selectedHoleCard2FromServer = data[1];
+            $scope.selectedHoleCard2FromServer.rank = convertRankFromIntegerToRank(data[1].rank);
             $scope.selectedFlopCard1FromServer = data[2];
             $scope.selectedFlopCard1FromServer.rank = convertRankFromIntegerToRank(data[2].rank);
             $scope.selectedFlopCard2FromServer = data[3];
@@ -203,24 +212,18 @@ var mainApp = angular.module("mainApp", []);
             $scope.selectedFlopCard3FromServer = data[4];
             $scope.selectedFlopCard3FromServer.rank = convertRankFromIntegerToRank(data[4].rank);
 
-            alert(data[4].rank + data[4].suit);
-
             $scope.listOfSelectedCardsFromServer = data;
             $scope.hideHoleCardsBeforeSentToServerDiv = true;
             $scope.hideFlopCardsBeforeSentToServerDiv = true;
             $scope.hideTurnCardBeforeSentToServerDiv = false;
+            $scope.showSelectedFlopCardsFromServerInHandAdviceDiv = true;
             $scope.street = "Select turncard";
             $scope.reset();
-
 
         }).error(function() {
             alert("Failed to submit flopcards");
         });
-
-
     }
-
-
 
     function convertRankFromCharacterToInteger(rankCard1) {
         switch(rankCard1) {
@@ -266,7 +269,7 @@ var mainApp = angular.module("mainApp", []);
         }
     }
 
-    function sjaakson() {
+    function setCorrectPropertiesForJsonToSendToServer() {
         var rankCard1 = $scope.firstCard.substring(0,1);
         rankCard1 = convertRankFromCharacterToInteger(rankCard1);
         $scope.selectedCard1.rank = rankCard1;
@@ -282,8 +285,6 @@ var mainApp = angular.module("mainApp", []);
         $scope.selectedCard2.suit = suitCard2;
 
         if(!($scope.listOfSelectedCardsFromServer === undefined)) {
-           alert("Yo hier komt ie yo");
-
            var rankCard3 = $scope.thirdCard.substring(0,1);
            rankCard3 = convertRankFromCharacterToInteger(rankCard3);
            $scope.selectedCard3.rank = rankCard3;
@@ -292,5 +293,4 @@ var mainApp = angular.module("mainApp", []);
            $scope.selectedCard3.suit = suitCard3;
         }
     }
-
  });

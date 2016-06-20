@@ -32,7 +32,7 @@
             </table>
         </div>
         <div class="handadvice">
-            <div ng-show="hideHoleCardsBeforeSentToServerDiv">Holecards:</div>
+            <div ng-show="showSelectedHoleCardsFromServerInHandAdviceDiv">Holecards:</div>
             <div id="first holecard">
                 {{selectedHoleCard1FromServer.rank}}{{selectedHoleCard1FromServer.suit}}
             </div>
@@ -40,22 +40,16 @@
                 {{selectedHoleCard2FromServer.rank}}{{selectedHoleCard2FromServer.suit}}
             </div>
 
-            <div>
-                Flopcards:
-            </div>
-
-            <div>
+            <div ng-show="showSelectedFlopCardsFromServerInHandAdviceDiv">Flopcards:</div>
+            <div id="first flopcard">
                 {{selectedFlopCard1FromServer.rank}}{{selectedFlopCard1FromServer.suit}}
             </div>
-
-            <div>
+            <div id="second flopcard">
                 {{selectedFlopCard2FromServer.rank}}{{selectedFlopCard2FromServer.suit}}
             </div>
-
-            <div>
+            <div id="third flopcard">
                 {{selectedFlopCard3FromServer.rank}}{{selectedFlopCard3FromServer.suit}}
             </div>
-
         </div>
     </div>
 
