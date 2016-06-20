@@ -54,6 +54,10 @@ var mainApp = angular.module("mainApp", []);
 
         if($scope.firstCardSelected === false) {
             $scope.firstCard = id;
+            if($scope.street === "Select turncard") {
+                $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(true);
+                $scope.disableOkButton = false;
+            }
             $scope.firstCardSelected = true;
             $scope.disableResetButton = false;
         }

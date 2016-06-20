@@ -32,24 +32,24 @@
             </table>
         </div>
         <div class="handadvice">
-            <div ng-show="showSelectedHoleCardsFromServerInHandAdviceDiv">Holecards:</div>
-            <div id="first holecard">
+            <div class="handadvice-street" ng-show="showSelectedHoleCardsFromServerInHandAdviceDiv">Holecards:</div>
+            <span id="first holecard">
                 {{selectedHoleCard1FromServer.rank}}{{selectedHoleCard1FromServer.suit}}
-            </div>
-            <div id="second holecard">
+            </span>
+            <span id="second holecard">
                 {{selectedHoleCard2FromServer.rank}}{{selectedHoleCard2FromServer.suit}}
-            </div>
+            </span>
 
-            <div ng-show="showSelectedFlopCardsFromServerInHandAdviceDiv">Flopcards:</div>
-            <div id="first flopcard">
+            <div class="handadvice-street" ng-show="showSelectedFlopCardsFromServerInHandAdviceDiv">Flopcards:</div>
+            <span id="first flopcard">
                 {{selectedFlopCard1FromServer.rank}}{{selectedFlopCard1FromServer.suit}}
-            </div>
-            <div id="second flopcard">
+            </span>
+            <span id="second flopcard">
                 {{selectedFlopCard2FromServer.rank}}{{selectedFlopCard2FromServer.suit}}
-            </div>
-            <div id="third flopcard">
+            </span>
+            <span id="third flopcard">
                 {{selectedFlopCard3FromServer.rank}}{{selectedFlopCard3FromServer.suit}}
-            </div>
+            </span>
         </div>
     </div>
 
@@ -67,8 +67,6 @@
     <div id="selectedTurnCardBeforeSentToServer" ng-hide="hideTurnCardBeforeSentToServerDiv">
         <p>Turncard: {{firstCard}} </p>
     </div>
-
-
 
     <div id="controlButtons">
         <button class="proceedOrStayButton" ng-disabled="disableOkButton" ng-click="submitCardsToServer()">OK</button>
