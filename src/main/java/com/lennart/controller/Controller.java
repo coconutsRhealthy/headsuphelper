@@ -1,5 +1,6 @@
 package com.lennart.controller;
 
+import com.lennart.model.BoardEvaluator;
 import com.lennart.model.Card;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -15,6 +16,7 @@ import java.util.List;
 public class Controller {
 
     private List<Card> holeCards = new ArrayList<Card>();
+    private List<Card> flopCards = new ArrayList<Card>();
     private List<Card> allSelectedCards = new ArrayList<Card>();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
@@ -36,22 +38,22 @@ public class Controller {
 
     @RequestMapping(value = "/postFlopCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postFlopCards(@RequestBody List<Card> cardList) {
-//        if (allSelectedCards.size() > 0) {
-//            allSelectedCards.clear();
-//        }
-
-        //System.out.println(cardList.get(0));
-
+        if (flopCards.size() > 0) {
+            flopCards.clear();
+        }
+        flopCards.add(cardList.get(0));
+        flopCards.add(cardList.get(1));
+        flopCards.add(cardList.get(2));
 
         allSelectedCards.add(cardList.get(0));
         allSelectedCards.add(cardList.get(1));
         allSelectedCards.add(cardList.get(2));
 
+        //BoardEvaluator.isBoardSuited(flopCards);
+        BoardEvaluator.hasBoardTwoOfOneSuit(flopCards);
+
         return allSelectedCards;
     }
-
-
-
 
 
 
