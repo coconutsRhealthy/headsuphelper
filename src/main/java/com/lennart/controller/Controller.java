@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableAutoConfiguration
@@ -52,8 +54,43 @@ public class Controller {
         //BoardEvaluator.isBoardSuited(flopCards);
         BoardEvaluator.hasBoardTwoOfOneSuit(flopCards);
 
+
+        //List<Boolean> eije = new ArrayList<Boolean>()
+
         return allSelectedCards;
     }
+
+    @RequestMapping(value = "/eije", method = RequestMethod.GET)
+    public @ResponseBody Map<String, Boolean> houOp() {
+
+////        System.out.println("eije");
+////        Card card = new Card();
+////        card.setSuit('d');
+////        card.setRank(9);
+//
+//        Boolean yoyo = true;
+//        Boolean eije = false;
+//        Boolean hmm = false;
+//
+//        List<Boolean> sjaak = new ArrayList<Boolean>();
+//
+//        Map<String, Boolean> sjaakie = new HashMap<String, Boolean>();
+////        sjaak.add(yoyo);
+////        sjaak.add(eije);
+////        sjaak.add(hmm);
+//
+//        sjaakie.put("aap", yoyo);
+//        sjaakie.put("noot", eije);
+//        sjaakie.put("mies", hmm);
+
+        System.out.println(flopCards);
+        return BoardEvaluator.allFunctions(flopCards);
+
+
+        //return sjaakie;
+    }
+
+
 
 
 

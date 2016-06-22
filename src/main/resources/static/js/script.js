@@ -224,9 +224,15 @@ var mainApp = angular.module("mainApp", []);
             $scope.street = "Select turncard";
             $scope.reset();
 
+            $http.get('/eije/').success(function(data) {
+              alert(JSON.stringify(data));
+            })
+
         }).error(function() {
             alert("Failed to submit flopcards");
         });
+
+
     }
 
     function convertRankFromCharacterToInteger(rankCard1) {

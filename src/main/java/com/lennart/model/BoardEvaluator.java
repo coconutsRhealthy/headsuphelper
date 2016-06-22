@@ -4,7 +4,9 @@ package com.lennart.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LPO10346 on 21-6-2016.
@@ -28,14 +30,29 @@ public class BoardEvaluator {
     }
 
     public static boolean hasBoardTwoOfOneSuit(List<Card> board) {
-        StringBuilder s = new StringBuilder();
-        for(Card c : board) {
-            s.append(c.getSuit());
+        if(!isBoardSuited(board)) {
+            StringBuilder s = new StringBuilder();
+            for(Card c : board) {
+                s.append(c.getSuit());
+            }
+            for(int i = 0; i <= (s.length()-1); i++) {
+                if(StringUtils.countMatches(s, "" + s.charAt(i)) > 1) {
+                    return true;
+                }
+            }
+            return false;
         }
-        for(int i = 0; i <= (s.length()-1); i++) {
-            StringUtils.countMatches("a.b.c.d", ".");
-        }
-        System.out.println("Het is een rainbow flop");
         return false;
     }
+
+
+    public static Map<String, Boolean> allFunctions(List<Card> board) {
+        Map<String, Boolean> laterz = new HashMap<String, Boolean>();
+        laterz.put("isBoardSuited", isBoardSuited(board));
+        laterz.put("hasBoardTwoOfOneSuit", hasBoardTwoOfOneSuit(board));
+        return(laterz);
+    }
+
+
+
 }
