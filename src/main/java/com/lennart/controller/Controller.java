@@ -1,6 +1,7 @@
 package com.lennart.controller;
 
 import com.lennart.model.BoardEvaluator;
+import com.lennart.model.BooleanResult;
 import com.lennart.model.Card;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -61,7 +62,7 @@ public class Controller {
     }
 
     @RequestMapping(value = "/eije", method = RequestMethod.GET)
-    public @ResponseBody Map<String, Boolean> houOp() {
+    public @ResponseBody List<BooleanResult> houOp() {
 
 ////        System.out.println("eije");
 ////        Card card = new Card();

@@ -47,6 +47,12 @@ var mainApp = angular.module("mainApp", []);
     $scope.selectedHoleCard2FromServer;
     $scope.flopCards;
 
+
+
+    $scope.allBooleanFunctionResults = [];
+
+
+
     //functions
     $scope.selectCard = function(id) {
         var cardButtonToDisable = "disable_" + id;
@@ -225,7 +231,8 @@ var mainApp = angular.module("mainApp", []);
             $scope.reset();
 
             $http.get('/eije/').success(function(data) {
-              alert(JSON.stringify(data));
+              $scope.allBooleanFunctionResults = data;
+              //alert(JSON.stringify(data[1]));
             })
 
         }).error(function() {

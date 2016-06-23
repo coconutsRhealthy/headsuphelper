@@ -4,6 +4,7 @@ package com.lennart.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +47,34 @@ public class BoardEvaluator {
     }
 
 
-    public static Map<String, Boolean> allFunctions(List<Card> board) {
-        Map<String, Boolean> laterz = new HashMap<String, Boolean>();
-        laterz.put("isBoardSuited", isBoardSuited(board));
-        laterz.put("hasBoardTwoOfOneSuit", hasBoardTwoOfOneSuit(board));
-        return(laterz);
+    public static List<BooleanResult> allFunctions(List<Card> board) {
+        BooleanResult result1 = new BooleanResult();
+        BooleanResult result2 = new BooleanResult();
+
+        result1.setFunctionName("isBoardSuited");
+        result1.setResult(isBoardSuited(board));
+        result2.setFunctionName("hasBoardTwoOfOneSuit");
+        result2.setResult(hasBoardTwoOfOneSuit(board));
+
+//        Map<String, Boolean> laterz = new HashMap<String, Boolean>();
+
+        List<BooleanResult> hallo = new ArrayList<BooleanResult>();
+
+        hallo.add(result1);
+        hallo.add(result2);
+
+//        laterz.put(result1.getFunctionName(), result1.isResult());
+//        laterz.put(result2.getFunctionName(), result2.isResult());
+
+
+
+//        laterz.put("isBoardSuited", isBoardSuited(board));
+//        laterz.put("hasBoardTwoOfOneSuit", hasBoardTwoOfOneSuit(board));
+
+        System.out.println(hallo);
+
+
+        return hallo;
     }
 
 
