@@ -4,15 +4,15 @@ package com.lennart.model;
  * Created by LPO10346 on 23-6-2016.
  */
 public class BooleanResult {
-    private String functionName;
+    private String functionDescription;
     private boolean result;
 
-    public String getFunctionName() {
-        return functionName;
+    public String getFunctionDescription() {
+        return functionDescription;
     }
 
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
+    public void setFunctionDescription(String functionDescription) {
+        this.functionDescription = functionDescription;
     }
 
     public boolean isResult() {

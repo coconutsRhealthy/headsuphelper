@@ -12,6 +12,7 @@ var mainApp = angular.module("mainApp", []);
 
     $scope.holeCards = [];
     $scope.flopCards = [];
+    $scope.allBooleanFunctionResults = [];
 
     $scope.street = "Select holecards";
     $scope.hideHoleCardsBeforeSentToServerDiv = false;
@@ -46,12 +47,6 @@ var mainApp = angular.module("mainApp", []);
     $scope.selectedHoleCard1FromServer;
     $scope.selectedHoleCard2FromServer;
     $scope.flopCards;
-
-
-
-    $scope.allBooleanFunctionResults = [];
-
-
 
     //functions
     $scope.selectCard = function(id) {
@@ -230,7 +225,7 @@ var mainApp = angular.module("mainApp", []);
             $scope.street = "Select turncard";
             $scope.reset();
 
-            $http.get('/eije/').success(function(data) {
+            $http.get('/getFunctionResults/').success(function(data) {
               $scope.allBooleanFunctionResults = data;
               //alert(JSON.stringify(data[1]));
             })

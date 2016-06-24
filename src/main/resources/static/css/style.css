@@ -22,3 +22,8 @@
 .handadvice-street {
   font-weight: bold;
 }
+
+.boardEvaluationFunctionResult {
+  margin-left: 40px;
+  display: inline-block;
+}

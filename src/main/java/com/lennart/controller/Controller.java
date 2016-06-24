@@ -52,43 +52,16 @@ public class Controller {
         allSelectedCards.add(cardList.get(1));
         allSelectedCards.add(cardList.get(2));
 
-        //BoardEvaluator.isBoardSuited(flopCards);
-        BoardEvaluator.hasBoardTwoOfOneSuit(flopCards);
-
-
-        //List<Boolean> eije = new ArrayList<Boolean>()
+        BoardEvaluator.isBoardConnected(flopCards);
 
         return allSelectedCards;
     }
 
-    @RequestMapping(value = "/eije", method = RequestMethod.GET)
-    public @ResponseBody List<BooleanResult> houOp() {
+    @RequestMapping(value = "/getFunctionResults", method = RequestMethod.GET)
+    public @ResponseBody List<BooleanResult> getFunctionResults() {
 
-////        System.out.println("eije");
-////        Card card = new Card();
-////        card.setSuit('d');
-////        card.setRank(9);
-//
-//        Boolean yoyo = true;
-//        Boolean eije = false;
-//        Boolean hmm = false;
-//
-//        List<Boolean> sjaak = new ArrayList<Boolean>();
-//
-//        Map<String, Boolean> sjaakie = new HashMap<String, Boolean>();
-////        sjaak.add(yoyo);
-////        sjaak.add(eije);
-////        sjaak.add(hmm);
-//
-//        sjaakie.put("aap", yoyo);
-//        sjaakie.put("noot", eije);
-//        sjaakie.put("mies", hmm);
 
-        System.out.println(flopCards);
         return BoardEvaluator.allFunctions(flopCards);
-
-
-        //return sjaakie;
     }
 
 

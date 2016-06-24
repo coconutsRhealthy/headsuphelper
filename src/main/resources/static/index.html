@@ -52,9 +52,9 @@
             </span>
 
             <div>
-                <div ng-repeat = "eije in allBooleanFunctionResults">
-                    <span>{{eije.functionName}}</span><span>{{eije.result}}</span>
-                </div>
+                <ul ng-repeat ="function in allBooleanFunctionResults">
+                    <li><span>{{function.functionDescription}}</span><span class=boardEvaluationFunctionResult>{{function.result}}</span></li>
+                </ul>
             </div>
 
         </div>
