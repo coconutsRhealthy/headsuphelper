@@ -52,8 +52,6 @@ public class Controller {
         allSelectedCards.add(cardList.get(1));
         allSelectedCards.add(cardList.get(2));
 
-        BoardEvaluator.isBoardConnected(flopCards);
-
         return allSelectedCards;
     }
 
