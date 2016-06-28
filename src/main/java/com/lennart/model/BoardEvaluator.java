@@ -47,19 +47,15 @@ public class BoardEvaluator {
     public static boolean isBoardConnected(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         Integer q = 14;
-        System.out.println(boardRanks);
 
         if(boardContainsAceAndWheelCard(board)) {
             for(int i = 0; i <= (boardRanks.size()-1); i++) {
-                System.out.println("sjaakson");
                 if(boardRanks.get(i).equals(q)) {
-                    System.out.println("Eijerrr");
                     boardRanks.add(0, 1);
                     break;
                 }
             }
         }
-        System.out.println("hou op " + boardRanks);
 
         for(int i = 0; i < (boardRanks.size()-1); i++) {
             if(boardRanks.get(i) + 1 == boardRanks.get(i+1)) {
@@ -159,6 +155,61 @@ public class BoardEvaluator {
         }
         return false;
     }
+
+    public static List<String> getCombosThatMakeStraight(List<Card> board) {
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        List<Integer> combo = new ArrayList<Integer>();
+        List<String> straightCombos = new ArrayList<String>();
+
+        for(int i = 1; i < 15; i++) {
+            combo.clear();
+            combo.add(i);
+            for(int j = 14; j > i; j--) {
+                combo.add(j);
+                boardRanks.addAll(combo);
+                Collections.sort(boardRanks);
+                int x = 0;
+                for(int z = 0; z < (boardRanks.size()-1); z++) {
+                    if(boardRanks.get(z) + 1 == boardRanks.get(z+1)) {
+                        x++;
+                    }
+                }
+                if(x == 4) {
+                    straightCombos.add(combo.toString());
+                }
+                boardRanks.remove(combo.get(0));
+                boardRanks.remove(combo.get(1));
+
+                if(boardContainsAceAndWheelCard(board)) {
+                    Integer aceLow = 1;
+                    Integer aceHigh = 14;
+                    boardRanks.add(aceLow);
+                    boardRanks.remove(aceHigh);
+                    boardRanks.addAll(combo);
+                    Collections.sort(boardRanks);
+                    int k = 0;
+                    for(int v = 0; v < (boardRanks.size()-1); v++) {
+                        if(boardRanks.get(v) + 1 == boardRanks.get(v+1)) {
+                            k++;
+                        }
+                    }
+                    if(k == 4) {
+                        straightCombos.add(combo.toString());
+                    }
+                    boardRanks.remove(aceLow);
+                    boardRanks.add(aceHigh);
+                    boardRanks.remove(combo.get(0));
+                    boardRanks.remove(combo.get(1));
+                }
+                combo.remove(combo.size()-1);
+            }
+        }
+        System.out.println(straightCombos);
+        return straightCombos;
+    }
+
+
+
 
     public static List<BooleanResult> allFunctions(List<Card> board) {
         BooleanResult result1 = new BooleanResult();

@@ -58,8 +58,13 @@ public class Controller {
     @RequestMapping(value = "/getFunctionResults", method = RequestMethod.GET)
     public @ResponseBody List<BooleanResult> getFunctionResults() {
 
-
         return BoardEvaluator.allFunctions(flopCards);
+    }
+
+    @RequestMapping(value = "/getStraightCombos", method = RequestMethod.GET)
+    public @ResponseBody List<String> getStraightCombos() {
+
+        return BoardEvaluator.getCombosThatMakeStraight(flopCards);
     }
 
 

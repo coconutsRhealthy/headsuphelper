@@ -47,6 +47,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.selectedHoleCard1FromServer;
     $scope.selectedHoleCard2FromServer;
     $scope.flopCards;
+    $scope.straightCombos;
 
     //functions
     $scope.selectCard = function(id) {
@@ -228,6 +229,11 @@ var mainApp = angular.module("mainApp", []);
             $http.get('/getFunctionResults/').success(function(data) {
               $scope.allBooleanFunctionResults = data;
               //alert(JSON.stringify(data[1]));
+            })
+
+            $http.get('/getStraightCombos/').success(function(data) {
+              $scope.straightCombos = data;
+              //alert(JSON.stringify(data));
             })
 
         }).error(function() {
