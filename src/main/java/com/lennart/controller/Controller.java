@@ -20,6 +20,8 @@ public class Controller {
 
     private List<Card> holeCards = new ArrayList<Card>();
     private List<Card> flopCards = new ArrayList<Card>();
+    private Card turnCard = new Card();
+    private List<Card> board = new ArrayList<Card>();
     private List<Card> allSelectedCards = new ArrayList<Card>();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
@@ -48,6 +50,13 @@ public class Controller {
         flopCards.add(cardList.get(1));
         flopCards.add(cardList.get(2));
 
+        if (board.size() > 0) {
+            board.clear();
+        }
+        board.add(cardList.get(0));
+        board.add(cardList.get(1));
+        board.add(cardList.get(2));
+
         allSelectedCards.add(cardList.get(0));
         allSelectedCards.add(cardList.get(1));
         allSelectedCards.add(cardList.get(2));
@@ -55,16 +64,30 @@ public class Controller {
         return allSelectedCards;
     }
 
+    @RequestMapping(value = "/postTurnCard", method = RequestMethod.POST)
+    public @ResponseBody Card postTurnCard(@RequestBody Card card) {
+        turnCard = card;
+
+        board.add(turnCard);
+
+        allSelectedCards.add(turnCard);
+
+        return board.get(board.size()-1);
+    }
+
+
+
+
     @RequestMapping(value = "/getFunctionResults", method = RequestMethod.GET)
     public @ResponseBody List<BooleanResult> getFunctionResults() {
 
-        return BoardEvaluator.allFunctions(flopCards);
+        return BoardEvaluator.allFunctions(board);
     }
 
     @RequestMapping(value = "/getStraightCombos", method = RequestMethod.GET)
     public @ResponseBody List<String> getStraightCombos() {
 
-        return BoardEvaluator.getCombosThatMakeStraight(flopCards);
+        return BoardEvaluator.getCombosThatMakeStraight(board);
     }
 
 

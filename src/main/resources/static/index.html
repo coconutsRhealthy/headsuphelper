@@ -51,6 +51,12 @@
                 {{selectedFlopCard3FromServer.rank}}{{selectedFlopCard3FromServer.suit}}
             </span>
 
+            <div class="handadvice-street" ng-show="showSelectedTurnCardFromServerInHandAdviceDiv">Turncard:</div>
+            <span id="turncard">
+                {{selectedTurnCardFromServer.rank}}{{selectedTurnCardFromServer.suit}}
+            </span>
+
+
             <div>
                 <ul ng-repeat ="function in allBooleanFunctionResults">
                     <li><span>{{function.functionDescription}}</span><span class=boardEvaluationFunctionResult>{{function.result}}</span></li>
@@ -78,6 +84,11 @@
     <div id="selectedTurnCardBeforeSentToServer" ng-hide="hideTurnCardBeforeSentToServerDiv">
         <p>Turncard: {{firstCard}} </p>
     </div>
+
+    <div id="selectedRiverCardBeforeSentToServer" ng-hide="hideRiverCardBeforeSentToServerDiv">
+        <p>Rivercard: {{firstCard}} </p>
+    </div>
+
 
     <div id="controlButtons">
         <button class="proceedOrStayButton" ng-disabled="disableOkButton" ng-click="submitCardsToServer()">OK</button>
