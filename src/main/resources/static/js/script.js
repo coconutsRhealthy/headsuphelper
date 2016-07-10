@@ -105,10 +105,6 @@ var mainApp = angular.module("mainApp", []);
         $scope.secondCardSelected = false;
         $scope.disableOkButton = true;
         $scope.disableResetButton = true;
-
-//        $http.get('/resource/').success(function(data) {
-//          alert(JSON.stringify(data));
-//        })
     }
 
     $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse = function(trueOrFalse, selectedCardsInPreviousStreets) {
@@ -126,39 +122,14 @@ var mainApp = angular.module("mainApp", []);
             })
         }
         else {
-            var lengthOfServerCardList = selectedCardsInPreviousStreets.length;
-            switch(lengthOfServerCardList) {
-                case 2:
-                    var card1rank = selectedCardsInPreviousStreets[0].rank;
-                    var card1suit = selectedCardsInPreviousStreets[0].suit;
-                    var card2rank = selectedCardsInPreviousStreets[1].rank;
-                    var card2suit = selectedCardsInPreviousStreets[1].suit;
+            var rankCard = [];
+            var suitCard = [];
+            var cardsToBeButtonDisabled = [];
 
-                    var card1 = "disable_" + card1rank + card1suit;
-                    var card2 = "disable_" + card2rank + card2suit;
-                    break;
-                case 5:
-                    var card1rank = selectedCardsInPreviousStreets[0].rank;
-                    var card1suit = selectedCardsInPreviousStreets[0].suit;
-                    var card2rank = selectedCardsInPreviousStreets[1].rank;
-                    var card2suit = selectedCardsInPreviousStreets[1].suit;
-                    var card3rank = selectedCardsInPreviousStreets[2].rank;
-                    var card3suit = selectedCardsInPreviousStreets[2].suit;
-                    var card4rank = selectedCardsInPreviousStreets[3].rank;
-                    var card4suit = selectedCardsInPreviousStreets[3].suit;
-                    var card5rank = selectedCardsInPreviousStreets[4].rank;
-                    var card5suit = selectedCardsInPreviousStreets[4].suit;
-
-                    var card1 = "disable_" + card1rank + card1suit;
-                    var card2 = "disable_" + card2rank + card2suit;
-                    var card3 = "disable_" + card3rank + card3suit;
-                    var card4 = "disable_" + card4rank + card4suit;
-                    var card5 = "disable_" + card5rank + card5suit;
-                    break;
-                case 6:
-                    alert("to implement: turn selected");
-                default:
-                    alert("List with weird number of cards");
+            for(var i = 0; i < selectedCardsInPreviousStreets.length; i++) {
+                rankCard[i] = selectedCardsInPreviousStreets[i].rank;
+                suitCard[i] = selectedCardsInPreviousStreets[i].suit;
+                cardsToBeButtonDisabled[i] = "disable_" + rankCard[i] + suitCard[i];
             }
 
             angular.forEach($scope.allHoleCards, function(value, index){
@@ -173,11 +144,9 @@ var mainApp = angular.module("mainApp", []);
                 $scope[hearts] = trueOrFalse;
             })
 
-            $scope[card1] = !trueOrFalse;
-            $scope[card2] = !trueOrFalse;
-            $scope[card3] = !trueOrFalse;
-            $scope[card4] = !trueOrFalse;
-            $scope[card5] = !trueOrFalse;
+            for(var i = 0; i < selectedCardsInPreviousStreets.length; i++) {
+                $scope[cardsToBeButtonDisabled[i]] = !trueOrFalse;
+            }
         }
     }
 
@@ -262,14 +231,14 @@ var mainApp = angular.module("mainApp", []);
         $scope.turnCard = $scope.selectedCard1;
         $http.post('/postTurnCard/', $scope.turnCard).success(function(data) {
 
-            alert($scope.listOfSelectedCardsFromServer.length);
+            //alert($scope.listOfSelectedCardsFromServer.length);
             //alert(JSON.stringify(data));
             $scope.selectedTurnCardFromServer = data;
             $scope.selectedTurnCardFromServer.rank = convertRankFromIntegerToRank(data.rank);
             $scope.listOfSelectedCardsFromServer = $scope.listOfSelectedCardsFromServer.concat(data);
 
             //alert(JSON.stringify($scope.listOfSelectedCardsFromServer));
-            alert($scope.listOfSelectedCardsFromServer.length);
+            //alert($scope.listOfSelectedCardsFromServer.length);
 
             $scope.hideHoleCardsBeforeSentToServerDiv = true;
             $scope.hideFlopCardsBeforeSentToServerDiv = true;
