@@ -9,9 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Configuration
 @EnableAutoConfiguration
@@ -21,8 +19,8 @@ public class Controller {
     private List<Card> holeCards = new ArrayList<Card>();
     private List<Card> flopCards = new ArrayList<Card>();
     private Card turnCard = new Card();
+    private Card riverCard = new Card();
     private List<Card> board = new ArrayList<Card>();
-    private List<Card> allSelectedCards = new ArrayList<Card>();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -32,13 +30,7 @@ public class Controller {
         holeCards.add(cardList.get(0));
         holeCards.add(cardList.get(1));
 
-        if (allSelectedCards.size() > 0) {
-            allSelectedCards.clear();
-        }
-        allSelectedCards.add(cardList.get(0));
-        allSelectedCards.add(cardList.get(1));
-
-        return allSelectedCards;
+        return holeCards;
     }
 
     @RequestMapping(value = "/postFlopCards", method = RequestMethod.POST)
@@ -57,25 +49,22 @@ public class Controller {
         board.add(cardList.get(1));
         board.add(cardList.get(2));
 
-        allSelectedCards.add(cardList.get(0));
-        allSelectedCards.add(cardList.get(1));
-        allSelectedCards.add(cardList.get(2));
-
-        return allSelectedCards;
+        return flopCards;
     }
 
     @RequestMapping(value = "/postTurnCard", method = RequestMethod.POST)
     public @ResponseBody Card postTurnCard(@RequestBody Card card) {
         turnCard = card;
-
         board.add(turnCard);
-
-        allSelectedCards.add(turnCard);
-
         return board.get(board.size()-1);
     }
 
-
+    @RequestMapping(value = "/postRiverCard", method = RequestMethod.POST)
+    public @ResponseBody Card postRiverCard(@RequestBody Card card) {
+        riverCard = card;
+        board.add(riverCard);
+        return board.get(board.size()-1);
+    }
 
 
     @RequestMapping(value = "/getFunctionResults", method = RequestMethod.GET)
@@ -89,8 +78,6 @@ public class Controller {
 
         return BoardEvaluator.getCombosThatMakeStraight(board);
     }
-
-
 
 
 

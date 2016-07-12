@@ -12,10 +12,8 @@ var mainApp = angular.module("mainApp", []);
 
     $scope.holeCards = [];
     $scope.flopCards = [];
-
-
     $scope.turnCard = {};
-
+    $scope.riverCard = {};
 
     $scope.allBooleanFunctionResults = [];
 
@@ -28,6 +26,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.showSelectedHoleCardsFromServerInHandAdviceDiv = false;
     $scope.showSelectedFlopCardsFromServerInHandAdviceDiv = false;
     $scope.showSelectedTurnCardFromServerInHandAdviceDiv = false;
+    $scope.showSelectedRiverCardFromServerInHandAdviceDiv = false;
 
     $scope.allHoleCards = [
           {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
@@ -67,7 +66,7 @@ var mainApp = angular.module("mainApp", []);
 
         if($scope.firstCardSelected === false) {
             $scope.firstCard = id;
-            if($scope.street === "Select turncard") {
+            if($scope.street === "Select turncard" || $scope.street === "Select rivercard") {
                 $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(true);
                 $scope.disableOkButton = false;
             }
@@ -157,14 +156,13 @@ var mainApp = angular.module("mainApp", []);
                 break;
             case "Select flopcards":
                 $scope.submitFlopCards();
-                //alert("To implement, flop submit function");
                 break;
             case "Select turncard":
                 $scope.submitTurnCard();
-                //alert("To implement, turn submit function");
                 break;
-            default:
-                alert("This is the default")
+            case "Select rivercard":
+                $scope.submitRiverCard();
+                break;
         }
     }
 
@@ -191,19 +189,15 @@ var mainApp = angular.module("mainApp", []);
         setCorrectPropertiesForJsonToSendToServer();
         $scope.flopCards = [$scope.selectedCard1, $scope.selectedCard2, $scope.selectedCard3];
         $http.post('/postFlopCards/', $scope.flopCards).success(function(data) {
-            $scope.selectedHoleCard1FromServer = data[0];
-            $scope.selectedHoleCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
-            $scope.selectedHoleCard2FromServer = data[1];
-            $scope.selectedHoleCard2FromServer.rank = convertRankFromIntegerToRank(data[1].rank);
-            $scope.selectedFlopCard1FromServer = data[2];
-            $scope.selectedFlopCard1FromServer.rank = convertRankFromIntegerToRank(data[2].rank);
-            $scope.selectedFlopCard2FromServer = data[3];
-            $scope.selectedFlopCard2FromServer.rank = convertRankFromIntegerToRank(data[3].rank);
-            $scope.selectedFlopCard3FromServer = data[4];
-            $scope.selectedFlopCard3FromServer.rank = convertRankFromIntegerToRank(data[4].rank);
+            $scope.selectedFlopCard1FromServer = data[0];
+            $scope.selectedFlopCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
+            $scope.selectedFlopCard2FromServer = data[1];
+            $scope.selectedFlopCard2FromServer.rank = convertRankFromIntegerToRank(data[1].rank);
+            $scope.selectedFlopCard3FromServer = data[2];
+            $scope.selectedFlopCard3FromServer.rank = convertRankFromIntegerToRank(data[2].rank);
 
-            $scope.listOfSelectedCardsFromServer = data;
-            $scope.hideHoleCardsBeforeSentToServerDiv = true;
+            $scope.listOfSelectedCardsFromServer = $scope.listOfSelectedCardsFromServer.concat(data);
+            //$scope.listOfSelectedCardsFromServer = data;
             $scope.hideFlopCardsBeforeSentToServerDiv = true;
             $scope.hideTurnCardBeforeSentToServerDiv = false;
             $scope.showSelectedFlopCardsFromServerInHandAdviceDiv = true;
@@ -230,45 +224,57 @@ var mainApp = angular.module("mainApp", []);
         setCorrectPropertiesForJsonToSendToServer();
         $scope.turnCard = $scope.selectedCard1;
         $http.post('/postTurnCard/', $scope.turnCard).success(function(data) {
-
-            //alert($scope.listOfSelectedCardsFromServer.length);
-            //alert(JSON.stringify(data));
             $scope.selectedTurnCardFromServer = data;
             $scope.selectedTurnCardFromServer.rank = convertRankFromIntegerToRank(data.rank);
             $scope.listOfSelectedCardsFromServer = $scope.listOfSelectedCardsFromServer.concat(data);
-
-            //alert(JSON.stringify($scope.listOfSelectedCardsFromServer));
-            //alert($scope.listOfSelectedCardsFromServer.length);
-
-            $scope.hideHoleCardsBeforeSentToServerDiv = true;
-            $scope.hideFlopCardsBeforeSentToServerDiv = true;
             $scope.hideTurnCardBeforeSentToServerDiv = true;
             $scope.hideRiverCardBeforeSentToServerDiv = false;
-
             $scope.showSelectedTurnCardFromServerInHandAdviceDiv = true;
             $scope.street = "Select rivercard";
             $scope.reset();
 
-//            $http.get('/getFunctionResults/').success(function(data) {
-//              $scope.allBooleanFunctionResults = data;
-//              //alert(JSON.stringify(data[1]));
-//            })
-//
-//            $http.get('/getStraightCombos/').success(function(data) {
-//              $scope.straightCombos = data;
-//              //alert(JSON.stringify(data));
-//            })
+            $http.get('/getFunctionResults/').success(function(data) {
+              $scope.allBooleanFunctionResults = data;
+              //alert(JSON.stringify(data[1]));
+            })
+
+            $http.get('/getStraightCombos/').success(function(data) {
+              $scope.straightCombos = data;
+              //alert(JSON.stringify(data));
+            })
 
         }).error(function() {
             alert("Failed to submit turncard");
         });
     }
 
+    $scope.submitRiverCard = function() {
+        setCorrectPropertiesForJsonToSendToServer();
+        $scope.riverCard = $scope.selectedCard1;
+        $http.post('/postRiverCard/', $scope.riverCard).success(function(data) {
+            $scope.selectedRiverCardFromServer = data;
+            $scope.selectedRiverCardFromServer.rank = convertRankFromIntegerToRank(data.rank);
+            $scope.listOfSelectedCardsFromServer = $scope.listOfSelectedCardsFromServer.concat(data);
+            $scope.hideTurnCardBeforeSentToServerDiv = true;
+            $scope.hideRiverCardBeforeSentToServerDiv = true;
+            $scope.showSelectedRiverCardFromServerInHandAdviceDiv = true;
+            $scope.street = "All cards selected";
+            $scope.reset();
 
+            $http.get('/getFunctionResults/').success(function(data) {
+              $scope.allBooleanFunctionResults = data;
+              //alert(JSON.stringify(data[1]));
+            })
 
+            $http.get('/getStraightCombos/').success(function(data) {
+              $scope.straightCombos = data;
+              //alert(JSON.stringify(data));
+            })
 
-
-
+        }).error(function() {
+            alert("Failed to submit turncard");
+        });
+    }
 
 
 

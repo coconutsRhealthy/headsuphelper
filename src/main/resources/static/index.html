@@ -56,6 +56,11 @@
                 {{selectedTurnCardFromServer.rank}}{{selectedTurnCardFromServer.suit}}
             </span>
 
+            <div class="handadvice-street" ng-show="showSelectedRiverCardFromServerInHandAdviceDiv">Rivercard:</div>
+            <span id="rivercard">
+                {{selectedRiverCardFromServer.rank}}{{selectedRiverCardFromServer.suit}}
+            </span>
+
 
             <div>
                 <ul ng-repeat ="function in allBooleanFunctionResults">
