@@ -172,11 +172,10 @@ public class BoardEvaluator {
     public static List<String> getCombosThatMakeStraight(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
-        //correct for double entries
-        Set<Integer> hs = new HashSet<Integer>();
-        hs.addAll(boardRanks);
+        Set<Integer> boardRankClearedDoubleCards = new HashSet<Integer>();
+        boardRankClearedDoubleCards.addAll(boardRanks);
         boardRanks.clear();
-        boardRanks.addAll(hs);
+        boardRanks.addAll(boardRankClearedDoubleCards);
 
         List<Integer> subBoardRanks1 = new ArrayList<Integer>();
         List<Integer> subBoardRanks2 = new ArrayList<Integer>();
@@ -248,10 +247,10 @@ public class BoardEvaluator {
             allCombosThatMakeStraight.addAll(twoCardsThatMakeStraightList2);
             allCombosThatMakeStraight.addAll(oneCardThatMakesStraightList1);
 
-            Set<String> hs2 = new HashSet<String>();
-            hs2.addAll(allCombosThatMakeStraight);
+            Set<String> allCombosThatMakeStraightClearedDoubleEntries = new HashSet<String>();
+            allCombosThatMakeStraightClearedDoubleEntries.addAll(allCombosThatMakeStraight);
             allCombosThatMakeStraight.clear();
-            allCombosThatMakeStraight.addAll(hs2);
+            allCombosThatMakeStraight.addAll(allCombosThatMakeStraightClearedDoubleEntries);
 
             return allCombosThatMakeStraight;
         }
@@ -270,10 +269,10 @@ public class BoardEvaluator {
             allCombosThatMakeStraight.addAll(oneCardThatMakesStraightList1);
             allCombosThatMakeStraight.addAll(oneCardThatMakesStraightList2);
 
-            Set<String> hs2 = new HashSet<String>();
-            hs2.addAll(allCombosThatMakeStraight);
+            Set<String> allCombosThatMakeStraightClearedDoubleEntries = new HashSet<String>();
+            allCombosThatMakeStraightClearedDoubleEntries.addAll(allCombosThatMakeStraight);
             allCombosThatMakeStraight.clear();
-            allCombosThatMakeStraight.addAll(hs2);
+            allCombosThatMakeStraight.addAll(allCombosThatMakeStraightClearedDoubleEntries);
 
             return allCombosThatMakeStraight;
         }
@@ -348,11 +347,27 @@ public class BoardEvaluator {
         return straightCombos;
     }
 
-    private static List<String> getOneCardThatMakeStraight(List<Card> boardje, List<Integer> subBoardRanks) {
-        List<Integer> combo = new ArrayList<Integer>();
-        List<String> straightCombos = new ArrayList<String>();
+    private static List<String> getOneCardThatMakeStraight(List<Card> board, List<Integer> subBoardRanks) {
+        final List<Integer> combo = new ArrayList<Integer>();
+        final List<String> straightCombos = new ArrayList<String>();
         List<Integer> subBoardRanksCopy = new ArrayList<Integer>();
         subBoardRanksCopy.addAll(subBoardRanks);
+
+        class HelperClassForInnerMethod {
+            private void addCombos() {
+                for(int z = 2; z < 15; z++) {
+                    List<Integer> createdCombo = addSecondCardToCreateComboWhenSingleCardMakesStraight(combo, z);
+                    if(comboContainsLowAce(createdCombo)) {
+                        List<Integer> convertedCombo = convertComboWithLowAceToHighAce(createdCombo);
+                        straightCombos.add(convertedCombo.toString());
+                    }
+                    else {
+                        straightCombos.add(createdCombo.toString());
+                    }
+                }
+            }
+        }
+
         for(int i = 1; i < 15; i++) {
             combo.clear();
             combo.add(i);
@@ -365,25 +380,15 @@ public class BoardEvaluator {
                 }
             }
             if(connectingCardCounter == 5) {
-                if(!isBoardConnected(boardje)) {
-                    for(int z = 2; z < 15; z++) {
-                        List<Integer> createdCombo = addSecondCardToCreateComboWhenSingleCardMakesStraight(combo, z);
-                        straightCombos.add(createdCombo.toString());
-                    }
+                if(!isBoardConnected(board) || board.size() == 4) {
+                    HelperClassForInnerMethod h = new HelperClassForInnerMethod();
+                    h.addCombos();
                 }
                 else {
-                    if(boardje.size() == 4) {
-                        for(int z = 2; z < 15; z++) {
-                            List<Integer> createdCombo = addSecondCardToCreateComboWhenSingleCardMakesStraight(combo, z);
-                            straightCombos.add(createdCombo.toString());
-                        }
-                    }
-                    if(boardje.size() == 5) {
-                        if(combo.get(0) == getValueOfHighestCardOnBoard(boardje) + 1) {
-                            for(int z = 2; z < 15; z++) {
-                                List<Integer> createdCombo = addSecondCardToCreateComboWhenSingleCardMakesStraight(combo, z);
-                                straightCombos.add(createdCombo.toString());
-                            }
+                    if(board.size() == 5) {
+                        if(combo.get(0) == getValueOfHighestCardOnBoard(board) + 1) {
+                            HelperClassForInnerMethod h = new HelperClassForInnerMethod();
+                            h.addCombos();
                         }
                     }
                 }
@@ -391,7 +396,7 @@ public class BoardEvaluator {
             subBoardRanks.clear();
             subBoardRanks.addAll(subBoardRanksCopy);
 
-            if(boardContainsAce(boardje)) {
+            if(boardContainsAce(board)) {
                 subBoardRanks = addLowAceToSubBoardRanksAndRemoveHighAceIfPresent(subBoardRanks, 4);
                 subBoardRanks.addAll(combo);
                 Collections.sort(subBoardRanks);
@@ -402,19 +407,15 @@ public class BoardEvaluator {
                     }
                 }
                 if(connectingCardCounterAceBoard == 5) {
-                    if (!isBoardConnected(boardje)) {
-                        for(int z = 2; z < 15; z++) {
-                            List<Integer> createdCombo = addSecondCardToCreateComboWhenSingleCardMakesStraight(combo, z);
-                            straightCombos.add(createdCombo.toString());
-                        }
+                    if (!isBoardConnected(board)) {
+                        HelperClassForInnerMethod h = new HelperClassForInnerMethod();
+                        h.addCombos();
                     }
                 }
-                if(isBoardConnected(boardje) && !subBoardRanksCopy.contains(13)) {
-                    if(combo.get(0) == boardje.size() + 1) {
-                        for(int z = 2; z < 15; z++) {
-                            List<Integer> createdCombo = addSecondCardToCreateComboWhenSingleCardMakesStraight(combo, z);
-                            straightCombos.add(createdCombo.toString());
-                        }
+                if(isBoardConnected(board) && !subBoardRanksCopy.contains(13)) {
+                    if(combo.get(0) == board.size() + 1) {
+                        HelperClassForInnerMethod h = new HelperClassForInnerMethod();
+                        h.addCombos();
                     }
                 }
                 subBoardRanks.clear();
