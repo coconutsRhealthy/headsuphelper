@@ -288,9 +288,6 @@ public class BoardEvaluator {
     }
 
 
-
-
-
     public static List<String> getCombosThatMakeStraight(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
@@ -307,30 +304,8 @@ public class BoardEvaluator {
 
         List<String> allCombosThatMakeStraight = new ArrayList<String>();
 
-        Map <Integer, List<Integer>> eijerst = new TreeMap();
-        Map <Integer, List<Integer>> hmm = new TreeMap();
-
-        if(boardRanks.size() == 1) {
-            eijerst = fillList(3, boardRanks);
-        }
-
-        if(boardRanks.size() == 2) {
-            eijerst = fillList(3, boardRanks);
-        }
-
-        if(boardRanks.size() == 3) {
-            eijerst = fillList(3, boardRanks);
-        }
-
-        if(boardRanks.size() == 4 || boardRanks.size() == 5) {
-            eijerst = fillList(3, boardRanks);
-            hmm = fillList(4, boardRanks);
-        }
-
-        if(boardRanks.size() == 5) {
-            eijerst = fillList(3, boardRanks);
-            hmm = fillList(4, boardRanks);
-        }
+        Map <Integer, List<Integer>> threeCardSubBoardRankLists = getSubBoardRankLists(3, boardRanks);
+        Map <Integer, List<Integer>> fourCardSubBoardRankLists = getSubBoardRankLists(4, boardRanks);
 
         if(boardRanks.size() < 4) {
             twoCardsThatMakeStraightList1 = getTwoCardsThatMakeStraight(board, boardRanks, 5);
@@ -339,9 +314,9 @@ public class BoardEvaluator {
         }
 
         if(boardRanks.size() == 4) {
-            twoCardsThatMakeStraightList1 = getTwoCardsThatMakeStraight(board, eijerst.get(1), 5);
-            twoCardsThatMakeStraightList2 = getTwoCardsThatMakeStraight(board, eijerst.get(2), 5);
-            oneCardThatMakesStraightList1 = getOneCardThatMakeStraight(board, hmm.get(1), 5);
+            twoCardsThatMakeStraightList1 = getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 5);
+            twoCardsThatMakeStraightList2 = getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 5);
+            oneCardThatMakesStraightList1 = getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(1), 5);
 
             allCombosThatMakeStraight.addAll(twoCardsThatMakeStraightList1);
             allCombosThatMakeStraight.addAll(twoCardsThatMakeStraightList2);
@@ -356,12 +331,12 @@ public class BoardEvaluator {
         }
 
         if(boardRanks.size() == 5) {
-            twoCardsThatMakeStraightList1 = getTwoCardsThatMakeStraight(board, eijerst.get(1), 5);
-            twoCardsThatMakeStraightList2 = getTwoCardsThatMakeStraight(board, eijerst.get(2), 5);
-            twoCardsThatMakeStraightList3 = getTwoCardsThatMakeStraight(board, eijerst.get(3), 5);
+            twoCardsThatMakeStraightList1 = getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 5);
+            twoCardsThatMakeStraightList2 = getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 5);
+            twoCardsThatMakeStraightList3 = getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(3), 5);
 
-            oneCardThatMakesStraightList1 = getOneCardThatMakeStraight(board, hmm.get(1), 5);
-            oneCardThatMakesStraightList2 = getOneCardThatMakeStraight(board, hmm.get(2), 5);
+            oneCardThatMakesStraightList1 = getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(1), 5);
+            oneCardThatMakesStraightList2 = getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(2), 5);
 
             allCombosThatMakeStraight.addAll(twoCardsThatMakeStraightList1);
             allCombosThatMakeStraight.addAll(twoCardsThatMakeStraightList2);
@@ -380,7 +355,7 @@ public class BoardEvaluator {
     }
 
 
-    private static Map <Integer, List<Integer>> fillList(int numberOValuesInSublist, List<Integer> boardRanks) {
+    private static Map <Integer, List<Integer>> getSubBoardRankLists(int numberOValuesInSublist, List<Integer> boardRanks) {
         int numberOfLists;
         if(boardRanks.size() > numberOValuesInSublist) {
             numberOfLists = 1 + (boardRanks.size() - numberOValuesInSublist);
@@ -388,23 +363,23 @@ public class BoardEvaluator {
             numberOfLists = 1;
         }
 
-        Map <Integer, List<Integer>> sjaakson = new TreeMap();
-        int effetjes = 0;
+        Map <Integer, List<Integer>> subBoardRankLists = new TreeMap();
+        int counter = 0;
         for(int i = 1; i <= numberOfLists; i++) {
-            sjaakson.put(i, new ArrayList<Integer>());
+            subBoardRankLists.put(i, new ArrayList<Integer>());
             if(boardRanks.size() < numberOValuesInSublist) {
-                for(int z = effetjes; z < effetjes + boardRanks.size(); z++) {
-                    sjaakson.get(i).add(boardRanks.get(z));
+                for(int z = counter; z < counter + boardRanks.size(); z++) {
+                    subBoardRankLists.get(i).add(boardRanks.get(z));
                 }
-                effetjes++;
+                counter++;
             } else {
-                for(int z = effetjes; z < effetjes + numberOValuesInSublist; z++) {
-                    sjaakson.get(i).add(boardRanks.get(z));
+                for(int z = counter; z < counter + numberOValuesInSublist; z++) {
+                    subBoardRankLists.get(i).add(boardRanks.get(z));
                 }
-                effetjes++;
+                counter++;
             }
         }
-        return sjaakson;
+        return subBoardRankLists;
     }
 
 
