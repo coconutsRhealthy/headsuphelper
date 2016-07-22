@@ -172,115 +172,54 @@ public class BoardEvaluator {
     public static List<String> getCombosThatGiveOOSD(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
-        Set<Integer> boardRankClearedDoubleCards = new HashSet<Integer>();
-        boardRankClearedDoubleCards.addAll(boardRanks);
-        boardRanks.clear();
-        boardRanks.addAll(boardRankClearedDoubleCards);
+        boardRanks = removeDoubleEntriesInList(boardRanks);
 
-        List<Integer> subBoardRanks1 = new ArrayList<Integer>();
-        List<Integer> subBoardRanks2 = new ArrayList<Integer>();
-        List<Integer> subBoardRanks3 = new ArrayList<Integer>();
-        List<Integer> subBoardRanks4 = new ArrayList<Integer>();
-        List<Integer> subBoardRanks5 = new ArrayList<Integer>();
-
-        List<String> twoCardsThatMakeOosdList1;
-        List<String> twoCardsThatMakeOosdList2;
-        List<String> twoCardsThatMakeOosdList3;
-        List<String> oneCardThatMakesOosdList1;
-        List<String> oneCardThatMakesOosdList2;
+        Map <Integer, List<String>> listsOfFoundCombos = new TreeMap();
+        for(int i = 1; i <= 5; i++) {
+            listsOfFoundCombos.put(i, new ArrayList<String>());
+        }
 
         List<String> allCombosThatMakeStraight = new ArrayList<String>();
 
-        if(boardRanks.size() == 1) {
-            subBoardRanks1.add(boardRanks.get(0));
-        }
-
-        if(boardRanks.size() == 2) {
-            subBoardRanks1.add(boardRanks.get(0));
-            subBoardRanks1.add(boardRanks.get(1));
-        }
-
-        if(boardRanks.size() == 3) {
-            subBoardRanks1.add(boardRanks.get(0));
-            subBoardRanks1.add(boardRanks.get(1));
-
-            subBoardRanks2.add(boardRanks.get(1));
-            subBoardRanks2.add(boardRanks.get(2));
-
-            subBoardRanks4.add(boardRanks.get(0));
-            subBoardRanks4.add(boardRanks.get(1));
-            subBoardRanks4.add(boardRanks.get(2));
-        }
-
-        if(boardRanks.size() == 4) {
-            subBoardRanks1.add(boardRanks.get(0));
-            subBoardRanks1.add(boardRanks.get(1));
-
-            subBoardRanks2.add(boardRanks.get(1));
-            subBoardRanks2.add(boardRanks.get(2));
-
-            subBoardRanks3.add(boardRanks.get(2));
-            subBoardRanks3.add(boardRanks.get(3));
-
-            subBoardRanks4.add(boardRanks.get(0));
-            subBoardRanks4.add(boardRanks.get(1));
-            subBoardRanks4.add(boardRanks.get(2));
-
-            subBoardRanks5.add(boardRanks.get(1));
-            subBoardRanks5.add(boardRanks.get(2));
-            subBoardRanks5.add(boardRanks.get(3));
-        }
+        Map <Integer, List<Integer>> twoCardSubBoardRankLists = getSubBoardRankLists(2, boardRanks);
+        Map <Integer, List<Integer>> threeCardSubBoardRankLists = getSubBoardRankLists(3, boardRanks);
 
         if(boardRanks.size() < 3) {
-            twoCardsThatMakeOosdList1 = getTwoCardsThatMakeStraight(board, boardRanks, 4);
-            allCombosThatMakeStraight.addAll(twoCardsThatMakeOosdList1);
+            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, boardRanks, 4));
+            allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(1));
             return allCombosThatMakeStraight;
         }
 
         if(boardRanks.size() == 3) {
-            twoCardsThatMakeOosdList1 = getTwoCardsThatMakeStraight(board, subBoardRanks1, 4);
-            twoCardsThatMakeOosdList2 = getTwoCardsThatMakeStraight(board, subBoardRanks2, 4);
-            oneCardThatMakesOosdList1 = getOneCardThatMakeStraight(board, subBoardRanks4, 4);
+            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(1), 4));
+            listsOfFoundCombos.get(2).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(2), 4));
+            listsOfFoundCombos.get(4).addAll(getOneCardThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 4));
 
-            allCombosThatMakeStraight.addAll(twoCardsThatMakeOosdList1);
-            allCombosThatMakeStraight.addAll(twoCardsThatMakeOosdList2);
-            allCombosThatMakeStraight.addAll(oneCardThatMakesOosdList1);
+            for(int i = 1; i <= listsOfFoundCombos.size(); i++) {
+                allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(i));
+            }
 
-            Set<String> allCombosThatMakeStraightClearedDoubleEntries = new HashSet<String>();
-            allCombosThatMakeStraightClearedDoubleEntries.addAll(allCombosThatMakeStraight);
-            List<String> straightCombosYeah = getCombosThatMakeStraight(board);
-            allCombosThatMakeStraightClearedDoubleEntries.removeAll(straightCombosYeah);
-
-            allCombosThatMakeStraight.clear();
-            allCombosThatMakeStraight.addAll(allCombosThatMakeStraightClearedDoubleEntries);
+            allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
+            List<String> straightCombos = getCombosThatMakeStraight(board);
+            allCombosThatMakeStraight.removeAll(straightCombos);
 
             return allCombosThatMakeStraight;
         }
 
         if(boardRanks.size() == 4) {
-            twoCardsThatMakeOosdList1 = getTwoCardsThatMakeStraight(board, subBoardRanks1, 4);
-            twoCardsThatMakeOosdList2 = getTwoCardsThatMakeStraight(board, subBoardRanks2, 4);
-            twoCardsThatMakeOosdList3 = getTwoCardsThatMakeStraight(board, subBoardRanks3, 4);
+            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(1), 4));
+            listsOfFoundCombos.get(2).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(2), 4));
+            listsOfFoundCombos.get(3).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(3), 4));
+            listsOfFoundCombos.get(4).addAll(getOneCardThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 4));
+            listsOfFoundCombos.get(5).addAll(getOneCardThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 4));
 
-            oneCardThatMakesOosdList1 = getOneCardThatMakeStraight(board, subBoardRanks4, 4);
-            oneCardThatMakesOosdList2 = getOneCardThatMakeStraight(board, subBoardRanks5, 4);
-
-            allCombosThatMakeStraight.addAll(twoCardsThatMakeOosdList1);
-            allCombosThatMakeStraight.addAll(twoCardsThatMakeOosdList2);
-            allCombosThatMakeStraight.addAll(twoCardsThatMakeOosdList3);
-            allCombosThatMakeStraight.addAll(oneCardThatMakesOosdList1);
-            allCombosThatMakeStraight.addAll(oneCardThatMakesOosdList2);
-
-            Set<String> allCombosThatMakeStraightClearedDoubleEntries = new HashSet<String>();
-            allCombosThatMakeStraightClearedDoubleEntries.addAll(allCombosThatMakeStraight);
-            List<String> straightCombosYeah = getCombosThatMakeStraight(board);
-            allCombosThatMakeStraightClearedDoubleEntries.removeAll(straightCombosYeah);
-
-            allCombosThatMakeStraight.clear();
-            if(!isBoardConnected(board)) {
-                allCombosThatMakeStraight.addAll(allCombosThatMakeStraightClearedDoubleEntries);
+            for(int i = 1; i <= listsOfFoundCombos.size(); i++) {
+                allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(i));
             }
-            //allCombosThatMakeStraightClearedDoubleEntries.clear();
+
+            allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
+            List<String> straightCombos = getCombosThatMakeStraight(board);
+            allCombosThatMakeStraight.removeAll(straightCombos);
 
             return allCombosThatMakeStraight;
         }
@@ -293,9 +232,9 @@ public class BoardEvaluator {
 
         boardRanks = removeDoubleEntriesInList(boardRanks);
 
-        Map <Integer, List<String>> eije = new TreeMap();
+        Map <Integer, List<String>> listsOfFoundCombos = new TreeMap();
         for(int i = 1; i <= 5; i++) {
-            eije.put(i, new ArrayList<String>());
+            listsOfFoundCombos.put(i, new ArrayList<String>());
         }
 
         List<String> allCombosThatMakeStraight = new ArrayList<String>();
@@ -304,18 +243,18 @@ public class BoardEvaluator {
         Map <Integer, List<Integer>> fourCardSubBoardRankLists = getSubBoardRankLists(4, boardRanks);
 
         if(boardRanks.size() < 4) {
-            eije.get(1).addAll(getTwoCardsThatMakeStraight(board, boardRanks, 5));
-            allCombosThatMakeStraight.addAll(eije.get(1));
+            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, boardRanks, 5));
+            allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(1));
             return allCombosThatMakeStraight;
         }
 
         if(boardRanks.size() == 4) {
-            eije.get(1).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 5));
-            eije.get(2).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 5));
-            eije.get(4).addAll(getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(1), 5));
+            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 5));
+            listsOfFoundCombos.get(2).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 5));
+            listsOfFoundCombos.get(4).addAll(getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(1), 5));
 
-            for(int i = 1; i <= eije.size(); i++) {
-                allCombosThatMakeStraight.addAll(eije.get(i));
+            for(int i = 1; i <= listsOfFoundCombos.size(); i++) {
+                allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(i));
             }
 
             allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
@@ -324,14 +263,14 @@ public class BoardEvaluator {
         }
 
         if(boardRanks.size() == 5) {
-            eije.get(1).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 5));
-            eije.get(2).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 5));
-            eije.get(3).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(3), 5));
-            eije.get(4).addAll(getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(1), 5));
-            eije.get(5).addAll(getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(2), 5));
+            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 5));
+            listsOfFoundCombos.get(2).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 5));
+            listsOfFoundCombos.get(3).addAll(getTwoCardsThatMakeStraight(board, threeCardSubBoardRankLists.get(3), 5));
+            listsOfFoundCombos.get(4).addAll(getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(1), 5));
+            listsOfFoundCombos.get(5).addAll(getOneCardThatMakeStraight(board, fourCardSubBoardRankLists.get(2), 5));
 
-            for(int i = 1; i <= eije.size(); i++) {
-                allCombosThatMakeStraight.addAll(eije.get(i));
+            for(int i = 1; i <= listsOfFoundCombos.size(); i++) {
+                allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(i));
             }
 
             allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
@@ -341,6 +280,7 @@ public class BoardEvaluator {
         return null;
     }
 
+   
     private static <E> List<E> removeDoubleEntriesInList(List<E> list) {
         Set<E> hs = new HashSet<E>();
         hs.addAll(list);
@@ -436,8 +376,16 @@ public class BoardEvaluator {
                         }
                     }
                     if(connectingCardCounterAceBoard == number) {
-                        Collections.sort(combo);
-                        straightCombos.add(combo.toString());
+                        if (!isBoardConnected(board)) {
+                            Collections.sort(combo);
+                            straightCombos.add(combo.toString());
+                        }
+                        if(isBoardConnected(board) && !board.contains(13)) {
+                            if(combo.get(0) == board.size() + 1 || combo.get(1) == board.size() + 1) {
+                                Collections.sort(combo);
+                                straightCombos.add(combo.toString());
+                            }
+                        }
                     }
                     subBoardRanks.clear();
                     subBoardRanks.addAll(subBoardRanksCopy);
