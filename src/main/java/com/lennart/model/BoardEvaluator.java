@@ -169,17 +169,17 @@ public class BoardEvaluator {
         return false;
     }
 
-    public static List<String> getCombosThatGiveOOSD(List<Card> board) {
+    public static List<List<Integer>> getCombosThatGiveOOSD(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
         boardRanks = removeDoubleEntriesInList(boardRanks);
 
-        Map <Integer, List<String>> listsOfFoundCombos = new TreeMap();
+        Map <Integer, List<List<Integer>>> listsOfFoundCombos = new TreeMap();
         for(int i = 1; i <= 5; i++) {
-            listsOfFoundCombos.put(i, new ArrayList<String>());
+            listsOfFoundCombos.put(i, new ArrayList<List<Integer>>());
         }
 
-        List<String> allCombosThatMakeStraight = new ArrayList<String>();
+        List<List<Integer>> allCombosThatMakeStraight = new ArrayList<List<Integer>>();
 
         Map <Integer, List<Integer>> twoCardSubBoardRankLists = getSubBoardRankLists(2, boardRanks);
         Map <Integer, List<Integer>> threeCardSubBoardRankLists = getSubBoardRankLists(3, boardRanks);
@@ -200,7 +200,7 @@ public class BoardEvaluator {
             }
 
             allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
-            List<String> straightCombos = getCombosThatMakeStraight(board);
+            List<List<Integer>> straightCombos = getCombosThatMakeStraight(board);
             allCombosThatMakeStraight.removeAll(straightCombos);
 
             return allCombosThatMakeStraight;
@@ -218,7 +218,7 @@ public class BoardEvaluator {
             }
 
             allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
-            List<String> straightCombos = getCombosThatMakeStraight(board);
+            List<List<Integer>> straightCombos = getCombosThatMakeStraight(board);
             allCombosThatMakeStraight.removeAll(straightCombos);
 
             return allCombosThatMakeStraight;
@@ -227,17 +227,17 @@ public class BoardEvaluator {
     }
 
 
-    public static List<String> getCombosThatMakeStraight(List<Card> board) {
+    public static List<List<Integer>> getCombosThatMakeStraight(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
         boardRanks = removeDoubleEntriesInList(boardRanks);
 
-        Map <Integer, List<String>> listsOfFoundCombos = new TreeMap();
+        Map <Integer, List<List<Integer>>> listsOfFoundCombos = new TreeMap();
         for(int i = 1; i <= 5; i++) {
-            listsOfFoundCombos.put(i, new ArrayList<String>());
+            listsOfFoundCombos.put(i, new ArrayList<List<Integer>>());
         }
 
-        List<String> allCombosThatMakeStraight = new ArrayList<String>();
+        List<List<Integer>> allCombosThatMakeStraight = new ArrayList<List<Integer>>();
 
         Map <Integer, List<Integer>> threeCardSubBoardRankLists = getSubBoardRankLists(3, boardRanks);
         Map <Integer, List<Integer>> fourCardSubBoardRankLists = getSubBoardRankLists(4, boardRanks);
@@ -320,9 +320,9 @@ public class BoardEvaluator {
 
 
 
-    private static List<String> getTwoCardsThatMakeStraight(List<Card> board, List<Integer> subBoardRanks, int number) {
+    private static List<List<Integer>> getTwoCardsThatMakeStraight(List<Card> board, List<Integer> subBoardRanks, int number) {
         List<Integer> combo = new ArrayList<Integer>();
-        List<String> straightCombos = new ArrayList<String>();
+        List<List<Integer>> straightCombos = new ArrayList<List<Integer>>();
         List<Integer> subBoardRanksCopy = new ArrayList<Integer>();
         subBoardRanksCopy.addAll(subBoardRanks);
         for(int i = 1; i < 15; i++) {
@@ -343,22 +343,26 @@ public class BoardEvaluator {
                         if(combo.get(0) == getValueOfHighestCardOnBoard(board) + 1 || combo.get(1) == getValueOfHighestCardOnBoard(board) + 1) {
                             if(comboContainsLowAce(combo)) {
                                 List<Integer> convertedCombo = convertComboWithLowAceToHighAce(combo);
-                                straightCombos.add(convertedCombo.toString());
+                                List<Integer> copiedCombo = makeCopyOfComboToAddToReturnList(convertedCombo);
+                                straightCombos.add(copiedCombo);
                             }
                             else {
                                 Collections.sort(combo);
-                                straightCombos.add(combo.toString());
+                                List<Integer> copiedCombo = makeCopyOfComboToAddToReturnList(combo);
+                                straightCombos.add(copiedCombo);
                             }
                         }
                     }
                     else {
                         if(comboContainsLowAce(combo)) {
                             List<Integer> convertedCombo = convertComboWithLowAceToHighAce(combo);
-                            straightCombos.add(convertedCombo.toString());
+                            List<Integer> copiedCombo = makeCopyOfComboToAddToReturnList(convertedCombo);
+                            straightCombos.add(copiedCombo);
                         }
                         else {
                             Collections.sort(combo);
-                            straightCombos.add(combo.toString());
+                            List<Integer> copiedCombo = makeCopyOfComboToAddToReturnList(combo);
+                            straightCombos.add(copiedCombo);
                         }
                     }
                 }
@@ -378,12 +382,14 @@ public class BoardEvaluator {
                     if(connectingCardCounterAceBoard == number) {
                         if (!isBoardConnected(board)) {
                             Collections.sort(combo);
-                            straightCombos.add(combo.toString());
+                            List<Integer> copiedCombo = makeCopyOfComboToAddToReturnList(combo);
+                            straightCombos.add(copiedCombo);
                         }
                         if(isBoardConnected(board) && !board.contains(13)) {
                             if(combo.get(0) == board.size() + 1 || combo.get(1) == board.size() + 1) {
                                 Collections.sort(combo);
-                                straightCombos.add(combo.toString());
+                                List<Integer> copiedCombo = makeCopyOfComboToAddToReturnList(combo);
+                                straightCombos.add(copiedCombo);
                             }
                         }
                     }
@@ -396,9 +402,9 @@ public class BoardEvaluator {
         return straightCombos;
     }
 
-    private static List<String> getOneCardThatMakeStraight(List<Card> board, List<Integer> subBoardRanks, int number) {
+    private static List<List<Integer>> getOneCardThatMakeStraight(List<Card> board, List<Integer> subBoardRanks, int number) {
         final List<Integer> combo = new ArrayList<Integer>();
-        final List<String> straightCombos = new ArrayList<String>();
+        final List<List<Integer>> straightCombos = new ArrayList<List<Integer>>();
         List<Integer> subBoardRanksCopy = new ArrayList<Integer>();
         subBoardRanksCopy.addAll(subBoardRanks);
 
@@ -408,10 +414,10 @@ public class BoardEvaluator {
                     List<Integer> createdCombo = addSecondCardToCreateComboWhenSingleCardMakesStraight(combo, z);
                     if(comboContainsLowAce(createdCombo)) {
                         List<Integer> convertedCombo = convertComboWithLowAceToHighAce(createdCombo);
-                        straightCombos.add(convertedCombo.toString());
+                        straightCombos.add(convertedCombo);
                     }
                     else {
-                        straightCombos.add(createdCombo.toString());
+                        straightCombos.add(createdCombo);
                     }
                 }
             }
@@ -519,6 +525,13 @@ public class BoardEvaluator {
         Collections.sort(combo);
         return combo;
     }
+
+    private static List<Integer> makeCopyOfComboToAddToReturnList(List<Integer> combo) {
+        List<Integer> copiedCombo = new ArrayList<Integer>();
+        copiedCombo.addAll(combo);
+        return copiedCombo;
+    }
+
 
     private static List<Integer> addSecondCardToCreateComboWhenSingleCardMakesStraight(List<Integer> combo, Integer i) {
         List<Integer> createdCombo = new ArrayList<Integer>();
