@@ -74,9 +74,11 @@ public class Controller {
     }
 
     @RequestMapping(value = "/getStraightCombos", method = RequestMethod.GET)
-    public @ResponseBody List<String> getStraightCombos() {
+    public @ResponseBody List<List<Integer>> getStraightCombos() {
 
-        return BoardEvaluator.getCombosThatMakeStraight(board);
+        BoardEvaluator.getCombosThatMakeWheelStraight(board);
+//        return BoardEvaluator.getCombosThatMakeStraight(board);
+        return BoardEvaluator.getCombosThatGiveOOSD(board);
     }
 
 
