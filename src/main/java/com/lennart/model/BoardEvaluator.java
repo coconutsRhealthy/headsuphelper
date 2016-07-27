@@ -319,8 +319,9 @@ public class BoardEvaluator {
         return subBoardRankLists;
     }
 
-    public static List<List<Integer>> getCombosThatMakeWheelStraight(List<Card> board) {
+    public static List<List<Integer>> getCombosThatGiveWheelStraightDraw(List<Card> board) {
         List<List<Integer>> combosThatMakeWheelStraight = new ArrayList<List<Integer>>();
+        List<Integer> boardRanksInitial = getSortedCardRanksFromCardList(board);
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         List<Integer> numbersToRetain = new ArrayList<Integer>();
         numbersToRetain.add(14);
@@ -339,26 +340,39 @@ public class BoardEvaluator {
 
         //als het 3 of 2 kaarten zijn, voeg hieraan de oosd combos toe
         List<List<Integer>> combosThatGiveOOSD = getCombosThatGiveOOSD(board);
-        Map<Integer, List<Integer>> fictionalBoards = new HashMap<Integer, List<Integer>>();
+        List<List<Integer>> fictionalBoards = new ArrayList<List<Integer>>();
+        fictionalBoards.addAll(getCombosThatGiveOOSD(board));
+
+        Map<Integer, List<Integer>> fictionalBoardsMap = new HashMap<Integer, List<Integer>>();
         for(int i = 0; i < combosThatGiveOOSD.size(); i++) {
-            fictionalBoards.put(i, combosThatGiveOOSD.get(i));
-            fictionalBoards.get(i).addAll(boardRanks);
+            fictionalBoardsMap.put(i, fictionalBoards.get(i));
+            fictionalBoardsMap.get(i).addAll(boardRanks);
         }
 
         //kijk bij het nieuw gegenereerde board hoeveel combos een straight geven.
         Map<List<Integer>, List<List<Integer>>> fictionalStraightCombos = new HashMap<List<Integer>, List<List<Integer>>>();
-        for(int i = 0; i < fictionalBoards.size(); i++) {
-            fictionalStraightCombos.put(combosThatGiveOOSD.get(i), getCombosThatMakeStraight(convertIntegerBoardToArtificialCardBoard(fictionalBoards.get(i))));
+        for(int i = 0; i < fictionalBoardsMap.size(); i++) {
+            fictionalStraightCombos.put(combosThatGiveOOSD.get(i), getCombosThatMakeStraight(convertIntegerBoardToArtificialCardBoard(fictionalBoardsMap.get(i))));
         }
 
         //Als dit er 13 zijn ipv 25, dan geeft de combo een wheel straight
         for(List<List<Integer>> list : fictionalStraightCombos.values()) {
-            if(list.size() < 20) {
+            if (list.size() < 20) {
                 combosThatMakeWheelStraight.add(getKeyByValue(fictionalStraightCombos, list));
+                fictionalStraightCombos.get(getKeyByValue(fictionalStraightCombos, list)).clear();
             }
         }
 
-        return combosThatMakeWheelStraight;
+        List<List<Integer>> newList = new ArrayList<List<Integer>>();
+
+        for(List<Integer> l : combosThatMakeWheelStraight) {
+            boardRanksInitial.addAll(l);
+            if(boardRanksInitial.equals(numbersToRetain)) {
+                newList.add(l);
+            }
+        }
+
+        return newList;
     }
 
 
