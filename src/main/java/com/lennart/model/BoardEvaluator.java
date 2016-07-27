@@ -323,20 +323,20 @@ public class BoardEvaluator {
         List<List<Integer>> combosThatMakeWheelStraight = new ArrayList<List<Integer>>();
         List<Integer> boardRanksInitial = getSortedCardRanksFromCardList(board);
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-        List<Integer> numbersToRetain = new ArrayList<Integer>();
-        numbersToRetain.add(14);
-        numbersToRetain.add(2);
-        numbersToRetain.add(3);
-        numbersToRetain.add(4);
-        numbersToRetain.add(5);
+//        List<Integer> numbersToRetain = new ArrayList<Integer>();
+//        numbersToRetain.add(14);
+//        numbersToRetain.add(2);
+//        numbersToRetain.add(3);
+//        numbersToRetain.add(4);
+//        numbersToRetain.add(5);
 
         //get alle kaarten onder de 6 incl A
-        boardRanks.retainAll(numbersToRetain);
+//        boardRanks.retainAll(numbersToRetain);
 
         //als dit 4 kaarten zijn, dan niets doen
-        if(boardRanks.size() == 4) {
-            return combosThatMakeWheelStraight;
-        }
+//        if(boardRanks.size() == 4) {
+//            return combosThatMakeWheelStraight;
+//        }
 
         //als het 3 of 2 kaarten zijn, voeg hieraan de oosd combos toe
         List<List<Integer>> combosThatGiveOOSD = getCombosThatGiveOOSD(board);
@@ -344,6 +344,10 @@ public class BoardEvaluator {
         fictionalBoards.addAll(getCombosThatGiveOOSD(board));
 
         Map<Integer, List<Integer>> fictionalBoardsMap = new HashMap<Integer, List<Integer>>();
+
+        Map <Integer, List<Integer>> sblists = getSubBoardRankLists(3, boardRanks);
+
+        //hier gaat het nog mis, dit kan een board van 6 kaarten opleveren als boardRanks 4 is, vandaar getSubBoardRankLists zoals hierboven.
         for(int i = 0; i < combosThatGiveOOSD.size(); i++) {
             fictionalBoardsMap.put(i, fictionalBoards.get(i));
             fictionalBoardsMap.get(i).addAll(boardRanks);
@@ -363,16 +367,18 @@ public class BoardEvaluator {
             }
         }
 
-        List<List<Integer>> newList = new ArrayList<List<Integer>>();
+        return combosThatMakeWheelStraight;
 
-        for(List<Integer> l : combosThatMakeWheelStraight) {
-            boardRanksInitial.addAll(l);
-            if(boardRanksInitial.equals(numbersToRetain)) {
-                newList.add(l);
-            }
-        }
-
-        return newList;
+//        List<List<Integer>> newList = new ArrayList<List<Integer>>();
+//
+//        for(List<Integer> l : combosThatMakeWheelStraight) {
+//            boardRanksInitial.addAll(l);
+//            if(boardRanksInitial.equals(numbersToRetain)) {
+//                newList.add(l);
+//            }
+//        }
+//
+//        return newList;
     }
 
 
