@@ -357,12 +357,29 @@ public class BoardEvaluator {
 
         //hier nog even aan werken, je moet maken dat alle elementen van de allStraightCombosList worden verwijderd uit de values van de
         //straightEvaluation map
-        for (Iterator<Map.Entry<List<Integer>, List<List<Integer>>>> it = straightEvaluation.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<List<Integer>, List<List<Integer>>> e = it.next();
-            if (e.getValue().size() == allStraightCombos.size()) {
-                it.remove();
+        for(List<Integer> list : straightEvaluation.keySet()) {
+            straightEvaluation.get(list).removeAll(allStraightCombos);
+        }
+
+        Set<List<Integer>> hmm = new HashSet<>();
+        for(List<List<Integer>> list : straightEvaluation.values()) {
+            if(board.size() == 4 && list.size() < 10) {
+                Set<List<Integer>> eije = getKeysByValue(straightEvaluation, list);
+                hmm.addAll(eije);
             }
         }
+
+        for(List<Integer> list1 : hmm) {
+            straightEvaluation.remove(list1);
+        }
+
+
+//        for (Iterator<Map.Entry<List<Integer>, List<List<Integer>>>> it = straightEvaluation.entrySet().iterator(); it.hasNext();) {
+//            Map.Entry<List<Integer>, List<List<Integer>>> e = it.next();
+//            if (e.getValue().size() == allStraightCombos.size()) {
+//                it.remove();
+//            }
+//        }
 
 
         System.out.println(straightEvaluation);
@@ -517,6 +534,17 @@ public class BoardEvaluator {
         }
         return null;
     }
+
+    public static <T, E> Set<T> getKeysByValue(Map<T, E> map, E value) {
+        Set<T> keys = new HashSet<T>();
+        for (Map.Entry<T, E> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                keys.add(entry.getKey());
+            }
+        }
+        return keys;
+    }
+
 
 
     private static List<Card> convertIntegerBoardToArtificialCardBoard(List<Integer> integerBoarList) {
