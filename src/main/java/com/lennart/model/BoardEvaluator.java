@@ -109,126 +109,6 @@ public class BoardEvaluator {
         return false;
     }
 
-    //helper methods
-    private static int getNumberOfSuitedCardsOnBoard(List<Card> board) {
-        StringBuilder s = new StringBuilder();
-        int x = 0;
-        for(Card c : board) {
-            s.append(c.getSuit());
-        }
-        for(int i = 0; i <= (s.length()-1); i++) {
-            int a = StringUtils.countMatches(s, "" + s.charAt(i));
-            if(a > 1 && a > x) {
-                x = a;
-            }
-        }
-        return x;
-    }
-
-    private static int getNumberOfPairsOnBoard(List<Card> board) {
-        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-        int x = 0;
-        int y = 0;
-        for(int i : boardRanks) {
-            if(Collections.frequency(boardRanks, i) == 2 && i != y) {
-                x++;
-                y = i;
-            }
-        }
-        return x;
-    }
-
-    private static List<Integer> getSortedCardRanksFromCardList(List<Card> board) {
-        List<Integer> boardRanks = new ArrayList<Integer>();
-        for(Card c : board) {
-            boardRanks.add(c.getRank());
-        }
-        Collections.sort(boardRanks);
-        return boardRanks;
-    }
-
-    private static boolean boardContainsAceAndWheelCard(List<Card> board) {
-        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-        Integer a = 2;
-        Integer b = 3;
-        Integer c = 4;
-        Integer d = 5;
-        Integer ace = 14;
-
-        List<Integer> wheelCards = new ArrayList<Integer>();
-        wheelCards.add(a);
-        wheelCards.add(b);
-        wheelCards.add(c);
-        wheelCards.add(d);
-
-        if(boardRanks.contains(ace)) {
-            if (CollectionUtils.containsAny(boardRanks, wheelCards)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static List<List<Integer>> getCombosThatGiveOOSD(List<Card> board) {
-        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-
-        boardRanks = removeDoubleEntriesInList(boardRanks);
-
-        Map <Integer, List<List<Integer>>> listsOfFoundCombos = new TreeMap();
-        for(int i = 1; i <= 5; i++) {
-            listsOfFoundCombos.put(i, new ArrayList<List<Integer>>());
-        }
-
-        List<List<Integer>> allCombosThatMakeStraight = new ArrayList<List<Integer>>();
-
-        Map <Integer, List<Integer>> twoCardSubBoardRankLists = getSubBoardRankLists(2, boardRanks);
-        Map <Integer, List<Integer>> threeCardSubBoardRankLists = getSubBoardRankLists(3, boardRanks);
-
-        if(boardRanks.size() < 3) {
-            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, boardRanks, 4));
-            allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(1));
-            return allCombosThatMakeStraight;
-        }
-
-        if(boardRanks.size() == 3) {
-            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(1), 4));
-            listsOfFoundCombos.get(2).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(2), 4));
-            listsOfFoundCombos.get(4).addAll(getOneCardThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 4));
-
-            for(int i = 1; i <= listsOfFoundCombos.size(); i++) {
-                allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(i));
-            }
-
-            allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
-            List<List<Integer>> straightCombos = getCombosThatMakeStraight(board);
-            allCombosThatMakeStraight.removeAll(straightCombos);
-
-            return allCombosThatMakeStraight;
-        }
-
-        if(boardRanks.size() == 4) {
-            listsOfFoundCombos.get(1).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(1), 4));
-            listsOfFoundCombos.get(2).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(2), 4));
-            listsOfFoundCombos.get(3).addAll(getTwoCardsThatMakeStraight(board, twoCardSubBoardRankLists.get(3), 4));
-            listsOfFoundCombos.get(4).addAll(getOneCardThatMakeStraight(board, threeCardSubBoardRankLists.get(1), 4));
-            listsOfFoundCombos.get(5).addAll(getOneCardThatMakeStraight(board, threeCardSubBoardRankLists.get(2), 4));
-
-            for(int i = 1; i <= listsOfFoundCombos.size(); i++) {
-                allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(i));
-            }
-
-            allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
-            List<List<Integer>> straightCombos = getCombosThatMakeStraight(board);
-            allCombosThatMakeStraight.removeAll(straightCombos);
-
-            //getCombosThatMakeWheelStraight(board);
-
-            return allCombosThatMakeStraight;
-        }
-        return null;
-    }
-
-
     public static List<List<Integer>> getCombosThatMakeStraight(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
@@ -236,7 +116,7 @@ public class BoardEvaluator {
 
         Map <Integer, List<List<Integer>>> listsOfFoundCombos = new TreeMap();
         for(int i = 1; i <= 7; i++) {
-            listsOfFoundCombos.put(i, new ArrayList<List<Integer>>());
+            listsOfFoundCombos.put(i, new ArrayList<>());
         }
 
         List<List<Integer>> allCombosThatMakeStraight = new ArrayList<List<Integer>>();
@@ -298,22 +178,120 @@ public class BoardEvaluator {
 
             return allCombosThatMakeStraight;
         }
-
-
-
         return null;
     }
 
-    public static List<List<Integer>> newGetOosdCombos(List<Card> board) {
-        //get board
-        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+    public static Map<Integer, List<Integer>> getCombosThatGiveOosdOrDoubleGutter(List<Card> board) {
+        Map<List<Integer>, List<List<Integer>>> allStraightDrawCombos = getCombosThatGiveAnyStraightDraw(board);
+        Map<Integer, List<Integer>> oosdCombos = new HashMap<>();
+        int counter = 0;
 
-        //add all possible card combos, except for the card combos that already make a straight
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : allStraightDrawCombos.entrySet()) {
+            if (entry.getValue().size() > 20) {
+                oosdCombos.put(counter, entry.getKey());
+                counter++;
+            }
+        }
+        return oosdCombos;
+    }
+
+    public static Map<Integer, List<Integer>> getCombosThatGiveGutshot (List<Card> board) {
+        Map<List<Integer>, List<List<Integer>>> allStraightDrawCombos = getCombosThatGiveAnyStraightDraw(board);
+        Map<Integer, List<Integer>> gutshotCombos = new HashMap<>();
+        int counter = 0;
+
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : allStraightDrawCombos.entrySet()) {
+            if (entry.getValue().size() > 9 && entry.getValue().size() < 15) {
+                gutshotCombos.put(counter, entry.getKey());
+                counter++;
+            }
+        }
+        return gutshotCombos;
+    }
+
+    public static Map<Integer, List<Integer>> getCombosThatGiveBackDoorStraightDraw(List<Card> board) {
+        Map<List<Integer>, List<List<Integer>>> allStraightDrawCombos = getCombosThatGiveAnyStraightDraw(board);
+        Map<Integer, List<Integer>> backdoorCombos = new HashMap<>();
+        int counter = 0;
+
+        if(board.size() < 4) {
+            for (Map.Entry<List<Integer>, List<List<Integer>>> entry : allStraightDrawCombos.entrySet()) {
+                if (entry.getValue().size() < 8) {
+                    backdoorCombos.put(counter, entry.getKey());
+                    counter++;
+                }
+            }
+        }
+        return backdoorCombos;
+    }
+
+    //helper methods
+    private static int getNumberOfSuitedCardsOnBoard(List<Card> board) {
+        StringBuilder s = new StringBuilder();
+        int x = 0;
+        for(Card c : board) {
+            s.append(c.getSuit());
+        }
+        for(int i = 0; i <= (s.length()-1); i++) {
+            int a = StringUtils.countMatches(s, "" + s.charAt(i));
+            if(a > 1 && a > x) {
+                x = a;
+            }
+        }
+        return x;
+    }
+
+    private static int getNumberOfPairsOnBoard(List<Card> board) {
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        int x = 0;
+        int y = 0;
+        for(int i : boardRanks) {
+            if(Collections.frequency(boardRanks, i) == 2 && i != y) {
+                x++;
+                y = i;
+            }
+        }
+        return x;
+    }
+
+    private static List<Integer> getSortedCardRanksFromCardList(List<Card> board) {
+        List<Integer> boardRanks = new ArrayList<Integer>();
+        for(Card c : board) {
+            boardRanks.add(c.getRank());
+        }
+        Collections.sort(boardRanks);
+        return boardRanks;
+    }
+
+    private static boolean boardContainsAceAndWheelCard(List<Card> board) {
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        Integer a = 2;
+        Integer b = 3;
+        Integer c = 4;
+        Integer d = 5;
+        Integer ace = 14;
+
+        List<Integer> wheelCards = new ArrayList<Integer>();
+        wheelCards.add(a);
+        wheelCards.add(b);
+        wheelCards.add(c);
+        wheelCards.add(d);
+
+        if(boardRanks.contains(ace)) {
+            if (CollectionUtils.containsAny(boardRanks, wheelCards)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Map<List<Integer>, List<List<Integer>>> getCombosThatGiveAnyStraightDraw(List<Card> board) {
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         Map<Integer, List<Integer>> allCardCombos = getAllPossibleCombos();
         Map<Integer, List<Integer>> fictionalBoardRanks = new HashMap<>();
-
         List<List<Integer>> allStraightCombos = getCombosThatMakeStraight(board);
         List<List<Integer>> allCardCombosCorrectedForStraightCombos = new ArrayList<>();
+        Map<List<Integer>, List<List<Integer>>> mapOfCombosThatGiveAnyStraightDraw = new HashMap<>();
 
         for(int i = 0; i < allCardCombos.size(); i++) {
             Collections.sort(allCardCombos.get(i));
@@ -325,18 +303,7 @@ public class BoardEvaluator {
             }
         }
 
-        allCardCombosCorrectedForStraightCombos.addAll(allStraightCombos);
-
-        for(int i = 0; i < allCardCombos.size(); i++) {
-            allCardCombosCorrectedForStraightCombos.add(allCardCombos.get(i));
-        }
-
-        List<List<Integer>> doubleElements = getDoubleEntriesFromList(allCardCombosCorrectedForStraightCombos);
-        allCardCombosCorrectedForStraightCombos.removeAll(doubleElements);
-
-        allCardCombos.clear();
-
-        for(int i = 0; i < allCardCombosCorrectedForStraightCombos.size(); i++) {
+        for (int i = 0; i < allCardCombosCorrectedForStraightCombos.size(); i++) {
             allCardCombos.put(i, allCardCombosCorrectedForStraightCombos.get(i));
         }
 
@@ -347,51 +314,254 @@ public class BoardEvaluator {
             fictionalBoardRanks.get(i).addAll(allCardCombos.get(i));
         }
 
-        //per added card combo, check how many combos would give straight on the new, fictional board
-        Map<List<Integer>, List<List<Integer>>> straightEvaluation = new HashMap<>();
-
         for(int i = 0; i < fictionalBoardRanks.size(); i++) {
             List<Card> x = convertIntegerBoardToArtificialCardBoard(fictionalBoardRanks.get(i));
-            straightEvaluation.put(allCardCombos.get(i), getCombosThatMakeStraight(x));
+            mapOfCombosThatGiveAnyStraightDraw.put(allCardCombos.get(i), getCombosThatMakeStraight(x));
         }
 
-        //hier nog even aan werken, je moet maken dat alle elementen van de allStraightCombosList worden verwijderd uit de values van de
-        //straightEvaluation map
-        for(List<Integer> list : straightEvaluation.keySet()) {
-            straightEvaluation.get(list).removeAll(allStraightCombos);
-        }
-
-        Set<List<Integer>> hmm = new HashSet<>();
-        for(List<List<Integer>> list : straightEvaluation.values()) {
-            if(board.size() == 4 && list.size() < 10) {
-                Set<List<Integer>> eije = getKeysByValue(straightEvaluation, list);
-                hmm.addAll(eije);
+        Set<List<Integer>> combosThatNeedToBeRemovedFromMap = new HashSet<>();
+        for(List<List<Integer>> list : mapOfCombosThatGiveAnyStraightDraw.values()) {
+            if(list.isEmpty()) {
+                Set<List<Integer>> keysOfCombosThatNeedToBeRemoved = getKeysByValue(mapOfCombosThatGiveAnyStraightDraw, list);
+                combosThatNeedToBeRemovedFromMap.addAll(keysOfCombosThatNeedToBeRemoved);
             }
         }
 
-        for(List<Integer> list1 : hmm) {
-            straightEvaluation.remove(list1);
+        for(List<Integer> list1 : combosThatNeedToBeRemovedFromMap) {
+            mapOfCombosThatGiveAnyStraightDraw.remove(list1);
         }
 
-
-//        for (Iterator<Map.Entry<List<Integer>, List<List<Integer>>>> it = straightEvaluation.entrySet().iterator(); it.hasNext();) {
-//            Map.Entry<List<Integer>, List<List<Integer>>> e = it.next();
-//            if (e.getValue().size() == allStraightCombos.size()) {
-//                it.remove();
-//            }
-//        }
-
-
-        System.out.println(straightEvaluation);
-
-        //if its 25, then the specific combo gives an oosd
-
-        //if its 13, then the specific combo gives a gutshot
-
-        //if its 1-3, then the specific combo gives a backdoor
-
-        return null;
+        mapOfCombosThatGiveAnyStraightDraw = removeIncorrectStraightCombosFromMap(mapOfCombosThatGiveAnyStraightDraw, board);
+        return mapOfCombosThatGiveAnyStraightDraw;
     }
+
+    private static Map<List<Integer>, List<List<Integer>>> removeIncorrectStraightCombosFromMap(Map<List<Integer>, List<List<Integer>>> mapOfCombosThatGiveAnyStraightDraw, List<Card> board) {
+        Map<List<Integer>, List<List<Integer>>> baseMap = mapOfCombosThatGiveAnyStraightDraw;
+        Map<Integer, List<Integer>> allCombined = new HashMap<>();
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        int counter = 0;
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : baseMap.entrySet()) {
+            entry.getValue().removeAll(getCombosThatMakeStraight(board));
+        }
+
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : baseMap.entrySet()) {
+            for(int i = 0; i < entry.getValue().size(); i++) {
+                List<Integer> newBoardRanks = new ArrayList<>();
+                newBoardRanks.addAll(boardRanks);
+                allCombined.put(counter, newBoardRanks);
+                allCombined.get(counter).addAll(entry.getKey());
+                allCombined.get(counter).addAll(entry.getValue().get(i));
+                counter++;
+            }
+        }
+
+        Map<Integer, List<Integer>> allPossibleStraights = getAllPossibleFiveConnectingCards();
+        Map<Integer, List<Integer>> allCombinedCopy = new HashMap<>();
+        Map<Integer, List<Integer>> highCardsMapFive = new HashMap<>();
+
+        for (int i = 0; i < allCombined.size(); i++) {
+            allCombinedCopy.put(i, allCombined.get(i));
+        }
+
+        for (int i = 0; i < allCombinedCopy.size(); i++) {
+            for (int z = 0; z < allPossibleStraights.size(); z++) {
+                Set<Integer> s = new HashSet<>();
+                s.addAll(allCombinedCopy.get(i));
+                int sizeInitial = s.size();
+                s.removeAll(allPossibleStraights.get(z));
+                int sizeAfter = s.size();
+                if(sizeInitial - sizeAfter == 5) {
+                    if(!s.iterator().hasNext()) {
+                        highCardsMapFive.put(i, allPossibleStraights.get(z));
+                        break;
+                    }
+                    if(s.iterator().hasNext() && s.iterator().next() != allPossibleStraights.get(z).get(4) + 1) {
+                        highCardsMapFive.put(i, allPossibleStraights.get(z));
+                        break;
+                    }
+                }
+            }
+        }
+
+        int counter2 = 0;
+        Map<Integer, List<Integer>> theCorrectKeyMap = new HashMap<>();
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : baseMap.entrySet()) {
+            for(int i = 0; i < entry.getValue().size(); i++) {
+                List<Integer> theKeyYouNeed = new ArrayList<>();
+                theKeyYouNeed.addAll(entry.getKey());
+                theCorrectKeyMap.put(counter2, theKeyYouNeed);
+                counter2++;
+            }
+        }
+
+        Map<Integer, List<Integer>> combosThatHaveToBeRemoved = new HashMap<>();
+        int counter3 = 0;
+
+        Map<Integer, List<Integer>> copyHighCardsMapFive = highCardsMapFive;
+        Map<Integer, List<Integer>> copyTheCorrectKeyMap = theCorrectKeyMap;
+        for(int i = 0; i < theCorrectKeyMap.size(); i++) {
+            List<Integer> x = new ArrayList<>();
+            x.addAll(copyHighCardsMapFive.get(i));
+            x.removeAll(copyTheCorrectKeyMap.get(i));
+            if(x.size() > 4) {
+                List<Integer> removeCombo = new ArrayList<>();
+                removeCombo.addAll(theCorrectKeyMap.get(i));
+                combosThatHaveToBeRemoved.put(counter3, removeCombo);
+                counter3++;
+            }
+        }
+
+        for(int i = 0; i < theCorrectKeyMap.size(); i++) {
+            if(!(highCardsMapFive.get(i).contains(theCorrectKeyMap.get(i).get(0)))) {
+                if(highCardsMapFive.get(i).contains(theCorrectKeyMap.get(i).get(1))) {
+                    if(boardRanks.contains(theCorrectKeyMap.get(i).get(1))) {
+                        List<Integer> removeCombo = new ArrayList<>();
+                        removeCombo.addAll(theCorrectKeyMap.get(i));
+                        combosThatHaveToBeRemoved.put(counter3, removeCombo);
+                        counter3++;
+                    }
+                }
+            }
+            if(!(highCardsMapFive.get(i).contains(theCorrectKeyMap.get(i).get(1)))) {
+                if(highCardsMapFive.get(i).contains(theCorrectKeyMap.get(i).get(0))) {
+                    if(boardRanks.contains(theCorrectKeyMap.get(i).get(0))) {
+                        List<Integer> removeCombo = new ArrayList<>();
+                        removeCombo.addAll(theCorrectKeyMap.get(i));
+                        combosThatHaveToBeRemoved.put(counter3, removeCombo);
+                        counter3++;
+                    }
+                }
+            }
+        }
+
+        for(int i = 0; i < theCorrectKeyMap.size(); i++) {
+            if(boardRanks.containsAll(theCorrectKeyMap.get(i))) {
+                List<Integer> removeCombo = new ArrayList<>();
+                removeCombo.addAll(theCorrectKeyMap.get(i));
+                combosThatHaveToBeRemoved.put(counter3, removeCombo);
+                counter3++;
+            }
+        }
+
+        List<List<Integer>> cleanedForDoubleEntriesCombosToBeRemoved = new ArrayList<>();
+        for(int i = 0; i < combosThatHaveToBeRemoved.size(); i++) {
+            cleanedForDoubleEntriesCombosToBeRemoved.add(combosThatHaveToBeRemoved.get(i));
+        }
+
+        Set<List<Integer>> hs = new HashSet<>();
+        hs.addAll(cleanedForDoubleEntriesCombosToBeRemoved);
+        cleanedForDoubleEntriesCombosToBeRemoved.clear();
+        cleanedForDoubleEntriesCombosToBeRemoved.addAll(hs);
+
+        combosThatHaveToBeRemoved.clear();
+
+        for(int i = 0; i < cleanedForDoubleEntriesCombosToBeRemoved.size(); i++) {
+            combosThatHaveToBeRemoved.put(i, cleanedForDoubleEntriesCombosToBeRemoved.get(i));
+        }
+
+        for(int i = 0; i < combosThatHaveToBeRemoved.size(); i++) {
+            baseMap.remove(combosThatHaveToBeRemoved.get(i));
+        }
+
+        List<List<Integer>> hs2 = new ArrayList<>();
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : baseMap.entrySet()) {
+            if(entry.getValue().isEmpty()) {
+                hs2.add(entry.getKey());
+            }
+        }
+
+        for(int i = 0; i < hs2.size(); i++) {
+            baseMap.remove(hs2.get(i));
+        }
+
+        Map<List<Integer>, List<List<Integer>>> keysOfWhichSomeValuesNeedToBeRemovedBecauseKeyMakesStraightOnBoard = new HashMap<>();
+
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : baseMap.entrySet()) {
+            if(comboIsAStraightComboOnTheBoard(entry.getKey(), board)) {
+                List<Integer> highestFiveConnectingCards = getHighestFiveConnectingCardsOnBoard(boardRanks, entry.getKey());
+                int highestCard = highestFiveConnectingCards.get(4);
+                keysOfWhichSomeValuesNeedToBeRemovedBecauseKeyMakesStraightOnBoard.put(entry.getKey(), new ArrayList<>());
+                for(List<Integer> list : baseMap.get(entry.getKey())) {
+                    if(list.get(0) != highestCard + 1 && list.get(1) != highestCard + 1) {
+                        List<Integer> copyOfListToBeRemoved = new ArrayList<>();
+                        copyOfListToBeRemoved.addAll(list);
+                        keysOfWhichSomeValuesNeedToBeRemovedBecauseKeyMakesStraightOnBoard.get(entry.getKey()).add(copyOfListToBeRemoved);
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : baseMap.entrySet()) {
+            for (Map.Entry<List<Integer>, List<List<Integer>>> entry2 : keysOfWhichSomeValuesNeedToBeRemovedBecauseKeyMakesStraightOnBoard.entrySet()) {
+                if(entry.getKey().equals(entry2.getKey())) {
+                    List<List<Integer>> cleanList = new ArrayList<>();
+                    cleanList.addAll(entry.getValue());
+                    cleanList.removeAll(entry2.getValue());
+
+                    baseMap.get(entry.getKey()).clear();
+                    baseMap.get(entry.getKey()).addAll(cleanList);
+                }
+            }
+        }
+        return baseMap;
+    }
+
+    private static boolean comboIsAStraightComboOnTheBoard (List<Integer> combo, List<Card> board) {
+        List<List<Integer>> allCombosThatMakeStraight = getCombosThatMakeStraight(board);
+        for(List<Integer> straightCombo : allCombosThatMakeStraight) {
+            if(combo.equals(straightCombo)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<Integer> getHighestFiveConnectingCardsOnBoard(List<Integer> board, List<Integer> combo) {
+        List<Integer> boardPlusCombo = new ArrayList<>();
+        boardPlusCombo.addAll(board);
+        boardPlusCombo.addAll(combo);
+        Map<Integer, List<Integer>> allPossibleFiveConnectingCards = getAllPossibleFiveConnectingCards();
+        Map<Integer, List<Integer>> fiveConnectingCardsThatArePresentOnBoard = new HashMap<>();
+
+        int counter = 0;
+        for(int i = 0; i < allPossibleFiveConnectingCards.size(); i++) {
+            if(boardPlusCombo.containsAll(allPossibleFiveConnectingCards.get(i))) {
+                fiveConnectingCardsThatArePresentOnBoard.put(counter, allPossibleFiveConnectingCards.get(i));
+                counter++;
+            }
+        }
+
+        List<Integer> highestFiveConnectingCards = fiveConnectingCardsThatArePresentOnBoard.get(counter-1);
+        return highestFiveConnectingCards;
+    }
+
+
+    private static Map<Integer, List<Integer>> getAllPossibleFiveConnectingCards() {
+        Map<Integer, List<Integer>> allPossibleStraights = new HashMap<>();
+        List<Integer> lowestStraight = new ArrayList<>();
+        lowestStraight.add(14);
+        lowestStraight.add(2);
+        lowestStraight.add(3);
+        lowestStraight.add(4);
+        lowestStraight.add(5);
+        allPossibleStraights.put(0, lowestStraight);
+
+        //Map<Integer, List<Integer>> tussenMap = new HashMap<>();
+        for(int i = 1; i < 10; i++) {
+            allPossibleStraights.put(i, new ArrayList<>());
+        }
+
+        int start = 2;
+        for(int i = 1; i < allPossibleStraights.size(); i++) {
+            for(int z = 0; z < 5; z++) {
+                allPossibleStraights.get(i).add(start + z);
+            }
+            start++;
+        }
+
+        return allPossibleStraights;
+    }
+
 
     private static Map<Integer, List<Integer>> getAllPossibleCombos() {
         Map<Integer, List<Integer>> allPossibleCombos = new HashMap<>();
@@ -425,8 +595,6 @@ public class BoardEvaluator {
         return listToReturn;
     }
 
-
-   
     private static <E> List<E> removeDoubleEntriesInList(List<E> list) {
         Set<E> hs = new HashSet<E>();
         hs.addAll(list);
@@ -434,7 +602,6 @@ public class BoardEvaluator {
         list.addAll(hs);
         return list;
     }
-
 
     private static Map <Integer, List<Integer>> getSubBoardRankLists(int numberOValuesInSublist, List<Integer> boardRanks) {
         int numberOfLists;
@@ -463,70 +630,7 @@ public class BoardEvaluator {
         return subBoardRankLists;
     }
 
-    public static List<List<Integer>> getCombosThatGiveWheelStraightDraw(List<Card> board) {
-        List<List<Integer>> combosThatMakeWheelStraight = new ArrayList<List<Integer>>();
-        List<Integer> boardRanksInitial = getSortedCardRanksFromCardList(board);
-        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-//        List<Integer> numbersToRetain = new ArrayList<Integer>();
-//        numbersToRetain.add(14);
-//        numbersToRetain.add(2);
-//        numbersToRetain.add(3);
-//        numbersToRetain.add(4);
-//        numbersToRetain.add(5);
-
-        //get alle kaarten onder de 6 incl A
-//        boardRanks.retainAll(numbersToRetain);
-
-        //als dit 4 kaarten zijn, dan niets doen
-//        if(boardRanks.size() == 4) {
-//            return combosThatMakeWheelStraight;
-//        }
-
-        //als het 3 of 2 kaarten zijn, voeg hieraan de oosd combos toe
-        List<List<Integer>> combosThatGiveOOSD = getCombosThatGiveOOSD(board);
-        List<List<Integer>> fictionalBoards = new ArrayList<List<Integer>>();
-        fictionalBoards.addAll(getCombosThatGiveOOSD(board));
-
-        Map<Integer, List<Integer>> fictionalBoardsMap = new HashMap<Integer, List<Integer>>();
-
-        Map <Integer, List<Integer>> sblists = getSubBoardRankLists(3, boardRanks);
-
-        //hier gaat het nog mis, dit kan een board van 6 kaarten opleveren als boardRanks 4 is, vandaar getSubBoardRankLists zoals hierboven.
-        for(int i = 0; i < combosThatGiveOOSD.size(); i++) {
-            fictionalBoardsMap.put(i, fictionalBoards.get(i));
-            fictionalBoardsMap.get(i).addAll(boardRanks);
-        }
-
-        //kijk bij het nieuw gegenereerde board hoeveel combos een straight geven.
-        Map<List<Integer>, List<List<Integer>>> fictionalStraightCombos = new HashMap<List<Integer>, List<List<Integer>>>();
-        for(int i = 0; i < fictionalBoardsMap.size(); i++) {
-            fictionalStraightCombos.put(combosThatGiveOOSD.get(i), getCombosThatMakeStraight(convertIntegerBoardToArtificialCardBoard(fictionalBoardsMap.get(i))));
-        }
-
-        //Als dit er 13 zijn ipv 25, dan geeft de combo een wheel straight
-        for(List<List<Integer>> list : fictionalStraightCombos.values()) {
-            if (list.size() < 20) {
-                combosThatMakeWheelStraight.add(getKeyByValue(fictionalStraightCombos, list));
-                fictionalStraightCombos.get(getKeyByValue(fictionalStraightCombos, list)).clear();
-            }
-        }
-
-        return combosThatMakeWheelStraight;
-
-//        List<List<Integer>> newList = new ArrayList<List<Integer>>();
-//
-//        for(List<Integer> l : combosThatMakeWheelStraight) {
-//            boardRanksInitial.addAll(l);
-//            if(boardRanksInitial.equals(numbersToRetain)) {
-//                newList.add(l);
-//            }
-//        }
-//
-//        return newList;
-    }
-
-
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+    private static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {
             if (Objects.equals(value, entry.getValue())) {
                 return entry.getKey();
@@ -535,7 +639,7 @@ public class BoardEvaluator {
         return null;
     }
 
-    public static <T, E> Set<T> getKeysByValue(Map<T, E> map, E value) {
+    private static <T, E> Set<T> getKeysByValue(Map<T, E> map, E value) {
         Set<T> keys = new HashSet<T>();
         for (Map.Entry<T, E> entry : map.entrySet()) {
             if (Objects.equals(value, entry.getValue())) {
@@ -544,8 +648,6 @@ public class BoardEvaluator {
         }
         return keys;
     }
-
-
 
     private static List<Card> convertIntegerBoardToArtificialCardBoard(List<Integer> integerBoarList) {
         Map<Integer, Card> newCardObjects = new HashMap<Integer, Card>();
@@ -558,8 +660,6 @@ public class BoardEvaluator {
         }
         return artificialCardBoard;
     }
-
-
 
     private static List<List<Integer>> getTwoCardsThatMakeStraight(List<Card> board, List<Integer> subBoardRanks, int number) {
         List<Integer> combo = new ArrayList<Integer>();
@@ -718,13 +818,8 @@ public class BoardEvaluator {
                 subBoardRanks.addAll(subBoardRanksCopy);
             }
         }
-        //straightCombos.clear();
         return straightCombos;
     }
-
-
-
-
 
     private static boolean boardContainsAce(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);

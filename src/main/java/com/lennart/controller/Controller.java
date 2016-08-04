@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableAutoConfiguration
@@ -73,16 +74,20 @@ public class Controller {
         return BoardEvaluator.allFunctions(board);
     }
 
-    @RequestMapping(value = "/getStraightCombos", method = RequestMethod.GET)
-    public @ResponseBody List<List<Integer>> getStraightCombos() {
-
-        BoardEvaluator.getCombosThatMakeWheelStraight(board);
-//        return BoardEvaluator.getCombosThatMakeStraight(board);
-        return BoardEvaluator.getCombosThatGiveOOSD(board);
+    @RequestMapping(value = "/getOosdStraightCombos", method = RequestMethod.GET)
+    public @ResponseBody Map<Integer, List<Integer>> getOosdStraightCombos() {
+        return BoardEvaluator.getCombosThatGiveOosdOrDoubleGutter(board);
     }
 
+    @RequestMapping(value = "/getGutshotStraightCombos", method = RequestMethod.GET)
+    public @ResponseBody Map<Integer, List<Integer>> getGutshotStraightCombos() {
+        return BoardEvaluator.getCombosThatGiveGutshot(board);
+    }
 
-
+    @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
+    public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
+        return BoardEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(Controller.class, args);
