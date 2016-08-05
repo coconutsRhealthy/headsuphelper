@@ -192,7 +192,91 @@ public class BoardEvaluator {
                 counter++;
             }
         }
+
+        if(board.size() == 4) {
+            oosdCombos = addSpecificOosdCombosIfNecessary(oosdCombos, board);
+        }
+
         return oosdCombos;
+    }
+
+    private static Map<Integer, List<Integer>> addSpecificOosdCombosIfNecessary (Map<Integer, List<Integer>> oosdCombos, List<Card> board) {
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        boolean boardMatchesWithTextureThatWronglyRecognizesOosdAsGutshot = false;
+
+        Map<Integer, List<Integer>> mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot = getMapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot();
+
+        for(int i = 0; i < mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.size(); i++) {
+            if (mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.get(i).equals(boardRanks)) {
+                boardMatchesWithTextureThatWronglyRecognizesOosdAsGutshot = true;
+                break;
+            }
+        }
+
+        if(boardMatchesWithTextureThatWronglyRecognizesOosdAsGutshot) {
+            int integerValueOfCombosThatNeedToBeAdded;
+            if(boardContainsAce(board)) {
+                integerValueOfCombosThatNeedToBeAdded = boardRanks.get(boardRanks.size()-2) + 1;
+            } else {
+                integerValueOfCombosThatNeedToBeAdded = boardRanks.get(boardRanks.size()-1) + 1;
+            }
+
+            Map<Integer, List<Integer>> combosToBeAdded = new HashMap<>();
+            for(int i = 0; i < 13; i++) {
+                combosToBeAdded.put(i, new ArrayList<>());
+                combosToBeAdded.get(i).add(integerValueOfCombosThatNeedToBeAdded);
+                combosToBeAdded.get(i).add(i + 2);
+            }
+
+            List<Integer> exceptionComboBecauseItMakesStraight = new ArrayList<>();
+            if(boardContainsAce(board)) {
+                exceptionComboBecauseItMakesStraight.add(boardRanks.get(boardRanks.size()-2) + 1);
+                exceptionComboBecauseItMakesStraight.add(boardRanks.get(boardRanks.size()-2) + 2);
+                combosToBeAdded.remove(getKeyByValue(combosToBeAdded, exceptionComboBecauseItMakesStraight));
+            } else {
+                exceptionComboBecauseItMakesStraight.add(boardRanks.get(boardRanks.size()-1) + 1);
+                exceptionComboBecauseItMakesStraight.add(boardRanks.get(boardRanks.size()-1) + 2);
+                combosToBeAdded.remove(getKeyByValue(combosToBeAdded, exceptionComboBecauseItMakesStraight));
+            }
+
+            int keyForOosdCombos = oosdCombos.size();
+
+            for (Map.Entry<Integer, List<Integer>> entry : combosToBeAdded.entrySet()) {
+                oosdCombos.put(keyForOosdCombos, combosToBeAdded.get(entry.getKey()));
+                keyForOosdCombos++;
+            }
+        }
+        return oosdCombos;
+    }
+
+    private static Map<Integer, List<Integer>> getMapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot() {
+        int a = 2;
+        int b = 4;
+        int c = 5;
+        int d = 6;
+
+        Map<Integer, List<Integer>> mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot = new HashMap<>();
+        List<Integer> firstList = new ArrayList<>();
+        firstList.add(3);
+        firstList.add(4);
+        firstList.add(5);
+        firstList.add(14);
+        mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.put(0, firstList);
+
+
+        for(int i = 1; i < 8; i++) {
+            mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.put(i, new ArrayList<>());
+            mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.get(i).add(a);
+            mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.get(i).add(b);
+            mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.get(i).add(c);
+            mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.get(i).add(d);
+
+            a++;
+            b++;
+            c++;
+            d++;
+        }
+        return mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot;
     }
 
     public static Map<Integer, List<Integer>> getCombosThatGiveGutshot (List<Card> board) {
@@ -204,6 +288,54 @@ public class BoardEvaluator {
             if (entry.getValue().size() > 9 && entry.getValue().size() < 15) {
                 gutshotCombos.put(counter, entry.getKey());
                 counter++;
+            }
+        }
+
+        if(board.size() == 4) {
+            gutshotCombos = removeSpecificGutshotCombosIfNecessary(gutshotCombos, board);
+        }
+
+        return gutshotCombos;
+    }
+
+    private static Map<Integer, List<Integer>> removeSpecificGutshotCombosIfNecessary (Map<Integer, List<Integer>> gutshotCombos, List<Card> board) {
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        boolean boardMatchesWithTextureThatWronglyRecognizesOosdAsGutshot = false;
+
+        Map<Integer, List<Integer>> mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot = getMapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot();
+
+        for(int i = 0; i < mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.size(); i++) {
+            if (mapOfBoardTexturesThatWronglyRecognizeOosdAsGutshot.get(i).equals(boardRanks)) {
+                boardMatchesWithTextureThatWronglyRecognizesOosdAsGutshot = true;
+                break;
+            }
+        }
+
+        if(boardMatchesWithTextureThatWronglyRecognizesOosdAsGutshot) {
+            int integerValueOfCombosThatNeedToBeRemoved;
+            if(boardContainsAce(board)) {
+                integerValueOfCombosThatNeedToBeRemoved = boardRanks.get(boardRanks.size()-2) + 1;
+            } else {
+                integerValueOfCombosThatNeedToBeRemoved = boardRanks.get(boardRanks.size()-1) + 1;
+            }
+
+            Map<Integer, List<Integer>> combosToBeRemoved = new HashMap<>();
+            for(int i = 0; i < 13; i++) {
+                combosToBeRemoved.put(i, new ArrayList<>());
+                combosToBeRemoved.get(i).add(integerValueOfCombosThatNeedToBeRemoved);
+                combosToBeRemoved.get(i).add(i + 2);
+            }
+
+            for(int i = 0; i < combosToBeRemoved.size(); i++) {
+                gutshotCombos.remove(getKeyByValue(gutshotCombos, combosToBeRemoved.get(i)));
+            }
+
+            for(int i = 0; i < combosToBeRemoved.size(); i++) {
+                Collections.sort(combosToBeRemoved.get(i));
+            }
+
+            for(int i = 0; i < combosToBeRemoved.size(); i++) {
+                gutshotCombos.remove(getKeyByValue(gutshotCombos, combosToBeRemoved.get(i)));
             }
         }
         return gutshotCombos;
