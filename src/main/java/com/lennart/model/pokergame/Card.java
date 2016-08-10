@@ -1,11 +1,20 @@
-package com.lennart.model;
+package com.lennart.model.pokergame;
 
 /**
- * Created by LPO10346 on 3-6-2016.
+ * Created by Lennart Popma on 3-6-2016.
  */
 public class Card {
     private int rank;
     private char suit;
+
+    public Card() {
+        //empty default constructor
+    }
+
+    public Card(int rank, char suit) {
+        this.rank = rank;
+        this.suit = suit;
+    }
 
     public int getRank() {
         return rank;

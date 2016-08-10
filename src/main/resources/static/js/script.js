@@ -57,7 +57,9 @@ var mainApp = angular.module("mainApp", []);
     $scope.selectedTurnCardFromServer;
     $scope.selectedRiverCardFromServer;
     $scope.flopCards;
-    $scope.straightCombos;
+    $scope.oosdStraightCombos;
+    $scope.gutshotStraightCombos;
+    $scope.backdoorStraightCombos;
 
     //functions
     $scope.selectCard = function(id) {
@@ -209,8 +211,18 @@ var mainApp = angular.module("mainApp", []);
               //alert(JSON.stringify(data[1]));
             })
 
-            $http.get('/getStraightCombos/').success(function(data) {
-              $scope.straightCombos = data;
+            $http.get('/getOosdStraightCombos/').success(function(data) {
+              $scope.oosdStraightCombos = data;
+              //alert(JSON.stringify(data));
+            })
+
+            $http.get('/getGutshotStraightCombos/').success(function(data) {
+              $scope.gutshotStraightCombos = data;
+              //alert(JSON.stringify(data));
+            })
+
+            $http.get('/getBackdoorStraightCombos/').success(function(data) {
+              $scope.backdoorStraightCombos = data;
               //alert(JSON.stringify(data));
             })
 
@@ -238,8 +250,18 @@ var mainApp = angular.module("mainApp", []);
               //alert(JSON.stringify(data[1]));
             })
 
-            $http.get('/getStraightCombos/').success(function(data) {
-              $scope.straightCombos = data;
+            $http.get('/getOosdStraightCombos/').success(function(data) {
+              $scope.oosdStraightCombos = data;
+              //alert(JSON.stringify(data));
+            })
+
+            $http.get('/getGutshotStraightCombos/').success(function(data) {
+              $scope.gutshotStraightCombos = data;
+              //alert(JSON.stringify(data));
+            })
+
+            $http.get('/getBackdoorStraightCombos/').success(function(data) {
+              $scope.backdoorStraightCombos = data;
               //alert(JSON.stringify(data));
             })
 
@@ -266,8 +288,18 @@ var mainApp = angular.module("mainApp", []);
               //alert(JSON.stringify(data[1]));
             })
 
-            $http.get('/getStraightCombos/').success(function(data) {
-              $scope.straightCombos = data;
+            $http.get('/getOosdStraightCombos/').success(function(data) {
+              $scope.oosdStraightCombos = data;
+              //alert(JSON.stringify(data));
+            })
+
+            $http.get('/getGutshotStraightCombos/').success(function(data) {
+              $scope.gutshotStraightCombos = data;
+              //alert(JSON.stringify(data));
+            })
+
+            $http.get('/getBackdoorStraightCombos/').success(function(data) {
+              $scope.backdoorStraightCombos = data;
               //alert(JSON.stringify(data));
             })
 
