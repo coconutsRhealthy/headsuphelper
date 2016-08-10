@@ -7,7 +7,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 /**
- * Created by LPO10346 on 21-6-2016.
+ * Created by Lennart Popma on 21-6-2016.
  */
 public class BoardEvaluator {
     public boolean isBoardRainbow(List<Card> board) {

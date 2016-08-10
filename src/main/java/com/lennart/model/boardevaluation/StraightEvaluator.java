@@ -5,7 +5,7 @@ import com.lennart.model.pokergame.Card;
 import java.util.*;
 
 /**
- * Created by LPO10346 on 8/9/2016.
+ * Created by Lennart Popma on 8/9/2016.
  */
 public class StraightEvaluator extends BoardEvaluator {
 

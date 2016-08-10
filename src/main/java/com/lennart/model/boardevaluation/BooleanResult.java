@@ -1,7 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 /**
- * Created by LPO10346 on 23-6-2016.
+ * Created by Lennart Popma on 23-6-2016.
  */
 public class BooleanResult {
     private String functionDescription;

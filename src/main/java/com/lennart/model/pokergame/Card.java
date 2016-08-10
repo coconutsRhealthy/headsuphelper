@@ -1,7 +1,7 @@
 package com.lennart.model.pokergame;
 
 /**
- * Created by LPO10346 on 3-6-2016.
+ * Created by Lennart Popma on 3-6-2016.
  */
 public class Card {
     private int rank;
