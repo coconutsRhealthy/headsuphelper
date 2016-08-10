@@ -1,8 +1,9 @@
 package com.lennart.controller;
 
-import com.lennart.model.BoardEvaluator;
-import com.lennart.model.BooleanResult;
-import com.lennart.model.Card;
+import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.boardevaluation.BooleanResult;
+import com.lennart.model.pokergame.Card;
+import com.lennart.model.boardevaluation.StraightEvaluator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,8 @@ public class Controller {
     private Card turnCard = new Card();
     private Card riverCard = new Card();
     private List<Card> board = new ArrayList<Card>();
+    private BoardEvaluator boardEvaluator = new BoardEvaluator();
+    private StraightEvaluator straightEvaluator = new StraightEvaluator();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -71,22 +74,22 @@ public class Controller {
     @RequestMapping(value = "/getFunctionResults", method = RequestMethod.GET)
     public @ResponseBody List<BooleanResult> getFunctionResults() {
 
-        return BoardEvaluator.allFunctions(board);
+        return boardEvaluator.allFunctions(board);
     }
 
     @RequestMapping(value = "/getOosdStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getOosdStraightCombos() {
-        return BoardEvaluator.getCombosThatGiveOosdOrDoubleGutter(board);
+        return straightEvaluator.getCombosThatGiveOosdOrDoubleGutter(board);
     }
 
     @RequestMapping(value = "/getGutshotStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getGutshotStraightCombos() {
-        return BoardEvaluator.getCombosThatGiveGutshot(board);
+        return straightEvaluator.getCombosThatGiveGutshot(board);
     }
 
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
-        return BoardEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
+        return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
     }
 
     public static void main(String[] args) {

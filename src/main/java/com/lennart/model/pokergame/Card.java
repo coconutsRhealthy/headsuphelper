@@ -1,4 +1,4 @@
-package com.lennart.model;
+package com.lennart.model.pokergame;
 
 /**
  * Created by LPO10346 on 3-6-2016.
