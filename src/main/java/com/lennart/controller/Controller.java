@@ -2,6 +2,7 @@ package com.lennart.controller;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.BooleanResult;
+import com.lennart.model.boardevaluation.FlushEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.boardevaluation.StraightEvaluator;
 import org.springframework.boot.SpringApplication;
@@ -25,6 +26,7 @@ public class Controller {
     private List<Card> board = new ArrayList<Card>();
     private BoardEvaluator boardEvaluator = new BoardEvaluator();
     private StraightEvaluator straightEvaluator = new StraightEvaluator();
+    private FlushEvaluator flushEvaluator = new FlushEvaluator();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -89,6 +91,10 @@ public class Controller {
 
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
+
+        flushEvaluator.getSuitsOfBoard(board);
+        flushEvaluator.getMapOfAllPossibleCombosOfOneSuit('d');
+        flushEvaluator.getFlushCombos(board);
         return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
     }
 
