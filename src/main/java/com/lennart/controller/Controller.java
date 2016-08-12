@@ -92,8 +92,10 @@ public class Controller {
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
 
+        flushEvaluator.getFlushCombos(board);
+        //flushEvaluator.getMapOfAllPossibleStartHands();
         flushEvaluator.getSuitsOfBoard(board);
-        flushEvaluator.getMapOfAllPossibleCombosOfOneSuit('d');
+//        flushEvaluator.getMapOfAllPossibleCombosOfOneSuit('d');
         flushEvaluator.getFlushCombos(board);
         return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
     }

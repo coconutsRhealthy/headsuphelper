@@ -32,9 +32,9 @@ public class FlushEvaluator extends BoardEvaluator {
         }
 
         if(numberOfSuitedCards == 3) {
-            Map<Integer, List<Card>> allPossibleCombosOfOneSuit = getMapOfAllPossibleCombosOfOneSuit(flushSuit);
-            clearComboMapOfCombosThatContainCardsOnTheBoard(allPossibleCombosOfOneSuit);
-
+            Map<Integer, List<Card>> allPossibleSuitedStartHands = getAllPossibleSuitedStartHands(flushSuit);
+            allPossibleSuitedStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleSuitedStartHands, board);
+            return allPossibleSuitedStartHands;
         }
 
         if(numberOfSuitedCards == 4) {
@@ -68,9 +68,32 @@ public class FlushEvaluator extends BoardEvaluator {
         return null;
     }
 
-    public Map<Integer, List<Card>> clearComboMapOfCombosThatContainCardsOnTheBoard(Map<Integer, List<Card>> comboMap) {
+    public Map<Integer, List<Card>> clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(Map<Integer, List<Card>> allSuitedStartHands, List<Card> board) {
+        Card boardCard1 = board.get(0);
+        Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = getAllStartHandsThatContainASpecificCard(boardCard1);
+        Map<Integer, List<Card>> allStartHandsThatContainASpecificCardCleardForBoardCards = new HashMap<>();
 
-        return comboMap;
+        int index = 0;
+        for (Map.Entry<Integer, List<Card>> entry : allSuitedStartHands.entrySet()) {
+            if(!entry.getValue().contains(boardCard1)) {
+                allStartHandsThatContainASpecificCardCleardForBoardCards.put(index, entry.getValue());
+            }
+        }
+
+        return allStartHandsThatContainASpecificCardCleardForBoardCards;
+    }
+
+    public Map<Integer, List<Card>> getAllStartHandsThatContainASpecificCard(Card card) {
+        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+        Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = new HashMap<>();
+
+        int index = 0;
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+            if(entry.getValue().contains(card)) {
+                allStartHandsThatContainASpecificCard.put(index, entry.getValue());
+            }
+        }
+        return allStartHandsThatContainASpecificCard;
     }
 
     public Map<Character, List<Card>> getSuitsOfBoard (List<Card> board) {
@@ -94,7 +117,7 @@ public class FlushEvaluator extends BoardEvaluator {
         return suitMap;
     }
 
-    public Map<Integer, List<Card>> getMapOfAllPossibleCombosOfOneSuit (char suit) {
+    public Map<Integer, List<Card>> getAllPossibleSuitedStartHands (char suit) {
         Map<Integer, List<Card>> allPossibleCombosOfOneSuit = new HashMap<>();
 
         for(int i = 0; i < 78; i++) {
@@ -114,5 +137,45 @@ public class FlushEvaluator extends BoardEvaluator {
             counter--;
         }
         return allPossibleCombosOfOneSuit;
+    }
+
+    public Map<Integer, List<Card>> getAllPossibleStartHands() {
+        Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
+        List<Card> completeCardDeck = getCompleteCardDeck();
+
+        int i = 1;
+        for(int z = 0; z < 52; z++) {
+            for(int q = 0; q < 52; q++) {
+                if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
+                    allPossibleStartHands.put(i, new ArrayList<>());
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(z));
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(q));
+                    i++;
+                }
+            }
+        }
+        return allPossibleStartHands;
+    }
+
+    public List<Card> getCompleteCardDeck() {
+        List<Card> completeCardDeck = new ArrayList<>();
+
+        for(int i = 2; i <= 14; i++) {
+            for(int z = 1; z <= 4; z++) {
+                if(z == 1) {
+                    completeCardDeck.add(new Card(i, 's'));
+                }
+                if(z == 2) {
+                    completeCardDeck.add(new Card(i, 'c'));
+                }
+                if(z == 3) {
+                    completeCardDeck.add(new Card(i, 'd'));
+                }
+                if(z == 4) {
+                    completeCardDeck.add(new Card(i, 'h'));
+                }
+            }
+        }
+        return completeCardDeck;
     }
 }
