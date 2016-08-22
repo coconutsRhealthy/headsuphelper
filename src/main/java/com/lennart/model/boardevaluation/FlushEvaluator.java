@@ -11,11 +11,8 @@ public class FlushEvaluator extends BoardEvaluator {
 
     public Map<Integer, List<Card>> getFlushCombos (List<Card> board) {
         Map<Integer, List<Card>> flushCombos = new HashMap<>();
-
-        //get suits of board
         Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
 
-        //als er geeneen suit op het board 3 of meer is, dan return null
         char flushSuit = 'x';
         int numberOfSuitedCards = 0;
         for (Map.Entry<Character, List<Card>> entry : suitsOfBoard.entrySet()) {
@@ -32,55 +29,70 @@ public class FlushEvaluator extends BoardEvaluator {
         }
 
         if(numberOfSuitedCards == 3) {
-            Map<Integer, List<Card>> allPossibleSuitedStartHands = getAllPossibleSuitedStartHands(flushSuit);
-            allPossibleSuitedStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleSuitedStartHands, board);
-            return allPossibleSuitedStartHands;
+            flushCombos = getAllPossibleSuitedStartHands(flushSuit);
+            flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
+            return flushCombos;
         }
 
-        if(numberOfSuitedCards == 4) {
+        if(numberOfSuitedCards == 4 || numberOfSuitedCards == 5) {
+            flushCombos = getAllPossibleSuitedStartHands(flushSuit);
+            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
+            for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
+                if(entry.getValue().get(0).getSuit() == flushSuit && entry.getValue().get(1).getSuit() != flushSuit) {
+                    flushCombos.put(flushCombos.size(), entry.getValue());
+                } else if (entry.getValue().get(0).getSuit() != flushSuit && entry.getValue().get(1).getSuit() == flushSuit) {
+                    flushCombos.put(flushCombos.size(), entry.getValue());
+                }
+            }
+            flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
 
+            if(numberOfSuitedCards == 5) {
+                for(Iterator<Map.Entry<Integer, List<Card>>> it = flushCombos.entrySet().iterator(); it.hasNext(); ) {
+                    Map.Entry<Integer, List<Card>> entry = it.next();
+                    List<Card> startHandCardsThatAreHigherThanHighestBoardCard = getStartHandCardsThatAreHigherThanHighestBoardCard(entry.getValue(), board);
+                    if(startHandCardsThatAreHigherThanHighestBoardCard.isEmpty()) {
+                        it.remove();
+                    } else if (startHandCardsThatAreHigherThanHighestBoardCard.size() == 1) {
+                        if(startHandCardsThatAreHigherThanHighestBoardCard.get(0).getSuit() != flushSuit) {
+                            it.remove();
+                        }
+                    }
+                }
+            }
+            return flushCombos;
         }
-
-        if(numberOfSuitedCards == 5) {
-
-        }
-
-
-//        if(sizesOfListsInFlushComboMap[3] < 2) {
-//            return flushCombos;
-//        }
-
-
-
-
-
-
-        //als een suit 3 is, get dan map van allPossibleCombosOfOneSuit
-        //verwijder uit deze map alle combos waarin de suit kaarten op het board voorkomen
-        //dit zijn alle flushcombos bij 3 of one suit
-
-        //als een suit 4 is, get dan map van allPossibleCombosOfSpecificSuitAndOffSuit
-        //en get ook map van allPossibleCombosOfOneSuit
-        //verwijder uit deze map alle combos waarin de suit kaarten op het board voorkomen
-        //dit zijn alle flushcombos bij 4 of one suit
-
-
         return null;
     }
 
-    public Map<Integer, List<Card>> clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(Map<Integer, List<Card>> allSuitedStartHands, List<Card> board) {
-        Card boardCard1 = board.get(0);
-        Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = getAllStartHandsThatContainASpecificCard(boardCard1);
-        Map<Integer, List<Card>> allStartHandsThatContainASpecificCardCleardForBoardCards = new HashMap<>();
+    public Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
+        return null;
+    }
 
-        int index = 0;
-        for (Map.Entry<Integer, List<Card>> entry : allSuitedStartHands.entrySet()) {
-            if(!entry.getValue().contains(boardCard1)) {
-                allStartHandsThatContainASpecificCardCleardForBoardCards.put(index, entry.getValue());
+    public List<Card> getStartHandCardsThatAreHigherThanHighestBoardCard(List<Card> startHand, List<Card> board) {
+        List<Card> startHandCardsThatAreHigherThanHighestBoardCard = new ArrayList<>();
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        int valueOfHighestBoardCard = boardRanks.get(boardRanks.size() - 1);
+
+        for(Card c : startHand) {
+            if(c.getRank() > valueOfHighestBoardCard) {
+                startHandCardsThatAreHigherThanHighestBoardCard.add(c);
             }
         }
+        return startHandCardsThatAreHigherThanHighestBoardCard;
+    }
 
-        return allStartHandsThatContainASpecificCardCleardForBoardCards;
+
+    public Map<Integer, List<Card>> clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(Map<Integer, List<Card>> allStartHands, List<Card> board) {
+        Map<Integer, List<Card>> allStartHandsClearedForBoardCards = new HashMap<>();
+
+        int index = 0;
+        for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
+            if(Collections.disjoint(entry.getValue(), board)) {
+                allStartHandsClearedForBoardCards.put(index, entry.getValue());
+                index++;
+            }
+        }
+        return allStartHandsClearedForBoardCards;
     }
 
     public Map<Integer, List<Card>> getAllStartHandsThatContainASpecificCard(Card card) {
