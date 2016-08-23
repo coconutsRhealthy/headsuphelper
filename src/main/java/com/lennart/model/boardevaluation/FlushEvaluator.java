@@ -65,7 +65,72 @@ public class FlushEvaluator extends BoardEvaluator {
     }
 
     public Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
-        return null;
+
+        //backdoor niet in deze methode
+
+        //als het twee kaarten van een suit zijn en verder rainbow dan de suited starthands
+        Map<Integer, List<Card>> flushDrawCombos = new HashMap<>();
+        Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
+
+        if(board.size() == 5) {
+            return flushDrawCombos;
+        }
+
+        char flushSuit = 'x';
+        char flushSuit2 = 'x';
+        for (Map.Entry<Character, List<Card>> entry : suitsOfBoard.entrySet()) {
+            if(entry.getValue().size() == 2) {
+                if(flushSuit == 'x') {
+                    flushSuit = entry.getValue().get(0).getSuit();
+                } else {
+                    flushSuit2 = entry.getValue().get(0).getSuit();
+                }
+            }
+        }
+
+        if(flushSuit != 'x' && flushSuit2 == 'x') {
+            flushDrawCombos = getAllPossibleSuitedStartHands(flushSuit);
+            flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
+            return flushDrawCombos;
+        }
+
+        //als het twee kaarten van een suit zijn en nog twee kaarten van een suit dan van beide de suited starthands
+        if(flushSuit != 'x' && flushSuit2 != 'x') {
+            flushDrawCombos = getAllPossibleSuitedStartHands(flushSuit);
+            flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
+
+            Map<Integer, List<Card>> flushDrawCombos2;
+            flushDrawCombos2 = getAllPossibleSuitedStartHands(flushSuit2);
+            flushDrawCombos2 = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos2, board);
+
+            for (Map.Entry<Integer, List<Card>> entry : flushDrawCombos2.entrySet()) {
+                flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());
+            }
+
+            return flushDrawCombos;
+        }
+
+        //als het 3 kaarten van een suit zijn dan alle combos waarin één flushsuit zit
+        boolean threeToFlushOnBoard = false;
+        for (Map.Entry<Character, List<Card>> entry : suitsOfBoard.entrySet()) {
+            if(entry.getValue().size() == 3) {
+                flushSuit = entry.getValue().get(0).getSuit();
+                threeToFlushOnBoard = true;
+            }
+        }
+
+        if(threeToFlushOnBoard) {
+            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
+            for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
+                if(entry.getValue().get(0).getSuit() == flushSuit && entry.getValue().get(1).getSuit() != flushSuit) {
+                    flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());
+                } else if (entry.getValue().get(0).getSuit() != flushSuit && entry.getValue().get(1).getSuit() == flushSuit) {
+                    flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());
+                }
+            }
+            flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
+        }
+        return flushDrawCombos;
     }
 
     public List<Card> getStartHandCardsThatAreHigherThanHighestBoardCard(List<Card> startHand, List<Card> board) {
