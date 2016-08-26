@@ -133,6 +133,72 @@ public class FlushEvaluator extends BoardEvaluator {
         return flushDrawCombos;
     }
 
+    public Map<Integer, List<Card>> getBackDoorFlushDrawCombos(List<Card> board) {
+        Map<Integer, List<Card>> backDoorFlushDrawCombos = new HashMap<>();
+
+        if(board.size() > 3) {
+            return backDoorFlushDrawCombos;
+        }
+
+        Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
+
+        char flushSuitTwoOfSameSuitOnBoard;
+        char flushSuitRainbow1 = 'x';
+        char flushSuitRainbow2 = 'x';
+        char flushSuitRainbow3;
+
+        Map<Integer, List<Card>> allPossibleSuitedStartHands = new HashMap<>();
+        Map<Integer, List<Card>> allStartHandsThatContainFlushSuitRainbow1 = new HashMap<>();
+        Map<Integer, List<Card>> allStartHandsThatContainFlushSuitRainbow2 = new HashMap<>();
+        Map<Integer, List<Card>> allStartHandsThatContainFlushSuitRainbow3 = new HashMap<>();
+
+        for (Map.Entry<Character, List<Card>> entry : suitsOfBoard.entrySet()) {
+            if(entry.getValue().size() == 1) {
+                if(flushSuitRainbow1 == 'x') {
+                    flushSuitRainbow1 = entry.getValue().get(0).getSuit();
+                    allStartHandsThatContainFlushSuitRainbow1 = getAllNonSuitedStartHandsThatContainASpecificSuit(flushSuitRainbow1);
+                } else if (flushSuitRainbow2 == 'x') {
+                    flushSuitRainbow2 = entry.getValue().get(0).getSuit();
+                    allStartHandsThatContainFlushSuitRainbow2 = getAllNonSuitedStartHandsThatContainASpecificSuit(flushSuitRainbow2);
+                } else {
+                    flushSuitRainbow3 = entry.getValue().get(0).getSuit();
+                    allStartHandsThatContainFlushSuitRainbow3 = getAllNonSuitedStartHandsThatContainASpecificSuit(flushSuitRainbow3);
+                }
+            } else if (entry.getValue().size() == 2) {
+                flushSuitTwoOfSameSuitOnBoard = entry.getValue().get(0).getSuit();
+                allPossibleSuitedStartHands = getAllPossibleSuitedStartHands(flushSuitTwoOfSameSuitOnBoard);
+            }
+        }
+
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleSuitedStartHands.entrySet()) {
+            backDoorFlushDrawCombos.put(backDoorFlushDrawCombos.size(), entry.getValue());
+        }
+        for (Map.Entry<Integer, List<Card>> entry : allStartHandsThatContainFlushSuitRainbow1.entrySet()) {
+            backDoorFlushDrawCombos.put(backDoorFlushDrawCombos.size(), entry.getValue());
+        }
+        for (Map.Entry<Integer, List<Card>> entry : allStartHandsThatContainFlushSuitRainbow2.entrySet()) {
+            backDoorFlushDrawCombos.put(backDoorFlushDrawCombos.size(), entry.getValue());
+        }
+        for (Map.Entry<Integer, List<Card>> entry : allStartHandsThatContainFlushSuitRainbow3.entrySet()) {
+            backDoorFlushDrawCombos.put(backDoorFlushDrawCombos.size(), entry.getValue());
+        }
+
+        return backDoorFlushDrawCombos;
+    }
+
+    public Map<Integer, List<Card>> getAllNonSuitedStartHandsThatContainASpecificSuit(char suit) {
+        Map<Integer, List<Card>> allNonSuitedStartHandsThatContainASpecificSuit = new HashMap<>();
+        Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
+        for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
+            if(entry.getValue().get(0).getSuit() == suit && entry.getValue().get(1).getSuit() != suit) {
+                allNonSuitedStartHandsThatContainASpecificSuit.put(allNonSuitedStartHandsThatContainASpecificSuit.size(), entry.getValue());
+            } else if (entry.getValue().get(0).getSuit() != suit && entry.getValue().get(1).getSuit() == suit) {
+                allNonSuitedStartHandsThatContainASpecificSuit.put(allNonSuitedStartHandsThatContainASpecificSuit.size(), entry.getValue());
+            }
+        }
+        return allNonSuitedStartHandsThatContainASpecificSuit;
+    }
+
     public List<Card> getStartHandCardsThatAreHigherThanHighestBoardCard(List<Card> startHand, List<Card> board) {
         List<Card> startHandCardsThatAreHigherThanHighestBoardCard = new ArrayList<>();
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
