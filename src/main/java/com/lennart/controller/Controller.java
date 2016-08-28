@@ -1,10 +1,7 @@
 package com.lennart.controller;
 
-import com.lennart.model.boardevaluation.BoardEvaluator;
-import com.lennart.model.boardevaluation.BooleanResult;
-import com.lennart.model.boardevaluation.FlushEvaluator;
+import com.lennart.model.boardevaluation.*;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.boardevaluation.StraightEvaluator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +24,7 @@ public class Controller {
     private BoardEvaluator boardEvaluator = new BoardEvaluator();
     private StraightEvaluator straightEvaluator = new StraightEvaluator();
     private FlushEvaluator flushEvaluator = new FlushEvaluator();
+    private PairEvaluator pairEvaluator = new PairEvaluator();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -92,6 +90,7 @@ public class Controller {
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
 
+        pairEvaluator.getCombosThatMakePair(board);
         flushEvaluator.getFlushDrawCombos(board);
         flushEvaluator.getFlushCombos(board);
         //flushEvaluator.getMapOfAllPossibleStartHands();

@@ -381,6 +381,18 @@ public class BoardEvaluator {
         return completeCardDeck;
     }
 
+    protected Map<Integer, List<Card>> getAllPocketPairStartHands() {
+        Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
+        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+            if(entry.getValue().get(0).getRank() == entry.getValue().get(1).getRank()) {
+                allPocketPairStartHands.put(allPocketPairStartHands.size(), entry.getValue());
+            }
+        }
+        return allPocketPairStartHands;
+    }
+
     public List<BooleanResult> allFunctions(List<Card> board) {
         BooleanResult result1 = new BooleanResult();
         BooleanResult result2 = new BooleanResult();
