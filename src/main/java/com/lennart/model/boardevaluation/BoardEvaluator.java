@@ -302,6 +302,85 @@ public class BoardEvaluator {
         return boardRanks.get(boardRanks.size() - 1);
     }
 
+    protected List<Card> getStartHandCardsThatAreHigherThanHighestBoardCard(List<Card> startHand, List<Card> board) {
+        List<Card> startHandCardsThatAreHigherThanHighestBoardCard = new ArrayList<>();
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        int valueOfHighestBoardCard = boardRanks.get(boardRanks.size() - 1);
+
+        for(Card c : startHand) {
+            if(c.getRank() > valueOfHighestBoardCard) {
+                startHandCardsThatAreHigherThanHighestBoardCard.add(c);
+            }
+        }
+        return startHandCardsThatAreHigherThanHighestBoardCard;
+    }
+
+    protected Map<Integer, List<Card>> clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(Map<Integer, List<Card>> allStartHands, List<Card> board) {
+        Map<Integer, List<Card>> allStartHandsClearedForBoardCards = new HashMap<>();
+
+        int index = 0;
+        for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
+            if(Collections.disjoint(entry.getValue(), board)) {
+                allStartHandsClearedForBoardCards.put(index, entry.getValue());
+                index++;
+            }
+        }
+        return allStartHandsClearedForBoardCards;
+    }
+
+    protected Map<Integer, List<Card>> getAllStartHandsThatContainASpecificCard(Card card) {
+        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+        Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = new HashMap<>();
+
+        int index = 0;
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+            if(entry.getValue().contains(card)) {
+                allStartHandsThatContainASpecificCard.put(index, entry.getValue());
+            }
+        }
+        return allStartHandsThatContainASpecificCard;
+    }
+
+    protected Map<Integer, List<Card>> getAllPossibleStartHands() {
+        Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
+        List<Card> completeCardDeck = getCompleteCardDeck();
+
+        int i = 1;
+        for(int z = 0; z < 52; z++) {
+            for(int q = 0; q < 52; q++) {
+                if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
+                    allPossibleStartHands.put(i, new ArrayList<>());
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(z));
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(q));
+                    i++;
+                }
+            }
+        }
+        return allPossibleStartHands;
+    }
+
+    protected List<Card> getCompleteCardDeck() {
+        List<Card> completeCardDeck = new ArrayList<>();
+
+        for(int i = 2; i <= 14; i++) {
+            for(int z = 1; z <= 4; z++) {
+                if(z == 1) {
+                    completeCardDeck.add(new Card(i, 's'));
+                }
+                if(z == 2) {
+                    completeCardDeck.add(new Card(i, 'c'));
+                }
+                if(z == 3) {
+                    completeCardDeck.add(new Card(i, 'd'));
+                }
+                if(z == 4) {
+                    completeCardDeck.add(new Card(i, 'h'));
+                }
+            }
+        }
+        return completeCardDeck;
+    }
+
     public List<BooleanResult> allFunctions(List<Card> board) {
         BooleanResult result1 = new BooleanResult();
         BooleanResult result2 = new BooleanResult();
