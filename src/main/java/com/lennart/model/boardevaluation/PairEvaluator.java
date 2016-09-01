@@ -15,14 +15,9 @@ public class PairEvaluator extends BoardEvaluator {
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
+            Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnlyCorrectedForBoard(allPossibleStartHands, board);
 
-            Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = new HashMap<>();
-            for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-                allPossibleStartHandsRankOnly.put(entry.getKey(), new ArrayList<>());
-                allPossibleStartHandsRankOnly.get(entry.getKey()).add(entry.getValue().get(0).getRank());
-                allPossibleStartHandsRankOnly.get(entry.getKey()).add(entry.getValue().get(1).getRank());
-            }
-
+            //gaat dit wel goed? Krijg je hier niet ook two pairs mee?
             for(Card c : board) {
                 for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
                     if(Collections.frequency(entry.getValue(), c.getRank()) == 1) {
@@ -31,10 +26,25 @@ public class PairEvaluator extends BoardEvaluator {
                 }
             }
 
+            for (Map.Entry<Integer, List<Card>> entry : combosThatMakePair.entrySet()) {
+                if(entry.getValue().get(0).getRank() == 4 && entry.getValue().get(1).getRank() == 8) {
+                    System.out.println("jajaEIJE!");
+                }
+            }
+
             Map<Integer, List<Card>> allPocketPairs = getAllPocketPairStartHands();
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(0).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(1).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(2).getRank());
+
+            if(board.size() == 4) {
+                allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(3).getRank());
+            }
+
+            if(board.size() == 5) {
+                allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(3).getRank());
+                allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(4).getRank());
+            }
 
             for (Map.Entry<Integer, List<Card>> entry : allPocketPairs.entrySet()) {
                 combosThatMakePair.put(combosThatMakePair.size(), entry.getValue());
@@ -44,13 +54,7 @@ public class PairEvaluator extends BoardEvaluator {
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
-
-            Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = new HashMap<>();
-            for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-                allPossibleStartHandsRankOnly.put(entry.getKey(), new ArrayList<>());
-                allPossibleStartHandsRankOnly.get(entry.getKey()).add(entry.getValue().get(0).getRank());
-                allPossibleStartHandsRankOnly.get(entry.getKey()).add(entry.getValue().get(1).getRank());
-            }
+            Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnlyCorrectedForBoard(allPossibleStartHands, board);
 
             int counter = 0;
             for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {

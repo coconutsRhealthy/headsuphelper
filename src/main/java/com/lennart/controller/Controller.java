@@ -25,6 +25,7 @@ public class Controller {
     private StraightEvaluator straightEvaluator = new StraightEvaluator();
     private FlushEvaluator flushEvaluator = new FlushEvaluator();
     private PairEvaluator pairEvaluator = new PairEvaluator();
+    private TwoPairEvaluator twoPairEvaluator = new TwoPairEvaluator();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -90,6 +91,7 @@ public class Controller {
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
 
+        twoPairEvaluator.getCombosThatMakeTwoPair(board);
         pairEvaluator.getCombosThatMakePair(board);
         flushEvaluator.getFlushDrawCombos(board);
         flushEvaluator.getFlushCombos(board);

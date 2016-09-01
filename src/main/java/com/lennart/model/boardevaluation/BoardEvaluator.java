@@ -433,6 +433,18 @@ public class BoardEvaluator {
         return false;
     }
 
+    protected Map<Integer, List<Integer>> getAllPossibleStartHandsRankOnlyCorrectedForBoard(Map<Integer, List<Card>> allPossibleStartHands, List<Card> board) {
+        Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = new HashMap<>();
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+            allPossibleStartHandsRankOnly.put(entry.getKey(), new ArrayList<>());
+            allPossibleStartHandsRankOnly.get(entry.getKey()).add(entry.getValue().get(0).getRank());
+            allPossibleStartHandsRankOnly.get(entry.getKey()).add(entry.getValue().get(1).getRank());
+        }
+        return allPossibleStartHandsRankOnly;
+    }
+
+
+
     public List<BooleanResult> allFunctions(List<Card> board) {
         BooleanResult result1 = new BooleanResult();
         BooleanResult result2 = new BooleanResult();
