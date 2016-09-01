@@ -381,6 +381,16 @@ public class BoardEvaluator {
         return completeCardDeck;
     }
 
+    protected Map<Integer, List<Card>> clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank (Map<Integer, List<Card>> startHandMap, int rank) {
+        for(Iterator<Map.Entry<Integer, List<Card>>> it = startHandMap.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, List<Card>> entry = it.next();
+            if(entry.getValue().get(0).getRank() == rank || entry.getValue().get(1).getRank() == rank) {
+                it.remove();
+            }
+        }
+        return startHandMap;
+    }
+
     protected Map<Integer, List<Card>> getAllPocketPairStartHands() {
         Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
         Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -391,6 +401,36 @@ public class BoardEvaluator {
             }
         }
         return allPocketPairStartHands;
+    }
+
+    protected Map<Integer, Integer> getFrequencyOfRanksOnBoard(List<Card> board) {
+        Map<Integer, Integer> frequencyOfRanksOnBoard = new HashMap<>();
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+        for(Integer i : boardRanks) {
+            frequencyOfRanksOnBoard.put(i, Collections.frequency(boardRanks, i));
+        }
+        return frequencyOfRanksOnBoard;
+    }
+
+    protected boolean boardContainsTrips(List<Card> board) {
+        Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
+        for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {
+            if(entry.getValue() == 3) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean boardContainsQuads(List<Card> board) {
+        Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
+        for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {
+            if(entry.getValue() == 4) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<BooleanResult> allFunctions(List<Card> board) {
