@@ -44,8 +44,9 @@ public class TwoPairEvaluator extends BoardEvaluator {
             //4 7 7 9 J
             //alle combos die pairen met één andere kaart op het board
             //alle combos die pairen met twee kaarten van het board, allebei boven het pair dat er al ligt
-            int counter = 0;
+
             int rankOfPairOnBoard = 0;
+
             Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
 
             for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {
@@ -54,27 +55,24 @@ public class TwoPairEvaluator extends BoardEvaluator {
                 }
             }
 
-            Map<Integer, Integer> rankOfComboCardsThatPairWithBoard = new HashMap<>();
+            List<Integer> rankOfPairOnBoardHelpList = new ArrayList<>();
+            rankOfPairOnBoardHelpList.add(rankOfPairOnBoard);
+            boardRanks.removeAll(rankOfPairOnBoardHelpList);
+
+            int initialSizeBoardRanks = boardRanks.size();
 
             for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
-                for(Card c : board) {
-                    if (Collections.frequency(entry.getValue(), c.getRank()) == 1 && c.getRank() != rankOfPairOnBoard) {
-                        combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
-                        //rankOfComboCardsThatPairWithBoard.put(rankOfComboCardsThatPairWithBoard.size(), c.getRank());
-                        //counter++;
-                    }
+                List<Integer> copyCombo = new ArrayList<>();
+                copyCombo.addAll(entry.getValue());
+
+                List<Integer> copyBoardRanks = new ArrayList<>();
+                copyBoardRanks.addAll(boardRanks);
+
+                copyBoardRanks.removeAll(copyCombo);
+
+                if(copyBoardRanks.size() == initialSizeBoardRanks - 1 && !entry.getValue().contains(rankOfPairOnBoard)) {
+                    combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
                 }
-//                if(counter == 1) {
-//                    combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
-//                }
-//
-//                if(counter == 2) {
-//                    int rankOfFirstPair = rankOfComboCardsThatPairWithBoard.get(0);
-//                    int rankOfSecondPair = rankOfComboCardsThatPairWithBoard.get(1);
-//                    if(rankOfFirstPair > rankOfPairOnBoard && rankOfSecondPair > rankOfPairOnBoard) {
-//                        combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
-//                    }
-//                }
             }
 
             //voeg pocket pairs toe

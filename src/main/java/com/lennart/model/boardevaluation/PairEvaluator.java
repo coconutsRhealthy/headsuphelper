@@ -17,18 +17,20 @@ public class PairEvaluator extends BoardEvaluator {
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnlyCorrectedForBoard(allPossibleStartHands, board);
 
-            //gaat dit wel goed? Krijg je hier niet ook two pairs mee?
-            for(Card c : board) {
-                for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
-                    if(Collections.frequency(entry.getValue(), c.getRank()) == 1) {
-                        combosThatMakePair.put(combosThatMakePair.size(), allPossibleStartHands.get(entry.getKey()));
-                    }
-                }
-            }
+            List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+            int initialSizeBoardRanks = boardRanks.size();
 
-            for (Map.Entry<Integer, List<Card>> entry : combosThatMakePair.entrySet()) {
-                if(entry.getValue().get(0).getRank() == 4 && entry.getValue().get(1).getRank() == 8) {
-                    System.out.println("jajaEIJE!");
+            for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
+                List<Integer> copyCombo = new ArrayList<>();
+                copyCombo.addAll(entry.getValue());
+
+                List<Integer> copyBoardRanks = new ArrayList<>();
+                copyBoardRanks.addAll(boardRanks);
+
+                copyBoardRanks.removeAll(copyCombo);
+
+                if(copyBoardRanks.size() == initialSizeBoardRanks - 1) {
+                    combosThatMakePair.put(combosThatMakePair.size(), allPossibleStartHands.get(entry.getKey()));
                 }
             }
 
