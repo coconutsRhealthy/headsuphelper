@@ -127,16 +127,37 @@ public class BoardEvaluator {
     }
 
     protected int getNumberOfPairsOnBoard(List<Card> board) {
-        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-        int x = 0;
-        int y = 0;
-        for(int i : boardRanks) {
-            if(Collections.frequency(boardRanks, i) == 2 && i != y) {
-                x++;
-                y = i;
+        int numberOfPairsOnBoard = 0;
+
+        if(!boardContainsTrips(board) && !boardContainsQuads(board)) {
+            List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+            int y = 0;
+            for(int i : boardRanks) {
+                if(Collections.frequency(boardRanks, i) == 2 && i != y) {
+                    numberOfPairsOnBoard++;
+                    y = i;
+                }
             }
         }
-        return x;
+
+        return numberOfPairsOnBoard;
+    }
+
+    protected List<Integer> getRanksOfPairsOnBoard(List<Card> board) {
+        List<Integer> ranksOfPairsOnBoad = new ArrayList<>();
+
+        if(!boardContainsTrips(board) && !boardContainsQuads(board)) {
+            List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+            int y = 0;
+            for(int i : boardRanks) {
+                if(Collections.frequency(boardRanks, i) == 2 && i != y) {
+                    ranksOfPairsOnBoad.add(i);
+                    y = i;
+                }
+            }
+        }
+        return ranksOfPairsOnBoad;
     }
 
     protected List<Integer> getSortedCardRanksFromCardList(List<Card> board) {

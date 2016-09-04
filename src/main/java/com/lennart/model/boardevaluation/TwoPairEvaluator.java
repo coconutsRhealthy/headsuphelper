@@ -45,20 +45,8 @@ public class TwoPairEvaluator extends BoardEvaluator {
             //alle combos die pairen met één andere kaart op het board
             //alle combos die pairen met twee kaarten van het board, allebei boven het pair dat er al ligt
 
-            int rankOfPairOnBoard = 0;
-
-            Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
-
-            for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {
-                if (entry.getValue() == 2) {
-                    rankOfPairOnBoard = entry.getKey();
-                }
-            }
-
-            List<Integer> rankOfPairOnBoardHelpList = new ArrayList<>();
-            rankOfPairOnBoardHelpList.add(rankOfPairOnBoard);
-            boardRanks.removeAll(rankOfPairOnBoardHelpList);
-
+            Integer rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
+            boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
             int initialSizeBoardRanks = boardRanks.size();
 
             for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
@@ -90,15 +78,14 @@ public class TwoPairEvaluator extends BoardEvaluator {
                 allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(4).getRank());
             }
 
-            //nog even bekijken
+            boardRanks = getSortedCardRanksFromCardList(board);
+
             for (Map.Entry<Integer, List<Card>> pocketPairEntry : allPocketPairs.entrySet()) {
                 if(!boardRanks.contains(pocketPairEntry.getValue().get(0).getRank())) {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), pocketPairEntry.getValue());
                 }
             }
-
             return combosThatMakeTwoPair;
-
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.
         }
