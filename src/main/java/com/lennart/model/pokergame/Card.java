@@ -65,7 +65,7 @@ public class Card implements Comparable<Card> {
             }
     }
 
-    static Comparator<List<Card>> getComboComparator() {
+    public static Comparator<List<Card>> getComboComparator() {
         return new Comparator<List<Card>>() {
             @Override
             public int compare(List<Card> combo1, List<Card> combo2) {

@@ -52,6 +52,7 @@ public class PairEvaluator extends BoardEvaluator {
                 combosThatMakePair.put(combosThatMakePair.size(), entry.getValue());
             }
 
+            combosThatMakePair = getSortedComboMap(combosThatMakePair);
             return combosThatMakePair;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -77,8 +78,10 @@ public class PairEvaluator extends BoardEvaluator {
                     it.remove();
                 }
             }
+            combosThatMakePair = getSortedComboMap(combosThatMakePair);
             return combosThatMakePair;
         }
+        combosThatMakePair = getSortedComboMap(combosThatMakePair);
         return combosThatMakePair;
     }
 }

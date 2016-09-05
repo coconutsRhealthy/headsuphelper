@@ -464,6 +464,17 @@ public class BoardEvaluator {
         return allPossibleStartHandsRankOnly;
     }
 
+    protected Map<Integer, List<Card>> getSortedComboMap(Map<Integer, List<Card>> comboMap) {
+        List<List<Card>> comboList = new ArrayList<>(comboMap.values());
+        Collections.sort(comboList, Card.getComboComparator());
+        Map<Integer, List<Card>> sortedComboMap = new HashMap<>();
+
+        for(List<Card> list : comboList) {
+            sortedComboMap.put(sortedComboMap.size(), list);
+        }
+        return sortedComboMap;
+    }
+
 
 
     public List<BooleanResult> allFunctions(List<Card> board) {
