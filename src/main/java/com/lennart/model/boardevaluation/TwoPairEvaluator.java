@@ -114,12 +114,40 @@ public class TwoPairEvaluator extends BoardEvaluator {
             }
 
             //voeg alle pocket pairs toe hoger dan het laagste pair on board
+            //get laagste boardpair kaart
+            int rankOfLowestPairOnBoard = Collections.min(ranksOfPairsOnBoard);
+
+            Map<Integer, List<Card>> allPocketPairs = getAllPocketPairStartHands();
+            allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(0).getRank());
+            allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(1).getRank());
+            allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(2).getRank());
+
+            if(board.size() == 4) {
+                allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(3).getRank());
+            }
+
+            if(board.size() == 5) {
+                allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(3).getRank());
+                allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(4).getRank());
+            }
+
+
+            for(Iterator<Map.Entry<Integer, List<Card>>> it = allPocketPairs.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Integer, List<Card>> entry = it.next();
+                if(entry.getValue().get(0).getRank() > rankOfLowestPairOnBoard) {
+                    combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), entry.getValue());
+                }
+            }
 
             //voeg alle combos toe die niet pairen en geen boat maken
+            boardRanks = getSortedCardRanksFromCardList(board);
 
+            for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
+                if(Collections.disjoint(entry.getValue(), boardRanks) && entry.getValue().get(0) != entry.getValue().get(1)) {
+                    combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
+                }
+            }
             return combosThatMakeTwoPair;
-
-
         }
         return combosThatMakeTwoPair;
     }
