@@ -58,6 +58,7 @@ public class TwoPairEvaluator extends BoardEvaluator {
 
                 copyBoardRanks.removeAll(copyCombo);
 
+                //TODO: gaat hier nog wat mis? Zoals in PairEvaluator
                 if(copyBoardRanks.size() == initialSizeBoardRanks - 1 && !entry.getValue().contains(rankOfPairOnBoard)) {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
                 }

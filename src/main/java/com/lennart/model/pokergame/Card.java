@@ -85,4 +85,25 @@ public class Card implements Comparable<Card> {
             }
         };
     }
+
+    public static Comparator<List<Integer>> getComboComparatorRankOnly() {
+        return new Comparator<List<Integer>>() {
+            @Override
+            public int compare(List<Integer> combo1, List<Integer> combo2) {
+                Collections.sort(combo1, Collections.reverseOrder());
+                Collections.sort(combo2, Collections.reverseOrder());
+
+                if(combo2.get(0) > combo1.get(0)) {
+                    return 1;
+                } else if(combo2.get(0) == combo1.get(0)) {
+                    if(combo2.get(1) > combo1.get(1)) {
+                        return 1;
+                    } else if(combo2.get(1) == combo1.get(1)) {
+                        return 0;
+                    }
+                }
+                return -1;
+            }
+        };
+    }
 }
