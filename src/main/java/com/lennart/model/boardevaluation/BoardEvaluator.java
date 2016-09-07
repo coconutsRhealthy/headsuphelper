@@ -475,9 +475,9 @@ public class BoardEvaluator {
         return sortedComboMap;
     }
 
-    protected Map<Integer, List<Integer>> getSortedComboMapRankOnly(Map<Integer, List<Card>> comboMap) {
+    protected Map<Integer, List<Integer>> getSortedComboMapRankOnly(Map<Integer, List<Card>> comboMap, List<Card> board) {
         Map<Integer, List<Integer>> sortedComboMapRankOnly = new HashMap<>();
-        Set<List<Integer>> comboSetRankOnly = new TreeSet<>(Card.getComboComparatorRankOnly());
+        Set<List<Integer>> comboSetRankOnly = new TreeSet<>(PairEvaluator.getPairComboComparatorRankOnly(board));
 
         for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
             List<Integer> comboRanksOnly = getSortedCardRanksFromCardList(entry.getValue());
