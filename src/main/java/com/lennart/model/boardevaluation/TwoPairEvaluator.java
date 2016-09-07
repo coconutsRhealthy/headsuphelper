@@ -152,4 +152,171 @@ public class TwoPairEvaluator extends BoardEvaluator {
         }
         return combosThatMakeTwoPair;
     }
+
+
+    public static Comparator<List<Integer>> getPairComboComparatorRankOnly(List<Card> board) {
+        return new Comparator<List<Integer>>() {
+            @Override
+            public int compare(List<Integer> combo1, List<Integer> combo2) {
+                BoardEvaluator boardEvaluator = new BoardEvaluator();
+                List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
+
+                Collections.sort(combo1, Collections.reverseOrder());
+                Collections.sort(combo2, Collections.reverseOrder());
+
+
+                if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
+                    if(Collections.max(combo2) > Collections.max(combo1)) {
+                        return 1;
+                    } else if(Collections.max(combo2) == Collections.max(combo1)) {
+                        if(Collections.min(combo2) > Collections.min(combo1)) {
+                            return 1;
+                        } else if(Collections.min(combo2) == Collections.min(combo1)) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        return -1;
+                    }
+                } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 1) {
+                    //7 8 9 9 J
+
+                    int combo1HighCard = combo1.get(0);
+                    int combo1LowCard = combo1.get(1);
+
+                    int combo2HighCard = combo2.get(0);
+                    int combo2LowCard = combo2.get(1);
+
+                    int combo1HighPairCard = 0;
+                    int combo1LowPairCard = 0;
+
+                    int combo2HighPairCard = 0;
+                    int combo2LowPairCard = 0;
+
+                    int rankOfPairOnBoard = boardEvaluator.getRanksOfPairsOnBoard(board).get(0);
+
+                    //voor combo1
+                    //als beide combo kaarten pairen met het board
+                    if(boardRanks.contains(combo1HighCard) && boardRanks.contains(combo1LowCard)) {
+                        //als beide kaarten boven rank of pair on board zijn
+                        if(combo1HighCard > rankOfPairOnBoard && combo1LowCard > rankOfPairOnBoard) {
+                            combo1HighPairCard = combo1HighCard;
+                            combo1LowPairCard = combo1LowCard;
+                        }
+
+                        //als een van beide kaarten boven rank of pair on board zijn
+                        if(combo1HighCard > rankOfPairOnBoard && combo1LowCard < rankOfPairOnBoard) {
+                            combo1HighPairCard = combo1HighCard;
+                            combo1LowPairCard = rankOfPairOnBoard;
+                        }
+
+                        //als beide kaarten onder rank of pair on board zijn
+                        if(combo1HighCard < rankOfPairOnBoard && combo1LowCard < rankOfPairOnBoard) {
+                            combo1HighPairCard = rankOfPairOnBoard;
+                            combo1LowPairCard = combo1HighCard;
+                        }
+                    }
+
+                    //als een combo kaart pairt met het board
+                    if(boardRanks.contains(combo1HighCard) && !boardRanks.contains(combo1LowCard)) {
+                        if(combo1HighCard > rankOfPairOnBoard) {
+                            combo1HighPairCard = combo1HighCard;
+                            combo1LowPairCard = rankOfPairOnBoard;
+                        } else if(combo1HighCard < rankOfPairOnBoard) {
+                            combo1HighPairCard = rankOfPairOnBoard;
+                            combo1LowPairCard = combo1HighCard;
+                        }
+                    } else if (!boardRanks.contains(combo1HighCard) && boardRanks.contains(combo1LowCard)) {
+                        if(combo1LowCard > rankOfPairOnBoard) {
+                            combo1HighPairCard = combo1LowCard;
+                            combo1LowPairCard = rankOfPairOnBoard;
+                        } else if(combo1LowCard < rankOfPairOnBoard) {
+                            combo1HighPairCard = rankOfPairOnBoard;
+                            combo1LowPairCard = combo1LowCard;
+                        }
+                    }
+
+
+
+                    //voor combo2
+                    //als beide combo kaarten pairen met het board
+                    if(boardRanks.contains(combo2HighCard) && boardRanks.contains(combo2LowCard)) {
+                        //als beide kaarten boven rank of pair on board zijn
+                        if(combo2HighCard > rankOfPairOnBoard && combo2LowCard > rankOfPairOnBoard) {
+                            combo2HighPairCard = combo2HighCard;
+                            combo2LowPairCard = combo2LowCard;
+                        }
+
+                        //als een van beide kaarten boven rank of pair on board zijn
+                        if(combo2HighCard > rankOfPairOnBoard && combo2LowCard < rankOfPairOnBoard) {
+                            combo2HighPairCard = combo2HighCard;
+                            combo2LowPairCard = rankOfPairOnBoard;
+                        }
+
+                        //als beide kaarten onder rank of pair on board zijn
+                        if(combo2HighCard < rankOfPairOnBoard && combo2LowCard < rankOfPairOnBoard) {
+                            combo2HighPairCard = rankOfPairOnBoard;
+                            combo2LowPairCard = combo2HighCard;
+                        }
+                    }
+
+                    //als een combo kaart pairt met het board
+                    if(boardRanks.contains(combo2HighCard) && !boardRanks.contains(combo2LowCard)) {
+                        if(combo2HighCard > rankOfPairOnBoard) {
+                            combo2HighPairCard = combo2HighCard;
+                            combo2LowPairCard = rankOfPairOnBoard;
+                        } else if(combo2HighCard < rankOfPairOnBoard) {
+                            combo2HighPairCard = rankOfPairOnBoard;
+                            combo2LowPairCard = combo2HighCard;
+                        }
+                    } else if (!boardRanks.contains(combo2HighCard) && boardRanks.contains(combo2LowCard)) {
+                        if(combo2LowCard > rankOfPairOnBoard) {
+                            combo2HighPairCard = combo2LowCard;
+                            combo2LowPairCard = rankOfPairOnBoard;
+                        } else if(combo2LowCard < rankOfPairOnBoard) {
+                            combo2HighPairCard = rankOfPairOnBoard;
+                            combo2LowPairCard = combo2LowCard;
+                        }
+                    }
+
+
+                    if(combo2HighPairCard > combo1HighPairCard) {
+                        return 1;
+                    } else if (combo2HighPairCard == combo1HighPairCard) {
+                        if(combo2LowPairCard > combo1LowPairCard) {
+                            return 1;
+                        } else if(combo2LowPairCard == combo1LowPairCard) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        return -1;
+                    }
+
+
+
+                } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 2) {
+                    //hier gewoon de standaard
+
+                    Collections.sort(combo1, Collections.reverseOrder());
+                    Collections.sort(combo2, Collections.reverseOrder());
+
+                    if(combo2.get(0) > combo1.get(0)) {
+                        return 1;
+                    } else if(combo2.get(0) == combo1.get(0)) {
+                        if(combo2.get(1) > combo1.get(1)) {
+                            return 1;
+                        } else if(combo2.get(1) == combo1.get(1)) {
+                            return 0;
+                        }
+                    }
+                    return -1;
+
+                }
+                return 0;
+            }
+        };
+    }
 }
