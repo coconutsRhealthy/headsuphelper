@@ -95,9 +95,7 @@ public class PairEvaluator extends BoardEvaluator {
             public int compare(List<Integer> combo1, List<Integer> combo2) {
                 BoardEvaluator boardEvaluator = new BoardEvaluator();
                 List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
-                //Collections.sort(boardRanks, Collections.reverseOrder());
 
-                //geen pair op het board
                 if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
 
                     int pairedCardCombo1;
@@ -141,12 +139,7 @@ public class PairEvaluator extends BoardEvaluator {
                     } else {
                         return -1;
                     }
-                }
-
-                if(boardEvaluator.getNumberOfPairsOnBoard(board) == 1) {
-                    //wel een pair op het board
-
-                    //de gebruikelijke sortering
+                } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 1) {
                     Collections.sort(combo1, Collections.reverseOrder());
                     Collections.sort(combo2, Collections.reverseOrder());
 
