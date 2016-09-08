@@ -52,7 +52,7 @@ public class PairEvaluator extends BoardEvaluator {
                 combosThatMakePair.put(combosThatMakePair.size(), entry.getValue());
             }
 
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board);
+            Map<Integer, List<Integer>> rankMap = getSortedPairComboMapRankOnly(combosThatMakePair, board);
             return combosThatMakePair;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -80,11 +80,11 @@ public class PairEvaluator extends BoardEvaluator {
             }
             combosThatMakePair = getSortedComboMap(combosThatMakePair);
 
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board);
+            Map<Integer, List<Integer>> rankMap = getSortedPairComboMapRankOnly(combosThatMakePair, board);
             return combosThatMakePair;
         }
         combosThatMakePair = getSortedComboMap(combosThatMakePair);
-        Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board);
+        Map<Integer, List<Integer>> rankMap = getSortedPairComboMapRankOnly(combosThatMakePair, board);
         return combosThatMakePair;
     }
 

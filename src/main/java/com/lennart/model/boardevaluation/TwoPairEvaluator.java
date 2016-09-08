@@ -34,6 +34,7 @@ public class TwoPairEvaluator extends BoardEvaluator {
                     it.remove();
                 }
             }
+            Map<Integer, List<Integer>> rankMap = getSortedTwoPairComboMapRankOnly(combosThatMakeTwoPair, board);
             return combosThatMakeTwoPair;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -86,6 +87,7 @@ public class TwoPairEvaluator extends BoardEvaluator {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), pocketPairEntry.getValue());
                 }
             }
+            Map<Integer, List<Integer>> rankMap = getSortedTwoPairComboMapRankOnly(combosThatMakeTwoPair, board);
             return combosThatMakeTwoPair;
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.

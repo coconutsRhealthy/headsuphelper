@@ -475,9 +475,25 @@ public class BoardEvaluator {
         return sortedComboMap;
     }
 
-    protected Map<Integer, List<Integer>> getSortedComboMapRankOnly(Map<Integer, List<Card>> comboMap, List<Card> board) {
+    //TODO: parameterize these methods for comparator methods
+    protected Map<Integer, List<Integer>> getSortedPairComboMapRankOnly(Map<Integer, List<Card>> comboMap, List<Card> board) {
         Map<Integer, List<Integer>> sortedComboMapRankOnly = new HashMap<>();
         Set<List<Integer>> comboSetRankOnly = new TreeSet<>(PairEvaluator.getPairComboComparatorRankOnly(board));
+
+        for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
+            List<Integer> comboRanksOnly = getSortedCardRanksFromCardList(entry.getValue());
+            comboSetRankOnly.add(comboRanksOnly);
+        }
+
+        for(List<Integer> combo : comboSetRankOnly) {
+            sortedComboMapRankOnly.put(sortedComboMapRankOnly.size(), combo);
+        }
+        return sortedComboMapRankOnly;
+    }
+
+    protected Map<Integer, List<Integer>> getSortedTwoPairComboMapRankOnly(Map<Integer, List<Card>> comboMap, List<Card> board) {
+        Map<Integer, List<Integer>> sortedComboMapRankOnly = new HashMap<>();
+        Set<List<Integer>> comboSetRankOnly = new TreeSet<>(TwoPairEvaluator.getPairComboComparatorRankOnly(board));
 
         for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
             List<Integer> comboRanksOnly = getSortedCardRanksFromCardList(entry.getValue());
