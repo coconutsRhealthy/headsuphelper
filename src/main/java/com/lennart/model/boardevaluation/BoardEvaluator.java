@@ -493,16 +493,27 @@ public class BoardEvaluator {
 
     protected Map<Integer, List<Integer>> getSortedTwoPairComboMapRankOnly(Map<Integer, List<Card>> comboMap, List<Card> board) {
         Map<Integer, List<Integer>> sortedComboMapRankOnly = new HashMap<>();
+        Set<List<Integer>> eije = new HashSet<>();
         Set<List<Integer>> comboSetRankOnly = new TreeSet<>(TwoPairEvaluator.getPairComboComparatorRankOnly(board));
 
         for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
             List<Integer> comboRanksOnly = getSortedCardRanksFromCardList(entry.getValue());
-            comboSetRankOnly.add(comboRanksOnly);
+            eije.add(comboRanksOnly);
+        }
+
+
+        for(List<Integer> combo : eije) {
+            comboSetRankOnly.add(combo);
         }
 
         for(List<Integer> combo : comboSetRankOnly) {
             sortedComboMapRankOnly.put(sortedComboMapRankOnly.size(), combo);
         }
+
+
+
+
+
         return sortedComboMapRankOnly;
     }
 
