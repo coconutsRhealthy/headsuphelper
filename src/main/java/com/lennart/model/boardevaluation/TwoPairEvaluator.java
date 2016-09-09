@@ -50,6 +50,13 @@ public class TwoPairEvaluator extends BoardEvaluator {
             boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
             int initialSizeBoardRanks = boardRanks.size();
 
+//            allPossibleStartHandsRankOnly.clear();
+//            List<Integer> x = new ArrayList<>();
+//            x.add(9);
+//            x.add(9);
+//
+//            allPossibleStartHandsRankOnly.put(1, x);
+
             for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
                 List<Integer> copyCombo = new ArrayList<>();
                 copyCombo.addAll(entry.getValue());
@@ -60,7 +67,8 @@ public class TwoPairEvaluator extends BoardEvaluator {
                 copyBoardRanks.removeAll(copyCombo);
 
                 //TODO: gaat hier nog wat mis? Zoals in PairEvaluator
-                if(copyBoardRanks.size() == initialSizeBoardRanks - 1 && !entry.getValue().contains(rankOfPairOnBoard)) {
+                if(copyBoardRanks.size() == initialSizeBoardRanks - 1 && !entry.getValue().contains(rankOfPairOnBoard)
+                        && entry.getValue().get(0) != entry.getValue().get(1)) {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
                 }
             }
@@ -166,7 +174,6 @@ public class TwoPairEvaluator extends BoardEvaluator {
                 Collections.sort(combo1, Collections.reverseOrder());
                 Collections.sort(combo2, Collections.reverseOrder());
 
-
                 if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
                     if(Collections.max(combo2) > Collections.max(combo1)) {
                         return 1;
@@ -195,6 +202,9 @@ public class TwoPairEvaluator extends BoardEvaluator {
 
                     int combo2HighPairCard = 0;
                     int combo2LowPairCard = 0;
+
+                    int combo1KickerCard = 0;
+                    int combo2KickerCard = 0;
 
                     int rankOfPairOnBoard = boardEvaluator.getRanksOfPairsOnBoard(board).get(0);
 
@@ -225,17 +235,32 @@ public class TwoPairEvaluator extends BoardEvaluator {
                         if(combo1HighCard > rankOfPairOnBoard) {
                             combo1HighPairCard = combo1HighCard;
                             combo1LowPairCard = rankOfPairOnBoard;
+                            combo1KickerCard = combo1LowCard;
                         } else if(combo1HighCard < rankOfPairOnBoard) {
                             combo1HighPairCard = rankOfPairOnBoard;
                             combo1LowPairCard = combo1HighCard;
+                            combo1KickerCard = combo1LowCard;
                         }
                     } else if (!boardRanks.contains(combo1HighCard) && boardRanks.contains(combo1LowCard)) {
                         if(combo1LowCard > rankOfPairOnBoard) {
                             combo1HighPairCard = combo1LowCard;
                             combo1LowPairCard = rankOfPairOnBoard;
+                            combo1KickerCard = combo1HighCard;
                         } else if(combo1LowCard < rankOfPairOnBoard) {
                             combo1HighPairCard = rankOfPairOnBoard;
                             combo1LowPairCard = combo1LowCard;
+                            combo1KickerCard = combo1HighCard;
+                        }
+                    }
+
+                    //als geen kaart pairt met het board
+                    if(!boardRanks.contains(combo1HighCard) && !boardRanks.contains(combo1LowCard)) {
+                        if(combo1HighCard > rankOfPairOnBoard) {
+                            combo1HighPairCard = combo1HighCard;
+                            combo1LowPairCard = rankOfPairOnBoard;
+                        } else if(combo1HighCard < rankOfPairOnBoard) {
+                            combo1HighPairCard = rankOfPairOnBoard;
+                            combo1LowPairCard = combo1HighCard;
                         }
                     }
 
@@ -268,20 +293,34 @@ public class TwoPairEvaluator extends BoardEvaluator {
                         if(combo2HighCard > rankOfPairOnBoard) {
                             combo2HighPairCard = combo2HighCard;
                             combo2LowPairCard = rankOfPairOnBoard;
+                            combo2KickerCard = combo2LowCard;
                         } else if(combo2HighCard < rankOfPairOnBoard) {
                             combo2HighPairCard = rankOfPairOnBoard;
                             combo2LowPairCard = combo2HighCard;
+                            combo2KickerCard = combo2LowCard;
                         }
                     } else if (!boardRanks.contains(combo2HighCard) && boardRanks.contains(combo2LowCard)) {
                         if(combo2LowCard > rankOfPairOnBoard) {
                             combo2HighPairCard = combo2LowCard;
                             combo2LowPairCard = rankOfPairOnBoard;
+                            combo2KickerCard = combo2HighCard;
                         } else if(combo2LowCard < rankOfPairOnBoard) {
                             combo2HighPairCard = rankOfPairOnBoard;
                             combo2LowPairCard = combo2LowCard;
+                            combo2KickerCard = combo2HighCard;
                         }
                     }
 
+                    //als geen kaart pairt met het board
+                    if(!boardRanks.contains(combo2HighCard) && !boardRanks.contains(combo2LowCard)) {
+                        if(combo2HighCard > rankOfPairOnBoard) {
+                            combo2HighPairCard = combo2HighCard;
+                            combo2LowPairCard = rankOfPairOnBoard;
+                        } else if(combo2HighCard < rankOfPairOnBoard) {
+                            combo2HighPairCard = rankOfPairOnBoard;
+                            combo2LowPairCard = combo2HighCard;
+                        }
+                    }
 
                     if(combo2HighPairCard > combo1HighPairCard) {
                         return 1;
@@ -289,15 +328,23 @@ public class TwoPairEvaluator extends BoardEvaluator {
                         if(combo2LowPairCard > combo1LowPairCard) {
                             return 1;
                         } else if(combo2LowPairCard == combo1LowPairCard) {
-                            return 0;
+                            if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
+                                return 0;
+                            } else {
+                                if(combo2KickerCard > combo1KickerCard) {
+                                    return 1;
+                                } else if(combo2KickerCard == combo1KickerCard) {
+                                    return 0;
+                                } else {
+                                    return -1;
+                                }
+                            }
                         } else {
                             return -1;
                         }
                     } else {
                         return -1;
                     }
-
-
 
                 } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 2) {
                     //hier gewoon de standaard
