@@ -7,9 +7,7 @@ import java.util.*;
 /**
  * Created by LPO10346 on 9/1/2016.
  */
-public class TwoPairEvaluator extends BoardEvaluator {
-
-    //class gaat na of je two pair hebt.
+public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
 
     public Map<Integer, List<Card>> getCombosThatMakeTwoPair (List<Card> board) {
         Map<Integer, List<Card>> combosThatMakeTwoPair = new HashMap<>();
@@ -34,7 +32,7 @@ public class TwoPairEvaluator extends BoardEvaluator {
                     it.remove();
                 }
             }
-            Map<Integer, List<Integer>> rankMap = getSortedTwoPairComboMapRankOnly(combosThatMakeTwoPair, board);
+            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
             return combosThatMakeTwoPair;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -50,13 +48,6 @@ public class TwoPairEvaluator extends BoardEvaluator {
             boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
             int initialSizeBoardRanks = boardRanks.size();
 
-//            allPossibleStartHandsRankOnly.clear();
-//            List<Integer> x = new ArrayList<>();
-//            x.add(9);
-//            x.add(9);
-//
-//            allPossibleStartHandsRankOnly.put(1, x);
-
             for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
                 List<Integer> copyCombo = new ArrayList<>();
                 copyCombo.addAll(entry.getValue());
@@ -66,7 +57,6 @@ public class TwoPairEvaluator extends BoardEvaluator {
 
                 copyBoardRanks.removeAll(copyCombo);
 
-                //TODO: gaat hier nog wat mis? Zoals in PairEvaluator
                 if(copyBoardRanks.size() == initialSizeBoardRanks - 1 && !entry.getValue().contains(rankOfPairOnBoard)
                         && entry.getValue().get(0) != entry.getValue().get(1)) {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
@@ -95,14 +85,13 @@ public class TwoPairEvaluator extends BoardEvaluator {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), pocketPairEntry.getValue());
                 }
             }
-            Map<Integer, List<Integer>> rankMap = getSortedTwoPairComboMapRankOnly(combosThatMakeTwoPair, board);
+            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
             return combosThatMakeTwoPair;
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnlyCorrectedForBoard(allPossibleStartHands, board);
-
 
             //get card die niet met andere boardCards pairt, indien aanwezig
             Integer rankOfUnpairedBoardCard = 0;
@@ -163,8 +152,8 @@ public class TwoPairEvaluator extends BoardEvaluator {
         return combosThatMakeTwoPair;
     }
 
-
-    public static Comparator<List<Integer>> getPairComboComparatorRankOnly(List<Card> board) {
+    @Override
+    public Comparator<List<Integer>> getComboComparatorRankOnly(List<Card> board) {
         return new Comparator<List<Integer>>() {
             @Override
             public int compare(List<Integer> combo1, List<Integer> combo2) {
@@ -263,7 +252,6 @@ public class TwoPairEvaluator extends BoardEvaluator {
                             combo1LowPairCard = combo1HighCard;
                         }
                     }
-
 
 
                     //voor combo2

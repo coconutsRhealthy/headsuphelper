@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by lennart on 28-8-16.
  */
-public class PairEvaluator extends BoardEvaluator {
+public class PairEvaluator extends BoardEvaluator implements ComboComparator {
 
     public Map<Integer, List<Card>> getCombosThatMakePair (List<Card> board) {
         Map<Integer, List<Card>> combosThatMakePair = new HashMap<>();
@@ -52,7 +52,7 @@ public class PairEvaluator extends BoardEvaluator {
                 combosThatMakePair.put(combosThatMakePair.size(), entry.getValue());
             }
 
-            Map<Integer, List<Integer>> rankMap = getSortedPairComboMapRankOnly(combosThatMakePair, board);
+            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
             return combosThatMakePair;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -80,16 +80,16 @@ public class PairEvaluator extends BoardEvaluator {
             }
             combosThatMakePair = getSortedComboMap(combosThatMakePair);
 
-            Map<Integer, List<Integer>> rankMap = getSortedPairComboMapRankOnly(combosThatMakePair, board);
+            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
             return combosThatMakePair;
         }
         combosThatMakePair = getSortedComboMap(combosThatMakePair);
-        Map<Integer, List<Integer>> rankMap = getSortedPairComboMapRankOnly(combosThatMakePair, board);
+        Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
         return combosThatMakePair;
     }
 
-
-    public static Comparator<List<Integer>> getPairComboComparatorRankOnly(List<Card> board) {
+    @Override
+    public Comparator<List<Integer>> getComboComparatorRankOnly(List<Card> board) {
         return new Comparator<List<Integer>>() {
             @Override
             public int compare(List<Integer> combo1, List<Integer> combo2) {
