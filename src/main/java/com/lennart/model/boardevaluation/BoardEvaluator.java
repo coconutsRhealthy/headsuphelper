@@ -481,6 +481,12 @@ public class BoardEvaluator {
         Set<List<Integer>> comboSetRankOnlyUnsorted = new HashSet<>();
         Set<List<Integer>> comboSetRankOnlySorted = new TreeSet<>(evaluatorClass.getComboComparatorRankOnly(board));
 
+        //doe nu hashset.removeall(treeset). Nu heb je alle element die gelijk zijn vanwege kickers op board etc.
+
+        //doe dan for loop over alle elementen van de hashset. Als element gelijk is aan het element in de treeset,
+        //dan voeg je deze twee elementen samen toe in een list.
+
+
         for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
             List<Integer> comboRanksOnly = getSortedCardRanksFromCardList(entry.getValue());
             comboSetRankOnlyUnsorted.add(comboRanksOnly);
