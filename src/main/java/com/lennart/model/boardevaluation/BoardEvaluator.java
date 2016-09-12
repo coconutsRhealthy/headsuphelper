@@ -502,19 +502,13 @@ public class BoardEvaluator {
 
         copyComboSetRankOnlyUnsortedList.removeAll(copyComboSetRankOnlySortedList);
 
-        Set<List<Integer>> h = new HashSet<>();
-
-        h.addAll(copyComboSetRankOnlyUnsortedList);
-
-        System.out.println(h);
-
         //doe dan for loop over alle elementen van de hashset. Als element gelijk is aan het element in de treeset,
         //dan voeg je deze twee elementen samen toe in een list.
-        Map<List<Integer>, List<List<Integer>>> eije = new HashMap<>();
+        Map<List<Integer>, Set<List<Integer>>> allCombosSortedComboIsKey = new HashMap<>();
 
         for(List<Integer> l : comboSetRankOnlySorted) {
-            eije.put(l, new ArrayList<>());
-            eije.get(l).add(l);
+            allCombosSortedComboIsKey.put(l, new HashSet<>());
+            allCombosSortedComboIsKey.get(l).add(l);
         }
 
         for(List<Integer> x : comboSetRankOnlyUnsorted) {
@@ -524,18 +518,29 @@ public class BoardEvaluator {
                 test.add(y);
 
                 if(test.size() == 1) {
-                    eije.get(y).add(x);
+                    allCombosSortedComboIsKey.get(y).add(x);
                 }
             }
         }
 
-        System.out.println(eije);
+        Map<Integer, List<List<Integer>>> sortedCombos = new HashMap<>();
 
-
-
-        for(List<Integer> combo : comboSetRankOnlySorted) {
-            sortedComboMapRankOnly.put(sortedComboMapRankOnly.size(), combo);
+        for (Map.Entry<List<Integer>, Set<List<Integer>>> entry : allCombosSortedComboIsKey.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), new ArrayList<>());
+            sortedCombos.get(sortedCombos.size() -1).addAll(entry.getValue());
+            Collections.sort(sortedCombos.get(sortedCombos.size() -1), evaluatorClass.getComboComparatorRankOnly(board));
         }
+
+        System.out.println(sortedCombos);
+
+
+        //System.out.println(eije);
+//
+//
+//
+//        for(List<Integer> combo : comboSetRankOnlySorted) {
+//            sortedComboMapRankOnly.put(sortedComboMapRankOnly.size(), combo);
+//        }
         return sortedComboMapRankOnly;
     }
 
