@@ -481,10 +481,6 @@ public class BoardEvaluator {
         Set<List<Integer>> comboSetRankOnlyUnsorted = new HashSet<>();
         Set<List<Integer>> comboSetRankOnlySorted = new TreeSet<>(evaluatorClass.getComboComparatorRankOnly(board));
 
-        //doe nu hashset.removeall(treeset). Nu heb je alle element die gelijk zijn vanwege kickers op board etc.
-
-        //doe dan for loop over alle elementen van de hashset. Als element gelijk is aan het element in de treeset,
-        //dan voeg je deze twee elementen samen toe in een list.
 
 
         for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
@@ -493,6 +489,49 @@ public class BoardEvaluator {
         }
 
         comboSetRankOnlySorted.addAll(comboSetRankOnlyUnsorted);
+
+
+        //doe nu hashset.removeall(treeset). Nu heb je alle element die gelijk zijn vanwege kickers op board etc.
+        //comboSetRankOnlyUnsorted.removeAll(comboSetRankOnlySorted);
+
+        List<List<Integer>> copyComboSetRankOnlyUnsortedList = new ArrayList<>();
+        copyComboSetRankOnlyUnsortedList.addAll(comboSetRankOnlyUnsorted);
+
+        List<List<Integer>> copyComboSetRankOnlySortedList = new ArrayList<>();
+        copyComboSetRankOnlySortedList.addAll(comboSetRankOnlySorted);
+
+        copyComboSetRankOnlyUnsortedList.removeAll(copyComboSetRankOnlySortedList);
+
+        Set<List<Integer>> h = new HashSet<>();
+
+        h.addAll(copyComboSetRankOnlyUnsortedList);
+
+        System.out.println(h);
+
+        //doe dan for loop over alle elementen van de hashset. Als element gelijk is aan het element in de treeset,
+        //dan voeg je deze twee elementen samen toe in een list.
+        Map<List<Integer>, List<List<Integer>>> eije = new HashMap<>();
+
+        for(List<Integer> l : comboSetRankOnlySorted) {
+            eije.put(l, new ArrayList<>());
+            eije.get(l).add(l);
+        }
+
+        for(List<Integer> x : comboSetRankOnlyUnsorted) {
+            for(List<Integer> y : comboSetRankOnlySorted) {
+                Set<List<Integer>> test = new TreeSet<>(evaluatorClass.getComboComparatorRankOnly(board));
+                test.add(x);
+                test.add(y);
+
+                if(test.size() == 1) {
+                    eije.get(y).add(x);
+                }
+            }
+        }
+
+        System.out.println(eije);
+
+
 
         for(List<Integer> combo : comboSetRankOnlySorted) {
             sortedComboMapRankOnly.put(sortedComboMapRankOnly.size(), combo);
