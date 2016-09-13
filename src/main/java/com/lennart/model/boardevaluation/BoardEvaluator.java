@@ -477,11 +477,9 @@ public class BoardEvaluator {
 
     protected <T extends ComboComparator> Map<Integer, List<Integer>> getSortedComboMapRankOnly
             (Map<Integer, List<Card>> comboMap, List<Card> board, T evaluatorClass) {
-        Map<Integer, List<Integer>> sortedComboMapRankOnly = new HashMap<>();
+        Map<Integer, List<List<Integer>>> sortedComboMapRankOnly = new HashMap<>();
         Set<List<Integer>> comboSetRankOnlyUnsorted = new HashSet<>();
         Set<List<Integer>> comboSetRankOnlySorted = new TreeSet<>(evaluatorClass.getComboComparatorRankOnly(board));
-
-
 
         for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
             List<Integer> comboRanksOnly = getSortedCardRanksFromCardList(entry.getValue());
@@ -489,10 +487,6 @@ public class BoardEvaluator {
         }
 
         comboSetRankOnlySorted.addAll(comboSetRankOnlyUnsorted);
-
-
-        //doe nu hashset.removeall(treeset). Nu heb je alle element die gelijk zijn vanwege kickers op board etc.
-        //comboSetRankOnlyUnsorted.removeAll(comboSetRankOnlySorted);
 
         List<List<Integer>> copyComboSetRankOnlyUnsortedList = new ArrayList<>();
         copyComboSetRankOnlyUnsortedList.addAll(comboSetRankOnlyUnsorted);
@@ -504,11 +498,13 @@ public class BoardEvaluator {
 
         //doe dan for loop over alle elementen van de hashset. Als element gelijk is aan het element in de treeset,
         //dan voeg je deze twee elementen samen toe in een list.
-        Map<List<Integer>, Set<List<Integer>>> allCombosSortedComboIsKey = new HashMap<>();
+        Map<List<Integer>, Set<List<Integer>>> allCombosUnsortedComboIsKey = new HashMap<>();
 
         for(List<Integer> l : comboSetRankOnlySorted) {
-            allCombosSortedComboIsKey.put(l, new HashSet<>());
-            allCombosSortedComboIsKey.get(l).add(l);
+            allCombosUnsortedComboIsKey.put(l, new HashSet<>());
+            allCombosUnsortedComboIsKey.get(l).add(l);
+            //TODO: dit nog toevoegen
+            //Collections.sort(allCombosUnsortedComboIsKey.get(l), evaluatorClass.getComboComparatorRankOnly(board));
         }
 
         for(List<Integer> x : comboSetRankOnlyUnsorted) {
@@ -518,30 +514,49 @@ public class BoardEvaluator {
                 test.add(y);
 
                 if(test.size() == 1) {
-                    allCombosSortedComboIsKey.get(y).add(x);
+                    allCombosUnsortedComboIsKey.get(y).add(x);
                 }
             }
         }
 
-        Map<Integer, List<List<Integer>>> sortedCombos = new HashMap<>();
+//        - Maak een nieuwe map, 'sortedSetMap', op basis van de set met 16, keys integer
+        Map<Integer, List<List<Integer>>> sortedSetMap = new HashMap<>();
+        List<List<Integer>> comboSetRankOnlySortedAsList = new ArrayList<>();
+        comboSetRankOnlySortedAsList.addAll(comboSetRankOnlySorted);
 
-        for (Map.Entry<List<Integer>, Set<List<Integer>>> entry : allCombosSortedComboIsKey.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), new ArrayList<>());
-            sortedCombos.get(sortedCombos.size() -1).addAll(entry.getValue());
-            Collections.sort(sortedCombos.get(sortedCombos.size() -1), evaluatorClass.getComboComparatorRankOnly(board));
+        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
+            sortedSetMap.put(i, new ArrayList<>());
+            sortedSetMap.get(i).add(comboSetRankOnlySortedAsList.get(i));
         }
 
-        System.out.println(sortedCombos);
+//        - Maak een nieuwe map, 'final', met 16 integers als key
+        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
+            sortedComboMapRankOnly.put(i, new ArrayList<>());
+        }
 
+//        - Loop door de 'alles' map alle entries heen.
+        for (Map.Entry<List<Integer>, Set<List<Integer>>> unsortedComboIsKeyEntry : allCombosUnsortedComboIsKey.entrySet()) {
+            //Als een entrie een value bevat die in een van de values van de sortedSetMap zit, dan voeg je deze 'alles' entry toe aan
+//        'final', aan de key binnen 'final' die overeenkomt met de key binnen 'sortedSetMap'.
+            for (Map.Entry<Integer, List<List<Integer>>> sortedSetMapEntry : sortedSetMap.entrySet()) {
+                int initialSize = unsortedComboIsKeyEntry.getValue().size();
 
-        //System.out.println(eije);
-//
-//
-//
-//        for(List<Integer> combo : comboSetRankOnlySorted) {
-//            sortedComboMapRankOnly.put(sortedComboMapRankOnly.size(), combo);
-//        }
-        return sortedComboMapRankOnly;
+                List<List<Integer>> unsortedComboIsKeyEntryCopy = new ArrayList<>();
+                unsortedComboIsKeyEntryCopy.addAll(unsortedComboIsKeyEntry.getValue());
+
+                List<List<Integer>> sortedSetMapEntryCopy = new ArrayList<>();
+                sortedSetMapEntryCopy.addAll(sortedSetMapEntry.getValue());
+
+                unsortedComboIsKeyEntryCopy.removeAll(sortedSetMapEntryCopy);
+
+                if(initialSize != unsortedComboIsKeyEntryCopy.size()) {
+                    sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).addAll(unsortedComboIsKeyEntry.getValue());
+                }
+            }
+        }
+
+        System.out.println(sortedComboMapRankOnly);
+        return null;
     }
 
     public List<BooleanResult> allFunctions(List<Card> board) {
