@@ -551,6 +551,7 @@ public class BoardEvaluator {
 
                 if(initialSize != unsortedComboIsKeyEntryCopy.size()) {
                     sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).addAll(unsortedComboIsKeyEntry.getValue());
+                    Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()), new HighCardEvaluator().getComboComparatorRankOnly(board));
                 }
             }
         }
