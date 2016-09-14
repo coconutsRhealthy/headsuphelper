@@ -134,9 +134,9 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
 
             for(Iterator<Map.Entry<Integer, List<Card>>> it = allPocketPairs.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<Integer, List<Card>> entry = it.next();
-                if(entry.getValue().get(0).getRank() > rankOfLowestPairOnBoard) {
+//                if(entry.getValue().get(0).getRank() > rankOfLowestPairOnBoard) {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), entry.getValue());
-                }
+//                }
             }
 
             //voeg alle combos toe die niet pairen en geen boat maken
@@ -158,6 +158,14 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
         return new Comparator<List<Integer>>() {
             @Override
             public int compare(List<Integer> combo1, List<Integer> combo2) {
+//                if(combo2.get(0) == 4 && combo2.get(1) == 4) {
+//                    System.out.println("wait here");
+//                }
+
+                if(combo1.get(0) == 11 && combo1.get(1) == 10 && combo2.get(0) == 2 && combo2.get(1) == 2) {
+                    System.out.println("hier ff checken");
+                }
+
                 BoardEvaluator boardEvaluator = new BoardEvaluator();
                 List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
 
@@ -365,166 +373,412 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                     }
 
                 } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 2) {
-                    //hier gewoon de standaard
-
-                    int rankOfLowestPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
-
-
-                    //maak je eerst onderscheid tussen board.size() == 4 en board.size() == 5 of niet?
-                    //want in je huidige
-
-
-                    //als beide combos pocket pair
-                    if(combo1.get(0) == combo1.get(1) && combo2.get(0) == combo2.get(1)) {
-                        //als combo2 boven laagste board pocket pair en combo1 niet
-                        if(combo2.get(0) > rankOfLowestPairOnBoard && combo1.get(0) < rankOfLowestPairOnBoard) {
-                            return 1;
-                        //als combo2 en combo1 beide boven of onder laagste board pocket pair
-                        } else if((combo2.get(0) > rankOfLowestPairOnBoard && combo1.get(0) > rankOfLowestPairOnBoard) ||
-                                (combo2.get(0) < rankOfLowestPairOnBoard && combo1.get(0) < rankOfLowestPairOnBoard)) {
-                            if(combo2.get(0) > combo1.get(0)) {
-                                return 1;
-                            } else if (combo2.get(0) == combo1.get(0)) {
-                                return 0;
-                            } else {
-                                return -1;
-                            }
-                        //als combo2 onder laagste board pocket pair en combo1 erboven
-                        } else if(combo2.get(0) < rankOfLowestPairOnBoard && combo1.get(0) > rankOfLowestPairOnBoard) {
-                            return -1;
-                        }
-                    }
-
-                    //als combo1 pocket pair en combo2 niet
-                    else if(combo1.get(0) == combo1.get(1) && combo2.get(0) != combo2.get(1)) {
-                        //als combo1 boven laagste pocket pair op board
-                        if(combo1.get(0) > rankOfLowestPairOnBoard) {
-                            return -1;
-                            //als combo1 onder laagste pocket pair op board
-                        } else {
-                            if(Collections.max(combo2) > Collections.max(combo1)) {
-                                return 1;
-                            } else if(Collections.max(combo2) == Collections.max(combo1)) {
-                                return 0;
-                            } else {
-                                return -1;
-                            }
-                        }
-                    }
-
-                    //als combo2 pocket pair en combo1 niet
-                    else if(combo1.get(0) != combo1.get(1) && combo2.get(0) == combo2.get(1)) {
-                        //als combo1 boven laagste pocket pair op board
-                        if(combo2.get(0) > rankOfLowestPairOnBoard) {
-                            return 1;
-                            //als combo1 onder laagste pocket pair op board
-                        } else {
-                            if(Collections.max(combo2) > Collections.max(combo1)) {
-                                return 1;
-                            } else if(Collections.max(combo2) == Collections.max(combo1)) {
-                                return 0;
-                            } else {
-                                return -1;
-                            }
-                        }
-                    }
-
-
-                        //als combo2 boven laagste pocket pair op board
-
-                        //als combo2 onder laagste pocket pair op board
-
-                    //als geen van beide pocket pair
-
-
-
+                    //als het board 4 kaarten heeft
                     if(board.size() == 4) {
+                        //als beide combos gepaired zijn
+                        if(combo1.get(0) == combo1.get(1) && combo2.get(0) == combo2.get(1)) {
+                            //als beide combos boven laagste boardpair
+                            if(combo1.get(0) > Collections.min(boardRanks) && combo2.get(0) > Collections.min(boardRanks)) {
+                                //als hoogste kaart combo2 > hoogste kaart combo1
+                                if(Collections.max(combo2) > Collections.max(combo1)) {
+                                    return 1;
+                                }
 
+                                //als hoogste kaart combo2 == hoogste kaart combo1
+                                if(Collections.max(combo2) == Collections.max(combo1)) {
+                                    return 0;
+                                }
 
+                                //als hoogste kaart combo2 < hoogste kaart combo1
+                                if(Collections.max(combo2) < Collections.max(combo1)) {
+                                    return -1;
+                                }
+                            }
 
+                            //als combo1 boven laagste boardpair en combo2 niet
+                            if(combo1.get(0) > Collections.min(boardRanks) && combo2.get(0) < Collections.min(boardRanks)) {
+                                return -1;
+                            }
 
+                            //als combo2 boven laagste boardpair en combo1 niet
+                            if(combo1.get(0) < Collections.min(boardRanks) && combo2.get(0) > Collections.min(boardRanks)) {
+                                return 1;
+                            }
 
-                        //als combo2max > combo1max, return 1
-                        if(Collections.max(combo2) > Collections.max(combo1)) {
-                            return 1;
-                        } else if(Collections.max(combo2) == Collections.max(combo1)) {
+                            //als beide combos onder laagste boardpair
+                            if(combo1.get(0) < Collections.min(boardRanks) && combo2.get(0) < Collections.min(boardRanks)) {
+                                //als hoogste kaart combo2 > hoogste kaart combo1
+                                if(Collections.max(combo2) > Collections.max(combo1)) {
+                                    return 1;
+                                }
 
-                            //dit zou helemaal weg moeten kunnen na de pocketpair analyse hierboven
+                                //als hoogste kaart combo2 == hoogste kaart combo1
+                                if(Collections.max(combo2) == Collections.max(combo1)) {
+                                    return 0;
+                                }
 
-//                            //als combo2 is pocketpair en combo1 niet
-//                            if((combo2.get(0) == combo2.get(1)) && (combo1.get(0) != combo1.get(1))) {
-//                                List<Integer> ranksOfPairsOnBoard = getRanksOfPairsOnBoard(board);
-//                                Collections.sort(ranksOfPairsOnBoard);
-//
-//                                if(combo2.get(0) > ranksOfPairsOnBoard.get(0)) {
-//                                    return 1;
-//                                } else {
-//                                    return 0;
-//                                }
-//                            }
-//                            //als combo2 en combo1 zijn beide pocketpair, dan return 0;
-//                            else if((combo2.get(0) == combo2.get(1)) && (combo1.get(0) == combo1.get(1))) {
-//                                return 0;
-//                            } else if((combo2.get(0) != combo2.get(1)) && (combo1.get(0) == combo1.get(1))){
-//                                List<Integer> ranksOfPairsOnBoard = getRanksOfPairsOnBoard(board);
-//                                Collections.sort(ranksOfPairsOnBoard);
-//
-//                                if(combo1.get(0) > ranksOfPairsOnBoard.get(0)) {
-//                                    return -1;
-//                                } else {
-//                                    return 0;
-//                                }
-//                            } else {
-                                return 0;
-//                            }
-                        } else {
-                            return -1;
+                                //als hoogste kaart combo2 < hoogste kaart combo1
+                                if(Collections.max(combo2) < Collections.max(combo1)) {
+                                    return -1;
+                                }
+                            }
                         }
 
-                        //als combo2max == combo1max, return 0;
+                        //als combo1 gepaired is en 2 niet
+                        if(combo1.get(0) == combo1.get(1) && combo2.get(0) != combo2.get(1)) {
+                            //als combo1 boven laagste boardpair
+                            if(combo1.get(0) > Collections.min(boardRanks)) {
+                                return -1;
+                            }
 
-                        //als combo2max < combo1max. return -1;
+                            //als combo1 onder laagste boardpair
+                            if(combo1.get(0) < Collections.min(boardRanks)) {
+                                //als hoogste kaart combo2 > hoogste kaart combo1
+                                if(Collections.max(combo2) > Collections.max(combo1)) {
+                                    return 1;
+                                }
 
+                                //als hoogste kaart combo2 == hoogste kaart combo1
+                                if(Collections.max(combo2) == Collections.max(combo1)) {
+                                    return 0;
+                                }
 
-//                        Collections.sort(combo1, Collections.reverseOrder());
-//                        Collections.sort(combo2, Collections.reverseOrder());
-//
-//                        if(combo2.get(0) > combo1.get(0)) {
-//                            return 1;
-//                        } else if(combo2.get(0) == combo1.get(0)) {
-//                            if(combo2.get(1) > combo1.get(1)) {
-//                                return 1;
-//                            } else if(combo2.get(1) == combo1.get(1)) {
-//                                return 0;
-//                            }
-//                        }
-//                        return -1;
-                    } else {
-                        List<Integer> ranksOfPairsOnBoard = getRanksOfPairsOnBoard(board);
+                                //als hoogste kaart combo2 < hoogste kaart combo1
+                                if(Collections.max(combo2) < Collections.max(combo1)) {
+                                    return -1;
+                                }
+                            }
+                        }
 
-                        boardRanks.removeAll(Collections.singleton(ranksOfPairsOnBoard.get(0)));
-                        boardRanks.removeAll(Collections.singleton(ranksOfPairsOnBoard.get(1)));
+                        //als combo2 gepaired is en 1 niet
+                        if(combo1.get(0) != combo1.get(1) && combo2.get(0) == combo2.get(1)) {
+                            //als combo2 boven laagste boardpair
+                            if(combo2.get(0) > Collections.min(boardRanks)) {
+                                return 1;
+                            }
 
-                        int highestUnpairedBoardCard = boardRanks.get(0);
+                            //als combo2 onder laagste boardpair
+                            if(combo2.get(0) < Collections.min(boardRanks)) {
+                                //als hoogste kaart combo2 > hoogste kaart combo1
+                                if(Collections.max(combo2) > Collections.max(combo1)) {
+                                    return 1;
+                                }
 
-                        //als beide onder highestunpaired, dan return 0;
-                        if(Collections.max(combo2) <= highestUnpairedBoardCard && Collections.max(combo1) <= highestUnpairedBoardCard) {
-                            return 0;
-                        } else if(Collections.max(combo1) <= highestUnpairedBoardCard && Collections.max(combo2) > highestUnpairedBoardCard) {
-                            return 1;
-                        } else if(Collections.max(combo1) > highestUnpairedBoardCard && Collections.max(combo2) <= highestUnpairedBoardCard) {
-                            return -1;
-                        } else {
+                                //als hoogste kaart combo2 == hoogste kaart combo1
+                                if(Collections.max(combo2) == Collections.max(combo1)) {
+                                    return 0;
+                                }
+
+                                //als hoogste kaart combo2 < hoogste kaart combo1
+                                if(Collections.max(combo2) < Collections.max(combo1)) {
+                                    return -1;
+                                }
+                            }
+                        }
+
+                        //als beide niet gepaired
+                        if(combo1.get(0) != combo1.get(1) && combo2.get(0) != combo2.get(1)) {
+                            //als hoogste kaart combo2 > hoogste kaart combo1
                             if(Collections.max(combo2) > Collections.max(combo1)) {
                                 return 1;
-                            } else if(Collections.max(combo2) == Collections.max(combo1)) {
+                            }
+
+                            //als hoogste kaart combo2 == hoogste kaart combo1
+                            if(Collections.max(combo2) == Collections.max(combo1)) {
                                 return 0;
-                            } else {
+                            }
+
+                            //als hoogste kaart combo2 < hoogste kaart combo1
+                            if(Collections.max(combo2) < Collections.max(combo1)) {
                                 return -1;
+                            }
+                        }
+                    }
+
+                    //als het board 5 kaarten heeft
+                    if(board.size() == 5) {
+                        //als beide combos gepaired zijn
+                        if(combo1.get(0) == combo1.get(1) && combo2.get(0) == combo2.get(1)) {
+                            //als beide combos boven laagste boardpair
+
+                            int rankOfLowestPairOnBoard = Collections.min(getRanksOfPairsOnBoard(board));
+                            if(combo1.get(0) > rankOfLowestPairOnBoard && combo2.get(0) > rankOfLowestPairOnBoard) {
+                                //als hoogste kaart combo2 > hoogste kaart combo1
+                                if(Collections.max(combo2) > Collections.max(combo1)) {
+                                    return 1;
+                                }
+
+                                //als hoogste kaart combo2 == hoogste kaart combo1
+                                if(Collections.max(combo2) == Collections.max(combo1)) {
+                                    return 0;
+                                }
+
+                                //als hoogste kaart combo2 < hoogste kaart combo1
+                                if(Collections.max(combo2) < Collections.max(combo1)) {
+                                    return -1;
+                                }
+                            }
+
+                            //als combo1 boven laagste boardpair en combo2 niet
+                            if(combo1.get(0) > rankOfLowestPairOnBoard && combo2.get(0) < rankOfLowestPairOnBoard) {
+                                return -1;
+                            }
+
+                            //als combo2 boven laagste boardpair en combo1 niet
+                            if(combo1.get(0) < rankOfLowestPairOnBoard && combo2.get(0) > rankOfLowestPairOnBoard) {
+                                return 1;
+                            }
+
+                            //als beide combos onder laagste boardpair
+                            if(combo1.get(0) < rankOfLowestPairOnBoard && combo2.get(0) < rankOfLowestPairOnBoard) {
+                                //hier moet nog meer
+                                boardRanks.removeAll(getRanksOfPairsOnBoard(board));
+                                int boardKickerCard = boardRanks.get(0);
+
+                                //als combo1 en combo2 boven boardKickerCard
+                                if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                    //als combo1 hoger dan combo2
+                                    if(combo1.get(0) > combo2.get(0)) {
+                                        return -1;
+                                    }
+
+                                    //als combo1 en combo2 gelijk
+                                    if(combo1.get(0) == combo2.get(0)) {
+                                        return 0;
+                                    }
+
+                                    //als combo2 boven combo1
+                                    if(combo1.get(0) < combo2.get(0)) {
+                                        return 1;
+                                    }
+                                }
+
+                                //als combo1 boven boardKickerCard en combo2 niet
+                                if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                    return -1;
+                                }
+
+                                //als combo2 boven boardKickerCard en combo1 niet
+                                if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                    return 1;
+                                }
+
+                                //als beide combos onder boardKickerCard
+                                if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                    return 0;
+                                }
+                            }
+                        }
+
+                        //als combo1 gepaired is en 2 niet
+                        if(combo1.get(0) == combo1.get(1) && combo2.get(0) != combo2.get(1)) {
+                            //als combo1 hoger is dan laagste boardpair
+                            if(combo1.get(0) > Collections.min(getRanksOfPairsOnBoard(board))) {
+                                //hier nog toevoegen dat als combo2 pairt met boardKicker en deze hoger is dan combo1
+                                //dan wint combo2
+
+
+                                return -1;
+                            }
+
+                            //als combo1 lager is dan laagste boardpair
+                            if(combo1.get(0) < Collections.min(getRanksOfPairsOnBoard(board))) {
+                                boardRanks.removeAll(getRanksOfPairsOnBoard(board));
+                                int boardKickerCard = boardRanks.get(0);
+
+                                //als combo1 en combo2 boven boardKickerCard
+                                //TODO: hier gaat ie nog mis
+                                if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                    //als combo1 hoger dan combo2
+                                    if(combo1.get(0) > combo2.get(0)) {
+                                        return -1;
+                                    }
+
+                                    //als combo1 en combo2 gelijk
+                                    if(combo1.get(0) == combo2.get(0)) {
+                                        return 0;
+                                    }
+
+                                    //als combo2 boven combo1
+                                    if(combo1.get(0) < combo2.get(0)) {
+                                        return 1;
+                                    }
+                                }
+
+                                //als combo1 boven boardKickerCard en combo2 niet
+                                if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                    return -1;
+                                }
+
+                                //als combo2 boven boardKickerCard en combo1 niet
+                                if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                    return 1;
+                                }
+
+                                //als beide combos onder boardKickerCard
+                                if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                    return 0;
+                                }
+
+                                //als combo2 pairt met boardKickerCard
+
+
+                            }
+                        }
+
+                        //als combo2 gepaired is en 1 niet
+                        if(combo1.get(0) != combo1.get(1) && combo2.get(0) == combo2.get(1)) {
+                            //als combo2 hoger is dan laagste boardpair
+                            if(combo2.get(0) > Collections.min(getRanksOfPairsOnBoard(board))) {
+                                //hier nog toevoegen dat als combo2 pairt met boardKicker en deze hoger is dan combo1
+                                //dan wint combo2
+
+
+                                return 1;
+                            }
+
+                            //als combo2 lager is dan laagste boardpair
+                            if(combo2.get(0) < Collections.min(getRanksOfPairsOnBoard(board))) {
+                                boardRanks.removeAll(getRanksOfPairsOnBoard(board));
+                                int boardKickerCard = boardRanks.get(0);
+
+                                //als combo1 en combo2 boven boardKickerCard
+                                //TODO: hier gaat ie nog mis
+                                if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                    //als combo1 hoger dan combo2
+                                    if(combo1.get(0) > combo2.get(0)) {
+                                        return -1;
+                                    }
+
+                                    //als combo1 en combo2 gelijk
+                                    if(combo1.get(0) == combo2.get(0)) {
+                                        return 0;
+                                    }
+
+                                    //als combo2 boven combo1
+                                    if(combo1.get(0) < combo2.get(0)) {
+                                        return 1;
+                                    }
+                                }
+
+                                //als combo1 boven boardKickerCard en combo2 niet
+                                if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                    return -1;
+                                }
+
+                                //als combo2 boven boardKickerCard en combo1 niet
+                                if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                    return 1;
+                                }
+
+                                //als beide combos onder boardKickerCard
+                                if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                    return 0;
+                                }
+
+                                //TODO: Deze nog invullen
+                                //als combo2 pairt met boardKickerCard
+
+                            }
+                        }
+
+                        //als beide niet gepaired
+                        if(combo1.get(0) != combo1.get(1) && combo2.get(0) != combo2.get(1)) {
+                            boardRanks.removeAll(getRanksOfPairsOnBoard(board));
+                            int boardKickerCard = boardRanks.get(0);
+
+                            //als combo1 en combo2 boven boardKickerCard
+                            if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                //als combo1 hoger dan combo2
+                                if(combo1.get(0) > combo2.get(0)) {
+                                    return -1;
+                                }
+
+                                //als combo1 en combo2 gelijk
+                                if(combo1.get(0) == combo2.get(0)) {
+                                    return 0;
+                                }
+
+                                //als combo2 boven combo1
+                                if(combo1.get(0) < combo2.get(0)) {
+                                    return 1;
+                                }
+                            }
+
+                            //als combo1 boven boardKickerCard en combo2 niet
+                            if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                return -1;
+                            }
+
+                            //als combo2 boven boardKickerCard en combo1 niet
+                            if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                return 1;
+                            }
+
+                            //als beide combos onder boardKickerCard
+                            if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                return 0;
+                            }
+
+
+                            //pair met kickercard check
+                            //als kickercard is hoger dan laagste boardpair
+                            if(boardKickerCard > Collections.min(getRanksOfPairsOnBoard(board))) {
+                                //als combo1 pairt met kickercard en combo2 niet
+                                if(combo1.contains(boardKickerCard) && !combo2.contains(boardKickerCard)) {
+                                    return -1;
+                                }
+
+                                //als combo2 pairt met kickercard en combo1 niet
+                                if(combo2.contains(boardKickerCard) && !combo1.contains(boardKickerCard)) {
+                                    return 1;
+                                }
+
+                                //als beide combos niet pairen met kickercard
+                                if(!combo1.contains(boardKickerCard) && !combo2.contains(boardKickerCard)) {
+                                    //als combo1 en combo2 boven boardKickerCard
+                                    if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                        //als combo1 hoger dan combo2
+                                        if(combo1.get(0) > combo2.get(0)) {
+                                            return -1;
+                                        }
+
+                                        //als combo1 en combo2 gelijk
+                                        if(combo1.get(0) == combo2.get(0)) {
+                                            return 0;
+                                        }
+
+                                        //als combo2 boven combo1
+                                        if(combo1.get(0) < combo2.get(0)) {
+                                            return 1;
+                                        }
+                                    }
+
+                                    //als combo1 boven boardKickerCard en combo2 niet
+                                    if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                        return -1;
+                                    }
+
+                                    //als combo2 boven boardKickerCard en combo1 niet
+                                    if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                        return 1;
+                                    }
+
+                                    //als beide combos onder boardKickerCard
+                                    if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                        return 0;
+                                    }
+                                }
+
+                                //als beide combos pairen met kickercard
+                                if(combo1.contains(boardKickerCard) && combo2.contains(boardKickerCard)) {
+                                    return 0;
+                                }
                             }
                         }
                     }
                 }
+                System.out.println("komt ie hier nog?");
                 return 0;
             }
         };
