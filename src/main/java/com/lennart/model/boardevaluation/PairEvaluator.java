@@ -97,7 +97,6 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparator {
                 List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
 
                 if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
-
                     int pairedCardCombo1;
                     int kickerCombo1;
 
@@ -129,30 +128,98 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparator {
                     if(pairedCardCombo2 > pairedCardCombo1) {
                         return 1;
                     } else if (pairedCardCombo2 == pairedCardCombo1) {
-                        if(kickerCombo2 > kickerCombo1) {
-                            return 1;
-                        } else if(kickerCombo2 == kickerCombo1) {
-                            return 0;
+                        if(board.size() > 3) {
+                            if(boardRanks.contains(pairedCardCombo1)) {
+                                boardRanks.remove(Integer.valueOf(pairedCardCombo1));
+                            }
+                            Collections.sort(boardRanks, Collections.reverseOrder());
+                            int thirdRankedCardOnBoard = boardRanks.get(2);
+
+
+                            if(kickerCombo2 > kickerCombo1) {
+                                if(kickerCombo2 > thirdRankedCardOnBoard) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            } else if(kickerCombo2 == kickerCombo1) {
+                                return 0;
+                            } else {
+                                if(kickerCombo1 > thirdRankedCardOnBoard) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
+                            }
                         } else {
-                            return -1;
+                            if(kickerCombo2 > kickerCombo1) {
+                                return 1;
+                            } else if(kickerCombo2 == kickerCombo1) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
                         }
                     } else {
                         return -1;
                     }
                 } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 1) {
-                    Collections.sort(combo1, Collections.reverseOrder());
-                    Collections.sort(combo2, Collections.reverseOrder());
+                    if(board.size() > 3) {
+                        int rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
+                        boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
 
-                    if(combo2.get(0) > combo1.get(0)) {
-                        return 1;
-                    } else if(combo2.get(0) == combo1.get(0)) {
-                        if(combo2.get(1) > combo1.get(1)) {
-                            return 1;
-                        } else if(combo2.get(1) == combo1.get(1)) {
-                            return 0;
+                        Collections.sort(boardRanks, Collections.reverseOrder());
+                        int thirdRankedCardOnBoard = boardRanks.get(boardRanks.size() -1);
+
+                        Collections.sort(combo1, Collections.reverseOrder());
+                        Collections.sort(combo2, Collections.reverseOrder());
+
+                        if (combo2.get(0) > combo1.get(0)) {
+                            if (combo2.get(0) > thirdRankedCardOnBoard) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        } else if (combo2.get(0) == combo1.get(0)) {
+                            if (combo2.get(1) > combo1.get(1)) {
+                                if (combo2.get(1) > thirdRankedCardOnBoard) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            } else if (combo2.get(1) == combo1.get(1)) {
+                                return 0;
+                            } else {
+                                if (combo1.get(1) > thirdRankedCardOnBoard) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        } else {
+                            if (combo1.get(0) > thirdRankedCardOnBoard) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
                         }
+                    } else {
+                        Collections.sort(combo1, Collections.reverseOrder());
+                        Collections.sort(combo2, Collections.reverseOrder());
+
+                        if(combo2.get(0) > combo1.get(0)) {
+                            return 1;
+                        } else if(combo2.get(0) == combo1.get(0)) {
+                            if(combo2.get(1) > combo1.get(1)) {
+                                return 1;
+                            } else if(combo2.get(1) == combo1.get(1)) {
+                                return 0;
+                            } else {
+                                return -1;
+                            }
+                        }
+                        return -1;
                     }
-                    return -1;
                 }
                 return 0;
             }
