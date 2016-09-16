@@ -503,8 +503,6 @@ public class BoardEvaluator {
         for(List<Integer> l : comboSetRankOnlySorted) {
             allCombosUnsortedComboIsKey.put(l, new HashSet<>());
             allCombosUnsortedComboIsKey.get(l).add(l);
-            //TODO: dit nog toevoegen
-            //Collections.sort(allCombosUnsortedComboIsKey.get(l), evaluatorClass.getComboComparatorRankOnly(board));
         }
 
         for(List<Integer> x : comboSetRankOnlyUnsorted) {

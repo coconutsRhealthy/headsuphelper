@@ -158,14 +158,6 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
         return new Comparator<List<Integer>>() {
             @Override
             public int compare(List<Integer> combo1, List<Integer> combo2) {
-//                if(combo2.get(0) == 4 && combo2.get(1) == 4) {
-//                    System.out.println("wait here");
-//                }
-
-                if(combo1.get(0) == 11 && combo1.get(1) == 10 && combo2.get(0) == 2 && combo2.get(1) == 2) {
-                    System.out.println("hier ff checken");
-                }
-
                 BoardEvaluator boardEvaluator = new BoardEvaluator();
                 List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
 
@@ -187,7 +179,6 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                         return -1;
                     }
                 } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 1) {
-                    //7 8 9 9 J
 
                     int combo1HighCard = combo1.get(0);
                     int combo1LowCard = combo1.get(1);
@@ -574,9 +565,12 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                         if(combo1.get(0) == combo1.get(1) && combo2.get(0) != combo2.get(1)) {
                             //als combo1 hoger is dan laagste boardpair
                             if(combo1.get(0) > Collections.min(getRanksOfPairsOnBoard(board))) {
-                                //hier nog toevoegen dat als combo2 pairt met boardKicker en deze hoger is dan combo1
-                                //dan wint combo2
+                                boardRanks.removeAll(getRanksOfPairsOnBoard(board));
+                                int boardKickerCard = boardRanks.get(0);
 
+                                if(combo2.contains(boardKickerCard) && boardKickerCard > combo1.get(0)) {
+                                    return 1;
+                                }
 
                                 return -1;
                             }
@@ -586,42 +580,81 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                                 boardRanks.removeAll(getRanksOfPairsOnBoard(board));
                                 int boardKickerCard = boardRanks.get(0);
 
-                                //als combo1 en combo2 boven boardKickerCard
-                                //TODO: hier gaat ie nog mis
-                                if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
-                                    //als combo1 hoger dan combo2
-                                    if(combo1.get(0) > combo2.get(0)) {
+                                if(!combo1.contains(boardKickerCard) && !combo2.contains(boardKickerCard)) {
+                                    //als combo1 en combo2 boven boardKickerCard
+                                    if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                        //als combo1 hoger dan combo2
+                                        if(combo1.get(0) > combo2.get(0)) {
+                                            return -1;
+                                        }
+
+                                        //als combo1 en combo2 gelijk
+                                        if(combo1.get(0) == combo2.get(0)) {
+                                            return 0;
+                                        }
+
+                                        //als combo2 boven combo1
+                                        if(combo1.get(0) < combo2.get(0)) {
+                                            return 1;
+                                        }
+                                    }
+
+                                    //als combo1 boven boardKickerCard en combo2 niet
+                                    if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
                                         return -1;
                                     }
 
-                                    //als combo1 en combo2 gelijk
-                                    if(combo1.get(0) == combo2.get(0)) {
-                                        return 0;
-                                    }
-
-                                    //als combo2 boven combo1
-                                    if(combo1.get(0) < combo2.get(0)) {
+                                    //als combo2 boven boardKickerCard en combo1 niet
+                                    if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
                                         return 1;
                                     }
-                                }
 
-                                //als combo1 boven boardKickerCard en combo2 niet
-                                if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
-                                    return -1;
-                                }
-
-                                //als combo2 boven boardKickerCard en combo1 niet
-                                if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
-                                    return 1;
-                                }
-
-                                //als beide combos onder boardKickerCard
-                                if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
-                                    return 0;
+                                    //als beide combos onder boardKickerCard
+                                    if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                        return 0;
+                                    }
                                 }
 
                                 //als combo2 pairt met boardKickerCard
+                                if(combo2.contains(boardKickerCard)) {
+                                    //als boardKickerCard boven laagste boardPairCard
+                                    if(boardKickerCard > Collections.min(getRanksOfPairsOnBoard(board))) {
+                                        return 1;
+                                    }
 
+                                    //als boardKickerCard onder laagste boardPairCard
+                                    if(boardKickerCard < Collections.min(getRanksOfPairsOnBoard(board))) {
+                                        //nu gaat het er om welke kicker het hoogst is:
+                                        //kicker combo1, kicker combo2, of boardKickerCard
+                                        combo2.remove(boardKickerCard);
+                                        int kickerCombo1 = combo1.get(0);
+                                        int kickerCombo2 = combo2.get(0);
+
+                                        if(kickerCombo1 > kickerCombo2 ) {
+                                            if(kickerCombo1 > boardKickerCard) {
+                                                return -1;
+                                            }
+
+                                            if(kickerCombo1 < boardKickerCard) {
+                                                return 0;
+                                            }
+                                        }
+
+                                        if(kickerCombo1 == kickerCombo2) {
+                                            return 0;
+                                        }
+
+                                        if(kickerCombo1 < kickerCombo2) {
+                                            if(kickerCombo1 > boardKickerCard) {
+                                                return 1;
+                                            }
+
+                                            if(kickerCombo2 < boardKickerCard) {
+                                                return 0;
+                                            }
+                                        }
+                                    }
+                                }
 
                             }
                         }
@@ -630,9 +663,12 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                         if(combo1.get(0) != combo1.get(1) && combo2.get(0) == combo2.get(1)) {
                             //als combo2 hoger is dan laagste boardpair
                             if(combo2.get(0) > Collections.min(getRanksOfPairsOnBoard(board))) {
-                                //hier nog toevoegen dat als combo2 pairt met boardKicker en deze hoger is dan combo1
-                                //dan wint combo2
+                                boardRanks.removeAll(getRanksOfPairsOnBoard(board));
+                                int boardKickerCard = boardRanks.get(0);
 
+                                if(combo1.contains(boardKickerCard) && boardKickerCard > combo2.get(0)) {
+                                    return -1;
+                                }
 
                                 return 1;
                             }
@@ -643,7 +679,90 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                                 int boardKickerCard = boardRanks.get(0);
 
                                 //als combo1 en combo2 boven boardKickerCard
-                                //TODO: hier gaat ie nog mis
+                                if(!combo1.contains(boardKickerCard) && !combo2.contains(boardKickerCard)) {
+                                    if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                        //als combo1 hoger dan combo2
+                                        if(combo1.get(0) > combo2.get(0)) {
+                                            return -1;
+                                        }
+
+                                        //als combo1 en combo2 gelijk
+                                        if(combo1.get(0) == combo2.get(0)) {
+                                            return 0;
+                                        }
+
+                                        //als combo2 boven combo1
+                                        if(combo1.get(0) < combo2.get(0)) {
+                                            return 1;
+                                        }
+                                    }
+
+                                    //als combo1 boven boardKickerCard en combo2 niet
+                                    if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                        return -1;
+                                    }
+
+                                    //als combo2 boven boardKickerCard en combo1 niet
+                                    if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
+                                        return 1;
+                                    }
+
+                                    //als beide combos onder boardKickerCard
+                                    if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
+                                        return 0;
+                                    }
+                                }
+
+                                //als combo1 pairt met boardKickerCard
+                                if(combo1.contains(boardKickerCard)) {
+                                    //als boardKickerCard boven laagste boardPairCard
+                                    if(boardKickerCard > Collections.min(getRanksOfPairsOnBoard(board))) {
+                                        return 1;
+                                    }
+
+                                    //als boardKickerCard onder laagste boardPairCard
+                                    if(boardKickerCard < Collections.min(getRanksOfPairsOnBoard(board))) {
+                                        //nu gaat het er om welke kicker het hoogst is:
+                                        //kicker combo1, kicker combo2, of boardKickerCard
+                                        combo1.remove(boardKickerCard);
+                                        int kickerCombo1 = combo1.get(0);
+                                        int kickerCombo2 = combo2.get(0);
+
+                                        if(kickerCombo1 > kickerCombo2 ) {
+                                            if(kickerCombo1 > boardKickerCard) {
+                                                return -1;
+                                            }
+
+                                            if(kickerCombo1 < boardKickerCard) {
+                                                return 0;
+                                            }
+                                        }
+
+                                        if(kickerCombo1 == kickerCombo2) {
+                                            return 0;
+                                        }
+
+                                        if(kickerCombo1 < kickerCombo2) {
+                                            if(kickerCombo1 > boardKickerCard) {
+                                                return 1;
+                                            }
+
+                                            if(kickerCombo2 < boardKickerCard) {
+                                                return 0;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        //als beide niet gepaired
+                        if(combo1.get(0) != combo1.get(1) && combo2.get(0) != combo2.get(1)) {
+                            boardRanks.removeAll(getRanksOfPairsOnBoard(board));
+                            int boardKickerCard = boardRanks.get(0);
+
+                            if(!combo1.contains(boardKickerCard) && !combo2.contains(boardKickerCard)) {
+                                //als combo1 en combo2 boven boardKickerCard
                                 if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
                                     //als combo1 hoger dan combo2
                                     if(combo1.get(0) > combo2.get(0)) {
@@ -675,51 +794,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                                 if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
                                     return 0;
                                 }
-
-                                //TODO: Deze nog invullen
-                                //als combo2 pairt met boardKickerCard
-
                             }
-                        }
-
-                        //als beide niet gepaired
-                        if(combo1.get(0) != combo1.get(1) && combo2.get(0) != combo2.get(1)) {
-                            boardRanks.removeAll(getRanksOfPairsOnBoard(board));
-                            int boardKickerCard = boardRanks.get(0);
-
-                            //als combo1 en combo2 boven boardKickerCard
-                            if(combo1.get(0) > boardKickerCard && combo2.get(0) > boardKickerCard) {
-                                //als combo1 hoger dan combo2
-                                if(combo1.get(0) > combo2.get(0)) {
-                                    return -1;
-                                }
-
-                                //als combo1 en combo2 gelijk
-                                if(combo1.get(0) == combo2.get(0)) {
-                                    return 0;
-                                }
-
-                                //als combo2 boven combo1
-                                if(combo1.get(0) < combo2.get(0)) {
-                                    return 1;
-                                }
-                            }
-
-                            //als combo1 boven boardKickerCard en combo2 niet
-                            if(combo1.get(0) > boardKickerCard && combo2.get(0) < boardKickerCard) {
-                                return -1;
-                            }
-
-                            //als combo2 boven boardKickerCard en combo1 niet
-                            if(combo1.get(0) < boardKickerCard && combo2.get(0) > boardKickerCard) {
-                                return 1;
-                            }
-
-                            //als beide combos onder boardKickerCard
-                            if(combo1.get(0) < boardKickerCard && combo2.get(0) < boardKickerCard) {
-                                return 0;
-                            }
-
 
                             //pair met kickercard check
                             //als kickercard is hoger dan laagste boardpair
@@ -778,7 +853,6 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                         }
                     }
                 }
-                System.out.println("komt ie hier nog?");
                 return 0;
             }
         };
