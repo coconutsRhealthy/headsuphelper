@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by lennart on 3-9-16.
  */
-public class ThreeOfAKindEvaluator extends BoardEvaluator{
+public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboComparator{
 
     //check welke combos three of a kind geven, gegeven een bepaald board
 
@@ -24,6 +24,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator{
                 }
             }
             threeOfAKindCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(threeOfAKindCombos, board);
+            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
             return threeOfAKindCombos;
         } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -41,6 +42,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator{
                     }
                 }
             }
+            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
             return threeOfAKindCombos;
         } else if(boardContainsTrips(board) && !boardContainsQuads(board)) {
             //alle combos die niet met de andere kaarten op het board pairen, geen pocket pair zijn, en niet met de trips
@@ -81,20 +83,185 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator{
             for(Iterator<Map.Entry<Integer, List<Card>>> it = allPossibleStartHands.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<Integer, List<Card>> entry = it.next();
                 if(boardRanksTripsOnBoardRemoved.size() == 1) {
-                    if(entry.getValue().get(0).getRank() == boardRanksTripsOnBoardRemoved.get(0)) {
+                    if(boardRanksTripsOnBoardRemoved.contains(entry.getValue().get(0).getRank()) ||
+                            boardRanksTripsOnBoardRemoved.contains(entry.getValue().get(1).getRank())) {
                         it.remove();
                     }
                 } else if(boardRanksTripsOnBoardRemoved.size() == 2) {
-                    if(entry.getValue().get(0).getRank() == boardRanksTripsOnBoardRemoved.get(0) || entry.getValue().get(0).getRank() == boardRanksTripsOnBoardRemoved.get(1)) {
+                    if(boardRanksTripsOnBoardRemoved.contains(entry.getValue().get(0).getRank()) ||
+                            boardRanksTripsOnBoardRemoved.contains(entry.getValue().get(1).getRank())) {
                         it.remove();
                     }
                 }
             }
 
             threeOfAKindCombos = allPossibleStartHands;
+            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
             return threeOfAKindCombos;
         }
         return threeOfAKindCombos;
+    }
+
+    @Override
+    public Comparator<List<Integer>> getComboComparatorRankOnly(List<Card> board) {
+        return new Comparator<List<Integer>>() {
+            @Override
+            public int compare(List<Integer> combo1, List<Integer> combo2) {
+                if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
+                    return compareCombosUnpairedBoard(combo1, combo2, board);
+                } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
+                    return compareCombosOnePairOnBoard(combo1, combo2, board);
+                } else if(getNumberOfPairsOnBoard(board) == 0 && boardContainsTrips(board) && !boardContainsQuads(board)) {
+                    return compareCombosThreeOfAKindOnBoard(combo1, combo2, board);
+                } else {
+                    System.out.println("should never come here, getComboComparatorRankOnly() -> ThreeOfAKindEvaluator");
+                    return 0;
+                }
+            }
+        };
+    }
+
+    private int compareCombosUnpairedBoard(List<Integer> combo1, List<Integer> combo2, List<Card> board) {
+        if(combo2.get(0) > combo1.get(0)) {
+            return 1;
+        } else if(combo2.get(0) == combo1.get(0)) {
+            System.out.println("should never come here, compareCombosUnpairedBoard, ThreeOfAKindEvaluator");
+            return 0;
+        } else {
+            return -1;
+        }
+    }
+
+    private int compareCombosOnePairOnBoard(List<Integer> combo1, List<Integer> combo2, List<Card> board) {
+        int kickerCardCombo1;
+        int kickerCardCombo2;
+
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+        if(!boardRanks.contains(combo1.get(0))) {
+            kickerCardCombo1 = combo1.get(0);
+        } else {
+            kickerCardCombo1 = combo1.get(1);
+        }
+
+        if(!boardRanks.contains(combo2.get(0))) {
+            kickerCardCombo2 = combo2.get(0);
+        } else {
+            kickerCardCombo2 = combo2.get(1);
+        }
+
+        if(board.size() == 3) {
+            if(kickerCardCombo2 > kickerCardCombo1) {
+                return 1;
+            } else if(kickerCardCombo2 == kickerCardCombo1) {
+                return 0;
+            } else {
+                return -1;
+            }
+        } else {
+            int rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
+            boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
+
+            int boardKickerCard;
+
+            if(board.size() == 4) {
+                boardKickerCard = Collections.min(boardRanks);
+            } else {
+                boardRanks.remove(Integer.valueOf(Collections.min(boardRanks)));
+                boardKickerCard = Collections.min(boardRanks);
+            }
+
+            if(kickerCardCombo2 > kickerCardCombo1) {
+                if(kickerCardCombo2 > boardKickerCard) {
+                    return 1;
+                } else if (kickerCardCombo2 == boardKickerCard) {
+                    System.out.println("should never come here, compareCombosOnePairOnBoard, ThreeOfAKindEvaluator");
+                    return 0;
+                } else {
+                    return 0;
+                }
+            } else if(kickerCardCombo2 == kickerCardCombo1) {
+                return 0;
+            } else {
+                if(kickerCardCombo1 > boardKickerCard) {
+                    return -1;
+                } else if (kickerCardCombo1 == boardKickerCard) {
+                    System.out.println("should never come here, compareCombosOnePairOnBoard, ThreeOfAKindEvaluator");
+                    return 0;
+                } else {
+                    return 0;
+                }
+            }
+        }
+    }
+
+    private int compareCombosThreeOfAKindOnBoard(List<Integer> combo1, List<Integer> combo2, List<Card> board) {
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+        Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
+        Integer rankOfTripsOnBoard = 0;
+
+        for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {
+            if(entry.getValue() == 3) {
+                rankOfTripsOnBoard = entry.getKey();
+            }
+        }
+
+        if(boardRanks.size() == 3) {
+            if(Collections.max(combo2) > Collections.max(combo1)) {
+                return 1;
+            } else if(Collections.max(combo2) == Collections.max(combo1)) {
+                if(Collections.min(combo2) > Collections.min(combo1)) {
+                    return 1;
+                } else if(Collections.min(combo2) == Collections.min(combo1)) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else {
+                return -1;
+            }
+        } else {
+            boardRanks.removeAll(Collections.singleton(rankOfTripsOnBoard));
+
+            if(Collections.max(combo2) > Collections.max(combo1)) {
+                if(board.size() == 4) {
+                    return 1;
+                } else {
+                    if(Collections.max(combo2) > Collections.min(boardRanks)) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            } else if(Collections.max(combo2) == Collections.max(combo1)) {
+                if(Collections.min(combo2) > Collections.min(combo1)) {
+                    if(Collections.min(combo2) > Collections.min(boardRanks)) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } else if (Collections.min(combo2) == Collections.min(combo1)) {
+                    return 0;
+                } else {
+                    if(Collections.min(combo1) > Collections.min(boardRanks)) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            } else {
+                if(board.size() == 4) {
+                    return -1;
+                } else {
+                    if(Collections.max(combo1) > Collections.min(boardRanks)) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+        }
     }
 }
 

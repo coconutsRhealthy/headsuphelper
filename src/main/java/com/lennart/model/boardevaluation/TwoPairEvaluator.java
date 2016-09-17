@@ -158,13 +158,12 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
         return new Comparator<List<Integer>>() {
             @Override
             public int compare(List<Integer> combo1, List<Integer> combo2) {
-                BoardEvaluator boardEvaluator = new BoardEvaluator();
-                List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
+                List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
                 Collections.sort(combo1, Collections.reverseOrder());
                 Collections.sort(combo2, Collections.reverseOrder());
 
-                if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
+                if(getNumberOfPairsOnBoard(board) == 0) {
                     if(Collections.max(combo2) > Collections.max(combo1)) {
                         return 1;
                     } else if(Collections.max(combo2) == Collections.max(combo1)) {
@@ -178,7 +177,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                     } else {
                         return -1;
                     }
-                } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 1) {
+                } else if(getNumberOfPairsOnBoard(board) == 1) {
 
                     int combo1HighCard = combo1.get(0);
                     int combo1LowCard = combo1.get(1);
@@ -195,7 +194,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                     int combo1KickerCard = 0;
                     int combo2KickerCard = 0;
 
-                    int rankOfPairOnBoard = boardEvaluator.getRanksOfPairsOnBoard(board).get(0);
+                    int rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
 
                     if(boardRanks.contains(combo1HighCard) && boardRanks.contains(combo1LowCard)) {
                         //als beide kaarten boven rank of pair on board zijn
@@ -321,7 +320,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                         if(combo2LowPairCard > combo1LowPairCard) {
                             return 1;
                         } else if(combo2LowPairCard == combo1LowPairCard) {
-                            if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
+                            if(getNumberOfPairsOnBoard(board) == 0) {
                                 return 0;
                             } else {
                                 if(boardRanks.size() == 3) {
@@ -363,7 +362,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                         return -1;
                     }
 
-                } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 2) {
+                } else if(getNumberOfPairsOnBoard(board) == 2) {
                     //als het board 4 kaarten heeft
                     if(board.size() == 4) {
                         //als beide combos gepaired zijn
