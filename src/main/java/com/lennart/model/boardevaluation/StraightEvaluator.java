@@ -154,25 +154,42 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
         return new Comparator<List<Integer>>() {
             @Override
             public int compare(List<Integer> combo1, List<Integer> combo2) {
-                Collections.sort(combo1, Collections.reverseOrder());
-                Collections.sort(combo2, Collections.reverseOrder());
+                List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
-                if(combo2.get(0) > combo1.get(0)) {
-                    return 1;
-                } else if(combo2.get(0) == combo1.get(0)) {
-                    if(combo2.get(1) > combo1.get(1)) {
-                        return 1;
-                    } else if(combo2.get(1) == combo1.get(1)) {
-                        return 0;
-                    } else {
-                        return -1;
+                List<Integer> combo1PlusBoardRanks = new ArrayList<>();
+                List<Integer> combo2PlusBoardRanks = new ArrayList<>();
+
+                combo1PlusBoardRanks.addAll(combo1);
+                combo1PlusBoardRanks.addAll(boardRanks);
+                combo2PlusBoardRanks.addAll(combo2);
+                combo2PlusBoardRanks.addAll(boardRanks);
+
+                int highestStraightThatIsPresentInCombo1PlusBoardRanks = 0;
+                int highestStraightThatIsPresentInCombo2PlusBoardRanks = 0;
+
+                Map<Integer, List<Integer>> allPossibleStraights = getAllPossibleFiveConnectingCards();
+
+
+                for (Map.Entry<Integer, List<Integer>> entry : allPossibleStraights.entrySet()) {
+                    if(combo1PlusBoardRanks.containsAll(entry.getValue())) {
+                        highestStraightThatIsPresentInCombo1PlusBoardRanks = entry.getKey();
+                    }
+
+                    if(combo2PlusBoardRanks.containsAll(entry.getValue())) {
+                        highestStraightThatIsPresentInCombo2PlusBoardRanks = entry.getKey();
                     }
                 }
-                return -1;
+
+                if(highestStraightThatIsPresentInCombo2PlusBoardRanks > highestStraightThatIsPresentInCombo1PlusBoardRanks) {
+                    return 1;
+                } else if (highestStraightThatIsPresentInCombo2PlusBoardRanks == highestStraightThatIsPresentInCombo1PlusBoardRanks) {
+                    return 0;
+                } else {
+                    return -1;
+                }
             }
         };
     }
-
 
     //helper methods
     private Map<Integer, List<Integer>> addSpecificOosdCombosIfNecessary (Map<Integer, List<Integer>> oosdCombos, List<Card> board) {
@@ -896,12 +913,10 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
 
     private Map<Integer, List<Card>> convertListOfRankOnlyCombosToCardComboMap (List<List<Integer>> rankOnlyComboList) {
         Map<Integer, List<Card>> comboMap = new HashMap<>();
-
         for(List<Integer> l : rankOnlyComboList) {
             List<Card> cardListToAddToMap = convertIntegerBoardToArtificialCardBoard(l);
             comboMap.put(comboMap.size(), cardListToAddToMap);
         }
-
         return comboMap;
     }
 }
