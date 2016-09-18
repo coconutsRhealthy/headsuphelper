@@ -7,7 +7,15 @@ import java.util.*;
 /**
  * Created by Lennart Popma on 8/9/2016.
  */
-public class StraightEvaluator extends BoardEvaluator {
+public class StraightEvaluator extends BoardEvaluator implements ComboComparator {
+
+    public Map<Integer, List<Integer>> getMapOfStraightCombos(List<Card> board) {
+        List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);
+        Map<Integer, List<Card>> straightCombosArtificialSuits = convertListOfRankOnlyCombosToCardComboMap(straightCombosList);
+        Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, new StraightEvaluator());
+
+        return null;
+    }
 
     public List<List<Integer>> getCombosThatMakeStraight(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
@@ -140,6 +148,31 @@ public class StraightEvaluator extends BoardEvaluator {
         }
         return backdoorCombos;
     }
+
+    @Override
+    public Comparator<List<Integer>> getComboComparatorRankOnly(List<Card> board) {
+        return new Comparator<List<Integer>>() {
+            @Override
+            public int compare(List<Integer> combo1, List<Integer> combo2) {
+                Collections.sort(combo1, Collections.reverseOrder());
+                Collections.sort(combo2, Collections.reverseOrder());
+
+                if(combo2.get(0) > combo1.get(0)) {
+                    return 1;
+                } else if(combo2.get(0) == combo1.get(0)) {
+                    if(combo2.get(1) > combo1.get(1)) {
+                        return 1;
+                    } else if(combo2.get(1) == combo1.get(1)) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                }
+                return -1;
+            }
+        };
+    }
+
 
     //helper methods
     private Map<Integer, List<Integer>> addSpecificOosdCombosIfNecessary (Map<Integer, List<Integer>> oosdCombos, List<Card> board) {
@@ -859,5 +892,16 @@ public class StraightEvaluator extends BoardEvaluator {
             }
         }
         return straightCombos;
+    }
+
+    private Map<Integer, List<Card>> convertListOfRankOnlyCombosToCardComboMap (List<List<Integer>> rankOnlyComboList) {
+        Map<Integer, List<Card>> comboMap = new HashMap<>();
+
+        for(List<Integer> l : rankOnlyComboList) {
+            List<Card> cardListToAddToMap = convertIntegerBoardToArtificialCardBoard(l);
+            comboMap.put(comboMap.size(), cardListToAddToMap);
+        }
+
+        return comboMap;
     }
 }

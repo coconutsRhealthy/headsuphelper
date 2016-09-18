@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -92,16 +93,20 @@ public class Controller {
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
 
-        threeOfAKindEvaluator.getThreeOfAKindCombos(board);
-        twoPairEvaluator.getCombosThatMakeTwoPair(board);
-        pairEvaluator.getCombosThatMakePair(board);
-        flushEvaluator.getFlushDrawCombos(board);
-        flushEvaluator.getFlushCombos(board);
-        //flushEvaluator.getMapOfAllPossibleStartHands();
-        flushEvaluator.getSuitsOfBoard(board);
-//        flushEvaluator.getMapOfAllPossibleCombosOfOneSuit('d');
-        flushEvaluator.getFlushCombos(board);
-        return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
+//        threeOfAKindEvaluator.getThreeOfAKindCombos(board);
+//        twoPairEvaluator.getCombosThatMakeTwoPair(board);
+//        pairEvaluator.getCombosThatMakePair(board);
+//        flushEvaluator.getFlushDrawCombos(board);
+//        flushEvaluator.getFlushCombos(board);
+//        //flushEvaluator.getMapOfAllPossibleStartHands();
+//        flushEvaluator.getSuitsOfBoard(board);
+////        flushEvaluator.getMapOfAllPossibleCombosOfOneSuit('d');
+//        flushEvaluator.getFlushCombos(board);
+
+        straightEvaluator.getMapOfStraightCombos(board);
+        Map<Integer, List<Integer>> temp = new HashMap<>();
+        return temp;
+//        return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
     }
 
     public static void main(String[] args) {

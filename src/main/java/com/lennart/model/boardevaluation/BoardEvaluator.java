@@ -475,7 +475,7 @@ public class BoardEvaluator {
         return sortedComboMap;
     }
 
-    protected <T extends ComboComparator> Map<Integer, List<Integer>> getSortedComboMapRankOnly
+    protected <T extends ComboComparator> Map<Integer, List<List<Integer>>> getSortedComboMapRankOnly
             (Map<Integer, List<Card>> comboMap, List<Card> board, T evaluatorClass) {
         Map<Integer, List<List<Integer>>> sortedComboMapRankOnly = new HashMap<>();
         Set<List<Integer>> comboSetRankOnlyUnsorted = new HashSet<>();
@@ -558,7 +558,7 @@ public class BoardEvaluator {
         }
 
         System.out.println(sortedComboMapRankOnly);
-        return null;
+        return sortedComboMapRankOnly;
     }
 
     public List<BooleanResult> allFunctions(List<Card> board) {

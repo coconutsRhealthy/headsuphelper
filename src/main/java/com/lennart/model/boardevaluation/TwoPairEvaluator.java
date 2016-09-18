@@ -32,7 +32,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                     it.remove();
                 }
             }
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
             return combosThatMakeTwoPair;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -85,7 +85,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), pocketPairEntry.getValue());
                 }
             }
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
             return combosThatMakeTwoPair;
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.
@@ -147,7 +147,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
                 }
             }
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
             return combosThatMakeTwoPair;
         }
         return combosThatMakeTwoPair;

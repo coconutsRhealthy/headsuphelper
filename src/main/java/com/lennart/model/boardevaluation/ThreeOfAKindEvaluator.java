@@ -24,7 +24,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
                 }
             }
             threeOfAKindCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(threeOfAKindCombos, board);
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
             return threeOfAKindCombos;
         } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -42,7 +42,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
                     }
                 }
             }
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
             return threeOfAKindCombos;
         } else if(boardContainsTrips(board) && !boardContainsQuads(board)) {
             //alle combos die niet met de andere kaarten op het board pairen, geen pocket pair zijn, en niet met de trips
@@ -96,7 +96,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             }
 
             threeOfAKindCombos = allPossibleStartHands;
-            Map<Integer, List<Integer>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
             return threeOfAKindCombos;
         }
         return threeOfAKindCombos;
