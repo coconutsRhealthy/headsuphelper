@@ -242,7 +242,7 @@ public class FlushEvaluator extends BoardEvaluator {
                     sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).addAll(unsortedComboIsKeyEntry.getValue());
                     Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()), Card.sortCardCombosBasedOnRank());
                     if(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).size() == 1) {
-                        Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).get(0), Collections.reverseOrder());
+                        Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).get(0));
                     }
                 }
             }
@@ -307,10 +307,266 @@ public class FlushEvaluator extends BoardEvaluator {
         return allPossibleCombosOfOneSuit;
     }
 
+    private int getNumberOfFlushCardsInCombo(List<Card> combo, char flushSuit) {
+        int counter = 0;
+        for(Card c : combo) {
+            if(c.getSuit() == flushSuit) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
     public Comparator<List<Card>> sortFlushCombos(List<Card> board) {
         return new Comparator<List<Card>>() {
             @Override
             public int compare(List<Card> combo1, List<Card> combo2) {
+                Map<Character, List<Card>> suitsOnBoard = getSuitsOfBoard(board);
+                char flushSuit = 'x';
+                int numberOfSuitedCardsOnBoard = 0;
+
+                for (Map.Entry<Character, List<Card>> entry : suitsOnBoard.entrySet()) {
+                    if(entry.getValue().size() >= 3) {
+                        flushSuit = entry.getKey();
+                        numberOfSuitedCardsOnBoard = entry.getValue().size();
+                    }
+                }
+
+                //als er 3 van een suit op het board liggen
+                if(numberOfSuitedCardsOnBoard == 3) {
+                    List<Integer> combo1RankOnly = getSortedCardRanksFromCardList(combo1);
+                    List<Integer> combo2RankOnly = getSortedCardRanksFromCardList(combo2);
+
+                    if(Collections.max(combo2RankOnly) > Collections.max(combo1RankOnly)) {
+                        return 1;
+                    } else if(Collections.max(combo2RankOnly) == Collections.max(combo1RankOnly)) {
+                        if(Collections.min(combo2RankOnly) > Collections.min(combo1RankOnly)) {
+                            return 1;
+                        } else if(Collections.min(combo2RankOnly) == Collections.min(combo1RankOnly)) {
+                            return 0;
+                        }
+                    }
+                    return -1;
+                }
+
+                //als er 4 van een suit op het board liggen
+                else if(numberOfSuitedCardsOnBoard > 3) {
+                    //als beide combos 1 kaart hebben van flushsuit
+
+                    List<Card> flushCardsOnBoard = suitsOnBoard.get(flushSuit);
+                    Collections.sort(flushCardsOnBoard);
+                    int rankOfLowestFlushCardOnBoard = flushCardsOnBoard.get(flushCardsOnBoard.size() -1).getRank();
+
+                    if(getNumberOfFlushCardsInCombo(combo1, flushSuit) == 1 &&
+                            getNumberOfFlushCardsInCombo(combo2, flushSuit) == 1) {
+                        Card flushCardCombo1 = new Card();
+                        Card flushCardCombo2 = new Card();
+
+                        for(Card c : combo1) {
+                            if(c.getSuit() == flushSuit) {
+                                flushCardCombo1 = c;
+                            }
+                        }
+
+                        for(Card c : combo2) {
+                            if(c.getSuit() == flushSuit) {
+                                flushCardCombo2 = c;
+                            }
+                        }
+
+                        if(flushCardCombo2.getRank() > flushCardCombo1.getRank()) {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return 1;
+                            } else {
+                                if(flushCardCombo2.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        } else if(flushCardCombo2.getRank() == flushCardCombo1.getRank()) {
+                            return 0;
+                        } else {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return -1;
+                            } else {
+                                if(flushCardCombo1.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+
+                    //als combo2 twee kaarten van flushsuit heeft en combo1 één kaart
+                    if(getNumberOfFlushCardsInCombo(combo1, flushSuit) == 1 &&
+                            getNumberOfFlushCardsInCombo(combo2, flushSuit) == 2) {
+                        Collections.sort(combo2);
+                        Card flushCardCombo1 = new Card();
+                        Card flushCardCombo2High = combo2.get(0);
+                        Card flushCardCombo2Low = combo2.get(1);
+
+                        for(Card c : combo1) {
+                            if(c.getSuit() == flushSuit) {
+                                flushCardCombo1 = c;
+                            }
+                        }
+
+                        if(flushCardCombo2High.getRank() > flushCardCombo1.getRank()) {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return 1;
+                            } else {
+                                if(flushCardCombo2High.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        } else if(flushCardCombo2High.getRank() == flushCardCombo1.getRank()) {
+                            //als flushCardCombo2Low hoger is dan laagste flushKaart op board, dan wint combo2
+                            if(flushCardCombo2Low.getRank() > rankOfLowestFlushCardOnBoard) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        } else {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return -1;
+                            } else {
+                                if(flushCardCombo1.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+
+                    //als combo1 twee kaarten van flushsuit heeft en combo2 één kaart
+                    if(getNumberOfFlushCardsInCombo(combo1, flushSuit) == 2 &&
+                            getNumberOfFlushCardsInCombo(combo2, flushSuit) == 1) {
+                        Collections.sort(combo1);
+                        Card flushCardCombo1High = combo1.get(0);
+                        Card flushCardCombo1Low = combo1.get(1);
+                        Card flushCardCombo2 = new Card();
+
+                        for(Card c : combo2) {
+                            if(c.getSuit() == flushSuit) {
+                                flushCardCombo2 = c;
+                            }
+                        }
+
+                        if(flushCardCombo1High.getRank() > flushCardCombo2.getRank()) {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return -1;
+                            } else {
+                                if(flushCardCombo1High.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        } else if(flushCardCombo1High.getRank() == flushCardCombo2.getRank()) {
+                            //als flushCardCombo1Low hoger is dan laagste flushKaart op board, dan wint combo2
+                            if(flushCardCombo1Low.getRank() > rankOfLowestFlushCardOnBoard) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        } else {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return 1;
+                            } else {
+                                if(flushCardCombo2.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+
+                    //als beide combos twee kaarten van flushsuit hebben
+                    if(getNumberOfFlushCardsInCombo(combo1, flushSuit) == 2 &&
+                            getNumberOfFlushCardsInCombo(combo2, flushSuit) == 2) {
+                        Collections.sort(combo1);
+                        Collections.sort(combo2);
+                        Card flushCardCombo1High = combo1.get(0);
+                        Card flushCardCombo1Low = combo1.get(1);
+                        Card flushCardCombo2High = combo2.get(0);
+                        Card flushCardCombo2Low = combo2.get(1);
+
+                        if(flushCardCombo2High.getRank() > flushCardCombo1High.getRank()) {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return 1;
+                            } else {
+                                if(flushCardCombo2High.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        } else if(flushCardCombo2High.getRank() == flushCardCombo1High.getRank()) {
+                            if(flushCardCombo2Low.getRank() > flushCardCombo1Low.getRank()) {
+                                if(flushCardCombo2Low.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            } else if(flushCardCombo2Low.getRank() == flushCardCombo1Low.getRank()) {
+                                return 0;
+                            } else {
+                                if(flushCardCombo1Low.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        } else {
+                            if(numberOfSuitedCardsOnBoard == 4) {
+                                return -1;
+                            } else {
+                                if(flushCardCombo1High.getRank() > rankOfLowestFlushCardOnBoard) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
+                            }
+                        }
+                    }
+
+                    //als combo1 geen flushkaarten heeft
+                    if(getNumberOfFlushCardsInCombo(combo1, flushSuit) == 0) {
+                        //als combo2 ook geen flushkaarten heeft
+                        if(getNumberOfFlushCardsInCombo(combo2, flushSuit) == 0) {
+                            return 0;
+                        } else {
+                            Collections.sort(combo2);
+                            if(combo2.get(0).getRank() > rankOfLowestFlushCardOnBoard) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+
+                    //als combo2 geen flushkaarten heeft
+                    if(getNumberOfFlushCardsInCombo(combo2, flushSuit) == 0) {
+                        //als combo1 ook geen flushkaarten heeft
+                        if(getNumberOfFlushCardsInCombo(combo1, flushSuit) == 0) {
+                            return 0;
+                        } else {
+                            Collections.sort(combo1);
+                            if(combo1.get(0).getRank() > rankOfLowestFlushCardOnBoard) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                }
+                System.out.println("Should never come here");
                 return 0;
             }
         };
