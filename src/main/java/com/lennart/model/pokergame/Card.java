@@ -1,5 +1,7 @@
 package com.lennart.model.pokergame;
 
+import com.lennart.model.boardevaluation.BoardEvaluator;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -65,19 +67,21 @@ public class Card implements Comparable<Card> {
             }
     }
 
-    public static Comparator<List<Card>> getComboComparator() {
+    public static Comparator<List<Card>> sortCardCombosBasedOnRank() {
         return new Comparator<List<Card>>() {
             @Override
-            public int compare(List<Card> combo1, List<Card> combo2) {
-                Collections.sort(combo1);
-                Collections.sort(combo2);
+            public int compare(List<Card> xCombo1, List<Card> xCombo2) {
+                BoardEvaluator boardEvaluator = new BoardEvaluator();
 
-                if(combo2.get(0).getRank() > combo1.get(0).getRank()) {
+                List<Integer> combo1 = boardEvaluator.getSortedCardRanksFromCardList(xCombo1);
+                List<Integer> combo2 = boardEvaluator.getSortedCardRanksFromCardList(xCombo2);
+
+                if(Collections.max(combo2) > Collections.max(combo1)) {
                     return 1;
-                } else if(combo2.get(0).getRank() == combo1.get(0).getRank()) {
-                    if(combo2.get(1).getRank() > combo1.get(1).getRank()) {
+                } else if(Collections.max(combo2) == Collections.max(combo1)) {
+                    if(Collections.min(combo2) > Collections.min(combo1)) {
                         return 1;
-                    } else if(combo2.get(1).getRank() == combo1.get(1).getRank()) {
+                    } else if(Collections.min(combo2) == Collections.min(combo1)) {
                         return 0;
                     }
                 }

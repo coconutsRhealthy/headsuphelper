@@ -160,7 +160,7 @@ public class BoardEvaluator {
         return ranksOfPairsOnBoad;
     }
 
-    protected List<Integer> getSortedCardRanksFromCardList(List<Card> board) {
+    public List<Integer> getSortedCardRanksFromCardList(List<Card> board) {
         List<Integer> boardRanks = new ArrayList<Integer>();
         for(Card c : board) {
             boardRanks.add(c.getRank());
@@ -466,7 +466,7 @@ public class BoardEvaluator {
 
     protected Map<Integer, List<Card>> getSortedComboMap(Map<Integer, List<Card>> comboMap) {
         List<List<Card>> comboList = new ArrayList<>(comboMap.values());
-        Collections.sort(comboList, Card.getComboComparator());
+        Collections.sort(comboList, Card.sortCardCombosBasedOnRank());
         Map<Integer, List<Card>> sortedComboMap = new HashMap<>();
 
         for(List<Card> list : comboList) {
@@ -533,7 +533,7 @@ public class BoardEvaluator {
 
                 if(initialSize != unsortedComboIsKeyEntryCopy.size()) {
                     sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).addAll(unsortedComboIsKeyEntry.getValue());
-                    Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()), new HighCardEvaluator().getComboComparatorRankOnly(board));
+                    Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()), sortRankCombosBasedOnRank());
                     if(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).size() == 1) {
                         Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).get(0), Collections.reverseOrder());
                     }
@@ -541,6 +541,27 @@ public class BoardEvaluator {
             }
         }
         return sortedComboMapRankOnly;
+    }
+
+    public Comparator<List<Integer>> sortRankCombosBasedOnRank() {
+        return new Comparator<List<Integer>>() {
+            @Override
+            public int compare(List<Integer> combo1, List<Integer> combo2) {
+                Collections.sort(combo1, Collections.reverseOrder());
+                Collections.sort(combo2, Collections.reverseOrder());
+
+                if(combo2.get(0) > combo1.get(0)) {
+                    return 1;
+                } else if(combo2.get(0) == combo1.get(0)) {
+                    if(combo2.get(1) > combo1.get(1)) {
+                        return 1;
+                    } else if(combo2.get(1) == combo1.get(1)) {
+                        return 0;
+                    }
+                }
+                return -1;
+            }
+        };
     }
 
     public List<BooleanResult> allFunctions(List<Card> board) {

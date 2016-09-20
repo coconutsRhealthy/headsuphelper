@@ -31,6 +31,7 @@ public class FlushEvaluator extends BoardEvaluator {
         if(numberOfSuitedCards == 3) {
             flushCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
+            Map<Integer, List<List<Card>>> sortedFlushCombos = getSortedFlushComboMap(flushCombos, board);
             return flushCombos;
         }
 
@@ -59,6 +60,7 @@ public class FlushEvaluator extends BoardEvaluator {
                     }
                 }
             }
+            Map<Integer, List<List<Card>>> sortedFlushCombos = getSortedFlushComboMap(flushCombos, board);
             return flushCombos;
         }
         return null;
@@ -182,6 +184,73 @@ public class FlushEvaluator extends BoardEvaluator {
     }
 
     //helper methods
+    private Map<Integer, List<List<Card>>> getSortedFlushComboMap(Map<Integer, List<Card>> comboMap, List<Card> board) {
+        Map<Integer, List<List<Card>>> sortedComboMapRankOnly = new HashMap<>();
+        Set<List<Card>> comboSetRankOnlyUnsorted = new HashSet<>();
+        Set<List<Card>> comboSetRankOnlySorted = new TreeSet<>(sortFlushCombos(board));
+
+        for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
+            comboSetRankOnlyUnsorted.add(entry.getValue());
+        }
+
+        comboSetRankOnlySorted.addAll(comboSetRankOnlyUnsorted);
+        Map<List<Card>, Set<List<Card>>> allCombosUnsortedComboIsKey = new HashMap<>();
+
+        for(List<Card> l : comboSetRankOnlySorted) {
+            allCombosUnsortedComboIsKey.put(l, new HashSet<>());
+            allCombosUnsortedComboIsKey.get(l).add(l);
+        }
+
+        for(List<Card> x : comboSetRankOnlyUnsorted) {
+            for(List<Card> y : comboSetRankOnlySorted) {
+                Set<List<Card>> test = new TreeSet<>(sortFlushCombos(board));
+                test.add(x);
+                test.add(y);
+
+                if(test.size() == 1) {
+                    allCombosUnsortedComboIsKey.get(y).add(x);
+                }
+            }
+        }
+
+        Map<Integer, List<List<Card>>> sortedSetMap = new HashMap<>();
+        List<List<Card>> comboSetRankOnlySortedAsList = new ArrayList<>();
+        comboSetRankOnlySortedAsList.addAll(comboSetRankOnlySorted);
+
+        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
+            sortedSetMap.put(i, new ArrayList<>());
+            sortedSetMap.get(i).add(comboSetRankOnlySortedAsList.get(i));
+        }
+
+        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
+            sortedComboMapRankOnly.put(i, new ArrayList<>());
+        }
+
+        for (Map.Entry<List<Card>, Set<List<Card>>> unsortedComboIsKeyEntry : allCombosUnsortedComboIsKey.entrySet()) {
+            for (Map.Entry<Integer, List<List<Card>>> sortedSetMapEntry : sortedSetMap.entrySet()) {
+                int initialSize = unsortedComboIsKeyEntry.getValue().size();
+
+                List<List<Card>> unsortedComboIsKeyEntryCopy = new ArrayList<>();
+                unsortedComboIsKeyEntryCopy.addAll(unsortedComboIsKeyEntry.getValue());
+
+                List<List<Card>> sortedSetMapEntryCopy = new ArrayList<>();
+                sortedSetMapEntryCopy.addAll(sortedSetMapEntry.getValue());
+
+                unsortedComboIsKeyEntryCopy.removeAll(sortedSetMapEntryCopy);
+
+                if(initialSize != unsortedComboIsKeyEntryCopy.size()) {
+                    sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).addAll(unsortedComboIsKeyEntry.getValue());
+                    Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()), Card.sortCardCombosBasedOnRank());
+                    if(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).size() == 1) {
+                        Collections.sort(sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).get(0), Collections.reverseOrder());
+                    }
+                }
+            }
+        }
+        return sortedComboMapRankOnly;
+    }
+
+
     private Map<Integer, List<Card>> getAllNonSuitedStartHandsThatContainASpecificSuit(char suit) {
         Map<Integer, List<Card>> allNonSuitedStartHandsThatContainASpecificSuit = new HashMap<>();
         Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
@@ -236,5 +305,14 @@ public class FlushEvaluator extends BoardEvaluator {
             counter--;
         }
         return allPossibleCombosOfOneSuit;
+    }
+
+    public Comparator<List<Card>> sortFlushCombos(List<Card> board) {
+        return new Comparator<List<Card>>() {
+            @Override
+            public int compare(List<Card> combo1, List<Card> combo2) {
+                return 0;
+            }
+        };
     }
 }
