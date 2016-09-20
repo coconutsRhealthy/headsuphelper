@@ -90,6 +90,10 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
     }
 
     public Map<Integer, List<Integer>> getCombosThatGiveOosdOrDoubleGutter(List<Card> board) {
+        if(board.size() == 5) {
+            return null;
+        }
+
         Map<List<Integer>, List<List<Integer>>> allStraightDrawCombos = getCombosThatGiveAnyStraightDraw(board);
         Map<Integer, List<Integer>> oosdCombos = new HashMap<>();
         int counter = 0;
@@ -109,6 +113,10 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
     }
 
     public Map<Integer, List<Integer>> getCombosThatGiveGutshot (List<Card> board) {
+        if(board.size() == 5) {
+            return null;
+        }
+
         Map<List<Integer>, List<List<Integer>>> allStraightDrawCombos = getCombosThatGiveAnyStraightDraw(board);
         Map<Integer, List<Integer>> gutshotCombos = new HashMap<>();
         int counter = 0;
@@ -131,6 +139,10 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
     }
 
     public Map<Integer, List<Integer>> getCombosThatGiveBackDoorStraightDraw(List<Card> board) {
+        if(board.size() > 3) {
+            return null;
+        }
+
         Map<List<Integer>, List<List<Integer>>> allStraightDrawCombos = getCombosThatGiveAnyStraightDraw(board);
         Map<Integer, List<Integer>> backdoorCombos = new HashMap<>();
         int counter = 0;
