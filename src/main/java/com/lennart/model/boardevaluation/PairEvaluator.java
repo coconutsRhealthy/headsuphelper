@@ -132,12 +132,11 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparator {
                             if(boardRanks.contains(pairedCardCombo1)) {
                                 boardRanks.remove(Integer.valueOf(pairedCardCombo1));
                             }
-                            Collections.sort(boardRanks, Collections.reverseOrder());
-                            int thirdRankedCardOnBoard = boardRanks.get(2);
 
+                            int lowestRankedCardOnBoard = Collections.min(boardRanks);
 
                             if(kickerCombo2 > kickerCombo1) {
-                                if(kickerCombo2 > thirdRankedCardOnBoard) {
+                                if(kickerCombo2 > lowestRankedCardOnBoard) {
                                     return 1;
                                 } else {
                                     return 0;
@@ -145,7 +144,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparator {
                             } else if(kickerCombo2 == kickerCombo1) {
                                 return 0;
                             } else {
-                                if(kickerCombo1 > thirdRankedCardOnBoard) {
+                                if(kickerCombo1 > lowestRankedCardOnBoard) {
                                     return -1;
                                 } else {
                                     return 0;
@@ -168,21 +167,24 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparator {
                         int rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
                         boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
 
-                        Collections.sort(boardRanks, Collections.reverseOrder());
-                        int thirdRankedCardOnBoard = boardRanks.get(boardRanks.size() -1);
+                        int lowestRankedCardOnBoard = Collections.min(boardRanks);
 
                         Collections.sort(combo1, Collections.reverseOrder());
                         Collections.sort(combo2, Collections.reverseOrder());
 
                         if (combo2.get(0) > combo1.get(0)) {
-                            if (combo2.get(0) > thirdRankedCardOnBoard) {
+                            if (combo2.get(0) > lowestRankedCardOnBoard) {
                                 return 1;
                             } else {
-                                return 0;
+                                if(board.size() == 4) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
                             }
                         } else if (combo2.get(0) == combo1.get(0)) {
                             if (combo2.get(1) > combo1.get(1)) {
-                                if (combo2.get(1) > thirdRankedCardOnBoard) {
+                                if (combo2.get(1) > lowestRankedCardOnBoard) {
                                     return 1;
                                 } else {
                                     return 0;
@@ -190,17 +192,21 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparator {
                             } else if (combo2.get(1) == combo1.get(1)) {
                                 return 0;
                             } else {
-                                if (combo1.get(1) > thirdRankedCardOnBoard) {
+                                if (combo1.get(1) > lowestRankedCardOnBoard) {
                                     return -1;
                                 } else {
                                     return 0;
                                 }
                             }
                         } else {
-                            if (combo1.get(0) > thirdRankedCardOnBoard) {
+                            if (combo1.get(0) > lowestRankedCardOnBoard) {
                                 return -1;
                             } else {
-                                return 0;
+                                if(board.size() == 4) {
+                                    return -1;
+                                } else {
+                                    return 0;
+                                }
                             }
                         }
                     } else {
