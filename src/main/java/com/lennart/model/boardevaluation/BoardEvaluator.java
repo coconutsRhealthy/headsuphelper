@@ -543,6 +543,19 @@ public class BoardEvaluator {
         return sortedComboMapRankOnly;
     }
 
+//    public Map<Integer, Set<Set<Card>>> convertRankComboMapToCardComboMap
+//            (Map<Integer, List<List<Integer>>> rankComboMap, List<Card> board) {
+//
+//        //maak per rankCombo een set van alle cardcombos die deze rankcombo zijn
+//
+//    }
+//
+//    public Set<Card> convertRankComboToSetOfCardCombos(List<Integer> rankCombo) {
+//
+//        Map<Integer, Card> eije = new HashMap<>();
+//
+//    }
+
     public Comparator<List<Integer>> sortRankCombosBasedOnRank() {
         return new Comparator<List<Integer>>() {
             @Override
