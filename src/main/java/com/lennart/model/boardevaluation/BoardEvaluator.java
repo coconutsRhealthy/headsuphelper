@@ -549,12 +549,35 @@ public class BoardEvaluator {
 //        //maak per rankCombo een set van alle cardcombos die deze rankcombo zijn
 //
 //    }
-//
-//    public Set<Card> convertRankComboToSetOfCardCombos(List<Integer> rankCombo) {
-//
-//        Map<Integer, Card> eije = new HashMap<>();
-//
-//    }
+
+    public Set<Set<Card>> convertRankComboToSetOfCardCombos(List<Integer> rankCombo) {
+        List<Card> card1List = new ArrayList<>();
+        card1List.add(new Card(rankCombo.get(0), 's'));
+        card1List.add(new Card(rankCombo.get(0), 'c'));
+        card1List.add(new Card(rankCombo.get(0), 'd'));
+        card1List.add(new Card(rankCombo.get(0), 'h'));
+
+        List<Card> card2List = new ArrayList<>();
+        card2List.add(new Card(rankCombo.get(1), 's'));
+        card2List.add(new Card(rankCombo.get(1), 'c'));
+        card2List.add(new Card(rankCombo.get(1), 'd'));
+        card2List.add(new Card(rankCombo.get(1), 'h'));
+
+        Set<Set<Card>> setOfCardCombos = new HashSet<>();
+
+        for(Card c1 : card1List) {
+            for(Card c2: card2List) {
+                Set<Card> combo = new HashSet<>();
+                combo.add(c1);
+                combo.add(c2);
+
+                if(combo.size() == 2) {
+                    setOfCardCombos.add(combo);
+                }
+            }
+        }
+        return setOfCardCombos;
+    }
 
     public Comparator<List<Integer>> sortRankCombosBasedOnRank() {
         return new Comparator<List<Integer>>() {
