@@ -543,12 +543,26 @@ public class BoardEvaluator {
         return sortedComboMapRankOnly;
     }
 
-//    public Map<Integer, Set<Set<Card>>> convertRankComboMapToCardComboMap
-//            (Map<Integer, List<List<Integer>>> rankComboMap, List<Card> board) {
-//
-//        //maak per rankCombo een set van alle cardcombos die deze rankcombo zijn
-//
-//    }
+    public Map<Integer, Set<Set<Card>>> convertRankComboMapToCardComboMapCorrectedForBoard
+            (Map<Integer, List<List<Integer>>> rankComboMap, List<Card> board) {
+        Map<Integer, Set<Set<Card>>> cardComboMap = new HashMap<>();
+
+        for (Map.Entry<Integer, List<List<Integer>>> entry : rankComboMap.entrySet()) {
+            cardComboMap.put(cardComboMap.size(), new HashSet<>());
+            for(List<Integer> l : entry.getValue()) {
+                Set<Set<Card>> cardCombosCorrespondingToRankCombo = convertRankComboToSetOfCardCombos(l);
+                Set<Set<Card>> cardCombosCorrespondingToRankComboCorrectedForBoard = new HashSet<>();
+
+                for(Set<Card> s : cardCombosCorrespondingToRankCombo) {
+                    if(Collections.disjoint(s, board)) {
+                        cardCombosCorrespondingToRankComboCorrectedForBoard.add(s);
+                    }
+                }
+                cardComboMap.get(entry.getKey()).addAll(cardCombosCorrespondingToRankComboCorrectedForBoard);
+            }
+        }
+        return cardComboMap;
+    }
 
     public Set<Set<Card>> convertRankComboToSetOfCardCombos(List<Integer> rankCombo) {
         List<Card> card1List = new ArrayList<>();

@@ -33,6 +33,9 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                 }
             }
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+
+            Map<Integer, Set<Set<Card>>> cardComboMap = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+
             return combosThatMakeTwoPair;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -148,6 +151,9 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
                 }
             }
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+
+            Map<Integer, Set<Set<Card>>> cardComboMap = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+
             return combosThatMakeTwoPair;
         }
         return combosThatMakeTwoPair;
