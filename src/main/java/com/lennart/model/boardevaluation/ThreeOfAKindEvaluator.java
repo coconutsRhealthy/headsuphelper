@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by lennart on 3-9-16.
  */
-public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboComparator{
+public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
     //check welke combos three of a kind geven, gegeven een bepaald board
 

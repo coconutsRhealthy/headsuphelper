@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by lpo10346 on 9/13/2016.
  */
-public class HighCardEvaluator implements ComboComparator {
+public class HighCardEvaluator implements ComboComparatorRankOnly {
 
     @Override
     public Comparator<List<Integer>> getComboComparatorRankOnly(List<Card> board) {

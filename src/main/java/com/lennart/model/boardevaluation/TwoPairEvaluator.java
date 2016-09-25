@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by LPO10346 on 9/1/2016.
  */
-public class TwoPairEvaluator extends BoardEvaluator implements ComboComparator{
+public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
     public Map<Integer, List<Card>> getCombosThatMakeTwoPair (List<Card> board) {
         Map<Integer, List<Card>> combosThatMakeTwoPair = new HashMap<>();

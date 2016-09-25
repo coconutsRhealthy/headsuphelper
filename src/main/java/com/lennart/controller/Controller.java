@@ -28,6 +28,7 @@ public class Controller {
     private PairEvaluator pairEvaluator = new PairEvaluator();
     private TwoPairEvaluator twoPairEvaluator = new TwoPairEvaluator();
     private ThreeOfAKindEvaluator threeOfAKindEvaluator = new ThreeOfAKindEvaluator();
+    private FourOfAKindEvaluator fourOfAKindEvaluator = new FourOfAKindEvaluator();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -101,7 +102,9 @@ public class Controller {
 //        //flushEvaluator.getMapOfAllPossibleStartHands();
 //        flushEvaluator.getSuitsOfBoard(board);
 ////        flushEvaluator.getMapOfAllPossibleCombosOfOneSuit('d');
-//        flushEvaluator.getFlushCombos(board);
+        flushEvaluator.getFlushCombos(board);
+
+//        fourOfAKindEvaluator.getFourOfAKindCombos(board);
 
         straightEvaluator.getMapOfStraightCombos(board);
         Map<Integer, List<Integer>> temp = new HashMap<>();

@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by Lennart Popma on 8/9/2016.
  */
-public class StraightEvaluator extends BoardEvaluator implements ComboComparator {
+public class StraightEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
     public Map<Integer, List<Integer>> getMapOfStraightCombos(List<Card> board) {
         List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);

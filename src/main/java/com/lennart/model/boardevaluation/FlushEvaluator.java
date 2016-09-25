@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Created by LPO10346 on 8/10/2016.
  */
-public class FlushEvaluator extends BoardEvaluator {
+public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
     public Map<Integer, List<Card>> getFlushCombos (List<Card> board) {
         Map<Integer, List<Card>> flushCombos = new HashMap<>();
@@ -31,7 +31,7 @@ public class FlushEvaluator extends BoardEvaluator {
         if(numberOfSuitedCards == 3) {
             flushCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedFlushComboMap(flushCombos, board);
+            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
             return flushCombos;
         }
 
@@ -46,14 +46,14 @@ public class FlushEvaluator extends BoardEvaluator {
                 }
             }
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedFlushComboMap(flushCombos, board);
+            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
             return flushCombos;
         }
 
         if(numberOfSuitedCards == 5) {
             Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
-            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedFlushComboMap(flushCombos, board);
+            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
             return flushCombos;
         }
         return null;
@@ -177,71 +177,6 @@ public class FlushEvaluator extends BoardEvaluator {
     }
 
     //helper methods
-    private Map<Integer, Set<Set<Card>>> getSortedFlushComboMap(Map<Integer, List<Card>> comboMap, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> sortedComboMapRankOnly = new HashMap<>();
-        Set<Set<Card>> comboSetRankOnlyUnsorted = new HashSet<>();
-        Set<Set<Card>> comboSetRankOnlySorted = new TreeSet<>(sortFlushCombos(board));
-
-        for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
-            Set<Card> entryListAsSet = new HashSet<>();
-            entryListAsSet.addAll(entry.getValue());
-            comboSetRankOnlyUnsorted.add(entryListAsSet);
-        }
-
-        comboSetRankOnlySorted.addAll(comboSetRankOnlyUnsorted);
-        Map<Set<Card>, Set<Set<Card>>> allCombosUnsortedComboIsKey = new HashMap<>();
-
-        for(Set<Card> l : comboSetRankOnlySorted) {
-            allCombosUnsortedComboIsKey.put(l, new HashSet<>());
-            allCombosUnsortedComboIsKey.get(l).add(l);
-        }
-
-        for(Set<Card> x : comboSetRankOnlyUnsorted) {
-            for(Set<Card> y : comboSetRankOnlySorted) {
-                Set<Set<Card>> test = new TreeSet<>(sortFlushCombos(board));
-                test.add(x);
-                test.add(y);
-
-                if(test.size() == 1) {
-                    allCombosUnsortedComboIsKey.get(y).add(x);
-                }
-            }
-        }
-
-        Map<Integer, List<Set<Card>>> sortedSetMap = new HashMap<>();
-        List<Set<Card>> comboSetRankOnlySortedAsList = new ArrayList<>();
-        comboSetRankOnlySortedAsList.addAll(comboSetRankOnlySorted);
-
-        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
-            sortedSetMap.put(i, new ArrayList<>());
-            sortedSetMap.get(i).add(comboSetRankOnlySortedAsList.get(i));
-        }
-
-        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
-            sortedComboMapRankOnly.put(i, new HashSet<>());
-        }
-
-        for (Map.Entry<Set<Card>, Set<Set<Card>>> unsortedComboIsKeyEntry : allCombosUnsortedComboIsKey.entrySet()) {
-            for (Map.Entry<Integer, List<Set<Card>>> sortedSetMapEntry : sortedSetMap.entrySet()) {
-                int initialSize = unsortedComboIsKeyEntry.getValue().size();
-
-                List<Set<Card>> unsortedComboIsKeyEntryCopy = new ArrayList<>();
-                unsortedComboIsKeyEntryCopy.addAll(unsortedComboIsKeyEntry.getValue());
-
-                List<Set<Card>> sortedSetMapEntryCopy = new ArrayList<>();
-                sortedSetMapEntryCopy.addAll(sortedSetMapEntry.getValue());
-
-                unsortedComboIsKeyEntryCopy.removeAll(sortedSetMapEntryCopy);
-
-                if(initialSize != unsortedComboIsKeyEntryCopy.size()) {
-                    sortedComboMapRankOnly.get(sortedSetMapEntry.getKey()).addAll(unsortedComboIsKeyEntry.getValue());
-                }
-            }
-        }
-        return sortedComboMapRankOnly;
-    }
-
-
     private Map<Integer, List<Card>> getAllNonSuitedStartHandsThatContainASpecificSuit(char suit) {
         Map<Integer, List<Card>> allNonSuitedStartHandsThatContainASpecificSuit = new HashMap<>();
         Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
@@ -308,7 +243,8 @@ public class FlushEvaluator extends BoardEvaluator {
         return counter;
     }
 
-    public Comparator<Set<Card>> sortFlushCombos(List<Card> board) {
+    @Override
+    public Comparator<Set<Card>> getComboComparator(List<Card> board) {
         return new Comparator<Set<Card>>() {
             @Override
             public int compare(Set<Card> xCombo1, Set<Card> xCombo2) {

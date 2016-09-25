@@ -353,10 +353,9 @@ public class BoardEvaluator {
         Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
         Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = new HashMap<>();
 
-        int index = 0;
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
             if(entry.getValue().contains(card)) {
-                allStartHandsThatContainASpecificCard.put(index, entry.getValue());
+                allStartHandsThatContainASpecificCard.put(allStartHandsThatContainASpecificCard.size(), entry.getValue());
             }
         }
         return allStartHandsThatContainASpecificCard;
@@ -475,7 +474,7 @@ public class BoardEvaluator {
         return sortedComboMap;
     }
 
-    protected <T extends ComboComparator> Map<Integer, List<List<Integer>>> getSortedComboMapRankOnly
+    protected <T extends ComboComparatorRankOnly> Map<Integer, List<List<Integer>>> getSortedComboMapRankOnly
             (Map<Integer, List<Card>> comboMap, List<Card> board, T evaluatorClass) {
         Map<Integer, List<List<Integer>>> sortedComboMapRankOnly = new HashMap<>();
         Set<List<Integer>> comboSetRankOnlyUnsorted = new HashSet<>();
@@ -541,6 +540,71 @@ public class BoardEvaluator {
             }
         }
         return sortedComboMapRankOnly;
+    }
+
+    protected <T extends ComboComparator> Map<Integer, Set<Set<Card>>> getSortedCardComboMap
+            (Map<Integer, List<Card>> comboMap, List<Card> board, T evaluatorClass) {
+        Map<Integer, Set<Set<Card>>> sortedComboMap = new HashMap<>();
+        Set<Set<Card>> comboSetUnsorted = new HashSet<>();
+        Set<Set<Card>> comboSetSorted = new TreeSet<>(evaluatorClass.getComboComparator(board));
+
+        for (Map.Entry<Integer, List<Card>> entry : comboMap.entrySet()) {
+            Set<Card> entryListAsSet = new HashSet<>();
+            entryListAsSet.addAll(entry.getValue());
+            comboSetUnsorted.add(entryListAsSet);
+        }
+
+        comboSetSorted.addAll(comboSetUnsorted);
+        Map<Set<Card>, Set<Set<Card>>> allCombosUnsortedComboIsKey = new HashMap<>();
+
+        for(Set<Card> l : comboSetSorted) {
+            allCombosUnsortedComboIsKey.put(l, new HashSet<>());
+            allCombosUnsortedComboIsKey.get(l).add(l);
+        }
+
+        for(Set<Card> x : comboSetUnsorted) {
+            for(Set<Card> y : comboSetSorted) {
+                Set<Set<Card>> test = new TreeSet<>(evaluatorClass.getComboComparator(board));
+                test.add(x);
+                test.add(y);
+
+                if(test.size() == 1) {
+                    allCombosUnsortedComboIsKey.get(y).add(x);
+                }
+            }
+        }
+
+        Map<Integer, List<Set<Card>>> sortedSetMap = new HashMap<>();
+        List<Set<Card>> comboSetRankOnlySortedAsList = new ArrayList<>();
+        comboSetRankOnlySortedAsList.addAll(comboSetSorted);
+
+        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
+            sortedSetMap.put(i, new ArrayList<>());
+            sortedSetMap.get(i).add(comboSetRankOnlySortedAsList.get(i));
+        }
+
+        for(int i = 0; i < comboSetRankOnlySortedAsList.size(); i++) {
+            sortedComboMap.put(i, new HashSet<>());
+        }
+
+        for (Map.Entry<Set<Card>, Set<Set<Card>>> unsortedComboIsKeyEntry : allCombosUnsortedComboIsKey.entrySet()) {
+            for (Map.Entry<Integer, List<Set<Card>>> sortedSetMapEntry : sortedSetMap.entrySet()) {
+                int initialSize = unsortedComboIsKeyEntry.getValue().size();
+
+                List<Set<Card>> unsortedComboIsKeyEntryCopy = new ArrayList<>();
+                unsortedComboIsKeyEntryCopy.addAll(unsortedComboIsKeyEntry.getValue());
+
+                List<Set<Card>> sortedSetMapEntryCopy = new ArrayList<>();
+                sortedSetMapEntryCopy.addAll(sortedSetMapEntry.getValue());
+
+                unsortedComboIsKeyEntryCopy.removeAll(sortedSetMapEntryCopy);
+
+                if(initialSize != unsortedComboIsKeyEntryCopy.size()) {
+                    sortedComboMap.get(sortedSetMapEntry.getKey()).addAll(unsortedComboIsKeyEntry.getValue());
+                }
+            }
+        }
+        return sortedComboMap;
     }
 
     public Map<Integer, Set<Set<Card>>> convertRankComboMapToCardComboMapCorrectedForBoard
