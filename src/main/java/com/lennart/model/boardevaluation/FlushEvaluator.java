@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
-    public Map<Integer, List<Card>> getFlushCombos (List<Card> board) {
+    public Map<Integer, Set<Set<Card>>> getFlushCombos (List<Card> board) {
         Map<Integer, List<Card>> flushCombos = new HashMap<>();
         Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
 
@@ -25,14 +25,13 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         }
 
         if(numberOfSuitedCards < 3) {
-            return flushCombos;
+            return new HashMap<>();
         }
 
         if(numberOfSuitedCards == 3) {
             flushCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
-            return flushCombos;
+            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
         }
 
         if(numberOfSuitedCards == 4) {
@@ -46,15 +45,13 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
                 }
             }
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
-            return flushCombos;
+            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
         }
 
         if(numberOfSuitedCards == 5) {
             Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
-            Map<Integer, Set<Set<Card>>> sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
-            return flushCombos;
+            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
         }
         return null;
     }

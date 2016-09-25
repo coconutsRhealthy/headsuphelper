@@ -9,12 +9,11 @@ import java.util.*;
  */
 public class StraightEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
-    public Map<Integer, List<Integer>> getMapOfStraightCombos(List<Card> board) {
+    public Map<Integer, Set<Set<Card>>> getMapOfStraightCombos(List<Card> board) {
         List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);
         Map<Integer, List<Card>> straightCombosArtificialSuits = convertListOfRankOnlyCombosToCardComboMap(straightCombosList);
         Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, new StraightEvaluator());
-
-        return null;
+        return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
     }
 
     public List<List<Integer>> getCombosThatMakeStraight(List<Card> board) {
@@ -63,8 +62,17 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
                 allCombosThatMakeStraight.addAll(listsOfFoundCombos.get(i));
             }
 
-            allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
+            if(isBoardConnected(board)) {
+                Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+                allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
+                Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
+                for (Map.Entry<Integer, List<Integer>> entry : allPossibleStartHandsRankOnly.entrySet()) {
+                    allCombosThatMakeStraight.add(entry.getValue());
+                }
+            }
+
+            allCombosThatMakeStraight = removeDoubleEntriesInList(allCombosThatMakeStraight);
             return allCombosThatMakeStraight;
         }
 
@@ -709,31 +717,6 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
 
         List<Integer> highestFiveConnectingCards = fiveConnectingCardsThatArePresentOnBoard.get(counter-1);
         return highestFiveConnectingCards;
-    }
-
-
-    private Map<Integer, List<Integer>> getAllPossibleFiveConnectingCards() {
-        Map<Integer, List<Integer>> allPossibleStraights = new HashMap<>();
-        List<Integer> lowestStraight = new ArrayList<>();
-        lowestStraight.add(14);
-        lowestStraight.add(2);
-        lowestStraight.add(3);
-        lowestStraight.add(4);
-        lowestStraight.add(5);
-        allPossibleStraights.put(0, lowestStraight);
-
-        for(int i = 1; i < 10; i++) {
-            allPossibleStraights.put(i, new ArrayList<>());
-        }
-
-        int start = 2;
-        for(int i = 1; i < allPossibleStraights.size(); i++) {
-            for(int z = 0; z < 5; z++) {
-                allPossibleStraights.get(i).add(start + z);
-            }
-            start++;
-        }
-        return allPossibleStraights;
     }
 
     private Map <Integer, List<Integer>> getSubBoardRankLists(int numberOValuesInSublist, List<Integer> boardRanks) {

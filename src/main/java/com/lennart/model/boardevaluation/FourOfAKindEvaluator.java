@@ -11,10 +11,10 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
 
     public Map<Integer, Set<Set<Card>>> getFourOfAKindCombos(List<Card> board) {
         Map<Integer, List<Card>> comboMap = new HashMap<>();
-        Map<Integer, Set<Set<Card>>> fourOfAKindCOmbos = new HashMap<>();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new HashMap<>();
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-            return fourOfAKindCOmbos;
+            return fourOfAKindCombos;
         }
 
         if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
@@ -37,8 +37,8 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             combo.addAll(pairCards);
             comboMap.put(comboMap.size(), combo);
 
-            fourOfAKindCOmbos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
-            return fourOfAKindCOmbos;
+            fourOfAKindCombos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
+            return fourOfAKindCombos;
         }
 
         if(getNumberOfPairsOnBoard(board) == 2 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
@@ -77,8 +77,8 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             comboMap.put(comboMap.size(), combo1);
             comboMap.put(comboMap.size(), combo2);
 
-            fourOfAKindCOmbos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
-            return fourOfAKindCOmbos;
+            fourOfAKindCombos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
+            return fourOfAKindCombos;
         }
 
         if(boardContainsTrips(board) && !boardContainsQuads(board)) {
@@ -137,15 +137,15 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
                 }
             }
 
-            fourOfAKindCOmbos = getSortedCardComboMap(allStartHandsThatContainTripsCardNotOnBoard, board, new FourOfAKindEvaluator());
-            return fourOfAKindCOmbos;
+            fourOfAKindCombos = getSortedCardComboMap(allStartHandsThatContainTripsCardNotOnBoard, board, new FourOfAKindEvaluator());
+            return fourOfAKindCombos;
         }
 
         if(boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
-            fourOfAKindCOmbos = getSortedCardComboMap(allPossibleStartHands, board, new FourOfAKindEvaluator());
-            return fourOfAKindCOmbos;
+            fourOfAKindCombos = getSortedCardComboMap(allPossibleStartHands, board, new FourOfAKindEvaluator());
+            return fourOfAKindCombos;
         }
 
         return null;

@@ -453,7 +453,7 @@ public class BoardEvaluator {
         return false;
     }
 
-    protected Map<Integer, List<Integer>> getAllPossibleStartHandsRankOnlyCorrectedForBoard(Map<Integer, List<Card>> allPossibleStartHands, List<Card> board) {
+    protected Map<Integer, List<Integer>> getAllPossibleStartHandsRankOnly(Map<Integer, List<Card>> allPossibleStartHands) {
         Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = new HashMap<>();
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
             allPossibleStartHandsRankOnly.put(entry.getKey(), new ArrayList<>());
@@ -472,6 +472,30 @@ public class BoardEvaluator {
             sortedComboMap.put(sortedComboMap.size(), list);
         }
         return sortedComboMap;
+    }
+
+    protected Map<Integer, List<Integer>> getAllPossibleFiveConnectingCards() {
+        Map<Integer, List<Integer>> allPossibleStraights = new HashMap<>();
+        List<Integer> lowestStraight = new ArrayList<>();
+        lowestStraight.add(14);
+        lowestStraight.add(2);
+        lowestStraight.add(3);
+        lowestStraight.add(4);
+        lowestStraight.add(5);
+        allPossibleStraights.put(0, lowestStraight);
+
+        for(int i = 1; i < 10; i++) {
+            allPossibleStraights.put(i, new ArrayList<>());
+        }
+
+        int start = 2;
+        for(int i = 1; i < allPossibleStraights.size(); i++) {
+            for(int z = 0; z < 5; z++) {
+                allPossibleStraights.get(i).add(start + z);
+            }
+            start++;
+        }
+        return allPossibleStraights;
     }
 
     protected <T extends ComboComparatorRankOnly> Map<Integer, List<List<Integer>>> getSortedComboMapRankOnly
