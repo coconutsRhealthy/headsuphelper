@@ -100,9 +100,45 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
         return null;
     }
 
-
     @Override
     public Comparator<Set<Card>> getComboComparator(List<Card> board) {
-        return null;
+        return new Comparator<Set<Card>>() {
+            @Override
+            public int compare(Set<Card> combo1, Set<Card> combo2) {
+                //List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+                List<Card> combo1PlusBoard = new ArrayList<>();
+                List<Card> combo2PlusBoard = new ArrayList<>();
+
+                combo1PlusBoard.addAll(combo1);
+                combo1PlusBoard.addAll(board);
+                combo2PlusBoard.addAll(combo2);
+                combo2PlusBoard.addAll(board);
+
+                int highestStraightThatIsPresentInCombo1PlusBoard = 0;
+                int highestStraightThatIsPresentInCombo2PlusBoard = 0;
+
+                Map<Integer, List<Card>> allPossibleStraightFlushes = getAllPossibleFiveConnectingSuitedCards();
+
+
+                for (Map.Entry<Integer, List<Card>> entry : allPossibleStraightFlushes.entrySet()) {
+                    if(combo1PlusBoard.containsAll(entry.getValue())) {
+                        highestStraightThatIsPresentInCombo1PlusBoard = entry.getKey();
+                    }
+
+                    if(combo2PlusBoard.containsAll(entry.getValue())) {
+                        highestStraightThatIsPresentInCombo2PlusBoard = entry.getKey();
+                    }
+                }
+
+                if(highestStraightThatIsPresentInCombo2PlusBoard > highestStraightThatIsPresentInCombo1PlusBoard) {
+                    return 1;
+                } else if (highestStraightThatIsPresentInCombo2PlusBoard == highestStraightThatIsPresentInCombo1PlusBoard) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            }
+        };
     }
 }

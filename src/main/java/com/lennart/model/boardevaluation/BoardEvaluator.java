@@ -498,6 +498,35 @@ public class BoardEvaluator {
         return allPossibleStraights;
     }
 
+    protected Map<Integer, List<Card>> getAllPossibleFiveConnectingSuitedCards() {
+        Map<Integer, List<Card>> allPossibleFiveConnectingSuitedCards = new HashMap<>();
+        Map<Integer, List<Integer>> allFiveConnectingCards = getAllPossibleFiveConnectingCards();
+
+        for (Map.Entry<Integer, List<Integer>> entry : allFiveConnectingCards.entrySet()) {
+            List<Card> sCardList = new ArrayList<>();
+            List<Card> cCardList = new ArrayList<>();
+            List<Card> dCardList = new ArrayList<>();
+            List<Card> hCardList = new ArrayList<>();
+
+            for(Integer rank : entry.getValue()) {
+                Card s = new Card(rank, 's');
+                Card c = new Card(rank, 'c');
+                Card d = new Card(rank, 'd');
+                Card h = new Card(rank, 'h');
+
+                sCardList.add(s);
+                cCardList.add(c);
+                dCardList.add(d);
+                hCardList.add(h);
+            }
+            allPossibleFiveConnectingSuitedCards.put(allPossibleFiveConnectingSuitedCards.size(), sCardList);
+            allPossibleFiveConnectingSuitedCards.put(allPossibleFiveConnectingSuitedCards.size(), cCardList);
+            allPossibleFiveConnectingSuitedCards.put(allPossibleFiveConnectingSuitedCards.size(), dCardList);
+            allPossibleFiveConnectingSuitedCards.put(allPossibleFiveConnectingSuitedCards.size(), hCardList);
+        }
+        return allPossibleFiveConnectingSuitedCards;
+    }
+
     protected <T extends ComboComparatorRankOnly> Map<Integer, List<List<Integer>>> getSortedComboMapRankOnly
             (Map<Integer, List<Card>> comboMap, List<Card> board, T evaluatorClass) {
         Map<Integer, List<List<Integer>>> sortedComboMapRankOnly = new HashMap<>();
