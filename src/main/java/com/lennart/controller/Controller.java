@@ -30,6 +30,7 @@ public class Controller {
     private ThreeOfAKindEvaluator threeOfAKindEvaluator = new ThreeOfAKindEvaluator();
     private FourOfAKindEvaluator fourOfAKindEvaluator = new FourOfAKindEvaluator();
     private StraightFlushEvaluator straightFlushEvaluator = new StraightFlushEvaluator();
+    private HighCardEvaluator highCardEvaluator = new HighCardEvaluator();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -106,9 +107,10 @@ public class Controller {
 //        flushEvaluator.getFlushCombos(board);
 
 //        fourOfAKindEvaluator.getFourOfAKindCombos(board);
-        straightFlushEvaluator.getStraightFlushCombos(board);
+//        straightFlushEvaluator.getStraightFlushCombos(board);
 
-        straightEvaluator.getMapOfStraightCombos(board);
+//        straightEvaluator.getMapOfStraightCombos(board);
+        highCardEvaluator.getHighCardCombos(board);
         Map<Integer, List<Integer>> temp = new HashMap<>();
         return temp;
 //        return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);

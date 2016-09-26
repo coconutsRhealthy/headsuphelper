@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class PairEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
-    public Map<Integer, List<Card>> getCombosThatMakePair (List<Card> board) {
+    public Map<Integer, Set<Set<Card>>> getCombosThatMakePair (List<Card> board) {
         Map<Integer, List<Card>> combosThatMakePair = new HashMap<>();
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
@@ -53,7 +53,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
             }
 
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
-            return combosThatMakePair;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
@@ -81,11 +81,11 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
             combosThatMakePair = getSortedComboMap(combosThatMakePair);
 
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
-            return combosThatMakePair;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         }
         combosThatMakePair = getSortedComboMap(combosThatMakePair);
         Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
-        return combosThatMakePair;
+        return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
     }
 
     @Override

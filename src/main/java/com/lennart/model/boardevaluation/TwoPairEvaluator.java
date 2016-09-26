@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
-    public Map<Integer, List<Card>> getCombosThatMakeTwoPair (List<Card> board) {
+    public Map<Integer, Set<Set<Card>>> getCombosThatMakeTwoPair (List<Card> board) {
         Map<Integer, List<Card>> combosThatMakeTwoPair = new HashMap<>();
 
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
@@ -32,11 +32,9 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
                     it.remove();
                 }
             }
+
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
-
-            Map<Integer, Set<Set<Card>>> cardComboMap = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-
-            return combosThatMakeTwoPair;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
@@ -88,8 +86,9 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), pocketPairEntry.getValue());
                 }
             }
+
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
-            return combosThatMakeTwoPair;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -151,12 +150,9 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
                 }
             }
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
-
-            Map<Integer, Set<Set<Card>>> cardComboMap = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-
-            return combosThatMakeTwoPair;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         }
-        return combosThatMakeTwoPair;
+        return null;
     }
 
     @Override

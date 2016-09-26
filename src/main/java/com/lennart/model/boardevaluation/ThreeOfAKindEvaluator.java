@@ -11,7 +11,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
 
     //check welke combos three of a kind geven, gegeven een bepaald board
 
-    public Map<Integer, List<Card>> getThreeOfAKindCombos(List<Card> board) {
+    public Map<Integer, Set<Set<Card>>> getThreeOfAKindCombos(List<Card> board) {
         Map<Integer, List<Card>> threeOfAKindCombos = new HashMap<>();
         Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
@@ -25,7 +25,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             }
             threeOfAKindCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(threeOfAKindCombos, board);
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
-            return threeOfAKindCombos;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
@@ -43,7 +43,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
                 }
             }
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
-            return threeOfAKindCombos;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         } else if(boardContainsTrips(board) && !boardContainsQuads(board)) {
             //alle combos die niet met de andere kaarten op het board pairen, geen pocket pair zijn, en niet met de trips
             //op het board pairen
@@ -97,9 +97,9 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
 
             threeOfAKindCombos = allPossibleStartHands;
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
-            return threeOfAKindCombos;
+            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         }
-        return threeOfAKindCombos;
+        return null;
     }
 
     @Override
