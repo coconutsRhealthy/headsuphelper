@@ -58,8 +58,8 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
 
                 copyBoardRanks.removeAll(copyCombo);
 
-                if(copyBoardRanks.size() == initialSizeBoardRanks - 1 && !entry.getValue().contains(rankOfPairOnBoard)
-                        && entry.getValue().get(0) != entry.getValue().get(1)) {
+                if((copyBoardRanks.size() == initialSizeBoardRanks - 1 || copyBoardRanks.size() == initialSizeBoardRanks - 2)
+                        && !entry.getValue().contains(rankOfPairOnBoard) && entry.getValue().get(0) != entry.getValue().get(1)) {
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
                 }
             }
