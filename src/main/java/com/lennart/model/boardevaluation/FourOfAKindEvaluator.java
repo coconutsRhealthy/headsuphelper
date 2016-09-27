@@ -148,7 +148,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             return fourOfAKindCombos;
         }
 
-        return null;
+        return fourOfAKindCombos;
     }
 
     //helper methods

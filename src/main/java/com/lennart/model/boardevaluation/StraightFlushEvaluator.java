@@ -97,7 +97,7 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
             }
             return getSortedCardComboMap(combosThatMakeStraightFlush, board, new StraightFlushEvaluator());
         }
-        return null;
+        return new HashMap<>();
     }
 
     @Override
