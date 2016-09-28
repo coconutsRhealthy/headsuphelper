@@ -147,7 +147,6 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                             comboRankOnly.get(0) != comboRankOnly.get(1)) {
                         comboMap.put(comboMap.size(), entry.getValue());
                     }
-
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
@@ -171,37 +170,81 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 List<Integer> combo2 = getSortedCardRanksFromCardList(combo2C);
 
                 //als één pair op het board
-                if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-                    //6 6 8 K J
-                        //voeg beide combos toe aan het board. Check welk getal trips is van beide combos.
-                            //als trips van combo2 > combo1
 
-                            //als trips van combo2 == combo1
+                List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+                List<Integer> boardPlusCombo1 = new ArrayList<>();
+                List<Integer> boardPlusCombo2 = new ArrayList<>();
 
-                            //als trips van combo1 > combo2
+                boardPlusCombo1.addAll(boardRanks);
+                boardPlusCombo1.addAll(combo1);
+                boardPlusCombo2.addAll(boardRanks);
+                boardPlusCombo2.addAll(combo2);
 
+                List<Integer> rankOfTripsCombo1 = getRanksOfTripsOrPairInBoardPlusCombo(boardPlusCombo1, 3);
+                List<Integer> rankOfPairCombo1 = getRanksOfTripsOrPairInBoardPlusCombo(boardPlusCombo1, 2);
+                List<Integer> rankOfTripsCombo2 = getRanksOfTripsOrPairInBoardPlusCombo(boardPlusCombo2, 3);
+                List<Integer> rankOfPairCombo2 = getRanksOfTripsOrPairInBoardPlusCombo(boardPlusCombo2, 2);
+
+                if(rankOfTripsCombo2.get(0) > rankOfTripsCombo1.get(0)) {
+                    return 1;
+                } else if (rankOfTripsCombo2.get(0) == rankOfTripsCombo1.get(0)) {
+                    if(rankOfTripsCombo2.size() == 1 && rankOfTripsCombo1.size() == 1) {
+                        if(rankOfPairCombo2.get(0) > rankOfPairCombo1.get(0)) {
+                            return 1;
+                        } else if(rankOfPairCombo2.get(0) == rankOfPairCombo1.get(0)) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    }
+                    if(rankOfTripsCombo2.size() == 1 && rankOfTripsCombo1.size() != 1) {
+                        if(rankOfPairCombo2.get(0) > rankOfTripsCombo1.get(1)) {
+                            return 1;
+                        } else if(rankOfPairCombo2.get(0) == rankOfTripsCombo1.get(1)) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    }
+                    if(rankOfTripsCombo2.size() != 1 && rankOfTripsCombo1.size() == 1) {
+                        if(rankOfTripsCombo2.get(1) > rankOfPairCombo1.get(0)) {
+                            return 1;
+                        } else if(rankOfTripsCombo2.get(1) == rankOfPairCombo1.get(0)) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    }
+                    if(rankOfTripsCombo2.size() != 1 && rankOfTripsCombo1.size() != 1) {
+                        if(rankOfTripsCombo2.get(1) > rankOfTripsCombo1.get(1)) {
+                            return 1;
+                        } else if(rankOfTripsCombo2.get(1) == rankOfTripsCombo1.get(1)) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    }
+                } else {
+                    return -1;
                 }
-
-                //als twee pair op het board
-                if(getNumberOfPairsOnBoard(board) == 2 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-
-
-                }
-
-                //als threeOfAKind op het board
-                if(getNumberOfPairsOnBoard(board) == 0 && boardContainsTrips(board) && !boardContainsBoat(board) && !boardContainsQuads(board)) {
-
-
-                }
-
-                //als boat op het board
-                if(boardContainsBoat(board)) {
-
-
-                }
-
-                return 1;
+                System.out.println("Should never come here, FullHouseEvaluator");
+                return 0;
             }
         };
+    }
+
+    //helper methods
+    private List<Integer> getRanksOfTripsOrPairInBoardPlusCombo (List<Integer> boardPlusCombo, int tripsOrPair) {
+        List<Integer> ranksOfTripsInBoardPlusCombo = new ArrayList<>();
+        List<Card> artificialCardBoardPlusCombo = convertIntegerBoardToArtificialCardBoard(boardPlusCombo);
+        Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(artificialCardBoardPlusCombo);
+
+        for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {
+            if(entry.getValue() == tripsOrPair) {
+                ranksOfTripsInBoardPlusCombo.add(entry.getKey());
+            }
+        }
+        Collections.sort(ranksOfTripsInBoardPlusCombo, Collections.reverseOrder());
+        return ranksOfTripsInBoardPlusCombo;
     }
 }
