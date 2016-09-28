@@ -443,6 +443,26 @@ public class BoardEvaluator {
         return false;
     }
 
+    protected boolean boardContainsBoat(List<Card> board) {
+        Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
+        boolean boardContainsTrips = false;
+        boolean boardContainsPair = false;
+
+        for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {
+            if(entry.getValue() == 3) {
+                boardContainsTrips = true;
+            }
+            if(entry.getValue() == 2) {
+                boardContainsPair = true;
+            }
+        }
+
+        if(boardContainsTrips && boardContainsPair) {
+            return true;
+        }
+        return false;
+    }
+
     protected boolean boardContainsQuads(List<Card> board) {
         Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
         for (Map.Entry<Integer, Integer> entry : frequencyOfRanksOnBoard.entrySet()) {

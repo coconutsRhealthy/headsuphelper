@@ -14,7 +14,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
         Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
-        
+
         //een pair op board
         if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
 
@@ -22,7 +22,21 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
             int rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
             boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
 
-            //get de trips combos van de andere kaarten
+            //ook nog, alle combos die trips maken met pair on board én pairen met een van de andere kaarten op het board
+            for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+                List<Integer> comboRankOnly = getSortedCardRanksFromCardList(entry.getValue());
+
+                if(comboRankOnly.contains(rankOfPairOnBoard)) {
+                    comboRankOnly.removeAll(Collections.singleton(rankOfPairOnBoard));
+                    if(comboRankOnly.size() == 1) {
+                        if(boardRanks.contains(comboRankOnly.get(0))) {
+                            comboMap.put(comboMap.size(), entry.getValue());
+                        }
+                    }
+                }
+            }
+
+            //get de set combos van de andere kaarten
             for (Map.Entry<Integer, List<Card>> entry : allPocketPairStartHands.entrySet()) {
                 if(boardRanks.contains(entry.getValue().get(0).getRank())) {
                     comboMap.put(comboMap.size(), entry.getValue());
@@ -40,13 +54,13 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
             int rankOfBoardPair2 = rankOfPairsOnBoard.get(1);
 
             for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-                if(entry.getValue().contains(Integer.valueOf(rankOfBoardPair1)) &&
-                        entry.getValue().get(0).getRank() != entry.getValue().get(1).getRank()) {
+                List<Integer> comboRankOnly = getSortedCardRanksFromCardList(entry.getValue());
+
+                if(comboRankOnly.contains(Integer.valueOf(rankOfBoardPair1)) && comboRankOnly.get(0) != comboRankOnly.get(1)) {
                     comboMap.put(comboMap.size(), entry.getValue());
                     continue;
                 }
-                if(entry.getValue().contains(Integer.valueOf(rankOfBoardPair2)) &&
-                        entry.getValue().get(0).getRank() != entry.getValue().get(1).getRank()) {
+                if(comboRankOnly.contains(Integer.valueOf(rankOfBoardPair2)) && comboRankOnly.get(0) != comboRankOnly.get(1)) {
                     comboMap.put(comboMap.size(), entry.getValue());
                 }
             }
@@ -67,7 +81,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         }
 
         //trips op board
-        if(getNumberOfPairsOnBoard(board) == 0 && boardContainsTrips(board) && !boardContainsQuads(board)) {
+        if(getNumberOfPairsOnBoard(board) == 0 && boardContainsTrips(board) && !boardContainsBoat(board) && !boardContainsQuads(board)) {
             //alle combos die pairen of set maken met een van de twee andere boardkaarten
             Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
 
@@ -104,7 +118,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         }
 
         //boat op board
-        if(getNumberOfPairsOnBoard(board) == 1 && boardContainsTrips(board) && !boardContainsQuads(board)) {
+        if(boardContainsBoat(board)) {
             //alle combos die niet met het board matchen, hierin zitten ook alle pocket pairs
             for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
                 if(!boardRanks.contains(entry.getValue().get(0).getRank()) &&
@@ -139,11 +153,55 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
             return getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
         }
-        return null;
+        return new HashMap<>();
     }
 
     @Override
     public Comparator<Set<Card>> getComboComparator(List<Card> board) {
-        return null;
+        return new Comparator<Set<Card>>() {
+            @Override
+            public int compare(Set<Card> xCombo1, Set<Card> xCombo2) {
+                List<Card> combo1C = new ArrayList<>();
+                List<Card> combo2C = new ArrayList<>();
+
+                combo1C.addAll(xCombo1);
+                combo2C.addAll(xCombo2);
+
+                List<Integer> combo1 = getSortedCardRanksFromCardList(combo1C);
+                List<Integer> combo2 = getSortedCardRanksFromCardList(combo2C);
+
+                //als één pair op het board
+                if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
+                    //6 6 8 K J
+                        //voeg beide combos toe aan het board. Check welk getal trips is van beide combos.
+                            //als trips van combo2 > combo1
+
+                            //als trips van combo2 == combo1
+
+                            //als trips van combo1 > combo2
+
+                }
+
+                //als twee pair op het board
+                if(getNumberOfPairsOnBoard(board) == 2 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
+
+
+                }
+
+                //als threeOfAKind op het board
+                if(getNumberOfPairsOnBoard(board) == 0 && boardContainsTrips(board) && !boardContainsBoat(board) && !boardContainsQuads(board)) {
+
+
+                }
+
+                //als boat op het board
+                if(boardContainsBoat(board)) {
+
+
+                }
+
+                return 1;
+            }
+        };
     }
 }

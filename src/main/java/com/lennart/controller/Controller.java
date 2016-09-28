@@ -28,6 +28,7 @@ public class Controller {
     private PairEvaluator pairEvaluator = new PairEvaluator();
     private TwoPairEvaluator twoPairEvaluator = new TwoPairEvaluator();
     private ThreeOfAKindEvaluator threeOfAKindEvaluator = new ThreeOfAKindEvaluator();
+    private FullHouseEvaluator fullHouseEvaluator = new FullHouseEvaluator();
     private FourOfAKindEvaluator fourOfAKindEvaluator = new FourOfAKindEvaluator();
     private StraightFlushEvaluator straightFlushEvaluator = new StraightFlushEvaluator();
     private HighCardEvaluator highCardEvaluator = new HighCardEvaluator();
@@ -110,6 +111,7 @@ public class Controller {
 //        straightFlushEvaluator.getStraightFlushCombos(board);
 
 //        straightEvaluator.getMapOfStraightCombos(board);
+        fullHouseEvaluator.getFullHouseCombos(board);
         highCardEvaluator.getHighCardCombos(board);
         Map<Integer, List<Integer>> temp = new HashMap<>();
         return temp;
