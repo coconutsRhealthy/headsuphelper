@@ -99,7 +99,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
             return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         }
-        return null;
+        return new HashMap<>();
     }
 
     @Override
@@ -125,7 +125,6 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
         if(combo2.get(0) > combo1.get(0)) {
             return 1;
         } else if(combo2.get(0) == combo1.get(0)) {
-            System.out.println("should never come here, compareCombosUnpairedBoard, ThreeOfAKindEvaluator");
             return 0;
         } else {
             return -1;

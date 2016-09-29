@@ -152,7 +152,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
             return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         }
-        return null;
+        return new HashMap<>();
     }
 
     @Override

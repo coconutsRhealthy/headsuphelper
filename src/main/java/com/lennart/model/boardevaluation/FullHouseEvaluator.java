@@ -169,8 +169,6 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 List<Integer> combo1 = getSortedCardRanksFromCardList(combo1C);
                 List<Integer> combo2 = getSortedCardRanksFromCardList(combo2C);
 
-                //als één pair op het board
-
                 List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
                 List<Integer> boardPlusCombo1 = new ArrayList<>();
                 List<Integer> boardPlusCombo2 = new ArrayList<>();

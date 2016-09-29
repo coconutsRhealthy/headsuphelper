@@ -53,7 +53,7 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
             return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
         }
-        return null;
+        return new HashMap<>();
     }
 
     public Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
