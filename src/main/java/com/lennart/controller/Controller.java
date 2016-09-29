@@ -7,10 +7,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
 @EnableAutoConfiguration
@@ -111,8 +108,10 @@ public class Controller {
 //        straightFlushEvaluator.getStraightFlushCombos(board);
 
 //        straightEvaluator.getMapOfStraightCombos(board);
-        fullHouseEvaluator.getFullHouseCombos(board);
-        highCardEvaluator.getHighCardCombos(board);
+//        fullHouseEvaluator.getFullHouseCombos(board);
+//        highCardEvaluator.getHighCardCombos(board);
+        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
+
         Map<Integer, List<Integer>> temp = new HashMap<>();
         return temp;
 //        return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);

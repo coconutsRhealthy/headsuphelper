@@ -751,6 +751,78 @@ public class BoardEvaluator {
         };
     }
 
+    public  Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
+        Map<Integer, Set<Set<Card>>> sortedCombos = new HashMap<>();
+
+        HighCardEvaluator highCardEvaluator = new HighCardEvaluator();
+        PairEvaluator pairEvaluator = new PairEvaluator();
+        TwoPairEvaluator twoPairEvaluator = new TwoPairEvaluator();
+        ThreeOfAKindEvaluator threeOfAKindEvaluator = new ThreeOfAKindEvaluator();
+        StraightEvaluator straightEvaluator = new StraightEvaluator();
+        FlushEvaluator flushEvaluator = new FlushEvaluator();
+        FullHouseEvaluator fullHouseEvaluator = new FullHouseEvaluator();
+        FourOfAKindEvaluator fourOfAKindEvaluator = new FourOfAKindEvaluator();
+        StraightFlushEvaluator straightFlushEvaluator = new StraightFlushEvaluator();
+
+        Map<Integer, Set<Set<Card>>> highCardCombos = highCardEvaluator.getHighCardCombos(board);
+        Map<Integer, Set<Set<Card>>> pairCombos = pairEvaluator.getCombosThatMakePair(board);
+        Map<Integer, Set<Set<Card>>> twoPairCombos = twoPairEvaluator.getCombosThatMakeTwoPair(board);
+        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = threeOfAKindEvaluator.getThreeOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombos(board);
+        Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos(board);
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos(board);
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : straightFlushCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : fourOfAKindCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : fullHouseCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : flushCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : straightCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : threeOfAKindCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : twoPairCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : pairCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : highCardCombos.entrySet()) {
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
+        }
+
+
+        int counter = 0;
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            for(Set<Card> s : entry.getValue()) {
+                counter++;
+            }
+        }
+
+        System.out.println(counter);
+        return sortedCombos;
+    }
+
     public List<BooleanResult> allFunctions(List<Card> board) {
         BooleanResult result1 = new BooleanResult();
         BooleanResult result2 = new BooleanResult();

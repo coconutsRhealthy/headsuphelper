@@ -147,12 +147,13 @@ public class HighCardEvaluator extends BoardEvaluator implements ComboComparator
     }
 
     private Map<Integer, List<Card>> removeCombos(Map<Integer, List<Card>> allPossibleStartHands, Map<Integer, Set<Set<Card>>> combosToRemove) {
-        for(Iterator<Map.Entry<Integer, List<Card>>> it = allPossibleStartHands.entrySet().iterator(); it.hasNext(); ) {
+        firstLoop: for(Iterator<Map.Entry<Integer, List<Card>>> it = allPossibleStartHands.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, List<Card>> entry = it.next();
             for(Map.Entry<Integer, Set<Set<Card>>> comboToRemove : combosToRemove.entrySet()) {
                 for(Set<Card> s : comboToRemove.getValue()) {
                     if(entry.getValue().containsAll(s)) {
                         it.remove();
+                        continue firstLoop;
                     }
                 }
             }
