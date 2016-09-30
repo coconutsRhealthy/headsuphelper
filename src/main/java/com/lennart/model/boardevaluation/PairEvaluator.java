@@ -11,6 +11,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
 
     public Map<Integer, Set<Set<Card>>> getCombosThatMakePair (List<Card> board) {
         Map<Integer, List<Card>> combosThatMakePair = new HashMap<>();
+        Map<Integer, Set<Set<Card>>> sortedCombos;
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
@@ -53,7 +54,9 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
             }
 
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
-            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            return sortedCombos;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
@@ -230,5 +233,55 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
                 return 0;
             }
         };
+    }
+
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
+        Map<Integer, Set<Set<Card>>> twoPairCombos = new TwoPairEvaluator().getCombosThatMakeTwoPair(board);
+        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = new ThreeOfAKindEvaluator().getThreeOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightCombos = new StraightEvaluator().getMapOfStraightCombos(board);
+        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos(board);
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+
+        sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fullHouseCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(flushCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(straightCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(threeOfAKindCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(twoPairCombos, sortedCombos);
+
+        return sortedCombos;
+    }
+
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombosPerCategory(Map<Integer, Set<Set<Card>>> categoryCombos,
+                                                                 Map<Integer, Set<Set<Card>>> sortedCombos) {
+        Set<Set<Card>> straightFLushSetsToBeRemoved = new HashSet<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            loop: for(Set<Card> s : entry.getValue()) {
+                for (Map.Entry<Integer, Set<Set<Card>>> entry2 : categoryCombos.entrySet()) {
+                    for(Set<Card> s2 : entry2.getValue()) {
+                        if (s.equals(s2)) {
+                            straightFLushSetsToBeRemoved.add(s);
+                            continue loop;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            for(Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
+                Set<Card> itSet = it.next();
+                for(Set<Card> s2 : straightFLushSetsToBeRemoved) {
+                    if(itSet.equals(s2)) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+        return sortedCombos;
     }
 }
