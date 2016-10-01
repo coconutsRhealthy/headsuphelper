@@ -1,6 +1,7 @@
 package com.lennart.controller;
 
 import com.lennart.model.boardevaluation.*;
+import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -110,7 +111,11 @@ public class Controller {
 //        straightEvaluator.getMapOfStraightCombos(board);
 //        fullHouseEvaluator.getFullHouseCombos(board);
 //        highCardEvaluator.getHighCardCombos(board);
-        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
+//        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
+//        System.out.println(sortedCombos.get(0));
+
+        double handStrength = new HandEvaluator().getHandStrength(holeCards, board);
+        System.out.println(handStrength);
 
         Map<Integer, List<Integer>> temp = new HashMap<>();
         return temp;
