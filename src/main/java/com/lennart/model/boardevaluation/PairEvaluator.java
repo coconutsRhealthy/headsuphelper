@@ -84,11 +84,15 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
             combosThatMakePair = getSortedComboMap(combosThatMakePair);
 
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
-            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            return sortedCombos;
         }
         combosThatMakePair = getSortedComboMap(combosThatMakePair);
         Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakePair, board, new PairEvaluator());
-        return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+        sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+        sortedCombos = removeDuplicateCombos(sortedCombos, board);
+        return sortedCombos;
     }
 
     @Override
@@ -252,36 +256,6 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
         sortedCombos = removeDuplicateCombosPerCategory(threeOfAKindCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(twoPairCombos, sortedCombos);
 
-        return sortedCombos;
-    }
-
-    private Map<Integer, Set<Set<Card>>> removeDuplicateCombosPerCategory(Map<Integer, Set<Set<Card>>> categoryCombos,
-                                                                 Map<Integer, Set<Set<Card>>> sortedCombos) {
-        Set<Set<Card>> straightFLushSetsToBeRemoved = new HashSet<>();
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
-            loop: for(Set<Card> s : entry.getValue()) {
-                for (Map.Entry<Integer, Set<Set<Card>>> entry2 : categoryCombos.entrySet()) {
-                    for(Set<Card> s2 : entry2.getValue()) {
-                        if (s.equals(s2)) {
-                            straightFLushSetsToBeRemoved.add(s);
-                            continue loop;
-                        }
-                    }
-                }
-            }
-        }
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
-            for(Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
-                Set<Card> itSet = it.next();
-                for(Set<Card> s2 : straightFLushSetsToBeRemoved) {
-                    if(itSet.equals(s2)) {
-                        it.remove();
-                    }
-                }
-            }
-        }
         return sortedCombos;
     }
 }

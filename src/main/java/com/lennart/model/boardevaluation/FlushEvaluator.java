@@ -10,7 +10,8 @@ import java.util.*;
 public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
     public Map<Integer, Set<Set<Card>>> getFlushCombos (List<Card> board) {
-        Map<Integer, List<Card>> flushCombos = new HashMap<>();
+        Map<Integer, List<Card>> flushCombos;
+        Map<Integer, Set<Set<Card>>> sortedFlushCombos;
         Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
 
         char flushSuit = 'x';
@@ -31,7 +32,9 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         if(numberOfSuitedCards == 3) {
             flushCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            sortedFlushCombos = removeDuplicateCombos(sortedFlushCombos, board);
+            return sortedFlushCombos;
         }
 
         if(numberOfSuitedCards == 4) {
@@ -45,13 +48,17 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
                 }
             }
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            sortedFlushCombos = removeDuplicateCombos(sortedFlushCombos, board);
+            return sortedFlushCombos;
         }
 
         if(numberOfSuitedCards == 5) {
             Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
-            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            sortedFlushCombos = getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            sortedFlushCombos = removeDuplicateCombos(sortedFlushCombos, board);
+            return sortedFlushCombos;
         }
         return new HashMap<>();
     }
@@ -503,5 +510,17 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
                 return 0;
             }
         };
+    }
+
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos(board);
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+
+        sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fullHouseCombos, sortedCombos);
+
+        return sortedCombos;
     }
 }

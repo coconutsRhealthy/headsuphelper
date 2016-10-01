@@ -841,6 +841,44 @@ public class BoardEvaluator {
         return sortedCombos;
     }
 
+    public Map<Integer, Set<Set<Card>>> removeDuplicateCombosPerCategory(Map<Integer, Set<Set<Card>>> categoryCombos,
+                                                                          Map<Integer, Set<Set<Card>>> sortedCombos) {
+        Map<Integer, Set<Set<Card>>> cleanedSortedCombos = new HashMap<>();
+        Set<Set<Card>> straightFLushSetsToBeRemoved = new HashSet<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            loop: for(Set<Card> s : entry.getValue()) {
+                for (Map.Entry<Integer, Set<Set<Card>>> entry2 : categoryCombos.entrySet()) {
+                    for(Set<Card> s2 : entry2.getValue()) {
+                        if (s.equals(s2)) {
+                            straightFLushSetsToBeRemoved.add(s);
+                            continue loop;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            for(Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
+                Set<Card> itSet = it.next();
+                for(Set<Card> s2 : straightFLushSetsToBeRemoved) {
+                    if(itSet.equals(s2)) {
+                        it.remove();
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            if(!entry.getValue().isEmpty()) {
+                cleanedSortedCombos.put(cleanedSortedCombos.size(), entry.getValue());
+            }
+        }
+
+        return cleanedSortedCombos;
+    }
+
     public List<BooleanResult> allFunctions(List<Card> board) {
         BooleanResult result1 = new BooleanResult();
         BooleanResult result2 = new BooleanResult();

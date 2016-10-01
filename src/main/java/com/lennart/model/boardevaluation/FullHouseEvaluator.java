@@ -11,6 +11,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
 
     public Map<Integer, Set<Set<Card>>> getFullHouseCombos(List<Card> board) {
         Map<Integer, List<Card>> comboMap = new HashMap<>();
+        Map<Integer, Set<Set<Card>>> sortedFullHouseCombos;
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
         Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
@@ -43,7 +44,9 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            return getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+            sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+            return sortedFullHouseCombos;
         }
 
         //twee pair op board
@@ -77,7 +80,9 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            return getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+            sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+            return sortedFullHouseCombos;
         }
 
         //trips op board
@@ -114,7 +119,9 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            return getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+            sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+            return sortedFullHouseCombos;
         }
 
         //boat op board
@@ -150,7 +157,9 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            return getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+            sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+            return sortedFullHouseCombos;
         }
         return new HashMap<>();
     }
@@ -244,5 +253,15 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         }
         Collections.sort(ranksOfTripsInBoardPlusCombo, Collections.reverseOrder());
         return ranksOfTripsInBoardPlusCombo;
+    }
+
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+
+        sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);
+
+        return sortedCombos;
     }
 }

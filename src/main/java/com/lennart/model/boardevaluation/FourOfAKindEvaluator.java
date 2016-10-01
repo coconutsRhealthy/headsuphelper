@@ -38,6 +38,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             comboMap.put(comboMap.size(), combo);
 
             fourOfAKindCombos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
+            fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
             return fourOfAKindCombos;
         }
 
@@ -78,6 +79,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             comboMap.put(comboMap.size(), combo2);
 
             fourOfAKindCombos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
+            fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
             return fourOfAKindCombos;
         }
 
@@ -138,6 +140,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             }
 
             fourOfAKindCombos = getSortedCardComboMap(allStartHandsThatContainTripsCardNotOnBoard, board, new FourOfAKindEvaluator());
+            fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
             return fourOfAKindCombos;
         }
 
@@ -145,6 +148,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             fourOfAKindCombos = getSortedCardComboMap(allPossibleStartHands, board, new FourOfAKindEvaluator());
+            fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
             return fourOfAKindCombos;
         }
 
@@ -249,5 +253,11 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
                 return 0;
             }
         };
+    }
+
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+        sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
+        return sortedCombos;
     }
 }

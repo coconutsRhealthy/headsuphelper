@@ -10,6 +10,16 @@ import java.util.*;
 public class StraightEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
     public Map<Integer, Set<Set<Card>>> getMapOfStraightCombos(List<Card> board) {
+        Map<Integer, Set<Set<Card>>> sortedCombos;
+        List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);
+        Map<Integer, List<Card>> straightCombosArtificialSuits = convertListOfRankOnlyCombosToCardComboMap(straightCombosList);
+        Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, new StraightEvaluator());
+        sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+        sortedCombos = removeDuplicateCombos(sortedCombos, board);
+        return sortedCombos;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getMapOfStraightCombosForStraightFLushEvaluator(List<Card> board) {
         List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);
         Map<Integer, List<Card>> straightCombosArtificialSuits = convertListOfRankOnlyCombosToCardComboMap(straightCombosList);
         Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, new StraightEvaluator());
@@ -913,5 +923,19 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
             comboMap.put(comboMap.size(), cardListToAddToMap);
         }
         return comboMap;
+    }
+
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
+        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos(board);
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+
+        sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fullHouseCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(flushCombos, sortedCombos);
+
+        return sortedCombos;
     }
 }

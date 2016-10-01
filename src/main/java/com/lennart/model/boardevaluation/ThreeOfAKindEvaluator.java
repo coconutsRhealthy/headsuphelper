@@ -15,6 +15,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
         Map<Integer, List<Card>> threeOfAKindCombos = new HashMap<>();
         Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        Map<Integer, Set<Set<Card>>> sortedCombos;
 
         //als het board unpaired is
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
@@ -25,7 +26,9 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             }
             threeOfAKindCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(threeOfAKindCombos, board);
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
-            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            return sortedCombos;
         } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
@@ -43,7 +46,9 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
                 }
             }
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
-            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            return sortedCombos;
         } else if(boardContainsTrips(board) && !boardContainsQuads(board)) {
             //alle combos die niet met de andere kaarten op het board pairen, geen pocket pair zijn, en niet met de trips
             //op het board pairen
@@ -97,7 +102,9 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
 
             threeOfAKindCombos = allPossibleStartHands;
             Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
-            return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            return sortedCombos;
         }
         return new HashMap<>();
     }
@@ -261,6 +268,22 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
                 }
             }
         }
+    }
+
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
+        Map<Integer, Set<Set<Card>>> straightCombos = new StraightEvaluator().getMapOfStraightCombos(board);
+        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos(board);
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+
+        sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(fullHouseCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(flushCombos, sortedCombos);
+        sortedCombos = removeDuplicateCombosPerCategory(straightCombos, sortedCombos);
+
+        return sortedCombos;
     }
 }
 

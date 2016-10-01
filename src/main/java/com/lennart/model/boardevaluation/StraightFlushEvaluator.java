@@ -13,7 +13,7 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
         StraightEvaluator straightEvaluator = new StraightEvaluator();
         FlushEvaluator flushEvaluator = new FlushEvaluator();
 
-        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombos(board);
+        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombosForStraightFLushEvaluator(board);
         Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos(board);
 
         List<Set<Card>> straightCombosList = new ArrayList<>();
