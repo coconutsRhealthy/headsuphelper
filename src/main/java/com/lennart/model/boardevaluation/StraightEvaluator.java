@@ -9,13 +9,22 @@ import java.util.*;
  */
 public class StraightEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
-    public Map<Integer, Set<Set<Card>>> getMapOfStraightCombos(List<Card> board) {
+    private static Map<Integer, Set<Set<Card>>> combosThatMakeStraight;
+
+    public Map<Integer, Set<Set<Card>>> getMapOfStraightCombos() {
+        return combosThatMakeStraight;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getMapOfStraightCombosInitialize(List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedCombos;
         List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);
         Map<Integer, List<Card>> straightCombosArtificialSuits = convertListOfRankOnlyCombosToCardComboMap(straightCombosList);
         Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, new StraightEvaluator());
         sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         sortedCombos = removeDuplicateCombos(sortedCombos, board);
+
+        this.combosThatMakeStraight = sortedCombos;
+
         return sortedCombos;
     }
 
@@ -926,10 +935,10 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
     }
 
     private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos(board);
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos(board);
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombosInitialize(board);
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
 
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);

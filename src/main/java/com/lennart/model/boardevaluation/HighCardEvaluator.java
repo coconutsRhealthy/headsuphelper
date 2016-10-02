@@ -9,29 +9,19 @@ import java.util.*;
  */
 public class HighCardEvaluator extends BoardEvaluator implements ComboComparator {
 
-    PairEvaluator pairEvaluator = new PairEvaluator();
-    TwoPairEvaluator twoPairEvaluator = new TwoPairEvaluator();
-    ThreeOfAKindEvaluator threeOfAKindEvaluator = new ThreeOfAKindEvaluator();
-    StraightEvaluator straightEvaluator = new StraightEvaluator();
-    FlushEvaluator flushEvaluator = new FlushEvaluator();
-    FullHouseEvaluator fullHouseEvaluator = new FullHouseEvaluator();
-    FourOfAKindEvaluator fourOfAKindEvaluator = new FourOfAKindEvaluator();
-    StraightFlushEvaluator straightFlushEvaluator = new StraightFlushEvaluator();
-
-
     public Map<Integer, Set<Set<Card>>> getHighCardCombos(List<Card> board) {
         //get alle mogelijke starthanden
         Map<Integer, List<Card>> highCardCombos = getAllPossibleStartHands();
 
         //verwijder alle combos die al in de andere klassen naar voren komen
-        Map<Integer, Set<Set<Card>>> pairCombos = pairEvaluator.getCombosThatMakePair(board);
-        Map<Integer, Set<Set<Card>>> twoPairCombos = twoPairEvaluator.getCombosThatMakeTwoPair(board);
-        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = threeOfAKindEvaluator.getThreeOfAKindCombos(board);
-        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombos(board);
-        Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos(board);
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos(board);
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos(board);
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> pairCombos = new PairEvaluator().getCombosThatMakePairInitialize(board);
+        Map<Integer, Set<Set<Card>>> twoPairCombos = new TwoPairEvaluator().getCombosThatMakeTwoPair();
+        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = new ThreeOfAKindEvaluator().getThreeOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightCombos = new StraightEvaluator().getMapOfStraightCombos();
+        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos();
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
 
         //remove pairCombos
         highCardCombos = removeCombos(highCardCombos, pairCombos);

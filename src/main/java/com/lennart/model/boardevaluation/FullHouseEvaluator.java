@@ -9,7 +9,13 @@ import java.util.*;
  */
 public class FullHouseEvaluator extends BoardEvaluator implements ComboComparator {
 
-    public Map<Integer, Set<Set<Card>>> getFullHouseCombos(List<Card> board) {
+    private static Map<Integer, Set<Set<Card>>> combosThatMakeFullHouse;
+
+    public Map<Integer, Set<Set<Card>>> getFullHouseCombos() {
+        return combosThatMakeFullHouse;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getFullHouseCombosInitialize(List<Card> board) {
         Map<Integer, List<Card>> comboMap = new HashMap<>();
         Map<Integer, Set<Set<Card>>> sortedFullHouseCombos;
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
@@ -46,6 +52,9 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
             sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+
+            this.combosThatMakeFullHouse = sortedFullHouseCombos;
+
             return sortedFullHouseCombos;
         }
 
@@ -82,6 +91,9 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
             sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+
+            this.combosThatMakeFullHouse = sortedFullHouseCombos;
+
             return sortedFullHouseCombos;
         }
 
@@ -121,6 +133,9 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
             sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+
+            this.combosThatMakeFullHouse = sortedFullHouseCombos;
+
             return sortedFullHouseCombos;
         }
 
@@ -160,8 +175,15 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
 
             sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
+
+            this.combosThatMakeFullHouse = sortedFullHouseCombos;
+
             return sortedFullHouseCombos;
         }
+        sortedFullHouseCombos = removeDuplicateCombos(new HashMap<>(), board);
+
+        this.combosThatMakeFullHouse = sortedFullHouseCombos;
+
         return new HashMap<>();
     }
 
@@ -257,8 +279,8 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
     }
 
     private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombosInitialize(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
 
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);

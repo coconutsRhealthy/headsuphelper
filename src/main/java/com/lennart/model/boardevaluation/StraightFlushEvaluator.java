@@ -9,7 +9,13 @@ import java.util.*;
  */
 public class StraightFlushEvaluator extends BoardEvaluator implements ComboComparator {
 
-    public Map<Integer, Set<Set<Card>>> getStraightFlushCombos(List<Card> board) {
+    private static Map<Integer, Set<Set<Card>>> combosThatMakeStraightFlush;
+
+    public Map<Integer, Set<Set<Card>>> getStraightFlushCombos() {
+        return combosThatMakeStraightFlush;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getStraightFlushCombosInitialize(List<Card> board) {
         StraightEvaluator straightEvaluator = new StraightEvaluator();
         FlushEvaluator flushEvaluator = new FlushEvaluator();
 
@@ -42,6 +48,8 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
         }
 
         if(board.size() == 3 && !combosThatMakeStraightAndFlush.isEmpty()) {
+            this.combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, new StraightFlushEvaluator());
+
             return getSortedCardComboMap(combosThatMakeStraightAndFlush, board, new StraightFlushEvaluator());
         }
 
@@ -79,6 +87,8 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
             if (board.size() == 5) {
                 for (Map.Entry<Integer, Set<Card>> entry : allPossibleStraightFlushes.entrySet()) {
                     if (board.containsAll(entry.getValue())) {
+                        this.combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, new StraightFlushEvaluator());
+
                         return getSortedCardComboMap(combosThatMakeStraightAndFlush, board, new StraightFlushEvaluator());
                     }
                 }
@@ -95,8 +105,12 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
                     }
                 }
             }
+            this.combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, new StraightFlushEvaluator());
+
             return getSortedCardComboMap(combosThatMakeStraightFlush, board, new StraightFlushEvaluator());
         }
+        this.combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, new StraightFlushEvaluator());
+
         return new HashMap<>();
     }
 

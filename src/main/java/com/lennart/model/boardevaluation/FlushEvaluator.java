@@ -9,11 +9,20 @@ import java.util.*;
  */
 public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
-    public Map<Integer, Set<Set<Card>>> getFlushCombos(List<Card> board) {
+    private static Map<Integer, Set<Set<Card>>> combosThatMakeFlush;
+
+    public Map<Integer, Set<Set<Card>>> getFlushCombos() {
+        return combosThatMakeFlush;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getFlushCombosInitialize(List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedFlushCombos;
 
         Map<Integer, Set<Set<Card>>> flushCombos = getFlushCombosOud(board);
         sortedFlushCombos = removeDuplicateCombos(flushCombos, board);
+
+        this.combosThatMakeFlush = sortedFlushCombos;
+
         return sortedFlushCombos;
     }
 
@@ -519,9 +528,9 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
     }
 
     private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos(board);
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos(board);
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombosInitialize(board);
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
 
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);

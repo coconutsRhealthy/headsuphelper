@@ -9,11 +9,21 @@ import java.util.*;
  */
 public class FourOfAKindEvaluator extends BoardEvaluator implements ComboComparator {
 
-    public Map<Integer, Set<Set<Card>>> getFourOfAKindCombos(List<Card> board) {
+    private static Map<Integer, Set<Set<Card>>> combosThatMakeFourOfAKind;
+
+    public Map<Integer, Set<Set<Card>>> getFourOfAKindCombos() {
+        return combosThatMakeFourOfAKind;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getFourOfAKindCombosInitialize(List<Card> board) {
         Map<Integer, List<Card>> comboMap = new HashMap<>();
         Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new HashMap<>();
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
+            fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
+
+            this.combosThatMakeFourOfAKind = fourOfAKindCombos;
+
             return fourOfAKindCombos;
         }
 
@@ -39,6 +49,9 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
 
             fourOfAKindCombos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
             fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
+
+            this.combosThatMakeFourOfAKind = fourOfAKindCombos;
+
             return fourOfAKindCombos;
         }
 
@@ -80,6 +93,9 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
 
             fourOfAKindCombos = getSortedCardComboMap(comboMap, board, new FourOfAKindEvaluator());
             fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
+
+            this.combosThatMakeFourOfAKind = fourOfAKindCombos;
+
             return fourOfAKindCombos;
         }
 
@@ -141,6 +157,9 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
 
             fourOfAKindCombos = getSortedCardComboMap(allStartHandsThatContainTripsCardNotOnBoard, board, new FourOfAKindEvaluator());
             fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
+
+            this.combosThatMakeFourOfAKind = fourOfAKindCombos;
+
             return fourOfAKindCombos;
         }
 
@@ -149,8 +168,14 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             fourOfAKindCombos = getSortedCardComboMap(allPossibleStartHands, board, new FourOfAKindEvaluator());
             fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
+
+            this.combosThatMakeFourOfAKind = fourOfAKindCombos;
+
             return fourOfAKindCombos;
         }
+        fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);
+
+        this.combosThatMakeFourOfAKind = fourOfAKindCombos;
 
         return fourOfAKindCombos;
     }
@@ -256,7 +281,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
     }
 
     private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos(board);
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombosInitialize(board);
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         return sortedCombos;
     }
