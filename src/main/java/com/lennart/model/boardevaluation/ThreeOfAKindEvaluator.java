@@ -119,6 +119,10 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
 
             return sortedCombos;
         }
+        sortedCombos = removeDuplicateCombos(new HashMap<>(), board);
+
+        this.combosThatMakeThreeOfAKind = sortedCombos;
+
         return new HashMap<>();
     }
 

@@ -173,6 +173,10 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
 
             return sortedCombos;
         }
+        sortedCombos = removeDuplicateCombos(new HashMap<>(), board);
+
+        this.combosThatMakeTwoPair = sortedCombos;
+
         return new HashMap<>();
     }
 
