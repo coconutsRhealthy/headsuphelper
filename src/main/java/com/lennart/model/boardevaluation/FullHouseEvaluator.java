@@ -44,7 +44,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
             return sortedFullHouseCombos;
         }
@@ -80,7 +80,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
             return sortedFullHouseCombos;
         }
@@ -119,22 +119,19 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
                 }
             }
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
             return sortedFullHouseCombos;
         }
 
         //boat op board
         if(boardContainsBoat(board)) {
-            //alle combos die niet met het board matchen, hierin zitten ook alle pocket pairs
-            for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-                if(!boardRanks.contains(entry.getValue().get(0).getRank()) &&
-                        !boardRanks.contains(entry.getValue().get(1).getRank())) {
-                    comboMap.put(comboMap.size(), entry.getValue());
-                }
-            }
+            //alle combos, behalve combos die quads en straight flush maken
 
-            //als het pair hoger dan de trips op board is, dan alle combos die trips maken met het pair
+            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
+            comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
+
+            //remove quads combos
             Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
             int rankOfTripsOnBoard = 0;
 
@@ -147,17 +144,21 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
             boardRanks.removeAll(Collections.singleton(rankOfTripsOnBoard));
             int rankOfPairOnBoard = boardRanks.get(0);
 
-            if(rankOfPairOnBoard > rankOfTripsOnBoard) {
-                for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-                    List<Integer> comboRankOnly = getSortedCardRanksFromCardList(entry.getValue());
-                    if(comboRankOnly.contains(rankOfPairOnBoard) && !comboRankOnly.contains(rankOfTripsOnBoard) &&
-                            comboRankOnly.get(0) != comboRankOnly.get(1)) {
-                        comboMap.put(comboMap.size(), entry.getValue());
-                    }
+            for(Iterator<Map.Entry<Integer, List<Card>>> it = comboMap.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Integer, List<Card>> entry = it.next();
+                if(entry.getValue().get(0).getRank() == rankOfPairOnBoard && entry.getValue().get(1).getRank() == rankOfPairOnBoard) {
+                    it.remove();
                 }
             }
-            comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(comboMap, board);
-            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FlushEvaluator());
+
+            for(Iterator<Map.Entry<Integer, List<Card>>> it = comboMap.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Integer, List<Card>> entry = it.next();
+                if(entry.getValue().get(0).getRank() == rankOfTripsOnBoard || entry.getValue().get(1).getRank() == rankOfTripsOnBoard) {
+                    it.remove();
+                }
+            }
+
+            sortedFullHouseCombos = getSortedCardComboMap(comboMap, board, new FullHouseEvaluator());
             sortedFullHouseCombos = removeDuplicateCombos(sortedFullHouseCombos, board);
             return sortedFullHouseCombos;
         }
