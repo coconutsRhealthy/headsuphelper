@@ -145,6 +145,16 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         return counter;
     }
 
+    protected char getFlushSuitWhen3ToFlushOnBoard(List<Card> board) {
+        char flushSuit = 'x';
+        for (Map.Entry<Character, List<Card>> entry : getSuitsOfBoard(board).entrySet()) {
+            if(entry.getValue().size() > 2) {
+                flushSuit = entry.getValue().get(0).getSuit();
+            }
+        }
+        return flushSuit;
+    }
+
     protected Card getHighestFlushCardFromCombo(List<Card> combo, char flushSuit) {
         Collections.sort(combo);
         if(combo.get(0).getSuit() == flushSuit) {
@@ -152,6 +162,18 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         } else {
             return combo.get(1);
         }
+    }
+
+    protected Card getHighestFlushCardFromBoardWhen3ToFlushOrMore(List<Card> board, char flushSuit) {
+        Map<Character, List<Card>> suitsOnBoard = getSuitsOfBoard(board);
+        List<Card> flushCardsOnBoard = suitsOnBoard.get(flushSuit);
+        Collections.sort(flushCardsOnBoard);
+        return flushCardsOnBoard.get(0);
+    }
+
+    protected List<Card> getFlushCardsOnBoard(List<Card> board, char flushSuit) {
+        Map<Character, List<Card>> suitsOnBoard = getSuitsOfBoard(board);
+        return suitsOnBoard.get(flushSuit);
     }
 
     @Override

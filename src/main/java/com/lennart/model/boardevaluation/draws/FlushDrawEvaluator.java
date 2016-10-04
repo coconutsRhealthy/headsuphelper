@@ -3,9 +3,7 @@ package com.lennart.model.boardevaluation.draws;
 import com.lennart.model.boardevaluation.FlushEvaluator;
 import com.lennart.model.pokergame.Card;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by LPO10346 on 10/4/2016.
@@ -136,20 +134,17 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                 return getFlushDrawCombos(board);
             }
 
-            if(getNumberOfSuitedCardsOnBoard(board) > 2) {
+            if(getNumberOfSuitedCardsOnBoard(board) == 3) {
                 Map<Integer, List<Card>> allFlushDrawCombos = getFlushDrawCombos(board);
-
-                char flushSuit = 'x';
-                for (Map.Entry<Character, List<Card>> entry : getSuitsOfBoard(board).entrySet()) {
-                    if(entry.getValue().size() > 2) {
-                        flushSuit = entry.getValue().get(0).getSuit();
-                    }
-                }
+                char flushSuit = getFlushSuitWhen3ToFlushOnBoard(board);
+                List<Card> flushCardsOnBoard = getFlushCardsOnBoard(board, flushSuit);
+                int numberOfRanksNeeded = 2;
+                List<Integer> highestRanksNotPresentOnBoard = getNeededRanksNotPresentOnFlushBoard(flushCardsOnBoard,
+                        numberOfRanksNeeded, "high");
 
                 for (Map.Entry<Integer, List<Card>> entry : allFlushDrawCombos.entrySet()) {
                     Card c = getHighestFlushCardFromCombo(entry.getValue(), flushSuit);
-
-                    if(c.getRank() >= 13) {
+                    if(highestRanksNotPresentOnBoard.contains(Integer.valueOf(c.getRank()))) {
                         strongFlushDrawCombos.put(strongFlushDrawCombos.size(), entry.getValue());
                     }
                 }
@@ -160,10 +155,171 @@ public class FlushDrawEvaluator extends FlushEvaluator {
     }
 
     public Map<Integer, List<Card>> getMediumFlushDrawCombos(List<Card> board) {
-        return null;
+        Map<Integer, List<Card>> mediumFlushDrawCombos = new HashMap<>();
+
+        //max 1 pair
+        if(getNumberOfPairsOnBoard(board) < 2 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
+            if (getNumberOfSuitedCardsOnBoard(board) == 3) {
+                Map<Integer, List<Card>> allFlushDrawCombos = getFlushDrawCombos(board);
+                char flushSuit = getFlushSuitWhen3ToFlushOnBoard(board);
+                List<Card> flushCardsOnBoard = getFlushCardsOnBoard(board, flushSuit);
+                int numberOfRanksNeeded = 4;
+                List<Integer> mediumRanksNotPresentOnBoard = getNeededRanksNotPresentOnFlushBoard(flushCardsOnBoard,
+                        numberOfRanksNeeded, "medium");
+
+                for (Map.Entry<Integer, List<Card>> entry : allFlushDrawCombos.entrySet()) {
+                    Card c = getHighestFlushCardFromCombo(entry.getValue(), flushSuit);
+                    if(mediumRanksNotPresentOnBoard.contains(Integer.valueOf(c.getRank()))) {
+                        mediumFlushDrawCombos.put(mediumFlushDrawCombos.size(), entry.getValue());
+                    }
+                }
+                return mediumFlushDrawCombos;
+            }
+        }
+
+        //twee pair
+        if(getNumberOfSuitedCardsOnBoard(board) == 2) {
+            if(getNumberOfSuitedCardsOnBoard(board) == 2) {
+                return getFlushDrawCombos(board);
+            }
+        }
+
+        return new HashMap<>();
     }
 
-    public Map<Integer, List<Card>> getWeakFlushDrawCombos(List<Card> board) {
-        return null;
+    public Map<Integer, Set<Card>> getWeakFlushDrawCombos(List<Card> board) {
+        Map<Integer, List<Card>> allFlushDraws = getFlushDrawCombos(board);
+        Map<Integer, List<Card>> strongFlushDraws = getStrongFlushDrawCombos(board);
+        Map<Integer, List<Card>> mediumFlushDraws = getMediumFlushDrawCombos(board);
+
+        return getWeakFlushOrBackDoorFlushDrawCombos(allFlushDraws, strongFlushDraws, mediumFlushDraws);
+    }
+
+    public Map<Integer, List<Card>> getStrongBackDoorFlushCombos(List<Card> board) {
+        return getStrongOrMediumBackDoorFlushCombos(board, "strong");
+    }
+
+    public Map<Integer, List<Card>> getMediumBackDoorFlushCombos(List<Card> board) {
+        return getStrongOrMediumBackDoorFlushCombos(board, "medium");
+    }
+
+    public Map<Integer, Set<Card>> getWeakBackDoorFlushCombos(List<Card> board) {
+        Map<Integer, List<Card>> allBackDoorFlushDraws = getBackDoorFlushDrawCombos(board);
+        Map<Integer, List<Card>> strongBackDoorDraws = getStrongBackDoorFlushCombos(board);
+        Map<Integer, List<Card>> mediumBackDoorDraws = getMediumBackDoorFlushCombos(board);
+
+        return getWeakFlushOrBackDoorFlushDrawCombos(allBackDoorFlushDraws, strongBackDoorDraws, mediumBackDoorDraws);
+    }
+
+    //helper methods
+    private Map<Integer, Set<Card>> getWeakFlushOrBackDoorFlushDrawCombos(Map<Integer, List<Card>> allDraws,
+                                                                         Map<Integer, List<Card>> strongDraws,
+                                                                         Map<Integer, List<Card>> mediumDraws) {
+        Map<Integer, Set<Card>> weakDraws = new HashMap<>();
+
+        Set<Set<Card>> allDrawsSet = new HashSet<>();
+        Set<Set<Card>> strongDrawsSet = new HashSet<>();
+        Set<Set<Card>> mediumDrawsSet = new HashSet<>();
+
+        for (Map.Entry<Integer, List<Card>> entry : allDraws.entrySet()) {
+            Set<Card> flushCombo = new HashSet<>();
+            flushCombo.addAll(entry.getValue());
+            allDrawsSet.add(flushCombo);
+        }
+
+        for (Map.Entry<Integer, List<Card>> entry : strongDraws.entrySet()) {
+            Set<Card> flushCombo = new HashSet<>();
+            flushCombo.addAll(entry.getValue());
+            strongDrawsSet.add(flushCombo);
+        }
+
+        for (Map.Entry<Integer, List<Card>> entry : mediumDraws.entrySet()) {
+            Set<Card> flushCombo = new HashSet<>();
+            flushCombo.addAll(entry.getValue());
+            mediumDrawsSet.add(flushCombo);
+        }
+
+        allDrawsSet.removeAll(strongDrawsSet);
+        allDrawsSet.removeAll(mediumDrawsSet);
+
+        for(Set s : allDrawsSet) {
+            weakDraws.put(weakDraws.size(), s);
+        }
+
+        return weakDraws;
+    }
+
+    private Map<Integer, List<Card>> getStrongOrMediumBackDoorFlushCombos(List<Card> board, String strongOrMedium) {
+        if(strongOrMedium.equals("strong")) {
+            if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board)) {
+                if(getNumberOfSuitedCardsOnBoard(board) < 2) {
+                    return getBackDoorFlushDrawCombos(board);
+                }
+            }
+        }
+
+        if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board)) {
+            if(getNumberOfSuitedCardsOnBoard(board) == 2) {
+                Map<Integer, List<Card>> strongOrMediumBackDoorCombos = new HashMap<>();
+                Map<Integer, List<Card>> allBackDoorCombos = getBackDoorFlushDrawCombos(board);
+
+                Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
+                List<Card> backDoorFlushCardsOnBoard = new ArrayList<>();
+
+                for (Map.Entry<Character, List<Card>> entry : suitsOfBoard.entrySet()) {
+                    if(entry.getValue().size() == 2) {
+                        backDoorFlushCardsOnBoard = entry.getValue();
+                    }
+                }
+
+                char flushSuit = backDoorFlushCardsOnBoard.get(0).getSuit();
+
+                int numberOfRanksNeeded = 0;
+                List<Integer> neededRanksNotPresentOnBoard = new ArrayList<>();
+                if(strongOrMedium.equals("strong")) {
+                    numberOfRanksNeeded = 2;
+                    neededRanksNotPresentOnBoard = getNeededRanksNotPresentOnFlushBoard(backDoorFlushCardsOnBoard,
+                            numberOfRanksNeeded, "high");
+                }
+                if(strongOrMedium.equals("medium")) {
+                    numberOfRanksNeeded = 4;
+                    neededRanksNotPresentOnBoard = getNeededRanksNotPresentOnFlushBoard(backDoorFlushCardsOnBoard,
+                            numberOfRanksNeeded, "medium");
+                }
+
+                for (Map.Entry<Integer, List<Card>> entry : allBackDoorCombos.entrySet()) {
+                    Card c = getHighestFlushCardFromCombo(entry.getValue(), flushSuit);
+                    if(neededRanksNotPresentOnBoard.contains(Integer.valueOf(c.getRank()))) {
+                        strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                    }
+                }
+                return strongOrMediumBackDoorCombos;
+            }
+        }
+        return new HashMap<>();
+    }
+
+    private List<Integer> getNeededRanksNotPresentOnFlushBoard(List<Card> flushCardsOnBoard, int numberOfRanksNeeded,
+                                                                String highMediumOrLow) {
+        List<Integer> flushCardsOnBoardRankOnly = getSortedCardRanksFromCardList(flushCardsOnBoard);
+        List<Integer> allPossibleCardRanksSorted = new ArrayList<>();
+        for(int i = 14; i > 1; i--) {
+            allPossibleCardRanksSorted.add(i);
+        }
+
+        allPossibleCardRanksSorted.removeAll(flushCardsOnBoardRankOnly);
+        List<Integer> cardRanksToReturn = new ArrayList<>();
+
+        if(highMediumOrLow.equals("high")) {
+            for(int i = 0; i < numberOfRanksNeeded; i++) {
+                cardRanksToReturn.add(allPossibleCardRanksSorted.get(i));
+            }
+        }
+        if(highMediumOrLow.equals("medium")) {
+            for(int i = 2; i < (numberOfRanksNeeded + 2); i++) {
+                cardRanksToReturn.add(allPossibleCardRanksSorted.get(i));
+            }
+        }
+        return cardRanksToReturn;
     }
 }
