@@ -1,6 +1,7 @@
 package com.lennart.controller;
 
 import com.lennart.model.boardevaluation.*;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
 import org.springframework.boot.SpringApplication;
@@ -30,6 +31,8 @@ public class Controller {
     private FourOfAKindEvaluator fourOfAKindEvaluator = new FourOfAKindEvaluator();
     private StraightFlushEvaluator straightFlushEvaluator = new StraightFlushEvaluator();
     private HighCardEvaluator highCardEvaluator = new HighCardEvaluator();
+
+    private StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -84,12 +87,12 @@ public class Controller {
 
     @RequestMapping(value = "/getOosdStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getOosdStraightCombos() {
-        return straightEvaluator.getCombosThatGiveOosdOrDoubleGutter(board);
+        return straightDrawEvaluator.getCombosThatGiveOosdOrDoubleGutter(board);
     }
 
     @RequestMapping(value = "/getGutshotStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getGutshotStraightCombos() {
-        return straightEvaluator.getCombosThatGiveGutshot(board);
+        return straightDrawEvaluator.getCombosThatGiveGutshot(board);
     }
 
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
@@ -114,8 +117,10 @@ public class Controller {
 //        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
 //        System.out.println(sortedCombos.get(0));
 
-        double handStrength = new HandEvaluator().getHandStrength(holeCards, board);
-        System.out.println(handStrength);
+        straightDrawEvaluator.getStrongOosdCombos(board);
+
+//        double handStrength = new HandEvaluator().getHandStrength(holeCards, board);
+//        System.out.println(handStrength);
 
         Map<Integer, List<Integer>> temp = new HashMap<>();
         return temp;
