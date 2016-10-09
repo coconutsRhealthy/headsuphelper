@@ -137,6 +137,80 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
     public Map<Integer, Set<Card>> getWeakBackDoorCombos(List<Card> board) { return null; }
 
 
+
+    public Map<Integer, List<Integer>> removeWeakGutshotCombos(List<Card> board) {
+        Map<Integer, List<Integer>> combosThatGiveGutshot = getCombosThatGiveGutshot(board);
+        Map<Integer, List<Integer>> allFiveConnectingCards = getAllPossibleFiveConnectingCards();
+        Map<List<Integer>, List<List<Integer>>> fiveConnectingCardsPerCombo = new HashMap<>();
+        Map<List<Integer>, List<List<Integer>>> fiveConnectingCardsPerComboForCombosThatContributeOnlyOneCard = new HashMap<>();
+        Map<Integer, List<Integer>> weakGutshotCombos = new HashMap<>();
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+        for (Map.Entry<Integer, List<Integer>> entry : combosThatGiveGutshot.entrySet()) {
+            List<Integer> comboPlusBoardRanks = new ArrayList<>();
+            comboPlusBoardRanks.addAll(boardRanks);
+            comboPlusBoardRanks.addAll(entry.getValue());
+
+            for (Map.Entry<Integer, List<Integer>> entry2 : allFiveConnectingCards.entrySet()) {
+                List<Integer> fiveConnectingCardsEntryCopy = new ArrayList<>();
+                fiveConnectingCardsEntryCopy.addAll(entry2.getValue());
+
+                fiveConnectingCardsEntryCopy.removeAll(comboPlusBoardRanks);
+
+                if(fiveConnectingCardsEntryCopy.size() == 1) {
+                    fiveConnectingCardsPerCombo.put(entry.getValue(), new ArrayList<>());
+                    fiveConnectingCardsPerCombo.get(entry.getValue()).add(entry2.getValue());
+                }
+            }
+        }
+
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : fiveConnectingCardsPerCombo.entrySet()) {
+            for(List<Integer> fiveConnectingCards : entry.getValue()) {
+                List<Integer> comboCopy = new ArrayList<>();
+                comboCopy.addAll(entry.getKey());
+                boolean oneComboCardIsPairedWithBoardAndPresentInStraightAndOtherComboCardIsLowerThanLowestBoardCard = false;
+
+                if(boardRanks.contains(comboCopy.get(0)) && fiveConnectingCards.contains(comboCopy.get(0))) {
+                    if(comboCopy.get(1) < Collections.min(boardRanks)) {
+                        oneComboCardIsPairedWithBoardAndPresentInStraightAndOtherComboCardIsLowerThanLowestBoardCard = true;
+                    }
+                }
+                if(boardRanks.contains(comboCopy.get(1)) && fiveConnectingCards.contains(comboCopy.get(1))) {
+                    if(comboCopy.get(0) < Collections.min(boardRanks)) {
+                        oneComboCardIsPairedWithBoardAndPresentInStraightAndOtherComboCardIsLowerThanLowestBoardCard = true;
+                    }
+                }
+
+                comboCopy.removeAll(fiveConnectingCards);
+
+                if(comboCopy.size() == 1 || (comboCopy.size() == 0 && entry.getKey().get(0) == entry.getKey().get(1)) ||
+                        (comboCopy.size() == 0 && oneComboCardIsPairedWithBoardAndPresentInStraightAndOtherComboCardIsLowerThanLowestBoardCard)) {
+                    fiveConnectingCardsPerComboForCombosThatContributeOnlyOneCard.put(entry.getKey(), new ArrayList<>());
+                    fiveConnectingCardsPerComboForCombosThatContributeOnlyOneCard.get(entry.getKey()).add(fiveConnectingCards);
+                }
+            }
+        }
+
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : fiveConnectingCardsPerComboForCombosThatContributeOnlyOneCard.entrySet()) {
+            boolean allCombosWeak = true;
+            for(List<Integer> fiveConnectingCards : entry.getValue()) {
+                List<Integer> comboCopy = new ArrayList<>();
+                comboCopy.addAll(entry.getKey());
+                comboCopy.retainAll(fiveConnectingCards);
+                if(comboCopy.get(0) != Collections.min(fiveConnectingCards)) {
+                    allCombosWeak = false;
+                }
+            }
+            if(allCombosWeak) {
+                weakGutshotCombos.put(weakGutshotCombos.size(), entry.getKey());
+            }
+        }
+
+        return weakGutshotCombos;
+    }
+
+
+
     //helper methods
     public Map<List<Integer>, List<List<Integer>>> getCombosThatGiveAnyStraightDraw(List<Card> board) {
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);

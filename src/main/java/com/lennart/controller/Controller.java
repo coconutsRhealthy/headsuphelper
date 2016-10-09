@@ -117,7 +117,8 @@ public class Controller {
 //        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
 //        System.out.println(sortedCombos.get(0));
 
-        straightDrawEvaluator.getStrongOosdCombos(board);
+        straightDrawEvaluator.removeWeakGutshotCombos(board);
+//        straightDrawEvaluator.getStrongOosdCombos(board);
 
 //        double handStrength = new HandEvaluator().getHandStrength(holeCards, board);
 //        System.out.println(handStrength);
