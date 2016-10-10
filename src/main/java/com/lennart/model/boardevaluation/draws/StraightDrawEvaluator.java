@@ -210,6 +210,82 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
     }
 
 
+    public Map<Integer, List<Integer>> removeWeakBackDoorCombos(List<Card> board) {
+        Map<Integer, List<Integer>> weakBackDoorCombos = new HashMap<>();
+
+        //1 get all backdoor combos
+        Map<Integer, List<Integer>> combosThatGiveBackDoor = getCombosThatGiveBackDoorStraightDraw(board);
+        Map<Integer, List<Integer>> allFiveConnectingCards = getAllPossibleFiveConnectingCards();
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+        //2 per backdoor combo, get all straights that it could make
+        Map<List<Integer>, List<List<Integer>>> backDoorComboWithAllStraightsItCanMake = new HashMap<>();
+
+        for (Map.Entry<Integer, List<Integer>> entry : combosThatGiveBackDoor.entrySet()) {
+            backDoorComboWithAllStraightsItCanMake.put(entry.getValue(), new ArrayList<>());
+        }
+
+        for (Map.Entry<Integer, List<Integer>> entry : combosThatGiveBackDoor.entrySet()) {
+            List<Integer> comboCopyPlusBoardRanks = new ArrayList<>();
+            comboCopyPlusBoardRanks.addAll(entry.getValue());
+            comboCopyPlusBoardRanks.addAll(boardRanks);
+            for (Map.Entry<Integer, List<Integer>> entry2 : allFiveConnectingCards.entrySet()) {
+                List<Integer> fiveConnectingCardsCopy = new ArrayList<>();
+                fiveConnectingCardsCopy.addAll(entry2.getValue());
+
+                fiveConnectingCardsCopy.removeAll(comboCopyPlusBoardRanks);
+
+                if(fiveConnectingCardsCopy.size() == 2) {
+                    if(!Collections.disjoint(entry.getValue(), entry2.getValue())) {
+                        backDoorComboWithAllStraightsItCanMake.get(entry.getValue()).add(entry2.getValue());
+                    }
+                }
+            }
+        }
+
+        //3 keep only the backdoor comobs where only one card in the combo contributes to the all the straight
+        Map<List<Integer>, List<List<Integer>>> backDoorCombosThatOnlyContributeOneCardToStraightWithAllStraightsItCanMake = new HashMap<>();
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry : backDoorComboWithAllStraightsItCanMake.entrySet()) {
+            boolean onlyOneCardContributes = true;
+
+            for(List<Integer> l : entry.getValue()) {
+                List<Integer> copyCombo = new ArrayList<>();
+                List<Integer> copyStraight = new ArrayList<>();
+                copyCombo.addAll(entry.getKey());
+                copyStraight.addAll(l);
+
+                copyCombo.removeAll(copyStraight);
+
+                if(!(copyCombo.size() == 1 || (copyCombo.size() == 0 && entry.getKey().get(0) == entry.getKey().get(1)))) {
+                    if(!boardRanks.contains(Integer.valueOf(Collections.max(copyStraight) + 1))) {
+                        onlyOneCardContributes = false;
+                    }
+                }
+            }
+
+            if(onlyOneCardContributes) {
+                backDoorCombosThatOnlyContributeOneCardToStraightWithAllStraightsItCanMake.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        //4 check if this card is the lowest card in all the staight. If so, then it is a weak combo
+        for (Map.Entry<List<Integer>, List<List<Integer>>> entry :
+                backDoorCombosThatOnlyContributeOneCardToStraightWithAllStraightsItCanMake.entrySet()) {
+            boolean isLowestCardInAllStraights = true;
+
+            for(List<Integer> l : entry.getValue()) {
+                if(!entry.getKey().contains(Collections.min(l))) {
+                    isLowestCardInAllStraights = false;
+                }
+            }
+
+            if(isLowestCardInAllStraights) {
+                weakBackDoorCombos.put(weakBackDoorCombos.size(), entry.getKey());
+            }
+        }
+
+        return weakBackDoorCombos;
+    }
 
     //helper methods
     public Map<List<Integer>, List<List<Integer>>> getCombosThatGiveAnyStraightDraw(List<Card> board) {
