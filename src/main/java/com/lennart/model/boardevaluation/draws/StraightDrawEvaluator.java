@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation.draws;
 
 import com.lennart.model.boardevaluation.ComboComparatorRankOnly;
+import com.lennart.model.boardevaluation.FlushEvaluator;
 import com.lennart.model.boardevaluation.StraightEvaluator;
 import com.lennart.model.pokergame.Card;
 
@@ -83,62 +84,99 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
     }
 
     public Map<Integer, Set<Card>> getStrongOosdCombos(List<Card> board) {
-        Map<Integer, List<Integer>> combosThatGiveOosdOrDoubleGutter = getCombosThatGiveOosdOrDoubleGutter(board);
-        Map<Integer, List<Integer>> combosThatGiveGutshot = getCombosThatGiveGutshot(board);
 
-        Map<Integer, List<Card>> artificialMap = new HashMap<>();
+        //max 1pair op board
+        if(getNumberOfPairsOnBoard(board) < 2) {
+            Map<Character, List<Card>> suitsOnBoard = new FlushEvaluator().getSuitsOfBoard(board);
+            char flushSuit = 'x';
+            int numberOfSuitedCardsOnBoard = 0;
 
-        for (Map.Entry<Integer, List<Integer>> entry : combosThatGiveOosdOrDoubleGutter.entrySet()) {
-            List<Card> l = convertIntegerBoardToArtificialCardBoard(entry.getValue());
-            artificialMap.put(artificialMap.size(), l);
+            for (Map.Entry<Character, List<Card>> entry : suitsOnBoard.entrySet()) {
+                if(entry.getValue().size() >= 3) {
+                    flushSuit = entry.getKey();
+                    numberOfSuitedCardsOnBoard = entry.getValue().size();
+                }
+            }
+
+            if(numberOfSuitedCardsOnBoard < 4) {
+                Map<Integer, List<Integer>> oosdCombos = getCombosThatGiveOosdOrDoubleGutter(board);
+
+
+
+            }
+
         }
 
-//        for (Map.Entry<Integer, List<Integer>> entry : combosThatGiveGutshot.entrySet()) {
-//            List<Card> l = convertIntegerBoardToArtificialCardBoard(entry.getValue());
-//            artificialMap.put(artificialMap.size(), l);
-//        }
 
-        Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(artificialMap, board, new StraightDrawEvaluator());
+        //geen 3toFlush of meer op board
 
-        System.out.println("wat doet ie?");
         return null;
     }
 
     public Map<Integer, Set<Card>> getMediumOosdCombos(List<Card> board) {
+
+        //max 2pair on board
+
+        //max 3toFlush op board
+
         return null;
     }
 
     public Map<Integer, Set<Card>> getWeakOosdCombos(List<Card> board) {
+        //the rest
+
         return null;
     }
 
     public Map<Integer, Set<Card>> getStrongGutshotCombos(List<Card> board) {
-        //je hebt je gutshot en het board.
-        //ga na hoeveel straights, en straightdraws er drawen naar straights hoger dan waar jij naar drawt.
-        //is dit 0, dan is ie sterk.
+        Map<Integer, List<Integer>> gutshotCombos = getCombosThatGiveGutshot(board);
+        Map<Integer, List<Integer>> weakGutshotCombos = getWeakGutshotCombosFromAllGutshotCombos(board);
 
-        //is dit meer dan 2, dan is het een zwakke gutshot
-        //8 T
-        //J 7 Q
-        //J 7 Q 9
+        gutshotCombos = removeWeakStraightDrawCombos(gutshotCombos, weakGutshotCombos);
+
+
 
 
         return null;
     }
 
-    public Map<Integer, Set<Card>> getMediumGutshotCombos(List<Card> board) { return null; }
+    public Map<Integer, Set<Card>> getMediumGutshotCombos(List<Card> board) {
+        Map<Integer, List<Integer>> gutshotCombos = getCombosThatGiveGutshot(board);
+        Map<Integer, List<Integer>> weakGutshotCombos = getWeakGutshotCombosFromAllGutshotCombos(board);
 
-    public Map<Integer, Set<Card>> getWeakGutshotCombos(List<Card> board) { return null; }
+        gutshotCombos = removeWeakStraightDrawCombos(gutshotCombos, weakGutshotCombos);
 
-    public Map<Integer, Set<Card>> getStrongBackDoorCombos(List<Card> board) { return null; }
 
-    public Map<Integer, Set<Card>> getMediumBackDoorCombos(List<Card> board) { return null; }
+        return null;
+    }
+
+    public Map<Integer, Set<Card>> getWeakGutshotCombos(List<Card> board) {
+
+
+
+        return null;
+    }
+
+    public Map<Integer, Set<Card>> getStrongBackDoorCombos(List<Card> board) {
+        Map<Integer, List<Integer>> backdoorCombos = getCombosThatGiveGutshot(board);
+        Map<Integer, List<Integer>> weakBackdoorCombos = getWeakGutshotCombosFromAllGutshotCombos(board);
+
+        backdoorCombos = removeWeakStraightDrawCombos(backdoorCombos, weakBackdoorCombos);
+
+
+        return null;
+    }
+
+    public Map<Integer, Set<Card>> getMediumBackDoorCombos(List<Card> board) {
+
+        return null;
+    }
 
     public Map<Integer, Set<Card>> getWeakBackDoorCombos(List<Card> board) { return null; }
 
 
 
-    public Map<Integer, List<Integer>> removeWeakGutshotCombos(List<Card> board) {
+    public Map<Integer, List<Integer>> getWeakGutshotCombosFromAllGutshotCombos(List<Card> board) {
         Map<Integer, List<Integer>> combosThatGiveGutshot = getCombosThatGiveGutshot(board);
         Map<Integer, List<Integer>> allFiveConnectingCards = getAllPossibleFiveConnectingCards();
         Map<List<Integer>, List<List<Integer>>> fiveConnectingCardsPerCombo = new HashMap<>();
@@ -210,7 +248,7 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
     }
 
 
-    public Map<Integer, List<Integer>> removeWeakBackDoorCombos(List<Card> board) {
+    public Map<Integer, List<Integer>> getWeakBackdoorCombosFromAllBackdoorCombos(List<Card> board) {
         Map<Integer, List<Integer>> weakBackDoorCombos = new HashMap<>();
 
         //1 get all backdoor combos
@@ -764,6 +802,19 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
             }
         }
         return backdoorCombos;
+    }
+
+    private Map<Integer, List<Integer>> removeWeakStraightDrawCombos (Map<Integer, List<Integer>> allSraightDrawCombosOfType,
+                                                                      Map<Integer, List<Integer>> weakStraightDrawCombosOfType) {
+        for(Iterator<Map.Entry<Integer, List<Integer>>> it = allSraightDrawCombosOfType.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, List<Integer>> entry = it.next();
+            for (Map.Entry<Integer, List<Integer>> entry2 : weakStraightDrawCombosOfType.entrySet()) {
+                if(entry.getValue().containsAll(entry2.getValue())) {
+                    it.remove();
+                }
+            }
+        }
+        return allSraightDrawCombosOfType;
     }
 
     @Override
