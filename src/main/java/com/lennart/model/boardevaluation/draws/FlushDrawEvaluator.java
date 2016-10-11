@@ -178,10 +178,8 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         }
 
         //twee pair
-        if(getNumberOfSuitedCardsOnBoard(board) == 2) {
-            if(getNumberOfSuitedCardsOnBoard(board) == 2) {
-                return getFlushDrawCombos(board);
-            }
+        if(getNumberOfPairsOnBoard(board) == 2 && getNumberOfSuitedCardsOnBoard(board) == 2) {
+            return getFlushDrawCombos(board);
         }
 
         return new HashMap<>();
