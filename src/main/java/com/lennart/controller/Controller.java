@@ -5,6 +5,7 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.RangeBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -115,11 +116,12 @@ public class Controller {
 //        straightEvaluator.getMapOfStraightCombos(board);
 //        fullHouseEvaluator.getFullHouseCombos(board);
 //        highCardEvaluator.getHighCardCombos(board);
-//        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
+//        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombosInitialize(board);
 //        System.out.println(sortedCombos.get(0));
 
 //        straightDrawEvaluator.getWeakGutshotCombosFromAllGutshotCombos(board);
 
+        new RangeBuilder().getRange("aap", board);
         new HandEvaluator().getHandStrength(holeCards, board);
         new HighCardDrawEvaluator().getMediumTwoOvercards(board);
 

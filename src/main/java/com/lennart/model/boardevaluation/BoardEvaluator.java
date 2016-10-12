@@ -10,6 +10,17 @@ import java.util.*;
  * Created by Lennart Popma on 21-6-2016.
  */
 public class BoardEvaluator {
+
+    private static Map<Integer, Set<Set<Card>>> sortedCombos;
+
+    public Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
+        if(sortedCombos != null) {
+            return sortedCombos;
+        } else {
+            return getSortedCombosInitialize(board);
+        }
+    }
+
     public boolean isBoardRainbow(List<Card> board) {
         if(getNumberOfSuitedCardsOnBoard(board) == 0) {
             return true;
@@ -751,8 +762,8 @@ public class BoardEvaluator {
         };
     }
 
-    public  Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
-        Map<Integer, Set<Set<Card>>> sortedCombos = new HashMap<>();
+    public  Map<Integer, Set<Set<Card>>> getSortedCombosInitialize(List<Card> board) {
+        Map<Integer, Set<Set<Card>>> sortedCombosMethod = new HashMap<>();
 
         Map<Integer, Set<Set<Card>>> highCardCombos = new HighCardEvaluator().getHighCardCombos(board);
         Map<Integer, Set<Set<Card>>> pairCombos = new PairEvaluator().getCombosThatMakePair();
@@ -765,39 +776,39 @@ public class BoardEvaluator {
         Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : straightFlushCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : fourOfAKindCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : fullHouseCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : flushCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : straightCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : threeOfAKindCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : twoPairCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : pairCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : highCardCombos.entrySet()) {
-            sortedCombos.put(sortedCombos.size(), entry.getValue());
+            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
         }
 
         Set<Set<Card>> allStartHandsSet = new HashSet<>();
@@ -813,18 +824,17 @@ public class BoardEvaluator {
         Set<Set<Card>> sortedCombosAsSet = new HashSet<>();
         List<Set<Card>> sortedComboAsList = new ArrayList<>();
 
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosMethod.entrySet()) {
             for(Set<Card> s : entry.getValue()) {
                 sortedCombosAsSet.add(s);
                 sortedComboAsList.add(s);
             }
         }
-
-        return sortedCombos;
+        sortedCombos = sortedCombosMethod;
+        return sortedCombosMethod;
     }
 
     public Map<Integer, Set<Set<Card>>> getSortedCombosAboveDesignatedStrengthLevel(double strengthLevel, List<Card> board) {
-        //TODO: make sortedCombos a static class variable in BoardEvaluator
         Map<Integer, Set<Set<Card>>> sortedCombos = getSortedCombos(board);
         double doubleFromWhereCombosShouldBeRemoved = (1176 * (1 - strengthLevel));
         int intFromWhereCombosShouldBeRemoved = (int) doubleFromWhereCombosShouldBeRemoved;
@@ -839,10 +849,7 @@ public class BoardEvaluator {
             }
 
             for(Iterator<Set<Card>> it2 = entry.getValue().iterator(); it2.hasNext(); ) {
-                Set<Card> entry2 = it2.next();
-
                 counter++;
-
                 if(counter > intFromWhereCombosShouldBeRemoved) {
                     it2.remove();
                 }
