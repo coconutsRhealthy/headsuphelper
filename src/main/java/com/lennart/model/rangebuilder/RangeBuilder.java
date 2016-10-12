@@ -1,5 +1,12 @@
 package com.lennart.model.rangebuilder;
 
+import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.pokergame.Card;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Created by LPO10346 on 9/2/2016.
  */
@@ -14,5 +21,23 @@ public class RangeBuilder {
     //combos from this map that do not fall in the range. Of course, the combos that getCombosThatMakeRoyalFlush() and
     //the other methods return, should first be sorted from strongest to weakest, before added to the map.
 
+    public Map<Integer, Set<Set<Card>>> getRange(String handPath, List<Card> board) {
+        if(handPath.equals("2bet2bet")) {
 
+            BoardEvaluator boardEvaluator = new BoardEvaluator();
+
+            //alle handen boven 50% op flop
+            Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
+
+            //alle strong en medium straight draws op flop
+
+            //alle strong en medium flushdraws op flop
+
+            //alle strong en medium overcarddraws op flop
+
+
+        }
+
+        return null;
+    }
 }
