@@ -1,6 +1,7 @@
 package com.lennart.controller;
 
 import com.lennart.model.boardevaluation.*;
+import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
@@ -117,7 +118,11 @@ public class Controller {
 //        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
 //        System.out.println(sortedCombos.get(0));
 
-        straightDrawEvaluator.removeWeakGutshotCombos(board);
+//        straightDrawEvaluator.getWeakGutshotCombosFromAllGutshotCombos(board);
+
+        new HandEvaluator().getHandStrength(holeCards, board);
+        new HighCardDrawEvaluator().getMediumTwoOvercards(board);
+
 //        straightDrawEvaluator.getStrongOosdCombos(board);
 
 //        double handStrength = new HandEvaluator().getHandStrength(holeCards, board);

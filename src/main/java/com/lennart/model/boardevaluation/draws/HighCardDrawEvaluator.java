@@ -14,76 +14,81 @@ public class HighCardDrawEvaluator extends HighCardEvaluator {
     StraightEvaluator straightEvaluator = new StraightEvaluator();
 
     public Map<Integer, Set<Card>> getStrongTwoOvercards(List<Card> board) {
-        //geen pair, max 2toStraight, max2toFlush, geen trips, geen quads
         if(getNumberOfPairsOnBoard(board) == 0 && straightEvaluator.getMapOfStraightCombos().isEmpty()
                 && getNumberOfSuitedCardsOnBoard(board) < 3) {
-
-            //get de max rank van board
-            List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-            int highestRankOnBoard = Collections.max(boardRanks);
-
-            //get alle ranks daarboven en lager dan 15
-            List<Integer> allRanksAboveHighestBoardRank = new ArrayList<>();
-
-            for(int i = highestRankOnBoard; i < 15; i++) {
-                allRanksAboveHighestBoardRank.add(i);
-            }
-
-            //maak van deze ranks alle 2rank combos
-            Set<Set<Integer>> rankCombos = new HashSet<>();
-
-            for(Integer i : allRanksAboveHighestBoardRank) {
-                for(Integer z : allRanksAboveHighestBoardRank) {
-                    if(i != z) {
-                        Set<Integer> rankCombo = new HashSet<>();
-                        rankCombo.add(i);
-                        rankCombo.add(z);
-                        rankCombos.add(rankCombo);
-                    }
-                }
-            }
-
-            //convert deze combos naar 2card combos, gecorrigeerd voor board
-            Map<Integer, Set<Card>> overcardCombos = new HashMap<>();
-            Set<Set<Card>> cardCombosCorrespondingToRankComboCorrectedForBoard = new HashSet<>();
-
-            List<List<Integer>> asList = new ArrayList<>();
-            asList.addAll(rankCombos);
-
-            for(Set<Integer> s : rankCombos) {
-
-            }
-
-
-
-            for (Map.Entry<Integer, List<Integer>> entry : drawCombosRankOnly.entrySet()) {
-                Set<Set<Card>> cardCombosCorrespondingToRankCombo = convertRankComboToSetOfCardCombos(entry.getValue());
-
-                for(Set<Card> s : cardCombosCorrespondingToRankCombo) {
-                    if(Collections.disjoint(s, board)) {
-                        cardCombosCorrespondingToRankComboCorrectedForBoard.add(s);
-                    }
-                }
-            }
-
-            for(Set<Card> s : cardCombosCorrespondingToRankComboCorrectedForBoard) {
-                drawCardCombos.put(drawCardCombos.size(), s);
-            }
-            return drawCardCombos;
-
-
+            return getAllOvercardCombos(board);
         }
-
+        return new HashMap<>();
     }
 
     public Map<Integer, Set<Card>> getMediumTwoOvercards(List<Card> board) {
-        //max 1 pair, max 3 to straight, max 3toFlush
+        List<List<Integer>> straightCombos = straightEvaluator.getCombosThatMakeStraight(board);
 
+        if(getNumberOfPairsOnBoard(board) == 1 || getNumberOfSuitedCardsOnBoard(board) == 3 || straightCombos.size() < 10) {
+            return getAllOvercardCombos(board);
+        }
+        return new HashMap<>();
     }
 
     public Map<Integer, Set<Card>> getWeakTwoOvercards(List<Card> board) {
-        //max 1 pair, more than 3 to straight, more than 3toFlush
+        List<List<Integer>> straightCombos = straightEvaluator.getCombosThatMakeStraight(board);
 
+        if(getNumberOfPairsOnBoard(board) > 1 || getNumberOfSuitedCardsOnBoard(board) > 3 || straightCombos.size() >= 10) {
+            return getAllOvercardCombos(board);
+        }
+        return new HashMap<>();
     }
 
+    public Map<Integer, Set<Card>> getAllOvercardCombos(List<Card> board) {
+        //get de max rank van board
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+        int highestRankOnBoard = Collections.max(boardRanks);
+
+        //get alle ranks daarboven en lager dan 15
+        List<Integer> allRanksAboveHighestBoardRank = new ArrayList<>();
+
+        for(int i = highestRankOnBoard + 1; i < 15; i++) {
+            allRanksAboveHighestBoardRank.add(i);
+        }
+
+        //maak van deze ranks alle 2rank combos
+        Set<Set<Integer>> rankCombos = new HashSet<>();
+
+        for(Integer i : allRanksAboveHighestBoardRank) {
+            for(Integer z : allRanksAboveHighestBoardRank) {
+                if(i != z) {
+                    Set<Integer> rankCombo = new HashSet<>();
+                    rankCombo.add(i);
+                    rankCombo.add(z);
+                    rankCombos.add(rankCombo);
+                }
+            }
+        }
+
+        //convert deze combos naar 2card combos, gecorrigeerd voor board
+        Map<Integer, Set<Card>> overcardCombos = new HashMap<>();
+        Set<Set<Card>> cardCombosCorrespondingToRankComboCorrectedForBoard = new HashSet<>();
+
+        List<List<Integer>> rankCombosAsList = new ArrayList<>();
+
+        for(Set<Integer> s : rankCombos) {
+            List<Integer> l = new ArrayList<>();
+            l.addAll(s);
+            rankCombosAsList.add(l);
+        }
+
+
+        for (List<Integer> l : rankCombosAsList) {
+            Set<Set<Card>> cardCombosCorrespondingToRankCombo = convertRankComboToSetOfCardCombos(l);
+
+            for(Set<Card> s : cardCombosCorrespondingToRankCombo) {
+                cardCombosCorrespondingToRankComboCorrectedForBoard.add(s);
+            }
+        }
+
+        for(Set<Card> s : cardCombosCorrespondingToRankComboCorrectedForBoard) {
+            overcardCombos.put(overcardCombos.size(), s);
+        }
+        return overcardCombos;
+    }
 }
