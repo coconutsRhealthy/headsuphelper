@@ -121,7 +121,7 @@ public class Controller {
 
 //        straightDrawEvaluator.getWeakGutshotCombosFromAllGutshotCombos(board);
 
-        new RangeBuilder().getRange("aap", board);
+        new RangeBuilder().getRange("aap", board, holeCards);
         new HandEvaluator().getHandStrength(holeCards, board);
         new HighCardDrawEvaluator().getMediumTwoOvercards(board);
 

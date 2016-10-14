@@ -805,7 +805,13 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
             Map.Entry<Integer, List<Integer>> entry = it.next();
             for (Map.Entry<Integer, List<Integer>> entry2 : weakStraightDrawCombosOfType.entrySet()) {
                 if(entry.getValue().containsAll(entry2.getValue())) {
-                    it.remove();
+                    if(entry.getValue().get(0) != entry.getValue().get(1) &&
+                            entry2.getValue().get(0) != entry2.getValue().get(1)) {
+                        it.remove();
+                    } else if(entry.getValue().get(0) == entry.getValue().get(1) &&
+                            entry2.getValue().get(0) == entry2.getValue().get(1)) {
+                        it.remove();
+                    }
                 }
             }
         }

@@ -836,11 +836,17 @@ public class BoardEvaluator {
 
     public Map<Integer, Set<Set<Card>>> getSortedCombosAboveDesignatedStrengthLevel(double strengthLevel, List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedCombos = getSortedCombos(board);
+        Map<Integer, Set<Set<Card>>> sortedCombosAboveDesignatedStrengthLevel = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            sortedCombosAboveDesignatedStrengthLevel.put(entry.getKey(), entry.getValue());
+        }
+
         double doubleFromWhereCombosShouldBeRemoved = (1176 * (1 - strengthLevel));
         int intFromWhereCombosShouldBeRemoved = (int) doubleFromWhereCombosShouldBeRemoved;
         int counter = 0;
 
-        for(Iterator<Map.Entry<Integer, Set<Set<Card>>>> it = sortedCombos.entrySet().iterator(); it.hasNext(); ) {
+        for(Iterator<Map.Entry<Integer, Set<Set<Card>>>> it = sortedCombosAboveDesignatedStrengthLevel.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, Set<Set<Card>>> entry = it.next();
 
             if(counter > intFromWhereCombosShouldBeRemoved) {
@@ -849,13 +855,14 @@ public class BoardEvaluator {
             }
 
             for(Iterator<Set<Card>> it2 = entry.getValue().iterator(); it2.hasNext(); ) {
+                Set<Card> entry2 = it2.next();
                 counter++;
                 if(counter > intFromWhereCombosShouldBeRemoved) {
                     it2.remove();
                 }
             }
         }
-        return sortedCombos;
+        return sortedCombosAboveDesignatedStrengthLevel;
     }
 
     public Map<Integer, Set<Set<Card>>> removeDuplicateCombosPerCategory(Map<Integer, Set<Set<Card>>> categoryCombos,

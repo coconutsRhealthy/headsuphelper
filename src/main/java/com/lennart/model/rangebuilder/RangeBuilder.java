@@ -4,12 +4,10 @@ import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
+import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by LPO10346 on 9/2/2016.
@@ -30,13 +28,19 @@ public class RangeBuilder {
     FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
     HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
 
-    public Map<Integer, Set<Set<Card>>> getRange(String handPath, List<Card> board) {
+    public Map<Integer, Set<Set<Card>>> getRange(String handPath, List<Card> board, List<Card> hand) {
 //        if(handPath.equals("2bet2bet")) {
             //get alle combos, sorted
             Map<Integer, Set<Set<Card>>> allSortedCombos = boardEvaluator.getSortedCombos(board);
 
+            Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = new HashMap<>();
+
+            for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombos.entrySet()) {
+                allSortedCombosClearedForRange.put(entry.getKey(), entry.getValue());
+            }
+
             //alle handen boven 50% op flop
-            Map<Integer, Set<Set<Card>>> sortedCombosAboveLevel = boardEvaluator.getSortedCombosAboveDesignatedStrengthLevel(0.5, board);
+            Map<Integer, Set<Set<Card>>> sortedCombosAboveLevel = boardEvaluator.getSortedCombosAboveDesignatedStrengthLevel(0.52, board);
 
             //alle strong en medium straight draws op flop
             Map<Integer, Set<Card>> strongOosdDraws = straightDrawEvaluator.getStrongOosdCombos(board);
@@ -45,12 +49,14 @@ public class RangeBuilder {
             Map<Integer, Set<Card>> mediumGutshotDraws = straightDrawEvaluator.getMediumGutshotCombos(board);
 
             //nog toevoegen, backdoor combos?
+            Map<Integer, Set<Card>> strongBackDoorStraightDraws = straightDrawEvaluator.getStrongBackDoorCombos(board);
 
             //alle strong en medium flushdraws op flop
             Map<Integer, List<Card>> strongFlushDraws = flushDrawEvaluator.getStrongFlushDrawCombos(board);
             Map<Integer, List<Card>> mediumFlushDraws = flushDrawEvaluator.getMediumFlushDrawCombos(board);
 
             //nog toevoegen, strong backdoor combos?
+            Map<Integer, List<Card>> strongBackDoorFlushDraws = flushDrawEvaluator.getStrongBackDoorFlushCombos(board);
 
             //alle strong en medium overcarddraws op flop
             Map<Integer, Set<Card>> strongHighCardDraws = highCardDrawEvaluator.getStrongTwoOvercards(board);
@@ -58,10 +64,20 @@ public class RangeBuilder {
 
 
             //nu gaan we removen:
-            for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombos.entrySet()) {
+            for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombosClearedForRange.entrySet()) {
                 loop: for(Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
                     Set<Card> setFromAllSortedCombos = it.next();
                     //alles wat niet daarin zit, moet uit de hoofdlijst
+
+                    //we beginnen met de hoge combos
+                    for (Map.Entry<Integer, Set<Set<Card>>> combosAboveLevel : sortedCombosAboveLevel.entrySet()) {
+                        for(Set<Card> s : combosAboveLevel.getValue()) {
+                            if(setFromAllSortedCombos.equals(s)) {
+                                //continue met next 'entrySet'
+                                continue loop;
+                            }
+                        }
+                    }
 
                     //we beginnen met strongOosdDraws:
                     for (Map.Entry<Integer, Set<Card>> entryStrongOosd : strongOosdDraws.entrySet()) {
@@ -93,6 +109,13 @@ public class RangeBuilder {
                         }
                     }
 
+                    for (Map.Entry<Integer, Set<Card>> entryStrongBackDoorStraight : strongBackDoorStraightDraws.entrySet()) {
+                        if(setFromAllSortedCombos.equals(entryStrongBackDoorStraight.getValue())) {
+                            //continue met next 'entrySet'
+                            continue loop;
+                        }
+                    }
+
                     for (Map.Entry<Integer, List<Card>> entryStrongFlushDraw : strongFlushDraws.entrySet()) {
                         if(setFromAllSortedCombos.containsAll(entryStrongFlushDraw.getValue())) {
                             //continue met next 'entrySet'
@@ -102,6 +125,13 @@ public class RangeBuilder {
 
                     for (Map.Entry<Integer, List<Card>> entryMediumFlushDraw : mediumFlushDraws.entrySet()) {
                         if(setFromAllSortedCombos.containsAll(entryMediumFlushDraw.getValue())) {
+                            //continue met next 'entrySet'
+                            continue loop;
+                        }
+                    }
+
+                    for (Map.Entry<Integer, List<Card>> entryStrongBackDoorFlush : strongBackDoorFlushDraws.entrySet()) {
+                        if(setFromAllSortedCombos.containsAll(entryStrongBackDoorFlush.getValue())) {
                             //continue met next 'entrySet'
                             continue loop;
                         }
@@ -125,7 +155,8 @@ public class RangeBuilder {
             }
 
 //        }
-        return allSortedCombos;
+        double x = new HandEvaluator().getHandStrengthAgainstRange(hand, allSortedCombosClearedForRange);
+        return allSortedCombosClearedForRange;
 //        return null;
     }
 }

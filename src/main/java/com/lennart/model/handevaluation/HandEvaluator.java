@@ -29,6 +29,22 @@ public class HandEvaluator {
         return handStrength;
     }
 
+    public double getHandStrengthAgainstRange(List<Card> hand, Map<Integer, Set<Set<Card>>> range) {
+        Set<Card> handSet = new HashSet<>();
+        handSet.addAll(hand);
+
+        double handStrength = 0;
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : range.entrySet()) {
+            for(Set<Card> s : entry.getValue()) {
+                if(s.equals(handSet)) {
+                    handStrength = getIndexOfHandInSortedCombos(entry.getKey(), range);
+                }
+            }
+        }
+        return handStrength;
+    }
+
     public double getIndexOfHandInSortedCombos(Integer key, Map<Integer, Set<Set<Card>>> sortedCombos) {
         double index;
 
