@@ -12,6 +12,7 @@ import java.util.*;
 public class BoardEvaluator {
 
     private static Map<Integer, Set<Set<Card>>> sortedCombos;
+    private static Map<Integer, List<Card>> allPossibleStartHands;
 
     public Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
         if(sortedCombos != null) {
@@ -372,22 +373,27 @@ public class BoardEvaluator {
         return allStartHandsThatContainASpecificCard;
     }
 
-    protected Map<Integer, List<Card>> getAllPossibleStartHands() {
-        Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
-        List<Card> completeCardDeck = getCompleteCardDeck();
+    public Map<Integer, List<Card>> getAllPossibleStartHands() {
+        if(allPossibleStartHands != null) {
+            return allPossibleStartHands;
+        } else {
+            Map<Integer, List<Card>> allPossibleStartHandsInMethod = new HashMap<>();
+            List<Card> completeCardDeck = getCompleteCardDeck();
 
-        int i = 1;
-        for(int z = 0; z < 52; z++) {
-            for(int q = 0; q < 52; q++) {
-                if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
-                    allPossibleStartHands.put(i, new ArrayList<>());
-                    allPossibleStartHands.get(i).add(completeCardDeck.get(z));
-                    allPossibleStartHands.get(i).add(completeCardDeck.get(q));
-                    i++;
+            int i = 1;
+            for(int z = 0; z < 52; z++) {
+                for(int q = 0; q < 52; q++) {
+                    if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
+                        allPossibleStartHandsInMethod.put(i, new ArrayList<>());
+                        allPossibleStartHandsInMethod.get(i).add(completeCardDeck.get(z));
+                        allPossibleStartHandsInMethod.get(i).add(completeCardDeck.get(q));
+                        i++;
+                    }
                 }
             }
+            allPossibleStartHands = allPossibleStartHandsInMethod;
+            return allPossibleStartHands;
         }
-        return allPossibleStartHands;
     }
 
     protected List<Card> getCompleteCardDeck() {
@@ -422,7 +428,7 @@ public class BoardEvaluator {
         return startHandMap;
     }
 
-    protected Map<Integer, List<Card>> getAllPocketPairStartHands() {
+    public Map<Integer, List<Card>> getAllPocketPairStartHands() {
         Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
         Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
 
