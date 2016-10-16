@@ -9,7 +9,73 @@ import java.util.*;
  * Created by LPO10346 on 10/4/2016.
  */
 public class FlushDrawEvaluator extends FlushEvaluator {
-    public Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
+
+    public Map<Integer, Set<Card>> getStrongFlushDrawCombos (List<Card> board) {
+        Map<Integer, Set<Card>> strongFlushDrawCombos = new HashMap<>();
+        Map<Integer, List<Card>> strongFlushDrawCombosAsMapList = getStrongFlushDrawCombosAsMapList(board);
+
+        for (Map.Entry<Integer, List<Card>> entry : strongFlushDrawCombosAsMapList.entrySet()) {
+            Set<Card> comboAsSet = new HashSet<>();
+            comboAsSet.addAll(entry.getValue());
+            strongFlushDrawCombos.put(strongFlushDrawCombos.size(), comboAsSet);
+        }
+        return strongFlushDrawCombos;
+    }
+
+    public Map<Integer, Set<Card>> getMediumFlushDrawCombos (List<Card> board) {
+        Map<Integer, Set<Card>> mediumFlushDrawCombos = new HashMap<>();
+        Map<Integer, List<Card>> mediumFlushDrawCombosAsMapList = getMediumFlushDrawCombosAsMapList(board);
+
+        for (Map.Entry<Integer, List<Card>> entry : mediumFlushDrawCombosAsMapList.entrySet()) {
+            Set<Card> comboAsSet = new HashSet<>();
+            comboAsSet.addAll(entry.getValue());
+            mediumFlushDrawCombos.put(mediumFlushDrawCombos.size(), comboAsSet);
+        }
+        return mediumFlushDrawCombos;
+    }
+
+    public Map<Integer, Set<Card>> getWeakFlushDrawCombos(List<Card> board) {
+        Map<Integer, List<Card>> allFlushDraws = getFlushDrawCombos(board);
+        Map<Integer, List<Card>> strongFlushDraws = getStrongFlushDrawCombosAsMapList(board);
+        Map<Integer, List<Card>> mediumFlushDraws = getMediumFlushDrawCombosAsMapList(board);
+
+        return getWeakFlushOrBackDoorFlushDrawCombos(allFlushDraws, strongFlushDraws, mediumFlushDraws);
+    }
+
+    public Map<Integer, Set<Card>> getStrongBackDoorFlushCombos (List<Card> board) {
+        Map<Integer, Set<Card>> strongBackDoorFlushDrawCombos = new HashMap<>();
+        Map<Integer, List<Card>> strongBackDoorFlushCombosAsMapList = getStrongBackDoorFlushCombosAsMapList(board);
+
+        for (Map.Entry<Integer, List<Card>> entry : strongBackDoorFlushCombosAsMapList.entrySet()) {
+            Set<Card> comboAsSet = new HashSet<>();
+            comboAsSet.addAll(entry.getValue());
+            strongBackDoorFlushDrawCombos.put(strongBackDoorFlushDrawCombos.size(), comboAsSet);
+        }
+        return strongBackDoorFlushDrawCombos;
+    }
+
+    public Map<Integer, Set<Card>> getMediumBackDoorFlushCombos (List<Card> board) {
+        Map<Integer, Set<Card>> mediumBackDoorFlushDrawCombos = new HashMap<>();
+        Map<Integer, List<Card>> mediumBackDoorFlushCombosAsMapList = getMediumBackDoorFlushCombosAsMapList(board);
+
+        for (Map.Entry<Integer, List<Card>> entry : mediumBackDoorFlushCombosAsMapList.entrySet()) {
+            Set<Card> comboAsSet = new HashSet<>();
+            comboAsSet.addAll(entry.getValue());
+            mediumBackDoorFlushDrawCombos.put(mediumBackDoorFlushDrawCombos.size(), comboAsSet);
+        }
+        return mediumBackDoorFlushDrawCombos;
+    }
+
+    private Map<Integer, Set<Card>> getWeakBackDoorFlushCombos(List<Card> board) {
+        Map<Integer, List<Card>> allBackDoorFlushDraws = getBackDoorFlushDrawCombos(board);
+        Map<Integer, List<Card>> strongBackDoorDraws = getStrongBackDoorFlushCombosAsMapList(board);
+        Map<Integer, List<Card>> mediumBackDoorDraws = getMediumBackDoorFlushCombosAsMapList(board);
+
+        return getWeakFlushOrBackDoorFlushDrawCombos(allBackDoorFlushDraws, strongBackDoorDraws, mediumBackDoorDraws);
+    }
+
+    //helper methods
+    private Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
         Map<Integer, List<Card>> flushDrawCombos = new HashMap<>();
         Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
 
@@ -72,7 +138,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return flushDrawCombos;
     }
 
-    public Map<Integer, List<Card>> getBackDoorFlushDrawCombos(List<Card> board) {
+    private Map<Integer, List<Card>> getBackDoorFlushDrawCombos(List<Card> board) {
         Map<Integer, List<Card>> backDoorFlushDrawCombos = new HashMap<>();
 
         if(board.size() > 3) {
@@ -126,7 +192,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return backDoorFlushDrawCombos;
     }
 
-    public Map<Integer, List<Card>> getStrongFlushDrawCombos(List<Card> board) {
+    private Map<Integer, List<Card>> getStrongFlushDrawCombosAsMapList(List<Card> board) {
         Map<Integer, List<Card>> strongFlushDrawCombos = new HashMap<>();
 
         if(getNumberOfPairsOnBoard(board) < 2 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
@@ -154,7 +220,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return new HashMap<>();
     }
 
-    public Map<Integer, List<Card>> getMediumFlushDrawCombos(List<Card> board) {
+    private Map<Integer, List<Card>> getMediumFlushDrawCombosAsMapList(List<Card> board) {
         Map<Integer, List<Card>> mediumFlushDrawCombos = new HashMap<>();
 
         //max 1 pair
@@ -185,31 +251,14 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return new HashMap<>();
     }
 
-    public Map<Integer, Set<Card>> getWeakFlushDrawCombos(List<Card> board) {
-        Map<Integer, List<Card>> allFlushDraws = getFlushDrawCombos(board);
-        Map<Integer, List<Card>> strongFlushDraws = getStrongFlushDrawCombos(board);
-        Map<Integer, List<Card>> mediumFlushDraws = getMediumFlushDrawCombos(board);
-
-        return getWeakFlushOrBackDoorFlushDrawCombos(allFlushDraws, strongFlushDraws, mediumFlushDraws);
-    }
-
-    public Map<Integer, List<Card>> getStrongBackDoorFlushCombos(List<Card> board) {
+    private Map<Integer, List<Card>> getStrongBackDoorFlushCombosAsMapList(List<Card> board) {
         return getStrongOrMediumBackDoorFlushCombos(board, "strong");
     }
 
-    public Map<Integer, List<Card>> getMediumBackDoorFlushCombos(List<Card> board) {
+    private Map<Integer, List<Card>> getMediumBackDoorFlushCombosAsMapList(List<Card> board) {
         return getStrongOrMediumBackDoorFlushCombos(board, "medium");
     }
 
-    public Map<Integer, Set<Card>> getWeakBackDoorFlushCombos(List<Card> board) {
-        Map<Integer, List<Card>> allBackDoorFlushDraws = getBackDoorFlushDrawCombos(board);
-        Map<Integer, List<Card>> strongBackDoorDraws = getStrongBackDoorFlushCombos(board);
-        Map<Integer, List<Card>> mediumBackDoorDraws = getMediumBackDoorFlushCombos(board);
-
-        return getWeakFlushOrBackDoorFlushDrawCombos(allBackDoorFlushDraws, strongBackDoorDraws, mediumBackDoorDraws);
-    }
-
-    //helper methods
     private Map<Integer, Set<Card>> getWeakFlushOrBackDoorFlushDrawCombos(Map<Integer, List<Card>> allDraws,
                                                                          Map<Integer, List<Card>> strongDraws,
                                                                          Map<Integer, List<Card>> mediumDraws) {

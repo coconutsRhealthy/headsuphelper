@@ -107,15 +107,6 @@ public class PreflopRange {
 
 
     //helper methods
-    private Map<Integer, Set<Card>> getCopyOfStaticAllStartHands() {
-        Map<Integer, Set<Card>> allStartHandsCopy = new HashMap<>();
-
-        for (Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
-            allStartHandsCopy.put(entry.getKey(), entry.getValue());
-        }
-        return allStartHandsCopy;
-    }
-
     private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited) {
         Map<Integer, Set<Card>> suitedOrOffSuitConnectors = new HashMap<>();
 

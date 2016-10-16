@@ -12,7 +12,40 @@ import java.util.*;
 public class BoardEvaluator {
 
     private static Map<Integer, Set<Set<Card>>> sortedCombos;
-    private static Map<Integer, List<Card>> allPossibleStartHands;
+    private static Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
+
+    static {
+        Map<Integer, List<Card>> allPossibleStartHandsInStaticBlock = new HashMap<>();
+        BoardEvaluator boardEvaluator = new BoardEvaluator();
+        List<Card> completeCardDeck = boardEvaluator.getCompleteCardDeck();
+
+        int i = 1;
+        for(int z = 0; z < 52; z++) {
+            for(int q = 0; q < 52; q++) {
+                if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
+                    allPossibleStartHandsInStaticBlock.put(i, new ArrayList<>());
+                    allPossibleStartHandsInStaticBlock.get(i).add(completeCardDeck.get(z));
+                    allPossibleStartHandsInStaticBlock.get(i).add(completeCardDeck.get(q));
+                    i++;
+                }
+            }
+        }
+
+        List<List<Card>> asList = new ArrayList<>(allPossibleStartHandsInStaticBlock.values());
+        Set<Set<Card>> asSet = new HashSet<>();
+
+        for(List<Card> l : asList) {
+            Set<Card> s = new HashSet<>();
+            s.addAll(l);
+            asSet.add(s);
+        }
+
+        for(Set<Card> pocketPairCombo : asSet) {
+            List<Card> l = new ArrayList<>();
+            l.addAll(pocketPairCombo);
+            allPossibleStartHands.put(allPossibleStartHands.size(), l);
+        }
+    }
 
     public Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
         if(sortedCombos != null) {
@@ -374,27 +407,13 @@ public class BoardEvaluator {
     }
 
     public Map<Integer, List<Card>> getAllPossibleStartHands() {
-//        if(allPossibleStartHands != null) {
-//            return allPossibleStartHands;
-//        } else {
-            Map<Integer, List<Card>> allPossibleStartHandsInMethod = new HashMap<>();
-            List<Card> completeCardDeck = getCompleteCardDeck();
+        Map<Integer, List<Card>> allPossibleStartHandsCopy = new HashMap<>();
 
-            int i = 1;
-            for(int z = 0; z < 52; z++) {
-                for(int q = 0; q < 52; q++) {
-                    if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
-                        allPossibleStartHandsInMethod.put(i, new ArrayList<>());
-                        allPossibleStartHandsInMethod.get(i).add(completeCardDeck.get(z));
-                        allPossibleStartHandsInMethod.get(i).add(completeCardDeck.get(q));
-                        i++;
-                    }
-                }
-            }
-//            allPossibleStartHands = allPossibleStartHandsInMethod;
-//            return allPossibleStartHands;
-            return allPossibleStartHandsInMethod;
-//        }
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+            allPossibleStartHandsCopy.put(allPossibleStartHandsCopy.size(), new ArrayList<>());
+            allPossibleStartHandsCopy.get(allPossibleStartHandsCopy.size()-1).addAll(entry.getValue());
+        }
+        return allPossibleStartHandsCopy;
     }
 
     protected List<Card> getCompleteCardDeck() {
@@ -873,7 +892,7 @@ public class BoardEvaluator {
     }
 
     public Map<Integer, Set<Set<Card>>> removeDuplicateCombosPerCategory(Map<Integer, Set<Set<Card>>> categoryCombos,
-                                                                          Map<Integer, Set<Set<Card>>> sortedCombos) {
+                                                                         Map<Integer, Set<Set<Card>>> sortedCombos) {
         Map<Integer, Set<Set<Card>>> cleanedSortedCombos = new HashMap<>();
         Set<Set<Card>> straightFLushSetsToBeRemoved = new HashSet<>();
 
