@@ -374,9 +374,9 @@ public class BoardEvaluator {
     }
 
     public Map<Integer, List<Card>> getAllPossibleStartHands() {
-        if(allPossibleStartHands != null) {
-            return allPossibleStartHands;
-        } else {
+//        if(allPossibleStartHands != null) {
+//            return allPossibleStartHands;
+//        } else {
             Map<Integer, List<Card>> allPossibleStartHandsInMethod = new HashMap<>();
             List<Card> completeCardDeck = getCompleteCardDeck();
 
@@ -391,9 +391,10 @@ public class BoardEvaluator {
                     }
                 }
             }
-            allPossibleStartHands = allPossibleStartHandsInMethod;
-            return allPossibleStartHands;
-        }
+//            allPossibleStartHands = allPossibleStartHandsInMethod;
+//            return allPossibleStartHands;
+            return allPossibleStartHandsInMethod;
+//        }
     }
 
     protected List<Card> getCompleteCardDeck() {

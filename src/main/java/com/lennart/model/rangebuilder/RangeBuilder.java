@@ -6,6 +6,7 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.preflop.PreflopRange;
 
 import java.util.*;
 
@@ -27,6 +28,7 @@ public class RangeBuilder {
     StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
     FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
     HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
+    PreflopRange preflopRange = new PreflopRange();
 
     public Map<Integer, Set<Set<Card>>> getRange(String handPath, List<Card> board, List<Card> hand) {
 //        if(handPath.equals("2bet2bet")) {
@@ -36,8 +38,94 @@ public class RangeBuilder {
             Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = new HashMap<>();
 
             for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombos.entrySet()) {
-                allSortedCombosClearedForRange.put(entry.getKey(), entry.getValue());
+                allSortedCombosClearedForRange.put(allSortedCombosClearedForRange.size(), new HashSet<>());
+                allSortedCombosClearedForRange.get(allSortedCombosClearedForRange.size()-1).addAll(entry.getValue());
             }
+
+            //preflop range van opponent
+            //all pocket pair
+            Map<Integer, Set<Card>> allPocketPairs = preflopRange.getPocketPairs(2);
+
+            //all suited
+            Map<Integer, Set<Card>> allSuitedHoleCards = preflopRange.getSuitedHoleCards(2, 2);
+
+            //all offsuit connectors lowest 4
+            Map<Integer, Set<Card>> allOffSuitConnectors = preflopRange.getOffSuitConnectors(4);
+
+            //all offsuit onegappers lowest 6
+            Map<Integer, Set<Card>> allOffSuitOneGappers = preflopRange.getOffSuitOneGappers(6);
+
+            //twogappers lowest 8
+            Map<Integer, Set<Card>> allOffSuitTwoGappers = preflopRange.getOffSuitTwoGappers(8);
+
+            //threegappers lowest 8
+            Map<Integer, Set<Card>> allOffSuitThreeGappers = preflopRange.getOffSuitThreeGappers(8);
+
+            //all A high
+            //all K high
+            //all Q high
+            Map<Integer, Set<Card>> allOffSuitHighCards = preflopRange.getOffSuitHoleCards(12, 2);
+
+            //nu gaan we preflop removen
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombosClearedForRange.entrySet()) {
+            loop: for(Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
+                Set<Card> setFromAllSortedCombos = it.next();
+                //alles wat niet daarin zit, moet uit de hoofdlijst
+
+                for (Map.Entry<Integer, Set<Card>> entryAllPocketPairs : allPocketPairs.entrySet()) {
+                    if(setFromAllSortedCombos.equals(entryAllPocketPairs.getValue())) {
+                        //continue met next 'entrySet'
+                        continue loop;
+                    }
+                }
+
+                for (Map.Entry<Integer, Set<Card>> entryAllSuitedHoleCards : allSuitedHoleCards.entrySet()) {
+                    if(setFromAllSortedCombos.equals(entryAllSuitedHoleCards.getValue())) {
+                        //continue met next 'entrySet'
+                        continue loop;
+                    }
+                }
+
+                for (Map.Entry<Integer, Set<Card>> entryAllOffSuitConnectors : allOffSuitConnectors.entrySet()) {
+                    if(setFromAllSortedCombos.equals(entryAllOffSuitConnectors.getValue())) {
+                        //continue met next 'entrySet'
+                        continue loop;
+                    }
+                }
+
+                for (Map.Entry<Integer, Set<Card>> entryAllOffSuitOneGappers : allOffSuitOneGappers.entrySet()) {
+                    if(setFromAllSortedCombos.equals(entryAllOffSuitOneGappers.getValue())) {
+                        //continue met next 'entrySet'
+                        continue loop;
+                    }
+                }
+
+                for (Map.Entry<Integer, Set<Card>> entryAllOffSuitTwoGappers : allOffSuitTwoGappers.entrySet()) {
+                    if(setFromAllSortedCombos.equals(entryAllOffSuitTwoGappers.getValue())) {
+                        //continue met next 'entrySet'
+                        continue loop;
+                    }
+                }
+
+                for (Map.Entry<Integer, Set<Card>> entryAllOffSuitThreeGappers : allOffSuitThreeGappers.entrySet()) {
+                    if(setFromAllSortedCombos.equals(entryAllOffSuitThreeGappers.getValue())) {
+                        //continue met next 'entrySet'
+                        continue loop;
+                    }
+                }
+
+                for (Map.Entry<Integer, Set<Card>> entryAllOffSuitHighCards : allOffSuitHighCards.entrySet()) {
+                    if(setFromAllSortedCombos.equals(entryAllOffSuitHighCards.getValue())) {
+                        //continue met next 'entrySet'
+                        continue loop;
+                    }
+                }
+
+                it.remove();
+            }
+        }
+
+
 
             //alle handen boven 50% op flop
             Map<Integer, Set<Set<Card>>> sortedCombosAboveLevel = boardEvaluator.getSortedCombosAboveDesignatedStrengthLevel(0.52, board);
@@ -49,21 +137,21 @@ public class RangeBuilder {
             Map<Integer, Set<Card>> mediumGutshotDraws = straightDrawEvaluator.getMediumGutshotCombos(board);
 
             //nog toevoegen, backdoor combos?
-            Map<Integer, Set<Card>> strongBackDoorStraightDraws = straightDrawEvaluator.getStrongBackDoorCombos(board);
+            //Map<Integer, Set<Card>> strongBackDoorStraightDraws = straightDrawEvaluator.getStrongBackDoorCombos(board);
 
             //alle strong en medium flushdraws op flop
             Map<Integer, List<Card>> strongFlushDraws = flushDrawEvaluator.getStrongFlushDrawCombos(board);
             Map<Integer, List<Card>> mediumFlushDraws = flushDrawEvaluator.getMediumFlushDrawCombos(board);
 
             //nog toevoegen, strong backdoor combos?
-            Map<Integer, List<Card>> strongBackDoorFlushDraws = flushDrawEvaluator.getStrongBackDoorFlushCombos(board);
+            //Map<Integer, List<Card>> strongBackDoorFlushDraws = flushDrawEvaluator.getStrongBackDoorFlushCombos(board);
 
             //alle strong en medium overcarddraws op flop
             Map<Integer, Set<Card>> strongHighCardDraws = highCardDrawEvaluator.getStrongTwoOvercards(board);
             Map<Integer, Set<Card>> mediumHighCardDraws = highCardDrawEvaluator.getMediumTwoOvercards(board);
 
 
-            //nu gaan we removen:
+            //nu gaan we postflop removen:
             for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombosClearedForRange.entrySet()) {
                 loop: for(Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
                     Set<Card> setFromAllSortedCombos = it.next();
@@ -109,12 +197,12 @@ public class RangeBuilder {
                         }
                     }
 
-                    for (Map.Entry<Integer, Set<Card>> entryStrongBackDoorStraight : strongBackDoorStraightDraws.entrySet()) {
-                        if(setFromAllSortedCombos.equals(entryStrongBackDoorStraight.getValue())) {
-                            //continue met next 'entrySet'
-                            continue loop;
-                        }
-                    }
+//                    for (Map.Entry<Integer, Set<Card>> entryStrongBackDoorStraight : strongBackDoorStraightDraws.entrySet()) {
+//                        if(setFromAllSortedCombos.equals(entryStrongBackDoorStraight.getValue())) {
+//                            //continue met next 'entrySet'
+//                            continue loop;
+//                        }
+//                    }
 
                     for (Map.Entry<Integer, List<Card>> entryStrongFlushDraw : strongFlushDraws.entrySet()) {
                         if(setFromAllSortedCombos.containsAll(entryStrongFlushDraw.getValue())) {
@@ -130,12 +218,12 @@ public class RangeBuilder {
                         }
                     }
 
-                    for (Map.Entry<Integer, List<Card>> entryStrongBackDoorFlush : strongBackDoorFlushDraws.entrySet()) {
-                        if(setFromAllSortedCombos.containsAll(entryStrongBackDoorFlush.getValue())) {
-                            //continue met next 'entrySet'
-                            continue loop;
-                        }
-                    }
+//                    for (Map.Entry<Integer, List<Card>> entryStrongBackDoorFlush : strongBackDoorFlushDraws.entrySet()) {
+//                        if(setFromAllSortedCombos.containsAll(entryStrongBackDoorFlush.getValue())) {
+//                            //continue met next 'entrySet'
+//                            continue loop;
+//                        }
+//                    }
 
                     for (Map.Entry<Integer, Set<Card>> strongHighCardDraw : strongHighCardDraws.entrySet()) {
                         if(setFromAllSortedCombos.equals(strongHighCardDraw.getValue())) {
