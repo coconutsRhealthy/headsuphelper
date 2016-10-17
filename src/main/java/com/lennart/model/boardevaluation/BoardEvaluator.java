@@ -55,6 +55,10 @@ public class BoardEvaluator {
         }
     }
 
+    public void resetSortedCombos() {
+        sortedCombos = null;
+    }
+
     public boolean isBoardRainbow(List<Card> board) {
         if(getNumberOfSuitedCardsOnBoard(board) == 0) {
             return true;

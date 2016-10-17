@@ -38,6 +38,7 @@ public class Controller {
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
+        boardEvaluator.resetSortedCombos();
         if (holeCards.size() > 0) {
             holeCards.clear();
         }
@@ -49,6 +50,7 @@ public class Controller {
 
     @RequestMapping(value = "/postFlopCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postFlopCards(@RequestBody List<Card> cardList) {
+        boardEvaluator.resetSortedCombos();
         if (flopCards.size() > 0) {
             flopCards.clear();
         }
@@ -68,6 +70,7 @@ public class Controller {
 
     @RequestMapping(value = "/postTurnCard", method = RequestMethod.POST)
     public @ResponseBody Card postTurnCard(@RequestBody Card card) {
+        boardEvaluator.resetSortedCombos();
         turnCard = card;
         board.add(turnCard);
         return board.get(board.size()-1);
@@ -75,6 +78,7 @@ public class Controller {
 
     @RequestMapping(value = "/postRiverCard", method = RequestMethod.POST)
     public @ResponseBody Card postRiverCard(@RequestBody Card card) {
+        boardEvaluator.resetSortedCombos();
         riverCard = card;
         board.add(riverCard);
         return board.get(board.size()-1);
@@ -121,7 +125,7 @@ public class Controller {
 
 //        straightDrawEvaluator.getWeakGutshotCombosFromAllGutshotCombos(board);
 
-        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
+//        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
         new HandEvaluator().getHandStrength(holeCards, board);
         new HighCardDrawEvaluator().getMediumTwoOvercards(board);
 
