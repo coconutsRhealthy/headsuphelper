@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Created by LennartMac on 15/10/16.
  */
-public class PreflopRange {
+public class PreflopRangeBuilder {
 
     private static Map<Integer, Set<Card>> allStartHands = new HashMap<>();
 

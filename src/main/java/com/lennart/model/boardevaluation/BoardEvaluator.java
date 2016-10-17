@@ -860,7 +860,7 @@ public class BoardEvaluator {
         return sortedCombosMethod;
     }
 
-    public Map<Integer, Set<Set<Card>>> getSortedCombosAboveDesignatedStrengthLevel(double strengthLevel, List<Card> board) {
+    public Map<Integer, Set<Card>> getCombosAboveDesignatedStrengthLevel(double strengthLevel, List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedCombos = getSortedCombos(board);
         Map<Integer, Set<Set<Card>>> sortedCombosAboveDesignatedStrengthLevel = new HashMap<>();
 
@@ -888,7 +888,15 @@ public class BoardEvaluator {
                 }
             }
         }
-        return sortedCombosAboveDesignatedStrengthLevel;
+
+        Map<Integer, Set<Card>> combosAboveDesignatedStrengthLevel = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosAboveDesignatedStrengthLevel.entrySet()) {
+            for(Set<Card> combo : entry.getValue()) {
+                combosAboveDesignatedStrengthLevel.put(combosAboveDesignatedStrengthLevel.size(), combo);
+            }
+        }
+        return combosAboveDesignatedStrengthLevel;
     }
 
     public Map<Integer, Set<Set<Card>>> removeDuplicateCombosPerCategory(Map<Integer, Set<Set<Card>>> categoryCombos,
@@ -927,6 +935,16 @@ public class BoardEvaluator {
         }
 
         return cleanedSortedCombos;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
+        Map<Integer, Set<Set<Card>>> copyOfAllSortedCombos = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            copyOfAllSortedCombos.put(copyOfAllSortedCombos.size(), new HashSet<>());
+            copyOfAllSortedCombos.get(copyOfAllSortedCombos.size()-1).addAll(entry.getValue());
+        }
+        return copyOfAllSortedCombos;
     }
 
     public List<BooleanResult> allFunctions(List<Card> board) {
