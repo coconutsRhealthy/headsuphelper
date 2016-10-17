@@ -5,7 +5,7 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -27,23 +27,38 @@ public class RangeBuilder {
     StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
     FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
     HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
-    PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
+    PreflopRangeBuilderUtil preflopRangeBuilderUtil = new PreflopRangeBuilderUtil();
 
     public Map<Integer, Set<Set<Card>>> getRange(String handPath, List<Card> board, List<Card> holeCards) {
         Map<Integer, Map<Integer, Set<Card>>> preflopRange = new HashMap<>();
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
+        if(handPath.equals("2betFcheck")) {
+            //preflop
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getPocketPairs(2));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getSuitedHoleCards(2, 2));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitConnectors(4));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitOneGappers(6));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitTwoGappers(8));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitThreeGappers(8));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitHoleCards(12, 2));
+
+            return createRange(preflopRange, flopRange, holeCards);
+        }
+
+
+
         if(handPath.equals("2bet2betFcheck")) {
             //preflop
-            preflopRange.put(preflopRange.size(), preflopRangeBuilder.getPocketPairs(2));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilder.getSuitedHoleCards(2, 2));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilder.getOffSuitConnectors(4));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilder.getOffSuitOneGappers(6));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilder.getOffSuitTwoGappers(8));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilder.getOffSuitThreeGappers(8));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilder.getOffSuitHoleCards(12, 2));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getPocketPairs(2));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getSuitedHoleCards(2, 2));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitConnectors(4));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitOneGappers(6));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitTwoGappers(8));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitThreeGappers(8));
+            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitHoleCards(12, 2));
 
-            //postflop
+            //flop
             flopRange.put(flopRange.size(), boardEvaluator.getCombosAboveDesignatedStrengthLevel(0.52, board));
             flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongOosdCombos(board));
             flopRange.put(flopRange.size(), straightDrawEvaluator.getMediumOosdCombos(board));
