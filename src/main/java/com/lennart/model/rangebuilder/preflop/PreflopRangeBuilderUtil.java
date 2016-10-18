@@ -29,43 +29,50 @@ public class PreflopRangeBuilderUtil {
         }
     }
 
-    public Map<Integer, Set<Card>> getBroadWayHoleCards() {
-        Map<Integer, Set<Card>> offSuitBroadWayCards = getOffSuitHoleCards(10, 10);
-        Map<Integer, Set<Card>> suitedBroadWayCards = getSuitedHoleCards(10, 10);
+    public Map<Integer, Set<Card>> getBroadWayHoleCards(double percentage) {
+        Map<Integer, Set<Card>> offSuitBroadWayCards = getOffSuitHoleCards(10, 10, 1);
+        Map<Integer, Set<Card>> suitedBroadWayCards = getSuitedHoleCards(10, 10, 1);
 
         Map<Integer, Set<Card>> broadWayHoleCards = new HashMap<>();
 
         for (Map.Entry<Integer, Set<Card>> entry : suitedBroadWayCards.entrySet()) {
-            broadWayHoleCards.put(entry.getKey(), entry.getValue());
+            double randomNumber = Math.random();
+            if(randomNumber < percentage) {
+                broadWayHoleCards.put(entry.getKey(), entry.getValue());
+            }
         }
 
         for (Map.Entry<Integer, Set<Card>> entry : offSuitBroadWayCards.entrySet()) {
-            broadWayHoleCards.put(entry.getKey(), entry.getValue());
+            double randomNumber = Math.random();
+            if(randomNumber < percentage) {
+                broadWayHoleCards.put(entry.getKey(), entry.getValue());
+            }
         }
         return broadWayHoleCards;
     }
 
-    public Map<Integer, Set<Card>> getOffSuitHoleCards(int minimumRankOfHighestCard, int minimumRankOfLowestCard) {
-        return getSuitedOrOffSuitHoleCards(minimumRankOfHighestCard, minimumRankOfLowestCard, false);
+    public Map<Integer, Set<Card>> getOffSuitHoleCards(int minimumRankOfHighestCard, int minimumRankOfLowestCard,
+                                                       double percentage) {
+        return getSuitedOrOffSuitHoleCards(minimumRankOfHighestCard, minimumRankOfLowestCard, false, percentage);
     }
 
-    public Map<Integer, Set<Card>> getOffSuitConnectors(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 1, false);
+    public Map<Integer, Set<Card>> getOffSuitConnectors(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 1, false, percentage);
     }
 
-    public Map<Integer, Set<Card>> getOffSuitOneGappers(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 2, false);
+    public Map<Integer, Set<Card>> getOffSuitOneGappers(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 2, false, percentage);
     }
 
-    public Map<Integer, Set<Card>> getOffSuitTwoGappers(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 3, false);
+    public Map<Integer, Set<Card>> getOffSuitTwoGappers(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 3, false, percentage);
     }
 
-    public Map<Integer, Set<Card>> getOffSuitThreeGappers(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 4, false);
+    public Map<Integer, Set<Card>> getOffSuitThreeGappers(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 4, false, percentage);
     }
 
-    public Map<Integer, Set<Card>> getPocketPairs(int minimumRankOfHighestCard) {
+    public Map<Integer, Set<Card>> getPocketPairs(int minimumRankOfHighestCard, double percentage) {
         Map<Integer, List<Card>> allPocketPairStartHands = new BoardEvaluator().getAllPocketPairStartHands();
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
@@ -80,34 +87,39 @@ public class PreflopRangeBuilderUtil {
             }
         }
         for(Set<Card> pocketPairCombo : asSet) {
-            pocketPairs.put(pocketPairs.size(), pocketPairCombo);
+            double randomNumber = Math.random();
+            if(randomNumber < percentage) {
+                pocketPairs.put(pocketPairs.size(), pocketPairCombo);
+            }
         }
         return pocketPairs;
     }
 
-    public Map<Integer, Set<Card>> getSuitedHoleCards(int minimumRankOfHighestCard, int minimumRankOfLowestCard) {
-        return getSuitedOrOffSuitHoleCards(minimumRankOfHighestCard, minimumRankOfLowestCard, true);
+    public Map<Integer, Set<Card>> getSuitedHoleCards(int minimumRankOfHighestCard, int minimumRankOfLowestCard,
+                                                      double percentage) {
+        return getSuitedOrOffSuitHoleCards(minimumRankOfHighestCard, minimumRankOfLowestCard, true, percentage);
     }
 
-    public Map<Integer, Set<Card>> getSuitedConnectors(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 1, true);
+    public Map<Integer, Set<Card>> getSuitedConnectors(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 1, true, percentage);
     }
 
-    public Map<Integer, Set<Card>> getSuitedOneGappers(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 2, true);
+    public Map<Integer, Set<Card>> getSuitedOneGappers(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 2, true, percentage);
     }
 
-    public Map<Integer, Set<Card>> getSuitedTwoGappers(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 3, true);
+    public Map<Integer, Set<Card>> getSuitedTwoGappers(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 3, true, percentage);
     }
 
-    public Map<Integer, Set<Card>> getSuitedThreeGappers(int minimumRankOfHighestCard) {
-        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 4, true);
+    public Map<Integer, Set<Card>> getSuitedThreeGappers(int minimumRankOfHighestCard, double percentage) {
+        return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 4, true, percentage);
     }
 
 
     //helper methods
-    private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited) {
+    private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited,
+                                                                      double percentage) {
         Map<Integer, Set<Card>> suitedOrOffSuitConnectors = new HashMap<>();
 
         for(Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
@@ -120,7 +132,10 @@ public class PreflopRangeBuilderUtil {
 
                     if(Collections.max(comboRanks) >= rankOfHighestCard &&
                             Collections.max(comboRanks) == Collections.min(comboRanks) + gapBetweenCards) {
-                        suitedOrOffSuitConnectors.put(suitedOrOffSuitConnectors.size(), entry.getValue());
+                        double randomNumber = Math.random();
+                        if(randomNumber < percentage) {
+                            suitedOrOffSuitConnectors.put(suitedOrOffSuitConnectors.size(), entry.getValue());
+                        }
                     }
                 }
             } else {
@@ -131,7 +146,10 @@ public class PreflopRangeBuilderUtil {
 
                     if(Collections.max(comboRanks) >= rankOfHighestCard &&
                             Collections.max(comboRanks) == Collections.min(comboRanks) + gapBetweenCards) {
-                        suitedOrOffSuitConnectors.put(suitedOrOffSuitConnectors.size(), entry.getValue());
+                        double randomNumber = Math.random();
+                        if(randomNumber < percentage) {
+                            suitedOrOffSuitConnectors.put(suitedOrOffSuitConnectors.size(), entry.getValue());
+                        }
                     }
                 }
             }
@@ -139,7 +157,8 @@ public class PreflopRangeBuilderUtil {
         return suitedOrOffSuitConnectors;
     }
 
-    private Map<Integer, Set<Card>> getSuitedOrOffSuitHoleCards(int rankOfHighestCard, int rankOfLowestCard, boolean suited) {
+    private Map<Integer, Set<Card>> getSuitedOrOffSuitHoleCards(int rankOfHighestCard, int rankOfLowestCard, boolean suited,
+                                                                double percentage) {
         Map<Integer, Set<Card>> suitedOrOffSuitHoleCards = new HashMap<>();
 
         for(Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
@@ -151,7 +170,10 @@ public class PreflopRangeBuilderUtil {
                     comboRanks.add(asList.get(1).getRank());
 
                     if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard) {
-                        suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
+                        double randomNumber = Math.random();
+                        if(randomNumber < percentage) {
+                            suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
+                        }
                     }
                 }
             } else {
@@ -161,7 +183,11 @@ public class PreflopRangeBuilderUtil {
                     comboRanks.add(asList.get(1).getRank());
 
                     if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard) {
-                        suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
+                        double randomNumber = Math.random();
+                        if(randomNumber < percentage) {
+                            suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
+
+                        }
                     }
                 }
             }
