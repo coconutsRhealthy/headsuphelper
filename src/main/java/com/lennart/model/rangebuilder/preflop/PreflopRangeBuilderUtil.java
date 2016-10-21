@@ -116,6 +116,76 @@ public class PreflopRangeBuilderUtil {
         return getSuitedOrOffSuitConnectingCards(minimumRankOfHighestCard, 4, true, percentage);
     }
 
+    public Map<Integer, Set<Card>> getSuitedCombosOfGivenRanks(int rankCard1, int rankCard2) {
+        Map<Integer, Set<Card>> suitedCombosOfGivenRanks = new HashMap<>();
+        List<Character> suits = new ArrayList<>();
+
+        suits.add('s');
+        suits.add('c');
+        suits.add('d');
+        suits.add('h');
+
+        for(Character suit : suits) {
+            Set<Card> combo = new HashSet<>();
+            Card holeCard1 = new Card(rankCard1, suit);
+            Card holeCard2 = new Card(rankCard2, suit);
+            combo.add(holeCard1);
+            combo.add(holeCard2);
+
+            if(combo.size() == 1) {
+                suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
+            }
+        }
+        return suitedCombosOfGivenRanks;
+    }
+
+    public Map<Integer, Set<Card>> getOffSuitCombosOfGivenRanks(int rankCard1, int rankCard2) {
+        Map<Integer, Set<Card>> offSuitCombosOfGivenRanks = new HashMap<>();
+        List<Character> suits = new ArrayList<>();
+
+        suits.add('s');
+        suits.add('c');
+        suits.add('d');
+        suits.add('h');
+
+        for(Character suit1 : suits) {
+            for(Character suit2 : suits) {
+                if(suit1 != suit2) {
+                    Set<Card> combo = new HashSet<>();
+                    Card holeCard1 = new Card(rankCard1, suit1);
+                    Card holeCard2 = new Card(rankCard2, suit2);
+                    combo.add(holeCard1);
+                    combo.add(holeCard2);
+                    offSuitCombosOfGivenRanks.put(offSuitCombosOfGivenRanks.size(), combo);
+                }
+            }
+        }
+        return offSuitCombosOfGivenRanks;
+    }
+
+    public Map<Integer, Set<Card>> getPocketPairCombosOfGivenRank(int rank) {
+        Map<Integer, Set<Card>> pocketPairCombosOfGivenRanks = new HashMap<>();
+        List<Character> suits = new ArrayList<>();
+
+        suits.add('s');
+        suits.add('c');
+        suits.add('d');
+        suits.add('h');
+
+        for(Character suit1 : suits) {
+            for(Character suit2 : suits) {
+                if(suit1 != suit2) {
+                    Set<Card> combo = new HashSet<>();
+                    Card holeCard1 = new Card(rank, suit1);
+                    Card holeCard2 = new Card(rank, suit2);
+                    combo.add(holeCard1);
+                    combo.add(holeCard2);
+                    pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
+                }
+            }
+        }
+        return pocketPairCombosOfGivenRanks;
+    }
 
     //helper methods
     private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited,
