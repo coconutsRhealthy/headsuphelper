@@ -1,6 +1,7 @@
-package com.lennart.model.rangebuilder.preflop;
+package com.lennart.model.rangebuilder.preflop.oop;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.HashMap;
 import java.util.Map;
