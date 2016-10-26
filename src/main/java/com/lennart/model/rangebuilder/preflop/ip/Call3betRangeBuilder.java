@@ -153,4 +153,25 @@ public class Call3betRangeBuilder {
         comboMap5Percent.put(7, p.getPocketPairCombosOfGivenRank(12));
         comboMap5Percent.put(8, p.getPocketPairCombosOfGivenRank(11));
     }
+
+    public Map<Integer, Set<Card>> getOpponentCall3betRange() {
+        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
+        Map<Integer, Set<Card>> opponentCall3betRange = new HashMap<>();
+
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap100Percent, 1);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap94Percent, 0.94);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap89Percent, 0.89);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap80Percent, 0.8);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap73Percent, 0.73);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap50Percent, 0.5);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap34Percent, 0.34);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap29Percent, 0.29);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap27Percent, 0.27);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap19Percent, 0.19);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap8Percent, 0.08);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap7Percent, 0.07);
+        opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMap5Percent, 0.05);
+
+        return opponentCall3betRange;
+    }
 }

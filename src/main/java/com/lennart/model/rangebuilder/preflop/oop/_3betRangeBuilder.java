@@ -173,4 +173,18 @@ public class _3betRangeBuilder {
         comboMap5Percent.put(24, p.getSuitedCombosOfGivenRanks(6, 2));
     }
 
+    public Map<Integer, Set<Card>> getOpponent3betRange() {
+        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
+        Map<Integer, Set<Card>> opponent3betRange = new HashMap<>();
+
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap95Percent, 0.95);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap70Percent, 0.7);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap50Percent, 0.5);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap35Percent, 0.35);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap20Percent, 0.2);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap10Percent, 0.1);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap5Percent, 0.05);
+
+        return opponent3betRange;
+    }
 }

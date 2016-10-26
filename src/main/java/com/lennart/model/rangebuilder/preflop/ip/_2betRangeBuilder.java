@@ -62,4 +62,14 @@ public class _2betRangeBuilder {
         comboMap5Percent.put(13, p.getOffSuitCombosOfGivenRanks(7, 2));
         comboMap5Percent.put(14, p.getOffSuitCombosOfGivenRanks(6, 2));
     }
+
+    public Map<Integer, Set<Card>> getOpponent2betRange() {
+        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
+        Map<Integer, Set<Card>> opponent2betRange = new HashMap<>();
+
+        opponent2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent2betRange, comboMap100Percent, 1);
+        opponent2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent2betRange, comboMap5Percent, 0.05);
+
+        return opponent2betRange;
+    }
 }

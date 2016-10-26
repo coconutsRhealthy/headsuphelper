@@ -102,4 +102,19 @@ public class Call4betRangeBuilder {
         comboMap5Percent.put(4, p.getOffSuitCombosOfGivenRanks(14, 13));
         comboMap5Percent.put(5, p.getSuitedCombosOfGivenRanks(14, 13));
     }
+
+    public Map<Integer, Set<Card>> getOpponentCall4betRange() {
+        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
+        Map<Integer, Set<Card>> opponentCall4betRange = new HashMap<>();
+
+        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap100Percent, 1);
+        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap80Percent, 0.8);
+        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap70Percent, 0.7);
+        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap62Percent, 0.62);
+        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap60Percent, 0.6);
+        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap50Percent, 0.5);
+        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap5Percent, 0.05);
+
+        return opponentCall4betRange;
+    }
 }

@@ -4,7 +4,6 @@ import com.lennart.model.pokergame.Card;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -169,32 +168,18 @@ public class Call2betRangeBuilder {
     }
 
     public Map<Integer, Set<Card>> getOpponentCall2betRange() {
+        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
         Map<Integer, Set<Card>> opponentCall2betRange = new HashMap<>();
 
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap90Percent, 0.9);
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap80Percent, 0.8);
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap65Percent, 0.65);
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap50Percent, 0.5);
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap33Percent, 0.33);
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap30Percent, 0.3);
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap10Percent, 0.1);
-        opponentCall2betRange = addCombosToInclude(opponentCall2betRange, comboMap5Percent, 0.05);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap90Percent, 0.9);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap80Percent, 0.8);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap65Percent, 0.65);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap50Percent, 0.5);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap33Percent, 0.33);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap30Percent, 0.3);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap10Percent, 0.1);
+        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap5Percent, 0.05);
 
         return opponentCall2betRange;
-    }
-
-    public Map<Integer, Set<Card>> addCombosToInclude(Map<Integer, Set<Card>> allCombosThusFar,
-                                                      Map<Integer, Map<Integer, Set<Card>>> comboPercentageMap,
-                                                      double percentage) {
-        for (Map.Entry<Integer, Map<Integer, Set<Card>>> entry : comboPercentageMap.entrySet()) {
-            for (Map.Entry<Integer, Set<Card>> entry2 : entry.getValue().entrySet()) {
-                if(Math.random() <= percentage) {
-                    Set<Card> comboToInclude = new HashSet<>();
-                    comboToInclude.addAll(entry2.getValue());
-                    allCombosThusFar.put(allCombosThusFar.size(), comboToInclude);
-                }
-            }
-        }
-        return allCombosThusFar;
     }
 }

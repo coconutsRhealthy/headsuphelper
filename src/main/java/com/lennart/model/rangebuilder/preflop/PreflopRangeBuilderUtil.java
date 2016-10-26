@@ -187,6 +187,21 @@ public class PreflopRangeBuilderUtil {
         return pocketPairCombosOfGivenRanks;
     }
 
+    public Map<Integer, Set<Card>> addCombosToIncludeInOpponentPreflopRange(Map<Integer, Set<Card>> allCombosThusFar,
+                                                                            Map<Integer, Map<Integer, Set<Card>>> comboPercentageMap,
+                                                                            double percentage) {
+        for (Map.Entry<Integer, Map<Integer, Set<Card>>> entry : comboPercentageMap.entrySet()) {
+            for (Map.Entry<Integer, Set<Card>> entry2 : entry.getValue().entrySet()) {
+                if(Math.random() <= percentage) {
+                    Set<Card> comboToInclude = new HashSet<>();
+                    comboToInclude.addAll(entry2.getValue());
+                    allCombosThusFar.put(allCombosThusFar.size(), comboToInclude);
+                }
+            }
+        }
+        return allCombosThusFar;
+    }
+
     //helper methods
     private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited,
                                                                       double percentage) {
