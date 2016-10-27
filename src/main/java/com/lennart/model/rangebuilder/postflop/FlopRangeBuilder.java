@@ -1,11 +1,12 @@
-package com.lennart.model.rangebuilder;
+package com.lennart.model.rangebuilder.postflop;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.rangebuilder.RangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,27 +19,28 @@ import java.util.Set;
 public class FlopRangeBuilder {
 
     PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
+    RangeBuilder rangeBuilder = new RangeBuilder();
     BoardEvaluator boardEvaluator = new BoardEvaluator();
     StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
     FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
     HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
 
     //IP
-    Map<Integer, Map<Integer, Set<Card>>> get2betFCheck() {
+    public Map<Integer, Set<Set<Card>>> get2betFCheck(List<Card> holeCards) {
         //preflop
-        Map<Integer, Map<Integer, Set<Card>>> preflopRange = preflopRangeBuilder.get2bet();
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall2betRange();
 
         //postflop
-        //alles van preflop range
+        Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
-        return null;
+        return rangeBuilder.createRange(preflopRange, flopRange, holeCards);
     }
 
-    Map<Integer, Map<Integer, Set<Card>>> get2betF2bet(List<Card> board) {
+    public Map<Integer, Set<Set<Card>>> get2betF2bet(List<Card> board, List<Card> holeCards) {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
         //preflop
-        Map<Integer, Map<Integer, Set<Card>>> preflopRange = preflopRangeBuilder.get2bet();
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall2betRange();
 
         //postflop
 
@@ -58,8 +60,7 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), flushDrawEvaluator.getMediumFlushDrawCombos(board));
         flopRange.put(flopRange.size(), highCardDrawEvaluator.getStrongTwoOvercards(board));
 
-
-        return null;
+        Map<Integer, Set<Set<Card>>> eije = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        return eije;
     }
-
 }

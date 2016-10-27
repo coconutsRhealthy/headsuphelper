@@ -24,59 +24,8 @@ public class RangeBuilder {
     //the other methods return, should first be sorted from strongest to weakest, before added to the map.
 
     BoardEvaluator boardEvaluator = new BoardEvaluator();
-    StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
-    FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
-    HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
-    PreflopRangeBuilderUtil preflopRangeBuilderUtil = new PreflopRangeBuilderUtil();
 
-    public Map<Integer, Set<Set<Card>>> getRange(String handPath, List<Card> board, List<Card> holeCards) {
-        Map<Integer, Map<Integer, Set<Card>>> preflopRange = new HashMap<>();
-        Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
-
-        if(handPath.equals("2betFcheck")) {
-            //preflop
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getPocketPairs(2));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getSuitedHoleCards(2, 2));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitConnectors(4));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitOneGappers(6));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitTwoGappers(8));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitThreeGappers(8));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitHoleCards(12, 2));
-
-            return createRange(preflopRange, flopRange, holeCards);
-        }
-
-
-
-        if(handPath.equals("2bet2betFcheck")) {
-            //preflop
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getPocketPairs(2));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getSuitedHoleCards(2, 2));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitConnectors(4));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitOneGappers(6));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitTwoGappers(8));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitThreeGappers(8));
-            preflopRange.put(preflopRange.size(), preflopRangeBuilderUtil.getOffSuitHoleCards(12, 2));
-
-            //flop
-            flopRange.put(flopRange.size(), boardEvaluator.getCombosAboveDesignatedStrengthLevel(0.52, board));
-            flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongOosdCombos(board));
-            flopRange.put(flopRange.size(), straightDrawEvaluator.getMediumOosdCombos(board));
-            flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongGutshotCombos(board));
-            flopRange.put(flopRange.size(), straightDrawEvaluator.getMediumGutshotCombos(board));
-            flopRange.put(flopRange.size(), flushDrawEvaluator.getStrongFlushDrawCombos(board));
-            flopRange.put(flopRange.size(), flushDrawEvaluator.getMediumFlushDrawCombos(board));
-            flopRange.put(flopRange.size(), highCardDrawEvaluator.getStrongTwoOvercards(board));
-            flopRange.put(flopRange.size(), highCardDrawEvaluator.getMediumTwoOvercards(board));
-
-            return createRange(preflopRange, flopRange, holeCards);
-        }
-
-        return null;
-    }
-
-    //helper methods
-    private Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Map<Integer, Set<Card>>> preflopRange,
+    public Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Set<Card>> preflopRange,
                                                     Map<Integer, Map<Integer, Set<Card>>> flopRange, List<Card> holeCards) {
         Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = boardEvaluator.getCopyOfSortedCombos();
         allSortedCombosClearedForRange = removeHoleCardCombosFromAllSortedCombos(allSortedCombosClearedForRange, holeCards);
@@ -84,13 +33,9 @@ public class RangeBuilder {
         for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombosClearedForRange.entrySet()) {
             loop: for (Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
                 Set<Card> comboFromAllSortedCombos = it.next();
-                for (Map.Entry<Integer, Map<Integer, Set<Card>>> preflopRangeMapEntry : preflopRange.entrySet()) {
-                    if(!preflopRangeMapEntry.getValue().isEmpty()) {
-                        for (Map.Entry<Integer, Set<Card>> comboToRetainInRange : preflopRangeMapEntry.getValue().entrySet()) {
-                            if (comboFromAllSortedCombos.equals(comboToRetainInRange.getValue())) {
-                                continue loop;
-                            }
-                        }
+                for (Map.Entry<Integer, Set<Card>> preflopRangeMapEntry : preflopRange.entrySet()) {
+                    if(comboFromAllSortedCombos.equals(preflopRangeMapEntry.getValue())) {
+                        continue loop;
                     }
                 }
                 it.remove();
@@ -112,9 +57,19 @@ public class RangeBuilder {
                 it.remove();
             }
         }
+
+        //clean up of empty Map entries
+        for(Iterator<Map.Entry<Integer, Set<Set<Card>>>> it = allSortedCombosClearedForRange.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, Set<Set<Card>>> entry = it.next();
+            if(entry.getValue().isEmpty()) {
+                it.remove();
+            }
+        }
+
         return allSortedCombosClearedForRange;
     }
 
+    //helper methods
     private Map<Integer, Set<Set<Card>>> removeHoleCardCombosFromAllSortedCombos(Map<Integer, Set<Set<Card>>> allSortedCombos,
                                                                                  List<Card> holeCards) {
         for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombos.entrySet()) {
