@@ -45,10 +45,11 @@ public class FlopRangeBuilder {
         //postflop
 
         //de value range
-        flopRange.put(flopRange.size(), boardEvaluator.getCombosAboveDesignatedStrengthLevel(0.87, board));
+        flopRange.put(flopRange.size(), boardEvaluator.getCombosAboveDesignatedStrengthLevel(0.87, 0, board));
 
         //de tricky range
         //iets van getCombosBetweenTwoStrengthLevels, en dan uit die verzameling bijv random 20% van de combos pakken
+        Map<Integer, Set<Card>> hmm = boardEvaluator.getCombosAboveDesignatedStrengthLevel(0.55, 0.75, board);
 
         //de draws
         flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongOosdCombos(board));
@@ -59,6 +60,10 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), flushDrawEvaluator.getStrongFlushDrawCombos(board));
         flopRange.put(flopRange.size(), flushDrawEvaluator.getMediumFlushDrawCombos(board));
         flopRange.put(flopRange.size(), highCardDrawEvaluator.getStrongTwoOvercards(board));
+
+        //de air combos
+        flopRange.put(flopRange.size(), flushDrawEvaluator.getStrongBackDoorFlushCombos(board)); //max 60 combos
+        flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongBackDoorCombos(board)); //max 40 combos
 
         Map<Integer, Set<Set<Card>>> eije = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
         return eije;

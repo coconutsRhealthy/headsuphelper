@@ -6,6 +6,7 @@ import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.oop.Call2betRangeBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -126,6 +127,7 @@ public class Controller {
 //        straightDrawEvaluator.getWeakGutshotCombosFromAllGutshotCombos(board);
 
 //        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
+        new Call2betRangeBuilder().getOpponentCall2betRange();
         new FlopRangeBuilder().get2betF2bet(board, holeCards);
         new HandEvaluator().getHandStrength(holeCards, board);
         new HighCardDrawEvaluator().getMediumTwoOvercards(board);

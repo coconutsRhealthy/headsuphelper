@@ -420,6 +420,18 @@ public class BoardEvaluator {
         return allPossibleStartHandsCopy;
     }
 
+    public Map<Integer, Set<Card>> getAllPossibleStartHandsAsSets() {
+        Map<Integer, List<Card>> allPossibleStartHandsAsAlist = getAllPossibleStartHands();
+        Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
+
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsAlist.entrySet()) {
+            Set<Card> combo = new HashSet<>();
+            combo.addAll(entry.getValue());
+            allPossibleStartHandsAsSet.put(allPossibleStartHandsAsSet.size(), combo);
+        }
+        return allPossibleStartHandsAsSet;
+    }
+
     protected List<Card> getCompleteCardDeck() {
         List<Card> completeCardDeck = new ArrayList<>();
 
@@ -864,7 +876,8 @@ public class BoardEvaluator {
         return sortedCombosMethod;
     }
 
-    public Map<Integer, Set<Card>> getCombosAboveDesignatedStrengthLevel(double strengthLevel, List<Card> board) {
+    public Map<Integer, Set<Card>> getCombosAboveDesignatedStrengthLevel(double strengthLevel,
+                                                                         double strengthLevelUpLimit, List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedCombos = getSortedCombos(board);
         Map<Integer, Set<Set<Card>>> sortedCombosAboveDesignatedStrengthLevel = new HashMap<>();
 
@@ -872,12 +885,31 @@ public class BoardEvaluator {
             sortedCombosAboveDesignatedStrengthLevel.put(entry.getKey(), entry.getValue());
         }
 
+        double doubleUntilWhereCombosShouldBeRemovedUpLimit = (1176 * (1 - strengthLevelUpLimit));
         double doubleFromWhereCombosShouldBeRemoved = (1176 * (1 - strengthLevel));
+        int intUntilWhereCombosShouldBeRemovedUpLimit = (int) doubleUntilWhereCombosShouldBeRemovedUpLimit;
         int intFromWhereCombosShouldBeRemoved = (int) doubleFromWhereCombosShouldBeRemoved;
+        int counterUpLimit = 0;
         int counter = 0;
 
         for(Iterator<Map.Entry<Integer, Set<Set<Card>>>> it = sortedCombosAboveDesignatedStrengthLevel.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, Set<Set<Card>>> entry = it.next();
+
+            if(counterUpLimit < intUntilWhereCombosShouldBeRemovedUpLimit) {
+                counterUpLimit = counterUpLimit + entry.getValue().size();
+                if(counterUpLimit < intUntilWhereCombosShouldBeRemovedUpLimit) {
+                    it.remove();
+                    continue;
+                }
+            }
+
+            for(Iterator<Set<Card>> it2 = entry.getValue().iterator(); it2.hasNext(); ) {
+                Set<Card> entry2 = it2.next();
+                counterUpLimit++;
+                if(counterUpLimit < intUntilWhereCombosShouldBeRemovedUpLimit) {
+                    it2.remove();
+                }
+            }
 
             if(counter > intFromWhereCombosShouldBeRemoved) {
                 it.remove();

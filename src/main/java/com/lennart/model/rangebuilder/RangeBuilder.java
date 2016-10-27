@@ -69,6 +69,14 @@ public class RangeBuilder {
         return allSortedCombosClearedForRange;
     }
 
+//    public Map<Integer, Set<Card>> getStrongBackDoorFlushCombosMaxAmount(List<Card> board, int maxAmount) {
+//        Map<Integer, Set<Card>> strongBackDoorFlushCombosMaxAmount = new StraightDrawEvaluator().getStrongBackDoorCombos(board);
+//
+//
+//
+//
+//    }
+
     //helper methods
     private Map<Integer, Set<Set<Card>>> removeHoleCardCombosFromAllSortedCombos(Map<Integer, Set<Set<Card>>> allSortedCombos,
                                                                                  List<Card> holeCards) {
