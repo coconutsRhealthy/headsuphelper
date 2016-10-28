@@ -45,11 +45,11 @@ public class FlopRangeBuilder {
         //postflop
 
         //de value range
-        flopRange.put(flopRange.size(), boardEvaluator.getCombosAboveDesignatedStrengthLevel(0.87, 0, board));
+        //flopRange.put(flopRange.size(), boardEvaluator.getCombosOfDesignatedStrength(0.87, 1, board, 0.9));
 
         //de tricky range
         //iets van getCombosBetweenTwoStrengthLevels, en dan uit die verzameling bijv random 20% van de combos pakken
-        Map<Integer, Set<Card>> hmm = boardEvaluator.getCombosAboveDesignatedStrengthLevel(0.55, 0.75, board);
+        Map<Integer, Set<Card>> hmm = boardEvaluator.getCombosOfDesignatedStrength(0.65, 0.87, board, 0.2);
 
         //de draws
         flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongOosdCombos(board));
