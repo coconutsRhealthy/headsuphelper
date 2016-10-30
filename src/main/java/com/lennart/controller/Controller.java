@@ -127,7 +127,7 @@ public class Controller {
 //        straightDrawEvaluator.getWeakGutshotCombosFromAllGutshotCombos(board);
 
 //        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
-        new Call2betRangeBuilder().getOpponentCall2betRange();
+//        new Call2betRangeBuilder().getOpponentCall2betRange();
         new FlopRangeBuilder().get2betF2bet(board, holeCards);
         new HandEvaluator().getHandStrength(holeCards, board);
         new HighCardDrawEvaluator().getMediumTwoOvercards(board);

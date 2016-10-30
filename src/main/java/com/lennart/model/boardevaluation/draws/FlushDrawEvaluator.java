@@ -66,7 +66,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return mediumBackDoorFlushDrawCombos;
     }
 
-    private Map<Integer, Set<Card>> getWeakBackDoorFlushCombos(List<Card> board) {
+    public Map<Integer, Set<Card>> getWeakBackDoorFlushCombos(List<Card> board) {
         Map<Integer, List<Card>> allBackDoorFlushDraws = getBackDoorFlushDrawCombos(board);
         Map<Integer, List<Card>> strongBackDoorDraws = getStrongBackDoorFlushCombosAsMapList(board);
         Map<Integer, List<Card>> mediumBackDoorDraws = getMediumBackDoorFlushCombosAsMapList(board);
