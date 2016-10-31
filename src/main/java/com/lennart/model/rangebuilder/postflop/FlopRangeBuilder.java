@@ -62,7 +62,7 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), highCardDrawEvaluator.getStrongTwoOvercards(board));
 
         //de air combos
-        flopRange.put(flopRange.size(), rangeBuilder.getBackDoorAndAirCombos(flopRange, preflopRange, 0.2, board));
+        flopRange.put(flopRange.size(), rangeBuilder.getBackDoorAndAirCombos(flopRange, preflopRange, 0.2, board, holeCards));
 
 
 //        flopRange.put(flopRange.size(), flushDrawEvaluator.getStrongBackDoorFlushCombos(board)); //max 60 combos

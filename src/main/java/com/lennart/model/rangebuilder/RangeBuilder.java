@@ -151,7 +151,8 @@ public class RangeBuilder {
 
     public Map<Integer, Set<Card>> getBackDoorAndAirCombos(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
                                                            Map<Integer, Set<Card>> rangeOfPreviousStreet,
-                                                           double percentageOfAirCombos, List<Card> board) {
+                                                           double percentageOfAirCombos, List<Card> board,
+                                                           List<Card> holeCards) {
         //TODO: correct for holeCards
         //TODO: check of je gevonden air en bd combos niet aanwezig zijn in hogere strength regionen
 
@@ -188,8 +189,13 @@ public class RangeBuilder {
 
         strongBackDoorFlushDraws = getCombosThatArePresentInBothMaps(
                 new FlushDrawEvaluator().getStrongBackDoorFlushCombos(board), rangeOfPreviousStreet);
+        //remove hier de holecard combos
+        //remove hier de combos die aanwezig zijn in hogere strength regionen
+
         strongBackDoorStraightDraws = getCombosThatArePresentInBothMaps(
                 new StraightDrawEvaluator().getStrongBackDoorCombos(board), rangeOfPreviousStreet);
+        //remove hier de holecard combos
+        //remove hier de combos die aanwezig zijn in hogere strength regionen
 
         Set<Set<Card>> strongBackDoorFlushDrawsAsSet = convertMapToSet(strongBackDoorFlushDraws);
         Set<Set<Card>> strongBackDoorStraightDrawsAsSet = convertMapToSet(strongBackDoorStraightDraws);
@@ -203,8 +209,13 @@ public class RangeBuilder {
             mediumBackDoor = true;
             mediumBackDoorFlushDraws = getCombosThatArePresentInBothMaps(
                     new FlushDrawEvaluator().getMediumBackDoorFlushCombos(board), rangeOfPreviousStreet);
+            //remove hier de holecard combos
+            //remove hier de combos die aanwezig zijn in hogere strength regionen
+
             mediumBackDoorStraightDraws = getCombosThatArePresentInBothMaps(
                     new StraightDrawEvaluator().getMediumBackDoorCombos(board), rangeOfPreviousStreet);
+            //remove hier de holecard combos
+            //remove hier de combos die aanwezig zijn in hogere strength regionen
 
             Set<Set<Card>> mediumBackDoorFlushDrawsAsSet = convertMapToSet(mediumBackDoorFlushDraws);
             Set<Set<Card>> mediumBackDoorStraightDrawsAsSet = convertMapToSet(mediumBackDoorStraightDraws);
@@ -222,12 +233,19 @@ public class RangeBuilder {
 
             weakBackDoorFlushDraws = getCombosThatArePresentInBothMaps(
                     new FlushDrawEvaluator().getWeakBackDoorFlushCombos(board), rangeOfPreviousStreet);
+            //remove hier de holecard combos
+            //remove hier de combos die aanwezig zijn in hogere strength regionen
+
             weakBackDoorStraightDraws = getCombosThatArePresentInBothMaps(
                     new StraightDrawEvaluator().getWeakBackDoorCombos(board), rangeOfPreviousStreet);
+            //remove hier de holecard combos
+            //remove hier de combos die aanwezig zijn in hogere strength regionen
 
             Map<Integer, Set<Card>> designatedAirStrengthMap = getCombosOfDesignatedStrength(0, 0.4, board, 1);
             Map<Integer, Set<Card>> airCombosPresentInRange = getCombosThatArePresentInBothMaps(designatedAirStrengthMap,
                     rangeOfPreviousStreet);
+            //remove hier de holecard combos
+            //remove hier de combos die aanwezig zijn in hogere strength regionen
 
             //get 25% of combosStillNeeded from weakBackDoorFlush, or max number possible
             int counterWeakBdFlush = 0;
@@ -443,6 +461,26 @@ public class RangeBuilder {
         }
         return allSortedCombos;
     }
+
+    private Map<Integer, Set<Card>> removeHoleCardCombosFromComboMap(Map<Integer, Set<Card>> comboMap,
+                                                                      List<Card> holeCards) {
+        for(Iterator<Map.Entry<Integer, Set<Card>>> it = comboMap.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, Set<Card>> entry = it.next();
+            if(entry.getValue().contains(holeCards.get(0)) || entry.getValue().contains(holeCards.get(1))) {
+                it.remove();
+            }
+        }
+        return comboMap;
+    }
+
+    private Map<Integer, Set<Card>> removeDrawCombosThatAreAlsoHigherCombos(Map<Integer, Set<Card>> drawComboMap) {
+        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getCopyOfSortedCombos();
+
+
+
+        return null;
+    }
+
 
     private int countNumberOfCombos(Map<Integer, Set<Set<Card>>> combos) {
         int counter = 0;
