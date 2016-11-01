@@ -45,34 +45,34 @@ public class FlopRangeBuilder {
         //postflop
 
         //de value range
-        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.87, 1, board, 0.9));
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.87, 1, 0.9));
 
         //de tricky range
-        //iets van getCombosBetweenTwoStrengthLevels, en dan uit die verzameling bijv random 20% van de combos pakken
-        Map<Integer, Set<Card>> hmm = rangeBuilder.getCombosOfDesignatedStrength(0.65, 0.87, board, 0.2);
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.65, 0.87, 0.2, holeCards, preflopRange));
 
         //de draws
-        flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongOosdCombos(board));
-        flopRange.put(flopRange.size(), straightDrawEvaluator.getMediumGutshotCombos(board));
+        //TODO: hier nog corrigeren voor holeCard combos en previous street range?
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(board, 0.5));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumOosdCombos(board, 0.5));
 
-        flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongGutshotCombos(board));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongGutshotCombos(board, 0.5));
 
-        flopRange.put(flopRange.size(), flushDrawEvaluator.getStrongFlushDrawCombos(board));
-        flopRange.put(flopRange.size(), flushDrawEvaluator.getMediumFlushDrawCombos(board));
-        flopRange.put(flopRange.size(), highCardDrawEvaluator.getStrongTwoOvercards(board));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(board, 0.5));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(board, 0.5));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(board, 0.5));
 
         //de air combos
-        //flopRange.put(flopRange.size(), rangeBuilder.getBackDoorAndAirCombos(flopRange, preflopRange, 0.2, board, holeCards));
-        flopRange.put(flopRange.size(), rangeBuilder.getAirRangeNew(flopRange, preflopRange, 0.2, board, holeCards));
-
-
-//        flopRange.put(flopRange.size(), flushDrawEvaluator.getStrongBackDoorFlushCombos(board)); //max 60 combos
-//        flopRange.put(flopRange.size(), straightDrawEvaluator.getStrongBackDoorCombos(board)); //max 40 combos
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(flopRange,
+                preflopRange, 0.05, board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(flopRange, preflopRange, 0.03,
+                board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(flopRange, preflopRange, 0.03,
+                board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getAirRangeNew(flopRange, preflopRange, 0.14, board, holeCards));
 
         Map<Integer, Set<Set<Card>>> eije = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
 
-        //eigenlijk moet je na de value + straight range pas de air gaan toevoegen... Of je geeft als parameter mee
-        //aan de nieuwe functie getBackDoorAndAirCombos(rangeOfPreviousStreet)
+        int x = rangeBuilder.countNumberOfCombos(eije);
 
         return eije;
     }

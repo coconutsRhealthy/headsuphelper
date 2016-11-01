@@ -2,6 +2,7 @@ package com.lennart.model.rangebuilder;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
@@ -24,6 +25,9 @@ public class RangeBuilder {
     //the other methods return, should first be sorted from strongest to weakest, before added to the map.
 
     BoardEvaluator boardEvaluator = new BoardEvaluator();
+    FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
+    StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
+    HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
 
     public Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Set<Card>> preflopRange,
                                                     Map<Integer, Map<Integer, Set<Card>>> flopRange, List<Card> holeCards) {
@@ -69,7 +73,7 @@ public class RangeBuilder {
         return allSortedCombosClearedForRange;
     }
 
-    public Map<Integer, Set<Card>> getCombosOfDesignatedStrength(double lowLimit, double highLimit, List<Card> board,
+    public Map<Integer, Set<Card>> getCombosOfDesignatedStrength(double lowLimit, double highLimit,
                                                                  double percentageOfCombosToInclude) {
         Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getCopyOfSortedCombos();
         Map<Integer, Set<Set<Card>>> sortedCombosAboveDesignatedStrengthLevel = new HashMap<>();
@@ -109,6 +113,23 @@ public class RangeBuilder {
             }
         }
         return combosAboveDesignatedStrengthLevel;
+    }
+
+    public Map<Integer, Set<Card>> getCombosOfDesignatedStrength(double lowLimit, double highLimit,
+                                                                 double percentageOfCombosToInclude,
+                                                                 List<Card> holeCards,
+                                                                 Map<Integer, Set<Card>> rangeOfPreviousStreet) {
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+        Map<Integer, Set<Card>> allCombosOfDesignatedStrength = getCombosOfDesignatedStrength(lowLimit, highLimit, 1);
+        allCombosOfDesignatedStrength = removeHoleCardCombosFromComboMap(allCombosOfDesignatedStrength, holeCards);
+        allCombosOfDesignatedStrength = getCombosThatArePresentInBothMaps(allCombosOfDesignatedStrength, rangeOfPreviousStreet);
+
+        for (Map.Entry<Integer, Set<Card>> entry : allCombosOfDesignatedStrength.entrySet()) {
+            if(Math.random() < percentageOfCombosToInclude) {
+                combosToReturn.put(combosToReturn.size(), entry.getValue());
+            }
+        }
+        return combosToReturn;
     }
 
     //deprecated
@@ -191,7 +212,7 @@ public class RangeBuilder {
         Map<Integer, Set<Card>> mediumBackDoorStraightDraws = straightDrawEvaluator.getMediumBackDoorCombos(board);
         Map<Integer, Set<Card>> weakBackDoorStraightDraws = straightDrawEvaluator.getWeakBackDoorCombos(board);
 
-        Map<Integer, Set<Card>> airCombos = getCombosOfDesignatedStrength(0, 0.35, board, 1);
+        Map<Integer, Set<Card>> airCombos = getCombosOfDesignatedStrength(0, 0.35, 1);
 
         strongBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(strongBackDoorFlushDraws, board);
         mediumBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(mediumBackDoorFlushDraws, board);
@@ -254,7 +275,158 @@ public class RangeBuilder {
         return airCombosAddedToTotalRange;
     }
 
+    public Map<Integer, Set<Card>> getCombosThatAreBothStrongBdFlushAndBdStraightDraw(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
+                                                                                      Map<Integer, Set<Card>> rangeOfPreviousStreet,
+                                                                                      double percentageOfAirCombos, List<Card> board,
+                                                                                      List<Card> holeCards) {
+        double numberOfCombosToReturn = percentageOfAirCombos * getNumberOfNoAirCombos(rangeNoAir, rangeOfPreviousStreet);
 
+        Map<Integer, Set<Card>> strongBackDoorFlushDraws = new FlushDrawEvaluator().getStrongBackDoorFlushCombos(board);
+        Map<Integer, Set<Card>> strongBackDoorStraightDraws = new StraightDrawEvaluator().getStrongBackDoorCombos(board);
+
+        Map<Integer, Set<Card>> bothBdFlushDrawAndBdStraightDraw =
+                getCombosThatArePresentInBothMaps(strongBackDoorFlushDraws, strongBackDoorStraightDraws);
+
+        bothBdFlushDrawAndBdStraightDraw = removeHoleCardCombosFromComboMap(bothBdFlushDrawAndBdStraightDraw, holeCards);
+        bothBdFlushDrawAndBdStraightDraw = getCombosThatArePresentInBothMaps(bothBdFlushDrawAndBdStraightDraw,
+                rangeOfPreviousStreet);
+
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Card>> entry : bothBdFlushDrawAndBdStraightDraw.entrySet()) {
+            if(Math.random() < numberOfCombosToReturn) {
+                combosToReturn.put(combosToReturn.size(), entry.getValue());
+            }
+        }
+        return combosToReturn;
+    }
+
+    public Map<Integer, Set<Card>> getStrongBackDoorFlushDrawCombos(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
+                                                                    Map<Integer, Set<Card>> rangeOfPreviousStreet,
+                                                                    double percentageOfAirCombos, List<Card> board,
+                                                                    List<Card> holeCards) {
+        double numberOfCombosToReturn = percentageOfAirCombos * getNumberOfNoAirCombos(rangeNoAir, rangeOfPreviousStreet);
+
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+        Map<Integer, Set<Card>> strongBackDoorFlushDraws = new FlushDrawEvaluator().getStrongBackDoorFlushCombos(board);
+        Map<Integer, Set<Card>> strongBackDoorStraightDraws = new StraightDrawEvaluator().getStrongBackDoorCombos(board);
+
+        strongBackDoorFlushDraws = removeHoleCardCombosFromComboMap(strongBackDoorFlushDraws, holeCards);
+        strongBackDoorStraightDraws = removeHoleCardCombosFromComboMap(strongBackDoorStraightDraws, holeCards);
+
+        Set<Set<Card>> strongBackDoorFlushDrawsAsSet = convertMapToSet(strongBackDoorFlushDraws);
+        Set<Set<Card>> strongBackDoorStraightDrawsAsSet = convertMapToSet(strongBackDoorStraightDraws);
+
+        strongBackDoorFlushDrawsAsSet.removeAll(strongBackDoorStraightDrawsAsSet);
+
+        for(Set<Card> s : strongBackDoorFlushDrawsAsSet) {
+            if(combosToReturn.size() < numberOfCombosToReturn) {
+                combosToReturn.put(combosToReturn.size(), s);
+            }
+        }
+        return combosToReturn;
+    }
+
+    public Map<Integer, Set<Card>> getStrongBackDoorStraightDrawCombos(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
+                                                                       Map<Integer, Set<Card>> rangeOfPreviousStreet,
+                                                                       double percentageOfAirCombos, List<Card> board,
+                                                                       List<Card> holeCards) {
+        double numberOfCombosToReturn = percentageOfAirCombos * getNumberOfNoAirCombos(rangeNoAir, rangeOfPreviousStreet);
+
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+        Map<Integer, Set<Card>> strongBackDoorFlushDraws = new FlushDrawEvaluator().getStrongBackDoorFlushCombos(board);
+        Map<Integer, Set<Card>> strongBackDoorStraightDraws = new StraightDrawEvaluator().getStrongBackDoorCombos(board);
+
+        strongBackDoorFlushDraws = removeHoleCardCombosFromComboMap(strongBackDoorFlushDraws, holeCards);
+        strongBackDoorStraightDraws = removeHoleCardCombosFromComboMap(strongBackDoorStraightDraws, holeCards);
+
+        Set<Set<Card>> strongBackDoorFlushDrawsAsSet = convertMapToSet(strongBackDoorFlushDraws);
+        Set<Set<Card>> strongBackDoorStraightDrawsAsSet = convertMapToSet(strongBackDoorStraightDraws);
+
+        strongBackDoorStraightDrawsAsSet.removeAll(strongBackDoorFlushDrawsAsSet);
+
+        for(Set<Card> s : strongBackDoorStraightDrawsAsSet) {
+            if(combosToReturn.size() < numberOfCombosToReturn) {
+                combosToReturn.put(combosToReturn.size(), s);
+            }
+        }
+        return combosToReturn;
+    }
+
+    public Map<Integer, Set<Card>> getStrongFlushDrawCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> strongFlushDrawCombos = flushDrawEvaluator.getStrongFlushDrawCombos(board);
+        return getPercentageOfCombos(strongFlushDrawCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getMediumFlushDrawCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> mediumFlushDrawCombos = flushDrawEvaluator.getMediumFlushDrawCombos(board);
+        return getPercentageOfCombos(mediumFlushDrawCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getWeakFlushDrawCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> weakFlushDrawCombos = flushDrawEvaluator.getWeakFlushDrawCombos(board);
+        return getPercentageOfCombos(weakFlushDrawCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getStrongOosdCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> strongOosdCombos = straightDrawEvaluator.getStrongOosdCombos(board);
+        return getPercentageOfCombos(strongOosdCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getMediumOosdCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> mediumOosdCombos = straightDrawEvaluator.getMediumOosdCombos(board);
+        return getPercentageOfCombos(mediumOosdCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getWeakOosdCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> weakOosdCombos = straightDrawEvaluator.getWeakOosdCombos(board);
+        return getPercentageOfCombos(weakOosdCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getStrongGutshotCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> strongGutshotCombos = straightDrawEvaluator.getStrongGutshotCombos(board);
+        return getPercentageOfCombos(strongGutshotCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getMediumGutshotCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> mediumGutshotCombos = straightDrawEvaluator.getMediumGutshotCombos(board);
+        return getPercentageOfCombos(mediumGutshotCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getWeakGutshotCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> weakGutshotCombos = straightDrawEvaluator.getWeakGutshotCombos(board);
+        return getPercentageOfCombos(weakGutshotCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getStrongTwoOvercardCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> strongTwoOvercardCombos = highCardDrawEvaluator.getStrongTwoOvercards(board);
+        return getPercentageOfCombos(strongTwoOvercardCombos, percentage);
+    }
+
+    public Map<Integer, Set<Card>> getMediumTwoOvercardCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> mediumTwoOvercardCombos = highCardDrawEvaluator.getMediumTwoOvercards(board);
+        return getPercentageOfCombos(mediumTwoOvercardCombos, percentage);
+    }
+    public Map<Integer, Set<Card>> getWeakTwoOvercardCombos(List<Card> board, double percentage) {
+        Map<Integer, Set<Card>> weakTwoOvercardCombos = highCardDrawEvaluator.getWeakTwoOvercards(board);
+        return getPercentageOfCombos(weakTwoOvercardCombos, percentage);
+    }
+
+    public int getNumberOfNoAirCombos(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
+                                      Map<Integer, Set<Card>> rangeOfPreviousStreet) {
+        Map<Integer, Set<Card>> rangeNoAirSimpleMap = new HashMap<>();
+
+        for (Map.Entry<Integer, Map<Integer, Set<Card>>> entry : rangeNoAir.entrySet()) {
+            for(Map.Entry<Integer, Set<Card>> entry2 : entry.getValue().entrySet()) {
+                rangeNoAirSimpleMap.put(rangeNoAirSimpleMap.size(), entry2.getValue());
+            }
+        }
+
+        Map<Integer, Set<Card>> rangeNoAirCorrectedForPreviousStreetRange =
+                getCombosThatArePresentInBothMaps(rangeNoAirSimpleMap, rangeOfPreviousStreet);
+
+        return rangeNoAirCorrectedForPreviousStreetRange.size();
+    }
 
     public Map<Integer, Set<Card>> getBackDoorAndAirCombos(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
                                                            Map<Integer, Set<Card>> rangeOfPreviousStreet,
@@ -360,7 +532,7 @@ public class RangeBuilder {
             weakBackDoorStraightDraws = removeDrawCombosThatAreAlsoHigherCombos(weakBackDoorStraightDraws, board);
             weakBackDoorStraightDraws = removeBackDoorCombosThatAreAlreadyInRangeNoAir(weakBackDoorStraightDraws, rangeNoAir);
 
-            Map<Integer, Set<Card>> designatedAirStrengthMap = getCombosOfDesignatedStrength(0, 0.4, board, 1);
+            Map<Integer, Set<Card>> designatedAirStrengthMap = getCombosOfDesignatedStrength(0, 0.4, 1);
             Map<Integer, Set<Card>> airCombosPresentInRange = getCombosThatArePresentInBothMaps(designatedAirStrengthMap,
                     rangeOfPreviousStreet);
             //remove hier de holecard combos
@@ -568,6 +740,16 @@ public class RangeBuilder {
         return set;
     }
 
+    private Map<Integer, Set<Card>> getPercentageOfCombos(Map<Integer, Set<Card>> allCombos, double percentage) {
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Card>> entry : allCombos.entrySet()) {
+            if(Math.random() < percentage) {
+                combosToReturn.put(combosToReturn.size(), entry.getValue());
+            }
+        }
+        return combosToReturn;
+    }
 
     private Map<Integer, Set<Set<Card>>> removeHoleCardCombosFromAllSortedCombos(Map<Integer, Set<Set<Card>>> allSortedCombos,
                                                                                  List<Card> holeCards) {
@@ -583,7 +765,7 @@ public class RangeBuilder {
     }
 
     private Map<Integer, Set<Card>> removeHoleCardCombosFromComboMap(Map<Integer, Set<Card>> comboMap,
-                                                                      List<Card> holeCards) {
+                                                                     List<Card> holeCards) {
         for(Iterator<Map.Entry<Integer, Set<Card>>> it = comboMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, Set<Card>> entry = it.next();
             if(entry.getValue().contains(holeCards.get(0)) || entry.getValue().contains(holeCards.get(1))) {
@@ -643,7 +825,7 @@ public class RangeBuilder {
         return set;
     }
 
-    private int countNumberOfCombos(Map<Integer, Set<Set<Card>>> combos) {
+    public int countNumberOfCombos(Map<Integer, Set<Set<Card>>> combos) {
         int counter = 0;
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : combos.entrySet()) {
