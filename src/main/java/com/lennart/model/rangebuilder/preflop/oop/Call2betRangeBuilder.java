@@ -20,6 +20,7 @@ public class Call2betRangeBuilder {
     private static Map<Integer, Map<Integer, Set<Card>>> comboMap25Percent = new HashMap<>();
     private static Map<Integer, Map<Integer, Set<Card>>> comboMap20Percent = new HashMap<>();
     private static Map<Integer, Map<Integer, Set<Card>>> comboMapRest10Percent = new HashMap<>();
+    private static List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
 
     static {
         PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
@@ -166,7 +167,19 @@ public class Call2betRangeBuilder {
         comboMap20Percent.put(9, p.getPocketPairCombosOfGivenRank(11));
         comboMap20Percent.put(10, p.getPocketPairCombosOfGivenRank(10));
 
-        comboMapRest10Percent.put(1, new BoardEvaluator().getAllPossibleStartHandsAsSets());
+        //comboMapRest10Percent.put(1, new BoardEvaluator().getAllPossibleStartHandsAsSets());
+
+        allCombosNoRestCombos.add(comboMap100Percent);
+        allCombosNoRestCombos.add(comboMap90Percent);
+        allCombosNoRestCombos.add(comboMap80Percent);
+        allCombosNoRestCombos.add(comboMap70Percent);
+        allCombosNoRestCombos.add(comboMap45Percent);
+        allCombosNoRestCombos.add(comboMap40Percent);
+        allCombosNoRestCombos.add(comboMap25Percent);
+        allCombosNoRestCombos.add(comboMap20Percent);
+
+        comboMapRest10Percent.put(1,
+                new PreflopRangeBuilderUtil().removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
     }
 
     public Map<Integer, Set<Card>> getOpponentCall2betRange() {

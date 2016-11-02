@@ -51,15 +51,14 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.65, 0.87, 0.2, holeCards, preflopRange));
 
         //de draws
-        //TODO: hier nog corrigeren voor holeCard combos en previous street range?
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(board, 0.5));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumOosdCombos(board, 0.5));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(board, 0.5, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumOosdCombos(board, 0.5, holeCards, preflopRange));
 
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongGutshotCombos(board, 0.5));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongGutshotCombos(board, 0.5, holeCards, preflopRange));
 
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(board, 0.5));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(board, 0.5));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(board, 0.5));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(board, 0.5, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(board, 0.5, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(board, 0.5, holeCards, preflopRange));
 
         //de air combos
         flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(flopRange,
@@ -75,5 +74,18 @@ public class FlopRangeBuilder {
         int x = rangeBuilder.countNumberOfCombos(eije);
 
         return eije;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getCall3betF1bet(List<Card> board, List<Card> holeCards) {
+        Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
+
+        //preflop
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent3betRange();
+
+        //postflop
+
+        //de value range
+
+        return null;
     }
 }

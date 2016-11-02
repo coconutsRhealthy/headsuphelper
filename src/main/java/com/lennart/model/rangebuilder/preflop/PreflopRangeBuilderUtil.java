@@ -2,6 +2,7 @@ package com.lennart.model.rangebuilder.preflop;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
 
@@ -132,7 +133,7 @@ public class PreflopRangeBuilderUtil {
             combo.add(holeCard1);
             combo.add(holeCard2);
 
-            if(combo.size() == 1) {
+            if(combo.size() == 2) {
                 suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
             }
         }
@@ -200,6 +201,46 @@ public class PreflopRangeBuilderUtil {
             }
         }
         return allCombosThusFar;
+    }
+
+    public Map<Integer, Set<Card>> removeCombosThatCouldBeInOtherMapsFromRestMap(List<Map<Integer, Map<Integer, Set<Card>>>>
+                                                                                         allCombosNoRestCombos) {
+        Map<Integer, Set<Card>> mapToReturn = new HashMap<>();
+        Set<Set<Card>> allCombosNoRestCombosAsSet = new HashSet<>();
+        Map<Integer, Set<Card>> allCombos = new BoardEvaluator().getAllPossibleStartHandsAsSets();
+        Set<Set<Card>> allCombosAsSet = new HashSet<>();
+
+        //ff
+        Card c1 = new Card(2, 'c');
+        Card c2 = new Card(3, 'c');
+
+        Set<Card> testSet = new HashSet<>();
+        testSet.add(c1);
+        testSet.add(c2);
+        //ff
+
+        for(Map<Integer, Map<Integer, Set<Card>>> comboMapOuter : allCombosNoRestCombos) {
+            for(Map.Entry<Integer, Map<Integer, Set<Card>>> comboMapInner : comboMapOuter.entrySet()) {
+                for(Map.Entry<Integer, Set<Card>> entry : comboMapInner.getValue().entrySet()) {
+                    if(entry.getValue().equals(testSet)) {
+                        System.out.println("wacht hier");
+                    }
+                    allCombosNoRestCombosAsSet.add(entry.getValue());
+                }
+            }
+        }
+
+        for(Map.Entry<Integer, Set<Card>> entry : allCombos.entrySet()) {
+            allCombosAsSet.add(entry.getValue());
+        }
+
+        allCombosAsSet.removeAll(allCombosNoRestCombosAsSet);
+
+        for(Set<Card> combo : allCombosAsSet) {
+            mapToReturn.put(mapToReturn.size(), combo);
+        }
+
+        return mapToReturn;
     }
 
     //helper methods
