@@ -5,6 +5,7 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.GameCards;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.oop.Call2betRangeBuilder;
 import org.springframework.boot.SpringApplication;
@@ -46,6 +47,8 @@ public class Controller {
         holeCards.add(cardList.get(0));
         holeCards.add(cardList.get(1));
 
+        GameCards.setHoleCards(cardList);
+
         return holeCards;
     }
 
@@ -66,6 +69,8 @@ public class Controller {
         board.add(cardList.get(1));
         board.add(cardList.get(2));
 
+        GameCards.setFlopCards(cardList);
+
         return flopCards;
     }
 
@@ -74,6 +79,9 @@ public class Controller {
         boardEvaluator.resetSortedCombos();
         turnCard = card;
         board.add(turnCard);
+
+        GameCards.setTurnCard(card);
+
         return board.get(board.size()-1);
     }
 
@@ -82,6 +90,9 @@ public class Controller {
         boardEvaluator.resetSortedCombos();
         riverCard = card;
         board.add(riverCard);
+
+        GameCards.setRiverCard(card);
+
         return board.get(board.size()-1);
     }
 

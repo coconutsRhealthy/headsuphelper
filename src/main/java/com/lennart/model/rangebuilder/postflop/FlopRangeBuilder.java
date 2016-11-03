@@ -45,10 +45,12 @@ public class FlopRangeBuilder {
         //postflop
 
         //de value range
-        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.87, 1, 0.9));
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.87, 0.90, 0.3));
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.90, 0.95, 0.5));
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.95, 1, 0.9));
 
         //de tricky range
-        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.65, 0.87, 0.2, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.65, 0.87, 0.16, holeCards, preflopRange));
 
         //de draws
         flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(board, 0.5, holeCards, preflopRange));
@@ -67,13 +69,13 @@ public class FlopRangeBuilder {
                 board, holeCards));
         flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(flopRange, preflopRange, 0.03,
                 board, holeCards));
-        flopRange.put(flopRange.size(), rangeBuilder.getAirRangeNew(flopRange, preflopRange, 0.14, board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getAirRange(flopRange, preflopRange, 0.14, board, holeCards));
 
-        Map<Integer, Set<Set<Card>>> eije = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
 
-        int x = rangeBuilder.countNumberOfCombos(eije);
+        int x = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
-        return eije;
+        return flopRangeToReturn;
     }
 
     public Map<Integer, Set<Set<Card>>> getCall3betF1bet(List<Card> board, List<Card> holeCards) {

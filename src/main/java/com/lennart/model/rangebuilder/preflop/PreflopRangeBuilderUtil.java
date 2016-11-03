@@ -2,6 +2,7 @@ package com.lennart.model.rangebuilder.preflop;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.GameCards;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
@@ -11,6 +12,7 @@ import java.util.*;
  */
 public class PreflopRangeBuilderUtil {
 
+    private RangeBuilder rangeBuilder = new RangeBuilder();
     private static Map<Integer, Set<Card>> allStartHands = new HashMap<>();
 
     static {
@@ -137,6 +139,9 @@ public class PreflopRangeBuilderUtil {
                 suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
             }
         }
+        suitedCombosOfGivenRanks = rangeBuilder.removeHoleCardCombosFromComboMap(suitedCombosOfGivenRanks,
+                GameCards.getHoleCards());
+
         return suitedCombosOfGivenRanks;
     }
 
@@ -161,6 +166,9 @@ public class PreflopRangeBuilderUtil {
                 }
             }
         }
+        offSuitCombosOfGivenRanks = rangeBuilder.removeHoleCardCombosFromComboMap(offSuitCombosOfGivenRanks,
+                GameCards.getHoleCards());
+
         return offSuitCombosOfGivenRanks;
     }
 
@@ -188,6 +196,9 @@ public class PreflopRangeBuilderUtil {
                 }
             }
         }
+        pocketPairCombosOfGivenRanks = rangeBuilder.removeHoleCardCombosFromComboMap(pocketPairCombosOfGivenRanks,
+                GameCards.getHoleCards());
+
         return pocketPairCombosOfGivenRanks;
     }
 
@@ -213,21 +224,9 @@ public class PreflopRangeBuilderUtil {
         Map<Integer, Set<Card>> allCombos = new BoardEvaluator().getAllPossibleStartHandsAsSets();
         Set<Set<Card>> allCombosAsSet = new HashSet<>();
 
-        //ff
-        Card c1 = new Card(2, 'c');
-        Card c2 = new Card(3, 'c');
-
-        Set<Card> testSet = new HashSet<>();
-        testSet.add(c1);
-        testSet.add(c2);
-        //ff
-
         for(Map<Integer, Map<Integer, Set<Card>>> comboMapOuter : allCombosNoRestCombos) {
             for(Map.Entry<Integer, Map<Integer, Set<Card>>> comboMapInner : comboMapOuter.entrySet()) {
                 for(Map.Entry<Integer, Set<Card>> entry : comboMapInner.getValue().entrySet()) {
-                    if(entry.getValue().equals(testSet)) {
-                        System.out.println("wacht hier");
-                    }
                     allCombosNoRestCombosAsSet.add(entry.getValue());
                 }
             }
