@@ -166,6 +166,7 @@ public class PreflopRangeBuilderUtil {
 
     public Map<Integer, Set<Card>> getPocketPairCombosOfGivenRank(int rank) {
         Map<Integer, Set<Card>> pocketPairCombosOfGivenRanks = new HashMap<>();
+        Set<Set<Card>> setToTestForUniqueness = new HashSet<>();
         List<Character> suits = new ArrayList<>();
 
         suits.add('s');
@@ -181,7 +182,9 @@ public class PreflopRangeBuilderUtil {
                     Card holeCard2 = new Card(rank, suit2);
                     combo.add(holeCard1);
                     combo.add(holeCard2);
-                    pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
+                    if(setToTestForUniqueness.add(combo)) {
+                        pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
+                    }
                 }
             }
         }

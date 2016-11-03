@@ -264,7 +264,7 @@ public class RangeBuilder {
         while(totalRange.size() < desiredSizeOfTotalRange) {
             //get random combos from airCombosPool en add deze aan totalRange
             int totalRangeSizeInitial = totalRange.size();
-            Integer random = ThreadLocalRandom.current().nextInt(0, airCombosPool.size() + 1);
+            Integer random = ThreadLocalRandom.current().nextInt(0, airCombosPool.size());
             totalRange.add(airCombosPoolAsMap.get(random));
 
             if(totalRange.size() == totalRangeSizeInitial + 1) {
@@ -782,6 +782,17 @@ public class RangeBuilder {
 //
 //    }
 
+    public Map<Integer, Set<Card>> removeHoleCardCombosFromComboMap(Map<Integer, Set<Card>> comboMap,
+                                                                    List<Card> holeCards) {
+        for(Iterator<Map.Entry<Integer, Set<Card>>> it = comboMap.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, Set<Card>> entry = it.next();
+            if(entry.getValue().contains(holeCards.get(0)) || entry.getValue().contains(holeCards.get(1))) {
+                it.remove();
+            }
+        }
+        return comboMap;
+    }
+
     //helper methods
     private Set<Set<Card>> convertMapToSet(Map<Integer, Set<Card>> mapToConvertToSet) {
         Set<Set<Card>> set = new HashSet<>();
@@ -814,17 +825,6 @@ public class RangeBuilder {
             }
         }
         return allSortedCombos;
-    }
-
-    private Map<Integer, Set<Card>> removeHoleCardCombosFromComboMap(Map<Integer, Set<Card>> comboMap,
-                                                                     List<Card> holeCards) {
-        for(Iterator<Map.Entry<Integer, Set<Card>>> it = comboMap.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Integer, Set<Card>> entry = it.next();
-            if(entry.getValue().contains(holeCards.get(0)) || entry.getValue().contains(holeCards.get(1))) {
-                it.remove();
-            }
-        }
-        return comboMap;
     }
 
     private Map<Integer, Set<Card>> removeDrawCombosThatAreAlsoHigherCombos(Map<Integer, Set<Card>> drawComboMap,
