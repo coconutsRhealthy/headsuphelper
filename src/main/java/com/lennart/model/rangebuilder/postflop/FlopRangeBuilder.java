@@ -1,9 +1,5 @@
 package com.lennart.model.rangebuilder.postflop;
 
-import com.lennart.model.boardevaluation.BoardEvaluator;
-import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
-import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
-import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
@@ -20,10 +16,6 @@ public class FlopRangeBuilder {
 
     PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
     RangeBuilder rangeBuilder = new RangeBuilder();
-    BoardEvaluator boardEvaluator = new BoardEvaluator();
-    StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
-    FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
-    HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
 
     //IP
     public Map<Integer, Set<Set<Card>>> get2betFCheck(List<Card> holeCards) {
@@ -34,6 +26,57 @@ public class FlopRangeBuilder {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
         return rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+    }
+
+    public Map<Integer, Set<Set<Card>>> get2betCheck(List<Card> holeCards) {
+        return get2betFCheck(holeCards);
+    }
+
+    public Map<Integer, Set<Set<Card>>> get2bet1bet(List<Card> board, List<Card> holeCards) {
+        //preflop
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall2betRange();
+
+        //postflop
+        Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
+
+        //alles wat de flop hit
+        //testcase: 5d6d8d, jij hebt 52o
+        //
+        //38% van je preflop range
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.55, 0.87, 0.85, holeCards, preflopRange));
+
+        //alle draws
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(board, 0.65, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumOosdCombos(board, 0.6, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getWeakOosdCombos(board, 0.5, holeCards, preflopRange));
+
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongGutshotCombos(board, 0.7, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumGutshotCombos(board, 0.8, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getWeakGutshotCombos(board, 0.5, holeCards, preflopRange));
+
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(board, 0.65, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(board, 0.55, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getWeakFlushDrawCombos(board, 0.5, holeCards, preflopRange));
+
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(board, 0.7, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(board, 0.6, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getWeakTwoOvercardCombos(board, 0.5, holeCards, preflopRange));
+
+        //beetje air
+        //TODO: dit is wat teveel air (38%?)
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(flopRange,
+                preflopRange, 0.05, board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(flopRange, preflopRange, 0.03,
+                board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(flopRange, preflopRange, 0.03,
+                board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getAirRange(flopRange, preflopRange, 0.14, board, holeCards));
+
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+
+        int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
+
+        return flopRangeToReturn;
     }
 
     public Map<Integer, Set<Set<Card>>> get2betF2bet(List<Card> board, List<Card> holeCards) {
@@ -78,6 +121,10 @@ public class FlopRangeBuilder {
         return flopRangeToReturn;
     }
 
+    public Map<Integer, Set<Set<Card>>> get2betCall2bet(List<Card> board, List<Card> holeCards) {
+        return null;
+    }
+
     public Map<Integer, Set<Set<Card>>> getCall3betF1bet(List<Card> board, List<Card> holeCards) {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
@@ -119,6 +166,10 @@ public class FlopRangeBuilder {
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
         return flopRangeToReturn;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getCall3betCall1bet(List<Card> board, List<Card> holeCards) {
+        return null;
     }
 
     public Map<Integer, Set<Set<Card>>> get4betFCheck(List<Card> board, List<Card> holeCards) {
@@ -170,6 +221,10 @@ public class FlopRangeBuilder {
         return flopRangeToReturn;
     }
 
+    public Map<Integer, Set<Set<Card>>> getCall2betCall1bet(List<Card> board, List<Card> holeCards) {
+        return null;
+    }
+
     //gets range of opponent when opponent calls preflop 3bet and bets flop. Should return 50%
     //of the previous range combos in default scenario.
     public Map<Integer, Set<Set<Card>>> get3betF1bet(List<Card> board, List<Card> holeCards) {
@@ -213,6 +268,18 @@ public class FlopRangeBuilder {
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
         return flopRangeToReturn;
+    }
+
+    public Map<Integer, Set<Set<Card>>> get3bet1bet(List<Card> board, List<Card> holeCards) {
+        return null;
+    }
+
+    public Map<Integer, Set<Set<Card>>> get3betCall1bet(List<Card> board, List<Card> holeCards) {
+        return null;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getCall4betF1bet(List<Card> board, List<Card> holeCards) {
+        return null;
     }
 
 }

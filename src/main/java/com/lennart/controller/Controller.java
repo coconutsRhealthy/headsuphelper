@@ -141,6 +141,7 @@ public class Controller {
 //        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
 //        new Call2betRangeBuilder().getOpponentCall2betRange();
         new HandEvaluator().getHandStrength(holeCards, board);
+        //TODO: loop dit even na, argumenten omgekeerd
         flopRangeBuilder.get3betF1bet(holeCards, board);
         flopRangeBuilder.getCall2betF1bet(holeCards, board);
         new FlopRangeBuilder().getCall3betF1bet(holeCards, board);

@@ -505,6 +505,18 @@ public class RangeBuilder {
         return comboMap;
     }
 
+    public Map<Integer, Set<Card>> convertPreviousStreetRangeToCorrectFormat(Map<Integer, Set<Set<Card>>>
+                                                                                     rangePreviousStreet) {
+        Map<Integer, Set<Card>> rangePreviousStreetCorrectFormat = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : rangePreviousStreet.entrySet()) {
+            for(Set<Card> combo : entry.getValue()) {
+                rangePreviousStreetCorrectFormat.put(rangePreviousStreetCorrectFormat.size(), combo);
+            }
+        }
+        return rangePreviousStreetCorrectFormat;
+    }
+
     //helper methods
     private Set<Set<Card>> convertMapToSet(Map<Integer, Set<Card>> mapToConvertToSet) {
         Set<Set<Card>> set = new HashSet<>();
