@@ -137,10 +137,8 @@ public class FlopRangeBuilder {
         Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent2betRange();
 
         //postflop
-        //dus je moet weten met welke range je opponent 2bet en daarna cbet op flop...
 
         //value range
-        //ik denk met alles boven de 50%
         flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.5, 1, 0.8));
 
         //draws
@@ -166,6 +164,51 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(flopRange, preflopRange, 0.03,
                 board, holeCards));
         flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(flopRange, preflopRange, 0.03,
+                board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getAirRange(flopRange, preflopRange, 0.14, board, holeCards));
+
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+
+        int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
+
+        return flopRangeToReturn;
+    }
+
+    //gets range of opponent when opponent calls preflop 3bet and bets flop. Should return 50%
+    //of the previous range combos in default scenario.
+    public Map<Integer, Set<Set<Card>>> get3betF1bet(List<Card> board, List<Card> holeCards) {
+        Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
+
+        //preflop
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall3betRange();
+
+        //postflop
+
+        //value range
+        //80% met alle 87%+ combos
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.87, 1, 0.8));
+
+        //50% met de mid pair combos en bottom pair combos
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.64, 0.87, 0.55));
+
+        //de tricky range?
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.5, 0.64, 0.2));
+
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(board, 0.72, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumOosdCombos(board, 0.72, holeCards, preflopRange));
+
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongGutshotCombos(board, 0.72, holeCards, preflopRange));
+
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(board, 0.72, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(board, 0.72, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(board, 0.72, holeCards, preflopRange));
+
+        //de air combos
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(flopRange,
+                preflopRange, 0.10, board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(flopRange, preflopRange, 0.06,
+                board, holeCards));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(flopRange, preflopRange, 0.06,
                 board, holeCards));
         flopRange.put(flopRange.size(), rangeBuilder.getAirRange(flopRange, preflopRange, 0.14, board, holeCards));
 
