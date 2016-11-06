@@ -20,9 +20,6 @@ public class _2betRangeBuilder {
 
         comboMap100Percent.put(1, p.getSuitedHoleCards(2, 2, 100));
         comboMap100Percent.put(2, p.getPocketPairs(2, 100));
-        comboMap100Percent.put(3, p.getOffSuitHoleCards(14, 2, 100));
-        comboMap100Percent.put(4, p.getOffSuitHoleCards(13, 2, 100));
-        comboMap100Percent.put(5, p.getOffSuitHoleCards(12, 2, 100));
         comboMap100Percent.put(6, p.getOffSuitHoleCards(11, 2, 100));
         comboMap100Percent.put(7, p.getOffSuitCombosOfGivenRanks(10, 9));
         comboMap100Percent.put(8, p.getOffSuitCombosOfGivenRanks(10, 8));

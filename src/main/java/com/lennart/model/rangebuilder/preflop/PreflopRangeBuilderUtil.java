@@ -95,6 +95,9 @@ public class PreflopRangeBuilderUtil {
                 pocketPairs.put(pocketPairs.size(), pocketPairCombo);
             }
         }
+        pocketPairs = rangeBuilder.removeHoleCardCombosFromComboMap(pocketPairs,
+                GameCards.getHoleCards());
+
         return pocketPairs;
     }
 
@@ -310,7 +313,8 @@ public class PreflopRangeBuilderUtil {
                     comboRanks.add(asList.get(0).getRank());
                     comboRanks.add(asList.get(1).getRank());
 
-                    if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard) {
+                    if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard
+                            && comboRanks.get(0) != comboRanks.get(1)) {
                         double randomNumber = Math.random();
                         if(randomNumber < percentage) {
                             suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
@@ -320,6 +324,9 @@ public class PreflopRangeBuilderUtil {
                 }
             }
         }
+        suitedOrOffSuitHoleCards = rangeBuilder.removeHoleCardCombosFromComboMap(suitedOrOffSuitHoleCards,
+                GameCards.getHoleCards());
+
         return suitedOrOffSuitHoleCards;
     }
 }

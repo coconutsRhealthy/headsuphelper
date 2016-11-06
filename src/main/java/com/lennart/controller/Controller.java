@@ -116,6 +116,7 @@ public class Controller {
     @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
     public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
 
+        FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
 //        threeOfAKindEvaluator.getThreeOfAKindCombos(board);
 //        twoPairEvaluator.getCombosThatMakeTwoPair(board);
 //        pairEvaluator.getCombosThatMakePair(board);
@@ -140,6 +141,9 @@ public class Controller {
 //        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
 //        new Call2betRangeBuilder().getOpponentCall2betRange();
         new HandEvaluator().getHandStrength(holeCards, board);
+        flopRangeBuilder.getCall2betF1bet(holeCards, board);
+        new FlopRangeBuilder().getCall3betF1bet(holeCards, board);
+
         new FlopRangeBuilder().get2betF2bet(board, holeCards);
         new HandEvaluator().getHandStrength(holeCards, board);
         new HighCardDrawEvaluator().getMediumTwoOvercards(board);

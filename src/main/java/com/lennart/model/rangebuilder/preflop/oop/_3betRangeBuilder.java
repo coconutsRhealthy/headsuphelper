@@ -1,11 +1,10 @@
 package com.lennart.model.rangebuilder.preflop.oop;
 
+import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by lpo10346 on 10/21/2016.
@@ -19,6 +18,10 @@ public class _3betRangeBuilder {
     private static Map<Integer, Map<Integer, Set<Card>>> comboMap20Percent = new HashMap<>();
     private static Map<Integer, Map<Integer, Set<Card>>> comboMap10Percent = new HashMap<>();
     private static Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
+
+    private static Map<Integer, Map<Integer, Set<Card>>> comboMapRest7Percent = new HashMap<>();
+    private static Map<Integer, Map<Integer, Set<Card>>> comboMapAllPossibleStartHands = new HashMap<>();
+    private static List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
 
     static {
         PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
@@ -171,6 +174,20 @@ public class _3betRangeBuilder {
         comboMap5Percent.put(22, p.getSuitedCombosOfGivenRanks(8, 2));
         comboMap5Percent.put(23, p.getSuitedCombosOfGivenRanks(7, 2));
         comboMap5Percent.put(24, p.getSuitedCombosOfGivenRanks(6, 2));
+
+        allCombosNoRestCombos.add(comboMap95Percent);
+        allCombosNoRestCombos.add(comboMap70Percent);
+        allCombosNoRestCombos.add(comboMap50Percent);
+        allCombosNoRestCombos.add(comboMap35Percent);
+        allCombosNoRestCombos.add(comboMap20Percent);
+        allCombosNoRestCombos.add(comboMap10Percent);
+        allCombosNoRestCombos.add(comboMap5Percent);
+
+        comboMapRest7Percent.put(1,
+                new PreflopRangeBuilderUtil().removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
+
+        comboMapAllPossibleStartHands.put(1, new BoardEvaluator().getAllPossibleStartHandsAsSets());
+
     }
 
     public Map<Integer, Set<Card>> getOpponent3betRange() {
@@ -184,6 +201,9 @@ public class _3betRangeBuilder {
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap20Percent, 0.2);
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap10Percent, 0.1);
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap5Percent, 0.05);
+
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMapRest7Percent, 0.07);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMapAllPossibleStartHands, 0.03);
 
         return opponent3betRange;
     }
