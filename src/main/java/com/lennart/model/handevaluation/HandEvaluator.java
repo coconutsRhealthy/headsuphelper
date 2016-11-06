@@ -93,9 +93,11 @@ public class HandEvaluator {
         }
 
         index = numberOfcombosWeakerThanYours / (numberOfcombosWeakerThanYours + numberOfCombosStrongerThanYours);
-        return index;
+
+        if(numberOfcombosWeakerThanYours == 0 && numberOfCombosStrongerThanYours == 0) {
+            return 1;
+        } else {
+            return index;
+        }
     }
-
-
-
 }
