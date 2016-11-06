@@ -170,8 +170,7 @@ public class Call3betRangeBuilder {
         allCombosNoRestCombos.add(comboMap7Percent);
         allCombosNoRestCombos.add(comboMap5Percent);
 
-        comboMapRest7Percent.put(1,
-                new PreflopRangeBuilderUtil().removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
+        comboMapRest7Percent.put(1, p.removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
 
         comboMapAllPossibleStartHands.put(1, new BoardEvaluator().getAllPossibleStartHandsAsSets());
     }
@@ -196,6 +195,8 @@ public class Call3betRangeBuilder {
 
         opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMapRest7Percent, 0.07);
         opponentCall3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall3betRange, comboMapAllPossibleStartHands, 0.03);
+
+        opponentCall3betRange = p.removeDoubleCombos(opponentCall3betRange);
 
         return opponentCall3betRange;
     }

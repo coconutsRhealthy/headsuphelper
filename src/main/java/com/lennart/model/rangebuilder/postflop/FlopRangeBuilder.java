@@ -87,10 +87,6 @@ public class FlopRangeBuilder {
         //postflop
 
         //de value range
-        //test op Ks9d7d board. Je hebt ge3bet. Met welke handen wil je value 1betten...
-        //Ik denk met elke K..
-
-        //80% met alle 87%+ combos
         flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.87, 1, 0.8));
 
         //60% met de mid pair combos en bottom pair combos

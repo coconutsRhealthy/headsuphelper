@@ -177,8 +177,7 @@ public class Call2betRangeBuilder {
         allCombosNoRestCombos.add(comboMap10Percent);
         allCombosNoRestCombos.add(comboMap5Percent);
 
-        comboMapRest7Percent.put(1,
-                new PreflopRangeBuilderUtil().removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
+        comboMapRest7Percent.put(1, p.removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
 
         comboMapAllPossibleStartHands.put(1, new BoardEvaluator().getAllPossibleStartHandsAsSets());
     }
@@ -197,6 +196,8 @@ public class Call2betRangeBuilder {
         opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap5Percent, 0.05);
         opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMapRest7Percent, 0.07);
         opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMapAllPossibleStartHands, 0.03);
+
+        opponentCall2betRange = p.removeDoubleCombos(opponentCall2betRange);
 
         return opponentCall2betRange;
     }

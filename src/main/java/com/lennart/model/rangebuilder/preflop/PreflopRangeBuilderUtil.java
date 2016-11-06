@@ -248,6 +248,21 @@ public class PreflopRangeBuilderUtil {
         return mapToReturn;
     }
 
+    public Map<Integer, Set<Card>> removeDoubleCombos(Map<Integer, Set<Card>> comboMap) {
+        Set<Set<Card>> comboMapAsSet = new HashSet<>();
+
+        for (Map.Entry<Integer, Set<Card>> entry : comboMap.entrySet()) {
+            comboMapAsSet.add(entry.getValue());
+        }
+
+        comboMap.clear();
+
+        for(Set<Card> s : comboMapAsSet) {
+            comboMap.put(comboMap.size(), s);
+        }
+        return comboMap;
+    }
+
     //helper methods
     private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited,
                                                                       double percentage) {
