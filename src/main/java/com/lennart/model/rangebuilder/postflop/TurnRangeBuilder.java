@@ -17,7 +17,7 @@ public class TurnRangeBuilder {
 
     //IP
 
-    //je wil de range van je opponent inschatten, gegeven dat hij je preflop 2bet gecallt heeft en je flop cbet gecallt heeft
+    //je wil de range van je opponent inschatten, gegeven dat hij je preflop 2bet gecallt heeft en je flop cbet gecallt heeft.
     public Map<Integer, Set<Set<Card>>> get2bet1betFCheck(List<Card> board, List<Card> holeCards) {
         //range resulting from previous actions:
 

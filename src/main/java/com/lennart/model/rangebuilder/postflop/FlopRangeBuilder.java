@@ -42,7 +42,7 @@ public class FlopRangeBuilder {
         //alles wat de flop hit
         //testcase: 5d6d8d, jij hebt 52o
         //
-        //38% van je preflop range
+        //38% van je preflop range, amout of combos to return here
         flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.55, 0.87, 0.85, holeCards, preflopRange));
 
         //alle draws
