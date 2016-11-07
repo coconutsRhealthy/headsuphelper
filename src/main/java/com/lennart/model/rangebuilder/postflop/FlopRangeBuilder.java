@@ -106,16 +106,18 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(board, 0.5, holeCards, preflopRange));
 
         //de air combos
-        flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(flopRange,
-                preflopRange, 0.05, board, holeCards));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(flopRange, preflopRange, 0.03,
-                board, holeCards));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(flopRange, preflopRange, 0.03,
-                board, holeCards));
+        Map<Integer, Set<Set<Card>>> flopRangeNoAir = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        int numberOfNoAirCombos = rangeBuilder.countNumberOfCombos(flopRangeNoAir);
+
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(preflopRange,
+                board, holeCards, numberOfNoAirCombos, 0.05));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(preflopRange, board, holeCards,
+                numberOfNoAirCombos, 0.03));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(preflopRange, board, holeCards,
+                numberOfNoAirCombos, 0.03));
         flopRange.put(flopRange.size(), rangeBuilder.getAirRange(flopRange, preflopRange, 0.14, board, holeCards));
 
         Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
-
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
         return flopRangeToReturn;

@@ -267,11 +267,10 @@ public class RangeBuilder {
         return airCombosAddedToTotalRange;
     }
 
-    public Map<Integer, Set<Card>> getCombosThatAreBothStrongBdFlushAndBdStraightDraw(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
-                                                                                      Map<Integer, Set<Card>> rangeOfPreviousStreet,
-                                                                                      double percentageOfAirCombos, List<Card> board,
-                                                                                      List<Card> holeCards) {
-        double numberOfCombosToReturn = percentageOfAirCombos * getNumberOfNoAirCombos(rangeNoAir, rangeOfPreviousStreet);
+    public Map<Integer, Set<Card>> getCombosThatAreBothStrongBdFlushAndBdStraightDraw(Map<Integer, Set<Card>> rangeOfPreviousStreet,
+                                                                                      List<Card> board, List<Card> holeCards,
+                                                                                      int numberNoAirCombos, double percentageOfAirCombos) {
+        double numberOfCombosToReturn = percentageOfAirCombos * numberNoAirCombos;
 
         Map<Integer, Set<Card>> strongBackDoorFlushDraws = new FlushDrawEvaluator().getStrongBackDoorFlushCombos(board);
         Map<Integer, Set<Card>> strongBackDoorStraightDraws = new StraightDrawEvaluator().getStrongBackDoorCombos(board);
@@ -293,11 +292,10 @@ public class RangeBuilder {
         return combosToReturn;
     }
 
-    public Map<Integer, Set<Card>> getStrongBackDoorFlushDrawCombos(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
-                                                                    Map<Integer, Set<Card>> rangeOfPreviousStreet,
-                                                                    double percentageOfAirCombos, List<Card> board,
-                                                                    List<Card> holeCards) {
-        double numberOfCombosToReturn = percentageOfAirCombos * getNumberOfNoAirCombos(rangeNoAir, rangeOfPreviousStreet);
+    public Map<Integer, Set<Card>> getStrongBackDoorFlushDrawCombos(Map<Integer, Set<Card>> rangeOfPreviousStreet,
+                                                                    List<Card> board, List<Card> holeCards,
+                                                                    int numberNoAirCombos, double percentageOfAirCombos) {
+        double numberOfCombosToReturn = percentageOfAirCombos * numberNoAirCombos;
 
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
         Map<Integer, Set<Card>> strongBackDoorFlushDraws = new FlushDrawEvaluator().getStrongBackDoorFlushCombos(board);
@@ -321,11 +319,10 @@ public class RangeBuilder {
         return combosToReturn;
     }
 
-    public Map<Integer, Set<Card>> getStrongBackDoorStraightDrawCombos(Map<Integer, Map<Integer, Set<Card>>> rangeNoAir,
-                                                                       Map<Integer, Set<Card>> rangeOfPreviousStreet,
-                                                                       double percentageOfAirCombos, List<Card> board,
-                                                                       List<Card> holeCards) {
-        double numberOfCombosToReturn = percentageOfAirCombos * getNumberOfNoAirCombos(rangeNoAir, rangeOfPreviousStreet);
+    public Map<Integer, Set<Card>> getStrongBackDoorStraightDrawCombos(Map<Integer, Set<Card>> rangeOfPreviousStreet,
+                                                                       List<Card> board, List<Card> holeCards,
+                                                                       int numberNoAirCombos, double percentageOfAirCombos) {
+        double numberOfCombosToReturn = percentageOfAirCombos * numberNoAirCombos;
 
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
         Map<Integer, Set<Card>> strongBackDoorFlushDraws = new FlushDrawEvaluator().getStrongBackDoorFlushCombos(board);
