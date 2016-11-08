@@ -175,7 +175,7 @@ public class RangeBuilder {
     public Map<Integer, Set<Card>> getAirRange(Map<Integer, Map<Integer, Set<Card>>> rangeThusFar,
                                                Map<Integer, Set<Card>> rangeOfPreviousStreet,
                                                List<Card> board, List<Card> holeCards,
-                                               int numberNoAirCombos, double percentageOfAirCombos) {
+                                               double numberOfAirCombosToBeAdded) {
         Set<Set<Card>> airCombosPool = new HashSet<>();
 
         FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
@@ -232,14 +232,12 @@ public class RangeBuilder {
             airCombosPoolAsMap.put(airCombosPoolAsMap.size(), s);
         }
 
-        double desiredSizeOfTotalRange = numberNoAirCombos * percentageOfAirCombos;
-
         Map<Integer, Set<Card>> airCombosAddedToTotalRange = new HashMap<>();
         Set<Set<Card>> setToTestIfComboIsUnique = new HashSet<>();
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
         int counter = 0;
 
-        while(counter <= desiredSizeOfTotalRange) {
+        while(counter <= numberOfAirCombosToBeAdded) {
             Integer random = ThreadLocalRandom.current().nextInt(0, airCombosPool.size());
             if(setToTestIfComboIsUnique.add(airCombosPoolAsMap.get(random)) &&
                     rangeThusFarAsSet.add(airCombosPoolAsMap.get(random))) {
@@ -271,11 +269,13 @@ public class RangeBuilder {
         Set<Set<Card>> setToTestIfComboIsUnique = new HashSet<>();
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
-        while(combosToReturn.size() < numberOfCombosToReturn) {
-            Integer random = ThreadLocalRandom.current().nextInt(0, bothBdFlushDrawAndBdStraightDraw.size());
-            if(setToTestIfComboIsUnique.add(bothBdFlushDrawAndBdStraightDraw.get(random)) &&
-                    rangeThusFarAsSet.add(bothBdFlushDrawAndBdStraightDraw.get(random))) {
-                combosToReturn.put(combosToReturn.size(), bothBdFlushDrawAndBdStraightDraw.get(random));
+        if(!bothBdFlushDrawAndBdStraightDraw.isEmpty()) {
+            while (combosToReturn.size() < numberOfCombosToReturn) {
+                Integer random = ThreadLocalRandom.current().nextInt(0, bothBdFlushDrawAndBdStraightDraw.size());
+                if (setToTestIfComboIsUnique.add(bothBdFlushDrawAndBdStraightDraw.get(random)) &&
+                        rangeThusFarAsSet.add(bothBdFlushDrawAndBdStraightDraw.get(random))) {
+                    combosToReturn.put(combosToReturn.size(), bothBdFlushDrawAndBdStraightDraw.get(random));
+                }
             }
         }
         return combosToReturn;
@@ -521,6 +521,29 @@ public class RangeBuilder {
         return rangePreviousStreetCorrectFormat;
     }
 
+    public Map<Integer, Map<Integer, Set<Card>>> add22PercentAirCombos(List<Card> holeCards, List<Card> board,
+                                                                       Map<Integer, Map<Integer, Set<Card>>> flopRange,
+                                                                       Map<Integer, Set<Card>> preflopRange) {
+        RangeBuilder rangeBuilder = new RangeBuilder();
+        int numberOfNoAirCombos = rangeBuilder.countNumberOfCombosMapInnerMap(flopRange, holeCards, preflopRange);
+        double desiredRangeSize = numberOfNoAirCombos * 1.22;
+
+        flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(preflopRange,
+                flopRange, board, holeCards, numberOfNoAirCombos, 0.05));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(preflopRange, flopRange, board,
+                holeCards, numberOfNoAirCombos, 0.03));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(preflopRange, flopRange, board,
+                holeCards, numberOfNoAirCombos, 0.03));
+
+        double numberOfCombosToBeAddedStill = desiredRangeSize -
+                rangeBuilder.countNumberOfCombosMapInnerMap(flopRange, holeCards, preflopRange);
+
+        flopRange.put(flopRange.size(), rangeBuilder.getAirRange(flopRange, preflopRange, board, holeCards,
+                numberOfCombosToBeAddedStill));
+
+        return flopRange;
+    }
+
     //helper methods
     private Set<Set<Card>> convertMapToSet(Map<Integer, Set<Card>> mapToConvertToSet) {
         Set<Set<Card>> set = new HashSet<>();
@@ -620,5 +643,26 @@ public class RangeBuilder {
             }
         }
         return counter;
+    }
+
+    public int countNumberOfCombosMapInnerMap(Map<Integer, Map<Integer, Set<Card>>> combos, List<Card> holeCards,
+                                              Map<Integer, Set<Card>> rangePreviousStreet) {
+        Set<Set<Card>> mapAsSet = new HashSet<>();
+        Map<Integer, Set<Card>> mapSimple = new HashMap<>();
+
+        for (Map.Entry<Integer, Map<Integer, Set<Card>>> entry : combos.entrySet()) {
+            for (Map.Entry<Integer, Set<Card>> entry2 : entry.getValue().entrySet()) {
+                mapAsSet.add(entry2.getValue());
+            }
+        }
+
+        for(Set<Card> s : mapAsSet) {
+            mapSimple.put(mapSimple.size(), s);
+        }
+
+        mapSimple = removeHoleCardCombosFromComboMap(mapSimple, holeCards);
+        mapSimple = getCombosThatArePresentInBothMaps(mapSimple, rangePreviousStreet);
+
+        return mapSimple.size();
     }
 }
