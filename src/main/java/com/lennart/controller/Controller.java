@@ -141,10 +141,15 @@ public class Controller {
 //        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
 //        new Call2betRangeBuilder().getOpponentCall2betRange();
         new HandEvaluator().getHandStrength(holeCards, board);
+        //flopRangeBuilder.get2bet1bet(board, holeCards);
+        //flopRangeBuilder.getCall2betF1bet(board, holeCards);
         flopRangeBuilder.get2bet1bet(board, holeCards);
-        new FlopRangeBuilder().get2betF2bet(board, holeCards);
-        new HandEvaluator().getHandStrength(holeCards, board);
-        new HighCardDrawEvaluator().getMediumTwoOvercards(board);
+        flopRangeBuilder.get3bet1bet(board, holeCards);
+        flopRangeBuilder.get3betF1bet(board, holeCards);
+//        flopRangeBuilder.getCall3betF1bet(board, holeCards);
+//        new FlopRangeBuilder().get2betF2bet(board, holeCards);
+//        new HandEvaluator().getHandStrength(holeCards, board);
+//        new HighCardDrawEvaluator().getMediumTwoOvercards(board);
 
 //        straightDrawEvaluator.getStrongOosdCombos(board);
 
