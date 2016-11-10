@@ -1,0 +1,21 @@
+Flop:
+
+    IP:
+
+        2betCheck           X
+        2bet1bet            X
+        2betCall2bet        X
+
+        call3betCheck
+        call3betCall1bet    X
+        call3bet1bet
+
+    OOP:
+
+        call2betCheck       X
+        call2betCall1bet    X
+        call2bet2bet
+
+        3betCheck
+        3bet1bet            X
+        3betCall1bet        X

@@ -527,7 +527,7 @@ public class RangeBuilder {
                                                                       double percentage) {
         RangeBuilder rangeBuilder = new RangeBuilder();
         int numberOfNoAirCombos = rangeBuilder.countNumberOfCombosMapInnerMap(flopRange, holeCards, preflopRange);
-        double desiredRangeSize = numberOfNoAirCombos * 1 + percentage;
+        double desiredRangeSize = numberOfNoAirCombos * (1 + percentage);
 
         flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(preflopRange,
                 flopRange, board, holeCards, numberOfNoAirCombos, 0.05));
@@ -544,6 +544,22 @@ public class RangeBuilder {
                     numberOfCombosToBeAddedStill));
         }
         return flopRange;
+    }
+
+    public Map<Integer, Set<Card>> getOppositeRangeAtFlop(Map<Integer, Set<Set<Card>>> baseRange,
+                                                               Map<Integer, Set<Card>> preflopRange) {
+        loop: for(Iterator<Map.Entry<Integer, Set<Card>>> it = preflopRange.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, Set<Card>> entry = it.next();
+            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : baseRange.entrySet()) {
+                for(Set<Card> combo : entry2.getValue()) {
+                    if(entry.getValue().equals(combo)) {
+                        it.remove();
+                        continue loop;
+                    }
+                }
+            }
+        }
+        return preflopRange;
     }
 
     //helper methods
