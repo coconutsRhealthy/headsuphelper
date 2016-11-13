@@ -79,6 +79,12 @@ public class PreflopRangeBuilderUtil {
         Map<Integer, List<Card>> allPocketPairStartHands = new BoardEvaluator().getAllPocketPairStartHands();
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         List<List<Card>> asList = new ArrayList<>(allPocketPairStartHands.values());
         Set<Set<Card>> asSet = new HashSet<>();
 
@@ -90,14 +96,17 @@ public class PreflopRangeBuilderUtil {
             }
         }
         for(Set<Card> pocketPairCombo : asSet) {
-            double randomNumber = Math.random();
-            if(randomNumber < percentage) {
-                pocketPairs.put(pocketPairs.size(), pocketPairCombo);
-            }
-        }
-        pocketPairs = rangeBuilder.removeHoleCardCombosFromComboMap(pocketPairs,
-                GameCards.getHoleCards());
+            List<Card> coboCheck = new ArrayList<>(pocketPairCombo);
 
+            if(knownGameCardsCopy.add(coboCheck.get(0)) && knownGameCardsCopy.add(coboCheck.get(1))) {
+                double randomNumber = Math.random();
+                if(randomNumber < percentage) {
+                    pocketPairs.put(pocketPairs.size(), pocketPairCombo);
+                }
+            }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
+        }
         return pocketPairs;
     }
 
@@ -131,20 +140,27 @@ public class PreflopRangeBuilderUtil {
         suits.add('d');
         suits.add('h');
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for(Character suit : suits) {
             Set<Card> combo = new HashSet<>();
             Card holeCard1 = new Card(rankCard1, suit);
             Card holeCard2 = new Card(rankCard2, suit);
-            combo.add(holeCard1);
-            combo.add(holeCard2);
+            if(knownGameCardsCopy.add(holeCard1) && knownGameCardsCopy.add(holeCard2)) {
+                combo.add(holeCard1);
+                combo.add(holeCard2);
 
-            if(combo.size() == 2) {
-                suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
+                if (combo.size() == 2) {
+                    suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
+                }
             }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
         }
-        suitedCombosOfGivenRanks = rangeBuilder.removeHoleCardCombosFromComboMap(suitedCombosOfGivenRanks,
-                GameCards.getHoleCards());
-
         return suitedCombosOfGivenRanks;
     }
 
@@ -157,21 +173,28 @@ public class PreflopRangeBuilderUtil {
         suits.add('d');
         suits.add('h');
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
                 if(suit1 != suit2) {
                     Set<Card> combo = new HashSet<>();
                     Card holeCard1 = new Card(rankCard1, suit1);
                     Card holeCard2 = new Card(rankCard2, suit2);
-                    combo.add(holeCard1);
-                    combo.add(holeCard2);
-                    offSuitCombosOfGivenRanks.put(offSuitCombosOfGivenRanks.size(), combo);
+                    if(knownGameCardsCopy.add(holeCard1) && knownGameCardsCopy.add(holeCard2)) {
+                        combo.add(holeCard1);
+                        combo.add(holeCard2);
+                        offSuitCombosOfGivenRanks.put(offSuitCombosOfGivenRanks.size(), combo);
+                    }
+                    knownGameCardsCopy.clear();
+                    knownGameCardsCopy.addAll(knownGameCards);
                 }
             }
         }
-        offSuitCombosOfGivenRanks = rangeBuilder.removeHoleCardCombosFromComboMap(offSuitCombosOfGivenRanks,
-                GameCards.getHoleCards());
-
         return offSuitCombosOfGivenRanks;
     }
 
@@ -185,23 +208,30 @@ public class PreflopRangeBuilderUtil {
         suits.add('d');
         suits.add('h');
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
                 if(suit1 != suit2) {
                     Set<Card> combo = new HashSet<>();
                     Card holeCard1 = new Card(rank, suit1);
                     Card holeCard2 = new Card(rank, suit2);
-                    combo.add(holeCard1);
-                    combo.add(holeCard2);
-                    if(setToTestForUniqueness.add(combo)) {
-                        pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
+                    if(knownGameCardsCopy.add(holeCard1) && knownGameCardsCopy.add(holeCard2)) {
+                        combo.add(holeCard1);
+                        combo.add(holeCard2);
+                        if (setToTestForUniqueness.add(combo)) {
+                            pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
+                        }
                     }
+                    knownGameCardsCopy.clear();
+                    knownGameCardsCopy.addAll(knownGameCards);
                 }
             }
         }
-        pocketPairCombosOfGivenRanks = rangeBuilder.removeHoleCardCombosFromComboMap(pocketPairCombosOfGivenRanks,
-                GameCards.getHoleCards());
-
         return pocketPairCombosOfGivenRanks;
     }
 
@@ -307,41 +337,48 @@ public class PreflopRangeBuilderUtil {
                                                                 double percentage) {
         Map<Integer, Set<Card>> suitedOrOffSuitHoleCards = new HashMap<>();
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for(Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());
-            if(suited) {
-                if(asList.get(0).getSuit() == asList.get(1).getSuit()) {
-                    List<Integer> comboRanks = new ArrayList<>();
-                    comboRanks.add(asList.get(0).getRank());
-                    comboRanks.add(asList.get(1).getRank());
 
-                    if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard) {
-                        double randomNumber = Math.random();
-                        if(randomNumber < percentage) {
-                            suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
+            if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                if(suited) {
+                    if(asList.get(0).getSuit() == asList.get(1).getSuit()) {
+                        List<Integer> comboRanks = new ArrayList<>();
+                        comboRanks.add(asList.get(0).getRank());
+                        comboRanks.add(asList.get(1).getRank());
+
+                        if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard) {
+                            double randomNumber = Math.random();
+                            if(randomNumber < percentage) {
+                                suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
+                            }
                         }
                     }
-                }
-            } else {
-                if(asList.get(0).getSuit() != asList.get(1).getSuit()) {
-                    List<Integer> comboRanks = new ArrayList<>();
-                    comboRanks.add(asList.get(0).getRank());
-                    comboRanks.add(asList.get(1).getRank());
+                } else {
+                    if(asList.get(0).getSuit() != asList.get(1).getSuit()) {
+                        List<Integer> comboRanks = new ArrayList<>();
+                        comboRanks.add(asList.get(0).getRank());
+                        comboRanks.add(asList.get(1).getRank());
 
-                    if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard
-                            && comboRanks.get(0) != comboRanks.get(1)) {
-                        double randomNumber = Math.random();
-                        if(randomNumber < percentage) {
-                            suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
-
+                        if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard
+                                && comboRanks.get(0) != comboRanks.get(1)) {
+                            double randomNumber = Math.random();
+                            if(randomNumber < percentage) {
+                                suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
+                            }
                         }
                     }
                 }
             }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
         }
-        suitedOrOffSuitHoleCards = rangeBuilder.removeHoleCardCombosFromComboMap(suitedOrOffSuitHoleCards,
-                GameCards.getHoleCards());
-
         return suitedOrOffSuitHoleCards;
     }
 }

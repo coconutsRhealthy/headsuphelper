@@ -6,6 +6,7 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.GameCards;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -105,11 +106,23 @@ public class RangeBuilder {
 
         Map<Integer, Set<Card>> combosAboveDesignatedStrengthLevel = new HashMap<>();
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosAboveDesignatedStrengthLevel.entrySet()) {
             for(Set<Card> combo : entry.getValue()) {
-                if(Math.random() <= percentageOfCombosToInclude) {
-                    combosAboveDesignatedStrengthLevel.put(combosAboveDesignatedStrengthLevel.size(), combo);
+                List<Card> asList = new ArrayList<>(combo);
+
+                if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                    if(Math.random() <= percentageOfCombosToInclude) {
+                        combosAboveDesignatedStrengthLevel.put(combosAboveDesignatedStrengthLevel.size(), combo);
+                    }
                 }
+                knownGameCardsCopy.clear();
+                knownGameCardsCopy.addAll(knownGameCards);
             }
         }
         return combosAboveDesignatedStrengthLevel;
@@ -124,10 +137,22 @@ public class RangeBuilder {
         allCombosOfDesignatedStrength = removeHoleCardCombosFromComboMap(allCombosOfDesignatedStrength, holeCards);
         allCombosOfDesignatedStrength = getCombosThatArePresentInBothMaps(allCombosOfDesignatedStrength, rangeOfPreviousStreet);
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for (Map.Entry<Integer, Set<Card>> entry : allCombosOfDesignatedStrength.entrySet()) {
-            if(Math.random() < percentageOfCombosToInclude) {
-                combosToReturn.put(combosToReturn.size(), entry.getValue());
+            List<Card> asList = new ArrayList<>(entry.getValue());
+
+            if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                if (Math.random() < percentageOfCombosToInclude) {
+                    combosToReturn.put(combosToReturn.size(), entry.getValue());
+                }
             }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
         }
         return combosToReturn;
     }
@@ -237,12 +262,24 @@ public class RangeBuilder {
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
         int counter = 0;
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         while(counter <= numberOfAirCombosToBeAdded) {
             Integer random = ThreadLocalRandom.current().nextInt(0, airCombosPool.size());
             if(setToTestIfComboIsUnique.add(airCombosPoolAsMap.get(random)) &&
                     rangeThusFarAsSet.add(airCombosPoolAsMap.get(random))) {
-                airCombosAddedToTotalRange.put(airCombosAddedToTotalRange.size(), airCombosPoolAsMap.get(random));
-                counter++;
+                List<Card> asList = new ArrayList<>(airCombosPoolAsMap.get(random));
+
+                if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                    airCombosAddedToTotalRange.put(airCombosAddedToTotalRange.size(), airCombosPoolAsMap.get(random));
+                    counter++;
+                }
+                knownGameCardsCopy.clear();
+                knownGameCardsCopy.addAll(knownGameCards);
             }
         }
 
@@ -269,10 +306,22 @@ public class RangeBuilder {
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for (Map.Entry<Integer, Set<Card>> entry : bothBdFlushDrawAndBdStraightDraw.entrySet()) {
-            if(combosToReturn.size() < numberOfCombosToReturn && rangeThusFarAsSet.add(entry.getValue())) {
-                combosToReturn.put(combosToReturn.size(), entry.getValue());
+            List<Card> asList = new ArrayList<>(entry.getValue());
+
+            if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                if (combosToReturn.size() < numberOfCombosToReturn && rangeThusFarAsSet.add(entry.getValue())) {
+                    combosToReturn.put(combosToReturn.size(), entry.getValue());
+                }
             }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
         }
         return combosToReturn;
     }
@@ -301,10 +350,22 @@ public class RangeBuilder {
 
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for(Set<Card> s : strongBackDoorFlushDrawsAsSet) {
-            if(combosToReturn.size() < numberOfCombosToReturn && rangeThusFarAsSet.add(s)) {
-                combosToReturn.put(combosToReturn.size(), s);
+            List<Card> asList = new ArrayList<>(s);
+
+            if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                if (combosToReturn.size() < numberOfCombosToReturn && rangeThusFarAsSet.add(s)) {
+                    combosToReturn.put(combosToReturn.size(), s);
+                }
             }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
         }
         return combosToReturn;
     }
@@ -333,10 +394,22 @@ public class RangeBuilder {
 
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for(Set<Card> s : strongBackDoorStraightDrawsAsSet) {
-            if(combosToReturn.size() < numberOfCombosToReturn && rangeThusFarAsSet.add(s)) {
-                combosToReturn.put(combosToReturn.size(), s);
+            List<Card> asList = new ArrayList<>(s);
+
+            if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                if (combosToReturn.size() < numberOfCombosToReturn && rangeThusFarAsSet.add(s)) {
+                    combosToReturn.put(combosToReturn.size(), s);
+                }
             }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
         }
         return combosToReturn;
     }
@@ -548,7 +621,14 @@ public class RangeBuilder {
 
     public Map<Integer, Set<Card>> getOppositeRangeAtFlop(Map<Integer, Set<Set<Card>>> baseRange,
                                                                Map<Integer, Set<Card>> preflopRange) {
-        loop: for(Iterator<Map.Entry<Integer, Set<Card>>> it = preflopRange.entrySet().iterator(); it.hasNext(); ) {
+        Map<Integer, Set<Card>> preflopRangeCopy = new HashMap<>();
+        for (Map.Entry<Integer, Set<Card>> entry : preflopRange.entrySet()) {
+            Set<Card> combo = new HashSet<>();
+            combo.addAll(entry.getValue());
+            preflopRangeCopy.put(preflopRangeCopy.size(), combo);
+        }
+
+        loop: for(Iterator<Map.Entry<Integer, Set<Card>>> it = preflopRangeCopy.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, Set<Card>> entry = it.next();
             for (Map.Entry<Integer, Set<Set<Card>>> entry2 : baseRange.entrySet()) {
                 for(Set<Card> combo : entry2.getValue()) {
@@ -559,7 +639,7 @@ public class RangeBuilder {
                 }
             }
         }
-        return preflopRange;
+        return preflopRangeCopy;
     }
 
     //helper methods
@@ -588,11 +668,22 @@ public class RangeBuilder {
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for (Map.Entry<Integer, Set<Card>> entry : allCombos.entrySet()) {
             if(rangeThusFarAsSet.add(entry.getValue())) {
-                if(Math.random() < percentage) {
-                    combosToReturn.put(combosToReturn.size(), entry.getValue());
+                List<Card> asList = new ArrayList<>(entry.getValue());
+                if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                    if(Math.random() < percentage) {
+                        combosToReturn.put(combosToReturn.size(), entry.getValue());
+                    }
                 }
+                knownGameCardsCopy.clear();
+                knownGameCardsCopy.addAll(knownGameCards);
             }
         }
         return combosToReturn;

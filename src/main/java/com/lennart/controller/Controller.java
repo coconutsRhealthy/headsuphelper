@@ -48,6 +48,7 @@ public class Controller {
         holeCards.add(cardList.get(1));
 
         GameCards.setHoleCards(cardList);
+        GameCards.setKnownGameCards(cardList);
 
         return holeCards;
     }
@@ -70,6 +71,7 @@ public class Controller {
         board.add(cardList.get(2));
 
         GameCards.setFlopCards(cardList);
+        GameCards.setKnownGameCards(cardList);
 
         return flopCards;
     }
@@ -81,6 +83,7 @@ public class Controller {
         board.add(turnCard);
 
         GameCards.setTurnCard(card);
+        GameCards.setKnownGameCards(card);
 
         return board.get(board.size()-1);
     }
@@ -92,6 +95,7 @@ public class Controller {
         board.add(riverCard);
 
         GameCards.setRiverCard(card);
+        GameCards.setKnownGameCards(card);
 
         return board.get(board.size()-1);
     }
@@ -143,7 +147,11 @@ public class Controller {
         new HandEvaluator().getHandStrength(holeCards, board);
         //flopRangeBuilder.get2bet1bet(board, holeCards);
         //flopRangeBuilder.getCall2betF1bet(board, holeCards);
+        //flopRangeBuilder.getCall2betCheck(board, holeCards);
         flopRangeBuilder.getCall2betCheck(board, holeCards);
+        flopRangeBuilder.getCall2betCall1bet(board, holeCards);
+        flopRangeBuilder.getCall3betCall1bet(board, holeCards);
+        flopRangeBuilder.get2betCall2bet(board, holeCards);
         flopRangeBuilder.get2bet1bet(board, holeCards);
         flopRangeBuilder.get3bet1bet(board, holeCards);
 //        flopRangeBuilder.getCall3betF1bet(board, holeCards);
