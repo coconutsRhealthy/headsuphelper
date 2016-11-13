@@ -8,7 +8,7 @@ Flop:
 
         call3betCheck       X
         call3betCall1bet    X
-        call3bet1bet
+        call3bet1bet        X
 
     OOP:
 
@@ -16,6 +16,6 @@ Flop:
         call2betCall1bet    X
         call2bet2bet
 
-        3betCheck
+        3betCheck           X
         3bet1bet            X
         3betCall1bet        X

@@ -20,7 +20,7 @@ public class TurnRangeBuilder {
 
     public Map<Integer, Set<Set<Card>>> get2bet1betFCheck(List<Card> board, List<Card> holeCards) {
         Map<Integer, Set<Card>> flopRange =
-                rangeBuilder.convertPreviousStreetRangeToCorrectFormat(flopRangeBuilder.get2bet1bet(board, holeCards));
+                rangeBuilder.convertPreviousActionOrStreetRangeToCorrectFormat(flopRangeBuilder.get2bet1bet(board, holeCards));
 
         //turn
         Map<Integer, Map<Integer, Set<Card>>> turnRange = new HashMap<>();
@@ -34,7 +34,7 @@ public class TurnRangeBuilder {
         Map<Integer, Map<Integer, Set<Card>>> turnRange = new HashMap<>();
 
         Map<Integer, Set<Card>> flopRange =
-                rangeBuilder.convertPreviousStreetRangeToCorrectFormat(flopRangeBuilder.getCall2betCall1bet(board, holeCards));
+                rangeBuilder.convertPreviousActionOrStreetRangeToCorrectFormat(flopRangeBuilder.getCall2betCall1bet(board, holeCards));
 
         //turn
 

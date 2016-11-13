@@ -148,6 +148,11 @@ public class Controller {
         //flopRangeBuilder.get2bet1bet(board, holeCards);
         //flopRangeBuilder.getCall2betF1bet(board, holeCards);
         //flopRangeBuilder.getCall2betCheck(board, holeCards);
+        flopRangeBuilder.getCall2bet2bet(board, holeCards);
+        flopRangeBuilder.get3betCheck(board, holeCards);
+        flopRangeBuilder.getCall3bet1bet(board, holeCards);
+        flopRangeBuilder.getCall2betCheck(board, holeCards);
+        flopRangeBuilder.getCall3betCheck(board, holeCards);
         flopRangeBuilder.getCall2betCheck(board, holeCards);
         flopRangeBuilder.getCall2betCall1bet(board, holeCards);
         flopRangeBuilder.getCall3betCall1bet(board, holeCards);

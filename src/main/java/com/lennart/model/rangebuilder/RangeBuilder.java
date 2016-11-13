@@ -582,7 +582,7 @@ public class RangeBuilder {
         return comboMap;
     }
 
-    public Map<Integer, Set<Card>> convertPreviousStreetRangeToCorrectFormat(Map<Integer, Set<Set<Card>>>
+    public Map<Integer, Set<Card>> convertPreviousActionOrStreetRangeToCorrectFormat(Map<Integer, Set<Set<Card>>>
                                                                                      rangePreviousStreet) {
         Map<Integer, Set<Card>> rangePreviousStreetCorrectFormat = new HashMap<>();
 
