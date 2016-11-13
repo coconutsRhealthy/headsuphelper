@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.GameCards;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -420,14 +421,25 @@ public class BoardEvaluator {
         return allPossibleStartHandsCopy;
     }
 
+    //Corrected for known boardCards, only use this method in RangeBuilder classes
     public Map<Integer, Set<Card>> getAllPossibleStartHandsAsSets() {
         Map<Integer, List<Card>> allPossibleStartHandsAsAlist = getAllPossibleStartHands();
         Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
 
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(GameCards.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsAlist.entrySet()) {
-            Set<Card> combo = new HashSet<>();
-            combo.addAll(entry.getValue());
-            allPossibleStartHandsAsSet.put(allPossibleStartHandsAsSet.size(), combo);
+            if(knownGameCardsCopy.add(entry.getValue().get(0)) && knownGameCardsCopy.add(entry.getValue().get(1))) {
+                Set<Card> combo = new HashSet<>();
+                combo.addAll(entry.getValue());
+                allPossibleStartHandsAsSet.put(allPossibleStartHandsAsSet.size(), combo);
+            }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
         }
         return allPossibleStartHandsAsSet;
     }

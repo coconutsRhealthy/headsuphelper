@@ -4,18 +4,17 @@ import com.lennart.model.pokergame.Card;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by LPO10346 on 10/17/2016.
  */
 public class FlopRangeBuilder {
 
-    PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
     RangeBuilder rangeBuilder = new RangeBuilder();
+    private PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
+    private Map<Integer, Set<Card>> opponent3betRange = preflopRangeBuilder.getOpponent3betRange();
+    private Map<Integer, Set<Card>> opponent2betRange = preflopRangeBuilder.getOpponent2betRange();
 
     //IP
 
@@ -107,7 +106,15 @@ public class FlopRangeBuilder {
     }
 
     public Map<Integer, Set<Set<Card>>> getCall3betCheck(List<Card> board, List<Card> holeCards) {
-        return null;
+        Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
+        Map<Integer, Set<Card>> preflopRange = opponent3betRange;
+        Map<Integer, Set<Card>> oppositeRange = rangeBuilder.getOppositeRangeAtFlop(getCall3betCall1bet(board, holeCards), preflopRange);
+        flopRange.put(flopRange.size(), oppositeRange);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+
+        int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
+
+        return flopRangeToReturn;
     }
 
     //65% van preflop range
@@ -115,7 +122,7 @@ public class FlopRangeBuilder {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
         //preflop
-        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent3betRange();
+        Map<Integer, Set<Card>> preflopRange = opponent3betRange;
 
         //postflop
 
@@ -129,17 +136,17 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.5, 0.64, 0.2));
 
         //de draws
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(flopRange, board, 0.78, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumOosdCombos(flopRange, board, 0.78, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongOosdCombos(flopRange, board, 0.75, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumOosdCombos(flopRange, board, 0.75, holeCards, preflopRange));
 
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongGutshotCombos(flopRange, board, 0.78, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongGutshotCombos(flopRange, board, 0.75, holeCards, preflopRange));
 
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(flopRange, board, 0.78, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, board, 0.78, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.78, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(flopRange, board, 0.75, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, board, 0.75, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.75, holeCards, preflopRange));
 
         //de air combos
-        flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.22);
+        flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.2);
 
         Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
 
@@ -159,7 +166,7 @@ public class FlopRangeBuilder {
     //37% -> 30%
     public Map<Integer, Set<Set<Card>>> getCall2betCheck(List<Card> board, List<Card> holeCards) {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
-        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent2betRange();
+        Map<Integer, Set<Card>> preflopRange = opponent2betRange;
         Map<Integer, Set<Card>> oppositeRange = rangeBuilder.getOppositeRangeAtFlop(getCall2betCall1bet(board, holeCards), preflopRange);
         flopRange.put(flopRange.size(), oppositeRange);
         Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
@@ -174,7 +181,7 @@ public class FlopRangeBuilder {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
         //preflop
-        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent2betRange();
+        Map<Integer, Set<Card>> preflopRange = opponent2betRange;
 
         //postflop
 
