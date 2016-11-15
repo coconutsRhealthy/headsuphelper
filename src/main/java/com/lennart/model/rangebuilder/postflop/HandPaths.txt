@@ -14,7 +14,7 @@ Flop:
 
         call2betCheck       X
         call2betCall1bet    X
-        call2bet2bet
+        call2bet2bet        X
 
         3betCheck           X
         3bet1bet            X

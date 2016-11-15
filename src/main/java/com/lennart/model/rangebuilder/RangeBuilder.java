@@ -260,7 +260,6 @@ public class RangeBuilder {
         Map<Integer, Set<Card>> airCombosAddedToTotalRange = new HashMap<>();
         Set<Set<Card>> setToTestIfComboIsUnique = new HashSet<>();
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
-        int counter = 0;
 
         Set<Card> knownGameCards = new HashSet<>();
         knownGameCards.addAll(GameCards.getKnownGameCards());
@@ -268,21 +267,25 @@ public class RangeBuilder {
         Set<Card> knownGameCardsCopy = new HashSet<>();
         knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
 
-        while(counter <= numberOfAirCombosToBeAdded) {
-            Integer random = ThreadLocalRandom.current().nextInt(0, airCombosPool.size());
-            if(setToTestIfComboIsUnique.add(airCombosPoolAsMap.get(random)) &&
-                    rangeThusFarAsSet.add(airCombosPoolAsMap.get(random))) {
-                List<Card> asList = new ArrayList<>(airCombosPoolAsMap.get(random));
+        List<Integer> keysOfAirCombosPoolsAsMap = new ArrayList<>(airCombosPoolAsMap.keySet());
+        Collections.shuffle(keysOfAirCombosPoolsAsMap);
+        int counter = 0;
 
-                if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
-                    airCombosAddedToTotalRange.put(airCombosAddedToTotalRange.size(), airCombosPoolAsMap.get(random));
-                    counter++;
+        for(int i : keysOfAirCombosPoolsAsMap) {
+            if(counter <= numberOfAirCombosToBeAdded) {
+                if(setToTestIfComboIsUnique.add(airCombosPoolAsMap.get(i)) &&
+                        rangeThusFarAsSet.add(airCombosPoolAsMap.get(i))) {
+                    List<Card> asList = new ArrayList<>(airCombosPoolAsMap.get(i));
+
+                    if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
+                        airCombosAddedToTotalRange.put(airCombosAddedToTotalRange.size(), airCombosPoolAsMap.get(i));
+                        counter++;
+                    }
+                    knownGameCardsCopy.clear();
+                    knownGameCardsCopy.addAll(knownGameCards);
                 }
-                knownGameCardsCopy.clear();
-                knownGameCardsCopy.addAll(knownGameCards);
             }
         }
-
         return airCombosAddedToTotalRange;
     }
 
