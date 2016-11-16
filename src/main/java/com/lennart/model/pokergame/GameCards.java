@@ -1,5 +1,6 @@
 package com.lennart.model.pokergame;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ public class GameCards {
     private static List<Card> flopCards;
     private static Card turnCard;
     private static Card riverCard;
+    private static List<Card> boardCards = new ArrayList<>();
     private static Set<Card> knownGameCards = new HashSet<>();
 
     public static List<Card> getHoleCards() {
@@ -47,6 +49,26 @@ public class GameCards {
         GameCards.riverCard = riverCard;
     }
 
+    public static List<Card> getBoardCards() {
+        return boardCards;
+    }
+
+    public static <T> void setBoardCards(T t) {
+        if(boardCards.size() >= 5) {
+            boardCards.clear();
+        }
+
+        if(t instanceof Card) {
+            Card c = (Card) t;
+            boardCards.add(c);
+        }
+
+        if(t instanceof List) {
+            List l = (List) t;
+            boardCards.addAll(l);
+        }
+    }
+
     public static Set<Card> getKnownGameCards() {
         return knownGameCards;
     }
@@ -65,5 +87,14 @@ public class GameCards {
             List l = (List) t;
             knownGameCards.addAll(l);
         }
+    }
+
+    public static void reset() {
+        GameCards.holeCards = new ArrayList<>();
+        GameCards.flopCards = new ArrayList<>();
+        GameCards.turnCard = new Card();
+        GameCards.riverCard = new Card();
+        GameCards.boardCards = new ArrayList<>();
+        GameCards.knownGameCards = new HashSet<>();
     }
 }

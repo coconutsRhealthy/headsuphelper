@@ -29,6 +29,7 @@ public class RangeBuilder {
     FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
     StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
     HighCardDrawEvaluator highCardDrawEvaluator = new HighCardDrawEvaluator();
+    private static List<Card> completeCardDeck = getCompleteCardDeckForTest();
 
     public Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Set<Card>> preflopRange,
                                                     Map<Integer, Map<Integer, Set<Card>>> flopRange, List<Card> holeCards) {
@@ -203,52 +204,61 @@ public class RangeBuilder {
                                                double numberOfAirCombosToBeAdded) {
         Set<Set<Card>> airCombosPool = new HashSet<>();
 
-        FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
-        StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
+        if(board.size() == 3) {
+            FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
+            StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
 
-        Map<Integer, Set<Card>> strongBackDoorFlushDraws = flushDrawEvaluator.getStrongBackDoorFlushCombos(board);
-        Map<Integer, Set<Card>> mediumBackDoorFlushDraws = flushDrawEvaluator.getMediumBackDoorFlushCombos(board);
-        Map<Integer, Set<Card>> weakBackDoorFlushDraws = flushDrawEvaluator.getWeakBackDoorFlushCombos(board);
+            Map<Integer, Set<Card>> strongBackDoorFlushDraws = flushDrawEvaluator.getStrongBackDoorFlushCombos(board);
+            Map<Integer, Set<Card>> mediumBackDoorFlushDraws = flushDrawEvaluator.getMediumBackDoorFlushCombos(board);
+            Map<Integer, Set<Card>> weakBackDoorFlushDraws = flushDrawEvaluator.getWeakBackDoorFlushCombos(board);
 
-        Map<Integer, Set<Card>> strongBackDoorStraightDraws = straightDrawEvaluator.getStrongBackDoorCombos(board);
-        Map<Integer, Set<Card>> mediumBackDoorStraightDraws = straightDrawEvaluator.getMediumBackDoorCombos(board);
-        Map<Integer, Set<Card>> weakBackDoorStraightDraws = straightDrawEvaluator.getWeakBackDoorCombos(board);
+            Map<Integer, Set<Card>> strongBackDoorStraightDraws = straightDrawEvaluator.getStrongBackDoorCombos(board);
+            Map<Integer, Set<Card>> mediumBackDoorStraightDraws = straightDrawEvaluator.getMediumBackDoorCombos(board);
+            Map<Integer, Set<Card>> weakBackDoorStraightDraws = straightDrawEvaluator.getWeakBackDoorCombos(board);
 
-        Map<Integer, Set<Card>> airCombos = getCombosOfDesignatedStrength(0, 0.35, 1);
+            strongBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(strongBackDoorFlushDraws, board);
+            mediumBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(mediumBackDoorFlushDraws, board);
+            weakBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(weakBackDoorFlushDraws, board);
 
-        strongBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(strongBackDoorFlushDraws, board);
-        mediumBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(mediumBackDoorFlushDraws, board);
-        weakBackDoorFlushDraws = removeDrawCombosThatAreAlsoHigherCombos(weakBackDoorFlushDraws, board);
+            strongBackDoorStraightDraws = removeDrawCombosThatAreAlsoHigherCombos(strongBackDoorStraightDraws, board);
+            mediumBackDoorStraightDraws = removeDrawCombosThatAreAlsoHigherCombos(mediumBackDoorStraightDraws, board);
+            weakBackDoorStraightDraws = removeDrawCombosThatAreAlsoHigherCombos(weakBackDoorStraightDraws, board);
 
-        strongBackDoorStraightDraws = removeDrawCombosThatAreAlsoHigherCombos(strongBackDoorStraightDraws, board);
-        mediumBackDoorStraightDraws = removeDrawCombosThatAreAlsoHigherCombos(mediumBackDoorStraightDraws, board);
-        weakBackDoorStraightDraws = removeDrawCombosThatAreAlsoHigherCombos(weakBackDoorStraightDraws, board);
+            strongBackDoorFlushDraws = removeHoleCardCombosFromComboMap(strongBackDoorFlushDraws, holeCards);
+            mediumBackDoorFlushDraws = removeHoleCardCombosFromComboMap(mediumBackDoorFlushDraws, holeCards);
+            weakBackDoorFlushDraws = removeHoleCardCombosFromComboMap(weakBackDoorFlushDraws, holeCards);
 
-        strongBackDoorFlushDraws = removeHoleCardCombosFromComboMap(strongBackDoorFlushDraws, holeCards);
-        mediumBackDoorFlushDraws = removeHoleCardCombosFromComboMap(mediumBackDoorFlushDraws, holeCards);
-        weakBackDoorFlushDraws = removeHoleCardCombosFromComboMap(weakBackDoorFlushDraws, holeCards);
+            strongBackDoorStraightDraws = removeHoleCardCombosFromComboMap(strongBackDoorStraightDraws, holeCards);
+            mediumBackDoorStraightDraws = removeHoleCardCombosFromComboMap(mediumBackDoorStraightDraws, holeCards);
+            weakBackDoorStraightDraws = removeHoleCardCombosFromComboMap(weakBackDoorStraightDraws, holeCards);
 
-        strongBackDoorStraightDraws = removeHoleCardCombosFromComboMap(strongBackDoorStraightDraws, holeCards);
-        mediumBackDoorStraightDraws = removeHoleCardCombosFromComboMap(mediumBackDoorStraightDraws, holeCards);
-        weakBackDoorStraightDraws = removeHoleCardCombosFromComboMap(weakBackDoorStraightDraws, holeCards);
+            strongBackDoorFlushDraws = getCombosThatArePresentInBothMaps(strongBackDoorFlushDraws, rangeOfPreviousStreet);
+            mediumBackDoorFlushDraws = getCombosThatArePresentInBothMaps(mediumBackDoorFlushDraws, rangeOfPreviousStreet);
+            weakBackDoorFlushDraws = getCombosThatArePresentInBothMaps(weakBackDoorFlushDraws, rangeOfPreviousStreet);
 
-        strongBackDoorFlushDraws = getCombosThatArePresentInBothMaps(strongBackDoorFlushDraws, rangeOfPreviousStreet);
-        mediumBackDoorFlushDraws = getCombosThatArePresentInBothMaps(mediumBackDoorFlushDraws, rangeOfPreviousStreet);
-        weakBackDoorFlushDraws = getCombosThatArePresentInBothMaps(weakBackDoorFlushDraws, rangeOfPreviousStreet);
+            strongBackDoorStraightDraws = getCombosThatArePresentInBothMaps(strongBackDoorStraightDraws, rangeOfPreviousStreet);
+            mediumBackDoorStraightDraws = getCombosThatArePresentInBothMaps(mediumBackDoorStraightDraws, rangeOfPreviousStreet);
+            weakBackDoorStraightDraws = getCombosThatArePresentInBothMaps(weakBackDoorStraightDraws, rangeOfPreviousStreet);
 
-        strongBackDoorStraightDraws = getCombosThatArePresentInBothMaps(strongBackDoorStraightDraws, rangeOfPreviousStreet);
-        mediumBackDoorStraightDraws = getCombosThatArePresentInBothMaps(mediumBackDoorStraightDraws, rangeOfPreviousStreet);
-        weakBackDoorStraightDraws = getCombosThatArePresentInBothMaps(weakBackDoorStraightDraws, rangeOfPreviousStreet);
+            airCombosPool = addMapCombosToSet(airCombosPool, strongBackDoorFlushDraws);
+            airCombosPool = addMapCombosToSet(airCombosPool, mediumBackDoorFlushDraws);
+            airCombosPool = addMapCombosToSet(airCombosPool, weakBackDoorFlushDraws);
+            airCombosPool = addMapCombosToSet(airCombosPool, strongBackDoorStraightDraws);
+            airCombosPool = addMapCombosToSet(airCombosPool, mediumBackDoorStraightDraws);
+            airCombosPool = addMapCombosToSet(airCombosPool, weakBackDoorStraightDraws);
+        }
+
+        Map<Integer, Set<Card>> airCombos;
+
+        if(board.size() == 3) {
+            airCombos = getCombosOfDesignatedStrength(0, 0.35, 1);
+        } else {
+            airCombos = getCombosOfDesignatedStrength(0, 0.45, 1);
+        }
 
         airCombos = removeHoleCardCombosFromComboMap(airCombos, holeCards);
         airCombos = getCombosThatArePresentInBothMaps(airCombos, rangeOfPreviousStreet);
 
-        airCombosPool = addMapCombosToSet(airCombosPool, strongBackDoorFlushDraws);
-        airCombosPool = addMapCombosToSet(airCombosPool, mediumBackDoorFlushDraws);
-        airCombosPool = addMapCombosToSet(airCombosPool, weakBackDoorFlushDraws);
-        airCombosPool = addMapCombosToSet(airCombosPool, strongBackDoorStraightDraws);
-        airCombosPool = addMapCombosToSet(airCombosPool, mediumBackDoorStraightDraws);
-        airCombosPool = addMapCombosToSet(airCombosPool, weakBackDoorStraightDraws);
         airCombosPool = addMapCombosToSet(airCombosPool, airCombos);
 
         Map<Integer, Set<Card>> airCombosPoolAsMap = new HashMap<>();
@@ -605,12 +615,14 @@ public class RangeBuilder {
         int numberOfNoAirCombos = rangeBuilder.countNumberOfCombosMapInnerMap(flopRange, holeCards, preflopRange);
         double desiredRangeSize = numberOfNoAirCombos * (1 + percentage);
 
-        flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(preflopRange,
-                flopRange, board, holeCards, numberOfNoAirCombos, 0.05));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(preflopRange, flopRange, board,
-                holeCards, numberOfNoAirCombos, 0.03));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(preflopRange, flopRange, board,
-                holeCards, numberOfNoAirCombos, 0.03));
+        if(board.size() == 3) {
+            flopRange.put(flopRange.size(), rangeBuilder.getCombosThatAreBothStrongBdFlushAndBdStraightDraw(preflopRange,
+                    flopRange, board, holeCards, numberOfNoAirCombos, 0.05));
+            flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorFlushDrawCombos(preflopRange, flopRange, board,
+                    holeCards, numberOfNoAirCombos, 0.03));
+            flopRange.put(flopRange.size(), rangeBuilder.getStrongBackDoorStraightDrawCombos(preflopRange, flopRange, board,
+                    holeCards, numberOfNoAirCombos, 0.03));
+        }
 
         double numberOfCombosToBeAddedStill = desiredRangeSize -
                 rangeBuilder.countNumberOfCombosMapInnerMap(flopRange, holeCards, preflopRange);
@@ -776,5 +788,42 @@ public class RangeBuilder {
         mapSimple = getCombosThatArePresentInBothMaps(mapSimple, rangePreviousStreet);
 
         return mapSimple.size();
+    }
+
+    private static List<Card> getCompleteCardDeckForTest() {
+        List<Card> completeCardDeck = new ArrayList<>();
+
+        for(int i = 2; i <= 14; i++) {
+            for(int z = 1; z <= 4; z++) {
+                if(z == 1) {
+                    completeCardDeck.add(new Card(i, 's'));
+                }
+                if(z == 2) {
+                    completeCardDeck.add(new Card(i, 'c'));
+                }
+                if(z == 3) {
+                    completeCardDeck.add(new Card(i, 'd'));
+                }
+                if(z == 4) {
+                    completeCardDeck.add(new Card(i, 'h'));
+                }
+            }
+        }
+        return completeCardDeck;
+    }
+
+    public static void setCompleteCardDeckForTest() {
+        RangeBuilder.completeCardDeck.clear();
+        RangeBuilder.completeCardDeck = getCompleteCardDeckForTest();
+    }
+
+    public Card getRandomCardForTest() {
+        Integer random = ThreadLocalRandom.current().nextInt(0, completeCardDeck.size());
+
+        Card c = completeCardDeck.get(random);
+
+        completeCardDeck.remove(c);
+
+        return c;
     }
 }
