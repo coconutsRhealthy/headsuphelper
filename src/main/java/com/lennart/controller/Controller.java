@@ -8,6 +8,7 @@ import com.lennart.model.pokergame.GameCards;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
 import com.lennart.model.rangebuilder.postflop.TurnRangeBuilder;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.*;
@@ -172,7 +173,7 @@ public class Controller {
 
 //        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
 //        new Call2betRangeBuilder().getOpponentCall2betRange();
-//        new HandEvaluator().getHandStrength(holeCards, board);
+//        double x = new HandEvaluator().getHandStrength(holeCards, board);
 //        turnRangeBuilder.getCall2betCall1betCall1bet(board, holeCards);
         //flopRangeBuilder.get2bet1bet(board, holeCards);
         //flopRangeBuilder.getCall2betF1bet(board, holeCards);
@@ -206,8 +207,8 @@ public class Controller {
     public static void main(String[] args) {
         //SpringApplication.run(Controller.class, args);
         Controller controller = new Controller();
-        FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
-        //TurnRangeBuilder turnRangeBuilder = new TurnRangeBuilder();
+        //FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
+        TurnRangeBuilder turnRangeBuilder = new TurnRangeBuilder();
         List<Double> percentages = new ArrayList<>();
 
         for(int i = 0; i < 100; i++) {
@@ -217,7 +218,7 @@ public class Controller {
 
             new HandEvaluator().getHandStrength(GameCards.getHoleCards(), GameCards.getBoardCards());
 
-            double percentage = flopRangeBuilder.get2betCall2bet(GameCards.getBoardCards(), GameCards.getHoleCards());
+            double percentage = turnRangeBuilder.get2bet1bet1bet(GameCards.getBoardCards(), GameCards.getHoleCards());
             percentages.add(percentage);
 
             GameCards.reset();

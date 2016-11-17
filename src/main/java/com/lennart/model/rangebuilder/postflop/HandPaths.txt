@@ -25,6 +25,8 @@ Turn:
 
     IP:
 
+        get2bet1bet1bet         X
+
     OOP:
 
-        call2betCall1Call1bet
+        call2betCall1Call1bet   X
