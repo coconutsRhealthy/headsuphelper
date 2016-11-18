@@ -2,6 +2,7 @@ package com.lennart.controller;
 
 import com.lennart.model.boardevaluation.*;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
+import com.lennart.model.pokergame.Action;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.Game;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
@@ -105,80 +106,10 @@ public class Controller {
         Game.setPosition(position);
     }
 
-
-    @RequestMapping(value = "/getFunctionResults", method = RequestMethod.GET)
-    public @ResponseBody List<BooleanResult> getFunctionResults() {
-
-        return boardEvaluator.allFunctions(board);
-    }
-
-    @RequestMapping(value = "/getOosdStraightCombos", method = RequestMethod.GET)
-    public @ResponseBody Map<Integer, List<Integer>> getOosdStraightCombos() {
-        return straightDrawEvaluator.getCombosThatGiveOosdOrDoubleGutter(board);
-    }
-
-    @RequestMapping(value = "/getGutshotStraightCombos", method = RequestMethod.GET)
-    public @ResponseBody Map<Integer, List<Integer>> getGutshotStraightCombos() {
-        return straightDrawEvaluator.getCombosThatGiveGutshot(board);
-    }
-
-    @RequestMapping(value = "/getBackdoorStraightCombos", method = RequestMethod.GET)
-    public @ResponseBody Map<Integer, List<Integer>> getBackdoorStraightCombos() {
-
-        FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
-        TurnRangeBuilder turnRangeBuilder = new TurnRangeBuilder();
-//        threeOfAKindEvaluator.getThreeOfAKindCombos(board);
-//        twoPairEvaluator.getCombosThatMakeTwoPair(board);
-//        pairEvaluator.getCombosThatMakePair(board);
-//        flushEvaluator.getFlushDrawCombos(board);
-//        flushEvaluator.getFlushCombos(board);
-//        //flushEvaluator.getMapOfAllPossibleStartHands();
-//        flushEvaluator.getSuitsOfBoard(board);
-////        flushEvaluator.getMapOfAllPossibleCombosOfOneSuit('d');
-//        flushEvaluator.getFlushCombos(board);
-
-//        fourOfAKindEvaluator.getFourOfAKindCombos(board);
-//        straightFlushEvaluator.getStraightFlushCombos(board);
-
-//        straightEvaluator.getMapOfStraightCombos(board);
-//        fullHouseEvaluator.getFullHouseCombos(board);
-//        highCardEvaluator.getHighCardCombos(board);
-//        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombosInitialize(board);
-//        System.out.println(sortedCombos.get(0));
-
-//        straightDrawEvaluator.getWeakGutshotCombosFromAllGutshotCombos(board);
-
-//        new RangeBuilder().getRange("2bet2betFcheck", board, holeCards);
-//        new Call2betRangeBuilder().getOpponentCall2betRange();
-//        double x = new HandEvaluator().getHandStrength(holeCards, board);
-//        turnRangeBuilder.getCall2betCall1betCall1bet(board, holeCards);
-        //flopRangeBuilder.get2bet1bet(board, holeCards);
-        //flopRangeBuilder.getCall2betF1bet(board, holeCards);
-        //flopRangeBuilder.getCall2betCheck(board, holeCards);
-//        flopRangeBuilder.getCall2bet2bet(board, holeCards);
-//        flopRangeBuilder.get3betCheck(board, holeCards);
-//        flopRangeBuilder.getCall3bet1bet(board, holeCards);
-//        flopRangeBuilder.getCall2betCheck(board, holeCards);
-//        flopRangeBuilder.getCall3betCheck(board, holeCards);
-//        flopRangeBuilder.getCall2betCheck(board, holeCards);
-//        flopRangeBuilder.getCall2betCall1bet(board, holeCards);
-//        flopRangeBuilder.getCall3betCall1bet(board, holeCards);
-//        flopRangeBuilder.get2betCall2bet(board, holeCards);
-//        flopRangeBuilder.get2bet1bet(board, holeCards);
-//        flopRangeBuilder.get3bet1bet(board, holeCards);
-//        flopRangeBuilder.getCall3betF1bet(board, holeCards);
-//        new FlopRangeBuilder().get2betF2bet(board, holeCards);
-//        new HandEvaluator().getHandStrength(holeCards, board);
-//        new HighCardDrawEvaluator().getMediumTwoOvercards(board);
-
-//        straightDrawEvaluator.getStrongOosdCombos(board);
-
-//        double handStrength = new HandEvaluator().getHandStrength(holeCards, board);
-//        System.out.println(handStrength);
-
-        Map<Integer, List<Integer>> temp = new HashMap<>();
-        return temp;
-//        return straightEvaluator.getCombosThatGiveBackDoorStraightDraw(board);
+    @RequestMapping(value = "/getAction", method = RequestMethod.GET)
+    public @ResponseBody Action getAction() {
+        Action action = new Action("bet 3bb");
+        return action;
     }
 
     public static void main(String[] args) {

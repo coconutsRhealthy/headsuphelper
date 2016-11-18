@@ -16,8 +16,6 @@ var mainApp = angular.module("mainApp", []);
     $scope.turnCard = {};
     $scope.riverCard = {};
 
-    $scope.allBooleanFunctionResults = [];
-
     $scope.street = "Select holecards";
     $scope.hideHoleCardsBeforeSentToServerDiv = false;
     $scope.hideFlopCardsBeforeSentToServerDiv = true;
@@ -64,10 +62,8 @@ var mainApp = angular.module("mainApp", []);
     $scope.selectedTurnCardFromServer;
     $scope.selectedRiverCardFromServer;
     $scope.flopCards;
-    $scope.oosdStraightCombos;
-    $scope.gutshotStraightCombos;
-    $scope.backdoorStraightCombos;
     $scope.position;
+    $scope.action;
 
     //functions
     $scope.selectCard = function(id) {
@@ -199,6 +195,10 @@ var mainApp = angular.module("mainApp", []);
             $scope.showActionBlock = true;
             $scope.street = "Select flopcards";
             $scope.reset();
+
+            $http.get('/getAction/').success(function(data) {
+              $scope.action = data.action;
+            })
         }).error(function() {
             alert("Failed to submit holecards");
         });
@@ -216,33 +216,11 @@ var mainApp = angular.module("mainApp", []);
             $scope.selectedFlopCard3FromServer.rank = convertRankFromIntegerToRank(data[2].rank);
 
             $scope.listOfSelectedCardsFromServer = $scope.listOfSelectedCardsFromServer.concat(data);
-            //$scope.listOfSelectedCardsFromServer = data;
             $scope.hideFlopCardsBeforeSentToServerDiv = true;
             $scope.hideTurnCardBeforeSentToServerDiv = false;
             $scope.showSelectedFlopCardsFromServerInHandAdviceDiv = true;
             $scope.street = "Select turncard";
             $scope.reset();
-
-            $http.get('/getFunctionResults/').success(function(data) {
-              $scope.allBooleanFunctionResults = data;
-              //alert(JSON.stringify(data[1]));
-            })
-
-            $http.get('/getOosdStraightCombos/').success(function(data) {
-              $scope.oosdStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
-            $http.get('/getGutshotStraightCombos/').success(function(data) {
-              $scope.gutshotStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
-            $http.get('/getBackdoorStraightCombos/').success(function(data) {
-              $scope.backdoorStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
         }).error(function() {
             alert("Failed to submit flopcards");
         });
@@ -261,27 +239,6 @@ var mainApp = angular.module("mainApp", []);
             $scope.showSelectedTurnCardFromServerInHandAdviceDiv = true;
             $scope.street = "Select rivercard";
             $scope.reset();
-
-            $http.get('/getFunctionResults/').success(function(data) {
-              $scope.allBooleanFunctionResults = data;
-              //alert(JSON.stringify(data[1]));
-            })
-
-            $http.get('/getOosdStraightCombos/').success(function(data) {
-              $scope.oosdStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
-            $http.get('/getGutshotStraightCombos/').success(function(data) {
-              $scope.gutshotStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
-            $http.get('/getBackdoorStraightCombos/').success(function(data) {
-              $scope.backdoorStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
         }).error(function() {
             alert("Failed to submit turncard");
         });
@@ -299,27 +256,6 @@ var mainApp = angular.module("mainApp", []);
             $scope.showSelectedRiverCardFromServerInHandAdviceDiv = true;
             $scope.street = "All cards selected";
             $scope.reset();
-
-            $http.get('/getFunctionResults/').success(function(data) {
-              $scope.allBooleanFunctionResults = data;
-              //alert(JSON.stringify(data[1]));
-            })
-
-            $http.get('/getOosdStraightCombos/').success(function(data) {
-              $scope.oosdStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
-            $http.get('/getGutshotStraightCombos/').success(function(data) {
-              $scope.gutshotStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
-            $http.get('/getBackdoorStraightCombos/').success(function(data) {
-              $scope.backdoorStraightCombos = data;
-              //alert(JSON.stringify(data));
-            })
-
         }).error(function() {
             alert("Failed to submit turncard");
         });

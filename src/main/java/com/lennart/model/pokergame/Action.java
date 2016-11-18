@@ -8,6 +8,20 @@ import com.lennart.model.rangebuilder.RangeBuilder;
 public class Action {
     //Future class to determine your action
 
+    String action;
+
+    public Action(String s) {
+        this.action = s;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
     public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {
 
         //evaluate your hand against opponentRange
