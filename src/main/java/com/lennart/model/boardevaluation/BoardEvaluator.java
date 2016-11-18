@@ -1,7 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.GameCards;
+import com.lennart.model.pokergame.Game;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -427,10 +427,10 @@ public class BoardEvaluator {
         Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsAlist.entrySet()) {
             if(knownGameCardsCopy.add(entry.getValue().get(0)) && knownGameCardsCopy.add(entry.getValue().get(1))) {

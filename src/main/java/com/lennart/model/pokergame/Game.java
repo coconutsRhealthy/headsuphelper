@@ -8,8 +8,9 @@ import java.util.Set;
 /**
  * Created by lennart on 3-11-16.
  */
-public class GameCards {
+public class Game {
 
+    private static String position;
     private static List<Card> holeCards;
     private static List<Card> flopCards;
     private static Card turnCard;
@@ -17,12 +18,20 @@ public class GameCards {
     private static List<Card> boardCards = new ArrayList<>();
     private static Set<Card> knownGameCards = new HashSet<>();
 
+    public static String getPosition() {
+        return position;
+    }
+
+    public static void setPosition(String position) {
+        Game.position = position;
+    }
+
     public static List<Card> getHoleCards() {
         return holeCards;
     }
 
     public static void setHoleCards(List<Card> holeCards) {
-        GameCards.holeCards = holeCards;
+        Game.holeCards = holeCards;
     }
 
     public static List<Card> getFlopCards() {
@@ -30,7 +39,7 @@ public class GameCards {
     }
 
     public static void setFlopCards(List<Card> flopCards) {
-        GameCards.flopCards = flopCards;
+        Game.flopCards = flopCards;
     }
 
     public static Card getTurnCard() {
@@ -38,7 +47,7 @@ public class GameCards {
     }
 
     public static void setTurnCard(Card turnCard) {
-        GameCards.turnCard = turnCard;
+        Game.turnCard = turnCard;
     }
 
     public static Card getRiverCard() {
@@ -46,7 +55,7 @@ public class GameCards {
     }
 
     public static void setRiverCard(Card riverCard) {
-        GameCards.riverCard = riverCard;
+        Game.riverCard = riverCard;
     }
 
     public static List<Card> getBoardCards() {
@@ -90,11 +99,11 @@ public class GameCards {
     }
 
     public static void reset() {
-        GameCards.holeCards = new ArrayList<>();
-        GameCards.flopCards = new ArrayList<>();
-        GameCards.turnCard = new Card();
-        GameCards.riverCard = new Card();
-        GameCards.boardCards = new ArrayList<>();
-        GameCards.knownGameCards = new HashSet<>();
+        Game.holeCards = new ArrayList<>();
+        Game.flopCards = new ArrayList<>();
+        Game.turnCard = new Card();
+        Game.riverCard = new Card();
+        Game.boardCards = new ArrayList<>();
+        Game.knownGameCards = new HashSet<>();
     }
 }

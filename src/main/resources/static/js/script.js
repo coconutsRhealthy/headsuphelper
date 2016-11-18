@@ -5,6 +5,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.secondCardSelected = false;
     $scope.disableResetButton = true;
     $scope.disableOkButton = true;
+    $scope.disablePositionButtons = false;
 
     $scope.selectedCard1 = {};
     $scope.selectedCard2 = {};
@@ -27,6 +28,12 @@ var mainApp = angular.module("mainApp", []);
     $scope.showSelectedFlopCardsFromServerInHandAdviceDiv = false;
     $scope.showSelectedTurnCardFromServerInHandAdviceDiv = false;
     $scope.showSelectedRiverCardFromServerInHandAdviceDiv = false;
+
+    $scope.showActionBlock = false;
+    $scope.showChosenPosition = false;
+
+    $scope.ip = "IP";
+    $scope.oop = "OOP";
 
     $scope.allHoleCards = [
           {spades:'As', clubs:'Ac', diamonds:'Ad', hearts:'Ah'},
@@ -60,6 +67,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.oosdStraightCombos;
     $scope.gutshotStraightCombos;
     $scope.backdoorStraightCombos;
+    $scope.position;
 
     //functions
     $scope.selectCard = function(id) {
@@ -79,7 +87,9 @@ var mainApp = angular.module("mainApp", []);
             $scope.secondCard = id;
             if($scope.street === "Select holecards") {
                 $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(true);
-                $scope.disableOkButton = false;
+                if($scope.position === "IP" || $scope.position === "OOP") {
+                    $scope.disableOkButton = false;
+                }
             }
             $scope.secondCardSelected = true;
         }
@@ -100,6 +110,11 @@ var mainApp = angular.module("mainApp", []);
         }
         else {
             $scope.setButtonFieldNgDisabledPropertiesToTrueOrFalse(false, $scope.listOfSelectedCardsFromServer);
+        }
+
+        if($scope.street === "Select holecards") {
+            $scope.disablePositionButtons = false;
+            $scope.showChosenPosition = false;
         }
 
         $scope.firstCardSelected = false;
@@ -172,6 +187,7 @@ var mainApp = angular.module("mainApp", []);
         setCorrectPropertiesForJsonToSendToServer();
         $scope.holeCards = [$scope.selectedCard1, $scope.selectedCard2];
         $http.post('/postHoleCards/', $scope.holeCards).success(function(data) {
+            $http.post('/postPosition/', $scope.position);
             $scope.selectedHoleCard1FromServer = data[0];
             $scope.selectedHoleCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
             $scope.selectedHoleCard2FromServer = data[1];
@@ -180,6 +196,7 @@ var mainApp = angular.module("mainApp", []);
             $scope.hideHoleCardsBeforeSentToServerDiv = true;
             $scope.hideFlopCardsBeforeSentToServerDiv = false;
             $scope.showSelectedHoleCardsFromServerInHandAdviceDiv = true;
+            $scope.showActionBlock = true;
             $scope.street = "Select flopcards";
             $scope.reset();
         }).error(function() {
@@ -308,7 +325,14 @@ var mainApp = angular.module("mainApp", []);
         });
     }
 
-
+    $scope.selectPosition = function(position) {
+        $scope.position = position;
+        $scope.showChosenPosition = true;
+        $scope.disablePositionButtons = true;
+        if($scope.secondCardSelected === true) {
+            $scope.disableOkButton = false;
+        }
+    }
 
 
     function convertRankFromCharacterToInteger(rankCard1) {

@@ -6,7 +6,7 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.GameCards;
+import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -108,10 +108,10 @@ public class RangeBuilder {
         Map<Integer, Set<Card>> combosAboveDesignatedStrengthLevel = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosAboveDesignatedStrengthLevel.entrySet()) {
             for(Set<Card> combo : entry.getValue()) {
@@ -139,10 +139,10 @@ public class RangeBuilder {
         allCombosOfDesignatedStrength = getCombosThatArePresentInBothMaps(allCombosOfDesignatedStrength, rangeOfPreviousStreet);
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for (Map.Entry<Integer, Set<Card>> entry : allCombosOfDesignatedStrength.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());
@@ -272,10 +272,10 @@ public class RangeBuilder {
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         List<Integer> keysOfAirCombosPoolsAsMap = new ArrayList<>(airCombosPoolAsMap.keySet());
         Collections.shuffle(keysOfAirCombosPoolsAsMap);
@@ -320,10 +320,10 @@ public class RangeBuilder {
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for (Map.Entry<Integer, Set<Card>> entry : bothBdFlushDrawAndBdStraightDraw.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());
@@ -364,10 +364,10 @@ public class RangeBuilder {
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for(Set<Card> s : strongBackDoorFlushDrawsAsSet) {
             List<Card> asList = new ArrayList<>(s);
@@ -408,10 +408,10 @@ public class RangeBuilder {
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for(Set<Card> s : strongBackDoorStraightDrawsAsSet) {
             List<Card> asList = new ArrayList<>(s);
@@ -684,10 +684,10 @@ public class RangeBuilder {
         Set<Set<Card>> rangeThusFarAsSet = convertMapWithInnerMapToSet(rangeThusFar);
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for (Map.Entry<Integer, Set<Card>> entry : allCombos.entrySet()) {
             if(rangeThusFarAsSet.add(entry.getValue())) {

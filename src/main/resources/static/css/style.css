@@ -3,6 +3,11 @@
   height: 25px;
 }
 
+.positionButton {
+  width: 40px;
+  height: 22px;
+}
+
 .proceedOrStayButton {
   width: 55px;
   height: 25px;
@@ -19,7 +24,7 @@
   display: inline-block;
 }
 
-.handadvice-street {
+.selectedCards-street {
   font-weight: bold;
 }
 

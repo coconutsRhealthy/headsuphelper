@@ -2,7 +2,7 @@ package com.lennart.model.rangebuilder.preflop;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.GameCards;
+import com.lennart.model.pokergame.Game;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
@@ -80,10 +80,10 @@ public class PreflopRangeBuilderUtil {
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         List<List<Card>> asList = new ArrayList<>(allPocketPairStartHands.values());
         Set<Set<Card>> asSet = new HashSet<>();
@@ -141,10 +141,10 @@ public class PreflopRangeBuilderUtil {
         suits.add('h');
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for(Character suit : suits) {
             Set<Card> combo = new HashSet<>();
@@ -174,10 +174,10 @@ public class PreflopRangeBuilderUtil {
         suits.add('h');
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
@@ -209,10 +209,10 @@ public class PreflopRangeBuilderUtil {
         suits.add('h');
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
@@ -338,10 +338,10 @@ public class PreflopRangeBuilderUtil {
         Map<Integer, Set<Card>> suitedOrOffSuitHoleCards = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(GameCards.getKnownGameCards());
+        knownGameCards.addAll(Game.getKnownGameCards());
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(GameCards.getKnownGameCards());
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
 
         for(Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());
