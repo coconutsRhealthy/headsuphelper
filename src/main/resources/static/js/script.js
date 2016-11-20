@@ -16,6 +16,8 @@ var mainApp = angular.module("mainApp", []);
     $scope.turnCard = {};
     $scope.riverCard = {};
 
+    $scope.initialGameVariables = [];
+
     $scope.street = "Select holecards";
     $scope.hideHoleCardsBeforeSentToServerDiv = false;
     $scope.hideFlopCardsBeforeSentToServerDiv = true;
@@ -62,6 +64,9 @@ var mainApp = angular.module("mainApp", []);
     $scope.selectedTurnCardFromServer;
     $scope.selectedRiverCardFromServer;
     $scope.flopCards;
+    $scope.stakes;
+    $scope.myStack;
+    $scope.opponentStack;
     $scope.position;
     $scope.action;
 
@@ -165,7 +170,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.submitCardsToServer = function() {
         switch($scope.street) {
             case "Select holecards":
-                $scope.submitHoleCards();
+                $scope.submitHoleCardsAndInitialGameVariables();
                 break;
             case "Select flopcards":
                 $scope.submitFlopCards();
@@ -179,11 +184,14 @@ var mainApp = angular.module("mainApp", []);
         }
     }
 
-    $scope.submitHoleCards = function() {
+    $scope.submitHoleCardsAndInitialGameVariables = function() {
+        $scope.initialGameVariables = [$scope.stakes, $scope.myStack, $scope.opponentStack, $scope.position];
+        $http.post('/postInitialGameVariables/', $scope.initialGameVariables);
+
         setCorrectPropertiesForJsonToSendToServer();
         $scope.holeCards = [$scope.selectedCard1, $scope.selectedCard2];
+
         $http.post('/postHoleCards/', $scope.holeCards).success(function(data) {
-            $http.post('/postPosition/', $scope.position);
             $scope.selectedHoleCard1FromServer = data[0];
             $scope.selectedHoleCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
             $scope.selectedHoleCard2FromServer = data[1];

@@ -11,6 +11,18 @@
 
 <div ng-app = "mainApp" ng-controller = "pokerController">
     <div>
+        <span>Stakes:</span>
+        <span><input type="text" ng-model="stakes"></span>
+    </div>
+
+    <p>
+        <span>My stack:</span>
+        <span><input type="text" ng-model="myStack"></span>
+        <span>Opponent stack:</span>
+        <span><input type="text" ng-model="opponentStack"></span>
+    </p>
+
+    <p>
         <span>
             <button class="positionButton" ng-disabled="disablePositionButtons" ng-click="selectPosition(ip)">IP</button>
             <button class="positionButton" ng-disabled="disablePositionButtons" ng-click="selectPosition(oop)">OOP</button>
@@ -18,7 +30,14 @@
         <span ng-show="showChosenPosition">
             Position: {{position}}
         </span>
-    </div>
+    </p>
+
+   <p>
+        <span>Handpath:</span>
+        <span><input type="text"></span>
+        <span>Facing:</span>
+        <span><input type="text"></span>
+    </p>
 
     <p>{{street}}</p>
 
@@ -42,36 +61,56 @@
             </table>
         </div>
         <div class="handadvice">
-            <div ng-show="showActionBlock">{{action}}</div>
+            <div>
+                <span>Potsize:</span>
+                <span>3.50</span>
+            </div>
 
-            <div class="selectedCards-street" ng-show="showSelectedHoleCardsFromServerInHandAdviceDiv">Holecards:</div>
-            <span id="first holecard">
-                {{selectedHoleCard1FromServer.rank}}{{selectedHoleCard1FromServer.suit}}
-            </span>
-            <span id="second holecard">
-                {{selectedHoleCard2FromServer.rank}}{{selectedHoleCard2FromServer.suit}}
-            </span>
+            <div>
+                <span>Your stack:</span><span>50.0</span>
+                <span>Opponent stack:</span><span>50.0</span>
+            </div>
 
-            <div class="selectedCards-street" ng-show="showSelectedFlopCardsFromServerInHandAdviceDiv">Flopcards:</div>
-            <span id="first flopcard">
-                {{selectedFlopCard1FromServer.rank}}{{selectedFlopCard1FromServer.suit}}
-            </span>
-            <span id="second flopcard">
-                {{selectedFlopCard2FromServer.rank}}{{selectedFlopCard2FromServer.suit}}
-            </span>
-            <span id="third flopcard">
-                {{selectedFlopCard3FromServer.rank}}{{selectedFlopCard3FromServer.suit}}
-            </span>
+            <div>
+                <span class="selectedCards-street" ng-show="showSelectedHoleCardsFromServerInHandAdviceDiv">Holecards:</span>
+                <span id="first holecard">
+                    {{selectedHoleCard1FromServer.rank}}{{selectedHoleCard1FromServer.suit}}
+                </span>
+                <span id="second holecard">
+                    {{selectedHoleCard2FromServer.rank}}{{selectedHoleCard2FromServer.suit}}
+                </span>
+            </div>
 
-            <div class="selectedCards-street" ng-show="showSelectedTurnCardFromServerInHandAdviceDiv">Turncard:</div>
-            <span id="turncard">
-                {{selectedTurnCardFromServer.rank}}{{selectedTurnCardFromServer.suit}}
-            </span>
+            <div>
+                <span class="selectedCards-street" ng-show="showSelectedFlopCardsFromServerInHandAdviceDiv">Flopcards:</span>
+                <span id="first flopcard">
+                    {{selectedFlopCard1FromServer.rank}}{{selectedFlopCard1FromServer.suit}}
+                </span>
+                <span id="second flopcard">
+                    {{selectedFlopCard2FromServer.rank}}{{selectedFlopCard2FromServer.suit}}
+                </span>
+                <span id="third flopcard">
+                    {{selectedFlopCard3FromServer.rank}}{{selectedFlopCard3FromServer.suit}}
+                </span>
+            </div>
 
-            <div class="selectedCards-street" ng-show="showSelectedRiverCardFromServerInHandAdviceDiv">Rivercard:</div>
-            <span id="rivercard">
-                {{selectedRiverCardFromServer.rank}}{{selectedRiverCardFromServer.suit}}
-            </span>
+            <div>
+                <span class="selectedCards-street" ng-show="showSelectedTurnCardFromServerInHandAdviceDiv">Turncard:</span>
+                <span id="turncard">
+                    {{selectedTurnCardFromServer.rank}}{{selectedTurnCardFromServer.suit}}
+                </span>
+            </div>
+
+            <div>
+                <span class="selectedCards-street" ng-show="showSelectedRiverCardFromServerInHandAdviceDiv">Rivercard:</span>
+                <span id="rivercard">
+                    {{selectedRiverCardFromServer.rank}}{{selectedRiverCardFromServer.suit}}
+                </span>
+            </div>
+
+            <p>
+                <div ng-show="showActionBlock">{{action}}</div>
+            </p>
         </div>
     </div>
 

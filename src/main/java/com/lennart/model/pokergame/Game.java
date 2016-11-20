@@ -10,6 +10,9 @@ import java.util.Set;
  */
 public class Game {
 
+    private static String stakes;
+    private static double myStack;
+    private static double opponentStack;
     private static String position;
     private static List<Card> holeCards;
     private static List<Card> flopCards;
@@ -17,6 +20,30 @@ public class Game {
     private static Card riverCard;
     private static List<Card> boardCards = new ArrayList<>();
     private static Set<Card> knownGameCards = new HashSet<>();
+
+    public static String getStakes() {
+        return stakes;
+    }
+
+    public static void setStakes(String stakes) {
+        Game.stakes = stakes;
+    }
+
+    public static double getMyStack() {
+        return myStack;
+    }
+
+    public static void setMyStack(double myStack) {
+        Game.myStack = myStack;
+    }
+
+    public static double getOpponentStack() {
+        return opponentStack;
+    }
+
+    public static void setOpponentStack(double opponentStack) {
+        Game.opponentStack = opponentStack;
+    }
 
     public static String getPosition() {
         return position;

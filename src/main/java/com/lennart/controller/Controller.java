@@ -101,9 +101,12 @@ public class Controller {
         return board.get(board.size()-1);
     }
 
-    @RequestMapping(value = "/postPosition", method = RequestMethod.POST)
-    public void postHoleCards(@RequestBody String position) {
-        Game.setPosition(position);
+    @RequestMapping(value = "/postInitialGameVariables", method = RequestMethod.POST)
+    public void postInitialGameVariables(@RequestBody List<String> initialGameVariables) {
+        Game.setStakes(initialGameVariables.get(0));
+        Game.setMyStack(Double.parseDouble(initialGameVariables.get(1)));
+        Game.setOpponentStack(Double.parseDouble(initialGameVariables.get(2)));
+        Game.setPosition(initialGameVariables.get(3));
     }
 
     @RequestMapping(value = "/getAction", method = RequestMethod.GET)
