@@ -293,6 +293,19 @@ public class PreflopRangeBuilderUtil {
         return comboMap;
     }
 
+    public Map<Integer, Set<Card>> convertPreflopComboMapToSimpleComboMap(Map<Integer, Map<Integer, Set<Card>>> preflopComboMap) {
+        Map<Integer, Set<Card>> simpleComboMap = new HashMap<>();
+
+        for (Map.Entry<Integer, Map<Integer, Set<Card>>> entry : preflopComboMap.entrySet()) {
+            for (Map.Entry<Integer, Set<Card>> entry2 : entry.getValue().entrySet()) {
+                Set<Card> combo = new HashSet<>();
+                combo.addAll(entry2.getValue());
+                simpleComboMap.put(simpleComboMap.size(), combo);
+            }
+        }
+        return simpleComboMap;
+    }
+
     //helper methods
     private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited,
                                                                       double percentage) {
