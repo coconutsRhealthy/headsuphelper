@@ -5,6 +5,7 @@ import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Action;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.Game;
+import com.lennart.model.pokergame.HandPath;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
 import com.lennart.model.rangebuilder.postflop.TurnRangeBuilder;
 import org.springframework.boot.SpringApplication;
@@ -36,6 +37,8 @@ public class Controller {
     private HighCardEvaluator highCardEvaluator = new HighCardEvaluator();
 
     private StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
+
+    private String handPath;
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -102,11 +105,35 @@ public class Controller {
     }
 
     @RequestMapping(value = "/postInitialGameVariables", method = RequestMethod.POST)
-    public void postInitialGameVariables(@RequestBody List<String> initialGameVariables) {
+    public @ResponseBody List<String> postInitialGameVariables(@RequestBody List<String> initialGameVariables) {
         Game.setStakes(initialGameVariables.get(0));
         Game.setMyStack(Double.parseDouble(initialGameVariables.get(1)));
         Game.setOpponentStack(Double.parseDouble(initialGameVariables.get(2)));
         Game.setPosition(initialGameVariables.get(3));
+
+        Game.setBlindsBasedOnStake(Game.getStakes());
+
+        if(Game.getPosition().equals("IP")) {
+            Game.setMyAdditionToPot(Game.getSmallBlind());
+            Game.setOpponentAdditionToPot(Game.getBigBlind());
+            Game.setStacksAndPotBasedOnAction(Game.getMyAdditionToPot(), Game.getOpponentAdditionToPot());
+            handPath = "0.5bet";
+        } else if(Game.getPosition().equals("OOP")) {
+            Game.setMyAdditionToPot(Game.getBigBlind());
+            Game.setOpponentAdditionToPot(Game.getSmallBlind());
+            Game.setStacksAndPotBasedOnAction(Game.getMyAdditionToPot(), Game.getOpponentAdditionToPot());
+            handPath = "1bet";
+        }
+
+        List<String> gameState = new ArrayList<>();
+        gameState.add(String.valueOf(Game.getMyStack()));
+        gameState.add(String.valueOf(Game.getOpponentStack()));
+        gameState.add(String.valueOf(Game.getMyAdditionToPot()));
+        gameState.add(String.valueOf(Game.getOpponentAdditionToPot()));
+        gameState.add(String.valueOf(Game.getPotSize()));
+        gameState.add(handPath);
+
+        return gameState;
     }
 
     @RequestMapping(value = "/getAction", method = RequestMethod.GET)
