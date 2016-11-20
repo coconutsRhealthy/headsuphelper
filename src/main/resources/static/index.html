@@ -34,7 +34,7 @@
 
    <p>
         <span>Handpath:</span>
-        <span><input type="text"></span>
+        <span><input type="text" value={{handPath}}></span>
         <span>Facing:</span>
         <span><input type="text"></span>
     </p>
@@ -63,12 +63,16 @@
         <div class="handadvice">
             <div>
                 <span>Potsize:</span>
-                <span>3.50</span>
+                <span>{{potSize}}</span>
             </div>
 
             <div>
-                <span>Your stack:</span><span>50.0</span>
-                <span>Opponent stack:</span><span>50.0</span>
+                <div>
+                    <span>My stack:</span><span>{{myStack}}</span><span>---- {{myAdditionToPot}}</span>
+                </div>
+                <div>
+                    <span>Opponent stack:</span><span>{{opponentStack}}</span><span>---- {{opponentAdditionToPot}}</span>
+                </div>
             </div>
 
             <div>

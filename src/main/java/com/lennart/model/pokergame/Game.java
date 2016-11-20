@@ -13,6 +13,11 @@ public class Game {
     private static String stakes;
     private static double myStack;
     private static double opponentStack;
+    private static double smallBlind;
+    private static double bigBlind;
+    private static double myAdditionToPot;
+    private static double opponentAdditionToPot;
+    private static double potSize = 0;
     private static String position;
     private static List<Card> holeCards;
     private static List<Card> flopCards;
@@ -43,6 +48,46 @@ public class Game {
 
     public static void setOpponentStack(double opponentStack) {
         Game.opponentStack = opponentStack;
+    }
+
+    public static double getSmallBlind() {
+        return smallBlind;
+    }
+
+    public static void setSmallBlind(double smallBlind) {
+        Game.smallBlind = smallBlind;
+    }
+
+    public static double getBigBlind() {
+        return bigBlind;
+    }
+
+    public static void setBigBlind(double bigBlind) {
+        Game.bigBlind = bigBlind;
+    }
+
+    public static double getMyAdditionToPot() {
+        return myAdditionToPot;
+    }
+
+    public static void setMyAdditionToPot(double myAdditionToPot) {
+        Game.myAdditionToPot = myAdditionToPot;
+    }
+
+    public static double getOpponentAdditionToPot() {
+        return opponentAdditionToPot;
+    }
+
+    public static void setOpponentAdditionToPot(double opponentAdditionToPot) {
+        Game.opponentAdditionToPot = opponentAdditionToPot;
+    }
+
+    public static double getPotSize() {
+        return potSize;
+    }
+
+    public static void setPotSize(double potSize) {
+        Game.potSize = potSize;
     }
 
     public static String getPosition() {
@@ -132,5 +177,60 @@ public class Game {
         Game.riverCard = new Card();
         Game.boardCards = new ArrayList<>();
         Game.knownGameCards = new HashSet<>();
+    }
+
+    public static void setBlindsBasedOnStake(String stakes) {
+        switch(stakes) {
+            case "2NL":
+                Game.setSmallBlind(0.01);
+                Game.setBigBlind(0.02);
+                break;
+            case "4NL":
+                Game.setSmallBlind(0.02);
+                Game.setBigBlind(0.04);
+                break;
+            case "5NL":
+                Game.setSmallBlind(0.02);
+                Game.setBigBlind(0.05);
+                break;
+            case "10NL":
+                Game.setSmallBlind(0.05);
+                Game.setBigBlind(0.10);
+                break;
+            case "20NL":
+                Game.setSmallBlind(0.10);
+                Game.setBigBlind(0.20);
+                break;
+            case "50NL":
+                Game.setSmallBlind(0.25);
+                Game.setBigBlind(0.50);
+                break;
+            case "100NL":
+                Game.setSmallBlind(0.50);
+                Game.setBigBlind(1.0);
+                break;
+            case "200NL":
+                Game.setSmallBlind(1.0);
+                Game.setBigBlind(2.0);
+                break;
+            case "400NL":
+                Game.setSmallBlind(2.0);
+                Game.setBigBlind(4.0);
+                break;
+            case "500NL":
+                Game.setSmallBlind(2.0);
+                Game.setBigBlind(5.0);
+                break;
+            case "1000NL":
+                Game.setSmallBlind(5.0);
+                Game.setBigBlind(10.0);
+                break;
+        }
+    }
+
+    public static void setStacksAndPotBasedOnAction(double myAdditionToPot, double opponentAdditionToPot) {
+        Game.setPotSize(Game.getPotSize() + myAdditionToPot + opponentAdditionToPot);
+        Game.setMyStack(Game.getMyStack() - myAdditionToPot);
+        Game.setOpponentStack(Game.getOpponentStack() - opponentAdditionToPot);
     }
 }

@@ -68,7 +68,11 @@ var mainApp = angular.module("mainApp", []);
     $scope.myStack;
     $scope.opponentStack;
     $scope.position;
+    $scope.potSize
     $scope.action;
+    $scope.handPath;
+    $scope.myAdditionToPot;
+    $scope.opponentAdditionToPot;
 
     //functions
     $scope.selectCard = function(id) {
@@ -186,7 +190,17 @@ var mainApp = angular.module("mainApp", []);
 
     $scope.submitHoleCardsAndInitialGameVariables = function() {
         $scope.initialGameVariables = [$scope.stakes, $scope.myStack, $scope.opponentStack, $scope.position];
-        $http.post('/postInitialGameVariables/', $scope.initialGameVariables);
+        $http.post('/postInitialGameVariables/', $scope.initialGameVariables).success(function(data) {
+            $scope.myStack = data[0];
+            $scope.opponentStack = data[1];
+            $scope.myAdditionToPot = data[2];
+            $scope.opponentAdditionToPot = data[3];
+            $scope.potSize = data[4];
+            $scope.handPath = data[5];
+
+         }).error(function() {
+             alert("Failed to post initial game variables");
+         });
 
         setCorrectPropertiesForJsonToSendToServer();
         $scope.holeCards = [$scope.selectedCard1, $scope.selectedCard2];
