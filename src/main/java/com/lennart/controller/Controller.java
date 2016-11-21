@@ -39,6 +39,7 @@ public class Controller {
     private StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
 
     private String handPath;
+    private String facing;
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -106,6 +107,7 @@ public class Controller {
 
     @RequestMapping(value = "/postInitialGameVariables", method = RequestMethod.POST)
     public @ResponseBody List<String> postInitialGameVariables(@RequestBody List<String> initialGameVariables) {
+        Game.resetPot();
         Game.setStakes(initialGameVariables.get(0));
         Game.setMyStack(Double.parseDouble(initialGameVariables.get(1)));
         Game.setOpponentStack(Double.parseDouble(initialGameVariables.get(2)));
@@ -117,12 +119,14 @@ public class Controller {
             Game.setMyAdditionToPot(Game.getSmallBlind());
             Game.setOpponentAdditionToPot(Game.getBigBlind());
             Game.setStacksAndPotBasedOnAction(Game.getMyAdditionToPot(), Game.getOpponentAdditionToPot());
-            handPath = "0.5bet";
+            handPath = "05betF1bet";
+            facing = "1bet";
         } else if(Game.getPosition().equals("OOP")) {
             Game.setMyAdditionToPot(Game.getBigBlind());
             Game.setOpponentAdditionToPot(Game.getSmallBlind());
             Game.setStacksAndPotBasedOnAction(Game.getMyAdditionToPot(), Game.getOpponentAdditionToPot());
             handPath = "1bet";
+            facing = "...";
         }
 
         List<String> gameState = new ArrayList<>();
@@ -132,13 +136,14 @@ public class Controller {
         gameState.add(String.valueOf(Game.getOpponentAdditionToPot()));
         gameState.add(String.valueOf(Game.getPotSize()));
         gameState.add(handPath);
+        gameState.add(facing);
 
         return gameState;
     }
 
     @RequestMapping(value = "/getAction", method = RequestMethod.GET)
     public @ResponseBody Action getAction() {
-        Action action = new Action("bet 3bb");
+        Action action = new Action(handPath);
         return action;
     }
 

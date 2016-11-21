@@ -6,20 +6,24 @@ import com.lennart.model.rangebuilder.RangeBuilder;
  * Created by LPO10346 on 10/12/2016.
  */
 public class Action {
-    //Future class to determine your action
+    //Future class to determine your suggestedAction
 
-    String action;
+    String suggestedAction;
+    PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
 
-    public Action(String s) {
-        this.action = s;
+    public Action(String handPath) {
+        if(handPath.equals("05betF1bet")) {
+            //TODO: check why this returns bet now with QQ, AQo, etc. Combos should have been removed
+            this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
+        }
     }
 
-    public String getAction() {
-        return action;
+    public String getSuggestedAction() {
+        return suggestedAction;
     }
 
-    public void setAction(String action) {
-        this.action = action;
+    public void setSuggestedAction(String suggestedAction) {
+        this.suggestedAction = suggestedAction;
     }
 
     public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {

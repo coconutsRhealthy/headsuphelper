@@ -71,6 +71,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.potSize
     $scope.action;
     $scope.handPath;
+    $scope.facing;
     $scope.myAdditionToPot;
     $scope.opponentAdditionToPot;
 
@@ -197,6 +198,7 @@ var mainApp = angular.module("mainApp", []);
             $scope.opponentAdditionToPot = data[3];
             $scope.potSize = data[4];
             $scope.handPath = data[5];
+            $scope.facing = data[6];
 
          }).error(function() {
              alert("Failed to post initial game variables");
@@ -219,7 +221,7 @@ var mainApp = angular.module("mainApp", []);
             $scope.reset();
 
             $http.get('/getAction/').success(function(data) {
-              $scope.action = data.action;
+              $scope.action = data.suggestedAction;
             })
         }).error(function() {
             alert("Failed to submit holecards");

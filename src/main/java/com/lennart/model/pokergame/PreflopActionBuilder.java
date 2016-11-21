@@ -16,7 +16,7 @@ public class PreflopActionBuilder {
     private static Map<Integer, Set<Card>> comboMap100Percent;
     private static Map<Integer, Set<Card>> comboMap5Percent;
 
-    public Action getFacing1bet(List<Card> holeCards) {
+    public String get05betF1bet(List<Card> holeCards) {
         if(comboMap100Percent == null) {
             setComboMap100Percent();
         }
@@ -46,9 +46,9 @@ public class PreflopActionBuilder {
         }
 
         if(Math.random() <= percentageBet) {
-            return new Action("2bet");
+            return "2bet" + 2.44 * Game.getBigBlind();
         } else {
-            return new Action("fold");
+            return "fold";
         }
     }
 

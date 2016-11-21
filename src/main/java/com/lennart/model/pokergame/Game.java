@@ -1,5 +1,7 @@
 package com.lennart.model.pokergame;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +41,7 @@ public class Game {
     }
 
     public static void setMyStack(double myStack) {
+        myStack = roundDoubleToTwoDigits(myStack);
         Game.myStack = myStack;
     }
 
@@ -47,6 +50,7 @@ public class Game {
     }
 
     public static void setOpponentStack(double opponentStack) {
+        opponentStack = roundDoubleToTwoDigits(opponentStack);
         Game.opponentStack = opponentStack;
     }
 
@@ -55,6 +59,7 @@ public class Game {
     }
 
     public static void setSmallBlind(double smallBlind) {
+        smallBlind = roundDoubleToTwoDigits(smallBlind);
         Game.smallBlind = smallBlind;
     }
 
@@ -63,6 +68,7 @@ public class Game {
     }
 
     public static void setBigBlind(double bigBlind) {
+        bigBlind = roundDoubleToTwoDigits(bigBlind);
         Game.bigBlind = bigBlind;
     }
 
@@ -71,6 +77,7 @@ public class Game {
     }
 
     public static void setMyAdditionToPot(double myAdditionToPot) {
+        myAdditionToPot = roundDoubleToTwoDigits(myAdditionToPot);
         Game.myAdditionToPot = myAdditionToPot;
     }
 
@@ -79,6 +86,7 @@ public class Game {
     }
 
     public static void setOpponentAdditionToPot(double opponentAdditionToPot) {
+        opponentAdditionToPot = roundDoubleToTwoDigits(opponentAdditionToPot);
         Game.opponentAdditionToPot = opponentAdditionToPot;
     }
 
@@ -87,6 +95,7 @@ public class Game {
     }
 
     public static void setPotSize(double potSize) {
+        potSize = roundDoubleToTwoDigits(potSize);
         Game.potSize = potSize;
     }
 
@@ -232,5 +241,14 @@ public class Game {
         Game.setPotSize(Game.getPotSize() + myAdditionToPot + opponentAdditionToPot);
         Game.setMyStack(Game.getMyStack() - myAdditionToPot);
         Game.setOpponentStack(Game.getOpponentStack() - opponentAdditionToPot);
+    }
+
+    public static void resetPot() {
+        Game.potSize = 0;
+    }
+
+    private static double roundDoubleToTwoDigits(double d) {
+        BigDecimal bd = new BigDecimal(d).setScale(2, RoundingMode.HALF_EVEN);
+        return bd.doubleValue();
     }
 }
