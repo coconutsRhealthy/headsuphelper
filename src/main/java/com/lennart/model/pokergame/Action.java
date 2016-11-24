@@ -12,9 +12,13 @@ public class Action {
     PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
 
     public Action(String handPath) {
-        if(handPath.equals("05betF1bet")) {
-            //TODO: check why this returns bet now with QQ, AQo, etc. Combos should have been removed
-            this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
+        switch(handPath) {
+            case "05betF1bet":
+                this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
+                break;
+            case "2betF3bet":
+                this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
+                break;
         }
     }
 
