@@ -251,4 +251,18 @@ public class Game {
         BigDecimal bd = new BigDecimal(d).setScale(2, RoundingMode.HALF_EVEN);
         return bd.doubleValue();
     }
+
+    public static void removeHoleCardsFromKnownGameCards() {
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(Game.holeCards);
+
+        Game.knownGameCards.removeAll(holeCardsAsSet);
+    }
+
+    public static void addHoleCardsToKnownGameCards() {
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(Game.holeCards);
+
+        Game.knownGameCards.addAll(holeCardsAsSet);
+    }
 }

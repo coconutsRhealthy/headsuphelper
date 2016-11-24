@@ -12,10 +12,10 @@ import java.util.Set;
  */
 public class _2betRangeBuilder {
 
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
-    static {
+    public _2betRangeBuilder() {
         PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
 
         comboMap100Percent.put(1, p.getSuitedHoleCards(2, 2, 100));
@@ -70,19 +70,11 @@ public class _2betRangeBuilder {
         return opponent2betRange;
     }
 
-    public static Map<Integer, Map<Integer, Set<Card>>> getComboMap100Percent() {
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap100Percent() {
         return comboMap100Percent;
     }
 
-    public static void setComboMap100Percent(Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent) {
-        _2betRangeBuilder.comboMap100Percent = comboMap100Percent;
-    }
-
-    public static Map<Integer, Map<Integer, Set<Card>>> getComboMap5Percent() {
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap5Percent() {
         return comboMap5Percent;
-    }
-
-    public static void setComboMap5Percent(Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent) {
-        _2betRangeBuilder.comboMap5Percent = comboMap5Percent;
     }
 }

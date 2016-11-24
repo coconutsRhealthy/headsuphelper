@@ -1,7 +1,5 @@
 package com.lennart.model.pokergame;
 
-import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.Action;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import com.lennart.model.rangebuilder.preflop.ip._2betRangeBuilder;
 
@@ -17,12 +15,14 @@ public class PreflopActionBuilder {
     private static Map<Integer, Set<Card>> comboMap5Percent;
 
     public String get05betF1bet(List<Card> holeCards) {
-        if(comboMap100Percent == null) {
-            setComboMap100Percent();
-        }
-        if(comboMap5Percent == null) {
-            setComboMap5Percent();
-        }
+        Game.removeHoleCardsFromKnownGameCards();
+        _2betRangeBuilder twoBetRangeBuilder = new _2betRangeBuilder();
+
+        comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (twoBetRangeBuilder.getComboMap100Percent());
+
+        comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (twoBetRangeBuilder.getComboMap5Percent());
 
         double percentageBet = 0;
 
@@ -45,20 +45,12 @@ public class PreflopActionBuilder {
             }
         }
 
+        Game.addHoleCardsToKnownGameCards();
+
         if(Math.random() <= percentageBet) {
             return "2bet" + 2.44 * Game.getBigBlind();
         } else {
             return "fold";
         }
-    }
-
-    public void setComboMap100Percent() {
-        comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (_2betRangeBuilder.getComboMap100Percent());
-    }
-
-    public void setComboMap5Percent() {
-        comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (_2betRangeBuilder.getComboMap5Percent());
     }
 }
