@@ -9,15 +9,17 @@ public class Action {
     //Future class to determine your suggestedAction
 
     String suggestedAction;
+    String suggestedSizing;
     PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
 
     public Action(String handPath) {
         switch(handPath) {
             case "05betF1bet":
                 this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
+                this.suggestedSizing = preflopActionBuilder.getSize(handPath);
                 break;
             case "2betF3bet":
-                this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
+                this.suggestedAction = preflopActionBuilder.get2betF3bet(Game.getHoleCards());
                 break;
         }
     }
@@ -28,6 +30,14 @@ public class Action {
 
     public void setSuggestedAction(String suggestedAction) {
         this.suggestedAction = suggestedAction;
+    }
+
+    public String getSuggestedSizing() {
+        return suggestedSizing;
+    }
+
+    public void setSuggestedSizing(String suggestedSizing) {
+        this.suggestedSizing = suggestedSizing;
     }
 
     public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {

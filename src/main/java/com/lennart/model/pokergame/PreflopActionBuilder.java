@@ -52,7 +52,8 @@ public class PreflopActionBuilder {
         Game.addHoleCardsToKnownGameCards();
 
         if(Math.random() <= percentageBet) {
-            return "2bet" + 2.44 * Game.getBigBlind();
+            return "2bet";
+            //return "2bet" + 2.44 * Game.getBigBlind();
         } else {
             return "fold";
         }
@@ -115,15 +116,87 @@ public class PreflopActionBuilder {
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(holeCards);
 
-//        for (Map.Entry<Integer, Set<Card>> entry : comboMap100Percent.entrySet()) {
-//            if(entry.getValue().equals(holeCardsAsSet)) {
-//                percentageBet = 1;
-//                break;
-//            }
-//        }
+        percentageCall3bet = setPercentage(call3bet_comboMap100Percent, holeCardsAsSet, 1);
 
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap94Percent, holeCardsAsSet, 0.94);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap89Percent, holeCardsAsSet, 0.89);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap80Percent, holeCardsAsSet, 0.80);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap73Percent, holeCardsAsSet, 0.73);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap50Percent, holeCardsAsSet, 0.50);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap34Percent, holeCardsAsSet, 0.34);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap29Percent, holeCardsAsSet, 0.29);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap27Percent, holeCardsAsSet, 0.27);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap19Percent, holeCardsAsSet, 0.19);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap8Percent, holeCardsAsSet, 0.08);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap7Percent, holeCardsAsSet, 0.07);
+        }
+        if(percentageCall3bet == 0) {
+            percentageCall3bet = setPercentage(call3bet_comboMap5Percent, holeCardsAsSet, 0.05);
+        }
 
+        if(percentageCall3bet == 0) {
+            percentage4bet = setPercentage(x4bet_comboMap95Percent, holeCardsAsSet, 0.95);
+        }
+        if(percentage4bet == 0) {
+            percentage4bet = setPercentage(x4bet_comboMap50Percent, holeCardsAsSet, 0.50);
+        }
+        if(percentage4bet == 0) {
+            percentage4bet = setPercentage(x4bet_comboMap20Percent, holeCardsAsSet, 0.20);
+        }
+        if(percentage4bet == 0) {
+            percentage4bet = setPercentage(x4bet_comboMap11Percent, holeCardsAsSet, 0.11);
+        }
+        if(percentage4bet == 0) {
+            percentage4bet = setPercentage(x4bet_comboMap6Percent, holeCardsAsSet, 0.06);
+        }
 
+        Game.addHoleCardsToKnownGameCards();
+
+        if(Math.random() <= 1 - percentage4bet - percentageCall3bet) {
+            return "fold";
+        } else if ((Math.random() <= 1 - percentage4bet) && (Math.random() >= 1 - percentage4bet - percentageCall3bet) ){
+            return "call3bet";
+        } else {
+            return "4bet";
+        }
+    }
+
+    public String getSize(String handPath) {
+        switch(handPath) {
+            case "05betF1bet":
+                return String.valueOf(2.44 * Game.getBigBlind());
+        }
         return null;
     }
+
+    private double setPercentage(Map<Integer, Set<Card>> mapjee, Set<Card> combo, double percentage) {
+        for (Map.Entry<Integer, Set<Card>> entry : mapjee.entrySet()) {
+            if(entry.getValue().equals(combo)) {
+                return percentage;
+            }
+        }
+        return 0;
+    }
+
 }

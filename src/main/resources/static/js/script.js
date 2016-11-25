@@ -74,6 +74,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.facing;
     $scope.myAdditionToPot;
     $scope.opponentAdditionToPot;
+    $scope.suggestedSizing
 
     //functions
     $scope.selectCard = function(id) {
@@ -222,6 +223,7 @@ var mainApp = angular.module("mainApp", []);
 
             $http.get('/getAction/').success(function(data) {
               $scope.action = data.suggestedAction;
+              $scope.suggestedSizing = data.suggestedSizing;
             })
         }).error(function() {
             alert("Failed to submit holecards");
