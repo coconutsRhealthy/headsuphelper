@@ -328,10 +328,10 @@ var mainApp = angular.module("mainApp", []);
         $scope.myLastActionSize = $scope.suggestedSizing;
         $scope.myIncrementalBetSize = $scope.suggestedSizing - $scope.myTotalBetSize;
 
-        $scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
+        //$scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
 
-        $scope.handPathAndAmountAdded = [$scope.handPath, $scope.myIncrementalBetSize, $scope.opponentIncrementalBetSize];
-
+        //$scope.handPathAndAmountAdded = [$scope.handPath, $scope.myIncrementalBetSize, $scope.opponentIncrementalBetSize];
+        $scope.handPathAndAmountAdded = [$scope.handPath, $scope.myIncrementalBetSize];
 
         $http.post('/postYourAction/', $scope.handPathAndAmountAdded).success(function(data) {
             $scope.myStack = data[0];
@@ -340,16 +340,23 @@ var mainApp = angular.module("mainApp", []);
             $scope.opponentTotalBetSize = data[3];
             $scope.potSize = data[4];
             $scope.handPath = data[5];
-            //$scope.facing = data[6];
+            $scope.opponentAction = "...";
+            $scope.opponentActionSize = "...";
+        })
+    }
 
-            $scope.opponentAction = data[6];
-            $scope.opponentActionSize = data[7];
+    $scope.postOpponentAction = function() {
+        $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver
+            + $scope.action + "F" + $scope.opponentAction;
 
+        $scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
+
+        $scope.handPathAndAmountAdded = [$scope.handPath, $scope.opponentIncrementalBetSize];
+
+
+        $http.post('/postOpponentAction/', $scope.handPathAndAmountAdded).success(function(data) {
 
         })
-
-
-
     }
 
 

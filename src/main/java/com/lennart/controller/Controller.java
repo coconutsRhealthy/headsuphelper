@@ -96,6 +96,7 @@ public class Controller {
         turnCard = card;
         board.add(turnCard);
 
+        //TODO: fix deze methodes met String.concat etc
         HandPath.setHandPathFlop("");
 
         Game.setStreet("turn");
@@ -202,12 +203,12 @@ public class Controller {
         }
 
         Game.setMyIncrementalBetSize(Double.parseDouble(handPathAndAmountAddedToPot.get(1)));
-        Game.setOpponentIncrementalBetsize(Double.parseDouble(handPathAndAmountAddedToPot.get(2)));
+        //Game.setOpponentIncrementalBetsize(Double.parseDouble(handPathAndAmountAddedToPot.get(2)));
 
         Game.setMyTotalBetSize(Game.getMyTotalBetSize() + Game.getMyIncrementalBetSize());
-        Game.setOpponentTotalBetSize(Game.getOpponentTotalBetSize() + Game.getOpponentIncrementalBetsize());
+        //Game.setOpponentTotalBetSize(Game.getOpponentTotalBetSize() + Game.getOpponentIncrementalBetsize());
 
-        Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), Game.getOpponentIncrementalBetsize());
+        Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), 0);
 
         opponentAction = "...";
         opponentActionSize = 0;
@@ -220,10 +221,37 @@ public class Controller {
         gameState.add(String.valueOf(Game.getPotSize()));
         gameState.add(HandPath.getHandPath());
 
-        gameState.add(opponentAction);
-        gameState.add(String.valueOf(opponentActionSize));
-
         return gameState;
+    }
+
+    @RequestMapping(value = "/postOpponentAction", method = RequestMethod.POST)
+    public @ResponseBody List<String> postOpponentAction(@RequestBody List<String> handPathAndAmountAddedToPot) {
+        switch(Game.getStreet()) {
+            case "preflop":
+                HandPath.setHandPathPreflop(handPathAndAmountAddedToPot.get(0));
+                break;
+            case "flop":
+                HandPath.setHandPathFlop(handPathAndAmountAddedToPot.get(0));
+                break;
+            case "turn":
+                HandPath.setHandPathTurn(handPathAndAmountAddedToPot.get(0));
+                break;
+            case "river":
+                HandPath.setHandPathRiver(handPathAndAmountAddedToPot.get(0));
+                break;
+        }
+
+        System.out.println("wacht ff");
+
+        List<String> eije = new ArrayList<>();
+        for(int i = 1; i < 101; i++) {
+            Action action = new Action(HandPath.getHandPath());
+            eije.add(action.getSuggestedAction());
+        }
+        //TODO: check waarom 76o te vaak 4bet returnt
+        System.out.println("yoyo");
+
+        return null;
     }
 
     @RequestMapping(value = "/getHandPath", method = RequestMethod.GET)

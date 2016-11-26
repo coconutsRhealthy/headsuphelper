@@ -173,9 +173,10 @@ public class PreflopActionBuilder {
 
         Game.addHoleCardsToKnownGameCards();
 
-        if(Math.random() <= 1 - percentage4bet - percentageCall3bet) {
+        double random = Math.random();
+        if(random <= 1 - percentage4bet - percentageCall3bet) {
             return "fold";
-        } else if ((Math.random() <= 1 - percentage4bet) && (Math.random() >= 1 - percentage4bet - percentageCall3bet) ){
+        } else if ((random <= 1 - percentage4bet) && (random >= 1 - percentage4bet - percentageCall3bet)){
             return "call3bet";
         } else {
             return "4bet";
@@ -190,8 +191,8 @@ public class PreflopActionBuilder {
         return null;
     }
 
-    private double setPercentage(Map<Integer, Set<Card>> mapjee, Set<Card> combo, double percentage) {
-        for (Map.Entry<Integer, Set<Card>> entry : mapjee.entrySet()) {
+    private double setPercentage(Map<Integer, Set<Card>> comboMap, Set<Card> combo, double percentage) {
+        for (Map.Entry<Integer, Set<Card>> entry : comboMap.entrySet()) {
             if(entry.getValue().equals(combo)) {
                 return percentage;
             }

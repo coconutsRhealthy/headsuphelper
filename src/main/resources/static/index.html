@@ -44,9 +44,10 @@
     </p>
     <p>
         <span>Opponent action:</span>
-        <span><input type="text" value={{opponentAction}}></span>
+        <span><input type="text" ng-model="opponentAction" value={{opponentAction}}></span>
         <span>Size:</span>
-        <span><input type="text" value={{opponentActionSize}}></span>
+        <span><input type="text" ng-model="opponentActionSize" value={{opponentActionSize}}></span>
+        <span><button ng-click="postOpponentAction()">Submit</button></span>
     </p>
 
 
