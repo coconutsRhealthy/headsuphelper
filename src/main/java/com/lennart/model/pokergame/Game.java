@@ -17,9 +17,12 @@ public class Game {
     private static double opponentStack;
     private static double smallBlind;
     private static double bigBlind;
-    private static double myAdditionToPot;
-    private static double opponentAdditionToPot;
+    private static double myTotalBetSize;
+    private static double opponentTotalBetSize;
+    private static double myIncrementalBetSize;
+    private static double opponentIncrementalBetsize;
     private static double potSize = 0;
+    private static String street;
     private static String position;
     private static List<Card> holeCards;
     private static List<Card> flopCards;
@@ -72,22 +75,38 @@ public class Game {
         Game.bigBlind = bigBlind;
     }
 
-    public static double getMyAdditionToPot() {
-        return myAdditionToPot;
+    public static double getMyTotalBetSize() {
+        return myTotalBetSize;
     }
 
-    public static void setMyAdditionToPot(double myAdditionToPot) {
-        myAdditionToPot = roundDoubleToTwoDigits(myAdditionToPot);
-        Game.myAdditionToPot = myAdditionToPot;
+    public static void setMyTotalBetSize(double myTotalBetSize) {
+        myTotalBetSize = roundDoubleToTwoDigits(myTotalBetSize);
+        Game.myTotalBetSize = myTotalBetSize;
     }
 
-    public static double getOpponentAdditionToPot() {
-        return opponentAdditionToPot;
+    public static double getOpponentTotalBetSize() {
+        return opponentTotalBetSize;
     }
 
-    public static void setOpponentAdditionToPot(double opponentAdditionToPot) {
-        opponentAdditionToPot = roundDoubleToTwoDigits(opponentAdditionToPot);
-        Game.opponentAdditionToPot = opponentAdditionToPot;
+    public static void setOpponentTotalBetSize(double opponentTotalBetSize) {
+        opponentTotalBetSize = roundDoubleToTwoDigits(opponentTotalBetSize);
+        Game.opponentTotalBetSize = opponentTotalBetSize;
+    }
+
+    public static double getMyIncrementalBetSize() {
+        return myIncrementalBetSize;
+    }
+
+    public static void setMyIncrementalBetSize(double myIncrementalBetSize) {
+        Game.myIncrementalBetSize = myIncrementalBetSize;
+    }
+
+    public static double getOpponentIncrementalBetsize() {
+        return opponentIncrementalBetsize;
+    }
+
+    public static void setOpponentIncrementalBetsize(double opponentIncrementalBetsize) {
+        Game.opponentIncrementalBetsize = opponentIncrementalBetsize;
     }
 
     public static double getPotSize() {
@@ -97,6 +116,14 @@ public class Game {
     public static void setPotSize(double potSize) {
         potSize = roundDoubleToTwoDigits(potSize);
         Game.potSize = potSize;
+    }
+
+    public static String getStreet() {
+        return street;
+    }
+
+    public static void setStreet(String street) {
+        Game.street = street;
     }
 
     public static String getPosition() {
@@ -237,10 +264,10 @@ public class Game {
         }
     }
 
-    public static void setStacksAndPotBasedOnAction(double myAdditionToPot, double opponentAdditionToPot) {
-        Game.setPotSize(Game.getPotSize() + myAdditionToPot + opponentAdditionToPot);
-        Game.setMyStack(Game.getMyStack() - myAdditionToPot);
-        Game.setOpponentStack(Game.getOpponentStack() - opponentAdditionToPot);
+    public static void setStacksAndPotBasedOnAction(double myIncrementalBetSize, double opponentIncrementalBetSize) {
+        Game.setPotSize(Game.getPotSize() + myIncrementalBetSize + opponentIncrementalBetSize);
+        Game.setMyStack(Game.getMyStack() - myIncrementalBetSize);
+        Game.setOpponentStack(Game.getOpponentStack() - opponentIncrementalBetSize);
     }
 
     public static void resetPot() {

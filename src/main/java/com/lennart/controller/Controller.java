@@ -6,8 +6,6 @@ import com.lennart.model.pokergame.Action;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.Game;
 import com.lennart.model.pokergame.HandPath;
-import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
-import com.lennart.model.rangebuilder.postflop.TurnRangeBuilder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -38,8 +36,16 @@ public class Controller {
 
     private StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
 
-    private String handPath;
-    private String facing;
+//    private String handPathPreflop;
+//    private String handPathFlop;
+//    private String handPathTurn;
+//    private String handPathRiver;
+//    private String handPath;
+
+    private String myLastAction;
+    private double myLastActionSize;
+    private String opponentAction;
+    private double opponentActionSize;
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
@@ -50,6 +56,7 @@ public class Controller {
         holeCards.add(cardList.get(0));
         holeCards.add(cardList.get(1));
 
+        Game.setStreet("preflop");
         Game.setHoleCards(cardList);
         Game.setKnownGameCards(cardList);
 
@@ -73,6 +80,9 @@ public class Controller {
         board.add(cardList.get(1));
         board.add(cardList.get(2));
 
+        HandPath.setHandPathPreflop(HandPath.getHandPath());
+
+        Game.setStreet("flop");
         Game.setFlopCards(cardList);
         Game.setBoardCards(cardList);
         Game.setKnownGameCards(cardList);
@@ -86,6 +96,9 @@ public class Controller {
         turnCard = card;
         board.add(turnCard);
 
+        HandPath.setHandPathFlop("");
+
+        Game.setStreet("turn");
         Game.setTurnCard(card);
         Game.setBoardCards(card);
         Game.setKnownGameCards(card);
@@ -99,7 +112,11 @@ public class Controller {
         riverCard = card;
         board.add(riverCard);
 
+        HandPath.setHandPathRiver("");
+
+        Game.setStreet("river");
         Game.setRiverCard(card);
+        Game.setBoardCards(card);
         Game.setKnownGameCards(card);
 
         return board.get(board.size()-1);
@@ -116,36 +133,104 @@ public class Controller {
         Game.setBlindsBasedOnStake(Game.getStakes());
 
         if(Game.getPosition().equals("IP")) {
-            Game.setMyAdditionToPot(Game.getSmallBlind());
-            Game.setOpponentAdditionToPot(Game.getBigBlind());
-            Game.setStacksAndPotBasedOnAction(Game.getMyAdditionToPot(), Game.getOpponentAdditionToPot());
-            handPath = "05betF1bet";
-            facing = "1bet";
+            Game.setMyTotalBetSize(Game.getSmallBlind());
+            Game.setOpponentTotalBetSize(Game.getBigBlind());
+            Game.setMyIncrementalBetSize(Game.getSmallBlind());
+            Game.setOpponentIncrementalBetsize(Game.getBigBlind());
+
+            Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), Game.getOpponentIncrementalBetsize());
+            //handPath = "05betF1bet";
+            HandPath.setHandPathPreflop("05betF1bet");
+
+            myLastAction = "0.5bet";
+            myLastActionSize = Game.getSmallBlind();
+            opponentAction = "1bet";
+            opponentActionSize = Game.getBigBlind();
         } else if(Game.getPosition().equals("OOP")) {
-            Game.setMyAdditionToPot(Game.getBigBlind());
-            Game.setOpponentAdditionToPot(Game.getSmallBlind());
-            Game.setStacksAndPotBasedOnAction(Game.getMyAdditionToPot(), Game.getOpponentAdditionToPot());
-            handPath = "1bet";
-            facing = "...";
+            Game.setMyTotalBetSize(Game.getBigBlind());
+            Game.setOpponentTotalBetSize(Game.getSmallBlind());
+            Game.setMyIncrementalBetSize(Game.getBigBlind());
+            Game.setOpponentIncrementalBetsize(Game.getSmallBlind());
+
+            Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), Game.getOpponentIncrementalBetsize());
+            //handPath = "1bet";
+            HandPath.setHandPathPreflop("1bet");
+
+            myLastAction = "1bet";
+            myLastActionSize = Game.getBigBlind();
+            opponentAction = "...";
+            opponentActionSize = 0;
         }
 
         List<String> gameState = new ArrayList<>();
         gameState.add(String.valueOf(Game.getMyStack()));
         gameState.add(String.valueOf(Game.getOpponentStack()));
-        gameState.add(String.valueOf(Game.getMyAdditionToPot()));
-        gameState.add(String.valueOf(Game.getOpponentAdditionToPot()));
+        gameState.add(String.valueOf(Game.getMyTotalBetSize()));
+        gameState.add(String.valueOf(Game.getOpponentTotalBetSize()));
         gameState.add(String.valueOf(Game.getPotSize()));
-        gameState.add(handPath);
-        gameState.add(facing);
+        gameState.add(HandPath.getHandPath());
+
+        gameState.add(myLastAction);
+        gameState.add(String.valueOf(myLastActionSize));
+        gameState.add(opponentAction);
+        gameState.add(String.valueOf(opponentActionSize));
 
         return gameState;
     }
 
-    @RequestMapping(value = "/getAction", method = RequestMethod.GET)
-    public @ResponseBody Action getAction() {
-        Action action = new Action(handPath);
+    @RequestMapping(value = "/getInitialAction", method = RequestMethod.GET)
+    public @ResponseBody Action getInitialAction() {
+        Action action = new Action(HandPath.getHandPath());
         return action;
     }
+
+    @RequestMapping(value = "/postYourAction", method = RequestMethod.POST)
+    public @ResponseBody List<String> postYourAction(@RequestBody List<String> handPathAndAmountAddedToPot) {
+        switch(Game.getStreet()) {
+            case "preflop":
+                HandPath.setHandPathPreflop(handPathAndAmountAddedToPot.get(0));
+                break;
+            case "flop":
+                HandPath.setHandPathFlop(handPathAndAmountAddedToPot.get(0));
+                break;
+            case "turn":
+                HandPath.setHandPathTurn(handPathAndAmountAddedToPot.get(0));
+                break;
+            case "river":
+                HandPath.setHandPathRiver(handPathAndAmountAddedToPot.get(0));
+                break;
+        }
+
+        Game.setMyIncrementalBetSize(Double.parseDouble(handPathAndAmountAddedToPot.get(1)));
+        Game.setOpponentIncrementalBetsize(Double.parseDouble(handPathAndAmountAddedToPot.get(2)));
+
+        Game.setMyTotalBetSize(Game.getMyTotalBetSize() + Game.getMyIncrementalBetSize());
+        Game.setOpponentTotalBetSize(Game.getOpponentTotalBetSize() + Game.getOpponentIncrementalBetsize());
+
+        Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), Game.getOpponentIncrementalBetsize());
+
+        opponentAction = "...";
+        opponentActionSize = 0;
+
+        List<String> gameState = new ArrayList<>();
+        gameState.add(String.valueOf(Game.getMyStack()));
+        gameState.add(String.valueOf(Game.getOpponentStack()));
+        gameState.add(String.valueOf(Game.getMyTotalBetSize()));
+        gameState.add(String.valueOf(Game.getOpponentTotalBetSize()));
+        gameState.add(String.valueOf(Game.getPotSize()));
+        gameState.add(HandPath.getHandPath());
+
+        gameState.add(opponentAction);
+        gameState.add(String.valueOf(opponentActionSize));
+
+        return gameState;
+    }
+
+    @RequestMapping(value = "/getHandPath", method = RequestMethod.GET)
+    public @ResponseBody HandPath getHandPath() {
+        return new HandPath();
+    }
+
 
     public static void main(String[] args) {
         SpringApplication.run(Controller.class, args);

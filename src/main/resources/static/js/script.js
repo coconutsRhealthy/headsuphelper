@@ -17,6 +17,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.riverCard = {};
 
     $scope.initialGameVariables = [];
+    $scope.handPathAndAmountAdded = [];
 
     $scope.street = "Select holecards";
     $scope.hideHoleCardsBeforeSentToServerDiv = false;
@@ -70,11 +71,23 @@ var mainApp = angular.module("mainApp", []);
     $scope.position;
     $scope.potSize
     $scope.action;
+    $scope.handPathPreflop = "";
+    $scope.handPathFlop = "";
+    $scope.handPathTurn = "";
+    $scope.handPathRiver = "";
     $scope.handPath;
     $scope.facing;
-    $scope.myAdditionToPot;
-    $scope.opponentAdditionToPot;
+    $scope.myTotalBetSize;
+    $scope.opponentTotalBetSize;
+    $scope.myIncrementalBetSize;
+    $scope.opponentIncrementalBetSize;
+
     $scope.suggestedSizing
+
+    $scope.myLastAction;
+    $scope.myLastActionSize;
+    $scope.opponentAction;
+    $scope.opponentActionSize;
 
     //functions
     $scope.selectCard = function(id) {
@@ -195,11 +208,16 @@ var mainApp = angular.module("mainApp", []);
         $http.post('/postInitialGameVariables/', $scope.initialGameVariables).success(function(data) {
             $scope.myStack = data[0];
             $scope.opponentStack = data[1];
-            $scope.myAdditionToPot = data[2];
-            $scope.opponentAdditionToPot = data[3];
+            $scope.myTotalBetSize = data[2];
+            $scope.opponentTotalBetSize = data[3];
             $scope.potSize = data[4];
             $scope.handPath = data[5];
-            $scope.facing = data[6];
+            //$scope.facing = data[6];
+
+            $scope.myLastAction = data[6];
+            $scope.myLastActionSize = data[7];
+            $scope.opponentAction = data[8];
+            $scope.opponentActionSize = data[9];
 
          }).error(function() {
              alert("Failed to post initial game variables");
@@ -221,7 +239,7 @@ var mainApp = angular.module("mainApp", []);
             $scope.street = "Select flopcards";
             $scope.reset();
 
-            $http.get('/getAction/').success(function(data) {
+            $http.get('/getInitialAction/').success(function(data) {
               $scope.action = data.suggestedAction;
               $scope.suggestedSizing = data.suggestedSizing;
             })
@@ -234,6 +252,9 @@ var mainApp = angular.module("mainApp", []);
         setCorrectPropertiesForJsonToSendToServer();
         $scope.flopCards = [$scope.selectedCard1, $scope.selectedCard2, $scope.selectedCard3];
         $http.post('/postFlopCards/', $scope.flopCards).success(function(data) {
+            $http.get('/getHandPath/').success(function(data) {
+              $scope.handPathPreflop = data.handPathPreflop;
+            })
             $scope.selectedFlopCard1FromServer = data[0];
             $scope.selectedFlopCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
             $scope.selectedFlopCard2FromServer = data[1];
@@ -252,11 +273,13 @@ var mainApp = angular.module("mainApp", []);
         });
     }
 
-
     $scope.submitTurnCard = function() {
         setCorrectPropertiesForJsonToSendToServer();
         $scope.turnCard = $scope.selectedCard1;
         $http.post('/postTurnCard/', $scope.turnCard).success(function(data) {
+            $http.get('/getHandPath/').success(function(data) {
+              $scope.handPathFlop = data.handPathFlop;
+            })
             $scope.selectedTurnCardFromServer = data;
             $scope.selectedTurnCardFromServer.rank = convertRankFromIntegerToRank(data.rank);
             $scope.listOfSelectedCardsFromServer = $scope.listOfSelectedCardsFromServer.concat(data);
@@ -274,6 +297,9 @@ var mainApp = angular.module("mainApp", []);
         setCorrectPropertiesForJsonToSendToServer();
         $scope.riverCard = $scope.selectedCard1;
         $http.post('/postRiverCard/', $scope.riverCard).success(function(data) {
+            $http.get('/getHandPath/').success(function(data) {
+              $scope.handPathTurn = data.handPathTurn;
+            })
             $scope.selectedRiverCardFromServer = data;
             $scope.selectedRiverCardFromServer.rank = convertRankFromIntegerToRank(data.rank);
             $scope.listOfSelectedCardsFromServer = $scope.listOfSelectedCardsFromServer.concat(data);
@@ -294,6 +320,36 @@ var mainApp = angular.module("mainApp", []);
         if($scope.secondCardSelected === true) {
             $scope.disableOkButton = false;
         }
+    }
+
+    $scope.postYourAction = function() {
+        $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver + $scope.action;
+        $scope.myLastAction = $scope.action;
+        $scope.myLastActionSize = $scope.suggestedSizing;
+        $scope.myIncrementalBetSize = $scope.suggestedSizing - $scope.myTotalBetSize;
+
+        $scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
+
+        $scope.handPathAndAmountAdded = [$scope.handPath, $scope.myIncrementalBetSize, $scope.opponentIncrementalBetSize];
+
+
+        $http.post('/postYourAction/', $scope.handPathAndAmountAdded).success(function(data) {
+            $scope.myStack = data[0];
+            $scope.opponentStack = data[1];
+            $scope.myTotalBetSize = data[2];
+            $scope.opponentTotalBetSize = data[3];
+            $scope.potSize = data[4];
+            $scope.handPath = data[5];
+            //$scope.facing = data[6];
+
+            $scope.opponentAction = data[6];
+            $scope.opponentActionSize = data[7];
+
+
+        })
+
+
+
     }
 
 

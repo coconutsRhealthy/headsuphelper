@@ -32,12 +32,23 @@
         </span>
     </p>
 
-   <p>
+    <p>
         <span>Handpath:</span>
         <span><input type="text" value={{handPath}}></span>
-        <span>Facing:</span>
-        <span><input type="text" value={{facing}}></span>
     </p>
+    <p>
+        <span>My action:</span>
+        <span><input type="text" value={{myLastAction}}></span>
+        <span>Size:</span>
+        <span><input type="text" value={{myLastActionSize}}></span>
+    </p>
+    <p>
+        <span>Opponent action:</span>
+        <span><input type="text" value={{opponentAction}}></span>
+        <span>Size:</span>
+        <span><input type="text" value={{opponentActionSize}}></span>
+    </p>
+
 
     <p>{{street}}</p>
 
@@ -68,10 +79,10 @@
 
             <div>
                 <div>
-                    <span>My stack:</span><span>{{myStack}}</span><span>---- {{myAdditionToPot}}</span>
+                    <span>My stack:</span><span>{{myStack}}</span><span>---- {{myTotalBetSize}}</span>
                 </div>
                 <div>
-                    <span>Opponent stack:</span><span>{{opponentStack}}</span><span>---- {{opponentAdditionToPot}}</span>
+                    <span>Opponent stack:</span><span>{{opponentStack}}</span><span>---- {{opponentTotalBetSize}}</span>
                 </div>
             </div>
 
@@ -116,6 +127,9 @@
                 <div ng-show="showActionBlock">
                     <span>{{action}}</span>
                     <span>{{suggestedSizing}}</span>
+                    <div>
+                        <button ng-click="postYourAction()">Follow action</button>
+                    </div>
                 </div>
             </p>
         </div>
