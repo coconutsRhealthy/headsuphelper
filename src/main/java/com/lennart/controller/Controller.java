@@ -80,8 +80,6 @@ public class Controller {
         board.add(cardList.get(1));
         board.add(cardList.get(2));
 
-        //HandPath.setHandPathPreflop(HandPath.getHandPath());
-
         Game.setStreet("flop");
         Game.setFlopCards(cardList);
         Game.setBoardCards(cardList);
@@ -96,9 +94,6 @@ public class Controller {
         turnCard = card;
         board.add(turnCard);
 
-        //TODO: fix deze methodes met String.concat etc
-        //HandPath.setHandPathFlop("");
-
         Game.setStreet("turn");
         Game.setTurnCard(card);
         Game.setBoardCards(card);
@@ -112,8 +107,6 @@ public class Controller {
         boardEvaluator.resetSortedCombos();
         riverCard = card;
         board.add(riverCard);
-
-        //HandPath.setHandPathTurn("");
 
         Game.setStreet("river");
         Game.setRiverCard(card);
@@ -140,7 +133,6 @@ public class Controller {
             Game.setOpponentIncrementalBetsize(Game.getBigBlind());
 
             Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), Game.getOpponentIncrementalBetsize());
-            //handPath = "05betF1bet";
             HandPath.setHandPathPreflop("05betF1bet");
 
             myLastAction = "0.5bet";
@@ -154,7 +146,6 @@ public class Controller {
             Game.setOpponentIncrementalBetsize(Game.getSmallBlind());
 
             Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), Game.getOpponentIncrementalBetsize());
-            //handPath = "1bet";
             HandPath.setHandPathPreflop("1bet");
 
             myLastAction = "1bet";
@@ -191,6 +182,7 @@ public class Controller {
             Game.proceedToNextStreet();
             switch(Game.getStreet()) {
                 case "flop":
+                    //TODO: dit gaat nog mis bij call3bet. HandPath.getHandPath() is dan nog 2betF3bet
                     HandPath.setHandPathPreflop(HandPath.getHandPath());
                     break;
                 case "turn":
@@ -218,21 +210,15 @@ public class Controller {
         }
 
         Game.setMyIncrementalBetSize(Double.parseDouble(handPathIncrementalBetSizeMoveToNextStreet.get(1)));
-        //Game.setOpponentIncrementalBetsize(Double.parseDouble(handPathIncrementalBetSizeMoveToNextStreet.get(2)));
-
         Game.setMyTotalBetSize(Game.getMyTotalBetSize() + Game.getMyIncrementalBetSize());
-        //Game.setOpponentTotalBetSize(Game.getOpponentTotalBetSize() + Game.getOpponentIncrementalBetsize());
-
         Game.setStacksAndPotBasedOnAction(Game.getMyIncrementalBetSize(), 0);
 
-        //nieuw
         if(handPathIncrementalBetSizeMoveToNextStreet.get(2).equals("true")) {
             Game.setMyIncrementalBetSize(0);
             Game.setOpponentIncrementalBetsize(0);
             Game.setMyTotalBetSize(0);
             Game.setOpponentTotalBetSize(0);
         }
-        //nieuw
 
         List<String> gameState = new ArrayList<>();
         gameState.add(String.valueOf(Game.getMyStack()));
@@ -247,9 +233,6 @@ public class Controller {
 
     @RequestMapping(value = "/postOpponentAction", method = RequestMethod.POST)
     public @ResponseBody List<String> postOpponentAction(@RequestBody List<String> handPathIncrementalBetSizeMoveToNextStreet) {
-
-
-        //if opponent action is 'call', then leave handPath as is and proceed to next street...
         if(handPathIncrementalBetSizeMoveToNextStreet.get(2).equals("true")) {
             Game.proceedToNextStreet();
             switch(Game.getStreet()) {
@@ -280,35 +263,16 @@ public class Controller {
             }
         }
 
-//        System.out.println("wacht ff");
-//
-//        List<String> eije = new ArrayList<>();
-//        for(int i = 1; i < 101; i++) {
-//            Action action = new Action(HandPath.getHandPath());
-//            eije.add(action.getSuggestedAction());
-//        }
-//        //TODO: check waarom 76o te vaak 4bet returnt
-//        System.out.println("yoyo");
-
-
-        //hier fixen dat als move naar next street is, dat dan total betsizes op 0 gezet worden
-
         Game.setOpponentIncrementalBetsize(Double.parseDouble(handPathIncrementalBetSizeMoveToNextStreet.get(1)));
-        //Game.setOpponentIncrementalBetsize(Double.parseDouble(handPathIncrementalBetSizeMoveToNextStreet.get(2)));
-
         Game.setOpponentTotalBetSize(Game.getOpponentTotalBetSize() + Game.getOpponentIncrementalBetsize());
-        //Game.setOpponentTotalBetSize(Game.getOpponentTotalBetSize() + Game.getOpponentIncrementalBetsize());
-
         Game.setStacksAndPotBasedOnAction(0, Game.getOpponentIncrementalBetsize());
 
-        //nieuw
         if(handPathIncrementalBetSizeMoveToNextStreet.get(2).equals("true")) {
             Game.setMyIncrementalBetSize(0);
             Game.setOpponentIncrementalBetsize(0);
             Game.setMyTotalBetSize(0);
             Game.setOpponentTotalBetSize(0);
         }
-        //nieuw
 
         List<String> gameState = new ArrayList<>();
         gameState.add(String.valueOf(Game.getMyStack()));

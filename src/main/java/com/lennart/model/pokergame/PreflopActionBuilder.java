@@ -155,7 +155,7 @@ public class PreflopActionBuilder {
             percentageCall3bet = setPercentage(call3bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
 
-        if(percentageCall3bet == 0) {
+        if(percentage4bet == 0) {
             percentage4bet = setPercentage(x4bet_comboMap95Percent, holeCardsAsSet, 0.95);
         }
         if(percentage4bet == 0) {
@@ -183,10 +183,12 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String getSize(String handPath) {
-        switch(handPath) {
-            case "05betF1bet":
-                return String.valueOf(2.44 * Game.getBigBlind());
+    public String getSize(Action action) {
+        switch(action.suggestedAction) {
+            case "2bet":
+                return String.valueOf(2.5 * Game.getBigBlind());
+            case "4bet":
+                return String.valueOf(2.15 * Game.getOpponentTotalBetSize());
         }
         return null;
     }

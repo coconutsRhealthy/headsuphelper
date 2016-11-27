@@ -126,10 +126,12 @@
 
             <p>
                 <div ng-show="showActionBlock">
+                    <span>Suggested action:</span>
                     <span>{{action}}</span>
                     <span>{{suggestedSizing}}</span>
                     <div>
-                        <button ng-click="postYourAction()">Follow action</button>
+                        <span><button ng-click="getAction()">Get action</button></span>
+                        <span><button ng-click="postYourAction()">Follow action</button></span>
                     </div>
                 </div>
             </p>

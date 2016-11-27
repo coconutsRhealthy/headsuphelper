@@ -16,11 +16,15 @@ public class Action {
         switch(handPath) {
             case "05betF1bet":
                 this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
-                this.suggestedSizing = preflopActionBuilder.getSize(handPath);
+                this.suggestedSizing = preflopActionBuilder.getSize(this);
                 break;
             case "2betF3bet":
                 this.suggestedAction = preflopActionBuilder.get2betF3bet(Game.getHoleCards());
+                this.suggestedSizing = preflopActionBuilder.getSize(this);
                 break;
+            default:
+                this.suggestedAction = "no action available for this handpath and board";
+                this.suggestedSizing = "";
         }
     }
 
