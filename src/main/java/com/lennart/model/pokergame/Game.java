@@ -292,4 +292,18 @@ public class Game {
 
         Game.knownGameCards.addAll(holeCardsAsSet);
     }
+
+    public static void proceedToNextStreet() {
+        switch(Game.getStreet()) {
+            case "preflop":
+                Game.setStreet("flop");
+                break;
+            case "flop":
+                Game.setStreet("turn");
+                break;
+            case "turn":
+                Game.setStreet("river");
+                break;
+        }
+    }
 }

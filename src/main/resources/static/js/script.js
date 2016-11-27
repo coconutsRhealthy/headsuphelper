@@ -17,7 +17,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.riverCard = {};
 
     $scope.initialGameVariables = [];
-    $scope.handPathAndAmountAdded = [];
+    $scope.handPathIncrementalBetSizeMoveToNextStreet = [];
 
     $scope.street = "Select holecards";
     $scope.hideHoleCardsBeforeSentToServerDiv = false;
@@ -81,6 +81,7 @@ var mainApp = angular.module("mainApp", []);
     $scope.opponentTotalBetSize;
     $scope.myIncrementalBetSize;
     $scope.opponentIncrementalBetSize;
+    $scope.moveToNextStreet;
 
     $scope.suggestedSizing
 
@@ -239,7 +240,8 @@ var mainApp = angular.module("mainApp", []);
             $scope.street = "Select flopcards";
             $scope.reset();
 
-            $http.get('/getInitialAction/').success(function(data) {
+            //to post the blinds
+            $http.get('/getAction/').success(function(data) {
               $scope.action = data.suggestedAction;
               $scope.suggestedSizing = data.suggestedSizing;
             })
@@ -331,9 +333,16 @@ var mainApp = angular.module("mainApp", []);
         //$scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
 
         //$scope.handPathAndAmountAdded = [$scope.handPath, $scope.myIncrementalBetSize, $scope.opponentIncrementalBetSize];
-        $scope.handPathAndAmountAdded = [$scope.handPath, $scope.myIncrementalBetSize];
+        if($scope.myLastAction.indexOf("call") !== -1) {
+            $scope.moveToNextStreet = "true";
+        } else {
+            $scope.moveToNextStreet = "false";
+        }
 
-        $http.post('/postYourAction/', $scope.handPathAndAmountAdded).success(function(data) {
+        $scope.handPathIncrementalBetSizeMoveToNextStreet = [$scope.handPath, $scope.myIncrementalBetSize,
+                                                                $scope.moveToNextStreet];
+
+        $http.post('/postYourAction/', $scope.handPathIncrementalBetSizeMoveToNextStreet).success(function(data) {
             $scope.myStack = data[0];
             $scope.opponentStack = data[1];
             $scope.myTotalBetSize = data[2];
@@ -343,20 +352,56 @@ var mainApp = angular.module("mainApp", []);
             $scope.opponentAction = "...";
             $scope.opponentActionSize = "...";
         })
+
+        //string.indexOf(substring) !== -1
+        if($scope.myLastAction.indexOf("call") !== -1) {
+            clearActionsAfterMoveToNextStreet()
+        }
     }
 
     $scope.postOpponentAction = function() {
-        $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver
-            + $scope.action + "F" + $scope.opponentAction;
+        //hier door naar volgende straat ja/nee goedmaken
+
+        if($scope.opponentAction === "call") {
+            $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver
+                + $scope.action;
+
+            $scope.moveToNextStreet = "true";
+        } else {
+            $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver
+                + $scope.action + "F" + $scope.opponentAction;
+
+            $scope.moveToNextStreet = "false";
+        }
 
         $scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
 
-        $scope.handPathAndAmountAdded = [$scope.handPath, $scope.opponentIncrementalBetSize];
+        $scope.handPathIncrementalBetSizeMoveToNextStreet = [$scope.handPath, $scope.opponentIncrementalBetSize,
+                                                                $scope.moveToNextStreet];
 
-
-        $http.post('/postOpponentAction/', $scope.handPathAndAmountAdded).success(function(data) {
+        $http.post('/postOpponentAction/', $scope.handPathIncrementalBetSizeMoveToNextStreet).success(function(data) {
+            $scope.myStack = data[0];
+            $scope.opponentStack = data[1];
+            $scope.myTotalBetSize = data[2];
+            $scope.opponentTotalBetSize = data[3];
+            $scope.potSize = data[4];
+            $scope.handPath = data[5];
 
         })
+
+        if($scope.opponentAction === "call") {
+            clearActionsAfterMoveToNextStreet()
+        }
+    }
+
+    function clearActionsAfterMoveToNextStreet() {
+        $scope.action = "";
+        $scope.suggestedSizing = "";
+
+        $scope.myLastAction = "...";
+        $scope.myLastActionSize = "...";
+        $scope.opponentAction = "...";
+        $scope.opponentActionSize = "...";
     }
 
 

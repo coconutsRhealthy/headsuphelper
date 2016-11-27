@@ -30,32 +30,35 @@ public class HandPath {
         return handPathPreflop;
     }
 
-    public static void setHandPathPreflop(String handPathPreflop) {
-        HandPath.handPathPreflop = handPathPreflop;
+    public static void setHandPathPreflop(String handPath) {
+        HandPath.handPathPreflop = handPath;
     }
 
     public static String getHandPathFlop() {
         return handPathFlop;
     }
 
-    public static void setHandPathFlop(String handPathFlop) {
-        HandPath.handPathFlop = handPathFlop;
+    public static void setHandPathFlop(String handPath) {
+        String handPathThusFar = HandPath.getHandPath();
+        HandPath.handPathFlop = handPath.replaceAll(handPathThusFar, "");
     }
 
     public static String getHandPathTurn() {
         return handPathTurn;
     }
 
-    public static void setHandPathTurn(String handPathTurn) {
-        HandPath.handPathTurn = handPathTurn;
+    public static void setHandPathTurn(String handPath) {
+        String handPathThusFar = HandPath.getHandPath();
+        HandPath.handPathTurn = handPath.replaceAll(handPathThusFar, "");
     }
 
     public static String getHandPathRiver() {
         return handPathRiver;
     }
 
-    public static void setHandPathRiver(String handPathRiver) {
-        HandPath.handPathRiver = handPathRiver;
+    public static void setHandPathRiver(String handPath) {
+        String handPathThusFar = HandPath.getHandPath();
+        HandPath.handPathRiver = handPath.replaceAll(handPathThusFar, "");
     }
 
     public static String getHandPath() {
