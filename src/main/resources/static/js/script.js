@@ -252,9 +252,8 @@ var mainApp = angular.module("mainApp", []);
         $scope.flopCards = [$scope.selectedCard1, $scope.selectedCard2, $scope.selectedCard3];
         $http.post('/postFlopCards/', $scope.flopCards).success(function(data) {
             $http.get('/getHandPath/').success(function(data) {
-              $scope.handPathPreflop = data.handPathPreflop;
+              $scope.handPathPreflop = data.instanceHandPathPreflop;
             })
-            alert("testje " + $scope.handPathFlop);
 
             $scope.selectedFlopCard1FromServer = data[0];
             $scope.selectedFlopCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
@@ -279,7 +278,7 @@ var mainApp = angular.module("mainApp", []);
         $scope.turnCard = $scope.selectedCard1;
         $http.post('/postTurnCard/', $scope.turnCard).success(function(data) {
             $http.get('/getHandPath/').success(function(data) {
-              $scope.handPathFlop = data.handPathFlop;
+              $scope.handPathFlop = data.instanceHandPathFlop;
             })
             $scope.selectedTurnCardFromServer = data;
             $scope.selectedTurnCardFromServer.rank = convertRankFromIntegerToRank(data.rank);
@@ -299,7 +298,7 @@ var mainApp = angular.module("mainApp", []);
         $scope.riverCard = $scope.selectedCard1;
         $http.post('/postRiverCard/', $scope.riverCard).success(function(data) {
             $http.get('/getHandPath/').success(function(data) {
-              $scope.handPathTurn = data.handPathTurn;
+              $scope.handPathTurn = data.instanceHandPathTurn;
             })
             $scope.selectedRiverCardFromServer = data;
             $scope.selectedRiverCardFromServer.rank = convertRankFromIntegerToRank(data.rank);
@@ -384,6 +383,15 @@ var mainApp = angular.module("mainApp", []);
             $scope.opponentTotalBetSize = data[3];
             $scope.potSize = data[4];
             $scope.handPath = data[5];
+
+//            alert($scope.moveToNextStreet);
+//            alert($scope.ip);
+//            alert(!($scope.moveToNextStreet && $scope.position === "IP"));
+
+            alert($scope.moveToNextStreet);
+            alert($scope.position === "IP");
+            alert($scope.moveToNextStreet && $scope.position === "IP");
+            alert(!($scope.moveToNextStreet && $scope.position === "IP"));
 
             if(!($scope.moveToNextStreet && $scope.position === "IP")) {
                 $http.get('/getAction/').success(function(data) {

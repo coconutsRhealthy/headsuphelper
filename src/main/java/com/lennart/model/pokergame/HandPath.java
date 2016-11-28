@@ -19,18 +19,6 @@ public class HandPath {
     private String instanceHandPathRiver;
     private String instanceHandPath;
 
-//    public HandPath(String handPathPreflop, String handPathFlop, String handPathTurn, String handPathRiver) {
-//        HandPath.handPathPreflop = handPathPreflop;
-//        HandPath.handPathFlop = handPathFlop;
-//        HandPath.handPathTurn = handPathTurn;
-//        HandPath.handPathRiver = handPathRiver;
-//        HandPath.handPath = handPathPreflop + handPathFlop + handPathTurn + handPathRiver;
-//    }
-//
-//    public String getHandPath(Action action) {
-//        return "2bet";
-//    }
-
     public HandPath() {
         this.instanceHandPathPreflop = getHandPathPreflop();
         this.instanceHandPathFlop = getHandPathFlop();
@@ -79,7 +67,43 @@ public class HandPath {
         return HandPath.getHandPathPreflop() + HandPath.getHandPathFlop() + HandPath.getHandPathTurn() + HandPath.getHandPathRiver();
     }
 
-//    public static void setHandPath() {
-//        HandPath.handPath = HandPath.getHandPathPreflop() + HandPath.
-//    }
+    public String getInstanceHandPathPreflop() {
+        return instanceHandPathPreflop;
+    }
+
+    public void setInstanceHandPathPreflop(String instanceHandPathPreflop) {
+        this.instanceHandPathPreflop = instanceHandPathPreflop;
+    }
+
+    public String getInstanceHandPathFlop() {
+        return instanceHandPathFlop;
+    }
+
+    public void setInstanceHandPathFlop(String instanceHandPathFlop) {
+        this.instanceHandPathFlop = instanceHandPathFlop;
+    }
+
+    public String getInstanceHandPathTurn() {
+        return instanceHandPathTurn;
+    }
+
+    public void setInstanceHandPathTurn(String instanceHandPathTurn) {
+        this.instanceHandPathTurn = instanceHandPathTurn;
+    }
+
+    public String getInstanceHandPathRiver() {
+        return instanceHandPathRiver;
+    }
+
+    public void setInstanceHandPathRiver(String instanceHandPathRiver) {
+        this.instanceHandPathRiver = instanceHandPathRiver;
+    }
+
+    public String getInstanceHandPath() {
+        return instanceHandPath;
+    }
+
+    public void setInstanceHandPath(String instanceHandPath) {
+        this.instanceHandPath = instanceHandPath;
+    }
 }
