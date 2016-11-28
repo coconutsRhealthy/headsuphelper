@@ -254,6 +254,8 @@ var mainApp = angular.module("mainApp", []);
             $http.get('/getHandPath/').success(function(data) {
               $scope.handPathPreflop = data.handPathPreflop;
             })
+            alert("testje " + $scope.handPathFlop);
+
             $scope.selectedFlopCard1FromServer = data[0];
             $scope.selectedFlopCard1FromServer.rank = convertRankFromIntegerToRank(data[0].rank);
             $scope.selectedFlopCard2FromServer = data[1];
@@ -329,6 +331,8 @@ var mainApp = angular.module("mainApp", []);
 
         if($scope.myLastAction.indexOf("call") !== -1) {
             $scope.moveToNextStreet = "true";
+
+            $scope.myIncrementalBetSize = $scope.opponentTotalBetSize - $scope.myTotalBetSize;
         } else {
             $scope.moveToNextStreet = "false";
         }
@@ -353,11 +357,15 @@ var mainApp = angular.module("mainApp", []);
     }
 
     $scope.postOpponentAction = function() {
+        $scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
+
         if($scope.opponentAction === "call") {
             $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver
                 + $scope.action;
 
             $scope.moveToNextStreet = "true";
+
+            $scope.opponentIncrementalBetSize = $scope.myTotalBetSize - $scope.opponentTotalBetSize;
         } else {
             $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver
                 + $scope.action + "F" + $scope.opponentAction;
@@ -365,7 +373,7 @@ var mainApp = angular.module("mainApp", []);
             $scope.moveToNextStreet = "false";
         }
 
-        $scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
+
         $scope.handPathIncrementalBetSizeMoveToNextStreet = [$scope.handPath, $scope.opponentIncrementalBetSize,
                                                                 $scope.moveToNextStreet];
 
@@ -377,10 +385,12 @@ var mainApp = angular.module("mainApp", []);
             $scope.potSize = data[4];
             $scope.handPath = data[5];
 
-            $http.get('/getAction/').success(function(data) {
-              $scope.action = data.suggestedAction;
-              $scope.suggestedSizing = data.suggestedSizing;
-            })
+            if(!($scope.moveToNextStreet && $scope.position === "IP")) {
+                $http.get('/getAction/').success(function(data) {
+                  $scope.action = data.suggestedAction;
+                  $scope.suggestedSizing = data.suggestedSizing;
+                })
+            }
         })
 
         if($scope.opponentAction === "call") {

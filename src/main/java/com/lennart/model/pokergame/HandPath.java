@@ -13,6 +13,12 @@ public class HandPath {
     private static String handPathRiver = "";
     private static String handPath = "";
 
+    private String instanceHandPathPreflop;
+    private String instanceHandPathFlop;
+    private String instanceHandPathTurn;
+    private String instanceHandPathRiver;
+    private String instanceHandPath;
+
 //    public HandPath(String handPathPreflop, String handPathFlop, String handPathTurn, String handPathRiver) {
 //        HandPath.handPathPreflop = handPathPreflop;
 //        HandPath.handPathFlop = handPathFlop;
@@ -24,6 +30,14 @@ public class HandPath {
 //    public String getHandPath(Action action) {
 //        return "2bet";
 //    }
+
+    public HandPath() {
+        this.instanceHandPathPreflop = getHandPathPreflop();
+        this.instanceHandPathFlop = getHandPathFlop();
+        this.instanceHandPathTurn = getHandPathTurn();
+        this.instanceHandPathRiver = getHandPathRiver();
+        this.instanceHandPath = getHandPath();
+    }
 
 
     public static String getHandPathPreflop() {

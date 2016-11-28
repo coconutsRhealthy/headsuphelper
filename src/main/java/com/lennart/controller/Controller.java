@@ -178,35 +178,23 @@ public class Controller {
 
     @RequestMapping(value = "/postYourAction", method = RequestMethod.POST)
     public @ResponseBody List<String> postYourAction(@RequestBody List<String> handPathIncrementalBetSizeMoveToNextStreet) {
+        switch(Game.getStreet()) {
+            case "preflop":
+                HandPath.setHandPathPreflop(handPathIncrementalBetSizeMoveToNextStreet.get(0));
+                break;
+            case "flop":
+                HandPath.setHandPathFlop(handPathIncrementalBetSizeMoveToNextStreet.get(0));
+                break;
+            case "turn":
+                HandPath.setHandPathTurn(handPathIncrementalBetSizeMoveToNextStreet.get(0));
+                break;
+            case "river":
+                HandPath.setHandPathRiver(handPathIncrementalBetSizeMoveToNextStreet.get(0));
+                break;
+        }
+
         if(handPathIncrementalBetSizeMoveToNextStreet.get(2).equals("true")) {
             Game.proceedToNextStreet();
-            switch(Game.getStreet()) {
-                case "flop":
-                    //TODO: dit gaat nog mis bij call3bet. HandPath.getHandPath() is dan nog 2betF3bet
-                    HandPath.setHandPathPreflop(HandPath.getHandPath());
-                    break;
-                case "turn":
-                    HandPath.setHandPathFlop(HandPath.getHandPath());
-                    break;
-                case "river":
-                    HandPath.setHandPathTurn(HandPath.getHandPath());
-                    break;
-            }
-        } else {
-            switch(Game.getStreet()) {
-                case "preflop":
-                    HandPath.setHandPathPreflop(handPathIncrementalBetSizeMoveToNextStreet.get(0));
-                    break;
-                case "flop":
-                    HandPath.setHandPathFlop(handPathIncrementalBetSizeMoveToNextStreet.get(0));
-                    break;
-                case "turn":
-                    HandPath.setHandPathTurn(handPathIncrementalBetSizeMoveToNextStreet.get(0));
-                    break;
-                case "river":
-                    HandPath.setHandPathRiver(handPathIncrementalBetSizeMoveToNextStreet.get(0));
-                    break;
-            }
         }
 
         Game.setMyIncrementalBetSize(Double.parseDouble(handPathIncrementalBetSizeMoveToNextStreet.get(1)));
