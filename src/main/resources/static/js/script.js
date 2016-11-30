@@ -384,16 +384,16 @@ var mainApp = angular.module("mainApp", []);
             $scope.potSize = data[4];
             $scope.handPath = data[5];
 
-//            alert($scope.moveToNextStreet);
-//            alert($scope.ip);
-//            alert(!($scope.moveToNextStreet && $scope.position === "IP"));
+            if($scope.moveToNextStreet === "false") {
+                alert("komt ie hier")
+                $http.get('/getAction/').success(function(data) {
+                  $scope.action = data.suggestedAction;
+                  $scope.suggestedSizing = data.suggestedSizing;
+                })
+            }
 
-            alert($scope.moveToNextStreet);
-            alert($scope.position === "IP");
-            alert($scope.moveToNextStreet && $scope.position === "IP");
-            alert(!($scope.moveToNextStreet && $scope.position === "IP"));
-
-            if(!($scope.moveToNextStreet && $scope.position === "IP")) {
+            if($scope.moveToNextStreet === "true" && $scope.position === "OOP") {
+                alert("komt ie hier")
                 $http.get('/getAction/').success(function(data) {
                   $scope.action = data.suggestedAction;
                   $scope.suggestedSizing = data.suggestedSizing;
