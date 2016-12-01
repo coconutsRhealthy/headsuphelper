@@ -183,8 +183,14 @@ public class PreflopActionBuilder {
         }
     }
 
+    public String get1betF2bet(List<Card> holeCards) {
+        return "call2bet";
+    }
+
     public String getSize(Action action) {
         switch(action.suggestedAction) {
+            case "call":
+                return String.valueOf(Game.getOpponentTotalBetSize() - Game.getMyTotalBetSize());
             case "2bet":
                 return String.valueOf(2.5 * Game.getBigBlind());
             case "4bet":

@@ -18,9 +18,17 @@ public class Action {
                 this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
                 this.suggestedSizing = preflopActionBuilder.getSize(this);
                 break;
+            case "1betF2bet":
+                this.suggestedAction = preflopActionBuilder.get1betF2bet(Game.getHoleCards());
+                this.suggestedSizing = preflopActionBuilder.getSize(this);
+                break;
             case "2betF3bet":
                 this.suggestedAction = preflopActionBuilder.get2betF3bet(Game.getHoleCards());
                 this.suggestedSizing = preflopActionBuilder.getSize(this);
+                break;
+            case "call2bet":
+                this.suggestedAction = "Check";
+                this.suggestedSizing = "0";
                 break;
             default:
                 this.suggestedAction = "no action available for this handpath and board";

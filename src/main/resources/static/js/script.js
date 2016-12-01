@@ -237,11 +237,12 @@ var mainApp = angular.module("mainApp", []);
             $scope.street = "Select flopcards";
             $scope.reset();
 
-            //to post the blinds
-            $http.get('/getAction/').success(function(data) {
-              $scope.action = data.suggestedAction;
-              $scope.suggestedSizing = data.suggestedSizing;
-            })
+            if($scope.position === "IP") {
+                $http.get('/getAction/').success(function(data) {
+                  $scope.action = data.suggestedAction;
+                  $scope.suggestedSizing = data.suggestedSizing;
+                })
+            }
         }).error(function() {
             alert("Failed to submit holecards");
         });
@@ -351,12 +352,18 @@ var mainApp = angular.module("mainApp", []);
         })
 
         if($scope.myLastAction.indexOf("call") !== -1) {
+            //TODO: hier nog even een check op positie toevoegen?
+            $http.get('/getAction/').success(function(data) {
+              $scope.action = data.suggestedAction;
+              $scope.suggestedSizing = data.suggestedSizing;
+            })
             clearActionsAfterMoveToNextStreet()
         }
     }
 
     $scope.postOpponentAction = function() {
         $scope.opponentIncrementalBetSize = $scope.opponentActionSize - $scope.opponentTotalBetSize;
+        $scope.action = $scope.myLastAction;
 
         if($scope.opponentAction === "call") {
             $scope.handPath = $scope.handPathPreflop + $scope.handPathFlop + $scope.handPathTurn + $scope.handPathRiver
@@ -385,7 +392,6 @@ var mainApp = angular.module("mainApp", []);
             $scope.handPath = data[5];
 
             if($scope.moveToNextStreet === "false") {
-                alert("komt ie hier")
                 $http.get('/getAction/').success(function(data) {
                   $scope.action = data.suggestedAction;
                   $scope.suggestedSizing = data.suggestedSizing;
@@ -393,7 +399,6 @@ var mainApp = angular.module("mainApp", []);
             }
 
             if($scope.moveToNextStreet === "true" && $scope.position === "OOP") {
-                alert("komt ie hier")
                 $http.get('/getAction/').success(function(data) {
                   $scope.action = data.suggestedAction;
                   $scope.suggestedSizing = data.suggestedSizing;
