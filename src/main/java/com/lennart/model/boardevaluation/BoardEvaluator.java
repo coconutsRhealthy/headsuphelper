@@ -936,40 +936,8 @@ public class BoardEvaluator {
         return copyOfAllSortedCombos;
     }
 
-    public List<BooleanResult> allFunctions(List<Card> board) {
-        BooleanResult result1 = new BooleanResult();
-        BooleanResult result2 = new BooleanResult();
-        BooleanResult result3 = new BooleanResult();
-        BooleanResult result4 = new BooleanResult();
-        BooleanResult result5 = new BooleanResult();
-        BooleanResult result6 = new BooleanResult();
-        BooleanResult result7 = new BooleanResult();
-
-        result1.setFunctionDescription("Is board rainbow");
-        result1.setResult(isBoardRainbow(board));
-        result2.setFunctionDescription("Has board two of one suit");
-        result2.setResult(hasBoardTwoOfOneSuit(board));
-        result3.setFunctionDescription("Is board suited");
-        result3.setResult(isBoardSuited(board));
-        result4.setFunctionDescription("Is board connected");
-        result4.setResult(isBoardConnected(board));
-        result5.setFunctionDescription("Has board two connecting cards");
-        result5.setResult(hasBoardTwoConnectingCards(board));
-        result6.setFunctionDescription("Is board paired once");
-        result6.setResult(isBoardPairedOnce(board));
-        result7.setFunctionDescription("is er wheel activity?");
-        result7.setResult(boardContainsAceAndWheelCard(board));
-
-        List<BooleanResult> listOfFunctionResults = new ArrayList<BooleanResult>();
-
-        listOfFunctionResults.add(result1);
-        listOfFunctionResults.add(result2);
-        listOfFunctionResults.add(result3);
-        listOfFunctionResults.add(result4);
-        listOfFunctionResults.add(result5);
-        listOfFunctionResults.add(result6);
-        listOfFunctionResults.add(result7);
-
-        return listOfFunctionResults;
+    public int getNumberOfArrivedDraws() {
+        //TODO: implement this method
+        return 0;
     }
 }

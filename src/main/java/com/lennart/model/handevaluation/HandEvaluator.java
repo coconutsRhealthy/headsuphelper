@@ -100,4 +100,25 @@ public class HandEvaluator {
             return index;
         }
     }
+
+    public int getNumberOfArrivedDrawsInYourPerceivedRange() {
+        //TODO: implement this method
+        return 0;
+    }
+
+    public double getPercentageOfYourPerceivedRangeThatHitsFlopRanks() {
+        //TODO: implement this method
+        return 0;
+    }
+
+    public double getPercentageOfYourPerceivedRangeThatHitsNewCard() {
+        //TODO: implement this method
+        return 0;
+    }
+
+    public double getHandStrengthNeededToCall() {
+        //TODO: implement this method
+        return 0;
+    }
+
 }
