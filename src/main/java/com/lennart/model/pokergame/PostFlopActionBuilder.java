@@ -13,7 +13,7 @@ public class PostFlopActionBuilder {
 
     private final String FOLD = "fold";
     private final String CHECK = "check";
-    private final String BET = "1bet";
+    private final String _1BET = "1bet";
     private final String _2BET = "2bet";
     private final String CALL_1_BET = "call1bet";
     private final String CALL_2_BET = "call2bet";
@@ -41,143 +41,19 @@ public class PostFlopActionBuilder {
     private String getIpAction(double handStrengthAgainstRange) {
         //facing check
         if(HandPath.getHandPath().contains("Fcheck")) {
-            if(handStrengthAgainstRange > 0.6) {
-                if(!Game.getStreet().equals("river")) {
-                    if(Math.random() < 0.8) {
-                        return BET;
-                    } else {
-                        return CHECK;
-                    }
-                } else {
-                    //hier nog onderscheid maken tussen hoeveel bets al gedaan zijn? Tighter bij grotere pot..
-                    return BET;
-                }
-            } else if (youHaveStrongFdOrSd) {
-                if(Math.random() < 0.75) {
-                    return BET;
-                } else {
-                    return CHECK;
-                }
-            } else if (youHaveStrongGutshot) {
-                if(Math.random() < 0.68) {
-                    return BET;
-                } else {
-                    return CHECK;
-                }
-            } else if (youHaveMediumFdOrSd) {
-                if(Math.random() < 0.5) {
-                    return BET;
-                } else {
-                    return CHECK;
-                }
-            } else {
-                //de bluffs
-                int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
-                int numberOfArrivedDrawsInYourPerceivedRange =
-                        handEvaluator.getNumberOfArrivedDrawsInYourPerceivedRange();
-                double percentageOfYourPerceivedRangeThatHitsFlopRanks =
-                        handEvaluator.getPercentageOfYourPerceivedRangeThatHitsFlopRanks();
-                double percentageOfYourPerceivedRangeThatHitsNewCard =
-                        handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
-
-
-
-                if(numberOfArrivedDraws > 10 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
-                    if(Math.random() < 0.8) {
-                        return BET;
-                    }
-                }
-
-                if(Game.getStreet().equals("flop")) {
-                    if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
-                        if(Math.random() < 0.8) {
-                            return BET;
-                        }
-                    }
-                } else {
-                    if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
-                        if(Math.random() < 0.8) {
-                            return BET;
-                        }
-                    }
-
-                }
-                return CHECK;
-            }
+            return getIpFCheck(handStrengthAgainstRange);
         }
         //facing 1bet
         if(HandPath.getHandPath().contains("F1bet")) {
-            if(handStrengthAgainstRange > 0.7) {
-                if(!Game.getStreet().equals("river")) {
-                    if(Math.random() < 0.8) {
-                        return _2BET;
-                    } else {
-                        return CALL_1_BET;
-                    }
-                } else {
-                    //hier nog onderscheid maken tussen hoeveel bets al gedaan zijn? Tighter bij grotere pot..
-                    return _2BET;
-                }
-            } else {
-                if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
-                    return CALL_1_BET;
-                } else {
-                    //de bluff 2bets...
-                    int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
-                    int numberOfArrivedDrawsInYourPerceivedRange =
-                            handEvaluator.getNumberOfArrivedDrawsInYourPerceivedRange();
-                    double percentageOfYourPerceivedRangeThatHitsFlopRanks =
-                            handEvaluator.getPercentageOfYourPerceivedRangeThatHitsFlopRanks();
-                    double percentageOfYourPerceivedRangeThatHitsNewCard =
-                            handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
-
-
-                    if(numberOfArrivedDraws > 10 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
-                        if(Math.random() < 0.8) {
-                            return _2BET;
-                        }
-                    }
-
-                    if(Game.getStreet().equals("flop")) {
-                        if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
-                            if(Math.random() < 0.8) {
-                                return _2BET;
-                            }
-                        }
-                    }
-
-                    if(!Game.getStreet().equals("flop")) {
-                        if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
-                            if(Math.random() < 0.8) {
-                                return _2BET;
-                            }
-                        }
-                    }
-                    return FOLD;
-                }
-            }
-
-
+            return getIpF1bet(handStrengthAgainstRange);
         }
         //facing 2bet
         if(HandPath.getHandPath().contains("F2bet")) {
-            if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
-                return CALL_2_BET;
-            } else {
-                //hier nog toevoegen: de calls met draws
-
-                return FOLD;
-            }
+            return getIpF2bet(handStrengthAgainstRange);
         }
         //facing 3bet
         if(HandPath.getHandPath().contains("F3bet")) {
-            if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
-                return CALL_2_BET;
-            } else {
-                //hier nog toevoegen: de calls met draws
-
-                return FOLD;
-            }
+            return getIpF3bet(handStrengthAgainstRange);
         }
         return null;
     }
@@ -185,83 +61,172 @@ public class PostFlopActionBuilder {
     private String getOopAction(double handStrengthAgainstRange) {
         //first to act
         if(!HandPath.getHandPath().contains("F")) {
-            if(myLastActionWasCall()) {
-                return CHECK;
-            } else {
-                if (handStrengthAgainstRange > 0.65) {
-                    if(!Game.getStreet().equals("river")) {
-                        if(Math.random() < 0.8) {
-                            return BET;
-                        } else {
-                            return CHECK;
-                        }
-                    } else {
-                        //hier nog onderscheid maken tussen hoeveel bets al gedaan zijn? Tigher bij grotere pot..
-                        return BET;
-                    }
-                } else if (youHaveStrongFdOrSd) {
-                    if(Math.random() < 0.75) {
-                        return BET;
-                    } else {
-                        return CHECK;
-                    }
-                } else if (youHaveStrongGutshot) {
-                    if(Math.random() < 0.68) {
-                        return BET;
-                    } else {
-                        return CHECK;
-                    }
-                } else if (youHaveMediumFdOrSd) {
-                    if (Math.random() < 0.5) {
-                        return BET;
-                    } else {
-                        return CHECK;
-                    }
-                } else {
-                    //de bluffs
-                    int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
-                    int numberOfArrivedDrawsInYourPerceivedRange =
-                            handEvaluator.getNumberOfArrivedDrawsInYourPerceivedRange();
-                    double percentageOfYourPerceivedRangeThatHitsFlopRanks =
-                            handEvaluator.getPercentageOfYourPerceivedRangeThatHitsFlopRanks();
-                    double percentageOfYourPerceivedRangeThatHitsNewCard =
-                            handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
-
-
-                    if(numberOfArrivedDraws > 10 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
-                        if(Math.random() < 0.8) {
-                            return BET;
-                        }
-                    }
-
-                    if(Game.getStreet().equals("flop")) {
-                        if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
-                            if(Math.random() < 0.8) {
-                                return BET;
-                            }
-                        }
-                    }
-
-                    if(!Game.getStreet().equals("flop")) {
-                        if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
-                            if(Math.random() < 0.8) {
-                                return BET;
-                            }
-                        }
-                    }
-
-                    return CHECK;
-                }
-            }
+            return getOopFirstToAct(handStrengthAgainstRange);
         }
 
         //facing 1bet
+        if(HandPath.getHandPath().contains("F1bet")) {
+            return getOopF1bet(handStrengthAgainstRange);
+        }
 
         //facing 2bet
 
         //facing 3bet
         return null;
     }
+
+    private String getIpFCheck(double handStrengthAgainstRange) {
+        if(handStrengthAgainstRange > 0.6) {
+            return getValueAction(_1BET, CHECK);
+        }
+
+        String drawAction = getDrawAction(_1BET, CHECK);
+
+        if(drawAction != null) {
+            return drawAction;
+        } else {
+            return getBluffAction(_1BET, CHECK);
+        }
+    }
+
+    private String getIpF1bet(double handStrengthAgainstRange) {
+        if(handStrengthAgainstRange > 0.7) {
+            return getValueAction(_2BET, CALL_1_BET);
+        } else {
+            if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
+                //nog toevoegen, de calls met draws
+
+                return CALL_1_BET;
+            } else {
+                return getBluffAction(_2BET, FOLD);
+            }
+        }
+    }
+
+    private String getIpF2bet(double handStrengthAgainstRange) {
+        if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
+            return CALL_2_BET;
+        } else {
+            //hier nog toevoegen: de calls met draws
+
+            return FOLD;
+        }
+    }
+
+    private String getIpF3bet(double handStrengthAgainstRange) {
+        if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
+            return CALL_2_BET;
+        } else {
+            //hier nog toevoegen: de calls met draws
+
+            return FOLD;
+        }
+    }
+
+    private String getOopFirstToAct(double handStrengthAgainstRange) {
+        if(myLastActionWasCall()) {
+            return CHECK;
+        } else {
+            if (handStrengthAgainstRange > 0.65) {
+                getValueAction(_1BET, CHECK);
+            }
+
+            String drawAction = getDrawAction(_1BET, CHECK);
+
+            if(drawAction != null) {
+                return drawAction;
+            } else {
+                return getBluffAction(_1BET, CHECK);
+            }
+        }
+    }
+
+    private String getOopF1bet(double handStrengthAgainstRange) {
+        return null;
+    }
+
+    private String getIpFCheckValue() {
+        if(!Game.getStreet().equals("river")) {
+            if(Math.random() < 0.8) {
+                return _1BET;
+            } else {
+                return CHECK;
+            }
+        } else {
+            //hier nog onderscheid maken tussen hoeveel bets al gedaan zijn? Tighter bij grotere pot..
+            return _1BET;
+        }
+    }
+
+    private String getValueAction(String bettingAction, String passiveAction) {
+        if(!Game.getStreet().equals("river")) {
+            if(Math.random() < 0.8) {
+                return bettingAction;
+            } else {
+                return passiveAction;
+            }
+        } else {
+            //hier nog onderscheid maken tussen hoeveel bets al gedaan zijn? Tighter bij grotere pot..
+            return bettingAction;
+        }
+    }
+
+    private String getDrawAction(String bettingAction, String passiveAction) {
+        if (youHaveStrongFdOrSd) {
+            if(Math.random() < 0.75) {
+                return bettingAction;
+            } else {
+                return passiveAction;
+            }
+        } else if (youHaveStrongGutshot) {
+            if(Math.random() < 0.68) {
+                return bettingAction;
+            } else {
+                return passiveAction;
+            }
+        } else if (youHaveMediumFdOrSd) {
+            if(Math.random() < 0.5) {
+                return bettingAction;
+            } else {
+                return passiveAction;
+            }
+        }
+        return null;
+    }
+
+    private String getBluffAction(String bettingAction, String passiveAction) {
+        int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
+        int numberOfArrivedDrawsInYourPerceivedRange =
+                handEvaluator.getNumberOfArrivedDrawsInYourPerceivedRange();
+        double percentageOfYourPerceivedRangeThatHitsFlopRanks =
+                handEvaluator.getPercentageOfYourPerceivedRangeThatHitsFlopRanks();
+        double percentageOfYourPerceivedRangeThatHitsNewCard =
+                handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
+
+        if(numberOfArrivedDraws > 10 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
+            if(Math.random() < 0.8) {
+                return bettingAction;
+            }
+        }
+
+        if(Game.getStreet().equals("flop")) {
+            if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
+                if(Math.random() < 0.8) {
+                    return bettingAction;
+                }
+            }
+        } else {
+            if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
+                if(Math.random() < 0.8) {
+                    return bettingAction;
+                }
+            }
+
+        }
+        return passiveAction;
+    }
+
+
 
     private boolean myLastActionWasCall() {
         //TODO: implement this method
