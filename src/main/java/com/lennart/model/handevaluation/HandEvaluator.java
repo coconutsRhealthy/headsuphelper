@@ -121,4 +121,14 @@ public class HandEvaluator {
         return 0;
     }
 
+    public int getDrawEquityOfYourHand() {
+        //TODO: implement this method
+        return 0;
+    }
+
+    public boolean isSingleBetPot() {
+        //TODO: implement this method;
+        return false;
+    }
+
 }

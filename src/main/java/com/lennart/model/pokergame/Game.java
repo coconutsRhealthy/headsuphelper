@@ -306,4 +306,10 @@ public class Game {
                 break;
         }
     }
+
+    public static double getPotOdds() {
+        //TODO: implement this method
+
+        return 0;
+    }
 }

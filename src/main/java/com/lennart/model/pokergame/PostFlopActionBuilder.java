@@ -17,6 +17,7 @@ public class PostFlopActionBuilder {
     private final String _2BET = "2bet";
     private final String CALL_1_BET = "call1bet";
     private final String CALL_2_BET = "call2bet";
+    private final String CALL_3_BET = "call3bet";
 
     private boolean youHaveStrongFdOrSd;
     private boolean youHaveStrongGutshot;
@@ -39,19 +40,15 @@ public class PostFlopActionBuilder {
     }
 
     private String getIpAction(double handStrengthAgainstRange) {
-        //facing check
         if(HandPath.getHandPath().contains("Fcheck")) {
             return getIpFCheck(handStrengthAgainstRange);
         }
-        //facing 1bet
         if(HandPath.getHandPath().contains("F1bet")) {
             return getIpF1bet(handStrengthAgainstRange);
         }
-        //facing 2bet
         if(HandPath.getHandPath().contains("F2bet")) {
             return getIpF2bet(handStrengthAgainstRange);
         }
-        //facing 3bet
         if(HandPath.getHandPath().contains("F3bet")) {
             return getIpF3bet(handStrengthAgainstRange);
         }
@@ -59,19 +56,18 @@ public class PostFlopActionBuilder {
     }
 
     private String getOopAction(double handStrengthAgainstRange) {
-        //first to act
         if(!HandPath.getHandPath().contains("F")) {
             return getOopFirstToAct(handStrengthAgainstRange);
         }
-
-        //facing 1bet
         if(HandPath.getHandPath().contains("F1bet")) {
             return getOopF1bet(handStrengthAgainstRange);
         }
-
-        //facing 2bet
-
-        //facing 3bet
+        if(HandPath.getHandPath().contains("F2bet")) {
+            return getOopF2bet(handStrengthAgainstRange);
+        }
+        if(HandPath.getHandPath().contains("F3bet")) {
+            return getOopF3bet(handStrengthAgainstRange);
+        }
         return null;
     }
 
@@ -80,7 +76,7 @@ public class PostFlopActionBuilder {
             return getValueAction(_1BET, CHECK);
         }
 
-        String drawAction = getDrawAction(_1BET, CHECK);
+        String drawAction = getDrawAction(_1BET, CHECK, true, true, true);
 
         if(drawAction != null) {
             return drawAction;
@@ -90,48 +86,26 @@ public class PostFlopActionBuilder {
     }
 
     private String getIpF1bet(double handStrengthAgainstRange) {
-        if(handStrengthAgainstRange > 0.7) {
-            return getValueAction(_2BET, CALL_1_BET);
-        } else {
-            if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
-                //nog toevoegen, de calls met draws
-
-                return CALL_1_BET;
-            } else {
-                return getBluffAction(_2BET, FOLD);
-            }
-        }
+        return getF1bet(handStrengthAgainstRange);
     }
 
     private String getIpF2bet(double handStrengthAgainstRange) {
-        if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
-            return CALL_2_BET;
-        } else {
-            //hier nog toevoegen: de calls met draws
-
-            return FOLD;
-        }
+        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_2_BET);
     }
 
     private String getIpF3bet(double handStrengthAgainstRange) {
-        if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
-            return CALL_2_BET;
-        } else {
-            //hier nog toevoegen: de calls met draws
-
-            return FOLD;
-        }
+        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_3_BET);
     }
 
     private String getOopFirstToAct(double handStrengthAgainstRange) {
         if(myLastActionWasCall()) {
             return CHECK;
         } else {
-            if (handStrengthAgainstRange > 0.65) {
-                getValueAction(_1BET, CHECK);
+            if (handStrengthAgainstRange > 0.6) {
+                return getValueAction(_1BET, CHECK);
             }
 
-            String drawAction = getDrawAction(_1BET, CHECK);
+            String drawAction = getDrawAction(_1BET, CHECK, true, true, true);
 
             if(drawAction != null) {
                 return drawAction;
@@ -142,19 +116,64 @@ public class PostFlopActionBuilder {
     }
 
     private String getOopF1bet(double handStrengthAgainstRange) {
-        return null;
+        return getF1bet(handStrengthAgainstRange);
     }
 
-    private String getIpFCheckValue() {
-        if(!Game.getStreet().equals("river")) {
-            if(Math.random() < 0.8) {
-                return _1BET;
+    private String getOopF2bet(double handStrengthAgainstRange) {
+        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_2_BET);
+    }
+
+    private String getOopF3bet(double handStrengthAgainstRange) {
+        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_3_BET);
+    }
+
+    private String getF1bet(double handStrengthAgainstRange) {
+        if(handEvaluator.isSingleBetPot()) {
+            if(handStrengthAgainstRange > 0.7) {
+                return getValueAction(_2BET, CALL_1_BET);
             } else {
-                return CHECK;
+                String drawAction = getDrawAction(_2BET, CALL_1_BET, true, true, false);
+                if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
+                    if(drawAction != null) {
+                        return drawAction;
+                    } else {
+                        if(!Game.getStreet().equals("River")) {
+                            if(Math.random() < 0.8) {
+                                return CALL_1_BET;
+                            } else {
+                                return _2BET;
+                            }
+                        }
+                        return CALL_1_BET;
+                    }
+                } else {
+                    if(drawAction != null) {
+                        return drawAction;
+                    } else {
+                        return getBluffAction(_2BET, FOLD);
+                    }
+                }
             }
         } else {
-            //hier nog onderscheid maken tussen hoeveel bets al gedaan zijn? Tighter bij grotere pot..
-            return _1BET;
+            if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
+                return CALL_1_BET;
+            }
+            if(Game.getPotOdds() > handEvaluator.getDrawEquityOfYourHand()) {
+                return CALL_1_BET;
+            }
+            return FOLD;
+        }
+    }
+
+    private String getFhigherThan1Bet(double handStrengthAgainstRange, String callAction) {
+        if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
+            return callAction;
+        } else {
+            if(Game.getPotOdds() > handEvaluator.getDrawEquityOfYourHand()) {
+                return callAction;
+            } else {
+                return FOLD;
+            }
         }
     }
 
@@ -166,26 +185,34 @@ public class PostFlopActionBuilder {
                 return passiveAction;
             }
         } else {
-            //hier nog onderscheid maken tussen hoeveel bets al gedaan zijn? Tighter bij grotere pot..
-            return bettingAction;
+            if(Game.getPosition().equals("OOP") && !HandPath.getHandPath().contains("F")) {
+                if(Math.random() < 0.8) {
+                    return bettingAction;
+                } else {
+                    return passiveAction;
+                }
+            } else {
+                return bettingAction;
+            }
         }
     }
 
-    private String getDrawAction(String bettingAction, String passiveAction) {
-        if (youHaveStrongFdOrSd) {
-            if(Math.random() < 0.75) {
-                return bettingAction;
-            } else {
-                return passiveAction;
-            }
-        } else if (youHaveStrongGutshot) {
-            if(Math.random() < 0.68) {
-                return bettingAction;
-            } else {
-                return passiveAction;
-            }
-        } else if (youHaveMediumFdOrSd) {
+    private String getDrawAction(String bettingAction, String passiveAction, boolean includeStrongFdOrSd,
+                                 boolean includeStrongGutshot, boolean includeMediumFdOrSd ) {
+        if (includeStrongFdOrSd && youHaveStrongFdOrSd) {
             if(Math.random() < 0.5) {
+                return bettingAction;
+            } else {
+                return passiveAction;
+            }
+        } else if (includeStrongGutshot && youHaveStrongGutshot) {
+            if(Math.random() < 0.38) {
+                return bettingAction;
+            } else {
+                return passiveAction;
+            }
+        } else if (includeMediumFdOrSd && youHaveMediumFdOrSd) {
+            if(Math.random() < 0.25) {
                 return bettingAction;
             } else {
                 return passiveAction;
@@ -225,8 +252,6 @@ public class PostFlopActionBuilder {
         }
         return passiveAction;
     }
-
-
 
     private boolean myLastActionWasCall() {
         //TODO: implement this method
