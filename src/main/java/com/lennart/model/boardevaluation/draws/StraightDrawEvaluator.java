@@ -3,6 +3,7 @@ package com.lennart.model.boardevaluation.draws;
 import com.lennart.model.boardevaluation.ComboComparatorRankOnly;
 import com.lennart.model.boardevaluation.StraightEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -169,6 +170,21 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
             return convertRankDrawCombosToCardDrawCombos(allBackdoorCombos, board);
         }
         return new HashMap<>();
+    }
+
+    public Map<Integer, Set<Card>> getAllStraightDrawCombos() {
+        Map<Integer, List<Integer>> allOosdCombos = getCombosThatGiveOosdOrDoubleGutter(Game.getBoardCards());
+        Map<Integer, List<Integer>> allGutshotCombos = getCombosThatGiveGutshot(Game.getBoardCards());
+
+        Map<Integer, Set<Card>> allStraightDrawCombos =
+                convertRankDrawCombosToCardDrawCombos(allOosdCombos, Game.getBoardCards());
+        Map<Integer, Set<Card>> allGutshotCardCombos =
+                convertRankDrawCombosToCardDrawCombos(allGutshotCombos, Game.getBoardCards());
+
+        for (Map.Entry<Integer, Set<Card>> entry : allGutshotCardCombos.entrySet()) {
+            allStraightDrawCombos.put(allOosdCombos.size(), entry.getValue());
+        }
+        return allStraightDrawCombos;
     }
 
     public Map<Integer, List<Integer>> getWeakGutshotCombosFromAllGutshotCombos(List<Card> board) {

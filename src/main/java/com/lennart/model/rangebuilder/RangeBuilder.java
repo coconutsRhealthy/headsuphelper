@@ -7,6 +7,9 @@ import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.Game;
+import com.lennart.model.pokergame.HandPath;
+import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -607,6 +610,17 @@ public class RangeBuilder {
         return rangePreviousStreetCorrectFormat;
     }
 
+    public Map<Integer, Set<Set<Card>>> convertPreflopRangeToMapSetSetFormat(Map<Integer, Set<Card>> preflopRange) {
+        Map<Integer, Set<Set<Card>>> range = new HashMap<>();
+        Set<Set<Card>> outerSetToAdd = new HashSet<>();
+        range.put(range.size(), outerSetToAdd);
+
+        for (Map.Entry<Integer, Set<Card>> entry : preflopRange.entrySet()) {
+            range.get(0).add(entry.getValue());
+        }
+        return range;
+    }
+
     public Map<Integer, Map<Integer, Set<Card>>> addXPercentAirCombos(List<Card> holeCards, List<Card> board,
                                                                       Map<Integer, Map<Integer, Set<Card>>> flopRange,
                                                                       Map<Integer, Set<Card>> preflopRange,
@@ -788,6 +802,37 @@ public class RangeBuilder {
         mapSimple = getCombosThatArePresentInBothMaps(mapSimple, rangePreviousStreet);
 
         return mapSimple.size();
+    }
+
+    public Map<Integer, Set<Set<Card>>> getRange(String opponentRangeOrMyPerceivedRange) {
+        Map<Integer, Set<Set<Card>>> rangeToReturn;
+        PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
+        FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
+        String handPath = HandPath.getHandPath();
+
+        if(opponentRangeOrMyPerceivedRange.equals("myPerceivedRange")) {
+            Game.removeHoleCardsFromKnownGameCards();
+        }
+
+        switch(handPath) {
+            case "2bet":
+                rangeToReturn = convertPreflopRangeToMapSetSetFormat(preflopRangeBuilder.getOpponentCall2betRange());
+                break;
+            case "call2bet":
+                rangeToReturn = convertPreflopRangeToMapSetSetFormat(preflopRangeBuilder.getOpponent2betRange());
+                break;
+            case "3bet":
+                rangeToReturn = convertPreflopRangeToMapSetSetFormat(preflopRangeBuilder.getOpponentCall3betRange());
+                break;
+            default:
+                rangeToReturn = boardEvaluator.getSortedCombos(Game.getBoardCards());
+        }
+
+        if(opponentRangeOrMyPerceivedRange.equals("myPerceivedRange")) {
+            Game.addHoleCardsToKnownGameCards();
+        }
+
+        return rangeToReturn;
     }
 
     private static List<Card> getCompleteCardDeckForTest() {

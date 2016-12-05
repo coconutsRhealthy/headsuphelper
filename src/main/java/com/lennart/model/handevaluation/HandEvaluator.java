@@ -1,7 +1,11 @@
 package com.lennart.model.handevaluation;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.Game;
+import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
 
@@ -103,6 +107,30 @@ public class HandEvaluator {
 
     public int getNumberOfArrivedDrawsInYourPerceivedRange() {
         //TODO: implement this method
+
+        RangeBuilder rangeBuilder = new RangeBuilder();
+        Map<Integer, Set<Set<Card>>> myPerceivedRange = rangeBuilder.getRange("myPerceivedRange");
+
+        FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
+        StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
+
+        Map<Integer, Set<Card>> allDrawCombos = flushDrawEvaluator.getAllFlushDrawCombos();
+        Map<Integer, Set<Card>> straightDrawCombosCurrentStreet = straightDrawEvaluator.getAllStraightDrawCombos();
+
+        for (Map.Entry<Integer, Set<Card>> entry : straightDrawCombosCurrentStreet.entrySet()) {
+            allDrawCombos.put(allDrawCombos.size(), entry.getValue());
+        }
+
+        if(Game.getStreet().equals("Flop")) {
+            //count hoeveel allDrawCombos aanwezig zijn in jouw perceived range:
+
+        } else if(Game.getStreet().equals("Turn")) {
+
+        } else if(Game.getStreet().equals("River")) {
+
+        }
+
+
         return 0;
     }
 
