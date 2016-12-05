@@ -937,7 +937,15 @@ public class BoardEvaluator {
     }
 
     public int getNumberOfArrivedDraws() {
-        //TODO: implement this method
-        return 0;
+        if(Game.getStreet().equals("Flop")) {
+            return StraightEvaluator.getNumberOfStraightsOnFlop() + FlushEvaluator.getNumberOfFlushesOnFlop();
+        } else if(Game.getStreet().equals("Turn")) {
+            return (StraightEvaluator.getNumberOfStraightsOnTurn() + FlushEvaluator.getNumberOfFlushesOnTurn())
+                    - (StraightEvaluator.getNumberOfStraightsOnFlop() + FlushEvaluator.getNumberOfFlushesOnFlop());
+        } else if(Game.getStreet().equals("River")) {
+            return (StraightEvaluator.getNumberOfStraightsOnRiver() + FlushEvaluator.getNumberOfFlushesOnRiver())
+                    - (StraightEvaluator.getNumberOfStraightsOnTurn() + FlushEvaluator.getNumberOfFlushesOnTurn());
+        }
+        return -1;
     }
 }

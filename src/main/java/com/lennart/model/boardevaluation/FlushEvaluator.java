@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -10,6 +11,9 @@ import java.util.*;
 public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
     private static Map<Integer, Set<Set<Card>>> combosThatMakeFlush;
+    private static int numberOfFlushesOnFlop;
+    private static int numberOfFlushesOnTurn;
+    private static int numberOfFlushesOnRiver;
 
     public Map<Integer, Set<Set<Card>>> getFlushCombos() {
         return combosThatMakeFlush;
@@ -20,6 +24,8 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
         Map<Integer, Set<Set<Card>>> flushCombos = getFlushCombosOud(board);
         sortedFlushCombos = removeDuplicateCombos(flushCombos, board);
+
+        setNumberOfFlushes(sortedFlushCombos.size());
 
         this.combosThatMakeFlush = sortedFlushCombos;
 
@@ -451,5 +457,39 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         sortedCombos = removeDuplicateCombosPerCategory(fullHouseCombos, sortedCombos);
 
         return sortedCombos;
+    }
+
+    public static int getNumberOfFlushesOnFlop() {
+        return numberOfFlushesOnFlop;
+    }
+
+    public static void setNumberOfFlushesOnFlop(int numberOfFlushesOnFlop) {
+        FlushEvaluator.numberOfFlushesOnFlop = numberOfFlushesOnFlop;
+    }
+
+    public static int getNumberOfFlushesOnTurn() {
+        return numberOfFlushesOnTurn;
+    }
+
+    public static void setNumberOfFlushesOnTurn(int numberOfFlushesOnTurn) {
+        FlushEvaluator.numberOfFlushesOnTurn = numberOfFlushesOnTurn;
+    }
+
+    public static int getNumberOfFlushesOnRiver() {
+        return numberOfFlushesOnRiver;
+    }
+
+    public static void setNumberOfFlushesOnRiver(int numberOfFlushesOnRiver) {
+        FlushEvaluator.numberOfFlushesOnRiver = numberOfFlushesOnRiver;
+    }
+
+    private void setNumberOfFlushes(int numberOfFlushes) {
+        if(Game.getStreet().equals("Flop")) {
+            setNumberOfFlushesOnFlop(numberOfFlushes);
+        } else if(Game.getStreet().equals("Turn")) {
+            setNumberOfFlushesOnTurn(numberOfFlushes);
+        } else if(Game.getStreet().equals("River")) {
+            setNumberOfFlushesOnRiver(numberOfFlushes);
+        }
     }
 }

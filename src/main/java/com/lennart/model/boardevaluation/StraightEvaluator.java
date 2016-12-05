@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -10,6 +11,9 @@ import java.util.*;
 public class StraightEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
     private static Map<Integer, Set<Set<Card>>> combosThatMakeStraight;
+    private static int numberOfStraightsOnFlop;
+    private static int numberOfStraightsOnTurn;
+    private static int numberOfStraightsOnRiver;
 
     public Map<Integer, Set<Set<Card>>> getMapOfStraightCombos() {
         return combosThatMakeStraight;
@@ -396,5 +400,39 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
         sortedCombos = removeDuplicateCombosPerCategory(flushCombos, sortedCombos);
 
         return sortedCombos;
+    }
+
+    public static int getNumberOfStraightsOnFlop() {
+        return numberOfStraightsOnFlop;
+    }
+
+    public static void setNumberOfStraightsOnFlop(int numberOfStraightsOnFlop) {
+        StraightEvaluator.numberOfStraightsOnFlop = numberOfStraightsOnFlop;
+    }
+
+    public static int getNumberOfStraightsOnTurn() {
+        return numberOfStraightsOnTurn;
+    }
+
+    public static void setNumberOfStraightsOnTurn(int numberOfStraightsOnTurn) {
+        StraightEvaluator.numberOfStraightsOnTurn = numberOfStraightsOnTurn;
+    }
+
+    public static int getNumberOfStraightsOnRiver() {
+        return numberOfStraightsOnRiver;
+    }
+
+    public static void setNumberOfStraightsOnRiver(int numberOfStraightsOnRiver) {
+        StraightEvaluator.numberOfStraightsOnRiver = numberOfStraightsOnRiver;
+    }
+
+    private void setNumberOfStraights(int numberOfStraights) {
+        if(Game.getStreet().equals("Flop")) {
+            setNumberOfStraightsOnFlop(numberOfStraights);
+        } else if(Game.getStreet().equals("Turn")) {
+            setNumberOfStraightsOnTurn(numberOfStraights);
+        } else if(Game.getStreet().equals("River")) {
+            setNumberOfStraightsOnRiver(numberOfStraights);
+        }
     }
 }

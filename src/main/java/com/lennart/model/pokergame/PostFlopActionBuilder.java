@@ -22,6 +22,7 @@ public class PostFlopActionBuilder {
     private boolean youHaveStrongFdOrSd;
     private boolean youHaveStrongGutshot;
     private boolean youHaveMediumFdOrSd;
+    private boolean youHaveStrongBackdoor;
 
     private BoardEvaluator boardEvaluator = new BoardEvaluator();
     private HandEvaluator handEvaluator = new HandEvaluator();
@@ -76,12 +77,12 @@ public class PostFlopActionBuilder {
             return getValueAction(_1BET, CHECK);
         }
 
-        String drawAction = getDrawAction(_1BET, CHECK, true, true, true);
+        String drawAction = getDrawAction(_1BET, CHECK, true, true, true, true);
 
         if(drawAction != null) {
             return drawAction;
         } else {
-            return getBluffAction(_1BET, CHECK);
+            return getBluffAction(_1BET, CHECK, handStrengthAgainstRange);
         }
     }
 
@@ -105,12 +106,12 @@ public class PostFlopActionBuilder {
                 return getValueAction(_1BET, CHECK);
             }
 
-            String drawAction = getDrawAction(_1BET, CHECK, true, true, true);
+            String drawAction = getDrawAction(_1BET, CHECK, true, true, true, true);
 
             if(drawAction != null) {
                 return drawAction;
             } else {
-                return getBluffAction(_1BET, CHECK);
+                return getBluffAction(_1BET, CHECK, handStrengthAgainstRange);
             }
         }
     }
@@ -132,7 +133,7 @@ public class PostFlopActionBuilder {
             if(handStrengthAgainstRange > 0.7) {
                 return getValueAction(_2BET, CALL_1_BET);
             } else {
-                String drawAction = getDrawAction(_2BET, CALL_1_BET, true, true, false);
+                String drawAction = getDrawAction(_2BET, CALL_1_BET, true, true, false, true);
                 if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
                     if(drawAction != null) {
                         return drawAction;
@@ -150,7 +151,7 @@ public class PostFlopActionBuilder {
                     if(drawAction != null) {
                         return drawAction;
                     } else {
-                        return getBluffAction(_2BET, FOLD);
+                        return getBluffAction(_2BET, FOLD, handStrengthAgainstRange);
                     }
                 }
             }
@@ -198,7 +199,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getDrawAction(String bettingAction, String passiveAction, boolean includeStrongFdOrSd,
-                                 boolean includeStrongGutshot, boolean includeMediumFdOrSd ) {
+                                 boolean includeStrongGutshot, boolean includeMediumFdOrSd, boolean includeStrongBackDoor) {
         if (includeStrongFdOrSd && youHaveStrongFdOrSd) {
             if(Math.random() < 0.5) {
                 return bettingAction;
@@ -217,11 +218,17 @@ public class PostFlopActionBuilder {
             } else {
                 return passiveAction;
             }
+        } else if(includeStrongBackDoor && youHaveStrongBackdoor) {
+            if(Math.random() < 0.05) {
+                return bettingAction;
+            } else {
+                return passiveAction;
+            }
         }
         return null;
     }
 
-    private String getBluffAction(String bettingAction, String passiveAction) {
+    private String getBluffAction(String bettingAction, String passiveAction, double handStrengthAgainstRange) {
         int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
         int numberOfArrivedDrawsInYourPerceivedRange =
                 handEvaluator.getNumberOfArrivedDrawsInYourPerceivedRange();
@@ -230,25 +237,27 @@ public class PostFlopActionBuilder {
         double percentageOfYourPerceivedRangeThatHitsNewCard =
                 handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
 
-        if(numberOfArrivedDraws > 10 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
-            if(Math.random() < 0.8) {
-                return bettingAction;
-            }
-        }
-
-        if(Game.getStreet().equals("flop")) {
-            if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
-                if(Math.random() < 0.8) {
-                    return bettingAction;
-                }
-            }
-        } else {
-            if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
+        if(handStrengthAgainstRange < 0.45) {
+            if(numberOfArrivedDraws > 10 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
                 if(Math.random() < 0.8) {
                     return bettingAction;
                 }
             }
 
+            if(Game.getStreet().equals("flop")) {
+                if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
+                    if(Math.random() < 0.8) {
+                        return bettingAction;
+                    }
+                }
+            } else {
+                if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
+                    if(Math.random() < 0.8) {
+                        return bettingAction;
+                    }
+                }
+
+            }
         }
         return passiveAction;
     }
