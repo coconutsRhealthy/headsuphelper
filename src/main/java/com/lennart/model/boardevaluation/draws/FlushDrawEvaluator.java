@@ -12,6 +12,8 @@ import java.util.*;
 public class FlushDrawEvaluator extends FlushEvaluator {
 
     private static Map<Integer, List<Card>> allFlushDraws;
+    private static Map<Integer, Set<Card>> allFlushDrawsFlop;
+    private static Map<Integer, Set<Card>> allFlushDrawsTurn;
 
     public Map<Integer, Set<Card>> getStrongFlushDrawCombos (List<Card> board) {
         Map<Integer, Set<Card>> strongFlushDrawCombos = new HashMap<>();
@@ -86,6 +88,8 @@ public class FlushDrawEvaluator extends FlushEvaluator {
             combo.addAll(entry.getValue());
             allFlushDrawCombos.put(allFlushDrawCombos.size(), combo);
         }
+
+        setFlushDrawCombosPerStreet(allFlushDrawCombos);
         return allFlushDrawCombos;
     }
 
@@ -395,5 +399,21 @@ public class FlushDrawEvaluator extends FlushEvaluator {
 
     public static void setAllFlushDraws(Map<Integer, List<Card>> allFlushDraws) {
         FlushDrawEvaluator.allFlushDraws = allFlushDraws;
+    }
+
+    private void setFlushDrawCombosPerStreet(Map<Integer, Set<Card>> flushDrawCombos) {
+        if(Game.getStreet().equals("Flop") && FlushDrawEvaluator.allFlushDrawsFlop == null) {
+            FlushDrawEvaluator.allFlushDrawsFlop = flushDrawCombos;
+        } else if(Game.getStreet().equals("Turn") && FlushDrawEvaluator.allFlushDrawsTurn == null) {
+            FlushDrawEvaluator.allFlushDrawsTurn = flushDrawCombos;
+        }
+    }
+
+    public static Map<Integer, Set<Card>> getAllFlushDrawsFlop() {
+        return FlushDrawEvaluator.allFlushDrawsFlop;
+    }
+
+    public static Map<Integer, Set<Card>> getAllFlushDrawsTurn() {
+        return FlushDrawEvaluator.allFlushDrawsTurn;
     }
 }

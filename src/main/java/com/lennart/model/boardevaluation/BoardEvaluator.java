@@ -952,4 +952,70 @@ public class BoardEvaluator {
         }
         return -1;
     }
+
+    public Map<Integer, Set<Card>> getArrivedStraightDraws() {
+        StraightEvaluator straightEvaluator = new StraightEvaluator();
+        Map<Integer, Set<Set<Card>>> allStraightCombos = straightEvaluator.getMapOfStraightCombos();
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+
+        if(Game.getStreet().equals("Flop")) {
+            for (Map.Entry<Integer, Set<Set<Card>>> entry : allStraightCombos.entrySet()) {
+                for(Set s : entry.getValue()) {
+                    combosToReturn.put(combosToReturn.size(), s);
+                }
+            }
+        }
+
+        if(Game.getStreet().equals("Turn")) {
+            Map<Integer, Set<Card>> allStraightDrawsFlop = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotFlop();
+            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allStraightCombos, allStraightDrawsFlop);
+        }
+
+        if(Game.getStreet().equals("River")) {
+            Map<Integer, Set<Card>> allStraightDrawsTurn = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotTurn();
+            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allStraightCombos, allStraightDrawsTurn);
+        }
+        return combosToReturn;
+    }
+
+    public Map<Integer, Set<Card>> getArrivedFlushDraws() {
+        FlushEvaluator flushEvaluator = new FlushEvaluator();
+        Map<Integer, Set<Set<Card>>> allFlushCombos = flushEvaluator.getFlushCombos();
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+
+        if(Game.getStreet().equals("Flop")) {
+            for (Map.Entry<Integer, Set<Set<Card>>> entry : allFlushCombos.entrySet()) {
+                for(Set s : entry.getValue()) {
+                    combosToReturn.put(combosToReturn.size(), s);
+                }
+            }
+        }
+
+        if(Game.getStreet().equals("Turn")) {
+            Map<Integer, Set<Card>> allFlushDrawsFlop = FlushDrawEvaluator.getAllFlushDrawsFlop();
+            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allFlushCombos, allFlushDrawsFlop);
+        }
+
+        if(Game.getStreet().equals("River")) {
+            Map<Integer, Set<Card>> allFlushDrawsTurn = FlushDrawEvaluator.getAllFlushDrawsTurn();
+            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allFlushCombos, allFlushDrawsTurn);
+        }
+        return combosToReturn;
+    }
+
+    private Map<Integer, Set<Card>> getCombosThatWereDrawAndNowMadeHand(Map<Integer, Set<Set<Card>>> madeHandsMap, Map<Integer, Set<Card>> drawMap) {
+        Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : madeHandsMap.entrySet()) {
+            for(Set s : entry.getValue()) {
+                for (Map.Entry<Integer, Set<Card>> entry2 : drawMap.entrySet()) {
+                    if(s.equals(entry2.getValue())) {
+                        combosToReturn.put(combosToReturn.size(), s);
+                    }
+                }
+            }
+        }
+        return combosToReturn;
+    }
+
 }

@@ -12,6 +12,8 @@ import java.util.*;
  */
 public class StraightDrawEvaluator extends StraightEvaluator implements ComboComparatorRankOnly {
     private static Map<List<Integer>, List<List<Integer>>> combosThatGiveAnyStraightDraw;
+    private static Map<Integer, Set<Card>> combosThatGiveOosdOrGutshotFlop;
+    private static Map<Integer, Set<Card>> combosThatGiveOosdOrGutshotTurn;
 
     public Map<Integer, List<Integer>> getCombosThatGiveOosdOrDoubleGutter(List<Card> board) {
         if(board.size() == 5) {
@@ -186,6 +188,7 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
         for (Map.Entry<Integer, Set<Card>> entry : allGutshotCardCombos.entrySet()) {
             allStraightDrawCombos.put(allOosdCombos.size(), entry.getValue());
         }
+        setCombosThatGiveOosdOrGutshotPerStreet(allStraightDrawCombos);
         return allStraightDrawCombos;
     }
 
@@ -919,5 +922,21 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
                 }
             }
         };
+    }
+
+    private void setCombosThatGiveOosdOrGutshotPerStreet(Map<Integer, Set<Card>> straightDrawCombos) {
+        if(Game.getStreet().equals("Flop") && StraightDrawEvaluator.combosThatGiveOosdOrGutshotFlop == null) {
+            StraightDrawEvaluator.combosThatGiveOosdOrGutshotFlop = straightDrawCombos;
+        } else if(Game.getStreet().equals("Turn") && StraightDrawEvaluator.combosThatGiveOosdOrGutshotTurn == null) {
+            StraightDrawEvaluator.combosThatGiveOosdOrGutshotTurn = straightDrawCombos;
+        }
+    }
+
+    public static Map<Integer, Set<Card>> getCombosThatGiveOosdOrGutshotFlop() {
+        return StraightDrawEvaluator.combosThatGiveOosdOrGutshotFlop;
+    }
+
+    public static Map<Integer, Set<Card>> getCombosThatGiveOosdOrGutshotTurn() {
+        return StraightDrawEvaluator.combosThatGiveOosdOrGutshotTurn;
     }
 }

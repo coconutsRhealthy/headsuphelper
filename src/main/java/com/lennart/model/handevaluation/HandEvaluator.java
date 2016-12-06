@@ -106,32 +106,35 @@ public class HandEvaluator {
     }
 
     public int getNumberOfArrivedDrawsInYourPerceivedRange() {
-        //TODO: implement this method
+        Map<Integer, Set<Card>> arrivedStraightDraws = boardEvaluator.getArrivedStraightDraws();
+        Map<Integer, Set<Card>> arrivedFlushDraws = boardEvaluator.getArrivedFlushDraws();
+        Map<Integer, Set<Set<Card>>> myPerceivedRange = new RangeBuilder().getRange("myPerceivedRange");
 
-        RangeBuilder rangeBuilder = new RangeBuilder();
-        Map<Integer, Set<Set<Card>>> myPerceivedRange = rangeBuilder.getRange("myPerceivedRange");
+        int counter = 0;
 
-        FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator();
-        StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator();
-
-        Map<Integer, Set<Card>> allDrawCombos = flushDrawEvaluator.getAllFlushDrawCombos();
-        Map<Integer, Set<Card>> straightDrawCombosCurrentStreet = straightDrawEvaluator.getAllStraightDrawCombos();
-
-        for (Map.Entry<Integer, Set<Card>> entry : straightDrawCombosCurrentStreet.entrySet()) {
-            allDrawCombos.put(allDrawCombos.size(), entry.getValue());
+        //de straights
+        for (Map.Entry<Integer, Set<Card>> entry : arrivedStraightDraws.entrySet()) {
+            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
+                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
+                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
+                        counter ++;
+                    }
+                }
+            }
         }
 
-        if(Game.getStreet().equals("Flop")) {
-            //count hoeveel allDrawCombos aanwezig zijn in jouw perceived range:
-
-        } else if(Game.getStreet().equals("Turn")) {
-
-        } else if(Game.getStreet().equals("River")) {
-
+        //de flushes
+        for (Map.Entry<Integer, Set<Card>> entry : arrivedFlushDraws.entrySet()) {
+            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
+                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
+                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
+                        counter ++;
+                    }
+                }
+            }
         }
 
-
-        return 0;
+        return counter;
     }
 
     public double getPercentageOfYourPerceivedRangeThatHitsFlopRanks() {
