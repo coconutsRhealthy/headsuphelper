@@ -2,6 +2,7 @@ package com.lennart.model.boardevaluation.draws;
 
 import com.lennart.model.boardevaluation.FlushEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -72,6 +73,18 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         Map<Integer, List<Card>> mediumBackDoorDraws = getMediumBackDoorFlushCombosAsMapList(board);
 
         return getWeakFlushOrBackDoorFlushDrawCombos(allBackDoorFlushDraws, strongBackDoorDraws, mediumBackDoorDraws);
+    }
+
+    public Map<Integer, Set<Card>> getAllFlushDrawCombos() {
+        Map<Integer, Set<Card>> allFlushDrawCombos = new HashMap<>();
+        Map<Integer, List<Card>> flushDrawCombosAsList = getFlushDrawCombos(Game.getBoardCards());
+
+        for (Map.Entry<Integer, List<Card>> entry : flushDrawCombosAsList.entrySet()) {
+            Set<Card> combo = new HashSet<>();
+            combo.addAll(entry.getValue());
+            allFlushDrawCombos.put(allFlushDrawCombos.size(), combo);
+        }
+        return allFlushDrawCombos;
     }
 
     //helper methods
