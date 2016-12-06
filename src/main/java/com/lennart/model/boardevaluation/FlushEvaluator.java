@@ -27,7 +27,7 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
         setNumberOfFlushes(sortedFlushCombos.size());
 
-        this.combosThatMakeFlush = sortedFlushCombos;
+        FlushEvaluator.combosThatMakeFlush = sortedFlushCombos;
 
         return sortedFlushCombos;
     }

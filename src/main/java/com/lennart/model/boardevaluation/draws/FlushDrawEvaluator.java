@@ -11,6 +11,8 @@ import java.util.*;
  */
 public class FlushDrawEvaluator extends FlushEvaluator {
 
+    private static Map<Integer, List<Card>> allFlushDraws;
+
     public Map<Integer, Set<Card>> getStrongFlushDrawCombos (List<Card> board) {
         Map<Integer, Set<Card>> strongFlushDrawCombos = new HashMap<>();
         Map<Integer, List<Card>> strongFlushDrawCombosAsMapList = getStrongFlushDrawCombosAsMapList(board);
@@ -89,10 +91,15 @@ public class FlushDrawEvaluator extends FlushEvaluator {
 
     //helper methods
     private Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
+        if(FlushDrawEvaluator.allFlushDraws != null) {
+            return FlushDrawEvaluator.allFlushDraws;
+        }
+
         Map<Integer, List<Card>> flushDrawCombos = new HashMap<>();
         Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
 
         if(board.size() == 5) {
+            FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -111,6 +118,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         if(flushSuit != 'x' && flushSuit2 == 'x') {
             flushDrawCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
+            FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -126,6 +134,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                 flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());
             }
 
+            FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -148,6 +157,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
             }
             flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
         }
+        FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
         return flushDrawCombos;
     }
 
@@ -381,5 +391,9 @@ public class FlushDrawEvaluator extends FlushEvaluator {
             }
         }
         return cardRanksToReturn;
+    }
+
+    public static void setAllFlushDraws(Map<Integer, List<Card>> allFlushDraws) {
+        FlushDrawEvaluator.allFlushDraws = allFlushDraws;
     }
 }

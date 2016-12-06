@@ -1,5 +1,7 @@
 package com.lennart.model.boardevaluation;
 
+import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.Game;
 import org.apache.commons.lang3.StringUtils;
@@ -56,8 +58,10 @@ public class BoardEvaluator {
         }
     }
 
-    public void resetSortedCombos() {
-        sortedCombos = null;
+    public void resetSortedCombosAndDraws() {
+        BoardEvaluator.sortedCombos = null;
+        StraightDrawEvaluator.setCombosThatGiveAnyStraightDraw(null);
+        FlushDrawEvaluator.setAllFlushDraws(null);
     }
 
     public boolean isBoardRainbow(List<Card> board) {

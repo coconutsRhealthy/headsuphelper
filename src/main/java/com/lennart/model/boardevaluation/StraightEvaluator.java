@@ -27,7 +27,7 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
         sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
         sortedCombos = removeDuplicateCombos(sortedCombos, board);
 
-        this.combosThatMakeStraight = sortedCombos;
+        StraightEvaluator.combosThatMakeStraight = sortedCombos;
 
         return sortedCombos;
     }

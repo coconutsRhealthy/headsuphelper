@@ -238,7 +238,7 @@ public class PostFlopActionBuilder {
                 handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
 
         if(handStrengthAgainstRange < 0.45) {
-            if(numberOfArrivedDraws > 10 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
+            if(numberOfArrivedDraws > 3 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
                 if(Math.random() < 0.8) {
                     return bettingAction;
                 }

@@ -11,6 +11,8 @@ import java.util.*;
  * Created by LPO10346 on 10/4/2016.
  */
 public class StraightDrawEvaluator extends StraightEvaluator implements ComboComparatorRankOnly {
+    private static Map<List<Integer>, List<List<Integer>>> combosThatGiveAnyStraightDraw;
+
     public Map<Integer, List<Integer>> getCombosThatGiveOosdOrDoubleGutter(List<Card> board) {
         if(board.size() == 5) {
             return new HashMap<>();
@@ -337,7 +339,11 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
     }
 
     //helper methods
-    public Map<List<Integer>, List<List<Integer>>> getCombosThatGiveAnyStraightDraw(List<Card> board) {
+    private Map<List<Integer>, List<List<Integer>>> getCombosThatGiveAnyStraightDraw(List<Card> board) {
+        if(StraightDrawEvaluator.combosThatGiveAnyStraightDraw != null) {
+            return StraightDrawEvaluator.combosThatGiveAnyStraightDraw;
+        }
+
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         Map<Integer, List<Integer>> allCardCombos = getAllPossibleCombos();
         Map<Integer, List<Integer>> fictionalBoardRanks = new HashMap<>();
@@ -384,6 +390,8 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
         }
 
         mapOfCombosThatGiveAnyStraightDraw = removeIncorrectStraightCombosFromMap(mapOfCombosThatGiveAnyStraightDraw, board);
+
+        StraightDrawEvaluator.combosThatGiveAnyStraightDraw = mapOfCombosThatGiveAnyStraightDraw;
         return mapOfCombosThatGiveAnyStraightDraw;
     }
 
@@ -853,6 +861,10 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
             drawCardCombos.put(drawCardCombos.size(), s);
         }
         return drawCardCombos;
+    }
+
+    public static void setCombosThatGiveAnyStraightDraw(Map<List<Integer>, List<List<Integer>>> combosThatGiveAnyStraightDraw) {
+        StraightDrawEvaluator.combosThatGiveAnyStraightDraw = combosThatGiveAnyStraightDraw;
     }
 
     @Override

@@ -49,7 +49,7 @@ public class Controller {
 
     @RequestMapping(value = "/postHoleCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postHoleCards(@RequestBody List<Card> cardList) {
-        boardEvaluator.resetSortedCombos();
+        boardEvaluator.resetSortedCombosAndDraws();
         if (holeCards.size() > 0) {
             holeCards.clear();
         }
@@ -65,7 +65,7 @@ public class Controller {
 
     @RequestMapping(value = "/postFlopCards", method = RequestMethod.POST)
     public @ResponseBody List<Card> postFlopCards(@RequestBody List<Card> cardList) {
-        boardEvaluator.resetSortedCombos();
+        boardEvaluator.resetSortedCombosAndDraws();
         if (flopCards.size() > 0) {
             flopCards.clear();
         }
@@ -90,7 +90,7 @@ public class Controller {
 
     @RequestMapping(value = "/postTurnCard", method = RequestMethod.POST)
     public @ResponseBody Card postTurnCard(@RequestBody Card card) {
-        boardEvaluator.resetSortedCombos();
+        boardEvaluator.resetSortedCombosAndDraws();
         turnCard = card;
         board.add(turnCard);
 
@@ -104,7 +104,7 @@ public class Controller {
 
     @RequestMapping(value = "/postRiverCard", method = RequestMethod.POST)
     public @ResponseBody Card postRiverCard(@RequestBody Card card) {
-        boardEvaluator.resetSortedCombos();
+        boardEvaluator.resetSortedCombosAndDraws();
         riverCard = card;
         board.add(riverCard);
 
