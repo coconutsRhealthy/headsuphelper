@@ -105,10 +105,10 @@ public class HandEvaluator {
         }
     }
 
-    public int getNumberOfArrivedDrawsInYourPerceivedRange() {
+    public int getNumberOfArrivedDrawsInRange(String opponentRangeOrMyPerceivedRange) {
         Map<Integer, Set<Card>> arrivedStraightDraws = boardEvaluator.getArrivedStraightDraws();
         Map<Integer, Set<Card>> arrivedFlushDraws = boardEvaluator.getArrivedFlushDraws();
-        Map<Integer, Set<Set<Card>>> myPerceivedRange = new RangeBuilder().getRange("myPerceivedRange");
+        Map<Integer, Set<Set<Card>>> myPerceivedRange = new RangeBuilder().getRange(opponentRangeOrMyPerceivedRange);
 
         int counter = 0;
 

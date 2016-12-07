@@ -805,6 +805,8 @@ public class RangeBuilder {
     }
 
     public Map<Integer, Set<Set<Card>>> getRange(String opponentRangeOrMyPerceivedRange) {
+        //TODO: hier nog goed onderscheid maken tussen of je opponent Range wil of jouw perceived range
+
         Map<Integer, Set<Set<Card>>> rangeToReturn;
         PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
         FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();

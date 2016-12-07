@@ -231,14 +231,23 @@ public class PostFlopActionBuilder {
     private String getBluffAction(String bettingAction, String passiveAction, double handStrengthAgainstRange) {
         int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
         int numberOfArrivedDrawsInYourPerceivedRange =
-                handEvaluator.getNumberOfArrivedDrawsInYourPerceivedRange();
+                handEvaluator.getNumberOfArrivedDrawsInRange("myPerceivedRange");
+        int numberOfArrivedDrawsInOpponentRange =
+                handEvaluator.getNumberOfArrivedDrawsInRange("opponentRange");
         double percentageOfYourPerceivedRangeThatHitsFlopRanks =
                 handEvaluator.getPercentageOfYourPerceivedRangeThatHitsFlopRanks();
         double percentageOfYourPerceivedRangeThatHitsNewCard =
                 handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
 
         if(handStrengthAgainstRange < 0.45) {
-            if(numberOfArrivedDraws > 3 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3)) {
+            if(boardEvaluator.boardIsDry()&& boardIsSingleRaisedAndNoBettingPostFlop()) {
+                if(Math.random() < 0.7) {
+                    return bettingAction;
+                }
+            }
+
+            if(numberOfArrivedDraws > 3 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3) &&
+                    numberOfArrivedDrawsInYourPerceivedRange > numberOfArrivedDrawsInOpponentRange) {
                 if(Math.random() < 0.8) {
                     return bettingAction;
                 }
@@ -256,13 +265,17 @@ public class PostFlopActionBuilder {
                         return bettingAction;
                     }
                 }
-
             }
         }
         return passiveAction;
     }
 
     private boolean myLastActionWasCall() {
+        //TODO: implement this method
+        return false;
+    }
+
+    private boolean boardIsSingleRaisedAndNoBettingPostFlop() {
         //TODO: implement this method
         return false;
     }

@@ -1018,4 +1018,23 @@ public class BoardEvaluator {
         return combosToReturn;
     }
 
+    public boolean boardIsDry() {
+        StraightEvaluator straightEvaluator = new StraightEvaluator();
+        FlushEvaluator flushEvaluator = new FlushEvaluator();
+
+        boolean noStraightCombos = straightEvaluator.getMapOfStraightCombos().isEmpty();
+        boolean noFlushCombos = flushEvaluator.getFlushCombos().isEmpty();
+        boolean noStraightDraws = true;
+        boolean noFlushDraws = true;
+
+        if(Game.getStreet().equals("Flop")) {
+            noStraightDraws = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotFlop().isEmpty();
+            noFlushDraws = FlushDrawEvaluator.getAllFlushDrawsFlop().isEmpty();
+        } else if(Game.getStreet().equals("Turn")) {
+            noStraightDraws = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotTurn().isEmpty();
+            noFlushDraws = FlushDrawEvaluator.getAllFlushDrawsTurn().isEmpty();
+        }
+        return(noStraightCombos && noFlushCombos && noStraightDraws && noFlushDraws);
+    }
+
 }
