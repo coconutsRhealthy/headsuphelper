@@ -11,19 +11,19 @@ import java.util.*;
  */
 public class Call2betRangeBuilder {
 
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap90Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap80Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap65Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap33Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap30Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap10Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMapRest7Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMapAllPossibleStartHands = new HashMap<>();
-    private static List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap90Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap80Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap65Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap33Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap30Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap10Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMapRest7Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMapAllPossibleStartHands = new HashMap<>();
+    private List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
 
-    static {
+    public Call2betRangeBuilder() {
         PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
 
         comboMap90Percent.put(1, p.getSuitedCombosOfGivenRanks(10, 6));
@@ -200,5 +200,37 @@ public class Call2betRangeBuilder {
         opponentCall2betRange = p.removeDoubleCombos(opponentCall2betRange);
 
         return opponentCall2betRange;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap90Percent() {
+        return comboMap90Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap80Percent() {
+        return comboMap80Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap65Percent() {
+        return comboMap65Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap50Percent() {
+        return comboMap50Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap33Percent() {
+        return comboMap33Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap30Percent() {
+        return comboMap30Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap10Percent() {
+        return comboMap10Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap5Percent() {
+        return comboMap5Percent;
     }
 }

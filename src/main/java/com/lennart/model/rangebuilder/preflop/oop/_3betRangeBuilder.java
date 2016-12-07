@@ -11,19 +11,19 @@ import java.util.*;
  */
 public class _3betRangeBuilder {
 
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap95Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap70Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap35Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap20Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap10Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap95Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap70Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap35Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap20Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap10Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMapRest7Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMapAllPossibleStartHands = new HashMap<>();
-    private static List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMapRest7Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMapAllPossibleStartHands = new HashMap<>();
+    private List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
 
-    static {
+    public _3betRangeBuilder() {
         PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
 
         comboMap95Percent.put(1, p.getPocketPairCombosOfGivenRank(14));
@@ -207,5 +207,33 @@ public class _3betRangeBuilder {
         opponent3betRange = p.removeDoubleCombos(opponent3betRange);
 
         return opponent3betRange;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap95Percent() {
+        return comboMap95Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap70Percent() {
+        return comboMap70Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap50Percent() {
+        return comboMap50Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap35Percent() {
+        return comboMap35Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap20Percent() {
+        return comboMap20Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap10Percent() {
+        return comboMap10Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap5Percent() {
+        return comboMap5Percent;
     }
 }

@@ -12,15 +12,15 @@ import java.util.Set;
  */
 public class Call4betRangeBuilder {
 
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap80Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap70Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap62Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap60Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
-    private static Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap80Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap70Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap62Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap60Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
-    static {
+    public Call4betRangeBuilder() {
         PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
 
         comboMap100Percent.put(1, p.getOffSuitCombosOfGivenRanks(14, 12));
@@ -116,5 +116,33 @@ public class Call4betRangeBuilder {
         opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap5Percent, 0.05);
 
         return opponentCall4betRange;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap100Percent() {
+        return comboMap100Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap80Percent() {
+        return comboMap80Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap70Percent() {
+        return comboMap70Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap62Percent() {
+        return comboMap62Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap60Percent() {
+        return comboMap60Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap50Percent() {
+        return comboMap50Percent;
+    }
+
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap5Percent() {
+        return comboMap5Percent;
     }
 }
