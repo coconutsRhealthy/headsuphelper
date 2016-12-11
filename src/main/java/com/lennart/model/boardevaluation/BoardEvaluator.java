@@ -448,7 +448,7 @@ public class BoardEvaluator {
         return allPossibleStartHandsAsSet;
     }
 
-    protected List<Card> getCompleteCardDeck() {
+    public List<Card> getCompleteCardDeck() {
         List<Card> completeCardDeck = new ArrayList<>();
 
         for(int i = 2; i <= 14; i++) {
