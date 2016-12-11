@@ -11,47 +11,61 @@
             <div>
                 <button ng-click="startGame()">Start game</button>
             </div>
-
-
-            <div class="myHand">
-                <div class="playingCards">
-
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
+            <div class="cards_wrapper">
+                <span id="my_hand">
+                    <div class="playingCards">
+                        <ul class="table">
+                            <li>
+                                <div class="card rank-q spades">
+                                    <span class="rank">Q</span>
+                                    <span class="suit">&spades;</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="card rank-8 hearts">
+                                    <span class="rank">8</span>
+                                    <span class="suit">&hearts;</span>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="card rank-8 hearts">
-                        <span class="rank">8</span>
-                        <span class="suit">&hearts;</span>
+                </span>
+                <span id="flop">
+                    <div class="playingCards">
+                        <ul class="table">
+                            <li>
+                                <div class="card rank-5 spades">
+                                    <span class="rank">5</span>
+                                    <span class="suit">&spades;</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="card rank-j hearts">
+                                    <span class="rank">J</span>
+                                    <span class="suit">&hearts;</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="card rank-a spades">
+                                    <span class="rank">A</span>
+                                    <span class="suit">&spades;</span>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-
-                </div>
-            </div>
-
-            <div class="computerHand">
-                <div class="playingCards">
-
-                    <div class="card back">*</div>
-                    <div class="card back">*</div>
-
-                </div>
-            </div>
-
-            <div class="boardCardsFlop">
-                <div class="playingCards">
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
+                </span>
+                <span id="computer_hand">
+                    <div class="playingCards">
+                        <ul class="table">
+                            <li>
+                                <div class="card back">*</div>
+                            </li>
+                            <li>
+                                <div class="card back">*</div>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="card rank-8 hearts">
-                        <span class="rank">8</span>
-                        <span class="suit">&hearts;</span>
-                    </div>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </div>
+                </span>
             </div>
         </div>
     </body>

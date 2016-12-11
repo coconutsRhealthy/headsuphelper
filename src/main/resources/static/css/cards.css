@@ -1,19 +1,25 @@
-.myHand {
+.cards_wrapper {
+    display:table;
+    width:100%;
+}
+
+.cards_wrapper span {
+    display:table-cell;
+    text-align:center;
+}
+
+#my_hand {
     float: left;
-    padding: 10px;
+    width: 170px;
 }
 
-.boardCardsFlop {
-    width: 262px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 10px;
+#flop {
+    width: 254px;
 }
 
-.computerHand {
+#computer_hand {
     float: right;
-    padding: 10px;
+    width: 170px;
 }
 
 
