@@ -8,6 +8,10 @@
     text-align:center;
 }
 
+.action_button {
+    width: 50px;
+}
+
 #my_hand {
     float: left;
     width: 170px;
@@ -22,6 +26,25 @@
     width: 170px;
 }
 
+#my_stack {
+    float: left;
+    padding-right: 200px;
+}
+
+#computer_stack {
+    float: right;
+    padding-left: 200px;
+}
+
+#computer_bet_size {
+    float: right;
+}
+
+#pot {
+    width:800px;
+    margin:0 auto;
+    text-align: center;
+}
 
 /**
  * Styles for CSS Playing Cards

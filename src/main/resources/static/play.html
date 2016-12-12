@@ -11,6 +11,9 @@
             <div>
                 <button ng-click="startGame()">Start game</button>
             </div>
+            <div style={{dealerButtonStyle}}>
+                <strong>D</strong>
+            </div>
             <div class="cards_wrapper">
                 <span id="my_hand">
                     <div class="playingCards">
@@ -34,21 +37,21 @@
                     <div class="playingCards">
                         <ul class="table">
                             <li>
-                                <div class="card rank-5 spades">
-                                    <span class="rank">5</span>
-                                    <span class="suit">&spades;</span>
+                                <div class={{flopCard1Class}}>
+                                    <span class="rank">{{flopCard1.rank}}</span>
+                                    <span class="suit">{{flopCard1SuitUniCode}}</span>
                                 </div>
                             </li>
                             <li>
-                                <div class="card rank-j hearts">
-                                    <span class="rank">J</span>
-                                    <span class="suit">&hearts;</span>
+                                <div class={{flopCard2Class}}>
+                                    <span class="rank">{{flopCard2.rank}}</span>
+                                    <span class="suit">{{flopCard2SuitUniCode}}</span>
                                 </div>
                             </li>
                             <li>
-                                <div class="card rank-a spades">
-                                    <span class="rank">A</span>
-                                    <span class="suit">&spades;</span>
+                                <div class={{flopCard3Class}}>
+                                    <span class="rank">{{flopCard3.rank}}</span>
+                                    <span class="suit">{{flopCard3SuitUniCode}}</span>
                                 </div>
                             </li>
                         </ul>
@@ -65,6 +68,40 @@
                             </li>
                         </ul>
                     </div>
+                </span>
+            </div>
+
+            <div>
+                <span id="my_stack">{{myStack}}</span>
+                <span id="computer_stack">{{computerStack}}</span>
+            </div>
+
+            <div>
+                <span id="my_bet_size">{{myBetSize}}</span>
+                <span id="computer_bet_size">{{computerBetSize}}</span>
+            </div>
+
+            <div id="pot">
+                {{potSize}}
+            </div>
+
+            <div><button class="action_button">fold</button></div>
+            <div><button class="action_button">check</button></div>
+            <div><button class="action_button">call</button></div>
+            <div>
+                <span>
+                    <button class="action_button">bet</button>
+                </span>
+                <span>
+                    <input type="text">
+                </span>
+            </div>
+            <div>
+                <span>
+                    <button class="action_button">raise</button>
+                </span>
+                <span>
+                    <input type="text">
                 </span>
             </div>
         </div>

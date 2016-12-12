@@ -18,14 +18,20 @@ public class ComputerGame {
     private double bigBlind;
     private double myStack;
     private double computerStack;
-    private boolean iAmButton;
+    private double myBetSize;
+    private double computerBetSize;
+    private double potSize;
+    private boolean button;
 
     public ComputerGame() {
         getNewCardDeck();
         dealHoleCards();
         decideWhoIsButton();
+        myStack = 50;
+        computerStack = 50;
         setBlinds();
         postBlinds();
+        setPotSize();
     }
 
     private void getNewCardDeck() {
@@ -53,9 +59,9 @@ public class ComputerGame {
 
     private void decideWhoIsButton() {
         if(Math.random() < 0.5) {
-            iAmButton = true;
+            button = true;
         } else {
-            iAmButton = false;
+            button = false;
         }
     }
 
@@ -65,12 +71,16 @@ public class ComputerGame {
     }
 
     private void postBlinds() {
-        if(iAmButton) {
+        if(button) {
             myStack = myStack - smallBlind;
+            myBetSize = smallBlind;
             computerStack = computerStack - bigBlind;
+            computerBetSize = bigBlind;
         } else {
             myStack = myStack - bigBlind;
+            myBetSize = bigBlind;
             computerStack = computerStack - smallBlind;
+            computerBetSize = smallBlind;
         }
     }
 
@@ -130,11 +140,35 @@ public class ComputerGame {
         this.computerStack = computerStack;
     }
 
-    public boolean isiAmButton() {
-        return iAmButton;
+    public boolean getButton() {
+        return button;
     }
 
-    public void setiAmButton(boolean iAmButton) {
-        this.iAmButton = iAmButton;
+    public void setButton(boolean button) {
+        this.button = button;
+    }
+
+    public double getMyBetSize() {
+        return myBetSize;
+    }
+
+    public void setMyBetSize(double myBetSize) {
+        this.myBetSize = myBetSize;
+    }
+
+    public double getComputerBetSize() {
+        return computerBetSize;
+    }
+
+    public void setComputerBetSize(double computerBetSize) {
+        this.computerBetSize = computerBetSize;
+    }
+
+    public double getPotSize() {
+        return potSize;
+    }
+
+    public void setPotSize() {
+        potSize = myBetSize + computerBetSize;
     }
 }
