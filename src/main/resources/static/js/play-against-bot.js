@@ -37,7 +37,7 @@ mainApp.controller('pokerController', function($scope, $http) {
                 $scope.holeCard1SuitUniCode = "\u2663";
                 break;
             case 'd':
-                $scope.holeCard1SuitWritten = "diamonds";
+                $scope.holeCard1SuitWritten = "diams";
                 $scope.holeCard1SuitUniCode = "\u2666";
                 break;
             case 'h':
