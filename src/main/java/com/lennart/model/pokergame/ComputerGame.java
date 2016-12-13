@@ -21,7 +21,9 @@ public class ComputerGame {
     private double myBetSize;
     private double computerBetSize;
     private double potSize;
-    private boolean button;
+    private boolean computerIsButton;
+    private String handPath;
+    private Action computerAction;
 
     public ComputerGame() {
         getNewCardDeck();
@@ -32,6 +34,15 @@ public class ComputerGame {
         setBlinds();
         postBlinds();
         setPotSize();
+
+        if(getComputerIsButton()) {
+            handPath = "05betF1bet";
+            computerAction = new Action(handPath);
+
+            if(computerAction.getSuggestedSizing() != null) {
+                //computerStack = computerStack - computerAction.getSuggestedSizing();
+            }
+        }
     }
 
     private void getNewCardDeck() {
@@ -59,9 +70,9 @@ public class ComputerGame {
 
     private void decideWhoIsButton() {
         if(Math.random() < 0.5) {
-            button = true;
+            computerIsButton = true;
         } else {
-            button = false;
+            computerIsButton = false;
         }
     }
 
@@ -71,16 +82,16 @@ public class ComputerGame {
     }
 
     private void postBlinds() {
-        if(button) {
-            myStack = myStack - smallBlind;
-            myBetSize = smallBlind;
-            computerStack = computerStack - bigBlind;
-            computerBetSize = bigBlind;
-        } else {
+        if(computerIsButton) {
             myStack = myStack - bigBlind;
             myBetSize = bigBlind;
             computerStack = computerStack - smallBlind;
             computerBetSize = smallBlind;
+        } else {
+            myStack = myStack - smallBlind;
+            myBetSize = smallBlind;
+            computerStack = computerStack - bigBlind;
+            computerBetSize = bigBlind;
         }
     }
 
@@ -140,12 +151,12 @@ public class ComputerGame {
         this.computerStack = computerStack;
     }
 
-    public boolean getButton() {
-        return button;
+    public boolean getComputerIsButton() {
+        return computerIsButton;
     }
 
-    public void setButton(boolean button) {
-        this.button = button;
+    public void setButton(boolean computerIsButton) {
+        this.computerIsButton = computerIsButton;
     }
 
     public double getMyBetSize() {

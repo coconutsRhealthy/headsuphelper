@@ -47,7 +47,7 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.computerBetSize;
     $scope.potSize;
 
-    $scope.button;
+    $scope.computerIsButton;
 
     $scope.dealerButtonStyle;
 
@@ -63,7 +63,7 @@ mainApp.controller('pokerController', function($scope, $http) {
             $scope.computerBetSize = data.computerBetSize;
             $scope.potSize = data.potSize;
 
-            $scope.button = data.button;
+            $scope.computerIsButton = data.computerIsButton;
 
             $scope.holeCard1.rank = convertRankFromIntegerToRank($scope.holeCard1.rank);
             $scope.holeCard2.rank = convertRankFromIntegerToRank($scope.holeCard2.rank);
@@ -142,10 +142,10 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     function setDealerButton() {
-        if($scope.button) {
-            $scope.dealerButtonStyle = "float: left; padding-top: 30px;";
-        } else {
+        if($scope.computerIsButton) {
             $scope.dealerButtonStyle = "float: right; padding-top: 30px;";
+        } else {
+            $scope.dealerButtonStyle = "float: left; padding-top: 30px;";
         }
     }
 });
