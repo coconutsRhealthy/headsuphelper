@@ -17,11 +17,13 @@ public class PreflopActionBuilder {
 
     private PreflopRangeBuilderUtil preflopRangeBuilderUtil = new PreflopRangeBuilderUtil();
 
-    public String get05betF1bet(List<Card> holeCards) {
+    public String get05betF1bet(ComputerGame computerGame) {
         Map<Integer, Set<Card>> comboMap100Percent;
         Map<Integer, Set<Card>> comboMap5Percent;
 
-        Game.removeHoleCardsFromKnownGameCards();
+        //Game.removeHoleCardsFromKnownGameCards();
+        computerGame.removeHoleCardsFromKnownGameCards();
+
         _2betRangeBuilder x2BetRangeBuilder = new _2betRangeBuilder();
 
         comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
@@ -33,7 +35,7 @@ public class PreflopActionBuilder {
         double percentageBet = 0;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(holeCards);
+        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
 
         for (Map.Entry<Integer, Set<Card>> entry : comboMap100Percent.entrySet()) {
             if(entry.getValue().equals(holeCardsAsSet)) {
@@ -51,11 +53,11 @@ public class PreflopActionBuilder {
             }
         }
 
-        Game.addHoleCardsToKnownGameCards();
+        //Game.addHoleCardsToKnownGameCards();
+        computerGame.removeHoleCardsFromKnownGameCards();
 
         if(Math.random() <= percentageBet) {
             return "2bet";
-            //return "2bet" + 2.44 * Game.getBigBlind();
         } else {
             return "fold";
         }
@@ -342,16 +344,12 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String getSize(Action action) {
-        switch(action.suggestedAction) {
-            case "call":
-                return String.valueOf(Game.getOpponentTotalBetSize() - Game.getMyTotalBetSize());
+    public double getSize(ComputerGame computerGame, String handPath) {
+        switch(handPath) {
             case "2bet":
-                return String.valueOf(2.5 * Game.getBigBlind());
-            case "4bet":
-                return String.valueOf(2.15 * Game.getOpponentTotalBetSize());
+                return 2.5 * computerGame.getBigBlind();
         }
-        return null;
+        return 0;
     }
 
     private double setPercentage(Map<Integer, Set<Card>> comboMap, Set<Card> combo, double percentage) {

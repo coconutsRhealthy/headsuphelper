@@ -53,8 +53,8 @@ mainApp.controller('pokerController', function($scope, $http) {
 
     $scope.startGame = function() {
         $http.get('/startGame/').success(function(data) {
-            $scope.holeCard1 = data.myHand[0];
-            $scope.holeCard2 = data.myHand[1];
+            $scope.holeCard1 = data.myHoleCards[0];
+            $scope.holeCard2 = data.myHoleCards[1];
 
             $scope.myStack = data.myStack;
             $scope.computerStack = data.computerStack;
@@ -72,6 +72,8 @@ mainApp.controller('pokerController', function($scope, $http) {
             setHoleCard2SuitWritten();
             setHoleCardsCss();
             setDealerButton();
+
+            alert(data.computerAction.writtenAction);
         })
     }
 

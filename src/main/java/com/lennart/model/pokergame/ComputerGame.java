@@ -2,9 +2,7 @@ package com.lennart.model.pokergame;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by lennart on 11-12-16.
@@ -12,8 +10,8 @@ import java.util.Random;
 public class ComputerGame {
 
     private List<Card> deck;
-    private List<Card> myHand;
-    private List<Card> computerHand;
+    private List<Card> myHoleCards;
+    private List<Card> computerHoleCards;
     private double smallBlind;
     private double bigBlind;
     private double myStack;
@@ -22,12 +20,13 @@ public class ComputerGame {
     private double computerBetSize;
     private double potSize;
     private boolean computerIsButton;
-    private String handPath;
     private Action computerAction;
+    private Set<Card> knownGameCards = new HashSet<>();
 
     public ComputerGame() {
         getNewCardDeck();
         dealHoleCards();
+        knownGameCards.addAll(computerHoleCards);
         decideWhoIsButton();
         myStack = 50;
         computerStack = 50;
@@ -36,12 +35,9 @@ public class ComputerGame {
         setPotSize();
 
         if(getComputerIsButton()) {
-            handPath = "05betF1bet";
-            computerAction = new Action(handPath);
-
-            if(computerAction.getSuggestedSizing() != null) {
-                //computerStack = computerStack - computerAction.getSuggestedSizing();
-            }
+            doComputerAction();
+        } else {
+            setWhoIsToAct();
         }
     }
 
@@ -50,13 +46,13 @@ public class ComputerGame {
     }
 
     private void dealHoleCards() {
-        myHand = new ArrayList<>();
-        computerHand = new ArrayList<>();
+        myHoleCards = new ArrayList<>();
+        computerHoleCards = new ArrayList<>();
 
-        myHand.add(getAndRemoveRandomCardFromDeck());
-        myHand.add(getAndRemoveRandomCardFromDeck());
-        computerHand.add(getAndRemoveRandomCardFromDeck());
-        computerHand.add(getAndRemoveRandomCardFromDeck());
+        myHoleCards.add(getAndRemoveRandomCardFromDeck());
+        myHoleCards.add(getAndRemoveRandomCardFromDeck());
+        computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+        computerHoleCards.add(getAndRemoveRandomCardFromDeck());
     }
 
     private Card getAndRemoveRandomCardFromDeck() {
@@ -95,6 +91,35 @@ public class ComputerGame {
         }
     }
 
+    public void removeHoleCardsFromKnownGameCards() {
+        knownGameCards.removeAll(computerHoleCards);
+    }
+
+    private void doComputerAction() {
+        computerAction = new Action(this, "05betF1bet");
+
+        String writtenComputerAction = computerAction.getWrittenAction();
+        if(!writtenComputerAction.contains("fold") && !writtenComputerAction.contains("check")) {
+            computerStack = computerStack - computerAction.getSizing();
+            potSize = potSize + computerAction.getSizing();
+            setWhoIsToAct();
+        } else if(writtenComputerAction.contains("fold")) {
+            finishHand();
+        } else {
+            setWhoIsToAct();
+        }
+    }
+
+    private void finishHand() {
+        //TODO: implement
+    }
+
+    private void setWhoIsToAct() {
+        //TODO: implement
+    }
+
+
+    //getters and setters
     public List<Card> getDeck() {
         return deck;
     }
@@ -103,20 +128,20 @@ public class ComputerGame {
         this.deck = deck;
     }
 
-    public List<Card> getMyHand() {
-        return myHand;
+    public List<Card> getMyHoleCards() {
+        return myHoleCards;
     }
 
-    public void setMyHand(List<Card> myHand) {
-        this.myHand = myHand;
+    public void setMyHoleCards(List<Card> myHoleCards) {
+        this.myHoleCards = myHoleCards;
     }
 
-    public List<Card> getComputerHand() {
-        return computerHand;
+    public List<Card> getComputerHoleCards() {
+        return computerHoleCards;
     }
 
-    public void setComputerHand(List<Card> computerHand) {
-        this.computerHand = computerHand;
+    public void setComputerHoleCards(List<Card> computerHoleCards) {
+        this.computerHoleCards = computerHoleCards;
     }
 
     public double getSmallBlind() {
@@ -181,5 +206,21 @@ public class ComputerGame {
 
     public void setPotSize() {
         potSize = myBetSize + computerBetSize;
+    }
+
+    public Action getComputerAction() {
+        return computerAction;
+    }
+
+    public void setComputerAction(Action computerAction) {
+        this.computerAction = computerAction;
+    }
+
+    public Set<Card> getKnownGameCards() {
+        return knownGameCards;
+    }
+
+    public void setKnownGameCards(Set<Card> knownGameCards) {
+        this.knownGameCards = knownGameCards;
     }
 }

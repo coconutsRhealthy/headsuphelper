@@ -8,48 +8,38 @@ import com.lennart.model.rangebuilder.RangeBuilder;
 public class Action {
     //Future class to determine your suggestedAction
 
-    String suggestedAction;
-    String suggestedSizing;
-    PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
+    private String handPath;
+    private double sizing;
+    private String writtenAction;
+    private PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
 
-    public Action(String handPath) {
+    public Action(ComputerGame computerGame, String handPath) {
         switch(handPath) {
             case "05betF1bet":
-                this.suggestedAction = preflopActionBuilder.get05betF1bet(Game.getHoleCards());
-                this.suggestedSizing = preflopActionBuilder.getSize(this);
-                break;
-            case "1betF2bet":
-                this.suggestedAction = preflopActionBuilder.get1betF2bet(Game.getHoleCards());
-                this.suggestedSizing = preflopActionBuilder.getSize(this);
-                break;
-            case "2betF3bet":
-                this.suggestedAction = preflopActionBuilder.get2betF3bet(Game.getHoleCards());
-                this.suggestedSizing = preflopActionBuilder.getSize(this);
-                break;
-            case "call2bet":
-                this.suggestedAction = "Check";
-                this.suggestedSizing = "0";
+                this.handPath = preflopActionBuilder.get05betF1bet(computerGame);
+                sizing = preflopActionBuilder.getSize(computerGame, this.handPath);
+                writtenAction = "Computer raises";
                 break;
             default:
-                this.suggestedAction = "no action available for this handpath and board";
-                this.suggestedSizing = "";
+                this.handPath = "no action available for latest handpath";
+                sizing = 0;
         }
     }
 
-    public String getSuggestedAction() {
-        return suggestedAction;
+    public double getSizing() {
+        return sizing;
     }
 
-    public void setSuggestedAction(String suggestedAction) {
-        this.suggestedAction = suggestedAction;
+    public void setSizing(double sizing) {
+        this.sizing = sizing;
     }
 
-    public String getSuggestedSizing() {
-        return suggestedSizing;
+    public String getWrittenAction() {
+        return writtenAction;
     }
 
-    public void setSuggestedSizing(String suggestedSizing) {
-        this.suggestedSizing = suggestedSizing;
+    public void setWrittenAction(String writtenAction) {
+        this.writtenAction = writtenAction;
     }
 
     public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {
