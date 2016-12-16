@@ -20,6 +20,12 @@ public class Controller {
         return computerGame;
     }
 
+    @RequestMapping(value = "/submitMyAction", method = RequestMethod.GET)
+    public @ResponseBody ComputerGame submitMyAction() {
+        System.out.println("wacht");
+        return computerGame;
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(Controller.class, args);
     }

@@ -2,14 +2,24 @@ var mainApp = angular.module("mainApp", []);
 
 mainApp.controller('pokerController', function($scope, $http) {
 
-    $scope.holeCard1;
-    $scope.holeCard2;
+    $scope.computerGame;
 
-    $scope.flopCard1;
-    $scope.flopCard2;
-    $scope.flopCard3;
-    $scope.turnCard;
-    $scope.riverCard;
+//    $scope.holeCard1;
+//    $scope.holeCard2;
+//
+//    $scope.flopCard1;
+//    $scope.flopCard2;
+//    $scope.flopCard3;
+//    $scope.turnCard;
+//    $scope.riverCard;
+
+    $scope.holeCard1ConvertedRank;
+    $scope.holeCard2ConvertedRank;
+    $scope.flopCard1ConvertedRank;
+    $scope.flopCard2ConvertedRank;
+    $scope.flopCard3ConvertedRank;
+    $scope.turnCardConvertedRank;
+    $scope.riverCardConvertedRank;
 
     $scope.holeCard1SuitWritten;
     $scope.holeCard2SuitWritten;
@@ -40,45 +50,45 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.riverCardClass;
     $scope.riverCardSuitUniCode;
 
-    $scope.myStack;
-    $scope.computerStack;
+//    $scope.myStack;
+//    $scope.computerStack;
+//
+//    $scope.myBetSize;
+//    $scope.computerBetSize;
+//    $scope.potSize;
 
-    $scope.myBetSize;
-    $scope.computerBetSize;
-    $scope.potSize;
-
-    $scope.computerIsButton;
+//    $scope.computerIsButton;
 
     $scope.dealerButtonStyle;
 
     $scope.startGame = function() {
         $http.get('/startGame/').success(function(data) {
-            $scope.holeCard1 = data.myHoleCards[0];
-            $scope.holeCard2 = data.myHoleCards[1];
+            $scope.computerGame = data;
 
-            $scope.myStack = data.myStack;
-            $scope.computerStack = data.computerStack;
+//            $scope.holeCard1 = data.myHoleCards[0];
+//            $scope.holeCard2 = data.myHoleCards[1];
+//
+//            $scope.myStack = data.myStack;
+//            $scope.computerStack = data.computerStack;
+//
+//            $scope.myBetSize = data.myBetSize;
+//            $scope.computerBetSize = data.computerBetSize;
+//            $scope.potSize = data.potSize;
+//
+//            $scope.computerIsButton = data.computerIsButton;
 
-            $scope.myBetSize = data.myBetSize;
-            $scope.computerBetSize = data.computerBetSize;
-            $scope.potSize = data.potSize;
-
-            $scope.computerIsButton = data.computerIsButton;
-
-            $scope.holeCard1.rank = convertRankFromIntegerToRank($scope.holeCard1.rank);
-            $scope.holeCard2.rank = convertRankFromIntegerToRank($scope.holeCard2.rank);
+            $scope.holeCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[0].rank);
+            $scope.holeCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[1].rank);
 
             setHoleCard1SuitWritten();
             setHoleCard2SuitWritten();
             setHoleCardsCss();
             setDealerButton();
-
-            alert(data.computerAction.writtenAction);
         })
     }
 
     function setHoleCard1SuitWritten() {
-        switch($scope.holeCard1.suit) {
+        switch($scope.computerGame.myHoleCards[0].suit) {
             case 's':
                 $scope.holeCard1SuitWritten = "spades";
                 $scope.holeCard1SuitUniCode = "\u2660";
@@ -99,7 +109,7 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     function setHoleCard2SuitWritten() {
-        switch($scope.holeCard2.suit) {
+        switch($scope.computerGame.myHoleCards[1].suit) {
             case 's':
                 $scope.holeCard2SuitWritten = "spades";
                 $scope.holeCard2SuitUniCode = "\u2660";
@@ -120,8 +130,8 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     function setHoleCardsCss() {
-        $scope.holeCard1Class = "card rank-" + $scope.holeCard1.rank + " " + $scope.holeCard1SuitWritten;
-        $scope.holeCard2Class = "card rank-" + $scope.holeCard2.rank + " " + $scope.holeCard2SuitWritten;
+        $scope.holeCard1Class = "card rank-" + $scope.computerGame.myHoleCards[0].rank + " " + $scope.holeCard1SuitWritten;
+        $scope.holeCard2Class = "card rank-" + $scope.computerGame.myHoleCards[1].rank + " " + $scope.holeCard2SuitWritten;
     }
 
     function convertRankFromIntegerToRank(rankCard) {
@@ -149,5 +159,11 @@ mainApp.controller('pokerController', function($scope, $http) {
         } else {
             $scope.dealerButtonStyle = "float: left; padding-top: 30px;";
         }
+    }
+
+    $scope.submitMyAction = function(action) {
+        $http.get('/submitMyAction/').success(function(data) {
+
+        })
     }
 });

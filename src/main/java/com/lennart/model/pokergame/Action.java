@@ -8,20 +8,19 @@ import com.lennart.model.rangebuilder.RangeBuilder;
 public class Action {
     //Future class to determine your suggestedAction
 
-    private String handPath;
     private double sizing;
     private String writtenAction;
     private PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
 
-    public Action(ComputerGame computerGame, String handPath) {
-        switch(handPath) {
+    public Action(ComputerGame computerGame) {
+        switch(computerGame.getHandPath()) {
             case "05betF1bet":
-                this.handPath = preflopActionBuilder.get05betF1bet(computerGame);
-                sizing = preflopActionBuilder.getSize(computerGame, this.handPath);
+                computerGame.setHandPath(preflopActionBuilder.get05betF1bet(computerGame));
+                sizing = preflopActionBuilder.getSize(computerGame);
                 writtenAction = "Computer raises";
                 break;
             default:
-                this.handPath = "no action available for latest handpath";
+                System.out.println("no action available for handpath: " + computerGame.getHandPath());
                 sizing = 0;
         }
     }

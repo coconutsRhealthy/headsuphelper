@@ -22,6 +22,10 @@ public class ComputerGame {
     private boolean computerIsButton;
     private Action computerAction;
     private Set<Card> knownGameCards = new HashSet<>();
+    private String handPath;
+    private boolean computerIsToAct;
+    private String myAction;
+    private String mySize;
 
     public ComputerGame() {
         getNewCardDeck();
@@ -35,9 +39,11 @@ public class ComputerGame {
         setPotSize();
 
         if(getComputerIsButton()) {
+            handPath = "05betF1bet";
             doComputerAction();
         } else {
-            setWhoIsToAct();
+            handPath = "1bet";
+            computerIsToAct = false;
         }
     }
 
@@ -96,25 +102,22 @@ public class ComputerGame {
     }
 
     private void doComputerAction() {
-        computerAction = new Action(this, "05betF1bet");
+        computerAction = new Action(this);
 
         String writtenComputerAction = computerAction.getWrittenAction();
         if(!writtenComputerAction.contains("fold") && !writtenComputerAction.contains("check")) {
             computerStack = computerStack - computerAction.getSizing();
             potSize = potSize + computerAction.getSizing();
-            setWhoIsToAct();
+            computerIsToAct = false;
         } else if(writtenComputerAction.contains("fold")) {
             finishHand();
         } else {
-            setWhoIsToAct();
+            //here the computer checks
+            computerIsToAct = false;
         }
     }
 
     private void finishHand() {
-        //TODO: implement
-    }
-
-    private void setWhoIsToAct() {
         //TODO: implement
     }
 
@@ -222,5 +225,49 @@ public class ComputerGame {
 
     public void setKnownGameCards(Set<Card> knownGameCards) {
         this.knownGameCards = knownGameCards;
+    }
+
+    public String getHandPath() {
+        return handPath;
+    }
+
+    public void setHandPath(String handPath) {
+        this.handPath = handPath;
+    }
+
+    public boolean isComputerIsToAct() {
+        return computerIsToAct;
+    }
+
+    public void setComputerIsToAct(boolean computerIsToAct) {
+        this.computerIsToAct = computerIsToAct;
+    }
+
+    public String getMyAction() {
+        return myAction;
+    }
+
+    public void setMyAction(String myAction) {
+        this.myAction = myAction;
+    }
+
+    public String getMySize() {
+        return mySize;
+    }
+
+    public void setMySize(String mySize) {
+        this.mySize = mySize;
+    }
+
+    public void setPotSize(double potSize) {
+        this.potSize = potSize;
+    }
+
+    public boolean isComputerIsButton() {
+        return computerIsButton;
+    }
+
+    public void setComputerIsButton(boolean computerIsButton) {
+        this.computerIsButton = computerIsButton;
     }
 }

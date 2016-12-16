@@ -344,8 +344,8 @@ public class PreflopActionBuilder {
         }
     }
 
-    public double getSize(ComputerGame computerGame, String handPath) {
-        switch(handPath) {
+    public double getSize(ComputerGame computerGame) {
+        switch(computerGame.getHandPath()) {
             case "2bet":
                 return 2.5 * computerGame.getBigBlind();
         }

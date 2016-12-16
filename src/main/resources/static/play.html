@@ -20,13 +20,13 @@
                         <ul class="table">
                             <li>
                                 <div class={{holeCard1Class}}>
-                                    <span class="rank">{{holeCard1.rank}}</span>
+                                    <span class="rank">{{holeCard1ConvertedRank}}</span>
                                     <span class="suit">{{holeCard1SuitUniCode}}</span>
                                 </div>
                             </li>
                             <li>
                                 <div class={{holeCard2Class}}>
-                                    <span class="rank">{{holeCard2.rank}}</span>
+                                    <span class="rank">{{holeCard2ConvertedRank}}</span>
                                     <span class="suit">{{holeCard2SuitUniCode}}</span>
                                 </div>
                             </li>
@@ -38,19 +38,19 @@
                         <ul class="table">
                             <li>
                                 <div class={{flopCard1Class}}>
-                                    <span class="rank">{{flopCard1.rank}}</span>
+                                    <span class="rank">{{flopCard1ConvertedRank}}</span>
                                     <span class="suit">{{flopCard1SuitUniCode}}</span>
                                 </div>
                             </li>
                             <li>
                                 <div class={{flopCard2Class}}>
-                                    <span class="rank">{{flopCard2.rank}}</span>
+                                    <span class="rank">{{flopCard2ConvertedRank}}</span>
                                     <span class="suit">{{flopCard2SuitUniCode}}</span>
                                 </div>
                             </li>
                             <li>
                                 <div class={{flopCard3Class}}>
-                                    <span class="rank">{{flopCard3.rank}}</span>
+                                    <span class="rank">{{flopCard3ConvertedRank}}</span>
                                     <span class="suit">{{flopCard3SuitUniCode}}</span>
                                 </div>
                             </li>
@@ -72,25 +72,25 @@
             </div>
 
             <div>
-                <span id="my_stack">{{myStack}}</span>
-                <span id="computer_stack">{{computerStack}}</span>
+                <span id="my_stack">{{computerGame.myStack}}</span>
+                <span id="computer_stack">{{computerGame.computerStack}}</span>
             </div>
 
             <div>
-                <span id="my_bet_size">{{myBetSize}}</span>
-                <span id="computer_bet_size">{{computerBetSize}}</span>
+                <span id="my_bet_size">{{computerGame.myBetSize}}</span>
+                <span id="computer_bet_size">{{computerGame.computerBetSize}}</span>
             </div>
 
             <div id="pot">
-                {{potSize}}
+                {{computerGame.potSize}}
             </div>
 
-            <div><button class="action_button">fold</button></div>
-            <div><button class="action_button">check</button></div>
-            <div><button class="action_button">call</button></div>
+            <div><button class="action_button" ng-click="submitMyAction(fold)">fold</button></div>
+            <div><button class="action_button" ng-click="submitMyAction(check)">check</button></div>
+            <div><button class="action_button" ng-click="submitMyAction(call)">call</button></div>
             <div>
                 <span>
-                    <button class="action_button">bet</button>
+                    <button class="action_button" ng-click="submitMyAction(bet)">bet</button>
                 </span>
                 <span>
                     <input type="text">
@@ -98,7 +98,7 @@
             </div>
             <div>
                 <span>
-                    <button class="action_button">raise</button>
+                    <button class="action_button" ng-click="submitMyAction(raise)">raise</button>
                 </span>
                 <span>
                     <input type="text">
