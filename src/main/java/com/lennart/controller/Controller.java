@@ -11,20 +11,16 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class Controller {
 
-    private ComputerGame computerGame;
-
     @RequestMapping(value = "/startGame", method = RequestMethod.GET)
     public @ResponseBody ComputerGame startGame() {
-        computerGame = new ComputerGame();
+        return new ComputerGame("initialize");
+    }
 
+    @RequestMapping(value = "/submitMyAction", method = RequestMethod.POST)
+    public @ResponseBody ComputerGame submitMyAction(@RequestBody ComputerGame computerGame) {
         return computerGame;
     }
 
-    @RequestMapping(value = "/submitMyAction", method = RequestMethod.GET)
-    public @ResponseBody ComputerGame submitMyAction() {
-        System.out.println("wacht");
-        return computerGame;
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(Controller.class, args);

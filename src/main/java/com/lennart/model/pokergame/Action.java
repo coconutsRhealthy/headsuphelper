@@ -12,6 +12,10 @@ public class Action {
     private String writtenAction;
     private PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
 
+    public Action() {
+        //default constructor
+    }
+
     public Action(ComputerGame computerGame) {
         switch(computerGame.getHandPath()) {
             case "05betF1bet":

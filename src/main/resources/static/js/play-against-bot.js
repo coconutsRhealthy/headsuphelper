@@ -4,15 +4,6 @@ mainApp.controller('pokerController', function($scope, $http) {
 
     $scope.computerGame;
 
-//    $scope.holeCard1;
-//    $scope.holeCard2;
-//
-//    $scope.flopCard1;
-//    $scope.flopCard2;
-//    $scope.flopCard3;
-//    $scope.turnCard;
-//    $scope.riverCard;
-
     $scope.holeCard1ConvertedRank;
     $scope.holeCard2ConvertedRank;
     $scope.flopCard1ConvertedRank;
@@ -50,32 +41,11 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.riverCardClass;
     $scope.riverCardSuitUniCode;
 
-//    $scope.myStack;
-//    $scope.computerStack;
-//
-//    $scope.myBetSize;
-//    $scope.computerBetSize;
-//    $scope.potSize;
-
-//    $scope.computerIsButton;
-
     $scope.dealerButtonStyle;
 
     $scope.startGame = function() {
         $http.get('/startGame/').success(function(data) {
             $scope.computerGame = data;
-
-//            $scope.holeCard1 = data.myHoleCards[0];
-//            $scope.holeCard2 = data.myHoleCards[1];
-//
-//            $scope.myStack = data.myStack;
-//            $scope.computerStack = data.computerStack;
-//
-//            $scope.myBetSize = data.myBetSize;
-//            $scope.computerBetSize = data.computerBetSize;
-//            $scope.potSize = data.potSize;
-//
-//            $scope.computerIsButton = data.computerIsButton;
 
             $scope.holeCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[0].rank);
             $scope.holeCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[1].rank);
@@ -130,8 +100,8 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     function setHoleCardsCss() {
-        $scope.holeCard1Class = "card rank-" + $scope.computerGame.myHoleCards[0].rank + " " + $scope.holeCard1SuitWritten;
-        $scope.holeCard2Class = "card rank-" + $scope.computerGame.myHoleCards[1].rank + " " + $scope.holeCard2SuitWritten;
+        $scope.holeCard1Class = "card rank-" + $scope.holeCard1ConvertedRank + " " + $scope.holeCard1SuitWritten;
+        $scope.holeCard2Class = "card rank-" + $scope.holeCard2ConvertedRank + " " + $scope.holeCard2SuitWritten;
     }
 
     function convertRankFromIntegerToRank(rankCard) {
@@ -154,7 +124,7 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     function setDealerButton() {
-        if($scope.computerIsButton) {
+        if($scope.computerGame.computerIsButton) {
             $scope.dealerButtonStyle = "float: right; padding-top: 30px;";
         } else {
             $scope.dealerButtonStyle = "float: left; padding-top: 30px;";
@@ -162,8 +132,8 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     $scope.submitMyAction = function(action) {
-        $http.get('/submitMyAction/').success(function(data) {
-
+        $http.post('/submitMyAction/', $scope.computerGame).success(function(data) {
+            alert("Sjaakie-son!");
         })
     }
 });

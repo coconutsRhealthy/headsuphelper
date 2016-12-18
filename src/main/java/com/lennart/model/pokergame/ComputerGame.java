@@ -28,6 +28,10 @@ public class ComputerGame {
     private String mySize;
 
     public ComputerGame() {
+        //default constructor
+    }
+
+    public ComputerGame(String initialize) {
         getNewCardDeck();
         dealHoleCards();
         knownGameCards.addAll(computerHoleCards);
@@ -36,9 +40,9 @@ public class ComputerGame {
         computerStack = 50;
         setBlinds();
         postBlinds();
-        setPotSize();
+        calculatePotSize();
 
-        if(getComputerIsButton()) {
+        if(isComputerIsButton()) {
             handPath = "05betF1bet";
             doComputerAction();
         } else {
@@ -107,6 +111,7 @@ public class ComputerGame {
         String writtenComputerAction = computerAction.getWrittenAction();
         if(!writtenComputerAction.contains("fold") && !writtenComputerAction.contains("check")) {
             computerStack = computerStack - computerAction.getSizing();
+            computerBetSize = computerBetSize + computerAction.getSizing();
             potSize = potSize + computerAction.getSizing();
             computerIsToAct = false;
         } else if(writtenComputerAction.contains("fold")) {
@@ -115,6 +120,10 @@ public class ComputerGame {
             //here the computer checks
             computerIsToAct = false;
         }
+    }
+
+    public void calculatePotSize() {
+        potSize = myBetSize + computerBetSize;
     }
 
     private void finishHand() {
@@ -179,14 +188,6 @@ public class ComputerGame {
         this.computerStack = computerStack;
     }
 
-    public boolean getComputerIsButton() {
-        return computerIsButton;
-    }
-
-    public void setButton(boolean computerIsButton) {
-        this.computerIsButton = computerIsButton;
-    }
-
     public double getMyBetSize() {
         return myBetSize;
     }
@@ -207,8 +208,8 @@ public class ComputerGame {
         return potSize;
     }
 
-    public void setPotSize() {
-        potSize = myBetSize + computerBetSize;
+    public void setPotSize(double potSize) {
+        this.potSize = potSize;
     }
 
     public Action getComputerAction() {
@@ -257,10 +258,6 @@ public class ComputerGame {
 
     public void setMySize(String mySize) {
         this.mySize = mySize;
-    }
-
-    public void setPotSize(double potSize) {
-        this.potSize = potSize;
     }
 
     public boolean isComputerIsButton() {
