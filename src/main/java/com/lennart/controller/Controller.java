@@ -18,12 +18,7 @@ public class Controller {
 
     @RequestMapping(value = "/submitMyAction", method = RequestMethod.POST)
     public @ResponseBody ComputerGame submitMyAction(@RequestBody ComputerGame computerGame) {
-        System.out.println("wacht ff");
-
-        //computerGame.doComputerAction(computerGame);
-
-        computerGame.submitOpponentAction();
-
+        computerGame = computerGame.submitHumanActionAndDoComputerAction();
         return computerGame;
     }
 
