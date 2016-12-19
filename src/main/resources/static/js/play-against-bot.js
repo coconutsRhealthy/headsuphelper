@@ -43,18 +43,28 @@ mainApp.controller('pokerController', function($scope, $http) {
 
     $scope.dealerButtonStyle;
 
+    $scope.fold = "fold";
+    $scope.check = "check";
+    $scope.call = "call";
+    $scope.bet = "bet";
+    $scope.raise = "raise";
+
     $scope.startGame = function() {
         $http.get('/startGame/').success(function(data) {
-            $scope.computerGame = data;
-
-            $scope.holeCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[0].rank);
-            $scope.holeCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[1].rank);
-
-            setHoleCard1SuitWritten();
-            setHoleCard2SuitWritten();
-            setHoleCardsCss();
-            setDealerButton();
+            setScopePropertiesCorrect(data);
         })
+    }
+
+    function setScopePropertiesCorrect(data) {
+        $scope.computerGame = data;
+
+        $scope.holeCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[0].rank);
+        $scope.holeCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.myHoleCards[1].rank);
+
+        setHoleCard1SuitWritten();
+        setHoleCard2SuitWritten();
+        setHoleCardsCss();
+        setDealerButton();
     }
 
     function setHoleCard1SuitWritten() {
@@ -132,7 +142,15 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     $scope.submitMyAction = function(action) {
+        alert(action);
+
+        $scope.computerGame.myAction = action;
+
+        alert($scope.computerGame.myAction);
+
         $http.post('/submitMyAction/', $scope.computerGame).success(function(data) {
+            setScopePropertiesCorrect(data);
+
             alert("Sjaakie-son!");
         })
     }

@@ -44,7 +44,7 @@ public class ComputerGame {
 
         if(isComputerIsButton()) {
             handPath = "05betF1bet";
-            doComputerAction();
+            doComputerAction(this);
         } else {
             handPath = "1bet";
             computerIsToAct = false;
@@ -105,8 +105,8 @@ public class ComputerGame {
         knownGameCards.removeAll(computerHoleCards);
     }
 
-    private void doComputerAction() {
-        computerAction = new Action(this);
+    public void doComputerAction(ComputerGame computerGame) {
+        computerAction = new Action(computerGame);
 
         String writtenComputerAction = computerAction.getWrittenAction();
         if(!writtenComputerAction.contains("fold") && !writtenComputerAction.contains("check")) {
@@ -128,6 +128,12 @@ public class ComputerGame {
 
     private void finishHand() {
         //TODO: implement
+    }
+
+    public void submitOpponentAction() {
+        //hij is zichzelf al hier
+
+        System.out.println("ho ff");
     }
 
 
