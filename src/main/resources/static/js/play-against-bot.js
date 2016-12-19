@@ -109,6 +109,69 @@ mainApp.controller('pokerController', function($scope, $http) {
         }
     }
 
+    function setFlopCard1SuitWritten() {
+        switch($scope.computerGame.flopCards[0].suit) {
+            case 's':
+                $scope.flopCard1SuitWritten = "spades";
+                $scope.flopCard1SuitUniCode = "\u2660";
+                break;
+            case 'c':
+                $scope.flopCard1SuitWritten = "clubs";
+                $scope.flopCard1SuitUniCode = "\u2663";
+                break;
+            case 'd':
+                $scope.flopCard1SuitWritten = "diams";
+                $scope.flopCard1SuitUniCode = "\u2666";
+                break;
+            case 'h':
+                $scope.flopCard1SuitWritten = "hearts";
+                $scope.flopCard1SuitUniCode = "\u2665";
+                break;
+        }
+    }
+
+    function setFlopCard2SuitWritten() {
+        switch($scope.computerGame.flopCards[0].suit) {
+            case 's':
+                $scope.flopCard2SuitWritten = "spades";
+                $scope.flopCard2SuitUniCode = "\u2660";
+                break;
+            case 'c':
+                $scope.flopCard2SuitWritten = "clubs";
+                $scope.flopCard2SuitUniCode = "\u2663";
+                break;
+            case 'd':
+                $scope.flopCard2SuitWritten = "diams";
+                $scope.flopCard2SuitUniCode = "\u2666";
+                break;
+            case 'h':
+                $scope.flopCard2SuitWritten = "hearts";
+                $scope.flopCard2SuitUniCode = "\u2665";
+                break;
+        }
+    }
+
+    function setFlopCard3SuitWritten() {
+        switch($scope.computerGame.flopCards[0].suit) {
+            case 's':
+                $scope.flopCard3SuitWritten = "spades";
+                $scope.flopCard3SuitUniCode = "\u2660";
+                break;
+            case 'c':
+                $scope.flopCard3SuitWritten = "clubs";
+                $scope.flopCard3SuitUniCode = "\u2663";
+                break;
+            case 'd':
+                $scope.flopCard3SuitWritten = "diams";
+                $scope.flopCard3SuitUniCode = "\u2666";
+                break;
+            case 'h':
+                $scope.flopCard3SuitWritten = "hearts";
+                $scope.flopCard3SuitUniCode = "\u2665";
+                break;
+        }
+    }
+
     function setHoleCardsCss() {
         $scope.holeCard1Class = "card rank-" + $scope.holeCard1ConvertedRank + " " + $scope.holeCard1SuitWritten;
         $scope.holeCard2Class = "card rank-" + $scope.holeCard2ConvertedRank + " " + $scope.holeCard2SuitWritten;
@@ -142,16 +205,22 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     $scope.submitMyAction = function(action) {
-        alert(action);
-
         $scope.computerGame.myAction = action;
-
-        alert($scope.computerGame.myAction);
 
         $http.post('/submitMyAction/', $scope.computerGame).success(function(data) {
             setScopePropertiesCorrect(data);
 
-            alert("Sjaakie-son!");
+            $scope.flopCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[0].rank);
+            $scope.flopCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[1].rank);
+            $scope.flopCard3ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[2].rank);
+
+            setFlopCard1SuitWritten();
+            setFlopCard2SuitWritten();
+            setFlopCard3SuitWritten();
+
+            $scope.flopCard1Class = "card rank-" + $scope.flopCard1ConvertedRank + " " + $scope.flopCard1SuitWritten;
+            $scope.flopCard2Class = "card rank-" + $scope.flopCard2ConvertedRank + " " + $scope.flopCard2SuitWritten;
+            $scope.flopCard3Class = "card rank-" + $scope.flopCard3ConvertedRank + " " + $scope.flopCard3SuitWritten;
         })
     }
 });

@@ -12,12 +12,17 @@ public class ComputerGame {
     private List<Card> deck;
     private List<Card> myHoleCards;
     private List<Card> computerHoleCards;
+    private List<Card> flopCards;
+    private Card turnCard;
+    private Card riverCard;
     private double smallBlind;
     private double bigBlind;
     private double myStack;
     private double computerStack;
-    private double myBetSize;
-    private double computerBetSize;
+    private double myIncrementalBetSize;
+    private double myTotalBetSize;
+    private double computerIncrementalBetSize;
+    private double computerTotalBetSize;
     private double potSize;
     private boolean computerIsButton;
     private Action computerAction;
@@ -90,14 +95,18 @@ public class ComputerGame {
     private void postBlinds() {
         if(computerIsButton) {
             myStack = myStack - bigBlind;
-            myBetSize = bigBlind;
+            myIncrementalBetSize = bigBlind;
+            myTotalBetSize = bigBlind;
             computerStack = computerStack - smallBlind;
-            computerBetSize = smallBlind;
+            computerIncrementalBetSize = smallBlind;
+            computerTotalBetSize = smallBlind;
         } else {
             myStack = myStack - smallBlind;
-            myBetSize = smallBlind;
+            myIncrementalBetSize = smallBlind;
+            myTotalBetSize = smallBlind;
             computerStack = computerStack - bigBlind;
-            computerBetSize = bigBlind;
+            computerIncrementalBetSize = smallBlind;
+            computerTotalBetSize = bigBlind;
         }
     }
 
@@ -110,9 +119,10 @@ public class ComputerGame {
 
         String writtenComputerAction = computerAction.getWrittenAction();
         if(!writtenComputerAction.contains("fold") && !writtenComputerAction.contains("check")) {
-            computerStack = computerStack - computerAction.getSizing();
-            computerBetSize = computerBetSize + computerAction.getSizing();
-            potSize = potSize + computerAction.getSizing();
+            computerIncrementalBetSize = computerAction.getSizing() - computerTotalBetSize;
+            computerStack = computerStack - computerIncrementalBetSize;
+            computerTotalBetSize = computerAction.getSizing();
+            potSize = potSize + computerIncrementalBetSize;
             computerIsToAct = false;
         } else if(writtenComputerAction.contains("fold")) {
             finishHand();
@@ -123,7 +133,7 @@ public class ComputerGame {
     }
 
     public void calculatePotSize() {
-        potSize = myBetSize + computerBetSize;
+        potSize = myTotalBetSize + computerTotalBetSize;
     }
 
     private void finishHand() {
@@ -133,14 +143,60 @@ public class ComputerGame {
     public ComputerGame submitHumanActionAndDoComputerAction() {
 
         //set correct bet and stacksizes
+        processMyStackAndBetsize();
 
         //set correct handPath
+
+        //proceed to next street/finish if necessary
+        proceedToNextStreetOrFinishHand();
 
         //do computer action
 
         //return computerGame
 
-        return null;
+        return this;
+    }
+
+    private void processMyStackAndBetsize() {
+        if(myAction.equals("fold")) {
+            finishHand();
+        } else if(myAction.equals("check")) {
+            computerIsToAct = true;
+        } else if(myAction.equals("call")) {
+            myStack = myStack - (computerTotalBetSize - myIncrementalBetSize);
+            potSize = potSize + (computerTotalBetSize - myIncrementalBetSize);
+            myIncrementalBetSize = 0;
+            myTotalBetSize = 0;
+        } else {
+            myIncrementalBetSize = myTotalBetSize - myIncrementalBetSize;
+            myStack = myStack - myIncrementalBetSize;
+            potSize = potSize + myIncrementalBetSize;
+        }
+    }
+
+    private void proceedToNextStreetOrFinishHand() {
+        if(flopCards == null) {
+            dealFlopCards();
+        } else if (turnCard == null) {
+            dealTurnCard();
+        } else if (riverCard == null) {
+            dealRiverCard();
+        }
+    }
+
+    private void dealFlopCards() {
+        flopCards = new ArrayList<>();
+        flopCards.add(getAndRemoveRandomCardFromDeck());
+        flopCards.add(getAndRemoveRandomCardFromDeck());
+        flopCards.add(getAndRemoveRandomCardFromDeck());
+    }
+
+    private void dealTurnCard() {
+        turnCard = getAndRemoveRandomCardFromDeck();
+    }
+
+    private void dealRiverCard() {
+        riverCard = getAndRemoveRandomCardFromDeck();
     }
 
 
@@ -201,20 +257,20 @@ public class ComputerGame {
         this.computerStack = computerStack;
     }
 
-    public double getMyBetSize() {
-        return myBetSize;
+    public double getMyTotalBetSize() {
+        return myTotalBetSize;
     }
 
-    public void setMyBetSize(double myBetSize) {
-        this.myBetSize = myBetSize;
+    public void setMyTotalBetSize(double myTotalBetSize) {
+        this.myTotalBetSize = myTotalBetSize;
     }
 
-    public double getComputerBetSize() {
-        return computerBetSize;
+    public double getComputerTotalBetSize() {
+        return computerTotalBetSize;
     }
 
-    public void setComputerBetSize(double computerBetSize) {
-        this.computerBetSize = computerBetSize;
+    public void setComputerTotalBetSize(double computerTotalBetSize) {
+        this.computerTotalBetSize = computerTotalBetSize;
     }
 
     public double getPotSize() {
@@ -279,5 +335,45 @@ public class ComputerGame {
 
     public void setComputerIsButton(boolean computerIsButton) {
         this.computerIsButton = computerIsButton;
+    }
+
+    public double getMyIncrementalBetSize() {
+        return myIncrementalBetSize;
+    }
+
+    public void setMyIncrementalBetSize(double myIncrementalBetSize) {
+        this.myIncrementalBetSize = myIncrementalBetSize;
+    }
+
+    public double getComputerIncrementalBetSize() {
+        return computerIncrementalBetSize;
+    }
+
+    public void setComputerIncrementalBetSize(double computerIncrementalBetSize) {
+        this.computerIncrementalBetSize = computerIncrementalBetSize;
+    }
+
+    public List<Card> getFlopCards() {
+        return flopCards;
+    }
+
+    public void setFlopCards(List<Card> flopCards) {
+        this.flopCards = flopCards;
+    }
+
+    public Card getTurnCard() {
+        return turnCard;
+    }
+
+    public void setTurnCard(Card turnCard) {
+        this.turnCard = turnCard;
+    }
+
+    public Card getRiverCard() {
+        return riverCard;
+    }
+
+    public void setRiverCard(Card riverCard) {
+        this.riverCard = riverCard;
     }
 }

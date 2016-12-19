@@ -77,8 +77,8 @@
             </div>
 
             <div>
-                <span id="my_bet_size">{{computerGame.myBetSize}}</span>
-                <span id="computer_bet_size">{{computerGame.computerBetSize}}</span>
+                <span id="my_bet_size">{{computerGame.myTotalBetSize}}</span>
+                <span id="computer_bet_size">{{computerGame.computerTotalBetSize}}</span>
             </div>
 
             <div id="pot">
@@ -88,22 +88,9 @@
             <div><button class="action_button" ng-click="submitMyAction(fold)">fold</button></div>
             <div><button class="action_button" ng-click="submitMyAction(check)">check</button></div>
             <div><button class="action_button" ng-click="submitMyAction(call)">call</button></div>
-            <div>
-                <span>
-                    <button class="action_button" ng-click="submitMyAction(bet)">bet</button>
-                </span>
-                <span>
-                    <input type="text" ng-model="myBetSize">
-                </span>
-            </div>
-            <div>
-                <span>
-                    <button class="action_button" ng-click="submitMyAction(raise)">raise</button>
-                </span>
-                <span>
-                    <input type="text" ng-model="myBetSize">
-                </span>
-            </div>
+            <div><button class="action_button" ng-click="submitMyAction(bet)">bet</button></div>
+            <div><button class="action_button" ng-click="submitMyAction(raise)">raise</button></div>
+            <div><input type="text" ng-model="computerGame.myTotalBetSize"></div>
         </div>
     </body>
 </html>
