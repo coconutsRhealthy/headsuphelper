@@ -1,6 +1,10 @@
 package com.lennart.model.pokergame;
 
 import com.lennart.model.rangebuilder.RangeBuilder;
+import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by LPO10346 on 10/12/2016.
@@ -9,8 +13,10 @@ public class Action {
     //Future class to determine your suggestedAction
 
     private double sizing;
+    private String lastAction;
     private String writtenAction;
     private PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
+    private PostFlopActionBuilder postFlopActionBuilder = new PostFlopActionBuilder();
 
     public Action() {
         //default constructor
@@ -19,10 +25,16 @@ public class Action {
     public Action(ComputerGame computerGame) {
         switch(computerGame.getHandPath()) {
             case "05betF1bet":
-                computerGame.setHandPath(preflopActionBuilder.get05betF1bet(computerGame));
+                lastAction = preflopActionBuilder.get05betF1bet(computerGame);
+                computerGame.setHandPath(computerGame.getHandPath() + lastAction);
                 sizing = preflopActionBuilder.getSize(computerGame);
                 writtenAction = "Computer raises";
                 break;
+            case "2bet":
+                FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
+                Map<Integer, Set<Set<Card>>> sortedOpponentRange = flopRangeBuilder.get2betCheck(computerGame.getComputerHoleCards());
+                lastAction = postFlopActionBuilder.getAction(sortedOpponentRange);
+
             default:
                 System.out.println("no action available for handpath: " + computerGame.getHandPath());
                 sizing = 0;
@@ -43,6 +55,14 @@ public class Action {
 
     public void setWrittenAction(String writtenAction) {
         this.writtenAction = writtenAction;
+    }
+
+    public String getLastAction() {
+        return lastAction;
+    }
+
+    public void setLastAction(String lastAction) {
+        this.lastAction = lastAction;
     }
 
     public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {

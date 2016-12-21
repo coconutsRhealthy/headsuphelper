@@ -146,11 +146,16 @@ public class ComputerGame {
         processMyStackAndBetsize();
 
         //set correct handPath
+        updateHandPath();
 
         //proceed to next street/finish if necessary
-        proceedToNextStreetOrFinishHand();
+        if(myAction.equals("call") || (myAction.equals("check") && !computerIsButton)) {
+            resetComputerBetsize();
+            proceedToNextStreetOrFinishHand();
+        }
 
         //do computer action
+        computerAction = new Action(this);
 
         //return computerGame
 
@@ -197,6 +202,29 @@ public class ComputerGame {
 
     private void dealRiverCard() {
         riverCard = getAndRemoveRandomCardFromDeck();
+    }
+
+    private void updateHandPath() {
+        if(myAction.equals("check")) {
+            if(computerIsButton) {
+                handPath = handPath + "Fcheck";
+            }
+        } else if(myAction.equals("bet")) {
+            handPath = handPath + "F1bet";
+        } else if(myAction.equals("call")) {
+            //handpath stays the same
+        } else if(myAction.equals("raise")) {
+            if(computerAction.getLastAction().contains("1")){
+                handPath = handPath + "F2bet";
+            } else if (computerAction.getLastAction().contains("2")){
+                handPath = handPath + "F3bet";
+            }
+        }
+    }
+
+    private void resetComputerBetsize() {
+        computerIncrementalBetSize = 0;
+        computerTotalBetSize = 0;
     }
 
 
