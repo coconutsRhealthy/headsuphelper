@@ -13,7 +13,6 @@ public class Action {
     //Future class to determine your suggestedAction
 
     private double sizing;
-    private String lastAction;
     private String writtenAction;
     private PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
     private PostFlopActionBuilder postFlopActionBuilder = new PostFlopActionBuilder();
@@ -25,15 +24,13 @@ public class Action {
     public Action(ComputerGame computerGame) {
         switch(computerGame.getHandPath()) {
             case "05betF1bet":
-                lastAction = preflopActionBuilder.get05betF1bet(computerGame);
-                computerGame.setHandPath(computerGame.getHandPath() + lastAction);
+                computerGame.setHandPath(preflopActionBuilder.get05betF1bet(computerGame));
                 sizing = preflopActionBuilder.getSize(computerGame);
                 writtenAction = "Computer raises";
                 break;
             case "2bet":
                 FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
                 Map<Integer, Set<Set<Card>>> sortedOpponentRange = flopRangeBuilder.get2betCheck(computerGame.getComputerHoleCards());
-                lastAction = postFlopActionBuilder.getAction(sortedOpponentRange);
 
             default:
                 System.out.println("no action available for handpath: " + computerGame.getHandPath());
@@ -57,40 +54,32 @@ public class Action {
         this.writtenAction = writtenAction;
     }
 
-    public String getLastAction() {
-        return lastAction;
-    }
-
-    public void setLastAction(String lastAction) {
-        this.lastAction = lastAction;
-    }
-
     public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {
 
         //evaluate your hand against opponentRange
-            //if 80%> valueBet 80% van de keren op flop en turn, en 100% op river
-            //if 60% - 80% valueBet X% van de keren op flop, turn en river
+        //if 80%> valueBet 80% van de keren op flop en turn, en 100% op river
+        //if 60% - 80% valueBet X% van de keren op flop, turn en river
 
         //draws
-            //bet X% van de keren met je draws op de flop en turn
+        //bet X% van de keren met je draws op de flop en turn
 
         //air
-            //bet X% van de keren met je air, afhankelijk van board texture
-                //flop
-                    //*!*hoe vaak komen de board kaarten voor in de range die jouw opponent jou geeft. En zijn eigen range?
-                    //hoe wet is de flop?
-                //turn
-                    //*!*hoe vaak komt de turn kaart voor in de range die jouw opponent jou geeft. En in zijn eigen range?
-                    //zijn er meer draws gearriveerd?
-                    //zijn er veel draws gecomplete?
-                    //is er overcard bijgekomen?
-                    //is boat mogelijk geworden?
-                //river
-                    //*!*hoe vaak komt de river kaart voor in de range die jouw opponent jou geeft. En in zijn eigen range?
-                    //hoeveel draws zijn er gearriveerd?
-                    //is er boat of beter mogelijk geworden?
-                    //is er overcard bijgekomen?
-                    //bepaal je showdown value
+        //bet X% van de keren met je air, afhankelijk van board texture
+        //flop
+        //*!*hoe vaak komen de board kaarten voor in de range die jouw opponent jou geeft. En zijn eigen range?
+        //hoe wet is de flop?
+        //turn
+        //*!*hoe vaak komt de turn kaart voor in de range die jouw opponent jou geeft. En in zijn eigen range?
+        //zijn er meer draws gearriveerd?
+        //zijn er veel draws gecomplete?
+        //is er overcard bijgekomen?
+        //is boat mogelijk geworden?
+        //river
+        //*!*hoe vaak komt de river kaart voor in de range die jouw opponent jou geeft. En in zijn eigen range?
+        //hoeveel draws zijn er gearriveerd?
+        //is er boat of beter mogelijk geworden?
+        //is er overcard bijgekomen?
+        //bepaal je showdown value
 
 
 

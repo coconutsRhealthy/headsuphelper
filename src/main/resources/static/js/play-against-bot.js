@@ -68,9 +68,9 @@ mainApp.controller('pokerController', function($scope, $http) {
         $scope.holeCard2Class = "card rank-" + $scope.holeCard2ConvertedRank + " " + $scope.holeCard2SuitWritten;
 
         if($scope.computerGame.flopCards != undefined) {
-            $scope.holeCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[0].rank);
-            $scope.holeCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[1].rank);
-            $scope.holeCard3ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[2].rank);
+            $scope.flopCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[0].rank);
+            $scope.flopCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[1].rank);
+            $scope.flopCard3ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.flopCards[2].rank);
 
             setSuitWrittenAndUniCode("flopCard1SuitWritten", "flopCard1SuitUniCode", $scope.computerGame.flopCards[0].suit);
             setSuitWrittenAndUniCode("flopCard2SuitWritten", "flopCard2SuitUniCode", $scope.computerGame.flopCards[1].suit);

@@ -155,7 +155,7 @@ public class ComputerGame {
         }
 
         //do computer action
-        computerAction = new Action(this);
+        doComputerAction();
 
         //return computerGame
 
@@ -208,15 +208,19 @@ public class ComputerGame {
         if(myAction.equals("check")) {
             if(computerIsButton) {
                 handPath = handPath + "Fcheck";
+            } else {
+                //handPath stays the same
             }
+        } else if(myAction.equals("call")) {
+            //handPath stays the same
         } else if(myAction.equals("bet")) {
             handPath = handPath + "F1bet";
-        } else if(myAction.equals("call")) {
-            //handpath stays the same
         } else if(myAction.equals("raise")) {
-            if(computerAction.getLastAction().contains("1")){
+            String computerLastAction = handPath.substring(handPath.length() - 4);
+
+            if(computerLastAction.contains("1")) {
                 handPath = handPath + "F2bet";
-            } else if (computerAction.getLastAction().contains("2")){
+            } else if(computerLastAction.contains("2")) {
                 handPath = handPath + "F3bet";
             }
         }
