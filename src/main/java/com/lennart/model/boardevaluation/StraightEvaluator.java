@@ -86,7 +86,7 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
             }
 
             if(isBoardConnected(board)) {
-                Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+                Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
                 allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
                 Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 

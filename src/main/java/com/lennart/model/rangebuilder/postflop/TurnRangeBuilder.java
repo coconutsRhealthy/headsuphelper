@@ -10,8 +10,14 @@ import java.util.*;
  */
 public class TurnRangeBuilder {
 
-    RangeBuilder rangeBuilder = new RangeBuilder();
-    FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
+    RangeBuilder rangeBuilder;
+    FlopRangeBuilder flopRangeBuilder;
+
+    public TurnRangeBuilder(RangeBuilder rangeBuilder, FlopRangeBuilder flopRangeBuilder) {
+        this.rangeBuilder = rangeBuilder;
+        this.flopRangeBuilder = flopRangeBuilder;
+    }
+
 
     //IP
 
@@ -44,7 +50,7 @@ public class TurnRangeBuilder {
         //air
         turnRange = rangeBuilder.addXPercentAirCombos(holeCards, board, turnRange, rangeResultingFromPreviousActions, 0.1);
 
-        Map<Integer, Set<Set<Card>>> turnRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, turnRange, holeCards);
+        Map<Integer, Set<Set<Card>>> turnRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, turnRange);
 
         double numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(turnRangeToReturn);
 
@@ -90,7 +96,7 @@ public class TurnRangeBuilder {
         //air
         turnRange = rangeBuilder.addXPercentAirCombos(holeCards, board, turnRange, rangeResultingFromPreviousActions, 0.15);
 
-        Map<Integer, Set<Set<Card>>> turnRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, turnRange, holeCards);
+        Map<Integer, Set<Set<Card>>> turnRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, turnRange);
 
         double numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(turnRangeToReturn);
 

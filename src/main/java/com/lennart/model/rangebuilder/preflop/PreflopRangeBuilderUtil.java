@@ -3,7 +3,6 @@ package com.lennart.model.rangebuilder.preflop;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.Game;
-import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
 
@@ -12,24 +11,12 @@ import java.util.*;
  */
 public class PreflopRangeBuilderUtil {
 
-    private RangeBuilder rangeBuilder = new RangeBuilder();
-    private static Map<Integer, Set<Card>> allStartHands = new HashMap<>();
+    private BoardEvaluator boardEvaluator;
+    private Map<Integer, Set<Card>> allStartHands = new HashMap<>();
 
-    static {
-        Map<Integer, List<Card>> allPossibleStartHands = new BoardEvaluator().getAllPossibleStartHands();
-
-        List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
-        Set<Set<Card>> asSet = new HashSet<>();
-
-        for(List<Card> l : asList) {
-            Set<Card> s = new HashSet<>();
-            s.addAll(l);
-            asSet.add(s);
-        }
-
-        for(Set<Card> combo : asSet) {
-            allStartHands.put(allStartHands.size(), combo);
-        }
+    public PreflopRangeBuilderUtil(BoardEvaluator boardEvaluator) {
+        this.boardEvaluator = boardEvaluator;
+        allStartHands = fillAllStartHands(allStartHands);
     }
 
     public Map<Integer, Set<Card>> getBroadWayHoleCards(double percentage) {
@@ -76,7 +63,7 @@ public class PreflopRangeBuilderUtil {
     }
 
     public Map<Integer, Set<Card>> getPocketPairs(int minimumRankOfHighestCard, double percentage) {
-        Map<Integer, List<Card>> allPocketPairStartHands = new BoardEvaluator().getAllPocketPairStartHands();
+        Map<Integer, List<Card>> allPocketPairStartHands = boardEvaluator.getAllPocketPairStartHands();
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
@@ -254,7 +241,7 @@ public class PreflopRangeBuilderUtil {
                                                                                          allCombosNoRestCombos) {
         Map<Integer, Set<Card>> mapToReturn = new HashMap<>();
         Set<Set<Card>> allCombosNoRestCombosAsSet = new HashSet<>();
-        Map<Integer, Set<Card>> allCombos = new BoardEvaluator().getAllPossibleStartHandsAsSets();
+        Map<Integer, Set<Card>> allCombos = getAllPossibleStartHandsAsSets();
         Set<Set<Card>> allCombosAsSet = new HashSet<>();
 
         for(Map<Integer, Map<Integer, Set<Card>>> comboMapOuter : allCombosNoRestCombos) {
@@ -306,7 +293,50 @@ public class PreflopRangeBuilderUtil {
         return simpleComboMap;
     }
 
+    //Corrected for known boardCards, only use this method in RangeBuilder classes
+    public Map<Integer, Set<Card>> getAllPossibleStartHandsAsSets() {
+        Map<Integer, List<Card>> allPossibleStartHandsAsAlist = boardEvaluator.getAllPossibleStartHandsNew();
+        Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
+
+        Set<Card> knownGameCards = new HashSet<>();
+        knownGameCards.addAll(Game.getKnownGameCards());
+
+        Set<Card> knownGameCardsCopy = new HashSet<>();
+        knownGameCardsCopy.addAll(Game.getKnownGameCards());
+
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsAlist.entrySet()) {
+            if(knownGameCardsCopy.add(entry.getValue().get(0)) && knownGameCardsCopy.add(entry.getValue().get(1))) {
+                Set<Card> combo = new HashSet<>();
+                combo.addAll(entry.getValue());
+                allPossibleStartHandsAsSet.put(allPossibleStartHandsAsSet.size(), combo);
+            }
+            knownGameCardsCopy.clear();
+            knownGameCardsCopy.addAll(knownGameCards);
+        }
+        return allPossibleStartHandsAsSet;
+    }
+
     //helper methods
+
+    //previously this was a static block in top of class
+    private Map<Integer, Set<Card>> fillAllStartHands(Map<Integer, Set<Card>> allStartHands) {
+        Map<Integer, List<Card>> allPossibleStartHands = boardEvaluator.getAllPossibleStartHandsNew();
+
+        List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
+        Set<Set<Card>> asSet = new HashSet<>();
+
+        for(List<Card> l : asList) {
+            Set<Card> s = new HashSet<>();
+            s.addAll(l);
+            asSet.add(s);
+        }
+
+        for(Set<Card> combo : asSet) {
+            allStartHands.put(allStartHands.size(), combo);
+        }
+        return allStartHands;
+    }
+
     private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited,
                                                                       double percentage) {
         Map<Integer, Set<Card>> suitedOrOffSuitConnectors = new HashMap<>();

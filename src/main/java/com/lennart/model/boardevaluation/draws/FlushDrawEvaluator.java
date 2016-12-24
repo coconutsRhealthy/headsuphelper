@@ -151,7 +151,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         }
 
         if(threeToFlushOnBoard) {
-            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
             for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
                 if(entry.getValue().get(0).getSuit() == flushSuit && entry.getValue().get(1).getSuit() != flushSuit) {
                     flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());

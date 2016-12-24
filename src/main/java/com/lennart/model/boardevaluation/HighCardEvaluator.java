@@ -11,7 +11,7 @@ public class HighCardEvaluator extends BoardEvaluator implements ComboComparator
 
     public Map<Integer, Set<Set<Card>>> getHighCardCombos(List<Card> board) {
         //get alle mogelijke starthanden
-        Map<Integer, List<Card>> highCardCombos = getAllPossibleStartHands();
+        Map<Integer, List<Card>> highCardCombos = getAllPossibleStartHandsNew();
 
         //verwijder alle combos die al in de andere klassen naar voren komen
         Map<Integer, Set<Set<Card>>> pairCombos = new PairEvaluator().getCombosThatMakePairInitialize(board);

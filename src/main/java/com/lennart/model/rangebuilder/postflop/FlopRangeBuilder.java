@@ -11,22 +11,24 @@ import java.util.*;
  */
 public class FlopRangeBuilder {
 
-    RangeBuilder rangeBuilder = new RangeBuilder();
-    private PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
-    private Map<Integer, Set<Card>> opponent2betRange = preflopRangeBuilder.getOpponent2betRange();
-    private Map<Integer, Set<Card>> opponent3betRange = preflopRangeBuilder.getOpponent3betRange();
-    private Map<Integer, Set<Card>> opponentCall3betRange = preflopRangeBuilder.getOpponentCall3betRange();
+    private RangeBuilder rangeBuilder;
+    private PreflopRangeBuilder preflopRangeBuilder;
+
+    public FlopRangeBuilder(RangeBuilder rangeBuilder, PreflopRangeBuilder preflopRangeBuilder) {
+        this.rangeBuilder = rangeBuilder;
+        this.preflopRangeBuilder = preflopRangeBuilder;
+    }
 
     //IP
 
-    public Map<Integer, Set<Set<Card>>> get2betCheck(List<Card> holeCards) {
+    public Map<Integer, Set<Set<Card>>> get2betCheck() {
         //preflop
         Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall2betRange();
 
         //postflop
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
-        return rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        return rangeBuilder.createRange(preflopRange, flopRange);
     }
 
     //40% -> 50% gemaakt
@@ -63,7 +65,7 @@ public class FlopRangeBuilder {
         //beetje air
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.1);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -101,7 +103,7 @@ public class FlopRangeBuilder {
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.18);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -112,10 +114,10 @@ public class FlopRangeBuilder {
     //CHECK: 27,9%
     public Map<Integer, Set<Set<Card>>> getCall3betCheck(List<Card> board, List<Card> holeCards) {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
-        Map<Integer, Set<Card>> preflopRange = opponent3betRange;
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent3betRange();
         Map<Integer, Set<Card>> oppositeRange = rangeBuilder.getOppositeRangeAtFlop(getCall3betCall1bet(board, holeCards), preflopRange);
         flopRange.put(flopRange.size(), oppositeRange);
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -128,7 +130,7 @@ public class FlopRangeBuilder {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
         //preflop
-        Map<Integer, Set<Card>> preflopRange = opponent3betRange;
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent3betRange();
 
         //postflop
 
@@ -161,7 +163,7 @@ public class FlopRangeBuilder {
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.25);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -196,7 +198,7 @@ public class FlopRangeBuilder {
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, rangeResultingFromPreviousActions, 0.16);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -211,10 +213,10 @@ public class FlopRangeBuilder {
     //CHECK: 19,8%
     public Map<Integer, Set<Set<Card>>> getCall2betCheck(List<Card> board, List<Card> holeCards) {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
-        Map<Integer, Set<Card>> preflopRange = opponent2betRange;
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent2betRange();
         Map<Integer, Set<Card>> oppositeRange = rangeBuilder.getOppositeRangeAtFlop(getCall2betCall1bet(board, holeCards), preflopRange);
         flopRange.put(flopRange.size(), oppositeRange);
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int x = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -227,7 +229,7 @@ public class FlopRangeBuilder {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
         //preflop
-        Map<Integer, Set<Card>> preflopRange = opponent2betRange;
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponent2betRange();
 
         //postflop
 
@@ -254,7 +256,7 @@ public class FlopRangeBuilder {
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.2);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -292,7 +294,7 @@ public class FlopRangeBuilder {
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, rangeResultingFromPreviousActions, 0.1);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(rangeResultingFromPreviousActions, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -303,10 +305,10 @@ public class FlopRangeBuilder {
     //CHECK: 35%
     public Map<Integer, Set<Set<Card>>> get3betCheck(List<Card> board, List<Card> holeCards) {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
-        Map<Integer, Set<Card>> preflopRange = opponentCall3betRange;
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall3betRange();
         Map<Integer, Set<Card>> oppositeRange = rangeBuilder.getOppositeRangeAtFlop(get3betCall1bet(board, holeCards), preflopRange);
         flopRange.put(flopRange.size(), oppositeRange);
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int x = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -341,7 +343,7 @@ public class FlopRangeBuilder {
         //de backdoors en air
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.1);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 
@@ -355,7 +357,7 @@ public class FlopRangeBuilder {
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
 
         //preflop
-        Map<Integer, Set<Card>> preflopRange = opponentCall3betRange;
+        Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall3betRange();
 
         //postflop
 
@@ -381,7 +383,7 @@ public class FlopRangeBuilder {
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.2);
 
-        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange, holeCards);
+        Map<Integer, Set<Set<Card>>> flopRangeToReturn = rangeBuilder.createRange(preflopRange, flopRange);
 
         int numberOfCombosToReturn = rangeBuilder.countNumberOfCombos(flopRangeToReturn);
 

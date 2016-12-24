@@ -3,6 +3,7 @@ package com.lennart.model.boardevaluation;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.ComputerGame;
 import com.lennart.model.pokergame.Game;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -14,28 +15,57 @@ import java.util.*;
  */
 public class BoardEvaluator {
 
-    private static Map<Integer, Set<Set<Card>>> sortedCombos;
-    private static Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
+    private Map<Integer, Set<Set<Card>>> sortedCombosNew;
+    private Map<Integer, List<Card>> allPossibleStartHandsNew;
 
-    static {
-        Map<Integer, List<Card>> allPossibleStartHandsInStaticBlock = new HashMap<>();
-        BoardEvaluator boardEvaluator = new BoardEvaluator();
-        List<Card> completeCardDeck = boardEvaluator.getCompleteCardDeck();
+    public BoardEvaluator() {
+        //default constructor
+    }
+
+    public BoardEvaluator(ComputerGame computerGame) {
+        allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
+
+        if(computerGame.getFlopCards() != null) {
+            sortedCombosNew = getSortedCombosInitialize(computerGame.getBoard());
+        }
+    }
+
+    public Map<Integer, Set<Set<Card>>> getSortedCombosNew() {
+        return sortedCombosNew;
+    }
+
+    public void setSortedCombosNew(Map<Integer, Set<Set<Card>>> sortedCombosNew) {
+        this.sortedCombosNew = sortedCombosNew;
+    }
+
+    public Map<Integer, List<Card>> getAllPossibleStartHandsNew() {
+        return allPossibleStartHandsNew;
+    }
+
+    public void setAllPossibleStartHandsNew(Map<Integer, List<Card>> allPossibleStartHandsNew) {
+        this.allPossibleStartHandsNew = allPossibleStartHandsNew;
+    }
+
+    public Map<Integer, List<Card>> getAllPossibleStartHandsInitialize() {
+        Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
+        List<Card> completeCardDeck = getCompleteCardDeck();
 
         int i = 1;
         for(int z = 0; z < 52; z++) {
             for(int q = 0; q < 52; q++) {
                 if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
-                    allPossibleStartHandsInStaticBlock.put(i, new ArrayList<>());
-                    allPossibleStartHandsInStaticBlock.get(i).add(completeCardDeck.get(z));
-                    allPossibleStartHandsInStaticBlock.get(i).add(completeCardDeck.get(q));
+                    allPossibleStartHands.put(i, new ArrayList<>());
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(z));
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(q));
                     i++;
                 }
             }
         }
 
-        List<List<Card>> asList = new ArrayList<>(allPossibleStartHandsInStaticBlock.values());
+        List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
         Set<Set<Card>> asSet = new HashSet<>();
+
+        allPossibleStartHands.clear();
 
         for(List<Card> l : asList) {
             Set<Card> s = new HashSet<>();
@@ -43,26 +73,27 @@ public class BoardEvaluator {
             asSet.add(s);
         }
 
-        for(Set<Card> pocketPairCombo : asSet) {
+        for(Set<Card> startHand : asSet) {
             List<Card> l = new ArrayList<>();
-            l.addAll(pocketPairCombo);
+            l.addAll(startHand);
             allPossibleStartHands.put(allPossibleStartHands.size(), l);
         }
+        return allPossibleStartHands;
     }
 
-    public Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
-        if(sortedCombos != null) {
-            return sortedCombos;
-        } else {
-            return getSortedCombosInitialize(board);
-        }
-    }
+//    public Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
+//        if(sortedCombos != null) {
+//            return sortedCombos;
+//        } else {
+//            return getSortedCombosInitialize(board);
+//        }
+//    }
 
-    public void resetSortedCombosAndDraws() {
-        BoardEvaluator.sortedCombos = null;
-        StraightDrawEvaluator.setCombosThatGiveAnyStraightDraw(null);
-        FlushDrawEvaluator.setAllFlushDraws(null);
-    }
+//    public void resetSortedCombosAndDraws() {
+//        BoardEvaluator.sortedCombos = null;
+//        StraightDrawEvaluator.setCombosThatGiveAnyStraightDraw(null);
+//        FlushDrawEvaluator.setAllFlushDraws(null);
+//    }
 
     public boolean isBoardRainbow(List<Card> board) {
         if(getNumberOfSuitedCardsOnBoard(board) == 0) {
@@ -404,7 +435,7 @@ public class BoardEvaluator {
     }
 
     protected Map<Integer, List<Card>> getAllStartHandsThatContainASpecificCard(Card card) {
-        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+        Map<Integer, List<Card>> allPossibleStartHands = allPossibleStartHandsNew;
         Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = new HashMap<>();
 
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
@@ -415,40 +446,17 @@ public class BoardEvaluator {
         return allStartHandsThatContainASpecificCard;
     }
 
-    public Map<Integer, List<Card>> getAllPossibleStartHands() {
-        Map<Integer, List<Card>> allPossibleStartHandsCopy = new HashMap<>();
+//    public Map<Integer, List<Card>> getAllPossibleStartHands() {
+//        Map<Integer, List<Card>> allPossibleStartHandsCopy = new HashMap<>();
+//
+//        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+//            allPossibleStartHandsCopy.put(allPossibleStartHandsCopy.size(), new ArrayList<>());
+//            allPossibleStartHandsCopy.get(allPossibleStartHandsCopy.size()-1).addAll(entry.getValue());
+//        }
+//        return allPossibleStartHandsCopy;
+//    }
 
-        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-            allPossibleStartHandsCopy.put(allPossibleStartHandsCopy.size(), new ArrayList<>());
-            allPossibleStartHandsCopy.get(allPossibleStartHandsCopy.size()-1).addAll(entry.getValue());
-        }
-        return allPossibleStartHandsCopy;
-    }
-
-    //Corrected for known boardCards, only use this method in RangeBuilder classes
-    public Map<Integer, Set<Card>> getAllPossibleStartHandsAsSets() {
-        Map<Integer, List<Card>> allPossibleStartHandsAsAlist = getAllPossibleStartHands();
-        Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
-
-        Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(Game.getKnownGameCards());
-
-        Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(Game.getKnownGameCards());
-
-        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsAlist.entrySet()) {
-            if(knownGameCardsCopy.add(entry.getValue().get(0)) && knownGameCardsCopy.add(entry.getValue().get(1))) {
-                Set<Card> combo = new HashSet<>();
-                combo.addAll(entry.getValue());
-                allPossibleStartHandsAsSet.put(allPossibleStartHandsAsSet.size(), combo);
-            }
-            knownGameCardsCopy.clear();
-            knownGameCardsCopy.addAll(knownGameCards);
-        }
-        return allPossibleStartHandsAsSet;
-    }
-
-    public List<Card> getCompleteCardDeck() {
+    public static List<Card> getCompleteCardDeck() {
         List<Card> completeCardDeck = new ArrayList<>();
 
         for(int i = 2; i <= 14; i++) {
@@ -482,7 +490,7 @@ public class BoardEvaluator {
 
     public Map<Integer, List<Card>> getAllPocketPairStartHands() {
         Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
-        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+        Map<Integer, List<Card>> allPossibleStartHands = allPossibleStartHandsNew;
 
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
             if(entry.getValue().get(0).getRank() == entry.getValue().get(1).getRank()) {
@@ -821,7 +829,7 @@ public class BoardEvaluator {
     }
 
     public  Map<Integer, Set<Set<Card>>> getSortedCombosInitialize(List<Card> board) {
-        Map<Integer, Set<Set<Card>>> sortedCombosMethod = new HashMap<>();
+        Map<Integer, Set<Set<Card>>> sortedCombos = new HashMap<>();
 
         Map<Integer, Set<Set<Card>>> highCardCombos = new HighCardEvaluator().getHighCardCombos(board);
         Map<Integer, Set<Set<Card>>> pairCombos = new PairEvaluator().getCombosThatMakePair();
@@ -834,43 +842,43 @@ public class BoardEvaluator {
         Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : straightFlushCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : fourOfAKindCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : fullHouseCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : flushCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : straightCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : threeOfAKindCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : twoPairCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : pairCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : highCardCombos.entrySet()) {
-            sortedCombosMethod.put(sortedCombosMethod.size(), entry.getValue());
+            sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
         Set<Set<Card>> allStartHandsSet = new HashSet<>();
-        Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
+        Map<Integer, List<Card>> allStartHands = allPossibleStartHandsNew;
         allStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
 
         for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
@@ -882,14 +890,13 @@ public class BoardEvaluator {
         Set<Set<Card>> sortedCombosAsSet = new HashSet<>();
         List<Set<Card>> sortedComboAsList = new ArrayList<>();
 
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosMethod.entrySet()) {
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
             for(Set<Card> s : entry.getValue()) {
                 sortedCombosAsSet.add(s);
                 sortedComboAsList.add(s);
             }
         }
-        sortedCombos = sortedCombosMethod;
-        return sortedCombosMethod;
+        return sortedCombos;
     }
 
     public Map<Integer, Set<Set<Card>>> removeDuplicateCombosPerCategory(Map<Integer, Set<Set<Card>>> categoryCombos,
@@ -930,15 +937,15 @@ public class BoardEvaluator {
         return cleanedSortedCombos;
     }
 
-    public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
-        Map<Integer, Set<Set<Card>>> copyOfAllSortedCombos = new HashMap<>();
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
-            copyOfAllSortedCombos.put(copyOfAllSortedCombos.size(), new HashSet<>());
-            copyOfAllSortedCombos.get(copyOfAllSortedCombos.size()-1).addAll(entry.getValue());
-        }
-        return copyOfAllSortedCombos;
-    }
+//    public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
+//        Map<Integer, Set<Set<Card>>> copyOfAllSortedCombos = new HashMap<>();
+//
+//        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+//            copyOfAllSortedCombos.put(copyOfAllSortedCombos.size(), new HashSet<>());
+//            copyOfAllSortedCombos.get(copyOfAllSortedCombos.size()-1).addAll(entry.getValue());
+//        }
+//        return copyOfAllSortedCombos;
+//    }
 
     public int getNumberOfArrivedDraws() {
         if(Game.getStreet().equals("Flop")) {

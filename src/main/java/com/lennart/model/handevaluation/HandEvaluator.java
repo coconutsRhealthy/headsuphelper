@@ -1,10 +1,7 @@
 package com.lennart.model.handevaluation;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
-import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
-import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.Game;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
@@ -13,10 +10,16 @@ import java.util.*;
  * Created by lennart on 1-10-16.
  */
 public class HandEvaluator {
-    BoardEvaluator boardEvaluator = new BoardEvaluator();
+    private BoardEvaluator boardEvaluator;
+    private RangeBuilder rangeBuilder;
 
-    public double getHandStrength(List<Card> hand, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombos(board);
+    public HandEvaluator(BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
+        this.boardEvaluator = boardEvaluator;
+        this.rangeBuilder = rangeBuilder;
+    }
+
+    public double getHandStrength(List<Card> hand) {
+        Map<Integer, Set<Set<Card>>> sortedCombos = boardEvaluator.getSortedCombosNew();
 
         Set<Card> handSet = new HashSet<>();
         handSet.addAll(hand);
@@ -108,7 +111,7 @@ public class HandEvaluator {
     public int getNumberOfArrivedDrawsInRange(String opponentRangeOrMyPerceivedRange) {
         Map<Integer, Set<Card>> arrivedStraightDraws = boardEvaluator.getArrivedStraightDraws();
         Map<Integer, Set<Card>> arrivedFlushDraws = boardEvaluator.getArrivedFlushDraws();
-        Map<Integer, Set<Set<Card>>> myPerceivedRange = new RangeBuilder().getRange(opponentRangeOrMyPerceivedRange);
+        Map<Integer, Set<Set<Card>>> myPerceivedRange = rangeBuilder.getRange(opponentRangeOrMyPerceivedRange);
 
         int counter = 0;
 

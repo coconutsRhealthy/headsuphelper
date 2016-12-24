@@ -37,7 +37,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
 
             return sortedCombos;
         } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
             Integer rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
@@ -63,7 +63,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             //alle combos die niet met de andere kaarten op het board pairen, geen pocket pair zijn, en niet met de trips
             //op het board pairen
 
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
             Integer rankOfTripsOnBoard = 0;

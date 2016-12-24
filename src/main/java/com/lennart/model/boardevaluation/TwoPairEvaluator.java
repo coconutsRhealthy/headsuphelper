@@ -21,7 +21,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -47,7 +47,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
 
             return sortedCombos;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -107,7 +107,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
             return sortedCombos;
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 

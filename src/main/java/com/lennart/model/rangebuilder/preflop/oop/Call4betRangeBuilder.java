@@ -20,8 +20,10 @@ public class Call4betRangeBuilder {
     private Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
-    public Call4betRangeBuilder() {
-        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
+    private PreflopRangeBuilderUtil p;
+
+    public Call4betRangeBuilder(PreflopRangeBuilderUtil p) {
+        this.p = p;
 
         comboMap100Percent.put(1, p.getOffSuitCombosOfGivenRanks(14, 12));
         comboMap100Percent.put(2, p.getOffSuitCombosOfGivenRanks(14, 11));
@@ -104,7 +106,6 @@ public class Call4betRangeBuilder {
     }
 
     public Map<Integer, Set<Card>> getOpponentCall4betRange() {
-        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
         Map<Integer, Set<Card>> opponentCall4betRange = new HashMap<>();
 
         opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap100Percent, 1);

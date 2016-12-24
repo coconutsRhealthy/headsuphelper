@@ -164,7 +164,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
         }
 
         if(boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             fourOfAKindCombos = getSortedCardComboMap(allPossibleStartHands, board, new FourOfAKindEvaluator());
             fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos, board);

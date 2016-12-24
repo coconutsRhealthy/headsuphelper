@@ -19,7 +19,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         Map<Integer, List<Card>> comboMap = new HashMap<>();
         Map<Integer, Set<Set<Card>>> sortedFullHouseCombos;
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
         Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
 
         //een pair op board
@@ -143,7 +143,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         if(boardContainsBoat(board)) {
             //alle combos, behalve combos die quads en straight flush maken
 
-            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
 
             //remove quads combos

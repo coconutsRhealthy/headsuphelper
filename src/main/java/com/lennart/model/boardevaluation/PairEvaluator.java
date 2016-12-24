@@ -20,7 +20,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
         Map<Integer, Set<Set<Card>>> sortedCombos;
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -67,7 +67,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
 
             return sortedCombos;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHands();
+            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -115,10 +115,9 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
         return new Comparator<List<Integer>>() {
             @Override
             public int compare(List<Integer> combo1, List<Integer> combo2) {
-                BoardEvaluator boardEvaluator = new BoardEvaluator();
-                List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
+                List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
-                if(boardEvaluator.getNumberOfPairsOnBoard(board) == 0) {
+                if(getNumberOfPairsOnBoard(board) == 0) {
                     int pairedCardCombo1;
                     int kickerCombo1;
 
@@ -184,7 +183,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
                     } else {
                         return -1;
                     }
-                } else if(boardEvaluator.getNumberOfPairsOnBoard(board) == 1) {
+                } else if(getNumberOfPairsOnBoard(board) == 1) {
                     if(board.size() > 3) {
                         int rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
                         boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));

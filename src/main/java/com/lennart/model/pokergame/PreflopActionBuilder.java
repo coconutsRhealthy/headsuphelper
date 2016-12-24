@@ -1,5 +1,6 @@
 package com.lennart.model.pokergame;
 
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip._2betRangeBuilder;
@@ -15,7 +16,11 @@ import java.util.*;
  */
 public class PreflopActionBuilder {
 
-    private PreflopRangeBuilderUtil preflopRangeBuilderUtil = new PreflopRangeBuilderUtil();
+    private PreflopRangeBuilderUtil preflopRangeBuilderUtil;
+
+    public PreflopActionBuilder(PreflopRangeBuilder preflopRangeBuilder) {
+        preflopRangeBuilderUtil = preflopRangeBuilder.getPreflopRangeBuilderUtil();
+    }
 
     public String get05betF1bet(ComputerGame computerGame) {
         Map<Integer, Set<Card>> comboMap100Percent;
@@ -24,7 +29,7 @@ public class PreflopActionBuilder {
         //Game.removeHoleCardsFromKnownGameCards();
         computerGame.removeHoleCardsFromKnownGameCards();
 
-        _2betRangeBuilder x2BetRangeBuilder = new _2betRangeBuilder();
+        _2betRangeBuilder x2BetRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
 
         comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x2BetRangeBuilder.getComboMap100Percent());
@@ -54,7 +59,7 @@ public class PreflopActionBuilder {
         }
 
         //Game.addHoleCardsToKnownGameCards();
-        computerGame.removeHoleCardsFromKnownGameCards();
+        computerGame.addHoleCardsToKnownGameCards();
 
         if(Math.random() <= percentageBet) {
             return "2bet";
@@ -63,11 +68,12 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String get2betF3bet(List<Card> holeCards) {
-        Game.removeHoleCardsFromKnownGameCards();
+    public String get2betF3bet(ComputerGame computerGame) {
+        //Game.removeHoleCardsFromKnownGameCards();
+        computerGame.removeHoleCardsFromKnownGameCards();
 
-        Call3betRangeBuilder call3betRangeBuilder = new Call3betRangeBuilder();
-        _4betRangeBuilder x4BetRangeBuilder = new _4betRangeBuilder();
+        Call3betRangeBuilder call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
+        _4betRangeBuilder x4BetRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);
 
         Map<Integer, Set<Card>> call3bet_comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call3betRangeBuilder.getComboMap100Percent());
@@ -112,7 +118,7 @@ public class PreflopActionBuilder {
         double percentage4bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(holeCards);
+        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
 
         percentageCall3bet = setPercentage(call3bet_comboMap100Percent, holeCardsAsSet, 1);
 
@@ -168,7 +174,8 @@ public class PreflopActionBuilder {
             percentage4bet = setPercentage(x4bet_comboMap6Percent, holeCardsAsSet, 0.06);
         }
 
-        Game.addHoleCardsToKnownGameCards();
+        //Game.addHoleCardsToKnownGameCards();
+        computerGame.addHoleCardsToKnownGameCards();
 
         double random = Math.random();
         if(random <= 1 - percentage4bet - percentageCall3bet) {
@@ -180,11 +187,12 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String get1betF2bet(List<Card> holeCards) {
-        Game.removeHoleCardsFromKnownGameCards();
+    public String get1betF2bet(ComputerGame computerGame) {
+        //Game.removeHoleCardsFromKnownGameCards();
+        computerGame.removeHoleCardsFromKnownGameCards();
 
-        Call2betRangeBuilder call2betRangeBuilder = new Call2betRangeBuilder();
-        _3betRangeBuilder x3BetRangeBuilder = new _3betRangeBuilder();
+        Call2betRangeBuilder call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
+        _3betRangeBuilder x3BetRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
 
         Map<Integer, Set<Card>> call2bet_comboMap90Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call2betRangeBuilder.getComboMap90Percent());
@@ -222,7 +230,7 @@ public class PreflopActionBuilder {
         double percentage3bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(holeCards);
+        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
 
         percentageCall2bet = setPercentage(call2bet_comboMap90Percent, holeCardsAsSet, 0.90);
 
@@ -269,7 +277,8 @@ public class PreflopActionBuilder {
             percentage3bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
 
-        Game.addHoleCardsToKnownGameCards();
+        //Game.addHoleCardsToKnownGameCards();
+        computerGame.addHoleCardsToKnownGameCards();
 
         double random = Math.random();
         if(random <= 1 - percentage3bet - percentageCall2bet) {
@@ -281,10 +290,11 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String get3betF4bet(List<Card> holeCards) {
-        Game.removeHoleCardsFromKnownGameCards();
+    public String get3betF4bet(ComputerGame computerGame) {
+        //Game.removeHoleCardsFromKnownGameCards();
+        computerGame.removeHoleCardsFromKnownGameCards();
 
-        Call4betRangeBuilder call4betRangeBuilder = new Call4betRangeBuilder();
+        Call4betRangeBuilder call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
 
         Map<Integer, Set<Card>> call4bet_comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4betRangeBuilder.getComboMap100Percent());
@@ -307,7 +317,7 @@ public class PreflopActionBuilder {
         double percentage5bet = 0;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(holeCards);
+        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
 
         percentageCall4bet = setPercentage(call4bet_comboMap100Percent, holeCardsAsSet, 1.0);
 
@@ -332,7 +342,8 @@ public class PreflopActionBuilder {
 
         //nog 5bet hier//
 
-        Game.addHoleCardsToKnownGameCards();
+        //Game.addHoleCardsToKnownGameCards();
+        computerGame.addHoleCardsToKnownGameCards();
 
         double random = Math.random();
         if(random <= 1 - percentage5bet - percentageCall4bet) {

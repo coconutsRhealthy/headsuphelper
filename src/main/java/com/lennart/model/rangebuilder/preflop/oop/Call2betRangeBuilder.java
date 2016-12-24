@@ -1,6 +1,5 @@
 package com.lennart.model.rangebuilder.preflop.oop;
 
-import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
@@ -23,8 +22,10 @@ public class Call2betRangeBuilder {
     private Map<Integer, Map<Integer, Set<Card>>> comboMapAllPossibleStartHands = new HashMap<>();
     private List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
 
-    public Call2betRangeBuilder() {
-        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
+    private PreflopRangeBuilderUtil p;
+
+    public Call2betRangeBuilder(PreflopRangeBuilderUtil p) {
+        this.p = p;
 
         comboMap90Percent.put(1, p.getSuitedCombosOfGivenRanks(10, 6));
         comboMap90Percent.put(2, p.getSuitedCombosOfGivenRanks(9, 5));
@@ -179,11 +180,10 @@ public class Call2betRangeBuilder {
 
         comboMapRest7Percent.put(1, p.removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
 
-        comboMapAllPossibleStartHands.put(1, new BoardEvaluator().getAllPossibleStartHandsAsSets());
+        comboMapAllPossibleStartHands.put(1, p.getAllPossibleStartHandsAsSets());
     }
 
     public Map<Integer, Set<Card>> getOpponentCall2betRange() {
-        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
         Map<Integer, Set<Card>> opponentCall2betRange = new HashMap<>();
 
         opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap90Percent, 0.90);

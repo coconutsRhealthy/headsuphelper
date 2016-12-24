@@ -2,6 +2,7 @@ package com.lennart.model.pokergame;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -67,14 +68,21 @@ public class Card implements Comparable<Card> {
             }
     }
 
+    private static List<Integer> getSortedCardRanks(List<Card> combo) {
+        List<Integer> sortedCardRanks = new ArrayList<>();
+        for(Card c : combo) {
+            sortedCardRanks.add(c.getRank());
+        }
+        Collections.sort(sortedCardRanks);
+        return sortedCardRanks;
+    }
+
     public static Comparator<List<Card>> sortCardCombosBasedOnRank() {
         return new Comparator<List<Card>>() {
             @Override
             public int compare(List<Card> xCombo1, List<Card> xCombo2) {
-                BoardEvaluator boardEvaluator = new BoardEvaluator();
-
-                List<Integer> combo1 = boardEvaluator.getSortedCardRanksFromCardList(xCombo1);
-                List<Integer> combo2 = boardEvaluator.getSortedCardRanksFromCardList(xCombo2);
+                List<Integer> combo1 = getSortedCardRanks(xCombo1);
+                List<Integer> combo2 = getSortedCardRanks(xCombo2);
 
                 if(Collections.max(combo2) > Collections.max(combo1)) {
                     return 1;

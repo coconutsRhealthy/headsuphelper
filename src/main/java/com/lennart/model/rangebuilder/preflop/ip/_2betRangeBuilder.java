@@ -15,8 +15,10 @@ public class _2betRangeBuilder {
     private Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
-    public _2betRangeBuilder() {
-        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
+    private PreflopRangeBuilderUtil p;
+
+    public _2betRangeBuilder(PreflopRangeBuilderUtil p) {
+        this.p = p;
 
         comboMap100Percent.put(1, p.getSuitedHoleCards(2, 2, 100));
         comboMap100Percent.put(2, p.getPocketPairs(2, 100));
@@ -61,7 +63,6 @@ public class _2betRangeBuilder {
     }
 
     public Map<Integer, Set<Card>> getOpponent2betRange() {
-        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil();
         Map<Integer, Set<Card>> opponent2betRange = new HashMap<>();
 
         opponent2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent2betRange, comboMap100Percent, 1);

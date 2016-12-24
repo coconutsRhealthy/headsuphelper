@@ -1,7 +1,10 @@
 package com.lennart.model.pokergame;
 
+import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 
 import java.util.Map;
 import java.util.Set;
@@ -14,14 +17,28 @@ public class Action {
 
     private double sizing;
     private String writtenAction;
-    private PreflopActionBuilder preflopActionBuilder = new PreflopActionBuilder();
-    private PostFlopActionBuilder postFlopActionBuilder = new PostFlopActionBuilder();
+    private BoardEvaluator boardEvaluator;
+    private RangeBuilder rangeBuilder;
+    private PreflopRangeBuilder preflopRangeBuilder;
+    private FlopRangeBuilder flopRangeBuilder;
+    private HandEvaluator handEvaluator;
+    private PreflopActionBuilder preflopActionBuilder;
+    private PostFlopActionBuilder postFlopActionBuilder;
+
 
     public Action() {
         //default constructor
     }
 
     public Action(ComputerGame computerGame) {
+        boardEvaluator = new BoardEvaluator(computerGame);
+        rangeBuilder = new RangeBuilder(boardEvaluator, computerGame.getComputerHoleCards());
+        preflopRangeBuilder = new PreflopRangeBuilder(boardEvaluator);
+        flopRangeBuilder = new FlopRangeBuilder(rangeBuilder, preflopRangeBuilder);
+        handEvaluator = new HandEvaluator(boardEvaluator, rangeBuilder);
+        preflopActionBuilder = new PreflopActionBuilder(preflopRangeBuilder);
+        postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame.getHandPath());
+
         switch(computerGame.getHandPath()) {
             case "05betF1bet":
                 computerGame.setHandPath(preflopActionBuilder.get05betF1bet(computerGame));
@@ -29,8 +46,10 @@ public class Action {
                 writtenAction = "Computer raises";
                 break;
             case "2bet":
-                FlopRangeBuilder flopRangeBuilder = new FlopRangeBuilder();
-                Map<Integer, Set<Set<Card>>> sortedOpponentRange = flopRangeBuilder.get2betCheck(computerGame.getComputerHoleCards());
+                //nu zet je de range
+                Map<Integer, Set<Set<Card>>> sortedOpponentRange = flopRangeBuilder.get2betCheck();
+
+                //en nu ga je de actie doen, met postFlopActionBuilder...
 
             default:
                 System.out.println("no action available for handpath: " + computerGame.getHandPath());
@@ -52,6 +71,38 @@ public class Action {
 
     public void setWrittenAction(String writtenAction) {
         this.writtenAction = writtenAction;
+    }
+
+    public PreflopActionBuilder getPreflopActionBuilder() {
+        return preflopActionBuilder;
+    }
+
+    public void setPreflopActionBuilder(PreflopActionBuilder preflopActionBuilder) {
+        this.preflopActionBuilder = preflopActionBuilder;
+    }
+
+    public PostFlopActionBuilder getPostFlopActionBuilder() {
+        return postFlopActionBuilder;
+    }
+
+    public void setPostFlopActionBuilder(PostFlopActionBuilder postFlopActionBuilder) {
+        this.postFlopActionBuilder = postFlopActionBuilder;
+    }
+
+    public BoardEvaluator getBoardEvaluator() {
+        return boardEvaluator;
+    }
+
+    public void setBoardEvaluator(BoardEvaluator boardEvaluator) {
+        this.boardEvaluator = boardEvaluator;
+    }
+
+    public FlopRangeBuilder getFlopRangeBuilder() {
+        return flopRangeBuilder;
+    }
+
+    public void setFlopRangeBuilder(FlopRangeBuilder flopRangeBuilder) {
+        this.flopRangeBuilder = flopRangeBuilder;
     }
 
     public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {

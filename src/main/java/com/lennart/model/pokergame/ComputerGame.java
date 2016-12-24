@@ -31,6 +31,9 @@ public class ComputerGame {
     private boolean computerIsToAct;
     private String myAction;
     private String mySize;
+    private List<Card> board;
+
+    private BoardEvaluator boardEvaluator;
 
     public ComputerGame() {
         //default constructor
@@ -57,7 +60,7 @@ public class ComputerGame {
     }
 
     private void getNewCardDeck() {
-        deck = (new BoardEvaluator().getCompleteCardDeck());
+        deck = (BoardEvaluator.getCompleteCardDeck());
     }
 
     private void dealHoleCards() {
@@ -112,6 +115,13 @@ public class ComputerGame {
 
     public void removeHoleCardsFromKnownGameCards() {
         knownGameCards.removeAll(computerHoleCards);
+    }
+
+    public void addHoleCardsToKnownGameCards() {
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(computerHoleCards);
+
+        knownGameCards.addAll(holeCardsAsSet);
     }
 
     private void doComputerAction() {
@@ -407,5 +417,13 @@ public class ComputerGame {
 
     public void setRiverCard(Card riverCard) {
         this.riverCard = riverCard;
+    }
+
+    public List<Card> getBoard() {
+        return board;
+    }
+
+    public void setBoard(List<Card> board) {
+        this.board = board;
     }
 }

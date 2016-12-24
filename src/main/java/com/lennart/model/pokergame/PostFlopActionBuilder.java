@@ -24,8 +24,15 @@ public class PostFlopActionBuilder {
     private boolean youHaveMediumFdOrSd;
     private boolean youHaveStrongBackdoor;
 
-    private BoardEvaluator boardEvaluator = new BoardEvaluator();
-    private HandEvaluator handEvaluator = new HandEvaluator();
+    private BoardEvaluator boardEvaluator;
+    private HandEvaluator handEvaluator;
+    private String handPath;
+
+    public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, String handPath) {
+        this.boardEvaluator = boardEvaluator;
+        this.handEvaluator = handEvaluator;
+        this.handPath = handPath;
+    }
 
     public String getAction(Map<Integer, Set<Set<Card>>> opponentRange) {
         double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRange(Game.getHoleCards(), opponentRange);
@@ -41,32 +48,32 @@ public class PostFlopActionBuilder {
     }
 
     private String getIpAction(double handStrengthAgainstRange) {
-        if(HandPath.getHandPath().contains("Fcheck")) {
+        if(handPath.contains("Fcheck")) {
             return getIpFCheck(handStrengthAgainstRange);
         }
-        if(HandPath.getHandPath().contains("F1bet")) {
+        if(handPath.contains("F1bet")) {
             return getIpF1bet(handStrengthAgainstRange);
         }
-        if(HandPath.getHandPath().contains("F2bet")) {
+        if(handPath.contains("F2bet")) {
             return getIpF2bet(handStrengthAgainstRange);
         }
-        if(HandPath.getHandPath().contains("F3bet")) {
+        if(handPath.contains("F3bet")) {
             return getIpF3bet(handStrengthAgainstRange);
         }
         return null;
     }
 
     private String getOopAction(double handStrengthAgainstRange) {
-        if(!HandPath.getHandPath().contains("F")) {
+        if(!handPath.contains("F")) {
             return getOopFirstToAct(handStrengthAgainstRange);
         }
-        if(HandPath.getHandPath().contains("F1bet")) {
+        if(handPath.contains("F1bet")) {
             return getOopF1bet(handStrengthAgainstRange);
         }
-        if(HandPath.getHandPath().contains("F2bet")) {
+        if(handPath.contains("F2bet")) {
             return getOopF2bet(handStrengthAgainstRange);
         }
-        if(HandPath.getHandPath().contains("F3bet")) {
+        if(handPath.contains("F3bet")) {
             return getOopF3bet(handStrengthAgainstRange);
         }
         return null;
@@ -186,7 +193,7 @@ public class PostFlopActionBuilder {
                 return passiveAction;
             }
         } else {
-            if(Game.getPosition().equals("OOP") && !HandPath.getHandPath().contains("F")) {
+            if(Game.getPosition().equals("OOP") && !handPath.contains("F")) {
                 if(Math.random() < 0.8) {
                     return bettingAction;
                 } else {
