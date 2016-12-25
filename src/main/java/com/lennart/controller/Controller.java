@@ -13,12 +13,15 @@ public class Controller {
 
     @RequestMapping(value = "/startGame", method = RequestMethod.GET)
     public @ResponseBody ComputerGame startGame() {
-        return new ComputerGame("initialize");
+        ComputerGame computerGame = new ComputerGame("initialize");
+        computerGame.setComputerAction(null);
+        return computerGame;
     }
 
     @RequestMapping(value = "/submitMyAction", method = RequestMethod.POST)
     public @ResponseBody ComputerGame submitMyAction(@RequestBody ComputerGame computerGame) {
         computerGame = computerGame.submitHumanActionAndDoComputerAction();
+        computerGame.setComputerAction(null);
         return computerGame;
     }
 

@@ -16,14 +16,18 @@ import java.util.*;
 public class BoardEvaluator {
 
     private Map<Integer, Set<Set<Card>>> sortedCombosNew;
-    private Map<Integer, List<Card>> allPossibleStartHandsNew;
+    private static Map<Integer, List<Card>> allPossibleStartHandsNew;
 
     public BoardEvaluator() {
-        //default constructor
+        if(allPossibleStartHandsNew == null) {
+            allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
+        }
     }
 
     public BoardEvaluator(ComputerGame computerGame) {
-        allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
+        if(allPossibleStartHandsNew == null) {
+            allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
+        }
 
         if(computerGame.getFlopCards() != null) {
             sortedCombosNew = getSortedCombosInitialize(computerGame.getBoard());

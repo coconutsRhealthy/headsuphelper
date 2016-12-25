@@ -204,14 +204,19 @@ public class ComputerGame {
         flopCards.add(getAndRemoveRandomCardFromDeck());
         flopCards.add(getAndRemoveRandomCardFromDeck());
         flopCards.add(getAndRemoveRandomCardFromDeck());
+
+        board = new ArrayList<>();
+        board.addAll(flopCards);
     }
 
     private void dealTurnCard() {
         turnCard = getAndRemoveRandomCardFromDeck();
+        board.add(turnCard);
     }
 
     private void dealRiverCard() {
         riverCard = getAndRemoveRandomCardFromDeck();
+        board.add(riverCard);
     }
 
     private void updateHandPath() {
