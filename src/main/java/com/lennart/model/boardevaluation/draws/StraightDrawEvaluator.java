@@ -3,7 +3,6 @@ package com.lennart.model.boardevaluation.draws;
 import com.lennart.model.boardevaluation.ComboComparatorRankOnly;
 import com.lennart.model.boardevaluation.StraightEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -11,9 +10,16 @@ import java.util.*;
  * Created by LPO10346 on 10/4/2016.
  */
 public class StraightDrawEvaluator extends StraightEvaluator implements ComboComparatorRankOnly {
-    private static Map<List<Integer>, List<List<Integer>>> combosThatGiveAnyStraightDraw;
-    private static Map<Integer, Set<Card>> combosThatGiveOosdOrGutshotFlop;
-    private static Map<Integer, Set<Card>> combosThatGiveOosdOrGutshotTurn;
+
+    private Map<List<Integer>, List<List<Integer>>> combosThatGiveAnyStraightDraw;
+    private Map<Integer, Set<Card>> combosThatGiveOosdOrGutshotFlop;
+    private Map<Integer, Set<Card>> combosThatGiveOosdOrGutshotTurn;
+    private List<Card> board;
+
+    public StraightDrawEvaluator(List<Card> board) {
+        this.board = board;
+        getAllStraightDrawCombos();
+    }
 
     public Map<Integer, List<Integer>> getCombosThatGiveOosdOrDoubleGutter(List<Card> board) {
         if(board.size() == 5) {
@@ -176,20 +182,19 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
         return new HashMap<>();
     }
 
-    public Map<Integer, Set<Card>> getAllStraightDrawCombos() {
-        Map<Integer, List<Integer>> allOosdCombos = getCombosThatGiveOosdOrDoubleGutter(Game.getBoardCards());
-        Map<Integer, List<Integer>> allGutshotCombos = getCombosThatGiveGutshot(Game.getBoardCards());
+    private void getAllStraightDrawCombos() {
+        Map<Integer, List<Integer>> allOosdCombos = getCombosThatGiveOosdOrDoubleGutter(board);
+        Map<Integer, List<Integer>> allGutshotCombos = getCombosThatGiveGutshot(board);
 
         Map<Integer, Set<Card>> allStraightDrawCombos =
-                convertRankDrawCombosToCardDrawCombos(allOosdCombos, Game.getBoardCards());
+                convertRankDrawCombosToCardDrawCombos(allOosdCombos, board);
         Map<Integer, Set<Card>> allGutshotCardCombos =
-                convertRankDrawCombosToCardDrawCombos(allGutshotCombos, Game.getBoardCards());
+                convertRankDrawCombosToCardDrawCombos(allGutshotCombos, board);
 
         for (Map.Entry<Integer, Set<Card>> entry : allGutshotCardCombos.entrySet()) {
             allStraightDrawCombos.put(allOosdCombos.size(), entry.getValue());
         }
         setCombosThatGiveOosdOrGutshotPerStreet(allStraightDrawCombos);
-        return allStraightDrawCombos;
     }
 
     public Map<Integer, List<Integer>> getWeakGutshotCombosFromAllGutshotCombos(List<Card> board) {
@@ -343,8 +348,8 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
 
     //helper methods
     private Map<List<Integer>, List<List<Integer>>> getCombosThatGiveAnyStraightDraw(List<Card> board) {
-        if(StraightDrawEvaluator.combosThatGiveAnyStraightDraw != null) {
-            return StraightDrawEvaluator.combosThatGiveAnyStraightDraw;
+        if(combosThatGiveAnyStraightDraw != null) {
+            return combosThatGiveAnyStraightDraw;
         }
 
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
@@ -394,7 +399,7 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
 
         mapOfCombosThatGiveAnyStraightDraw = removeIncorrectStraightCombosFromMap(mapOfCombosThatGiveAnyStraightDraw, board);
 
-        StraightDrawEvaluator.combosThatGiveAnyStraightDraw = mapOfCombosThatGiveAnyStraightDraw;
+        combosThatGiveAnyStraightDraw = mapOfCombosThatGiveAnyStraightDraw;
         return mapOfCombosThatGiveAnyStraightDraw;
     }
 
@@ -866,8 +871,8 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
         return drawCardCombos;
     }
 
-    public static void setCombosThatGiveAnyStraightDraw(Map<List<Integer>, List<List<Integer>>> combosThatGiveAnyStraightDraw) {
-        StraightDrawEvaluator.combosThatGiveAnyStraightDraw = combosThatGiveAnyStraightDraw;
+    public void setCombosThatGiveAnyStraightDraw(Map<List<Integer>, List<List<Integer>>> combosThatGiveAnyStraightDraw) {
+        this.combosThatGiveAnyStraightDraw = combosThatGiveAnyStraightDraw;
     }
 
     @Override
@@ -925,18 +930,18 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
     }
 
     private void setCombosThatGiveOosdOrGutshotPerStreet(Map<Integer, Set<Card>> straightDrawCombos) {
-        if(Game.getStreet().equals("Flop") && StraightDrawEvaluator.combosThatGiveOosdOrGutshotFlop == null) {
-            StraightDrawEvaluator.combosThatGiveOosdOrGutshotFlop = straightDrawCombos;
-        } else if(Game.getStreet().equals("Turn") && StraightDrawEvaluator.combosThatGiveOosdOrGutshotTurn == null) {
-            StraightDrawEvaluator.combosThatGiveOosdOrGutshotTurn = straightDrawCombos;
+        if(board.size() == 3 && combosThatGiveOosdOrGutshotFlop == null) {
+            combosThatGiveOosdOrGutshotFlop = straightDrawCombos;
+        } else if(board.size() == 4 && combosThatGiveOosdOrGutshotTurn == null) {
+            combosThatGiveOosdOrGutshotTurn = straightDrawCombos;
         }
     }
 
-    public static Map<Integer, Set<Card>> getCombosThatGiveOosdOrGutshotFlop() {
-        return StraightDrawEvaluator.combosThatGiveOosdOrGutshotFlop;
+    public Map<Integer, Set<Card>> getCombosThatGiveOosdOrGutshotFlop() {
+        return combosThatGiveOosdOrGutshotFlop;
     }
 
-    public static Map<Integer, Set<Card>> getCombosThatGiveOosdOrGutshotTurn() {
-        return StraightDrawEvaluator.combosThatGiveOosdOrGutshotTurn;
+    public Map<Integer, Set<Card>> getCombosThatGiveOosdOrGutshotTurn() {
+        return combosThatGiveOosdOrGutshotTurn;
     }
 }

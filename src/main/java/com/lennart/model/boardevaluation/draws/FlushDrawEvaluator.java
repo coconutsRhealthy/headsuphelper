@@ -2,7 +2,6 @@ package com.lennart.model.boardevaluation.draws;
 
 import com.lennart.model.boardevaluation.FlushEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -11,9 +10,15 @@ import java.util.*;
  */
 public class FlushDrawEvaluator extends FlushEvaluator {
 
-    private static Map<Integer, List<Card>> allFlushDraws;
-    private static Map<Integer, Set<Card>> allFlushDrawsFlop;
-    private static Map<Integer, Set<Card>> allFlushDrawsTurn;
+    private Map<Integer, List<Card>> allFlushDraws;
+    private Map<Integer, Set<Card>> allFlushDrawsFlop;
+    private Map<Integer, Set<Card>> allFlushDrawsTurn;
+    private List<Card> board;
+
+    public FlushDrawEvaluator(List<Card> board) {
+        this.board = board;
+        getAllFlushDrawCombos();
+    }
 
     public Map<Integer, Set<Card>> getStrongFlushDrawCombos (List<Card> board) {
         Map<Integer, Set<Card>> strongFlushDrawCombos = new HashMap<>();
@@ -79,31 +84,30 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return getWeakFlushOrBackDoorFlushDrawCombos(allBackDoorFlushDraws, strongBackDoorDraws, mediumBackDoorDraws);
     }
 
-    public Map<Integer, Set<Card>> getAllFlushDrawCombos() {
+    private void getAllFlushDrawCombos() {
         Map<Integer, Set<Card>> allFlushDrawCombos = new HashMap<>();
-        Map<Integer, List<Card>> flushDrawCombosAsList = getFlushDrawCombos(Game.getBoardCards());
+        allFlushDraws = getFlushDrawCombos(board);
 
-        for (Map.Entry<Integer, List<Card>> entry : flushDrawCombosAsList.entrySet()) {
+        for (Map.Entry<Integer, List<Card>> entry : allFlushDraws.entrySet()) {
             Set<Card> combo = new HashSet<>();
             combo.addAll(entry.getValue());
             allFlushDrawCombos.put(allFlushDrawCombos.size(), combo);
         }
 
         setFlushDrawCombosPerStreet(allFlushDrawCombos);
-        return allFlushDrawCombos;
     }
 
     //helper methods
     private Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
-        if(FlushDrawEvaluator.allFlushDraws != null) {
-            return FlushDrawEvaluator.allFlushDraws;
+        if(allFlushDraws != null) {
+            return allFlushDraws;
         }
 
         Map<Integer, List<Card>> flushDrawCombos = new HashMap<>();
         Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
 
         if(board.size() == 5) {
-            FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
+            allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -122,7 +126,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         if(flushSuit != 'x' && flushSuit2 == 'x') {
             flushDrawCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
-            FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
+            allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -138,7 +142,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                 flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());
             }
 
-            FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
+            allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -161,7 +165,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
             }
             flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
         }
-        FlushDrawEvaluator.allFlushDraws = flushDrawCombos;
+        allFlushDraws = flushDrawCombos;
         return flushDrawCombos;
     }
 
@@ -397,23 +401,23 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return cardRanksToReturn;
     }
 
-    public static void setAllFlushDraws(Map<Integer, List<Card>> allFlushDraws) {
-        FlushDrawEvaluator.allFlushDraws = allFlushDraws;
+    public void setAllFlushDraws(Map<Integer, List<Card>> allFlushDraws) {
+        this.allFlushDraws = allFlushDraws;
     }
 
     private void setFlushDrawCombosPerStreet(Map<Integer, Set<Card>> flushDrawCombos) {
-        if(Game.getStreet().equals("Flop") && FlushDrawEvaluator.allFlushDrawsFlop == null) {
-            FlushDrawEvaluator.allFlushDrawsFlop = flushDrawCombos;
-        } else if(Game.getStreet().equals("Turn") && FlushDrawEvaluator.allFlushDrawsTurn == null) {
-            FlushDrawEvaluator.allFlushDrawsTurn = flushDrawCombos;
+        if(board.size() == 3 && allFlushDrawsFlop == null) {
+            this.allFlushDrawsFlop = flushDrawCombos;
+        } else if(board.size() == 4 && this.allFlushDrawsTurn == null) {
+            this.allFlushDrawsTurn = flushDrawCombos;
         }
     }
 
-    public static Map<Integer, Set<Card>> getAllFlushDrawsFlop() {
-        return FlushDrawEvaluator.allFlushDrawsFlop;
+    public Map<Integer, Set<Card>> getAllFlushDrawsFlop() {
+        return allFlushDrawsFlop;
     }
 
-    public static Map<Integer, Set<Card>> getAllFlushDrawsTurn() {
-        return FlushDrawEvaluator.allFlushDrawsTurn;
+    public Map<Integer, Set<Card>> getAllFlushDrawsTurn() {
+        return allFlushDrawsTurn;
     }
 }
