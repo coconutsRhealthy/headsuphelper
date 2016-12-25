@@ -9,32 +9,50 @@ import java.util.*;
  */
 public class StraightEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
-    private static Map<Integer, Set<Set<Card>>> combosThatMakeStraight;
-    private static int numberOfStraightsOnFlop;
-    private static int numberOfStraightsOnTurn;
-    private static int numberOfStraightsOnRiver;
+    private Map<Integer, Set<Set<Card>>> combosThatMakeStraight;
+    private int numberOfStraightsOnFlop;
+    private int numberOfStraightsOnTurn;
+    private int numberOfStraightsOnRiver;
+    private List<Card> board;
+    private FlushEvaluator flushEvaluator;
+    private FullHouseEvaluator fullHouseEvaluator;
+    private FourOfAKindEvaluator fourOfAKindEvaluator;
+    private StraightFlushEvaluator straightFlushEvaluator;
+
+    public StraightEvaluator(List<Card> board, FlushEvaluator flushEvaluator, FullHouseEvaluator fullHouseEvaluator,
+                             FourOfAKindEvaluator fourOfAKindEvaluator, StraightFlushEvaluator straightFlushEvaluator) {
+        this.board = board;
+        this.flushEvaluator = flushEvaluator;
+        this.fullHouseEvaluator = fullHouseEvaluator;
+        this.fourOfAKindEvaluator = fourOfAKindEvaluator;
+        this.straightFlushEvaluator = straightFlushEvaluator;
+        getMapOfStraightCombosInitialize(board);
+    }
+
+    public StraightEvaluator() {
+        //This default constructor can only be used in StraightFlushEvaluator. In addition, it is needed for
+        //classes that extend StraightEvaluator.
+    }
 
     public Map<Integer, Set<Set<Card>>> getMapOfStraightCombos() {
         return combosThatMakeStraight;
     }
 
-    public Map<Integer, Set<Set<Card>>> getMapOfStraightCombosInitialize(List<Card> board) {
+    private void getMapOfStraightCombosInitialize(List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedCombos;
         List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);
         Map<Integer, List<Card>> straightCombosArtificialSuits = convertListOfRankOnlyCombosToCardComboMap(straightCombosList);
-        Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, new StraightEvaluator());
+        Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, this);
         sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-        sortedCombos = removeDuplicateCombos(sortedCombos, board);
+        sortedCombos = removeDuplicateCombos(sortedCombos);
 
-        StraightEvaluator.combosThatMakeStraight = sortedCombos;
-
-        return sortedCombos;
+        combosThatMakeStraight = sortedCombos;
     }
 
     public Map<Integer, Set<Set<Card>>> getMapOfStraightCombosForStraightFLushEvaluator(List<Card> board) {
         List<List<Integer>> straightCombosList = getCombosThatMakeStraight(board);
         Map<Integer, List<Card>> straightCombosArtificialSuits = convertListOfRankOnlyCombosToCardComboMap(straightCombosList);
-        Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, new StraightEvaluator());
+        Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(straightCombosArtificialSuits, board, this);
         return convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
     }
 
@@ -387,11 +405,11 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
         return comboMap;
     }
 
-    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombosInitialize(board);
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos();
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos) {
+        Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos();
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos();
 
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);
@@ -401,38 +419,37 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
         return sortedCombos;
     }
 
-    public static int getNumberOfStraightsOnFlop() {
+    public int getNumberOfStraightsOnFlop() {
         return numberOfStraightsOnFlop;
     }
 
-    public static void setNumberOfStraightsOnFlop(int numberOfStraightsOnFlop) {
-        StraightEvaluator.numberOfStraightsOnFlop = numberOfStraightsOnFlop;
+    public void setNumberOfStraightsOnFlop(int numberOfStraightsOnFlop) {
+        this.numberOfStraightsOnFlop = numberOfStraightsOnFlop;
     }
 
-    public static int getNumberOfStraightsOnTurn() {
+    public int getNumberOfStraightsOnTurn() {
         return numberOfStraightsOnTurn;
     }
 
-    public static void setNumberOfStraightsOnTurn(int numberOfStraightsOnTurn) {
-        StraightEvaluator.numberOfStraightsOnTurn = numberOfStraightsOnTurn;
+    public void setNumberOfStraightsOnTurn(int numberOfStraightsOnTurn) {
+        this.numberOfStraightsOnTurn = numberOfStraightsOnTurn;
     }
 
-    public static int getNumberOfStraightsOnRiver() {
+    public int getNumberOfStraightsOnRiver() {
         return numberOfStraightsOnRiver;
     }
 
-    public static void setNumberOfStraightsOnRiver(int numberOfStraightsOnRiver) {
-        StraightEvaluator.numberOfStraightsOnRiver = numberOfStraightsOnRiver;
+    public void setNumberOfStraightsOnRiver(int numberOfStraightsOnRiver) {
+        this.numberOfStraightsOnRiver = numberOfStraightsOnRiver;
     }
 
     private void setNumberOfStraights(int numberOfStraights) {
-        //TODO: implement with the new constructor
-//        if(board.size() == 3) {
-//            setNumberOfStraightsOnFlop(numberOfStraights);
-//        } else if(board.size() == 4) {
-//            setNumberOfStraightsOnTurn(numberOfStraights);
-//        } else if(board.size() == 5) {
-//            setNumberOfStraightsOnRiver(numberOfStraights);
-//        }
+        if(board.size() == 3) {
+            setNumberOfStraightsOnFlop(numberOfStraights);
+        } else if(board.size() == 4) {
+            setNumberOfStraightsOnTurn(numberOfStraights);
+        } else if(board.size() == 5) {
+            setNumberOfStraightsOnRiver(numberOfStraights);
+        }
     }
 }

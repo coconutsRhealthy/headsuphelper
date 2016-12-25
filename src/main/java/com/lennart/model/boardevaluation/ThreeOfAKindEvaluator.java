@@ -9,13 +9,29 @@ import java.util.*;
  */
 public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
-    private static Map<Integer, Set<Set<Card>>> combosThatMakeThreeOfAKind;
+    private Map<Integer, Set<Set<Card>>> combosThatMakeThreeOfAKind;
+    private StraightEvaluator straightEvaluator;
+    private FlushEvaluator flushEvaluator;
+    private FullHouseEvaluator fullHouseEvaluator;
+    private FourOfAKindEvaluator fourOfAKindEvaluator;
+    private StraightFlushEvaluator straightFlushEvaluator;
+
+    public ThreeOfAKindEvaluator(List<Card> board, StraightEvaluator straightEvaluator, FlushEvaluator flushEvaluator,
+                                 FullHouseEvaluator fullHouseEvaluator, FourOfAKindEvaluator fourOfAKindEvaluator,
+                                 StraightFlushEvaluator straightFlushEvaluator) {
+        this.straightEvaluator = straightEvaluator;
+        this.flushEvaluator = flushEvaluator;
+        this.fullHouseEvaluator = fullHouseEvaluator;
+        this.fourOfAKindEvaluator = fourOfAKindEvaluator;
+        this.straightFlushEvaluator = straightFlushEvaluator;
+        getThreeOfAKindCombosInitialize(board);
+    }
 
     public Map<Integer, Set<Set<Card>>> getThreeOfAKindCombos() {
         return combosThatMakeThreeOfAKind;
     }
 
-    public Map<Integer, Set<Set<Card>>> getThreeOfAKindCombosInitialize(List<Card> board) {
+    private void getThreeOfAKindCombosInitialize(List<Card> board) {
         Map<Integer, List<Card>> threeOfAKindCombos = new HashMap<>();
         Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
@@ -29,13 +45,12 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
                 }
             }
             threeOfAKindCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(threeOfAKindCombos, board);
-            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, this);
             sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos);
 
-            this.combosThatMakeThreeOfAKind = sortedCombos;
-
-            return sortedCombos;
+            combosThatMakeThreeOfAKind = sortedCombos;
+            return;
         } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
@@ -52,13 +67,12 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
                     }
                 }
             }
-            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, this);
             sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos);
 
-            this.combosThatMakeThreeOfAKind = sortedCombos;
-
-            return sortedCombos;
+            combosThatMakeThreeOfAKind = sortedCombos;
+            return;
         } else if(boardContainsTrips(board) && !boardContainsQuads(board)) {
             //alle combos die niet met de andere kaarten op het board pairen, geen pocket pair zijn, en niet met de trips
             //op het board pairen
@@ -111,19 +125,16 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             }
 
             threeOfAKindCombos = allPossibleStartHands;
-            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, new ThreeOfAKindEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(threeOfAKindCombos, board, this);
             sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos);
 
-            this.combosThatMakeThreeOfAKind = sortedCombos;
-
-            return sortedCombos;
+            combosThatMakeThreeOfAKind = sortedCombos;
+            return;
         }
-        sortedCombos = removeDuplicateCombos(new HashMap<>(), board);
+        sortedCombos = removeDuplicateCombos(new HashMap<>());
 
-        this.combosThatMakeThreeOfAKind = sortedCombos;
-
-        return new HashMap<>();
+        combosThatMakeThreeOfAKind = sortedCombos;
     }
 
     @Override
@@ -287,12 +298,12 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
         }
     }
 
-    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> straightCombos = new StraightEvaluator().getMapOfStraightCombosInitialize(board);
-        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos();
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos();
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos) {
+        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombos();
+        Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos();
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos();
 
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);

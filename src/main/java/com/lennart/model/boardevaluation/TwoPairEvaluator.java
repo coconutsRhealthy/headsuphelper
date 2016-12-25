@@ -9,13 +9,32 @@ import java.util.*;
  */
 public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorRankOnly {
 
-    private static Map<Integer, Set<Set<Card>>> combosThatMakeTwoPair;
+    private Map<Integer, Set<Set<Card>>> combosThatMakeTwoPair;
+    private ThreeOfAKindEvaluator threeOfAKindEvaluator;
+    private StraightEvaluator straightEvaluator;
+    private FlushEvaluator flushEvaluator;
+    private FullHouseEvaluator fullHouseEvaluator;
+    private FourOfAKindEvaluator fourOfAKindEvaluator;
+    private StraightFlushEvaluator straightFlushEvaluator;
+
+    public TwoPairEvaluator(List<Card> board, ThreeOfAKindEvaluator threeOfAKindEvaluator,
+                            StraightEvaluator straightEvaluator, FlushEvaluator flushEvaluator,
+                            FullHouseEvaluator fullHouseEvaluator, FourOfAKindEvaluator fourOfAKindEvaluator,
+                            StraightFlushEvaluator straightFlushEvaluator) {
+        this.threeOfAKindEvaluator = threeOfAKindEvaluator;
+        this.straightEvaluator = straightEvaluator;
+        this.flushEvaluator = flushEvaluator;
+        this.fullHouseEvaluator = fullHouseEvaluator;
+        this.fourOfAKindEvaluator = fourOfAKindEvaluator;
+        this.straightFlushEvaluator = straightFlushEvaluator;
+        getCombosThatMakeTwoPairInitialize(board);
+    }
 
     public Map<Integer, Set<Set<Card>>> getCombosThatMakeTwoPair() {
         return combosThatMakeTwoPair;
     }
 
-    public Map<Integer, Set<Set<Card>>> getCombosThatMakeTwoPairInitialize(List<Card> board) {
+    private void getCombosThatMakeTwoPairInitialize(List<Card> board) {
         Map<Integer, List<Card>> combosThatMakeTwoPair = new HashMap<>();
         Map<Integer, Set<Set<Card>>> sortedCombos;
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
@@ -39,13 +58,12 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
                 }
             }
 
-            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, this);
             sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos);
 
             this.combosThatMakeTwoPair = sortedCombos;
-
-            return sortedCombos;
+            return;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
@@ -98,13 +116,12 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
                 }
             }
 
-            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, this);
             sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos);
 
             this.combosThatMakeTwoPair = sortedCombos;
-
-            return sortedCombos;
+            return;
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.
             Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
@@ -165,19 +182,16 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
                     combosThatMakeTwoPair.put(combosThatMakeTwoPair.size(), allPossibleStartHands.get(entry.getKey()));
                 }
             }
-            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, new TwoPairEvaluator());
+            Map<Integer, List<List<Integer>>> rankMap = getSortedComboMapRankOnly(combosThatMakeTwoPair, board, this);
             sortedCombos = convertRankComboMapToCardComboMapCorrectedForBoard(rankMap, board);
-            sortedCombos = removeDuplicateCombos(sortedCombos, board);
+            sortedCombos = removeDuplicateCombos(sortedCombos);
 
             this.combosThatMakeTwoPair = sortedCombos;
-
-            return sortedCombos;
+            return;
         }
-        sortedCombos = removeDuplicateCombos(new HashMap<>(), board);
+        sortedCombos = removeDuplicateCombos(new HashMap<>());
 
         this.combosThatMakeTwoPair = sortedCombos;
-
-        return new HashMap<>();
     }
 
     @Override
@@ -884,13 +898,13 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
         };
     }
 
-    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = new ThreeOfAKindEvaluator().getThreeOfAKindCombosInitialize(board);
-        Map<Integer, Set<Set<Card>>> straightCombos = new StraightEvaluator().getMapOfStraightCombos();
-        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos();
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos();
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos) {
+        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = threeOfAKindEvaluator.getThreeOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombos();
+        Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos();
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos();
 
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);

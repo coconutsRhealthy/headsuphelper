@@ -18,6 +18,16 @@ public class BoardEvaluator {
     private Map<Integer, Set<Set<Card>>> sortedCombosNew;
     private static Map<Integer, List<Card>> allPossibleStartHandsNew;
 
+    private HighCardEvaluator highCardEvaluator;
+    private PairEvaluator pairEvaluator;
+    private TwoPairEvaluator twoPairEvaluator;
+    private ThreeOfAKindEvaluator threeOfAKindEvaluator;
+    private StraightEvaluator straightEvaluator;
+    private FlushEvaluator flushEvaluator;
+    private FullHouseEvaluator fullHouseEvaluator;
+    private FourOfAKindEvaluator fourOfAKindEvaluator;
+    private StraightFlushEvaluator straightFlushEvaluator;
+
     public BoardEvaluator() {
         if(allPossibleStartHandsNew == null) {
             allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
@@ -32,6 +42,21 @@ public class BoardEvaluator {
         }
 
         if(computerGame.getFlopCards() != null) {
+            straightFlushEvaluator = new StraightFlushEvaluator(board);
+            fourOfAKindEvaluator = new FourOfAKindEvaluator(board, straightFlushEvaluator);
+            fullHouseEvaluator = new FullHouseEvaluator(board, fourOfAKindEvaluator, straightFlushEvaluator);
+            flushEvaluator = new FlushEvaluator(board, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+            straightEvaluator = new StraightEvaluator(board, flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator,
+                    straightFlushEvaluator);
+            threeOfAKindEvaluator = new ThreeOfAKindEvaluator(board, straightEvaluator, flushEvaluator, fullHouseEvaluator,
+                    fourOfAKindEvaluator, straightFlushEvaluator);
+            twoPairEvaluator = new TwoPairEvaluator(board, threeOfAKindEvaluator, straightEvaluator, flushEvaluator,
+                    fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+            pairEvaluator = new PairEvaluator(board, twoPairEvaluator, threeOfAKindEvaluator, straightEvaluator,
+                    flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+            highCardEvaluator = new HighCardEvaluator(board, pairEvaluator, twoPairEvaluator, threeOfAKindEvaluator,
+                    straightEvaluator, flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+
             sortedCombosNew = getSortedCombosInitialize(computerGame.getBoard());
         }
     }
@@ -813,15 +838,15 @@ public class BoardEvaluator {
     public  Map<Integer, Set<Set<Card>>> getSortedCombosInitialize(List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedCombos = new HashMap<>();
 
-        Map<Integer, Set<Set<Card>>> highCardCombos = new HighCardEvaluator().getHighCardCombos(board);
-        Map<Integer, Set<Set<Card>>> pairCombos = new PairEvaluator().getCombosThatMakePair();
-        Map<Integer, Set<Set<Card>>> twoPairCombos = new TwoPairEvaluator().getCombosThatMakeTwoPair();
-        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = new ThreeOfAKindEvaluator().getThreeOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightCombos = new StraightEvaluator().getMapOfStraightCombos();
-        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos();
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos();
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
+        Map<Integer, Set<Set<Card>>> highCardCombos = highCardEvaluator.getHighCardCombos();
+        Map<Integer, Set<Set<Card>>> pairCombos = pairEvaluator.getCombosThatMakePair();
+        Map<Integer, Set<Set<Card>>> twoPairCombos = twoPairEvaluator.getCombosThatMakeTwoPair();
+        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = threeOfAKindEvaluator.getThreeOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombos();
+        Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos();
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos();
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : straightFlushCombos.entrySet()) {
             sortedCombos.put(sortedCombos.size(), entry.getValue());
@@ -921,19 +946,18 @@ public class BoardEvaluator {
 
     public int getNumberOfArrivedDraws() {
         if(board.size() == 3) {
-            return StraightEvaluator.getNumberOfStraightsOnFlop() + FlushEvaluator.getNumberOfFlushesOnFlop();
+            return straightEvaluator.getNumberOfStraightsOnFlop() + flushEvaluator.getNumberOfFlushesOnFlop();
         } else if(board.size() == 4) {
-            return (StraightEvaluator.getNumberOfStraightsOnTurn() + FlushEvaluator.getNumberOfFlushesOnTurn())
-                    - (StraightEvaluator.getNumberOfStraightsOnFlop() + FlushEvaluator.getNumberOfFlushesOnFlop());
+            return (straightEvaluator.getNumberOfStraightsOnTurn() + flushEvaluator.getNumberOfFlushesOnTurn())
+                    - (straightEvaluator.getNumberOfStraightsOnFlop() + flushEvaluator.getNumberOfFlushesOnFlop());
         } else if(board.size() == 5) {
-            return (StraightEvaluator.getNumberOfStraightsOnRiver() + FlushEvaluator.getNumberOfFlushesOnRiver())
-                    - (StraightEvaluator.getNumberOfStraightsOnTurn() + FlushEvaluator.getNumberOfFlushesOnTurn());
+            return (straightEvaluator.getNumberOfStraightsOnRiver() + flushEvaluator.getNumberOfFlushesOnRiver())
+                    - (straightEvaluator.getNumberOfStraightsOnTurn() + flushEvaluator.getNumberOfFlushesOnTurn());
         }
         return -1;
     }
 
     public Map<Integer, Set<Card>> getArrivedStraightDraws() {
-        StraightEvaluator straightEvaluator = new StraightEvaluator();
         Map<Integer, Set<Set<Card>>> allStraightCombos = straightEvaluator.getMapOfStraightCombos();
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
 
@@ -960,7 +984,6 @@ public class BoardEvaluator {
     }
 
     public Map<Integer, Set<Card>> getArrivedFlushDraws() {
-        FlushEvaluator flushEvaluator = new FlushEvaluator();
         Map<Integer, Set<Set<Card>>> allFlushCombos = flushEvaluator.getFlushCombos();
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
 
@@ -1002,9 +1025,6 @@ public class BoardEvaluator {
     }
 
     public boolean boardIsDry() {
-        StraightEvaluator straightEvaluator = new StraightEvaluator();
-        FlushEvaluator flushEvaluator = new FlushEvaluator();
-
         boolean noStraightCombos = straightEvaluator.getMapOfStraightCombos().isEmpty();
         boolean noFlushCombos = flushEvaluator.getFlushCombos().isEmpty();
         boolean noStraightDraws = true;
@@ -1021,5 +1041,4 @@ public class BoardEvaluator {
         }
         return(noStraightCombos && noFlushCombos && noStraightDraws && noFlushDraws);
     }
-
 }

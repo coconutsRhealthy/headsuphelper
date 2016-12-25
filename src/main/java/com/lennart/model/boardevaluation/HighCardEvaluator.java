@@ -9,19 +9,52 @@ import java.util.*;
  */
 public class HighCardEvaluator extends BoardEvaluator implements ComboComparator {
 
-    public Map<Integer, Set<Set<Card>>> getHighCardCombos(List<Card> board) {
+    private Map<Integer, Set<Set<Card>>> combosThatMakeHighCard;
+    private PairEvaluator pairEvaluator;
+    private TwoPairEvaluator twoPairEvaluator;
+    private ThreeOfAKindEvaluator threeOfAKindEvaluator;
+    private StraightEvaluator straightEvaluator;
+    private FlushEvaluator flushEvaluator;
+    private FullHouseEvaluator fullHouseEvaluator;
+    private FourOfAKindEvaluator fourOfAKindEvaluator;
+    private StraightFlushEvaluator straightFlushEvaluator;
+
+    public HighCardEvaluator(List<Card> board, PairEvaluator pairEvaluator, TwoPairEvaluator twoPairEvaluator,
+                             ThreeOfAKindEvaluator threeOfAKindEvaluator, StraightEvaluator straightEvaluator,
+                             FlushEvaluator flushEvaluator, FullHouseEvaluator fullHouseEvaluator,
+                             FourOfAKindEvaluator fourOfAKindEvaluator, StraightFlushEvaluator straightFlushEvaluator) {
+        this.pairEvaluator = pairEvaluator;
+        this.twoPairEvaluator = twoPairEvaluator;
+        this.threeOfAKindEvaluator = threeOfAKindEvaluator;
+        this.straightEvaluator = straightEvaluator;
+        this.flushEvaluator = flushEvaluator;
+        this.fullHouseEvaluator = fullHouseEvaluator;
+        this.fourOfAKindEvaluator = fourOfAKindEvaluator;
+        this.straightFlushEvaluator = straightFlushEvaluator;
+        getHighCardCombosInitialize(board);
+    }
+
+    public HighCardEvaluator() {
+        //Default constructor needed for classes that extend from HighCardEvaluator
+    }
+
+    public Map<Integer, Set<Set<Card>>> getHighCardCombos() {
+        return combosThatMakeHighCard;
+    }
+
+    private void getHighCardCombosInitialize(List<Card> board) {
         //get alle mogelijke starthanden
         Map<Integer, List<Card>> highCardCombos = getAllPossibleStartHandsNew();
 
         //verwijder alle combos die al in de andere klassen naar voren komen
-        Map<Integer, Set<Set<Card>>> pairCombos = new PairEvaluator().getCombosThatMakePairInitialize(board);
-        Map<Integer, Set<Set<Card>>> twoPairCombos = new TwoPairEvaluator().getCombosThatMakeTwoPair();
-        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = new ThreeOfAKindEvaluator().getThreeOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightCombos = new StraightEvaluator().getMapOfStraightCombos();
-        Map<Integer, Set<Set<Card>>> flushCombos = new FlushEvaluator().getFlushCombos();
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombos();
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
+        Map<Integer, Set<Set<Card>>> pairCombos = pairEvaluator.getCombosThatMakePair();
+        Map<Integer, Set<Set<Card>>> twoPairCombos = twoPairEvaluator.getCombosThatMakeTwoPair();
+        Map<Integer, Set<Set<Card>>> threeOfAKindCombos = threeOfAKindEvaluator.getThreeOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightCombos = straightEvaluator.getMapOfStraightCombos();
+        Map<Integer, Set<Set<Card>>> flushCombos = flushEvaluator.getFlushCombos();
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos();
 
         //remove pairCombos
         highCardCombos = removeCombos(highCardCombos, pairCombos);
@@ -50,7 +83,7 @@ public class HighCardEvaluator extends BoardEvaluator implements ComboComparator
         //corrigeer ook voor het board
         highCardCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(highCardCombos, board);
 
-        return getSortedCardComboMap(highCardCombos, board, new HighCardEvaluator());
+        combosThatMakeHighCard = getSortedCardComboMap(highCardCombos, board, this);
     }
 
     @Override

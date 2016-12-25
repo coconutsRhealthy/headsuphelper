@@ -9,26 +9,42 @@ import java.util.*;
  */
 public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
-    private static Map<Integer, Set<Set<Card>>> combosThatMakeFlush;
-    private static int numberOfFlushesOnFlop;
-    private static int numberOfFlushesOnTurn;
-    private static int numberOfFlushesOnRiver;
+    private Map<Integer, Set<Set<Card>>> combosThatMakeFlush;
+    private int numberOfFlushesOnFlop;
+    private int numberOfFlushesOnTurn;
+    private int numberOfFlushesOnRiver;
+    private List<Card> board;
+    private FullHouseEvaluator fullHouseEvaluator;
+    private FourOfAKindEvaluator fourOfAKindEvaluator;
+    private StraightFlushEvaluator straightFlushEvaluator;
+
+    public FlushEvaluator(List<Card> board, FullHouseEvaluator fullHouseEvaluator, FourOfAKindEvaluator fourOfAKindEvaluator,
+                          StraightFlushEvaluator straightFlushEvaluator) {
+        this.board = board;
+        this.fullHouseEvaluator = fullHouseEvaluator;
+        this.fourOfAKindEvaluator = fourOfAKindEvaluator;
+        this.straightFlushEvaluator = straightFlushEvaluator;
+        getFlushCombosInitialize(board);
+    }
+
+    public FlushEvaluator() {
+        //This default constructor can only be used in StraightFlushEvaluator. In addition, it is needed for
+        //classes that extend FlushEvaluator.
+    }
 
     public Map<Integer, Set<Set<Card>>> getFlushCombos() {
         return combosThatMakeFlush;
     }
 
-    public Map<Integer, Set<Set<Card>>> getFlushCombosInitialize(List<Card> board) {
+    private void getFlushCombosInitialize(List<Card> board) {
         Map<Integer, Set<Set<Card>>> sortedFlushCombos;
 
         Map<Integer, Set<Set<Card>>> flushCombos = getFlushCombosOud(board);
-        sortedFlushCombos = removeDuplicateCombos(flushCombos, board);
+        sortedFlushCombos = removeDuplicateCombos(flushCombos);
 
         setNumberOfFlushes(sortedFlushCombos.size());
 
-        FlushEvaluator.combosThatMakeFlush = sortedFlushCombos;
-
-        return sortedFlushCombos;
+        combosThatMakeFlush = sortedFlushCombos;
     }
 
 
@@ -446,10 +462,10 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         };
     }
 
-    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> fullHouseCombos = new FullHouseEvaluator().getFullHouseCombosInitialize(board);
-        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = new FourOfAKindEvaluator().getFourOfAKindCombos();
-        Map<Integer, Set<Set<Card>>> straightFlushCombos = new StraightFlushEvaluator().getStraightFlushCombos();
+    private Map<Integer, Set<Set<Card>>> removeDuplicateCombos(Map<Integer, Set<Set<Card>>> sortedCombos) {
+        Map<Integer, Set<Set<Card>>> fullHouseCombos = fullHouseEvaluator.getFullHouseCombos();
+        Map<Integer, Set<Set<Card>>> fourOfAKindCombos = fourOfAKindEvaluator.getFourOfAKindCombos();
+        Map<Integer, Set<Set<Card>>> straightFlushCombos = straightFlushEvaluator.getStraightFlushCombos();
 
         sortedCombos = removeDuplicateCombosPerCategory(straightFlushCombos, sortedCombos);
         sortedCombos = removeDuplicateCombosPerCategory(fourOfAKindCombos, sortedCombos);
@@ -458,38 +474,37 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         return sortedCombos;
     }
 
-    public static int getNumberOfFlushesOnFlop() {
+    public int getNumberOfFlushesOnFlop() {
         return numberOfFlushesOnFlop;
     }
 
-    public static void setNumberOfFlushesOnFlop(int numberOfFlushesOnFlop) {
-        FlushEvaluator.numberOfFlushesOnFlop = numberOfFlushesOnFlop;
+    public void setNumberOfFlushesOnFlop(int numberOfFlushesOnFlop) {
+        this.numberOfFlushesOnFlop = numberOfFlushesOnFlop;
     }
 
-    public static int getNumberOfFlushesOnTurn() {
+    public int getNumberOfFlushesOnTurn() {
         return numberOfFlushesOnTurn;
     }
 
-    public static void setNumberOfFlushesOnTurn(int numberOfFlushesOnTurn) {
-        FlushEvaluator.numberOfFlushesOnTurn = numberOfFlushesOnTurn;
+    public void setNumberOfFlushesOnTurn(int numberOfFlushesOnTurn) {
+        this.numberOfFlushesOnTurn = numberOfFlushesOnTurn;
     }
 
-    public static int getNumberOfFlushesOnRiver() {
+    public int getNumberOfFlushesOnRiver() {
         return numberOfFlushesOnRiver;
     }
 
-    public static void setNumberOfFlushesOnRiver(int numberOfFlushesOnRiver) {
-        FlushEvaluator.numberOfFlushesOnRiver = numberOfFlushesOnRiver;
+    public void setNumberOfFlushesOnRiver(int numberOfFlushesOnRiver) {
+        this.numberOfFlushesOnRiver = numberOfFlushesOnRiver;
     }
 
     private void setNumberOfFlushes(int numberOfFlushes) {
-        //TODO: implement with the new constructor
-//        if(board.size() == 3) {
-//            setNumberOfFlushesOnFlop(numberOfFlushes);
-//        } else if(board.size() == 4) {
-//            setNumberOfFlushesOnTurn(numberOfFlushes);
-//        } else if(board.size() == 5) {
-//            setNumberOfFlushesOnRiver(numberOfFlushes);
-//        }
+        if(board.size() == 3) {
+            setNumberOfFlushesOnFlop(numberOfFlushes);
+        } else if(board.size() == 4) {
+            setNumberOfFlushesOnTurn(numberOfFlushes);
+        } else if(board.size() == 5) {
+            setNumberOfFlushesOnRiver(numberOfFlushes);
+        }
     }
 }
