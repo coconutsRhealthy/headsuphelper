@@ -26,14 +26,12 @@ public class ComputerGame {
     private double potSize;
     private boolean computerIsButton;
     private Action computerAction;
-    private Set<Card> knownGameCards = new HashSet<>();
+    private Set<Card> knownGameCards;
     private String handPath;
     private boolean computerIsToAct;
     private String myAction;
     private String mySize;
     private List<Card> board;
-
-    private BoardEvaluator boardEvaluator;
 
     public ComputerGame() {
         //default constructor
@@ -42,7 +40,6 @@ public class ComputerGame {
     public ComputerGame(String initialize) {
         getNewCardDeck();
         dealHoleCards();
-        knownGameCards.addAll(computerHoleCards);
         decideWhoIsButton();
         myStack = 50;
         computerStack = 50;
@@ -66,11 +63,13 @@ public class ComputerGame {
     private void dealHoleCards() {
         myHoleCards = new ArrayList<>();
         computerHoleCards = new ArrayList<>();
+        knownGameCards = new HashSet<>();
 
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
         computerHoleCards.add(getAndRemoveRandomCardFromDeck());
         computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+        knownGameCards.addAll(computerHoleCards);
     }
 
     private Card getAndRemoveRandomCardFromDeck() {
@@ -207,16 +206,19 @@ public class ComputerGame {
 
         board = new ArrayList<>();
         board.addAll(flopCards);
+        knownGameCards.addAll(flopCards);
     }
 
     private void dealTurnCard() {
         turnCard = getAndRemoveRandomCardFromDeck();
         board.add(turnCard);
+        knownGameCards.add(turnCard);
     }
 
     private void dealRiverCard() {
         riverCard = getAndRemoveRandomCardFromDeck();
         board.add(riverCard);
+        knownGameCards.add(riverCard);
     }
 
     private void updateHandPath() {

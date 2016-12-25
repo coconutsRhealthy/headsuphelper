@@ -32,12 +32,12 @@ public class Action {
 
     public Action(ComputerGame computerGame) {
         boardEvaluator = new BoardEvaluator(computerGame);
-        rangeBuilder = new RangeBuilder(boardEvaluator, computerGame.getComputerHoleCards());
-        preflopRangeBuilder = new PreflopRangeBuilder(boardEvaluator);
+        rangeBuilder = new RangeBuilder(boardEvaluator, computerGame.getComputerHoleCards(), computerGame.getKnownGameCards());
+        preflopRangeBuilder = new PreflopRangeBuilder(boardEvaluator, computerGame.getKnownGameCards());
         flopRangeBuilder = new FlopRangeBuilder(rangeBuilder, preflopRangeBuilder);
         handEvaluator = new HandEvaluator(boardEvaluator, rangeBuilder);
         preflopActionBuilder = new PreflopActionBuilder(preflopRangeBuilder);
-        postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame.getHandPath());
+        postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame);
 
         switch(computerGame.getHandPath()) {
             case "05betF1bet":

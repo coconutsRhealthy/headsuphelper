@@ -27,21 +27,24 @@ public class PostFlopActionBuilder {
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
     private String handPath;
+    private ComputerGame computerGame;
 
-    public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, String handPath) {
+    public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, ComputerGame computerGame) {
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
-        this.handPath = handPath;
+        this.computerGame = computerGame;
+        handPath = computerGame.getHandPath();
     }
 
     public String getAction(Map<Integer, Set<Set<Card>>> opponentRange) {
-        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRange(Game.getHoleCards(), opponentRange);
+        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRange(computerGame.getComputerHoleCards(),
+                opponentRange);
 
-        if(Game.getPosition().equals("IP")) {
+        if(computerGame.isComputerIsButton()) {
             return getIpAction(handStrengthAgainstRange);
         }
 
-        if(Game.getPosition().equals("OOP")) {
+        if(!computerGame.isComputerIsButton()) {
             return getOopAction(handStrengthAgainstRange);
         }
         return null;
@@ -145,7 +148,7 @@ public class PostFlopActionBuilder {
                     if(drawAction != null) {
                         return drawAction;
                     } else {
-                        if(!Game.getStreet().equals("River")) {
+                        if(computerGame.getBoard().size() != 5) {
                             if(Math.random() < 0.8) {
                                 return CALL_1_BET;
                             } else {
@@ -166,7 +169,7 @@ public class PostFlopActionBuilder {
             if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
                 return CALL_1_BET;
             }
-            if(Game.getPotOdds() > handEvaluator.getDrawEquityOfYourHand()) {
+            if(getPotOdds() > handEvaluator.getDrawEquityOfYourHand()) {
                 return CALL_1_BET;
             }
             return FOLD;
@@ -177,7 +180,7 @@ public class PostFlopActionBuilder {
         if(handStrengthAgainstRange > handEvaluator.getHandStrengthNeededToCall()) {
             return callAction;
         } else {
-            if(Game.getPotOdds() > handEvaluator.getDrawEquityOfYourHand()) {
+            if(getPotOdds() > handEvaluator.getDrawEquityOfYourHand()) {
                 return callAction;
             } else {
                 return FOLD;
@@ -186,14 +189,14 @@ public class PostFlopActionBuilder {
     }
 
     private String getValueAction(String bettingAction, String passiveAction) {
-        if(!Game.getStreet().equals("river")) {
+        if(computerGame.getBoard().size() != 5) {
             if(Math.random() < 0.8) {
                 return bettingAction;
             } else {
                 return passiveAction;
             }
         } else {
-            if(Game.getPosition().equals("OOP") && !handPath.contains("F")) {
+            if(!computerGame.isComputerIsButton() && !handPath.contains("F")) {
                 if(Math.random() < 0.8) {
                     return bettingAction;
                 } else {
@@ -260,7 +263,7 @@ public class PostFlopActionBuilder {
                 }
             }
 
-            if(Game.getStreet().equals("flop")) {
+            if(computerGame.getBoard().size() == 3) {
                 if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
                     if(Math.random() < 0.8) {
                         return bettingAction;
@@ -285,6 +288,11 @@ public class PostFlopActionBuilder {
     private boolean boardIsSingleRaisedAndNoBettingPostFlop() {
         //TODO: implement this method
         return false;
+    }
+
+    private double getPotOdds() {
+        //TODO: implement this method
+        return 0;
     }
 
 }

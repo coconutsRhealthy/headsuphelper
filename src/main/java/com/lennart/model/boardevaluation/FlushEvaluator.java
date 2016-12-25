@@ -1,7 +1,6 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -59,7 +58,7 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         if(numberOfSuitedCards == 3) {
             flushCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            return getSortedCardComboMap(flushCombos, board, this);
         }
 
         if(numberOfSuitedCards == 4) {
@@ -73,13 +72,13 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
                 }
             }
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushCombos, board);
-            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            return getSortedCardComboMap(flushCombos, board, this);
         }
 
         if(numberOfSuitedCards == 5) {
             Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
-            return getSortedCardComboMap(flushCombos, board, new FlushEvaluator());
+            return getSortedCardComboMap(flushCombos, board, this);
         }
         return new HashMap<>();
     }
@@ -484,12 +483,13 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
     }
 
     private void setNumberOfFlushes(int numberOfFlushes) {
-        if(Game.getStreet().equals("Flop")) {
-            setNumberOfFlushesOnFlop(numberOfFlushes);
-        } else if(Game.getStreet().equals("Turn")) {
-            setNumberOfFlushesOnTurn(numberOfFlushes);
-        } else if(Game.getStreet().equals("River")) {
-            setNumberOfFlushesOnRiver(numberOfFlushes);
-        }
+        //TODO: implement with the new constructor
+//        if(board.size() == 3) {
+//            setNumberOfFlushesOnFlop(numberOfFlushes);
+//        } else if(board.size() == 4) {
+//            setNumberOfFlushesOnTurn(numberOfFlushes);
+//        } else if(board.size() == 5) {
+//            setNumberOfFlushesOnRiver(numberOfFlushes);
+//        }
     }
 }

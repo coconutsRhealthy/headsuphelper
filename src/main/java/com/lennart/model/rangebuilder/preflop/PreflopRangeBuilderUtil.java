@@ -2,7 +2,6 @@ package com.lennart.model.rangebuilder.preflop;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -13,10 +12,12 @@ public class PreflopRangeBuilderUtil {
 
     private BoardEvaluator boardEvaluator;
     private Map<Integer, Set<Card>> allStartHands = new HashMap<>();
+    private Set<Card> knownGameCards;
 
-    public PreflopRangeBuilderUtil(BoardEvaluator boardEvaluator) {
+    public PreflopRangeBuilderUtil(BoardEvaluator boardEvaluator, Set<Card> knownGameCards) {
         this.boardEvaluator = boardEvaluator;
         allStartHands = fillAllStartHands(allStartHands);
+        this.knownGameCards = knownGameCards;
     }
 
     public Map<Integer, Set<Card>> getBroadWayHoleCards(double percentage) {
@@ -67,10 +68,10 @@ public class PreflopRangeBuilderUtil {
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(Game.getKnownGameCards());
+        knownGameCards.addAll(this.knownGameCards);
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(Game.getKnownGameCards());
+        knownGameCardsCopy.addAll(this.knownGameCards);
 
         List<List<Card>> asList = new ArrayList<>(allPocketPairStartHands.values());
         Set<Set<Card>> asSet = new HashSet<>();
@@ -128,10 +129,10 @@ public class PreflopRangeBuilderUtil {
         suits.add('h');
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(Game.getKnownGameCards());
+        knownGameCards.addAll(this.knownGameCards);
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(Game.getKnownGameCards());
+        knownGameCardsCopy.addAll(this.knownGameCards);
 
         for(Character suit : suits) {
             Set<Card> combo = new HashSet<>();
@@ -161,10 +162,10 @@ public class PreflopRangeBuilderUtil {
         suits.add('h');
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(Game.getKnownGameCards());
+        knownGameCards.addAll(this.knownGameCards);
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(Game.getKnownGameCards());
+        knownGameCardsCopy.addAll(this.knownGameCards);
 
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
@@ -196,10 +197,10 @@ public class PreflopRangeBuilderUtil {
         suits.add('h');
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(Game.getKnownGameCards());
+        knownGameCards.addAll(this.knownGameCards);
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(Game.getKnownGameCards());
+        knownGameCardsCopy.addAll(this.knownGameCards);
 
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
@@ -299,10 +300,10 @@ public class PreflopRangeBuilderUtil {
         Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(Game.getKnownGameCards());
+        knownGameCards.addAll(this.knownGameCards);
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(Game.getKnownGameCards());
+        knownGameCardsCopy.addAll(this.knownGameCards);
 
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsAlist.entrySet()) {
             if(knownGameCardsCopy.add(entry.getValue().get(0)) && knownGameCardsCopy.add(entry.getValue().get(1))) {
@@ -381,10 +382,10 @@ public class PreflopRangeBuilderUtil {
         Map<Integer, Set<Card>> suitedOrOffSuitHoleCards = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(Game.getKnownGameCards());
+        knownGameCards.addAll(this.knownGameCards);
 
         Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(Game.getKnownGameCards());
+        knownGameCardsCopy.addAll(this.knownGameCards);
 
         for(Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());

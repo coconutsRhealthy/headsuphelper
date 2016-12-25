@@ -1,7 +1,6 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.Game;
 
 import java.util.*;
 
@@ -427,12 +426,13 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
     }
 
     private void setNumberOfStraights(int numberOfStraights) {
-        if(Game.getStreet().equals("Flop")) {
-            setNumberOfStraightsOnFlop(numberOfStraights);
-        } else if(Game.getStreet().equals("Turn")) {
-            setNumberOfStraightsOnTurn(numberOfStraights);
-        } else if(Game.getStreet().equals("River")) {
-            setNumberOfStraightsOnRiver(numberOfStraights);
-        }
+        //TODO: implement with the new constructor
+//        if(board.size() == 3) {
+//            setNumberOfStraightsOnFlop(numberOfStraights);
+//        } else if(board.size() == 4) {
+//            setNumberOfStraightsOnTurn(numberOfStraights);
+//        } else if(board.size() == 5) {
+//            setNumberOfStraightsOnRiver(numberOfStraights);
+//        }
     }
 }
