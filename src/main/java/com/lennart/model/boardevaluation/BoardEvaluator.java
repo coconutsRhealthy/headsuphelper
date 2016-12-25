@@ -4,7 +4,6 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.ComputerGame;
-import com.lennart.model.pokergame.Game;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -15,6 +14,7 @@ import java.util.*;
  */
 public class BoardEvaluator {
 
+    private List<Card> board;
     private Map<Integer, Set<Set<Card>>> sortedCombosNew;
     private static Map<Integer, List<Card>> allPossibleStartHandsNew;
 
@@ -25,6 +25,8 @@ public class BoardEvaluator {
     }
 
     public BoardEvaluator(ComputerGame computerGame) {
+        board = computerGame.getBoard();
+
         if(allPossibleStartHandsNew == null) {
             allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
         }
@@ -84,20 +86,6 @@ public class BoardEvaluator {
         }
         return allPossibleStartHands;
     }
-
-//    public Map<Integer, Set<Set<Card>>> getSortedCombos(List<Card> board) {
-//        if(sortedCombos != null) {
-//            return sortedCombos;
-//        } else {
-//            return getSortedCombosInitialize(board);
-//        }
-//    }
-
-//    public void resetSortedCombosAndDraws() {
-//        BoardEvaluator.sortedCombos = null;
-//        StraightDrawEvaluator.setCombosThatGiveAnyStraightDraw(null);
-//        FlushDrawEvaluator.setAllFlushDraws(null);
-//    }
 
     public boolean isBoardRainbow(List<Card> board) {
         if(getNumberOfSuitedCardsOnBoard(board) == 0) {
@@ -449,16 +437,6 @@ public class BoardEvaluator {
         }
         return allStartHandsThatContainASpecificCard;
     }
-
-//    public Map<Integer, List<Card>> getAllPossibleStartHands() {
-//        Map<Integer, List<Card>> allPossibleStartHandsCopy = new HashMap<>();
-//
-//        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-//            allPossibleStartHandsCopy.put(allPossibleStartHandsCopy.size(), new ArrayList<>());
-//            allPossibleStartHandsCopy.get(allPossibleStartHandsCopy.size()-1).addAll(entry.getValue());
-//        }
-//        return allPossibleStartHandsCopy;
-//    }
 
     public static List<Card> getCompleteCardDeck() {
         List<Card> completeCardDeck = new ArrayList<>();
@@ -941,23 +919,13 @@ public class BoardEvaluator {
         return cleanedSortedCombos;
     }
 
-//    public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
-//        Map<Integer, Set<Set<Card>>> copyOfAllSortedCombos = new HashMap<>();
-//
-//        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
-//            copyOfAllSortedCombos.put(copyOfAllSortedCombos.size(), new HashSet<>());
-//            copyOfAllSortedCombos.get(copyOfAllSortedCombos.size()-1).addAll(entry.getValue());
-//        }
-//        return copyOfAllSortedCombos;
-//    }
-
     public int getNumberOfArrivedDraws() {
-        if(Game.getStreet().equals("Flop")) {
+        if(board.size() == 3) {
             return StraightEvaluator.getNumberOfStraightsOnFlop() + FlushEvaluator.getNumberOfFlushesOnFlop();
-        } else if(Game.getStreet().equals("Turn")) {
+        } else if(board.size() == 4) {
             return (StraightEvaluator.getNumberOfStraightsOnTurn() + FlushEvaluator.getNumberOfFlushesOnTurn())
                     - (StraightEvaluator.getNumberOfStraightsOnFlop() + FlushEvaluator.getNumberOfFlushesOnFlop());
-        } else if(Game.getStreet().equals("River")) {
+        } else if(board.size() == 5) {
             return (StraightEvaluator.getNumberOfStraightsOnRiver() + FlushEvaluator.getNumberOfFlushesOnRiver())
                     - (StraightEvaluator.getNumberOfStraightsOnTurn() + FlushEvaluator.getNumberOfFlushesOnTurn());
         }
@@ -969,7 +937,7 @@ public class BoardEvaluator {
         Map<Integer, Set<Set<Card>>> allStraightCombos = straightEvaluator.getMapOfStraightCombos();
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
 
-        if(Game.getStreet().equals("Flop")) {
+        if(board.size() == 3) {
             for (Map.Entry<Integer, Set<Set<Card>>> entry : allStraightCombos.entrySet()) {
                 for(Set s : entry.getValue()) {
                     combosToReturn.put(combosToReturn.size(), s);
@@ -977,14 +945,16 @@ public class BoardEvaluator {
             }
         }
 
-        if(Game.getStreet().equals("Turn")) {
-            Map<Integer, Set<Card>> allStraightDrawsFlop = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotFlop();
-            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allStraightCombos, allStraightDrawsFlop);
+        if(board.size() == 4) {
+            //TODO implement without static method
+            //Map<Integer, Set<Card>> allStraightDrawsFlop = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotFlop();
+            //combosToReturn = getCombosThatWereDrawAndNowMadeHand(allStraightCombos, allStraightDrawsFlop);
         }
 
-        if(Game.getStreet().equals("River")) {
-            Map<Integer, Set<Card>> allStraightDrawsTurn = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotTurn();
-            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allStraightCombos, allStraightDrawsTurn);
+        if(board.size() == 5) {
+            //TODO implement without static method
+            //Map<Integer, Set<Card>> allStraightDrawsTurn = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotTurn();
+            //combosToReturn = getCombosThatWereDrawAndNowMadeHand(allStraightCombos, allStraightDrawsTurn);
         }
         return combosToReturn;
     }
@@ -994,7 +964,7 @@ public class BoardEvaluator {
         Map<Integer, Set<Set<Card>>> allFlushCombos = flushEvaluator.getFlushCombos();
         Map<Integer, Set<Card>> combosToReturn = new HashMap<>();
 
-        if(Game.getStreet().equals("Flop")) {
+        if(board.size() == 3) {
             for (Map.Entry<Integer, Set<Set<Card>>> entry : allFlushCombos.entrySet()) {
                 for(Set s : entry.getValue()) {
                     combosToReturn.put(combosToReturn.size(), s);
@@ -1002,14 +972,16 @@ public class BoardEvaluator {
             }
         }
 
-        if(Game.getStreet().equals("Turn")) {
-            Map<Integer, Set<Card>> allFlushDrawsFlop = FlushDrawEvaluator.getAllFlushDrawsFlop();
-            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allFlushCombos, allFlushDrawsFlop);
+        if(board.size() == 4) {
+            //TODO implement without static method
+            //Map<Integer, Set<Card>> allFlushDrawsFlop = FlushDrawEvaluator.getAllFlushDrawsFlop();
+            //combosToReturn = getCombosThatWereDrawAndNowMadeHand(allFlushCombos, allFlushDrawsFlop);
         }
 
-        if(Game.getStreet().equals("River")) {
-            Map<Integer, Set<Card>> allFlushDrawsTurn = FlushDrawEvaluator.getAllFlushDrawsTurn();
-            combosToReturn = getCombosThatWereDrawAndNowMadeHand(allFlushCombos, allFlushDrawsTurn);
+        if(board.size() == 5) {
+            //TODO implement without static method
+            //Map<Integer, Set<Card>> allFlushDrawsTurn = FlushDrawEvaluator.getAllFlushDrawsTurn();
+            //combosToReturn = getCombosThatWereDrawAndNowMadeHand(allFlushCombos, allFlushDrawsTurn);
         }
         return combosToReturn;
     }
@@ -1038,12 +1010,14 @@ public class BoardEvaluator {
         boolean noStraightDraws = true;
         boolean noFlushDraws = true;
 
-        if(Game.getStreet().equals("Flop")) {
-            noStraightDraws = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotFlop().isEmpty();
-            noFlushDraws = FlushDrawEvaluator.getAllFlushDrawsFlop().isEmpty();
-        } else if(Game.getStreet().equals("Turn")) {
-            noStraightDraws = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotTurn().isEmpty();
-            noFlushDraws = FlushDrawEvaluator.getAllFlushDrawsTurn().isEmpty();
+        if(board.size() == 3) {
+            //TODO: implement without static method
+            //noStraightDraws = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotFlop().isEmpty();
+            //noFlushDraws = FlushDrawEvaluator.getAllFlushDrawsFlop().isEmpty();
+        } else if(board.size() == 4) {
+            //TODO: implement without static method
+            //noStraightDraws = StraightDrawEvaluator.getCombosThatGiveOosdOrGutshotTurn().isEmpty();
+            //noFlushDraws = FlushDrawEvaluator.getAllFlushDrawsTurn().isEmpty();
         }
         return(noStraightCombos && noFlushCombos && noStraightDraws && noFlushDraws);
     }
