@@ -37,12 +37,7 @@ public class PostFlopActionBuilder {
     }
 
     public String getAction(Set<Set<Card>> opponentRange) {
-        //tijdelijk
-        Set<Card> computerHoleCardsAsSet = new HashSet<>();
-        computerHoleCardsAsSet.addAll(computerGame.getComputerHoleCards());
-        //tijdelijk
-
-        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRangeNew(computerHoleCardsAsSet,
+        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRangeNew(computerGame.getComputerHoleCards(),
                 opponentRange, boardEvaluator.getSortedCombosNew());
 
         if(computerGame.isComputerIsButton()) {

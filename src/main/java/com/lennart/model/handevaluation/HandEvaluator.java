@@ -55,29 +55,32 @@ public class HandEvaluator {
         return handStrength;
     }
 
-    public double getHandStrengthAgainstRangeNew(Set<Card> yourHand, Set<Set<Card>> range, Map<Integer, Set<Set<Card>>> sortedCombos) {
-        double combosInRangeBelowYourHand = 0;
+    public double getHandStrengthAgainstRangeNew(List<Card> yourHoleCardsAsList, Set<Set<Card>> opponentRange, Map<Integer,
+            Set<Set<Card>>> sortedCombos) {
+        Set<Card> yourHoleCards = convertListToSet(yourHoleCardsAsList);
+
+        double combosInOpponentRangeBelowYourHand = 0;
         double index;
         boolean myHandHasBeenPassedInSortedCombos = false;
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
             for(Set<Card> combo : entry.getValue()) {
-                if(combo.equals(yourHand)) {
+                if(combo.equals(yourHoleCards)) {
                     myHandHasBeenPassedInSortedCombos = true;
                 }
 
                 Set<Set<Card>> rangeCopy = new HashSet<>();
-                rangeCopy.addAll(range);
+                rangeCopy.addAll(opponentRange);
 
                 if(!rangeCopy.add(combo)) {
                     if(myHandHasBeenPassedInSortedCombos) {
-                        combosInRangeBelowYourHand++;
+                        combosInOpponentRangeBelowYourHand++;
                     }
                 }
             }
         }
 
-        index = combosInRangeBelowYourHand / (range.size() + 1);
+        index = combosInOpponentRangeBelowYourHand / (opponentRange.size());
         return index;
     }
 
@@ -167,6 +170,12 @@ public class HandEvaluator {
         }
 
         return counter;
+    }
+
+    private Set<Card> convertListToSet(List<Card> list) {
+        Set<Card> set = new HashSet<>();
+        set.addAll(list);
+        return set;
     }
 
     public double getPercentageOfYourPerceivedRangeThatHitsFlopRanks() {
