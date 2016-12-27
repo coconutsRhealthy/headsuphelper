@@ -49,7 +49,7 @@ public class Action {
                 break;
             case "2betFcheck":
                 //nu zet je de range
-                Map<Integer, Set<Set<Card>>> sortedOpponentRange = flopRangeBuilder.get2betCheck();
+                Set<Set<Card>> sortedOpponentRange = flopRangeBuilder.get2betCheck();
 
                 //en nu ga je de actie doen, met postFlopActionBuilder...
                 String action = postFlopActionBuilder.getAction(sortedOpponentRange);

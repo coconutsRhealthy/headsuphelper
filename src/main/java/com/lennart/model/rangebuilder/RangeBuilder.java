@@ -93,6 +93,49 @@ public class RangeBuilder {
         return allSortedCombosClearedForRange;
     }
 
+    public Set<Set<Card>> createRangeNew(Map<Integer, Set<Card>> preflopRange,
+                                                    Map<Integer, Map<Integer, Set<Card>>> flopRange) {
+        Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = getCopyOfSortedCombos();
+        allSortedCombosClearedForRange = removeHoleCardCombosFromAllSortedCombos(allSortedCombosClearedForRange, holeCards);
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombosClearedForRange.entrySet()) {
+            loop: for (Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
+                Set<Card> comboFromAllSortedCombos = it.next();
+                for (Map.Entry<Integer, Set<Card>> preflopRangeMapEntry : preflopRange.entrySet()) {
+                    if(comboFromAllSortedCombos.equals(preflopRangeMapEntry.getValue())) {
+                        continue loop;
+                    }
+                }
+                it.remove();
+            }
+        }
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombosClearedForRange.entrySet()) {
+            loop: for (Iterator<Set<Card>> it = entry.getValue().iterator(); it.hasNext(); ) {
+                Set<Card> comboFromAllSortedCombos = it.next();
+                for (Map.Entry<Integer, Map<Integer, Set<Card>>> flopRangeMapEntry : flopRange.entrySet()) {
+                    if(!flopRangeMapEntry.getValue().isEmpty()) {
+                        for (Map.Entry<Integer, Set<Card>> comboToRetainInRange : flopRangeMapEntry.getValue().entrySet()) {
+                            if (comboFromAllSortedCombos.equals(comboToRetainInRange.getValue())) {
+                                continue loop;
+                            }
+                        }
+                    }
+                }
+                it.remove();
+            }
+        }
+
+        Set<Set<Card>> rangeToReturn = new HashSet<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : allSortedCombosClearedForRange.entrySet()) {
+            for (Set<Card> combo : entry.getValue()) {
+                rangeToReturn.add(combo);
+            }
+        }
+        return rangeToReturn;
+    }
+
     public Map<Integer, Set<Card>> getCombosOfDesignatedStrength(double lowLimit, double highLimit,
                                                                  double percentageOfCombosToInclude) {
         Map<Integer, Set<Set<Card>>> sortedCombosInMethod = sortedCombos;
@@ -847,5 +890,17 @@ public class RangeBuilder {
 //        return rangeToReturn;
 
         return null;
+    }
+
+    public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
+        Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            allSortedCombosClearedForRange.put(entry.getKey(), new HashSet<>());
+            for(Set<Card> combo : entry.getValue()) {
+                allSortedCombosClearedForRange.get(entry.getKey()).add(combo);
+            }
+        }
+        return allSortedCombosClearedForRange;
     }
 }

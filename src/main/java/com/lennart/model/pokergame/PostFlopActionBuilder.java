@@ -3,7 +3,7 @@ package com.lennart.model.pokergame;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -36,9 +36,14 @@ public class PostFlopActionBuilder {
         handPath = computerGame.getHandPath();
     }
 
-    public String getAction(Map<Integer, Set<Set<Card>>> opponentRange) {
-        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRange(computerGame.getComputerHoleCards(),
-                opponentRange);
+    public String getAction(Set<Set<Card>> opponentRange) {
+        //tijdelijk
+        Set<Card> computerHoleCardsAsSet = new HashSet<>();
+        computerHoleCardsAsSet.addAll(computerGame.getComputerHoleCards());
+        //tijdelijk
+
+        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRangeNew(computerHoleCardsAsSet,
+                opponentRange, boardEvaluator.getSortedCombosNew());
 
         if(computerGame.isComputerIsButton()) {
             return getIpAction(handStrengthAgainstRange);

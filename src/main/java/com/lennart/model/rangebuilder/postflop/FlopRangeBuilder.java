@@ -21,7 +21,7 @@ public class FlopRangeBuilder {
 
     //IP
 
-    public Map<Integer, Set<Set<Card>>> get2betCheck() {
+    public Set<Set<Card>> get2betCheck() {
         //preflop
         Map<Integer, Set<Card>> preflopRange = preflopRangeBuilder.getOpponentCall2betRange();
 
@@ -30,7 +30,7 @@ public class FlopRangeBuilder {
             //dit gaat nu mis want nu zeg je dat je floprange empty is.. en cleart ie dus alles in createRange. Doe zo:
         flopRange.put(flopRange.size(), preflopRange);
 
-        return rangeBuilder.createRange(preflopRange, flopRange);
+        return rangeBuilder.createRangeNew(preflopRange, flopRange);
     }
 
     //40% -> 50% gemaakt

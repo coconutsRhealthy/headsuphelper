@@ -55,6 +55,32 @@ public class HandEvaluator {
         return handStrength;
     }
 
+    public double getHandStrengthAgainstRangeNew(Set<Card> yourHand, Set<Set<Card>> range, Map<Integer, Set<Set<Card>>> sortedCombos) {
+        double combosInRangeBelowYourHand = 0;
+        double index;
+        boolean myHandHasBeenPassedInSortedCombos = false;
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            for(Set<Card> combo : entry.getValue()) {
+                if(combo.equals(yourHand)) {
+                    myHandHasBeenPassedInSortedCombos = true;
+                }
+
+                Set<Set<Card>> rangeCopy = new HashSet<>();
+                rangeCopy.addAll(range);
+
+                if(!rangeCopy.add(combo)) {
+                    if(myHandHasBeenPassedInSortedCombos) {
+                        combosInRangeBelowYourHand++;
+                    }
+                }
+            }
+        }
+
+        index = combosInRangeBelowYourHand / (range.size() + 1);
+        return index;
+    }
+
     public double getIndexOfHandInSortedCombos(Integer key, Map<Integer, Set<Set<Card>>> sortedCombos) {
         double index;
 
