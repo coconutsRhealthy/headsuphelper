@@ -11,6 +11,7 @@ import java.util.*;
  */
 public class HighCardDrawEvaluator extends HighCardEvaluator {
 
+    //Todo: hier moet nog wat mee.. ook constructor
     StraightEvaluator straightEvaluator = new StraightEvaluator();
 
     public Map<Integer, Set<Card>> getStrongTwoOvercards(List<Card> board) {

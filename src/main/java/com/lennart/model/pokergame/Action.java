@@ -31,6 +31,8 @@ public class Action {
     }
 
     public Action(ComputerGame computerGame) {
+        //TODO: nog onderscheid maken tussen wat nodig is preflop / postflop
+
         boardEvaluator = new BoardEvaluator(computerGame);
         rangeBuilder = new RangeBuilder(boardEvaluator, computerGame.getComputerHoleCards(), computerGame.getKnownGameCards());
         preflopRangeBuilder = new PreflopRangeBuilder(boardEvaluator, computerGame.getKnownGameCards());
@@ -45,11 +47,14 @@ public class Action {
                 sizing = preflopActionBuilder.getSize(computerGame);
                 writtenAction = "Computer raises";
                 break;
-            case "2bet":
+            case "2betFcheck":
                 //nu zet je de range
                 Map<Integer, Set<Set<Card>>> sortedOpponentRange = flopRangeBuilder.get2betCheck();
 
                 //en nu ga je de actie doen, met postFlopActionBuilder...
+                String action = postFlopActionBuilder.getAction(sortedOpponentRange);
+
+                System.out.println("wacht");
 
             default:
                 System.out.println("no action available for handpath: " + computerGame.getHandPath());

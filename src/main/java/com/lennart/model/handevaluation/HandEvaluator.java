@@ -37,6 +37,9 @@ public class HandEvaluator {
     }
 
     public double getHandStrengthAgainstRange(List<Card> hand, Map<Integer, Set<Set<Card>>> range) {
+        //TODO: dit werkt nu niet goed, want je geeft een range mee waar jouw hand niet in kan zitten. Range moet
+        //een ander soort map zijn, nog even over nadenken hoe..
+
         Set<Card> handSet = new HashSet<>();
         handSet.addAll(hand);
 

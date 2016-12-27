@@ -161,6 +161,10 @@ public class ComputerGame {
         if(myAction.equals("call") || (myAction.equals("check") && !computerIsButton)) {
             resetComputerBetsize();
             proceedToNextStreetOrFinishHand();
+            if(isComputerIsButton()) {
+                //moved to next street and it is your turn again immediately
+                return this;
+            }
         }
 
         //do computer action

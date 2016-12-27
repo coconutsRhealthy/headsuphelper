@@ -27,6 +27,8 @@ public class FlopRangeBuilder {
 
         //postflop
         Map<Integer, Map<Integer, Set<Card>>> flopRange = new HashMap<>();
+            //dit gaat nu mis want nu zeg je dat je floprange empty is.. en cleart ie dus alles in createRange. Doe zo:
+        flopRange.put(flopRange.size(), preflopRange);
 
         return rangeBuilder.createRange(preflopRange, flopRange);
     }
