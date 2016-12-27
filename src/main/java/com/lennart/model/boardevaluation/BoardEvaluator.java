@@ -69,12 +69,12 @@ public class BoardEvaluator {
         this.sortedCombosNew = sortedCombosNew;
     }
 
-    public Map<Integer, List<Card>> getAllPossibleStartHandsNew() {
+    public static Map<Integer, List<Card>> getAllPossibleStartHandsNew() {
         return allPossibleStartHandsNew;
     }
 
-    public void setAllPossibleStartHandsNew(Map<Integer, List<Card>> allPossibleStartHandsNew) {
-        this.allPossibleStartHandsNew = allPossibleStartHandsNew;
+    public static void setAllPossibleStartHandsNew(Map<Integer, List<Card>> allPossibleStartHandsNew) {
+        BoardEvaluator.allPossibleStartHandsNew = allPossibleStartHandsNew;
     }
 
     public Map<Integer, List<Card>> getAllPossibleStartHandsInitialize() {
@@ -495,7 +495,7 @@ public class BoardEvaluator {
         return startHandMap;
     }
 
-    public Map<Integer, List<Card>> getAllPocketPairStartHands() {
+    public static Map<Integer, List<Card>> getAllPocketPairStartHands() {
         Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
         Map<Integer, List<Card>> allPossibleStartHands = allPossibleStartHandsNew;
 

@@ -25,27 +25,35 @@ public class Action {
     private PreflopActionBuilder preflopActionBuilder;
     private PostFlopActionBuilder postFlopActionBuilder;
 
+    private String handPathBeforeAction;
+    private String handPathAfterAction;
+    private String newPartOfHandPath;
+
 
     public Action() {
         //default constructor
     }
 
     public Action(ComputerGame computerGame) {
-        //TODO: nog onderscheid maken tussen wat nodig is preflop / postflop
-
-        boardEvaluator = new BoardEvaluator(computerGame);
-        rangeBuilder = new RangeBuilder(boardEvaluator, computerGame.getComputerHoleCards(), computerGame.getKnownGameCards());
-        preflopRangeBuilder = new PreflopRangeBuilder(boardEvaluator, computerGame.getKnownGameCards());
-        flopRangeBuilder = new FlopRangeBuilder(rangeBuilder, preflopRangeBuilder);
-        handEvaluator = new HandEvaluator(boardEvaluator, rangeBuilder);
+        handPathBeforeAction = computerGame.getHandPath();
+        preflopRangeBuilder = new PreflopRangeBuilder(computerGame.getKnownGameCards());
         preflopActionBuilder = new PreflopActionBuilder(preflopRangeBuilder);
-        postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame);
+
+        if(computerGame.getBoard() != null) {
+            boardEvaluator = new BoardEvaluator(computerGame);
+            rangeBuilder = new RangeBuilder(boardEvaluator, computerGame.getComputerHoleCards(), computerGame.getKnownGameCards());
+            flopRangeBuilder = new FlopRangeBuilder(rangeBuilder, preflopRangeBuilder);
+            handEvaluator = new HandEvaluator(boardEvaluator, rangeBuilder);
+            postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame);
+        }
 
         switch(computerGame.getHandPath()) {
             case "05betF1bet":
-                computerGame.setHandPath(preflopActionBuilder.get05betF1bet(computerGame));
-                sizing = preflopActionBuilder.getSize(computerGame);
-                writtenAction = "Computer raises";
+                handPathAfterAction = preflopActionBuilder.get05betF1bet(computerGame);
+                newPartOfHandPath = getNewPartOfHandPath();
+                computerGame.setHandPath(handPathAfterAction);
+                setSizingIfNecessary(computerGame);
+                setNewWrittenAction();
                 break;
             case "2betFcheck":
                 //nu zet je de range
@@ -59,6 +67,48 @@ public class Action {
             default:
                 System.out.println("no action available for handpath: " + computerGame.getHandPath());
                 sizing = 0;
+        }
+    }
+
+    private String getNewPartOfHandPath() {
+        String newPartOfHandPath = "";
+
+        if(handPathBeforeAction.charAt(0) != handPathAfterAction.charAt(0)) {
+            newPartOfHandPath = handPathAfterAction;
+        } else {
+            char[] oldHandPathChars = handPathBeforeAction.toCharArray();
+            char[] newHandPathChars = handPathAfterAction.toCharArray();
+
+            int indexWhereStringsStartToDiffer;
+
+            for(int i = 0; i < oldHandPathChars.length; i++) {
+                if(oldHandPathChars[i] == newHandPathChars [i]) {
+                    continue;
+                }
+                indexWhereStringsStartToDiffer = i;
+                newPartOfHandPath = handPathAfterAction.substring(indexWhereStringsStartToDiffer);
+            }
+        }
+        return newPartOfHandPath;
+    }
+
+    private void setNewWrittenAction() {
+        if(newPartOfHandPath.contains("Fold")) {
+            writtenAction = "Computer folds";
+        } else if(newPartOfHandPath.contains("Check")) {
+            writtenAction = "Computer checks";
+        } else if(newPartOfHandPath.contains("Call")) {
+            writtenAction = "Computer calls";
+        } else if(newPartOfHandPath.contains("1Bet")) {
+            writtenAction = "Computer bets";
+        } else {
+            writtenAction = "Computer raises";
+        }
+    }
+
+    private void setSizingIfNecessary(ComputerGame computerGame) {
+        if(newPartOfHandPath.contains("bet")) {
+            sizing = preflopActionBuilder.getSize(computerGame);
         }
     }
 

@@ -26,8 +26,8 @@ public class PreflopRangeBuilder {
     private _3betRangeBuilder _3betRangeBuilder;
     private Call4betRangeBuilder call4betRangeBuilder;
 
-    public PreflopRangeBuilder(BoardEvaluator boardEvaluator, Set<Card> knownGameCards) {
-        preflopRangeBuilderUtil = new PreflopRangeBuilderUtil(boardEvaluator, knownGameCards);
+    public PreflopRangeBuilder(Set<Card> knownGameCards) {
+        preflopRangeBuilderUtil = new PreflopRangeBuilderUtil(knownGameCards);
         _2betRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
         call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
         _4betRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);

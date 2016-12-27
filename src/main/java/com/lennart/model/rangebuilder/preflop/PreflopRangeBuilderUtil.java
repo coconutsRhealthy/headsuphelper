@@ -10,12 +10,10 @@ import java.util.*;
  */
 public class PreflopRangeBuilderUtil {
 
-    private BoardEvaluator boardEvaluator;
     private Map<Integer, Set<Card>> allStartHands = new HashMap<>();
     private Set<Card> knownGameCards;
 
-    public PreflopRangeBuilderUtil(BoardEvaluator boardEvaluator, Set<Card> knownGameCards) {
-        this.boardEvaluator = boardEvaluator;
+    public PreflopRangeBuilderUtil(Set<Card> knownGameCards) {
         allStartHands = fillAllStartHands(allStartHands);
         this.knownGameCards = knownGameCards;
     }
@@ -64,7 +62,7 @@ public class PreflopRangeBuilderUtil {
     }
 
     public Map<Integer, Set<Card>> getPocketPairs(int minimumRankOfHighestCard, double percentage) {
-        Map<Integer, List<Card>> allPocketPairStartHands = boardEvaluator.getAllPocketPairStartHands();
+        Map<Integer, List<Card>> allPocketPairStartHands = BoardEvaluator.getAllPocketPairStartHands();
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
@@ -296,7 +294,7 @@ public class PreflopRangeBuilderUtil {
 
     //Corrected for known boardCards, only use this method in RangeBuilder classes
     public Map<Integer, Set<Card>> getAllPossibleStartHandsAsSets() {
-        Map<Integer, List<Card>> allPossibleStartHandsAsAlist = boardEvaluator.getAllPossibleStartHandsNew();
+        Map<Integer, List<Card>> allPossibleStartHandsAsAlist = BoardEvaluator.getAllPossibleStartHandsNew();
         Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
@@ -321,7 +319,7 @@ public class PreflopRangeBuilderUtil {
 
     //previously this was a static block in top of class
     private Map<Integer, Set<Card>> fillAllStartHands(Map<Integer, Set<Card>> allStartHands) {
-        Map<Integer, List<Card>> allPossibleStartHands = boardEvaluator.getAllPossibleStartHandsNew();
+        Map<Integer, List<Card>> allPossibleStartHands = BoardEvaluator.getAllPossibleStartHandsNew();
 
         List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
         Set<Set<Card>> asSet = new HashSet<>();
