@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -28,8 +29,8 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         Map<Integer, List<Card>> comboMap = new HashMap<>();
         Map<Integer, Set<Set<Card>>> sortedFullHouseCombos;
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-        Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
-        Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
+        Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+        Map<Integer, List<Card>> allPocketPairStartHands = PreflopRangeBuilderUtil.getAllPocketPairStartHands();
 
         //een pair op board
         if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
@@ -149,7 +150,7 @@ public class FullHouseEvaluator extends BoardEvaluator implements ComboComparato
         if(boardContainsBoat(board)) {
             //alle combos, behalve combos die quads en straight flush maken
 
-            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
+            Map<Integer, List<Card>> allStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
             comboMap = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
 
             //remove quads combos

@@ -1,6 +1,5 @@
 package com.lennart.model.rangebuilder.preflop;
 
-import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
 
 import java.util.*;
@@ -10,11 +9,11 @@ import java.util.*;
  */
 public class PreflopRangeBuilderUtil {
 
-    private Map<Integer, Set<Card>> allStartHands = new HashMap<>();
+    private static final Map<Integer, List<Card>> allPossibleStartHandsAsList = getAllPossibleStartHandsInitialize();
+    private static final Map<Integer, Set<Card>> allStartHandsAsSet = fillAllStartHands();
     private Set<Card> knownGameCards;
 
     public PreflopRangeBuilderUtil(Set<Card> knownGameCards) {
-        allStartHands = fillAllStartHands(allStartHands);
         this.knownGameCards = knownGameCards;
     }
 
@@ -62,7 +61,7 @@ public class PreflopRangeBuilderUtil {
     }
 
     public Map<Integer, Set<Card>> getPocketPairs(int minimumRankOfHighestCard, double percentage) {
-        Map<Integer, List<Card>> allPocketPairStartHands = BoardEvaluator.getAllPocketPairStartHands();
+        Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
@@ -294,7 +293,7 @@ public class PreflopRangeBuilderUtil {
 
     //Corrected for known boardCards, only use this method in RangeBuilder classes
     public Map<Integer, Set<Card>> getAllPossibleStartHandsAsSets() {
-        Map<Integer, List<Card>> allPossibleStartHandsAsAlist = BoardEvaluator.getAllPossibleStartHandsNew();
+        Map<Integer, List<Card>> allPossibleStartHandsAsAlist = allPossibleStartHandsAsList;
         Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
 
         Set<Card> knownGameCards = new HashSet<>();
@@ -318,8 +317,9 @@ public class PreflopRangeBuilderUtil {
     //helper methods
 
     //previously this was a static block in top of class
-    private Map<Integer, Set<Card>> fillAllStartHands(Map<Integer, Set<Card>> allStartHands) {
-        Map<Integer, List<Card>> allPossibleStartHands = BoardEvaluator.getAllPossibleStartHandsNew();
+    private static Map<Integer, Set<Card>> fillAllStartHands() {
+        Map<Integer, Set<Card>> allStartHandsAsSets = new HashMap<>();
+        Map<Integer, List<Card>> allPossibleStartHands = allPossibleStartHandsAsList;
 
         List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
         Set<Set<Card>> asSet = new HashSet<>();
@@ -331,16 +331,16 @@ public class PreflopRangeBuilderUtil {
         }
 
         for(Set<Card> combo : asSet) {
-            allStartHands.put(allStartHands.size(), combo);
+            allStartHandsAsSets.put(allStartHandsAsSets.size(), combo);
         }
-        return allStartHands;
+        return allStartHandsAsSets;
     }
 
     private Map<Integer, Set<Card>> getSuitedOrOffSuitConnectingCards(int rankOfHighestCard, int gapBetweenCards, boolean suited,
                                                                       double percentage) {
         Map<Integer, Set<Card>> suitedOrOffSuitConnectors = new HashMap<>();
 
-        for(Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
+        for(Map.Entry<Integer, Set<Card>> entry : allStartHandsAsSet.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());
             if(suited) {
                 if(asList.get(0).getSuit() == asList.get(1).getSuit()) {
@@ -385,7 +385,7 @@ public class PreflopRangeBuilderUtil {
         Set<Card> knownGameCardsCopy = new HashSet<>();
         knownGameCardsCopy.addAll(this.knownGameCards);
 
-        for(Map.Entry<Integer, Set<Card>> entry : allStartHands.entrySet()) {
+        for(Map.Entry<Integer, Set<Card>> entry : allStartHandsAsSet.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());
 
             if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
@@ -422,5 +422,78 @@ public class PreflopRangeBuilderUtil {
             knownGameCardsCopy.addAll(knownGameCards);
         }
         return suitedOrOffSuitHoleCards;
+    }
+
+    private static Map<Integer, List<Card>> getAllPossibleStartHandsInitialize() {
+        Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
+        List<Card> completeCardDeck = getCompleteCardDeck();
+
+        int i = 1;
+        for(int z = 0; z < 52; z++) {
+            for(int q = 0; q < 52; q++) {
+                if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
+                    allPossibleStartHands.put(i, new ArrayList<>());
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(z));
+                    allPossibleStartHands.get(i).add(completeCardDeck.get(q));
+                    i++;
+                }
+            }
+        }
+
+        List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
+        Set<Set<Card>> asSet = new HashSet<>();
+
+        allPossibleStartHands.clear();
+
+        for(List<Card> l : asList) {
+            Set<Card> s = new HashSet<>();
+            s.addAll(l);
+            asSet.add(s);
+        }
+
+        for(Set<Card> startHand : asSet) {
+            List<Card> l = new ArrayList<>();
+            l.addAll(startHand);
+            allPossibleStartHands.put(allPossibleStartHands.size(), l);
+        }
+        return allPossibleStartHands;
+    }
+
+    public static List<Card> getCompleteCardDeck() {
+        List<Card> completeCardDeck = new ArrayList<>();
+
+        for(int i = 2; i <= 14; i++) {
+            for(int z = 1; z <= 4; z++) {
+                if(z == 1) {
+                    completeCardDeck.add(new Card(i, 's'));
+                }
+                if(z == 2) {
+                    completeCardDeck.add(new Card(i, 'c'));
+                }
+                if(z == 3) {
+                    completeCardDeck.add(new Card(i, 'd'));
+                }
+                if(z == 4) {
+                    completeCardDeck.add(new Card(i, 'h'));
+                }
+            }
+        }
+        return completeCardDeck;
+    }
+
+    public static Map<Integer, List<Card>> getAllPocketPairStartHands() {
+        Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
+        Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
+            if(entry.getValue().get(0).getRank() == entry.getValue().get(1).getRank()) {
+                allPocketPairStartHands.put(allPocketPairStartHands.size(), entry.getValue());
+            }
+        }
+        return allPocketPairStartHands;
+    }
+
+    public static Map<Integer, List<Card>> getAllPossibleStartHandsAsList() {
+        return allPossibleStartHandsAsList;
     }
 }

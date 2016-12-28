@@ -203,14 +203,28 @@ public class ComputerGame {
     }
 
     private void dealFlopCards() {
+        Card card1 = new Card(2, 'd');
+        Card card2 = new Card(9, 'd');
+        Card card3 = new Card(13, 'c');
+
         flopCards = new ArrayList<>();
-        flopCards.add(getAndRemoveRandomCardFromDeck());
-        flopCards.add(getAndRemoveRandomCardFromDeck());
-        flopCards.add(getAndRemoveRandomCardFromDeck());
+
+        flopCards.add(card1);
+        flopCards.add(card2);
+        flopCards.add(card3);
 
         board = new ArrayList<>();
         board.addAll(flopCards);
         knownGameCards.addAll(flopCards);
+
+//        flopCards = new ArrayList<>();
+//        flopCards.add(getAndRemoveRandomCardFromDeck());
+//        flopCards.add(getAndRemoveRandomCardFromDeck());
+//        flopCards.add(getAndRemoveRandomCardFromDeck());
+//
+//        board = new ArrayList<>();
+//        board.addAll(flopCards);
+//        knownGameCards.addAll(flopCards);
     }
 
     private void dealTurnCard() {

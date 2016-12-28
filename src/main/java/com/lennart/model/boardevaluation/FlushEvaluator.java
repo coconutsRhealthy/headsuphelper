@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -79,7 +80,7 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
 
         if(numberOfSuitedCards == 4) {
             flushCombos = getAllPossibleSuitedStartHands(flushSuit);
-            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
+            Map<Integer, List<Card>> allStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
             for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
                 if (entry.getValue().get(0).getSuit() == flushSuit && entry.getValue().get(1).getSuit() != flushSuit) {
                     flushCombos.put(flushCombos.size(), entry.getValue());
@@ -92,7 +93,7 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
         }
 
         if(numberOfSuitedCards == 5) {
-            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
+            Map<Integer, List<Card>> allStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
             flushCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
             return getSortedCardComboMap(flushCombos, board, this);
         }
@@ -102,7 +103,7 @@ public class FlushEvaluator extends BoardEvaluator implements ComboComparator {
     //helper methods
     protected Map<Integer, List<Card>> getAllNonSuitedStartHandsThatContainASpecificSuit(char suit) {
         Map<Integer, List<Card>> allNonSuitedStartHandsThatContainASpecificSuit = new HashMap<>();
-        Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
+        Map<Integer, List<Card>> allStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
         for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
             if(entry.getValue().get(0).getSuit() == suit && entry.getValue().get(1).getSuit() != suit) {
                 allNonSuitedStartHandsThatContainASpecificSuit.put(allNonSuitedStartHandsThatContainASpecificSuit.size(), entry.getValue());

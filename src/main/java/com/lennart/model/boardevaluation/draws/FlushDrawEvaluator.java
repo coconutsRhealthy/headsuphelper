@@ -2,6 +2,7 @@ package com.lennart.model.boardevaluation.draws;
 
 import com.lennart.model.boardevaluation.FlushEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -155,7 +156,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         }
 
         if(threeToFlushOnBoard) {
-            Map<Integer, List<Card>> allStartHands = getAllPossibleStartHandsNew();
+            Map<Integer, List<Card>> allStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
             for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
                 if(entry.getValue().get(0).getSuit() == flushSuit && entry.getValue().get(1).getSuit() != flushSuit) {
                     flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());

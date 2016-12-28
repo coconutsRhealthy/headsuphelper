@@ -4,6 +4,7 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.ComputerGame;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -16,8 +17,6 @@ public class BoardEvaluator {
 
     private List<Card> board;
     private Map<Integer, Set<Set<Card>>> sortedCombosNew;
-    private static Map<Integer, List<Card>> allPossibleStartHandsNew;
-
     private HighCardEvaluator highCardEvaluator;
     private PairEvaluator pairEvaluator;
     private TwoPairEvaluator twoPairEvaluator;
@@ -29,17 +28,11 @@ public class BoardEvaluator {
     private StraightFlushEvaluator straightFlushEvaluator;
 
     public BoardEvaluator() {
-        if(allPossibleStartHandsNew == null) {
-            allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
-        }
+
     }
 
     public BoardEvaluator(ComputerGame computerGame) {
         board = computerGame.getBoard();
-
-        if(allPossibleStartHandsNew == null) {
-            allPossibleStartHandsNew = getAllPossibleStartHandsInitialize();
-        }
 
         if(computerGame.getFlopCards() != null) {
             straightFlushEvaluator = new StraightFlushEvaluator(board);
@@ -67,49 +60,6 @@ public class BoardEvaluator {
 
     public void setSortedCombosNew(Map<Integer, Set<Set<Card>>> sortedCombosNew) {
         this.sortedCombosNew = sortedCombosNew;
-    }
-
-    public static Map<Integer, List<Card>> getAllPossibleStartHandsNew() {
-        return allPossibleStartHandsNew;
-    }
-
-    public static void setAllPossibleStartHandsNew(Map<Integer, List<Card>> allPossibleStartHandsNew) {
-        BoardEvaluator.allPossibleStartHandsNew = allPossibleStartHandsNew;
-    }
-
-    public Map<Integer, List<Card>> getAllPossibleStartHandsInitialize() {
-        Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
-        List<Card> completeCardDeck = getCompleteCardDeck();
-
-        int i = 1;
-        for(int z = 0; z < 52; z++) {
-            for(int q = 0; q < 52; q++) {
-                if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
-                    allPossibleStartHands.put(i, new ArrayList<>());
-                    allPossibleStartHands.get(i).add(completeCardDeck.get(z));
-                    allPossibleStartHands.get(i).add(completeCardDeck.get(q));
-                    i++;
-                }
-            }
-        }
-
-        List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
-        Set<Set<Card>> asSet = new HashSet<>();
-
-        allPossibleStartHands.clear();
-
-        for(List<Card> l : asList) {
-            Set<Card> s = new HashSet<>();
-            s.addAll(l);
-            asSet.add(s);
-        }
-
-        for(Set<Card> startHand : asSet) {
-            List<Card> l = new ArrayList<>();
-            l.addAll(startHand);
-            allPossibleStartHands.put(allPossibleStartHands.size(), l);
-        }
-        return allPossibleStartHands;
     }
 
     public boolean isBoardRainbow(List<Card> board) {
@@ -452,7 +402,7 @@ public class BoardEvaluator {
     }
 
     protected Map<Integer, List<Card>> getAllStartHandsThatContainASpecificCard(Card card) {
-        Map<Integer, List<Card>> allPossibleStartHands = allPossibleStartHandsNew;
+        Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
         Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = new HashMap<>();
 
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
@@ -493,18 +443,6 @@ public class BoardEvaluator {
             }
         }
         return startHandMap;
-    }
-
-    public static Map<Integer, List<Card>> getAllPocketPairStartHands() {
-        Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
-        Map<Integer, List<Card>> allPossibleStartHands = allPossibleStartHandsNew;
-
-        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
-            if(entry.getValue().get(0).getRank() == entry.getValue().get(1).getRank()) {
-                allPocketPairStartHands.put(allPocketPairStartHands.size(), entry.getValue());
-            }
-        }
-        return allPocketPairStartHands;
     }
 
     protected Map<Integer, Integer> getFrequencyOfRanksOnBoard(List<Card> board) {
@@ -885,7 +823,7 @@ public class BoardEvaluator {
         }
 
         Set<Set<Card>> allStartHandsSet = new HashSet<>();
-        Map<Integer, List<Card>> allStartHands = allPossibleStartHandsNew;
+        Map<Integer, List<Card>> allStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
         allStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
 
         for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {

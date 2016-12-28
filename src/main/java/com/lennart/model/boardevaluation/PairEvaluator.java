@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -41,7 +42,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
         Map<Integer, Set<Set<Card>>> sortedCombos;
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
+            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -62,7 +63,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
                 }
             }
 
-            Map<Integer, List<Card>> allPocketPairs = getAllPocketPairStartHands();
+            Map<Integer, List<Card>> allPocketPairs = PreflopRangeBuilderUtil.getAllPocketPairStartHands();
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(0).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(1).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(2).getRank());
@@ -87,7 +88,7 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
             this.combosThatMakePair = sortedCombos;
             return;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = getAllPossibleStartHandsNew();
+            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 

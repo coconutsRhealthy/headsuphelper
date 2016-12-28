@@ -1,6 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -44,7 +45,7 @@ public class HighCardEvaluator extends BoardEvaluator implements ComboComparator
 
     private void getHighCardCombosInitialize(List<Card> board) {
         //get alle mogelijke starthanden
-        Map<Integer, List<Card>> highCardCombos = getAllPossibleStartHandsNew();
+        Map<Integer, List<Card>> highCardCombos = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
 
         //verwijder alle combos die al in de andere klassen naar voren komen
         Map<Integer, Set<Set<Card>>> pairCombos = pairEvaluator.getCombosThatMakePair();
