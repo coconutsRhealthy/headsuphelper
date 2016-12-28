@@ -5,6 +5,7 @@ import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.Set;
@@ -50,10 +51,15 @@ public class Action {
         switch(computerGame.getHandPath()) {
             case "05betF1bet":
                 handPathAfterAction = preflopActionBuilder.get05betF1bet(computerGame);
-                newPartOfHandPath = getNewPartOfHandPath();
-                computerGame.setHandPath(handPathAfterAction);
-                setSizingIfNecessary(computerGame);
-                setNewWrittenAction();
+                processHandPath(computerGame);
+                break;
+            case "1betF2bet":
+                handPathAfterAction = preflopActionBuilder.get1betF2bet(computerGame);
+                processHandPath(computerGame);
+                break;
+            case "2betF3bet":
+                handPathAfterAction = preflopActionBuilder.get2betF3bet(computerGame);
+                processHandPath(computerGame);
                 break;
             case "2betFcheck":
                 //nu zet je de range
@@ -68,6 +74,13 @@ public class Action {
                 System.out.println("no action available for handpath: " + computerGame.getHandPath());
                 sizing = 0;
         }
+    }
+
+    private void processHandPath(ComputerGame computerGame) {
+        newPartOfHandPath = getNewPartOfHandPath();
+        computerGame.setHandPath(handPathAfterAction);
+        setSizingIfNecessary(computerGame);
+        setNewWrittenAction();
     }
 
     private String getNewPartOfHandPath() {
@@ -93,15 +106,15 @@ public class Action {
     }
 
     private void setNewWrittenAction() {
-        if(newPartOfHandPath.contains("Fold")) {
+        if(StringUtils.containsIgnoreCase(newPartOfHandPath, "fold")) {
             writtenAction = "Computer folds";
-        } else if(newPartOfHandPath.contains("Check")) {
+        } else if(StringUtils.containsIgnoreCase(newPartOfHandPath, "check")) {
             writtenAction = "Computer checks";
-        } else if(newPartOfHandPath.contains("Call")) {
+        } else if(StringUtils.containsIgnoreCase(newPartOfHandPath, "call")) {
             writtenAction = "Computer calls";
-        } else if(newPartOfHandPath.contains("1Bet")) {
+        } else if(StringUtils.containsIgnoreCase(newPartOfHandPath, "1bet")) {
             writtenAction = "Computer bets";
-        } else {
+        } else if(StringUtils.containsIgnoreCase(newPartOfHandPath, "bet")) {
             writtenAction = "Computer raises";
         }
     }
