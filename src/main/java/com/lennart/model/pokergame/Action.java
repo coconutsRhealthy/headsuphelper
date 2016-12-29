@@ -7,7 +7,6 @@ import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -62,13 +61,17 @@ public class Action {
                 processHandPath(computerGame);
                 break;
             case "2betFcheck":
-                //nu zet je de range
                 Set<Set<Card>> sortedOpponentRange = flopRangeBuilder.get2betCheck();
-
-                //en nu ga je de actie doen, met postFlopActionBuilder...
                 String action = postFlopActionBuilder.getAction(sortedOpponentRange);
-
-                System.out.println("wacht");
+                handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
+                processHandPath(computerGame);
+                break;
+            case "Call2bet":
+                //Welke range? Set<Set<Card>> sortedOpponentRange = ...
+                //action = postFlopActionBuilder.getAction(sortedOpponentRange);
+                //handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
+                processHandPath(computerGame);
+                break;
 
             default:
                 System.out.println("no action available for handpath: " + computerGame.getHandPath());
@@ -100,6 +103,7 @@ public class Action {
                 }
                 indexWhereStringsStartToDiffer = i;
                 newPartOfHandPath = handPathAfterAction.substring(indexWhereStringsStartToDiffer);
+                break;
             }
         }
         return newPartOfHandPath;
@@ -120,9 +124,36 @@ public class Action {
     }
 
     private void setSizingIfNecessary(ComputerGame computerGame) {
-        if(newPartOfHandPath.contains("bet")) {
-            sizing = preflopActionBuilder.getSize(computerGame);
+        if(computerGame.getFlopCards() == null) {
+            if(newPartOfHandPath.contains("bet")) {
+                sizing = preflopActionBuilder.getSize(computerGame);
+            }
+        } else {
+            sizing = postFlopActionBuilder.getSize(computerGame.getPotSize());
         }
+    }
+
+    private String includePostFlopActionInHandPath(String handPath, String postFlopAction) {
+        handPath = removeFacingPartFromHandPath(handPath);
+
+        if(postFlopAction.equals("check")) {
+            handPath = handPath + "Check";
+        } else if(postFlopAction.equals("1bet")) {
+            handPath = handPath + "1bet";
+        } else if(postFlopAction.equals("2bet")) {
+            handPath = handPath + "2bet";
+        } else if(postFlopAction.equals("call1bet")) {
+            handPath = handPath + "Call1bet";
+        } else if(postFlopAction.equals("call2bet")) {
+            handPath = handPath + "Call2bet";
+        } else if(postFlopAction.equals("call3bet")) {
+            handPath = handPath + "Call3bet";
+        }
+        return handPath;
+    }
+
+    private String removeFacingPartFromHandPath(String handPath) {
+        return handPath.substring(0, handPath.lastIndexOf("F"));
     }
 
     public double getSizing() {

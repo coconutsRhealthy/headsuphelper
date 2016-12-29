@@ -46,6 +46,11 @@
     text-align: center;
 }
 
+#written_computer_action {
+    margin-top: 20px;
+    float: right;
+}
+
 /**
  * Styles for CSS Playing Cards
  *

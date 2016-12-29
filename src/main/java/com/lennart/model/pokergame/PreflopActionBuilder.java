@@ -284,7 +284,7 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage3bet - percentageCall2bet) {
             return "fold";
         } else if ((random <= 1 - percentage3bet) && (random >= 1 - percentage3bet - percentageCall2bet)){
-            return "call2bet";
+            return "Call2bet";
         } else {
             return "3bet";
         }

@@ -32,6 +32,7 @@ public class ComputerGame {
     private String myAction;
     private String mySize;
     private List<Card> board;
+    private String computerWrittenAction;
 
     public ComputerGame() {
         //default constructor
@@ -107,7 +108,7 @@ public class ComputerGame {
             myIncrementalBetSize = smallBlind;
             myTotalBetSize = smallBlind;
             computerStack = computerStack - bigBlind;
-            computerIncrementalBetSize = smallBlind;
+            computerIncrementalBetSize = bigBlind;
             computerTotalBetSize = bigBlind;
         }
     }
@@ -126,19 +127,25 @@ public class ComputerGame {
     private void doComputerAction() {
         computerAction = new Action(this);
 
-        String writtenComputerAction = computerAction.getWrittenAction();
-        if(writtenComputerAction.contains("raise")) {
+        computerWrittenAction = computerAction.getWrittenAction();
+        if(computerWrittenAction.contains("bet")) {
+            computerIncrementalBetSize = computerAction.getSizing();
+            computerStack = computerStack - computerIncrementalBetSize;
+            computerTotalBetSize = computerIncrementalBetSize;
+            potSize = potSize + computerIncrementalBetSize;
+            computerIsToAct = false;
+        } else if (computerWrittenAction.contains("raise")) {
             computerIncrementalBetSize = computerAction.getSizing() - computerTotalBetSize;
             computerStack = computerStack - computerIncrementalBetSize;
             computerTotalBetSize = computerAction.getSizing();
             potSize = potSize + computerIncrementalBetSize;
             computerIsToAct = false;
-        } else if (writtenComputerAction.contains("call")) {
+        } else if (computerWrittenAction.contains("call")) {
             computerStack = computerStack - (myTotalBetSize - computerIncrementalBetSize);
             potSize = potSize + (myTotalBetSize - computerIncrementalBetSize);
             computerIncrementalBetSize = 0;
             computerTotalBetSize = 0;
-        } else if(writtenComputerAction.contains("fold")) {
+        } else if(computerWrittenAction.contains("fold")) {
             finishHand();
         } else {
             //here the computer checks
@@ -153,64 +160,41 @@ public class ComputerGame {
     private void finishHand() {
         if(myAction.equals("fold")) {
             computerStack = computerStack + potSize;
-
-            if(myStack < 50) {
-                myStack = 50;
-            }
-
-            if(computerStack < 50) {
-                computerStack = 50;
-            }
-
-            potSize = 0;
-            myIncrementalBetSize = 0;
-            myTotalBetSize = 0;
-            computerIncrementalBetSize = 0;
-            computerTotalBetSize = 0;
-
-            if(isComputerIsButton()) {
-                setComputerIsButton(false);
-            } else {
-                setComputerIsButton(true);
-            }
-
-            flopCards = null;
-            turnCard = null;
-            riverCard = null;
-            board = null;
-            knownGameCards = null;
+            resetGameVariablesAfterFold();
         } else if(computerAction.getWrittenAction().contains("fold")) {
             myStack = myStack + potSize;
-
-            if(myStack < 50) {
-                myStack = 50;
-            }
-
-            if(computerStack < 50) {
-                computerStack = 50;
-            }
-
-            potSize = 0;
-            myIncrementalBetSize = 0;
-            myTotalBetSize = 0;
-            computerIncrementalBetSize = 0;
-            computerTotalBetSize = 0;
-
-            if(isComputerIsButton()) {
-                setComputerIsButton(false);
-            } else {
-                setComputerIsButton(true);
-            }
-
-            flopCards = null;
-            turnCard = null;
-            riverCard = null;
-            board = null;
-            knownGameCards = null;
+            resetGameVariablesAfterFold();
         } else {
             //showdown, determine who has strongest hand
-
         }
+    }
+
+    private void resetGameVariablesAfterFold() {
+        if(myStack < 50) {
+            myStack = 50;
+        }
+
+        if(computerStack < 50) {
+            computerStack = 50;
+        }
+
+        potSize = 0;
+        myIncrementalBetSize = 0;
+        myTotalBetSize = 0;
+        computerIncrementalBetSize = 0;
+        computerTotalBetSize = 0;
+
+        if(isComputerIsButton()) {
+            setComputerIsButton(false);
+        } else {
+            setComputerIsButton(true);
+        }
+
+        flopCards = null;
+        turnCard = null;
+        riverCard = null;
+        board = null;
+        knownGameCards = null;
     }
 
     public ComputerGame submitHumanActionAndDoComputerAction() {
@@ -248,14 +232,33 @@ public class ComputerGame {
         //do computer action
         doComputerAction();
 
-        if(potSize == 0) {
+        //als computeraction fold is...
+        if(computerWrittenAction.contains("fold")) {
+            finishHand();
             dealHoleCards();
             postBlinds();
+            if(isComputerIsButton()) {
+                doComputerAction();
+            }
+        }
+
+        //als computeraction call is en computer zit oop...
+        if(computerWrittenAction.contains("call") && !isComputerIsButton()) {
+            resetAllBets();
+            if(flopCards == null) {
+                dealFlopCards();
+            } else if(turnCard == null) {
+                dealTurnCard();
+            } else if(riverCard == null) {
+                dealRiverCard();
+            } else {
+                //go to showdown
+            }
             doComputerAction();
+            computerWrittenAction = computerWrittenAction + " and " + computerAction.getWrittenAction();
         }
 
         //return computerGame
-
         return this;
     }
 
@@ -332,6 +335,13 @@ public class ComputerGame {
     }
 
     private void resetComputerBetsize() {
+        computerIncrementalBetSize = 0;
+        computerTotalBetSize = 0;
+    }
+
+    private void resetAllBets() {
+        myIncrementalBetSize = 0;
+        myTotalBetSize = 0;
         computerIncrementalBetSize = 0;
         computerTotalBetSize = 0;
     }
@@ -520,5 +530,13 @@ public class ComputerGame {
 
     public void setBoard(List<Card> board) {
         this.board = board;
+    }
+
+    public String getComputerWrittenAction() {
+        return computerWrittenAction;
+    }
+
+    public void setComputerWrittenAction(String computerWrittenAction) {
+        this.computerWrittenAction = computerWrittenAction;
     }
 }

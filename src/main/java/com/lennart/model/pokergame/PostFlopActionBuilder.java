@@ -280,6 +280,10 @@ public class PostFlopActionBuilder {
         return passiveAction;
     }
 
+    public double getSize(double potSize) {
+        return 0.75 * potSize;
+    }
+
     private boolean myLastActionWasCall() {
         //TODO: implement this method
         return false;
