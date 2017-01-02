@@ -3,7 +3,6 @@ package com.lennart.model.pokergame;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,11 +17,6 @@ public class PostFlopActionBuilder {
     private final String CALL_1_BET = "call1bet";
     private final String CALL_2_BET = "call2bet";
     private final String CALL_3_BET = "call3bet";
-
-    private boolean youHaveStrongFdOrSd;
-    private boolean youHaveStrongGutshot;
-    private boolean youHaveMediumFdOrSd;
-    private boolean youHaveStrongBackdoor;
 
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
@@ -210,25 +204,25 @@ public class PostFlopActionBuilder {
 
     private String getDrawAction(String bettingAction, String passiveAction, boolean includeStrongFdOrSd,
                                  boolean includeStrongGutshot, boolean includeMediumFdOrSd, boolean includeStrongBackDoor) {
-        if (includeStrongFdOrSd && youHaveStrongFdOrSd) {
+        if (includeStrongFdOrSd && handEvaluator.youHaveStrongFdOrSd()) {
             if(Math.random() < 0.5) {
                 return bettingAction;
             } else {
                 return passiveAction;
             }
-        } else if (includeStrongGutshot && youHaveStrongGutshot) {
+        } else if (includeStrongGutshot && handEvaluator.youHaveStrongGutshot()) {
             if(Math.random() < 0.38) {
                 return bettingAction;
             } else {
                 return passiveAction;
             }
-        } else if (includeMediumFdOrSd && youHaveMediumFdOrSd) {
+        } else if (includeMediumFdOrSd && handEvaluator.youHaveMediumFdOrSd()) {
             if(Math.random() < 0.25) {
                 return bettingAction;
             } else {
                 return passiveAction;
             }
-        } else if(includeStrongBackDoor && youHaveStrongBackdoor) {
+        } else if(includeStrongBackDoor && handEvaluator.youHaveStrongBackDoor()) {
             if(Math.random() < 0.05) {
                 return bettingAction;
             } else {

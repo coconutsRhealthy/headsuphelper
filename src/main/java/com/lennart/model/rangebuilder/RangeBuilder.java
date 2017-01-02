@@ -6,6 +6,7 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.ComputerGame;
 
 import java.util.*;
 
@@ -32,20 +33,13 @@ public class RangeBuilder {
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
 
-    public RangeBuilder(BoardEvaluator boardEvaluator, List<Card> holeCards, Set<Card> knownGameCards) {
+    public RangeBuilder(BoardEvaluator boardEvaluator, ComputerGame computerGame) {
         this.boardEvaluator = boardEvaluator;
         sortedCombos = boardEvaluator.getSortedCombosNew();
-        this.holeCards = holeCards;
-        this.knownGameCards = knownGameCards;
-
-        //Temporary solution for Straigt and FlushDrawEvaluator constructors
-        List<Card> board = new ArrayList<>();
-        board.addAll(knownGameCards);
-        board.removeAll(holeCards);
-        //Temporary solution for Straigt and FlushDrawEvaluator constructors
-
-        flushDrawEvaluator = new FlushDrawEvaluator(board);
-        straightDrawEvaluator = new StraightDrawEvaluator(board);
+        holeCards = computerGame.getComputerHoleCards();
+        knownGameCards = computerGame.getKnownGameCards();
+        flushDrawEvaluator = new FlushDrawEvaluator(computerGame.getBoard());
+        straightDrawEvaluator = new StraightDrawEvaluator(computerGame.getBoard());
         highCardDrawEvaluator = new HighCardDrawEvaluator();
     }
 
@@ -902,5 +896,17 @@ public class RangeBuilder {
             }
         }
         return allSortedCombosClearedForRange;
+    }
+
+    public StraightDrawEvaluator getStraightDrawEvaluator() {
+        return straightDrawEvaluator;
+    }
+
+    public FlushDrawEvaluator getFlushDrawEvaluator() {
+        return flushDrawEvaluator;
+    }
+
+    public HighCardDrawEvaluator getHighCardDrawEvaluator() {
+        return highCardDrawEvaluator;
     }
 }

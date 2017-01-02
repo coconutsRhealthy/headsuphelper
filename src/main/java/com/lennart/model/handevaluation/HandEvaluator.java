@@ -1,6 +1,9 @@
 package com.lennart.model.handevaluation;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
@@ -12,10 +15,16 @@ import java.util.*;
 public class HandEvaluator {
     private BoardEvaluator boardEvaluator;
     private RangeBuilder rangeBuilder;
+    private StraightDrawEvaluator straightDrawEvaluator;
+    private FlushDrawEvaluator flushDrawEvaluator;
+    private HighCardDrawEvaluator highCardDrawEvaluator;
 
     public HandEvaluator(BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
         this.boardEvaluator = boardEvaluator;
         this.rangeBuilder = rangeBuilder;
+        straightDrawEvaluator = rangeBuilder.getStraightDrawEvaluator();
+        flushDrawEvaluator = rangeBuilder.getFlushDrawEvaluator();
+        highCardDrawEvaluator = rangeBuilder.getHighCardDrawEvaluator();
     }
 
     public double getHandStrength(List<Card> hand) {
@@ -202,5 +211,28 @@ public class HandEvaluator {
         //TODO: implement this method;
         return false;
     }
+
+    public boolean youHaveStrongFdOrSd() {
+        return false;
+    }
+
+    public boolean youHaveStrongGutshot() {
+        return false;
+    }
+
+    public boolean youHaveMediumFdOrSd() {
+        return false;
+    }
+
+    public boolean youHaveStrongBackDoor() {
+        return false;
+    }
+
+
+
+//    private boolean youHaveStrongFdOrSd;
+//    private boolean youHaveStrongGutshot;
+//    private boolean youHaveMediumFdOrSd;
+//    private boolean youHaveStrongBackdoor;
 
 }

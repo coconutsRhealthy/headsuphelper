@@ -41,7 +41,7 @@ public class Action {
 
         if(computerGame.getBoard() != null) {
             boardEvaluator = new BoardEvaluator(computerGame);
-            rangeBuilder = new RangeBuilder(boardEvaluator, computerGame.getComputerHoleCards(), computerGame.getKnownGameCards());
+            rangeBuilder = new RangeBuilder(boardEvaluator, computerGame);
             flopRangeBuilder = new FlopRangeBuilder(rangeBuilder, preflopRangeBuilder);
             handEvaluator = new HandEvaluator(boardEvaluator, rangeBuilder);
             postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame);
