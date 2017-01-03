@@ -11,19 +11,74 @@ import java.util.*;
  */
 public class FlushDrawEvaluator extends FlushEvaluator {
 
-    private Map<Integer, List<Card>> allFlushDraws;
-    private Map<Integer, Set<Card>> allFlushDrawsFlop;
-    private Map<Integer, Set<Card>> allFlushDrawsTurn;
     private List<Card> board;
 
+    private Map<Integer, Set<Card>> strongFlushDrawCombos;
+    private Map<Integer, Set<Card>> mediumFlushDrawCombos;
+    private Map<Integer, Set<Card>> weakFlushDrawCombos;
+    private Map<Integer, Set<Card>> strongBackDoorFlushCombos;
+    private Map<Integer, Set<Card>> mediumBackDoorFlushCombos;
+    private Map<Integer, Set<Card>> weakBackDoorFlushCombos;
+
+    private Map<Integer, Set<Card>> allFlushDrawsFlop;
+    private Map<Integer, Set<Card>> allFlushDrawsTurn;
+
     public FlushDrawEvaluator(List<Card> board) {
-        this.board = board;
-        getAllFlushDrawCombos();
+        //TODO: on board 14d 6d 7c, combos like Tc9c are wrongfully recognised as mediumBdFd's instead of strong
+
+        final Map<Integer, List<Card>> allFlushDraws = getFlushDrawCombos(board);
+        final Map<Integer, List<Card>> strongFlushDrawCombosAsMapList = getStrongFlushDrawCombosAsMapList(allFlushDraws);
+        final Map<Integer, List<Card>> mediumFlushDrawCombosAsMapList = getMediumFlushDrawCombosAsMapList(allFlushDraws);
+        final Map<Integer, List<Card>> allBackDoorFlushDrawCombos = getBackDoorFlushDrawCombos();
+        final Map<Integer, List<Card>> strongBackDoorFlushDrawCombosAsMapList = getStrongBackDoorFlushCombosAsMapList(allBackDoorFlushDrawCombos);
+        final Map<Integer, List<Card>> mediumBackDoorFlushDrawCombosAsMapList = getMediumBackDoorFlushCombosAsMapList(allBackDoorFlushDrawCombos);
+
+        strongFlushDrawCombos = getStrongFlushDrawCombosInitialize(strongFlushDrawCombosAsMapList);
+        mediumFlushDrawCombos = getMediumFlushDrawCombosInitialize(mediumFlushDrawCombosAsMapList);
+        weakFlushDrawCombos = getWeakFlushDrawCombosInitialize(allFlushDraws, strongFlushDrawCombosAsMapList, mediumFlushDrawCombosAsMapList);
+        strongBackDoorFlushCombos = getStrongBackDoorFlushCombosInitialize(strongBackDoorFlushDrawCombosAsMapList);
+        mediumBackDoorFlushCombos = getMediumBackDoorFlushCombosInitialize(mediumBackDoorFlushDrawCombosAsMapList);
+        weakBackDoorFlushCombos = getWeakBackDoorFlushCombosInitialize(allBackDoorFlushDrawCombos,
+                strongBackDoorFlushDrawCombosAsMapList, mediumBackDoorFlushDrawCombosAsMapList);
+
+        setFlushDrawCombosPerStreet(allFlushDraws);
     }
 
-    public Map<Integer, Set<Card>> getStrongFlushDrawCombos (List<Card> board) {
+    public Map<Integer, Set<Card>> getStrongFlushDrawCombos() {
+        return strongFlushDrawCombos;
+    }
+
+    public Map<Integer, Set<Card>> getMediumFlushDrawCombos() {
+        return mediumFlushDrawCombos;
+    }
+
+    public Map<Integer, Set<Card>> getWeakFlushDrawCombos() {
+        return weakFlushDrawCombos;
+    }
+
+    public Map<Integer, Set<Card>> getStrongBackDoorFlushCombos() {
+        return strongBackDoorFlushCombos;
+    }
+
+    public Map<Integer, Set<Card>> getMediumBackDoorFlushCombos() {
+        return mediumBackDoorFlushCombos;
+    }
+
+    public Map<Integer, Set<Card>> getWeakBackDoorFlushCombos() {
+        return weakBackDoorFlushCombos;
+    }
+
+    public Map<Integer, Set<Card>> getAllFlushDrawsFlop() {
+        return allFlushDrawsFlop;
+    }
+
+    public Map<Integer, Set<Card>> getAllFlushDrawsTurn() {
+        return allFlushDrawsTurn;
+    }
+
+    //helper methods
+    private Map<Integer, Set<Card>> getStrongFlushDrawCombosInitialize(Map<Integer, List<Card>> strongFlushDrawCombosAsMapList) {
         Map<Integer, Set<Card>> strongFlushDrawCombos = new HashMap<>();
-        Map<Integer, List<Card>> strongFlushDrawCombosAsMapList = getStrongFlushDrawCombosAsMapList(board);
 
         for (Map.Entry<Integer, List<Card>> entry : strongFlushDrawCombosAsMapList.entrySet()) {
             Set<Card> comboAsSet = new HashSet<>();
@@ -33,9 +88,8 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return strongFlushDrawCombos;
     }
 
-    public Map<Integer, Set<Card>> getMediumFlushDrawCombos (List<Card> board) {
+    private Map<Integer, Set<Card>> getMediumFlushDrawCombosInitialize(Map<Integer, List<Card>> mediumFlushDrawCombosAsMapList) {
         Map<Integer, Set<Card>> mediumFlushDrawCombos = new HashMap<>();
-        Map<Integer, List<Card>> mediumFlushDrawCombosAsMapList = getMediumFlushDrawCombosAsMapList(board);
 
         for (Map.Entry<Integer, List<Card>> entry : mediumFlushDrawCombosAsMapList.entrySet()) {
             Set<Card> comboAsSet = new HashSet<>();
@@ -45,17 +99,15 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return mediumFlushDrawCombos;
     }
 
-    public Map<Integer, Set<Card>> getWeakFlushDrawCombos(List<Card> board) {
-        Map<Integer, List<Card>> allFlushDraws = getFlushDrawCombos(board);
-        Map<Integer, List<Card>> strongFlushDraws = getStrongFlushDrawCombosAsMapList(board);
-        Map<Integer, List<Card>> mediumFlushDraws = getMediumFlushDrawCombosAsMapList(board);
-
-        return getWeakFlushOrBackDoorFlushDrawCombos(allFlushDraws, strongFlushDraws, mediumFlushDraws);
+    private Map<Integer, Set<Card>> getWeakFlushDrawCombosInitialize(Map<Integer, List<Card>> allFlushDraws,
+                                                                     Map<Integer, List<Card>> strongFlushDrawCombosAsMapList,
+                                                                     Map<Integer, List<Card>> mediumFlushDrawCombosAsMapList) {
+        return getWeakFlushOrBackDoorFlushDrawCombos(allFlushDraws, strongFlushDrawCombosAsMapList, mediumFlushDrawCombosAsMapList);
     }
 
-    public Map<Integer, Set<Card>> getStrongBackDoorFlushCombos (List<Card> board) {
+    private Map<Integer, Set<Card>> getStrongBackDoorFlushCombosInitialize(Map<Integer, List<Card>>
+                                                                                   strongBackDoorFlushCombosAsMapList) {
         Map<Integer, Set<Card>> strongBackDoorFlushDrawCombos = new HashMap<>();
-        Map<Integer, List<Card>> strongBackDoorFlushCombosAsMapList = getStrongBackDoorFlushCombosAsMapList(board);
 
         for (Map.Entry<Integer, List<Card>> entry : strongBackDoorFlushCombosAsMapList.entrySet()) {
             Set<Card> comboAsSet = new HashSet<>();
@@ -65,9 +117,9 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return strongBackDoorFlushDrawCombos;
     }
 
-    public Map<Integer, Set<Card>> getMediumBackDoorFlushCombos (List<Card> board) {
+    private Map<Integer, Set<Card>> getMediumBackDoorFlushCombosInitialize(Map<Integer, List<Card>>
+                                                                                   mediumBackDoorFlushCombosAsMapList) {
         Map<Integer, Set<Card>> mediumBackDoorFlushDrawCombos = new HashMap<>();
-        Map<Integer, List<Card>> mediumBackDoorFlushCombosAsMapList = getMediumBackDoorFlushCombosAsMapList(board);
 
         for (Map.Entry<Integer, List<Card>> entry : mediumBackDoorFlushCombosAsMapList.entrySet()) {
             Set<Card> comboAsSet = new HashSet<>();
@@ -77,38 +129,19 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return mediumBackDoorFlushDrawCombos;
     }
 
-    public Map<Integer, Set<Card>> getWeakBackDoorFlushCombos(List<Card> board) {
-        Map<Integer, List<Card>> allBackDoorFlushDraws = getBackDoorFlushDrawCombos(board);
-        Map<Integer, List<Card>> strongBackDoorDraws = getStrongBackDoorFlushCombosAsMapList(board);
-        Map<Integer, List<Card>> mediumBackDoorDraws = getMediumBackDoorFlushCombosAsMapList(board);
+    private Map<Integer, Set<Card>> getWeakBackDoorFlushCombosInitialize(Map<Integer, List<Card>> allBackDoorFlushDraws,
+                                                                         Map<Integer, List<Card>> strongBackDoorFlushDrawCombosAsMapList,
+                                                                         Map<Integer, List<Card>> mediumBackDoorFlushDrawCombosAsMapList) {
 
-        return getWeakFlushOrBackDoorFlushDrawCombos(allBackDoorFlushDraws, strongBackDoorDraws, mediumBackDoorDraws);
+        return getWeakFlushOrBackDoorFlushDrawCombos(allBackDoorFlushDraws, strongBackDoorFlushDrawCombosAsMapList,
+                mediumBackDoorFlushDrawCombosAsMapList);
     }
 
-    private void getAllFlushDrawCombos() {
-        Map<Integer, Set<Card>> allFlushDrawCombos = new HashMap<>();
-        allFlushDraws = getFlushDrawCombos(board);
-
-        for (Map.Entry<Integer, List<Card>> entry : allFlushDraws.entrySet()) {
-            Set<Card> combo = new HashSet<>();
-            combo.addAll(entry.getValue());
-            allFlushDrawCombos.put(allFlushDrawCombos.size(), combo);
-        }
-
-        setFlushDrawCombosPerStreet(allFlushDrawCombos);
-    }
-
-    //helper methods
     private Map<Integer, List<Card>> getFlushDrawCombos (List<Card> board) {
-        if(allFlushDraws != null) {
-            return allFlushDraws;
-        }
-
         Map<Integer, List<Card>> flushDrawCombos = new HashMap<>();
         Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
 
         if(board.size() == 5) {
-            allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -127,7 +160,6 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         if(flushSuit != 'x' && flushSuit2 == 'x') {
             flushDrawCombos = getAllPossibleSuitedStartHands(flushSuit);
             flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
-            allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -143,7 +175,6 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                 flushDrawCombos.put(flushDrawCombos.size(), entry.getValue());
             }
 
-            allFlushDraws = flushDrawCombos;
             return flushDrawCombos;
         }
 
@@ -166,11 +197,10 @@ public class FlushDrawEvaluator extends FlushEvaluator {
             }
             flushDrawCombos = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(flushDrawCombos, board);
         }
-        allFlushDraws = flushDrawCombos;
         return flushDrawCombos;
     }
 
-    private Map<Integer, List<Card>> getBackDoorFlushDrawCombos(List<Card> board) {
+    private Map<Integer, List<Card>> getBackDoorFlushDrawCombos() {
         Map<Integer, List<Card>> backDoorFlushDrawCombos = new HashMap<>();
 
         if(board.size() > 3) {
@@ -224,16 +254,16 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return backDoorFlushDrawCombos;
     }
 
-    private Map<Integer, List<Card>> getStrongFlushDrawCombosAsMapList(List<Card> board) {
+    private Map<Integer, List<Card>> getStrongFlushDrawCombosAsMapList(Map<Integer, List<Card>> allFlushDraws) {
         Map<Integer, List<Card>> strongFlushDrawCombos = new HashMap<>();
 
         if(getNumberOfPairsOnBoard(board) < 2 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             if(getNumberOfSuitedCardsOnBoard(board) == 2) {
-                return getFlushDrawCombos(board);
+                return allFlushDraws;
             }
 
             if(getNumberOfSuitedCardsOnBoard(board) == 3) {
-                Map<Integer, List<Card>> allFlushDrawCombos = getFlushDrawCombos(board);
+                Map<Integer, List<Card>> allFlushDrawCombos = allFlushDraws;
                 char flushSuit = getFlushSuitWhen3ToFlushOnBoard(board);
                 List<Card> flushCardsOnBoard = getFlushCardsOnBoard(board, flushSuit);
                 int numberOfRanksNeeded = 2;
@@ -252,20 +282,19 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return new HashMap<>();
     }
 
-    private Map<Integer, List<Card>> getMediumFlushDrawCombosAsMapList(List<Card> board) {
+    private Map<Integer, List<Card>> getMediumFlushDrawCombosAsMapList(Map<Integer, List<Card>> allFlushDraws) {
         Map<Integer, List<Card>> mediumFlushDrawCombos = new HashMap<>();
 
         //max 1 pair
         if(getNumberOfPairsOnBoard(board) < 2 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
             if (getNumberOfSuitedCardsOnBoard(board) == 3) {
-                Map<Integer, List<Card>> allFlushDrawCombos = getFlushDrawCombos(board);
                 char flushSuit = getFlushSuitWhen3ToFlushOnBoard(board);
                 List<Card> flushCardsOnBoard = getFlushCardsOnBoard(board, flushSuit);
                 int numberOfRanksNeeded = 4;
                 List<Integer> mediumRanksNotPresentOnBoard = getNeededRanksNotPresentOnFlushBoard(flushCardsOnBoard,
                         numberOfRanksNeeded, "medium");
 
-                for (Map.Entry<Integer, List<Card>> entry : allFlushDrawCombos.entrySet()) {
+                for (Map.Entry<Integer, List<Card>> entry : allFlushDraws.entrySet()) {
                     Card c = getHighestFlushCardFromCombo(entry.getValue(), flushSuit);
                     if(mediumRanksNotPresentOnBoard.contains(Integer.valueOf(c.getRank()))) {
                         mediumFlushDrawCombos.put(mediumFlushDrawCombos.size(), entry.getValue());
@@ -277,18 +306,18 @@ public class FlushDrawEvaluator extends FlushEvaluator {
 
         //twee pair
         if(getNumberOfPairsOnBoard(board) == 2 && getNumberOfSuitedCardsOnBoard(board) == 2) {
-            return getFlushDrawCombos(board);
+            return allFlushDraws;
         }
 
         return new HashMap<>();
     }
 
-    private Map<Integer, List<Card>> getStrongBackDoorFlushCombosAsMapList(List<Card> board) {
-        return getStrongOrMediumBackDoorFlushCombos(board, "strong");
+    private Map<Integer, List<Card>> getStrongBackDoorFlushCombosAsMapList(Map<Integer, List<Card>> allBackDoorCombos) {
+        return getStrongOrMediumBackDoorFlushCombos(allBackDoorCombos, "strong");
     }
 
-    private Map<Integer, List<Card>> getMediumBackDoorFlushCombosAsMapList(List<Card> board) {
-        return getStrongOrMediumBackDoorFlushCombos(board, "medium");
+    private Map<Integer, List<Card>> getMediumBackDoorFlushCombosAsMapList(Map<Integer, List<Card>> allBackDoorCombos) {
+        return getStrongOrMediumBackDoorFlushCombos(allBackDoorCombos, "medium");
     }
 
     private Map<Integer, Set<Card>> getWeakFlushOrBackDoorFlushDrawCombos(Map<Integer, List<Card>> allDraws,
@@ -328,11 +357,12 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return weakDraws;
     }
 
-    private Map<Integer, List<Card>> getStrongOrMediumBackDoorFlushCombos(List<Card> board, String strongOrMedium) {
+    private Map<Integer, List<Card>> getStrongOrMediumBackDoorFlushCombos(Map<Integer, List<Card>> allBackDoorCombos,
+                                                                          String strongOrMedium) {
         if(strongOrMedium.equals("strong")) {
             if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board)) {
                 if(getNumberOfSuitedCardsOnBoard(board) < 2) {
-                    return getBackDoorFlushDrawCombos(board);
+                    return allBackDoorCombos;
                 }
             }
         }
@@ -340,7 +370,6 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board)) {
             if(getNumberOfSuitedCardsOnBoard(board) == 2) {
                 Map<Integer, List<Card>> strongOrMediumBackDoorCombos = new HashMap<>();
-                Map<Integer, List<Card>> allBackDoorCombos = getBackDoorFlushDrawCombos(board);
 
                 Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
                 List<Card> backDoorFlushCardsOnBoard = new ArrayList<>();
@@ -402,23 +431,24 @@ public class FlushDrawEvaluator extends FlushEvaluator {
         return cardRanksToReturn;
     }
 
-    public void setAllFlushDraws(Map<Integer, List<Card>> allFlushDraws) {
-        this.allFlushDraws = allFlushDraws;
-    }
+    private void setFlushDrawCombosPerStreet(Map<Integer, List<Card>> flushDrawCombos) {
+        Map<Integer, Set<Card>> flushDrawCombosAsSet = convertListMapToSetMap(flushDrawCombos);
 
-    private void setFlushDrawCombosPerStreet(Map<Integer, Set<Card>> flushDrawCombos) {
-        if(board.size() == 3 && allFlushDrawsFlop == null) {
-            this.allFlushDrawsFlop = flushDrawCombos;
-        } else if(board.size() == 4 && this.allFlushDrawsTurn == null) {
-            this.allFlushDrawsTurn = flushDrawCombos;
+        if(board.size() == 3) {
+            allFlushDrawsFlop = flushDrawCombosAsSet;
+        } else if(board.size() == 4) {
+            allFlushDrawsTurn = flushDrawCombosAsSet;
         }
     }
 
-    public Map<Integer, Set<Card>> getAllFlushDrawsFlop() {
-        return allFlushDrawsFlop;
-    }
+    private Map<Integer, Set<Card>> convertListMapToSetMap(Map<Integer, List<Card>> listMap) {
+        Map<Integer, Set<Card>> setMap = new HashMap<>();
 
-    public Map<Integer, Set<Card>> getAllFlushDrawsTurn() {
-        return allFlushDrawsTurn;
+        for (Map.Entry<Integer, List<Card>> entry : listMap.entrySet()) {
+            Set<Card> set = new HashSet<>();
+            set.addAll(entry.getValue());
+            setMap.put(setMap.size(), set);
+        }
+        return setMap;
     }
 }
