@@ -24,7 +24,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
     private Map<Integer, Set<Card>> allFlushDrawsTurn;
 
     public FlushDrawEvaluator(List<Card> board) {
-        //TODO: on board 14d 6d 7c, combos like Tc9c are wrongfully recognised as mediumBdFd's instead of strong
+        this.board = board;
 
         final Map<Integer, List<Card>> allFlushDraws = getFlushDrawCombos(board);
         final Map<Integer, List<Card>> strongFlushDrawCombosAsMapList = getStrongFlushDrawCombosAsMapList(allFlushDraws);
@@ -373,14 +373,17 @@ public class FlushDrawEvaluator extends FlushEvaluator {
 
                 Map<Character, List<Card>> suitsOfBoard = getSuitsOfBoard(board);
                 List<Card> backDoorFlushCardsOnBoard = new ArrayList<>();
+                char singleFlushSuit = 'x';
 
                 for (Map.Entry<Character, List<Card>> entry : suitsOfBoard.entrySet()) {
                     if(entry.getValue().size() == 2) {
                         backDoorFlushCardsOnBoard = entry.getValue();
+                    } else if(entry.getValue().size() == 1) {
+                        singleFlushSuit = entry.getKey();
                     }
                 }
 
-                char flushSuit = backDoorFlushCardsOnBoard.get(0).getSuit();
+                char doubleFlushSuit = backDoorFlushCardsOnBoard.get(0).getSuit();
 
                 int numberOfRanksNeeded = 0;
                 List<Integer> neededRanksNotPresentOnBoard = new ArrayList<>();
@@ -396,9 +399,19 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                 }
 
                 for (Map.Entry<Integer, List<Card>> entry : allBackDoorCombos.entrySet()) {
-                    Card c = getHighestFlushCardFromCombo(entry.getValue(), flushSuit);
+                    if(strongOrMedium.equals("strong")) {
+                        if(entry.getValue().get(0).getSuit() == singleFlushSuit &&
+                                entry.getValue().get(1).getSuit() == singleFlushSuit) {
+                            strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                        }
+                    }
+
+                    Card c = getHighestFlushCardFromCombo(entry.getValue(), doubleFlushSuit);
                     if(neededRanksNotPresentOnBoard.contains(Integer.valueOf(c.getRank()))) {
-                        strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                        if(entry.getValue().get(0).getSuit() != singleFlushSuit ||
+                                entry.getValue().get(1).getSuit() != singleFlushSuit) {
+                            strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                        }
                     }
                 }
                 return strongOrMediumBackDoorCombos;
