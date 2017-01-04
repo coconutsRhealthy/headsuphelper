@@ -367,7 +367,7 @@ public class FlushDrawEvaluator extends FlushEvaluator {
             }
         }
 
-        if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board)) {
+        if(getNumberOfPairsOnBoard(board) < 2 && !boardContainsTrips(board)) {
             if(getNumberOfSuitedCardsOnBoard(board) == 2) {
                 Map<Integer, List<Card>> strongOrMediumBackDoorCombos = new HashMap<>();
 
@@ -393,16 +393,33 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                             numberOfRanksNeeded, "high");
                 }
                 if(strongOrMedium.equals("medium")) {
+                    //voeg ook strong combos toe aan medium als er pair op board ligt
+                    if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
+                        neededRanksNotPresentOnBoard.addAll(getNeededRanksNotPresentOnFlushBoard(backDoorFlushCardsOnBoard,
+                                2, "high"));
+                    }
+
                     numberOfRanksNeeded = 4;
-                    neededRanksNotPresentOnBoard = getNeededRanksNotPresentOnFlushBoard(backDoorFlushCardsOnBoard,
-                            numberOfRanksNeeded, "medium");
+                    neededRanksNotPresentOnBoard.addAll(getNeededRanksNotPresentOnFlushBoard(backDoorFlushCardsOnBoard,
+                            numberOfRanksNeeded, "medium"));
                 }
 
                 for (Map.Entry<Integer, List<Card>> entry : allBackDoorCombos.entrySet()) {
                     if(strongOrMedium.equals("strong")) {
-                        if(entry.getValue().get(0).getSuit() == singleFlushSuit &&
-                                entry.getValue().get(1).getSuit() == singleFlushSuit) {
-                            strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                        if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board)) {
+                            if(entry.getValue().get(0).getSuit() == singleFlushSuit &&
+                                    entry.getValue().get(1).getSuit() == singleFlushSuit) {
+                                strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                            }
+                        }
+                    }
+
+                    if(strongOrMedium.equals("medium")) {
+                        if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
+                            if(entry.getValue().get(0).getSuit() == singleFlushSuit &&
+                                    entry.getValue().get(1).getSuit() == singleFlushSuit) {
+                                strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                            }
                         }
                     }
 
@@ -410,7 +427,16 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                     if(neededRanksNotPresentOnBoard.contains(Integer.valueOf(c.getRank()))) {
                         if(entry.getValue().get(0).getSuit() != singleFlushSuit ||
                                 entry.getValue().get(1).getSuit() != singleFlushSuit) {
-                            strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                            if(strongOrMedium.equals("strong")) {
+                                if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board)) {
+                                    strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                                }
+                            }
+                            if(strongOrMedium.equals("medium")) {
+                                if(getNumberOfPairsOnBoard(board) < 2 && !boardContainsTrips(board)) {
+                                    strongOrMediumBackDoorCombos.put(strongOrMediumBackDoorCombos.size(), entry.getValue());
+                                }
+                            }
                         }
                     }
                 }
