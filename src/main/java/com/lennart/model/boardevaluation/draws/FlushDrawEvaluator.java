@@ -441,6 +441,10 @@ public class FlushDrawEvaluator extends FlushEvaluator {
                     }
                 }
                 return strongOrMediumBackDoorCombos;
+            } else if(getNumberOfPairsOnBoard(board) == 1) {
+                if(strongOrMedium.equals("medium")) {
+                    return allBackDoorCombos;
+                }
             }
         }
         return new HashMap<>();
