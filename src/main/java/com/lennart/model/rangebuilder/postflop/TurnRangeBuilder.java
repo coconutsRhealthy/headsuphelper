@@ -37,14 +37,14 @@ public class TurnRangeBuilder {
         turnRange.put(turnRange.size(), rangeBuilder.getCombosOfDesignatedStrength(0.5, 0.64, 0.45));
 
         //draws
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongOosdCombos(turnRange, board, 0.5, holeCards, rangeResultingFromPreviousActions));
-        turnRange.put(turnRange.size(), rangeBuilder.getMediumOosdCombos(turnRange, board, 0.25, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongOosdCombos(turnRange, 0.5, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getMediumOosdCombos(turnRange, 0.25, holeCards, rangeResultingFromPreviousActions));
 
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongGutshotCombos(turnRange, board, 0.5, holeCards, rangeResultingFromPreviousActions));
-        turnRange.put(turnRange.size(), rangeBuilder.getMediumGutshotCombos(turnRange, board, 0.17, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongGutshotCombos(turnRange, 0.5, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getMediumGutshotCombos(turnRange, 0.17, holeCards, rangeResultingFromPreviousActions));
 
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongFlushDrawCombos(turnRange, board, 0.5, holeCards, rangeResultingFromPreviousActions));
-        turnRange.put(turnRange.size(), rangeBuilder.getMediumFlushDrawCombos(turnRange, board, 0.25, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongFlushDrawCombos(turnRange, 0.5, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getMediumFlushDrawCombos(turnRange, 0.25, holeCards, rangeResultingFromPreviousActions));
         turnRange.put(turnRange.size(), rangeBuilder.getStrongTwoOvercardCombos(turnRange, board, 0.4, holeCards, rangeResultingFromPreviousActions));
 
         //air
@@ -84,13 +84,13 @@ public class TurnRangeBuilder {
         //tricky range
 
         //draws
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongOosdCombos(turnRange, board, 0.6, holeCards, rangeResultingFromPreviousActions));
-        turnRange.put(turnRange.size(), rangeBuilder.getMediumOosdCombos(turnRange, board, 0.4, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongOosdCombos(turnRange, 0.6, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getMediumOosdCombos(turnRange, 0.4, holeCards, rangeResultingFromPreviousActions));
 
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongGutshotCombos(turnRange, board, 0.6, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongGutshotCombos(turnRange, 0.6, holeCards, rangeResultingFromPreviousActions));
 
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongFlushDrawCombos(turnRange, board, 0.6, holeCards, rangeResultingFromPreviousActions));
-        turnRange.put(turnRange.size(), rangeBuilder.getMediumFlushDrawCombos(turnRange, board, 0.4, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongFlushDrawCombos(turnRange, 0.6, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getMediumFlushDrawCombos(turnRange, 0.4, holeCards, rangeResultingFromPreviousActions));
         turnRange.put(turnRange.size(), rangeBuilder.getStrongTwoOvercardCombos(turnRange, board, 0.55, holeCards, rangeResultingFromPreviousActions));
 
         //air
