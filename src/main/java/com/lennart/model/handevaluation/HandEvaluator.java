@@ -22,9 +22,9 @@ public class HandEvaluator {
     public HandEvaluator(BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
         this.boardEvaluator = boardEvaluator;
         this.rangeBuilder = rangeBuilder;
-        straightDrawEvaluator = rangeBuilder.getStraightDrawEvaluator();
-        flushDrawEvaluator = rangeBuilder.getFlushDrawEvaluator();
-        highCardDrawEvaluator = rangeBuilder.getHighCardDrawEvaluator();
+        straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
+        flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
+        highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
     }
 
     public double getHandStrength(List<Card> hand) {

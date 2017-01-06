@@ -1,5 +1,8 @@
 package com.lennart.model.boardevaluation;
 
+import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.ComputerGame;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
@@ -25,6 +28,10 @@ public class BoardEvaluator {
     private FourOfAKindEvaluator fourOfAKindEvaluator;
     private StraightFlushEvaluator straightFlushEvaluator;
 
+    private HighCardDrawEvaluator highCardDrawEvaluator;
+    private StraightDrawEvaluator straightDrawEvaluator;
+    private FlushDrawEvaluator flushDrawEvaluator;
+
     public BoardEvaluator() {
 
     }
@@ -49,6 +56,10 @@ public class BoardEvaluator {
                     straightEvaluator, flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
 
             sortedCombosNew = getSortedCombosInitialize(computerGame.getBoard());
+
+            highCardDrawEvaluator = new HighCardDrawEvaluator(board, straightEvaluator);
+            straightDrawEvaluator = new StraightDrawEvaluator(board);
+            flushDrawEvaluator = new FlushDrawEvaluator(board);
         }
     }
 
@@ -882,6 +893,18 @@ public class BoardEvaluator {
 
     public StraightEvaluator getStraightEvaluator() {
         return straightEvaluator;
+    }
+
+    public HighCardDrawEvaluator getHighCardDrawEvaluator() {
+        return highCardDrawEvaluator;
+    }
+
+    public StraightDrawEvaluator getStraightDrawEvaluator() {
+        return straightDrawEvaluator;
+    }
+
+    public FlushDrawEvaluator getFlushDrawEvaluator() {
+        return flushDrawEvaluator;
     }
 
     public int getNumberOfArrivedDraws() {

@@ -31,13 +31,10 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
 
         final Map<List<Integer>, List<List<Integer>>> allStraightDrawCombos = getCombosThatGiveAnyStraightDraw(board);
         final Map<Integer, List<Integer>> combosThatGiveOosdOrDoubleGutter = getCombosThatGiveOosdOrDoubleGutter(board, allStraightDrawCombos);
-        //w.s. moet je kopie maken van allGutshotCombos
         final Map<Integer, List<Integer>> allGutshotCombos = getCombosThatGiveGutshot(board, allStraightDrawCombos);
         Map<Integer, List<Integer>> allGutshotCombosCopy = getCopyOfMap(allGutshotCombos);
         final Map<Integer, List<Integer>> gutShotCombosLowCard = getWeakGutshotCombosFromAllGutshotCombos(board, allGutshotCombosCopy);
         final Map<Integer, List<Integer>> gutShotCombosCorrectedForLowCard = removeWeakStraightDrawCombos(allGutshotCombosCopy, gutShotCombosLowCard);
-
-        //w.s. moet je kopie maken van allBackDoorCombos
         final Map<Integer, List<Integer>> allBackDoorCombos = getCombosThatGiveBackDoorStraightDraw(board, allStraightDrawCombos);
         Map<Integer, List<Integer>> allBackDoorCombosCopy = getCopyOfMap(allBackDoorCombos);
         final Map<Integer, List<Integer>> backDoorCombosLowCard = getWeakBackdoorCombosFromAllBackdoorCombos(board, allBackDoorCombosCopy);

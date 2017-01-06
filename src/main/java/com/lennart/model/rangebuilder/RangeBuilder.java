@@ -38,9 +38,9 @@ public class RangeBuilder {
         sortedCombos = boardEvaluator.getSortedCombosNew();
         holeCards = computerGame.getComputerHoleCards();
         knownGameCards = computerGame.getKnownGameCards();
-        flushDrawEvaluator = new FlushDrawEvaluator(computerGame.getBoard());
-        straightDrawEvaluator = new StraightDrawEvaluator(computerGame.getBoard());
-        highCardDrawEvaluator = new HighCardDrawEvaluator(computerGame.getBoard(), boardEvaluator.getStraightEvaluator());
+        flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
+        straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
+        highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
     }
 
     public Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Set<Card>> preflopRange,
@@ -896,17 +896,5 @@ public class RangeBuilder {
             }
         }
         return allSortedCombosClearedForRange;
-    }
-
-    public StraightDrawEvaluator getStraightDrawEvaluator() {
-        return straightDrawEvaluator;
-    }
-
-    public FlushDrawEvaluator getFlushDrawEvaluator() {
-        return flushDrawEvaluator;
-    }
-
-    public HighCardDrawEvaluator getHighCardDrawEvaluator() {
-        return highCardDrawEvaluator;
     }
 }
