@@ -45,7 +45,7 @@ public class TurnRangeBuilder {
 
         turnRange.put(turnRange.size(), rangeBuilder.getStrongFlushDrawCombos(turnRange, 0.5, holeCards, rangeResultingFromPreviousActions));
         turnRange.put(turnRange.size(), rangeBuilder.getMediumFlushDrawCombos(turnRange, 0.25, holeCards, rangeResultingFromPreviousActions));
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongTwoOvercardCombos(turnRange, board, 0.4, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongTwoOvercardCombos(turnRange, 0.4, holeCards, rangeResultingFromPreviousActions));
 
         //air
         turnRange = rangeBuilder.addXPercentAirCombos(holeCards, board, turnRange, rangeResultingFromPreviousActions, 0.1);
@@ -91,7 +91,7 @@ public class TurnRangeBuilder {
 
         turnRange.put(turnRange.size(), rangeBuilder.getStrongFlushDrawCombos(turnRange, 0.6, holeCards, rangeResultingFromPreviousActions));
         turnRange.put(turnRange.size(), rangeBuilder.getMediumFlushDrawCombos(turnRange, 0.4, holeCards, rangeResultingFromPreviousActions));
-        turnRange.put(turnRange.size(), rangeBuilder.getStrongTwoOvercardCombos(turnRange, board, 0.55, holeCards, rangeResultingFromPreviousActions));
+        turnRange.put(turnRange.size(), rangeBuilder.getStrongTwoOvercardCombos(turnRange, 0.55, holeCards, rangeResultingFromPreviousActions));
 
         //air
         turnRange = rangeBuilder.addXPercentAirCombos(holeCards, board, turnRange, rangeResultingFromPreviousActions, 0.15);

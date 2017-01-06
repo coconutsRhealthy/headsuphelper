@@ -11,36 +11,75 @@ import java.util.*;
  */
 public class HighCardDrawEvaluator extends HighCardEvaluator {
 
-    //Todo: hier moet nog wat mee.. ook constructor
-    StraightEvaluator straightEvaluator = new StraightEvaluator();
+    private List<Card> board;
 
-    public Map<Integer, Set<Card>> getStrongTwoOvercards(List<Card> board) {
+    private Map<Integer, Set<Card>> strongTwoOvercards;
+    private Map<Integer, Set<Card>> mediumTwoOvercards;
+    private Map<Integer, Set<Card>> weakTwoOvercards;
+
+    private Map<Integer, Set<Card>> allOvercardCombosFlop;
+    private Map<Integer, Set<Card>> allOvercardCombosTurn;
+
+    public HighCardDrawEvaluator(List<Card> board, StraightEvaluator straightEvaluator) {
+        this.board = board;
+
+        final Map<Integer, Set<Card>> allOvercardCombos = getAllOvercardCombos(board);
+
+        strongTwoOvercards = getStrongTwoOvercards(allOvercardCombos, straightEvaluator);
+        mediumTwoOvercards = getMediumTwoOvercards(allOvercardCombos, straightEvaluator);
+        weakTwoOvercards = getWeakTwoOvercards(allOvercardCombos, straightEvaluator);
+
+        setOvercardCombosPerStreet(allOvercardCombos);
+    }
+
+    public Map<Integer, Set<Card>> getStrongTwoOvercards() {
+        return strongTwoOvercards;
+    }
+
+    public Map<Integer, Set<Card>> getMediumTwoOvercards() {
+        return mediumTwoOvercards;
+    }
+
+    public Map<Integer, Set<Card>> getWeakTwoOvercards() {
+        return weakTwoOvercards;
+    }
+
+    public Map<Integer, Set<Card>> getAllOvercardCombosFlop() {
+        return allOvercardCombosFlop;
+    }
+
+    public Map<Integer, Set<Card>> getAllOvercardCombosTurn() {
+        return allOvercardCombosTurn;
+    }
+
+    //helper methods
+    private Map<Integer, Set<Card>> getStrongTwoOvercards(Map<Integer, Set<Card>> allOvercardCombos, StraightEvaluator straightEvaluator) {
         if(getNumberOfPairsOnBoard(board) == 0 && straightEvaluator.getMapOfStraightCombos().isEmpty()
                 && getNumberOfSuitedCardsOnBoard(board) < 3) {
-            return getAllOvercardCombos(board);
+            return allOvercardCombos;
         }
         return new HashMap<>();
     }
 
-    public Map<Integer, Set<Card>> getMediumTwoOvercards(List<Card> board) {
+    private Map<Integer, Set<Card>> getMediumTwoOvercards(Map<Integer, Set<Card>> allOvercardCombos, StraightEvaluator straightEvaluator) {
         List<List<Integer>> straightCombos = straightEvaluator.getCombosThatMakeStraight(board);
 
         if(getNumberOfPairsOnBoard(board) == 1 || getNumberOfSuitedCardsOnBoard(board) == 3 || straightCombos.size() < 10) {
-            return getAllOvercardCombos(board);
+            return allOvercardCombos;
         }
         return new HashMap<>();
     }
 
-    public Map<Integer, Set<Card>> getWeakTwoOvercards(List<Card> board) {
+    private Map<Integer, Set<Card>> getWeakTwoOvercards(Map<Integer, Set<Card>> allOvercardCombos, StraightEvaluator straightEvaluator) {
         List<List<Integer>> straightCombos = straightEvaluator.getCombosThatMakeStraight(board);
 
         if(getNumberOfPairsOnBoard(board) > 1 || getNumberOfSuitedCardsOnBoard(board) > 3 || straightCombos.size() >= 10) {
-            return getAllOvercardCombos(board);
+            return allOvercardCombos;
         }
         return new HashMap<>();
     }
 
-    public Map<Integer, Set<Card>> getAllOvercardCombos(List<Card> board) {
+    private Map<Integer, Set<Card>> getAllOvercardCombos(List<Card> board) {
         //get de max rank van board
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         int highestRankOnBoard = Collections.max(boardRanks);
@@ -91,5 +130,13 @@ public class HighCardDrawEvaluator extends HighCardEvaluator {
             overcardCombos.put(overcardCombos.size(), s);
         }
         return overcardCombos;
+    }
+
+    private void setOvercardCombosPerStreet(Map<Integer, Set<Card>> allOvercardCombos) {
+        if(board.size() == 3 && allOvercardCombosFlop == null) {
+            allOvercardCombosFlop = allOvercardCombos;
+        } else if(board.size() == 4 && allOvercardCombosTurn == null) {
+            allOvercardCombosTurn = allOvercardCombos;
+        }
     }
 }

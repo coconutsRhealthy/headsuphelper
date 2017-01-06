@@ -880,6 +880,10 @@ public class BoardEvaluator {
         return cleanedSortedCombos;
     }
 
+    public StraightEvaluator getStraightEvaluator() {
+        return straightEvaluator;
+    }
+
     public int getNumberOfArrivedDraws() {
         if(board.size() == 3) {
             return straightEvaluator.getNumberOfStraightsOnFlop() + flushEvaluator.getNumberOfFlushesOnFlop();

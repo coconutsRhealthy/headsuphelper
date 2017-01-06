@@ -60,9 +60,9 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getWeakFlushDrawCombos(flopRange, 0.5, holeCards, preflopRange));
 
         //check
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.7, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, board, 0.5, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getWeakTwoOvercardCombos(flopRange, board, 0.5, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 0.7, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, 0.5, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getWeakTwoOvercardCombos(flopRange, 0.5, holeCards, preflopRange));
 
         //beetje air
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.1);
@@ -100,7 +100,7 @@ public class FlopRangeBuilder {
 
         flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(flopRange, 0.5, holeCards, preflopRange));
         flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, 0.5, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.2, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 0.2, holeCards, preflopRange));
 
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.18);
@@ -158,9 +158,9 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, 0.75, holeCards, preflopRange));
         flopRange.put(flopRange.size(), rangeBuilder.getWeakFlushDrawCombos(flopRange, 0.25, holeCards, preflopRange));
 
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.75, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, board, 0.7, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getWeakTwoOvercardCombos(flopRange, board, 0.1, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 0.75, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, 0.7, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getWeakTwoOvercardCombos(flopRange, 0.1, holeCards, preflopRange));
 
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.25);
@@ -195,7 +195,7 @@ public class FlopRangeBuilder {
 
         flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(flopRange, 1, holeCards, rangeResultingFromPreviousActions));
         flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, 1, holeCards, rangeResultingFromPreviousActions));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 1, holeCards, rangeResultingFromPreviousActions));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 1, holeCards, rangeResultingFromPreviousActions));
 
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, rangeResultingFromPreviousActions, 0.16);
@@ -251,9 +251,9 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, 0.8, holeCards, preflopRange));
         flopRange.put(flopRange.size(), rangeBuilder.getWeakFlushDrawCombos(flopRange, 0.8, holeCards, preflopRange));
 
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.8, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, board, 0.8, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getWeakTwoOvercardCombos(flopRange, board, 0.8, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 0.8, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, 0.8, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getWeakTwoOvercardCombos(flopRange, 0.8, holeCards, preflopRange));
 
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.2);
@@ -290,8 +290,8 @@ public class FlopRangeBuilder {
         flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(flopRange, 0.7, holeCards, rangeResultingFromPreviousActions));
         flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, 0.6, holeCards, rangeResultingFromPreviousActions));
 
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.8, holeCards, rangeResultingFromPreviousActions));
-        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, board, 0.4, holeCards, rangeResultingFromPreviousActions));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 0.8, holeCards, rangeResultingFromPreviousActions));
+        flopRange.put(flopRange.size(), rangeBuilder.getMediumTwoOvercardCombos(flopRange, 0.4, holeCards, rangeResultingFromPreviousActions));
 
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, rangeResultingFromPreviousActions, 0.1);
@@ -340,7 +340,7 @@ public class FlopRangeBuilder {
 
         flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(flopRange, 1, holeCards, preflopRange));
         flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, 0.75, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.83, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 0.83, holeCards, preflopRange));
 
         //de backdoors en air
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.1);
@@ -380,7 +380,7 @@ public class FlopRangeBuilder {
 
         flopRange.put(flopRange.size(), rangeBuilder.getStrongFlushDrawCombos(flopRange, 0.77, holeCards, preflopRange));
         flopRange.put(flopRange.size(), rangeBuilder.getMediumFlushDrawCombos(flopRange, 0.67, holeCards, preflopRange));
-        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, board, 0.7, holeCards, preflopRange));
+        flopRange.put(flopRange.size(), rangeBuilder.getStrongTwoOvercardCombos(flopRange, 0.7, holeCards, preflopRange));
 
         //de air combos
         flopRange = rangeBuilder.addXPercentAirCombos(holeCards, board, flopRange, preflopRange, 0.2);

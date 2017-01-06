@@ -40,7 +40,7 @@ public class RangeBuilder {
         knownGameCards = computerGame.getKnownGameCards();
         flushDrawEvaluator = new FlushDrawEvaluator(computerGame.getBoard());
         straightDrawEvaluator = new StraightDrawEvaluator(computerGame.getBoard());
-        highCardDrawEvaluator = new HighCardDrawEvaluator();
+        highCardDrawEvaluator = new HighCardDrawEvaluator(computerGame.getBoard(), boardEvaluator.getStraightEvaluator());
     }
 
     public Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Set<Card>> preflopRange,
@@ -570,9 +570,9 @@ public class RangeBuilder {
     }
 
     public Map<Integer, Set<Card>> getStrongTwoOvercardCombos(Map<Integer, Map<Integer, Set<Card>>> rangeThusFar,
-                                                              List<Card> board, double percentage, List<Card> holeCards,
+                                                              double percentage, List<Card> holeCards,
                                                               Map<Integer, Set<Card>> rangeOfPreviousStreet) {
-        Map<Integer, Set<Card>> strongTwoOvercardCombos = highCardDrawEvaluator.getStrongTwoOvercards(board);
+        Map<Integer, Set<Card>> strongTwoOvercardCombos = highCardDrawEvaluator.getStrongTwoOvercards();
         strongTwoOvercardCombos = removeHoleCardCombosFromComboMap(strongTwoOvercardCombos, holeCards);
         strongTwoOvercardCombos = getCombosThatArePresentInBothMaps(strongTwoOvercardCombos, rangeOfPreviousStreet);
 
@@ -580,18 +580,18 @@ public class RangeBuilder {
     }
 
     public Map<Integer, Set<Card>> getMediumTwoOvercardCombos(Map<Integer, Map<Integer, Set<Card>>> rangeThusFar,
-                                                              List<Card> board, double percentage, List<Card> holeCards,
+                                                              double percentage, List<Card> holeCards,
                                                               Map<Integer, Set<Card>> rangeOfPreviousStreet) {
-        Map<Integer, Set<Card>> mediumTwoOvercardCombos = highCardDrawEvaluator.getMediumTwoOvercards(board);
+        Map<Integer, Set<Card>> mediumTwoOvercardCombos = highCardDrawEvaluator.getMediumTwoOvercards();
         mediumTwoOvercardCombos = removeHoleCardCombosFromComboMap(mediumTwoOvercardCombos, holeCards);
         mediumTwoOvercardCombos = getCombosThatArePresentInBothMaps(mediumTwoOvercardCombos, rangeOfPreviousStreet);
 
         return getPercentageOfCombos(rangeThusFar, mediumTwoOvercardCombos, percentage);
     }
     public Map<Integer, Set<Card>> getWeakTwoOvercardCombos(Map<Integer, Map<Integer, Set<Card>>> rangeThusFar,
-                                                            List<Card> board, double percentage, List<Card> holeCards,
+                                                            double percentage, List<Card> holeCards,
                                                             Map<Integer, Set<Card>> rangeOfPreviousStreet) {
-        Map<Integer, Set<Card>> weakTwoOvercardCombos = highCardDrawEvaluator.getWeakTwoOvercards(board);
+        Map<Integer, Set<Card>> weakTwoOvercardCombos = highCardDrawEvaluator.getWeakTwoOvercards();
         weakTwoOvercardCombos = removeHoleCardCombosFromComboMap(weakTwoOvercardCombos, holeCards);
         weakTwoOvercardCombos = getCombosThatArePresentInBothMaps(weakTwoOvercardCombos, rangeOfPreviousStreet);
 
