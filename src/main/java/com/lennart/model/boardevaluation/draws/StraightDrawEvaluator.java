@@ -256,7 +256,7 @@ public class StraightDrawEvaluator extends StraightEvaluator implements ComboCom
                 convertRankDrawCombosToCardDrawCombos(allGutshotCombos, board);
 
         for (Map.Entry<Integer, Set<Card>> entry : allGutshotCardCombos.entrySet()) {
-            allStraightDrawCombos.put(allOosdCombos.size(), entry.getValue());
+            allStraightDrawCombos.put(allStraightDrawCombos.size(), entry.getValue());
         }
         setCombosThatGiveOosdOrGutshotPerStreet(allStraightDrawCombos);
     }
