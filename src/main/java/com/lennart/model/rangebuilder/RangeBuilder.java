@@ -719,8 +719,7 @@ public class RangeBuilder {
         return preflopRangeCopy;
     }
 
-    //helper methods
-    private Set<Set<Card>> convertMapToSet(Map<Integer, Set<Card>> mapToConvertToSet) {
+    public Set<Set<Card>> convertMapToSet(Map<Integer, Set<Card>> mapToConvertToSet) {
         Set<Set<Card>> set = new HashSet<>();
 
         for (Map.Entry<Integer, Set<Card>> entry : mapToConvertToSet.entrySet()) {
@@ -729,6 +728,7 @@ public class RangeBuilder {
         return set;
     }
 
+    //helper methods
     private Set<Set<Card>> convertMapWithInnerMapToSet(Map<Integer, Map<Integer, Set<Card>>> mapToConvertToSet) {
         Set<Set<Card>> mapAsSet = new HashSet<>();
 

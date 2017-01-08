@@ -47,6 +47,8 @@ public class Action {
             postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame);
         }
 
+        Set<Set<Card>> opponentRange;
+        String action;
         switch(computerGame.getHandPath()) {
             case "05betF1bet":
                 handPathAfterAction = preflopActionBuilder.get05betF1bet(computerGame);
@@ -61,15 +63,15 @@ public class Action {
                 processHandPath(computerGame);
                 break;
             case "2betFcheck":
-                Set<Set<Card>> sortedOpponentRange = flopRangeBuilder.get2betCheck();
-                String action = postFlopActionBuilder.getAction(sortedOpponentRange);
+                opponentRange = flopRangeBuilder.get2betCheck();
+                action = postFlopActionBuilder.getAction(opponentRange);
                 handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
                 processHandPath(computerGame);
                 break;
             case "Call2bet":
-                //Welke range? Set<Set<Card>> sortedOpponentRange = ...
-                //action = postFlopActionBuilder.getAction(sortedOpponentRange);
-                //handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
+                opponentRange = rangeBuilder.convertMapToSet(preflopRangeBuilder.getOpponent2betRange());
+                action = postFlopActionBuilder.getAction(opponentRange);
+                handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
                 processHandPath(computerGame);
                 break;
 
@@ -97,9 +99,11 @@ public class Action {
 
             int indexWhereStringsStartToDiffer;
 
-            for(int i = 0; i < oldHandPathChars.length; i++) {
-                if(oldHandPathChars[i] == newHandPathChars [i]) {
-                    continue;
+            for(int i = 0; i < newHandPathChars.length; i++) {
+                if(i < oldHandPathChars.length) {
+                    if(oldHandPathChars[i] == newHandPathChars [i]) {
+                        continue;
+                    }
                 }
                 indexWhereStringsStartToDiffer = i;
                 newPartOfHandPath = handPathAfterAction.substring(indexWhereStringsStartToDiffer);
@@ -134,7 +138,7 @@ public class Action {
     }
 
     private String includePostFlopActionInHandPath(String handPath, String postFlopAction) {
-        handPath = removeFacingPartFromHandPath(handPath);
+        handPath = removeFacingPartFromHandPathIfPresent(handPath);
 
         if(postFlopAction.equals("check")) {
             handPath = handPath + "Check";
@@ -152,8 +156,11 @@ public class Action {
         return handPath;
     }
 
-    private String removeFacingPartFromHandPath(String handPath) {
-        return handPath.substring(0, handPath.lastIndexOf("F"));
+    private String removeFacingPartFromHandPathIfPresent(String handPath) {
+        if(handPath.contains("F")) {
+            return handPath.substring(0, handPath.lastIndexOf("F"));
+        }
+        return handPath;
     }
 
     public double getSizing() {

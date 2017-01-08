@@ -1,6 +1,7 @@
 package com.lennart.model.pokergame;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
 
@@ -132,17 +133,15 @@ public class ComputerGame {
             computerIncrementalBetSize = computerAction.getSizing();
             computerStack = computerStack - computerIncrementalBetSize;
             computerTotalBetSize = computerIncrementalBetSize;
-            potSize = potSize + computerIncrementalBetSize;
             computerIsToAct = false;
         } else if (computerWrittenAction.contains("raise")) {
             computerIncrementalBetSize = computerAction.getSizing() - computerTotalBetSize;
             computerStack = computerStack - computerIncrementalBetSize;
             computerTotalBetSize = computerAction.getSizing();
-            potSize = potSize + computerIncrementalBetSize;
             computerIsToAct = false;
         } else if (computerWrittenAction.contains("call")) {
-            computerStack = computerStack - (myTotalBetSize - computerIncrementalBetSize);
-            potSize = potSize + (myTotalBetSize - computerIncrementalBetSize);
+            computerStack = computerStack - (myTotalBetSize - computerTotalBetSize);
+            potSize = potSize + myTotalBetSize + computerTotalBetSize;
             computerIncrementalBetSize = 0;
             computerTotalBetSize = 0;
         } else if(computerWrittenAction.contains("fold")) {
@@ -242,22 +241,21 @@ public class ComputerGame {
             }
         }
 
-        //als computeraction call is en computer zit oop...
-        if(computerWrittenAction.contains("call") && !isComputerIsButton()) {
+        //als computeraction call is
+        if(computerWrittenAction.contains("call")) {
             resetAllBets();
-            if(flopCards == null) {
-                dealFlopCards();
-            } else if(turnCard == null) {
-                dealTurnCard();
-            } else if(riverCard == null) {
-                dealRiverCard();
-            } else {
-                //go to showdown
+            proceedToNextStreetOrFinishHand();
+
+            //als computer oop zit
+            if(!isComputerIsButton()) {
+                String formerComputerWrittenAction = computerWrittenAction;
+                doComputerAction();
+                computerWrittenAction = formerComputerWrittenAction + " and " + computerAction.getWrittenAction();
+                //computerWrittenAction = computerWrittenAction + " and " + computerAction.getWrittenAction();
             }
-            doComputerAction();
-            computerWrittenAction = computerWrittenAction + " and " + computerAction.getWrittenAction();
         }
 
+        roundToTwoDecimals();
         //return computerGame
         return this;
     }
@@ -269,13 +267,12 @@ public class ComputerGame {
             computerIsToAct = true;
         } else if(myAction.equals("call")) {
             myStack = myStack - (computerTotalBetSize - myIncrementalBetSize);
-            potSize = potSize + (computerTotalBetSize - myIncrementalBetSize);
+            potSize = potSize + myTotalBetSize + computerTotalBetSize;
             myIncrementalBetSize = 0;
             myTotalBetSize = 0;
         } else {
             myIncrementalBetSize = myTotalBetSize - myIncrementalBetSize;
             myStack = myStack - myIncrementalBetSize;
-            potSize = potSize + myIncrementalBetSize;
         }
     }
 
@@ -286,6 +283,8 @@ public class ComputerGame {
             dealTurnCard();
         } else if (riverCard == null) {
             dealRiverCard();
+        } else {
+            //go to showdown
         }
     }
 
@@ -344,6 +343,14 @@ public class ComputerGame {
         myTotalBetSize = 0;
         computerIncrementalBetSize = 0;
         computerTotalBetSize = 0;
+    }
+
+    private void roundToTwoDecimals() {
+        potSize = Precision.round(potSize, 2);
+        myStack = Precision.round(myStack, 2);
+        computerStack = Precision.round(computerStack, 2);
+        myTotalBetSize = Precision.round(myTotalBetSize, 2);
+        computerTotalBetSize = Precision.round(computerTotalBetSize, 2);
     }
 
 

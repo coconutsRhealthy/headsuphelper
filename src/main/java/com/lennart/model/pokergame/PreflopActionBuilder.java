@@ -361,6 +361,8 @@ public class PreflopActionBuilder {
                 return 2.5 * computerGame.getBigBlind();
             case "3bet":
                 return 3.2 * computerGame.getMyTotalBetSize();
+            case "4bet":
+                return 2.25 * computerGame.getMyTotalBetSize();
         }
         return 0;
     }

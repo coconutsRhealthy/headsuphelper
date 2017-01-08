@@ -233,45 +233,52 @@ public class PostFlopActionBuilder {
     }
 
     private String getBluffAction(String bettingAction, String passiveAction, double handStrengthAgainstRange) {
-        int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
-        int numberOfArrivedDrawsInYourPerceivedRange =
-                handEvaluator.getNumberOfArrivedDrawsInRange("myPerceivedRange");
-        int numberOfArrivedDrawsInOpponentRange =
-                handEvaluator.getNumberOfArrivedDrawsInRange("opponentRange");
-        double percentageOfYourPerceivedRangeThatHitsFlopRanks =
-                handEvaluator.getPercentageOfYourPerceivedRangeThatHitsFlopRanks();
-        double percentageOfYourPerceivedRangeThatHitsNewCard =
-                handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
-
-        if(handStrengthAgainstRange < 0.45) {
-            if(boardEvaluator.boardIsDry()&& boardIsSingleRaisedAndNoBettingPostFlop()) {
-                if(Math.random() < 0.7) {
-                    return bettingAction;
-                }
-            }
-
-            if(numberOfArrivedDraws > 3 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3) &&
-                    numberOfArrivedDrawsInYourPerceivedRange > numberOfArrivedDrawsInOpponentRange) {
-                if(Math.random() < 0.8) {
-                    return bettingAction;
-                }
-            }
-
-            if(computerGame.getBoard().size() == 3) {
-                if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
-                    if(Math.random() < 0.8) {
-                        return bettingAction;
-                    }
-                }
-            } else {
-                if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
-                    if(Math.random() < 0.8) {
-                        return bettingAction;
-                    }
-                }
-            }
+        if(Math.random() < 0.21) {
+            return bettingAction;
+        } else {
+            return passiveAction;
         }
-        return passiveAction;
+
+        //use this implementation later..
+//        int numberOfArrivedDraws = boardEvaluator.getNumberOfArrivedDraws();
+//        int numberOfArrivedDrawsInYourPerceivedRange =
+//                handEvaluator.getNumberOfArrivedDrawsInRange("myPerceivedRange");
+//        int numberOfArrivedDrawsInOpponentRange =
+//                handEvaluator.getNumberOfArrivedDrawsInRange("opponentRange");
+//        double percentageOfYourPerceivedRangeThatHitsFlopRanks =
+//                handEvaluator.getPercentageOfYourPerceivedRangeThatHitsFlopRanks();
+//        double percentageOfYourPerceivedRangeThatHitsNewCard =
+//                handEvaluator.getPercentageOfYourPerceivedRangeThatHitsNewCard();
+//
+//        if(handStrengthAgainstRange < 0.45) {
+//            if(boardEvaluator.boardIsDry()&& boardIsSingleRaisedAndNoBettingPostFlop()) {
+//                if(Math.random() < 0.7) {
+//                    return bettingAction;
+//                }
+//            }
+//
+//            if(numberOfArrivedDraws > 3 && numberOfArrivedDrawsInYourPerceivedRange > (numberOfArrivedDraws / 3) &&
+//                    numberOfArrivedDrawsInYourPerceivedRange > numberOfArrivedDrawsInOpponentRange) {
+//                if(Math.random() < 0.8) {
+//                    return bettingAction;
+//                }
+//            }
+//
+//            if(computerGame.getBoard().size() == 3) {
+//                if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
+//                    if(Math.random() < 0.8) {
+//                        return bettingAction;
+//                    }
+//                }
+//            } else {
+//                if(percentageOfYourPerceivedRangeThatHitsNewCard > 0.5) {
+//                    if(Math.random() < 0.8) {
+//                        return bettingAction;
+//                    }
+//                }
+//            }
+//        }
+//        return passiveAction;
     }
 
     public double getSize(double potSize) {
