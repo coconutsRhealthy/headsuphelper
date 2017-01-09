@@ -13,18 +13,22 @@ import java.util.*;
  * Created by lennart on 1-10-16.
  */
 public class HandEvaluator {
+    private List<Card> holeCards;
     private BoardEvaluator boardEvaluator;
     private RangeBuilder rangeBuilder;
     private StraightDrawEvaluator straightDrawEvaluator;
     private FlushDrawEvaluator flushDrawEvaluator;
     private HighCardDrawEvaluator highCardDrawEvaluator;
+    private Map<String, Boolean> handDrawEvaluation;
 
-    public HandEvaluator(BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
+    public HandEvaluator(List<Card> holeCards, BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
+        this.holeCards = holeCards;
         this.boardEvaluator = boardEvaluator;
         this.rangeBuilder = rangeBuilder;
         straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
         highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
+        fillHandDrawEvaluation();
     }
 
     public double getHandStrength(List<Card> hand) {
@@ -131,109 +135,26 @@ public class HandEvaluator {
         return false;
     }
 
-    public boolean youHaveStrongFlushDraw(List<Card> holeCards) {
-        return comboPresentInMap(flushDrawEvaluator.getStrongFlushDrawCombos(), holeCards);
+    public Map<String, Boolean> getHandDrawEvaluation() {
+        return handDrawEvaluation;
     }
 
-    public boolean youHaveMediumFlushDraw(List<Card> holeCards) {
-        return comboPresentInMap(flushDrawEvaluator.getMediumFlushDrawCombos(), holeCards);
-    }
-
-    public boolean youHaveWeakFlushDraw(List<Card> holeCards) {
-        return comboPresentInMap(flushDrawEvaluator.getWeakFlushDrawCombos(), holeCards);
-    }
-
-    public boolean youHaveStrongOosd(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getStrongOosdCombos(), holeCards);
-    }
-
-    public boolean youHaveMediumOosd(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getMediumOosdCombos(), holeCards);
-    }
-
-    public boolean youHaveWeakOosd(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getWeakOosdCombos(), holeCards);
-    }
-
-//    public boolean youHaveStrongGutshot(List<Card> holeCards) {
-//        return comboPresentInMap(straightDrawEvaluator.getStrongGutshotCombos(), holeCards);
-//    }
-
-    public boolean youHaveMediumGutshot(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getMediumGutshotCombos(), holeCards);
-    }
-
-    public boolean youHaveWeakGutshot(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getWeakGutshotCombos(), holeCards);
-    }
-
-//    public boolean youHaveStrongOvercards(List<Card> holeCards) {
-//        return comboPresentInMap(highCardDrawEvaluator.getStrongTwoOvercards(), holeCards);
-//    }
-
-    public boolean youHaveMediumOvercards(List<Card> holeCards) {
-        return comboPresentInMap(highCardDrawEvaluator.getMediumTwoOvercards(), holeCards);
-    }
-
-    public boolean youHaveWeakOvercards(List<Card> holeCards) {
-        return comboPresentInMap(highCardDrawEvaluator.getWeakTwoOvercards(), holeCards);
-    }
-
-    public boolean youHaveStrongBackDoorFlush(List<Card> holeCards) {
-        return comboPresentInMap(flushDrawEvaluator.getStrongBackDoorFlushCombos(), holeCards);
-    }
-
-    public boolean youHaveMediumBackDoorFlush(List<Card> holeCards) {
-        return comboPresentInMap(flushDrawEvaluator.getMediumBackDoorFlushCombos(), holeCards);
-    }
-
-    public boolean youHaveWeakBackDoorFlush(List<Card> holeCards) {
-        return comboPresentInMap(flushDrawEvaluator.getWeakBackDoorFlushCombos(), holeCards);
-    }
-
-    public boolean youHaveStrongBackDoorStraight(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getStrongBackDoorCombos(), holeCards);
-    }
-
-    public boolean youHaveMediumBackDoorStraight(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getMediumBackDoorCombos(), holeCards);
-    }
-
-    public boolean youHaveWeakBackDoorStraight(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getWeakBackDoorCombos(), holeCards);
-    }
-
-    public boolean youHaveAnyDraw(List<Card> holeCards) {
+    public boolean hasAnyDrawNonBackDoor() {
+        for (Map.Entry<String, Boolean> entry : handDrawEvaluation.entrySet()) {
+            if(!entry.getKey().contains("BackDoor") && entry.getValue()) {
+                return true;
+            }
+        }
         return false;
     }
 
-    public boolean youHaveStrongFdOrSd(List<Card> holeCards) {
-        boolean strongStraightDraw = comboPresentInMap(straightDrawEvaluator.getStrongOosdCombos(), holeCards);
-        boolean strongFlushDraw = comboPresentInMap(flushDrawEvaluator.getStrongFlushDrawCombos(), holeCards);
-
-        return(strongStraightDraw || strongFlushDraw);
-    }
-
-    public boolean youHaveStrongGutshot(List<Card> holeCards) {
-        return comboPresentInMap(straightDrawEvaluator.getStrongGutshotCombos(), holeCards);
-    }
-
-    public boolean youHaveMediumFdOrSd(List<Card> holeCards) {
-        boolean mediumStraightDraw = comboPresentInMap(straightDrawEvaluator.getMediumOosdCombos(), holeCards);
-        boolean mediumFlushDraw = comboPresentInMap(flushDrawEvaluator.getMediumFlushDrawCombos(), holeCards);
-
-        return(mediumStraightDraw || mediumFlushDraw);
-    }
-
-    public boolean youHaveStrongOvercards(List<Card> holeCards) {
-        return comboPresentInMap(highCardDrawEvaluator.getStrongTwoOvercards(), holeCards);
-    }
-
-    public boolean youHaveStrongBackDoor(List<Card> holeCards) {
-        boolean strongBackDoorStraight = comboPresentInMap(straightDrawEvaluator.getStrongBackDoorCombos(), holeCards);
-        boolean strongBackDoorFlush = comboPresentInMap(flushDrawEvaluator.getStrongBackDoorFlushCombos(), holeCards);
-
-        return(strongBackDoorStraight || strongBackDoorFlush);
+    public boolean hasDrawOfType(String drawType) {
+        for (Map.Entry<String, Boolean> entry : handDrawEvaluation.entrySet()) {
+            if(entry.getKey().contains(drawType) && entry.getValue()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //helper methods
@@ -291,6 +212,34 @@ public class HandEvaluator {
         } else {
             return index;
         }
+    }
+
+    private void fillHandDrawEvaluation() {
+        handDrawEvaluation = new HashMap<>();
+
+        handDrawEvaluation.put("strongFlushDraw", comboPresentInMap(flushDrawEvaluator.getStrongFlushDrawCombos(), holeCards));
+        handDrawEvaluation.put("mediumFlushDraw", comboPresentInMap(flushDrawEvaluator.getMediumFlushDrawCombos(), holeCards));
+        handDrawEvaluation.put("weakFlushDraw", comboPresentInMap(flushDrawEvaluator.getWeakFlushDrawCombos(), holeCards));
+
+        handDrawEvaluation.put("strongOosd", comboPresentInMap(straightDrawEvaluator.getStrongOosdCombos(), holeCards));
+        handDrawEvaluation.put("mediumOosd", comboPresentInMap(straightDrawEvaluator.getMediumOosdCombos(), holeCards));
+        handDrawEvaluation.put("weakOosd", comboPresentInMap(straightDrawEvaluator.getWeakOosdCombos(), holeCards));
+
+        handDrawEvaluation.put("strongGutshot", comboPresentInMap(straightDrawEvaluator.getStrongGutshotCombos(), holeCards));
+        handDrawEvaluation.put("mediumGutshot", comboPresentInMap(straightDrawEvaluator.getMediumGutshotCombos(), holeCards));
+        handDrawEvaluation.put("weakGutshot", comboPresentInMap(straightDrawEvaluator.getWeakGutshotCombos(), holeCards));
+
+        handDrawEvaluation.put("strongOvercards", comboPresentInMap(highCardDrawEvaluator.getStrongTwoOvercards(), holeCards));
+        handDrawEvaluation.put("mediumOvercards", comboPresentInMap(highCardDrawEvaluator.getMediumTwoOvercards(), holeCards));
+        handDrawEvaluation.put("weakOvercards", comboPresentInMap(highCardDrawEvaluator.getWeakTwoOvercards(), holeCards));
+
+        handDrawEvaluation.put("strongBackDoorFlush", comboPresentInMap(flushDrawEvaluator.getStrongBackDoorFlushCombos(), holeCards));
+        handDrawEvaluation.put("mediumBackDoorFlush", comboPresentInMap(flushDrawEvaluator.getMediumBackDoorFlushCombos(), holeCards));
+        handDrawEvaluation.put("weakBackDoorFlush", comboPresentInMap(flushDrawEvaluator.getWeakBackDoorFlushCombos(), holeCards));
+
+        handDrawEvaluation.put("strongBackDoorStraight", comboPresentInMap(straightDrawEvaluator.getStrongBackDoorCombos(), holeCards));
+        handDrawEvaluation.put("mediumBackDoorStraight", comboPresentInMap(straightDrawEvaluator.getMediumBackDoorCombos(), holeCards));
+        handDrawEvaluation.put("weakBackDoorStraight", comboPresentInMap(straightDrawEvaluator.getWeakBackDoorCombos(), holeCards));
     }
 
     private Set<Card> convertListToSet(List<Card> list) {

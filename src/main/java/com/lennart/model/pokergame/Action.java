@@ -43,7 +43,7 @@ public class Action {
             boardEvaluator = new BoardEvaluator(computerGame);
             rangeBuilder = new RangeBuilder(boardEvaluator, computerGame);
             flopRangeBuilder = new FlopRangeBuilder(rangeBuilder, preflopRangeBuilder);
-            handEvaluator = new HandEvaluator(boardEvaluator, rangeBuilder);
+            handEvaluator = rangeBuilder.getHandEvaluator();
             postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame);
         }
 

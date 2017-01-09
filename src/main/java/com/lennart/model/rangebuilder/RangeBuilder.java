@@ -30,17 +30,16 @@ public class RangeBuilder {
     private FlushDrawEvaluator flushDrawEvaluator;
     private StraightDrawEvaluator straightDrawEvaluator;
     private HighCardDrawEvaluator highCardDrawEvaluator;
-    private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
 
     public RangeBuilder(BoardEvaluator boardEvaluator, ComputerGame computerGame) {
-        this.boardEvaluator = boardEvaluator;
         sortedCombos = boardEvaluator.getSortedCombosNew();
         holeCards = computerGame.getComputerHoleCards();
         knownGameCards = computerGame.getKnownGameCards();
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
         straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
         highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
+        handEvaluator = new HandEvaluator(holeCards, boardEvaluator, this);
     }
 
     public Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Set<Card>> preflopRange,
@@ -211,46 +210,6 @@ public class RangeBuilder {
             knownGameCardsCopy.addAll(knownGameCards);
         }
         return combosToReturn;
-    }
-
-    //deprecated
-    public Map<Integer, Set<Card>> getCombosAboveDesignatedStrengthLevel(double strengthLevel, List<Card> board) {
-        Map<Integer, Set<Set<Card>>> sortedCombosInMethod = sortedCombos;
-        Map<Integer, Set<Set<Card>>> sortedCombosAboveDesignatedStrengthLevel = new HashMap<>();
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosInMethod.entrySet()) {
-            sortedCombosAboveDesignatedStrengthLevel.put(entry.getKey(), entry.getValue());
-        }
-
-        double doubleFromWhereCombosShouldBeRemoved = (1176 * (1 - strengthLevel));
-        int intFromWhereCombosShouldBeRemoved = (int) doubleFromWhereCombosShouldBeRemoved;
-        int counter = 0;
-
-        for(Iterator<Map.Entry<Integer, Set<Set<Card>>>> it = sortedCombosAboveDesignatedStrengthLevel.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Integer, Set<Set<Card>>> entry = it.next();
-
-            if(counter > intFromWhereCombosShouldBeRemoved) {
-                it.remove();
-                continue;
-            }
-
-            for(Iterator<Set<Card>> it2 = entry.getValue().iterator(); it2.hasNext(); ) {
-                Set<Card> entry2 = it2.next();
-                counter++;
-                if(counter > intFromWhereCombosShouldBeRemoved) {
-                    it2.remove();
-                }
-            }
-        }
-
-        Map<Integer, Set<Card>> combosAboveDesignatedStrengthLevel = new HashMap<>();
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosAboveDesignatedStrengthLevel.entrySet()) {
-            for(Set<Card> combo : entry.getValue()) {
-                combosAboveDesignatedStrengthLevel.put(combosAboveDesignatedStrengthLevel.size(), combo);
-            }
-        }
-        return combosAboveDesignatedStrengthLevel;
     }
 
     public Map<Integer, Set<Card>> getAirRange(Map<Integer, Map<Integer, Set<Card>>> rangeThusFar,
@@ -780,8 +739,6 @@ public class RangeBuilder {
     }
 
     private Map<Integer, Set<Card>> removeDrawCombosThatAreAlsoHigherCombos(Map<Integer, Set<Card>> drawComboMap) {
-        handEvaluator = new HandEvaluator(boardEvaluator, this);
-
         for(Iterator<Map.Entry<Integer, Set<Card>>> it = drawComboMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Integer, Set<Card>> entry = it.next();
 
@@ -896,5 +853,9 @@ public class RangeBuilder {
             }
         }
         return allSortedCombosClearedForRange;
+    }
+
+    public HandEvaluator getHandEvaluator() {
+        return handEvaluator;
     }
 }

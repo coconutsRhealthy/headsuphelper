@@ -86,7 +86,7 @@ public class PostFlopActionBuilder {
             return getValueAction(_1BET, CHECK);
         }
 
-        String drawAction = getDrawAction(_1BET, CHECK, true, true, true, true, true);
+        String drawAction = getDrawAction(_1BET);
 
         if(drawAction != null) {
             return drawAction;
@@ -115,7 +115,7 @@ public class PostFlopActionBuilder {
                 return getValueAction(_1BET, CHECK);
             }
 
-            String drawAction = getDrawAction(_1BET, CHECK, true, true, true, true, true);
+            String drawAction = getDrawAction(_1BET);
 
             if(drawAction != null) {
                 return drawAction;
@@ -142,7 +142,7 @@ public class PostFlopActionBuilder {
             if(handStrengthAgainstRange > 0.7) {
                 return getValueAction(_2BET, CALL_1_BET);
             } else {
-                String drawAction = getDrawAction(_2BET, CALL_1_BET, true, true, true, false, true);
+                String drawAction = getDrawAction(_2BET);
                 if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
                     if(drawAction != null) {
                         return drawAction;
@@ -168,7 +168,7 @@ public class PostFlopActionBuilder {
             if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
                 return CALL_1_BET;
             }
-            if(getHandStrengthNeededToCall() > handEvaluator.getDrawEquityOfYourHand()) {
+            if(getDrawCallingAction().contains("call")) {
                 return CALL_1_BET;
             }
             return FOLD;
@@ -179,7 +179,7 @@ public class PostFlopActionBuilder {
         if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
             return callAction;
         } else {
-            if(getHandStrengthNeededToCall() > handEvaluator.getDrawEquityOfYourHand()) {
+            if(getDrawCallingAction().contains("call")) {
                 return callAction;
             } else {
                 return FOLD;
@@ -207,41 +207,79 @@ public class PostFlopActionBuilder {
         }
     }
 
-    private String getDrawAction(String bettingAction, String passiveAction, boolean includeStrongFdOrSd,
-                                 boolean includeStrongGutshot, boolean includeStrongOvercards,
-                                 boolean includeMediumFdOrSd, boolean includeStrongBackDoor) {
-        if (includeStrongFdOrSd && handEvaluator.youHaveStrongFdOrSd(computerGame.getComputerHoleCards())) {
-            if(Math.random() < 0.5) {
-                return bettingAction;
-            } else {
-                return passiveAction;
+    private String getDrawAction(String bettingAction) {
+        if (bettingAction.equals(_1BET)) {
+            if(computerGame.getPotSize() / computerGame.getBigBlind() < 7) {
+                if (handEvaluator.hasAnyDrawNonBackDoor()) {
+                    if (Math.random() < 0.68) {
+                        return bettingAction;
+                    } else {
+                        return CHECK;
+                    }
+                }
+                if (handEvaluator.hasDrawOfType("strongBackDoor")) {
+                    if (Math.random() < 0.20) {
+                        return bettingAction;
+                    } else {
+                        return CHECK;
+                    }
+                }
+                if (handEvaluator.hasDrawOfType("mediumBackDoor")) {
+                    if (Math.random() < 0.10) {
+                        return bettingAction;
+                    } else {
+                        return CHECK;
+                    }
+                }
+                if (handEvaluator.hasDrawOfType("weakBackDoor")) {
+                    if (Math.random() < 0.05) {
+                        return bettingAction;
+                    } else {
+                        return CHECK;
+                    }
+                }
             }
-        } else if (includeStrongOvercards && handEvaluator.youHaveStrongOvercards(computerGame.getComputerHoleCards())) {
-            if(Math.random() < 0.40) {
-                return bettingAction;
-            } else {
-                return passiveAction;
+        } else {
+            if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd") ||
+                    handEvaluator.hasDrawOfType("strongOvercards")) {
+                if (Math.random() < 0.50) {
+                    return bettingAction;
+                } else {
+                    if (bettingAction.equals(_1BET)) {
+                        return CHECK;
+                    } else {
+                        return getDrawCallingAction();
+                    }
+                }
             }
-        } else if (includeStrongGutshot && handEvaluator.youHaveStrongGutshot(computerGame.getComputerHoleCards())) {
-            if(Math.random() < 0.38) {
-                return bettingAction;
-            } else {
-                return passiveAction;
+            if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                if (Math.random() < 0.38) {
+                    return bettingAction;
+                } else {
+                    if (bettingAction.equals(_1BET)) {
+                        return CHECK;
+                    } else {
+                        return getDrawCallingAction();
+                    }
+                }
             }
-        } else if (includeMediumFdOrSd && handEvaluator.youHaveMediumFdOrSd(computerGame.getComputerHoleCards())) {
-            if(Math.random() < 0.25) {
-                return bettingAction;
-            } else {
-                return passiveAction;
-            }
-        } else if(includeStrongBackDoor && handEvaluator.youHaveStrongBackDoor(computerGame.getComputerHoleCards())) {
-            if(Math.random() < 0.10) {
-                return bettingAction;
-            } else {
-                return passiveAction;
+            if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                if (Math.random() < 0.18) {
+                    return bettingAction;
+                } else {
+                    if (bettingAction.equals(_1BET)) {
+                        return CHECK;
+                    } else {
+                        return getDrawCallingAction();
+                    }
+                }
             }
         }
-        return null;
+        if (bettingAction.equals(_1BET)) {
+            return CHECK;
+        } else {
+            return getDrawCallingAction();
+        }
     }
 
     private String getBluffAction(String bettingAction, String passiveAction, double handStrengthAgainstRange) {
@@ -311,20 +349,49 @@ public class PostFlopActionBuilder {
         return (0.01 + amountToCall) / (potSize + amountToCall);
     }
 
-    private boolean drawCallingAction() {
-        //if pot below 5bb
-            //met alle draws
+    private String getDrawCallingAction() {
+        double potSizeInBb = computerGame.getPotSize() / computerGame.getBigBlind();
 
-        //if pot below 10bb
-            //met alle strong draws
-            //50% van de keren met medium draws
+        if(potSizeInBb <= 7) {
+            if(handEvaluator.hasAnyDrawNonBackDoor()) {
+                return "call";
+            }
+            if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                return "call";
+            }
+        }
 
-        //if pot below 20bb
-            //met alle strong draws
+        if(potSizeInBb > 7 && potSizeInBb <= 15) {
+            if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd") ||
+                    handEvaluator.hasDrawOfType("strongGutshot") || handEvaluator.hasDrawOfType("strongOvercards")) {
+                return "call";
+            }
+            if(handEvaluator.hasDrawOfType("mediumFlushDraw") || handEvaluator.hasDrawOfType("mediumOosd") ||
+                    handEvaluator.hasDrawOfType("mediumGutshot") || handEvaluator.hasDrawOfType("mediumOvercards")) {
+                if(Math.random() < 0.50) {
+                    return "call";
+                }
+            }
+            if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                if(Math.random() < 0.15) {
+                    return "call";
+                }
+            }
+        }
 
-        //else
-            //met draws die twee van de 4 zijn: strong gutshot, strong oosd, strong fd, strong overcards
+        if(potSizeInBb > 15 && potSizeInBb <= 25) {
+            if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd") ||
+                    handEvaluator.hasDrawOfType("strongGutshot")) {
+                return "call";
+            }
+        }
 
-        return false;
+        if(potSizeInBb > 25) {
+            if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                return "call";
+            }
+        }
+
+        return "fold";
     }
 }
