@@ -1,10 +1,6 @@
 package com.lennart.model.pokergame;
 
-import com.lennart.model.boardevaluation.BoardEvaluator;
-import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.rangebuilder.RangeBuilder;
-import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
@@ -17,11 +13,7 @@ public class Action {
 
     private double sizing;
     private String writtenAction;
-    private BoardEvaluator boardEvaluator;
     private RangeBuilder rangeBuilder;
-    private PreflopRangeBuilder preflopRangeBuilder;
-    private FlopRangeBuilder flopRangeBuilder;
-    private HandEvaluator handEvaluator;
     private PreflopActionBuilder preflopActionBuilder;
     private PostFlopActionBuilder postFlopActionBuilder;
 
@@ -36,40 +28,41 @@ public class Action {
 
     public Action(ComputerGame computerGame) {
         handPathBeforeAction = computerGame.getHandPath();
-        preflopRangeBuilder = new PreflopRangeBuilder(computerGame.getKnownGameCards());
-        preflopActionBuilder = new PreflopActionBuilder(preflopRangeBuilder);
+        rangeBuilder = new RangeBuilder(computerGame.getComputerHoleCards(), computerGame.getBoard(),
+                computerGame.getKnownGameCards());
+        preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
 
         if(computerGame.getBoard() != null) {
-            boardEvaluator = new BoardEvaluator(computerGame);
-            rangeBuilder = new RangeBuilder(boardEvaluator, computerGame);
-            flopRangeBuilder = new FlopRangeBuilder(rangeBuilder, preflopRangeBuilder);
-            handEvaluator = rangeBuilder.getHandEvaluator();
-            postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, computerGame);
+            postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
+                    rangeBuilder.getHandEvaluator(), computerGame);
         }
 
         Set<Set<Card>> opponentRange;
         String action;
         switch(computerGame.getHandPath()) {
             case "05betF1bet":
-                handPathAfterAction = preflopActionBuilder.get05betF1bet(computerGame);
+                action = preflopActionBuilder.get05betF1bet(computerGame);
+                handPathAfterAction = action;
                 processHandPath(computerGame);
                 break;
             case "1betF2bet":
-                handPathAfterAction = preflopActionBuilder.get1betF2bet(computerGame);
+                action = preflopActionBuilder.get1betF2bet(computerGame);
+                handPathAfterAction = action;
                 processHandPath(computerGame);
                 break;
             case "2betF3bet":
-                handPathAfterAction = preflopActionBuilder.get2betF3bet(computerGame);
+                action = preflopActionBuilder.get2betF3bet(computerGame);
+                handPathAfterAction = action;
                 processHandPath(computerGame);
                 break;
             case "2betFcheck":
-                opponentRange = flopRangeBuilder.get2betCheck();
+                opponentRange = rangeBuilder.getOpponentRange(computerGame.getAllHandPathsOfHand());
                 action = postFlopActionBuilder.getAction(opponentRange);
                 handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
                 processHandPath(computerGame);
                 break;
             case "Call2bet":
-                opponentRange = rangeBuilder.convertMapToSet(preflopRangeBuilder.getOpponent2betRange());
+                opponentRange = rangeBuilder.getOpponentRange(computerGame.getAllHandPathsOfHand());
                 action = postFlopActionBuilder.getAction(opponentRange);
                 handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
                 processHandPath(computerGame);
@@ -81,6 +74,15 @@ public class Action {
         }
     }
 
+    public double getSizing() {
+        return sizing;
+    }
+
+    public String getWrittenAction() {
+        return writtenAction;
+    }
+
+    //helper methods
     private void processHandPath(ComputerGame computerGame) {
         newPartOfHandPath = getNewPartOfHandPath();
         computerGame.setHandPath(handPathAfterAction);
@@ -161,85 +163,5 @@ public class Action {
             return handPath.substring(0, handPath.lastIndexOf("F"));
         }
         return handPath;
-    }
-
-    public double getSizing() {
-        return sizing;
-    }
-
-    public void setSizing(double sizing) {
-        this.sizing = sizing;
-    }
-
-    public String getWrittenAction() {
-        return writtenAction;
-    }
-
-    public void setWrittenAction(String writtenAction) {
-        this.writtenAction = writtenAction;
-    }
-
-    public PreflopActionBuilder getPreflopActionBuilder() {
-        return preflopActionBuilder;
-    }
-
-    public void setPreflopActionBuilder(PreflopActionBuilder preflopActionBuilder) {
-        this.preflopActionBuilder = preflopActionBuilder;
-    }
-
-    public PostFlopActionBuilder getPostFlopActionBuilder() {
-        return postFlopActionBuilder;
-    }
-
-    public void setPostFlopActionBuilder(PostFlopActionBuilder postFlopActionBuilder) {
-        this.postFlopActionBuilder = postFlopActionBuilder;
-    }
-
-    public BoardEvaluator getBoardEvaluator() {
-        return boardEvaluator;
-    }
-
-    public void setBoardEvaluator(BoardEvaluator boardEvaluator) {
-        this.boardEvaluator = boardEvaluator;
-    }
-
-    public FlopRangeBuilder getFlopRangeBuilder() {
-        return flopRangeBuilder;
-    }
-
-    public void setFlopRangeBuilder(FlopRangeBuilder flopRangeBuilder) {
-        this.flopRangeBuilder = flopRangeBuilder;
-    }
-
-    public String yourAction(int handStrenght, RangeBuilder opponentRange, boolean ip) {
-
-        //evaluate your hand against opponentRange
-        //if 80%> valueBet 80% van de keren op flop en turn, en 100% op river
-        //if 60% - 80% valueBet X% van de keren op flop, turn en river
-
-        //draws
-        //bet X% van de keren met je draws op de flop en turn
-
-        //air
-        //bet X% van de keren met je air, afhankelijk van board texture
-        //flop
-        //*!*hoe vaak komen de board kaarten voor in de range die jouw opponent jou geeft. En zijn eigen range?
-        //hoe wet is de flop?
-        //turn
-        //*!*hoe vaak komt de turn kaart voor in de range die jouw opponent jou geeft. En in zijn eigen range?
-        //zijn er meer draws gearriveerd?
-        //zijn er veel draws gecomplete?
-        //is er overcard bijgekomen?
-        //is boat mogelijk geworden?
-        //river
-        //*!*hoe vaak komt de river kaart voor in de range die jouw opponent jou geeft. En in zijn eigen range?
-        //hoeveel draws zijn er gearriveerd?
-        //is er boat of beter mogelijk geworden?
-        //is er overcard bijgekomen?
-        //bepaal je showdown value
-
-
-
-        return null;
     }
 }

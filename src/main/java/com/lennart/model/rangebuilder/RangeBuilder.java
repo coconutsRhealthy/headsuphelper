@@ -6,7 +6,9 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.ComputerGame;
+import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -24,22 +26,33 @@ public class RangeBuilder {
     //combos from this map that do not fall in the range. Of course, the combos that getCombosThatMakeRoyalFlush() and
     //the other methods return, should first be sorted from strongest to weakest, before added to the map.
 
-    private Map<Integer, Set<Set<Card>>> sortedCombos;
+
     private List<Card> holeCards;
     private Set<Card> knownGameCards;
+    private PreflopRangeBuilder preflopRangeBuilder;
+    private BoardEvaluator boardEvaluator;
+    private Map<Integer, Set<Set<Card>>> sortedCombos;
+    private FlopRangeBuilder flopRangeBuilder;
     private FlushDrawEvaluator flushDrawEvaluator;
     private StraightDrawEvaluator straightDrawEvaluator;
     private HighCardDrawEvaluator highCardDrawEvaluator;
     private HandEvaluator handEvaluator;
 
-    public RangeBuilder(BoardEvaluator boardEvaluator, ComputerGame computerGame) {
-        sortedCombos = boardEvaluator.getSortedCombosNew();
-        holeCards = computerGame.getComputerHoleCards();
-        knownGameCards = computerGame.getKnownGameCards();
-        flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
-        straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
-        highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
-        handEvaluator = new HandEvaluator(holeCards, boardEvaluator, this);
+    public RangeBuilder(List<Card> holeCards, List<Card> board, Set<Card> knownGameCards) {
+        this.holeCards = holeCards;
+        this.knownGameCards = knownGameCards;
+
+        preflopRangeBuilder = new PreflopRangeBuilder(knownGameCards);
+
+        if(board != null) {
+            boardEvaluator = new BoardEvaluator(board);
+            sortedCombos = boardEvaluator.getSortedCombosNew();
+            flopRangeBuilder = new FlopRangeBuilder(this, preflopRangeBuilder);
+            flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
+            straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
+            highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
+            handEvaluator = new HandEvaluator(holeCards, boardEvaluator, this);
+        }
     }
 
     public Map<Integer, Set<Set<Card>>> createRange(Map<Integer, Set<Card>> preflopRange,
@@ -808,40 +821,72 @@ public class RangeBuilder {
         return mapSimple.size();
     }
 
-    public Map<Integer, Set<Set<Card>>> getRange(String opponentRangeOrMyPerceivedRange) {
-        //TODO: hier nog goed onderscheid maken tussen of je opponent Range wil of jouw perceived range
+    private Set<Set<Card>> getAllStartHandsCorrectedForKnownGameCards() {
+        Set<Set<Card>> allStartHandsToReturn = new HashSet<>();
 
-        //TODO 2: kijken of je deze methode wil gebruiken
-//        Map<Integer, Set<Set<Card>>> rangeToReturn;
-//        PreflopRangeBuilder preflopRangeBuilder = new PreflopRangeBuilder();
-//        String handPath = HandPath.getHandPath();
-//
-//        if(opponentRangeOrMyPerceivedRange.equals("myPerceivedRange")) {
-//            Game.removeHoleCardsFromKnownGameCards();
-//        }
-//
-//        switch(handPath) {
-//            case "2bet":
-//                rangeToReturn = convertPreflopRangeToMapSetSetFormat(preflopRangeBuilder.getOpponentCall2betRange());
-//                break;
-//            case "call2bet":
-//                rangeToReturn = convertPreflopRangeToMapSetSetFormat(preflopRangeBuilder.getOpponent2betRange());
-//                break;
-//            case "3bet":
-//                rangeToReturn = convertPreflopRangeToMapSetSetFormat(preflopRangeBuilder.getOpponentCall3betRange());
-//                break;
-//            default:
-//                rangeToReturn = sortedCombos;
-//        }
-//
-//        if(opponentRangeOrMyPerceivedRange.equals("myPerceivedRange")) {
-//            Game.addHoleCardsToKnownGameCards();
-//        }
-//
-//        return rangeToReturn;
+        Map<Integer, Set<Card>> allPossibleStartHands = new HashMap<>();
 
-        return null;
+        for (Map.Entry<Integer, Set<Card>> entry : PreflopRangeBuilderUtil.getAllStartHandsAsSet().entrySet()) {
+            allPossibleStartHands.put(allPossibleStartHands.size(), new HashSet<>());
+            allPossibleStartHands.get(allPossibleStartHands.size()).addAll(entry.getValue());
+        }
+
+        for (Map.Entry<Integer, Set<Card>> entry : allPossibleStartHands.entrySet()) {
+            if(Collections.disjoint(entry.getValue(), knownGameCards)) {
+                allStartHandsToReturn.add(entry.getValue());
+            }
+        }
+        return allStartHandsToReturn;
     }
+
+    public Set<Set<Card>> getOpponentRange(List<String> allHandPathsOfHand) {
+        Set<Set<Card>> rangeToReturn;
+
+        List<String> allHandPathsOfHandCopy = new ArrayList<>();
+        allHandPathsOfHandCopy.addAll(allHandPathsOfHand);
+        String handPath = allHandPathsOfHandCopy.get(allHandPathsOfHandCopy.size());
+
+        switch(handPath) {
+            case "05betF1bet":
+                rangeToReturn = getAllStartHandsCorrectedForKnownGameCards();
+                break;
+            case "1bet":
+                rangeToReturn = getAllStartHandsCorrectedForKnownGameCards();
+                break;
+            case "1betF2bet":
+                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent2betRange());
+                break;
+            case "2betF3bet":
+                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent3betRange());
+                break;
+            case "3betF4bet":
+                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent4betRange());
+                break;
+            case "Call2bet":
+                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent2betRange());
+                break;
+            case "Call3bet":
+                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent3betRange());
+                break;
+            case "Call4bet":
+                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent4betRange());
+                break;
+            case "2betFcheck":
+                rangeToReturn = flopRangeBuilder.get2betCheck();
+                break;
+            default:
+                allHandPathsOfHandCopy.remove(allHandPathsOfHandCopy.size());
+
+                if(!allHandPathsOfHandCopy.isEmpty()) {
+                    return getOpponentRange(allHandPathsOfHandCopy);
+                } else {
+                    System.out.println("no usable handpath found!");
+                    return null;
+                }
+        }
+        return rangeToReturn;
+    }
+
 
     public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
         Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = new HashMap<>();
@@ -853,6 +898,14 @@ public class RangeBuilder {
             }
         }
         return allSortedCombosClearedForRange;
+    }
+
+    public BoardEvaluator getBoardEvaluator() {
+        return boardEvaluator;
+    }
+
+    public PreflopRangeBuilder getPreflopRangeBuilder() {
+        return preflopRangeBuilder;
     }
 
     public HandEvaluator getHandEvaluator() {

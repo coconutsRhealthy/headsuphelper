@@ -1,6 +1,6 @@
 package com.lennart.model.pokergame;
 
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
+import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip._2betRangeBuilder;
@@ -18,8 +18,8 @@ public class PreflopActionBuilder {
 
     private PreflopRangeBuilderUtil preflopRangeBuilderUtil;
 
-    public PreflopActionBuilder(PreflopRangeBuilder preflopRangeBuilder) {
-        preflopRangeBuilderUtil = preflopRangeBuilder.getPreflopRangeBuilderUtil();
+    public PreflopActionBuilder(RangeBuilder rangeBuilder) {
+        preflopRangeBuilderUtil = rangeBuilder.getPreflopRangeBuilder().getPreflopRangeBuilderUtil();
     }
 
     public String get05betF1bet(ComputerGame computerGame) {

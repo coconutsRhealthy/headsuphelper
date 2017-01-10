@@ -63,6 +63,9 @@ public class HandEvaluator {
                     myHandHasBeenPassedInSortedCombos = true;
                 }
 
+                //Todo: dit moet gefixt worden want nu tel je eventueel combos die gelijk zijn qua strength aan jouwe
+                //als combos die lager zijn dan jouwe. Hierboven moet in de binnenste if een 'continue' komen oid.
+
                 Set<Set<Card>> rangeCopy = new HashSet<>();
                 rangeCopy.addAll(opponentRange);
 
@@ -78,37 +81,37 @@ public class HandEvaluator {
         return index;
     }
 
-    public int getNumberOfArrivedDrawsInRange(String opponentRangeOrMyPerceivedRange) {
-        Map<Integer, Set<Card>> arrivedStraightDraws = boardEvaluator.getArrivedStraightDraws();
-        Map<Integer, Set<Card>> arrivedFlushDraws = boardEvaluator.getArrivedFlushDraws();
-        Map<Integer, Set<Set<Card>>> myPerceivedRange = rangeBuilder.getRange(opponentRangeOrMyPerceivedRange);
-
-        int counter = 0;
-
-        //de straights
-        for (Map.Entry<Integer, Set<Card>> entry : arrivedStraightDraws.entrySet()) {
-            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
-                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
-                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
-                        counter ++;
-                    }
-                }
-            }
-        }
-
-        //de flushes
-        for (Map.Entry<Integer, Set<Card>> entry : arrivedFlushDraws.entrySet()) {
-            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
-                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
-                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
-                        counter ++;
-                    }
-                }
-            }
-        }
-
-        return counter;
-    }
+//    public int getNumberOfArrivedDrawsInRange(String opponentRangeOrMyPerceivedRange) {
+//        Map<Integer, Set<Card>> arrivedStraightDraws = boardEvaluator.getArrivedStraightDraws();
+//        Map<Integer, Set<Card>> arrivedFlushDraws = boardEvaluator.getArrivedFlushDraws();
+//        Map<Integer, Set<Set<Card>>> myPerceivedRange = rangeBuilder.getRange(opponentRangeOrMyPerceivedRange);
+//
+//        int counter = 0;
+//
+//        //de straights
+//        for (Map.Entry<Integer, Set<Card>> entry : arrivedStraightDraws.entrySet()) {
+//            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
+//                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
+//                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
+//                        counter ++;
+//                    }
+//                }
+//            }
+//        }
+//
+//        //de flushes
+//        for (Map.Entry<Integer, Set<Card>> entry : arrivedFlushDraws.entrySet()) {
+//            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
+//                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
+//                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
+//                        counter ++;
+//                    }
+//                }
+//            }
+//        }
+//
+//        return counter;
+//    }
 
     public double getPercentageOfYourPerceivedRangeThatHitsFlopRanks() {
         //TODO: implement this method

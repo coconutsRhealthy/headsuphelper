@@ -34,6 +34,7 @@ public class ComputerGame {
     private String mySize;
     private List<Card> board;
     private String computerWrittenAction;
+    private List<String> allHandPathsOfHand;
 
     public ComputerGame() {
         //default constructor
@@ -56,6 +57,7 @@ public class ComputerGame {
             handPath = "1bet";
             computerIsToAct = false;
         }
+        allHandPathsOfHand.add(handPath);
     }
 
     private void getNewCardDeck() {
@@ -331,6 +333,7 @@ public class ComputerGame {
                 handPath = handPath + "F3bet";
             }
         }
+        allHandPathsOfHand.add(handPath);
     }
 
     private void resetComputerBetsize() {
@@ -545,5 +548,13 @@ public class ComputerGame {
 
     public void setComputerWrittenAction(String computerWrittenAction) {
         this.computerWrittenAction = computerWrittenAction;
+    }
+
+    public List<String> getAllHandPathsOfHand() {
+        return allHandPathsOfHand;
+    }
+
+    public void setAllHandPathsOfHand(List<String> allHandPathsOfHand) {
+        this.allHandPathsOfHand = allHandPathsOfHand;
     }
 }

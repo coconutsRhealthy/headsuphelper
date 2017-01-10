@@ -496,4 +496,8 @@ public class PreflopRangeBuilderUtil {
     public static Map<Integer, List<Card>> getAllPossibleStartHandsAsList() {
         return allPossibleStartHandsAsList;
     }
+
+    public static Map<Integer, Set<Card>> getAllStartHandsAsSet() {
+        return allStartHandsAsSet;
+    }
 }

@@ -4,7 +4,6 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.ComputerGame;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -36,31 +35,29 @@ public class BoardEvaluator {
 
     }
 
-    public BoardEvaluator(ComputerGame computerGame) {
-        board = computerGame.getBoard();
+    public BoardEvaluator(List<Card> board) {
+        this.board = board;
 
-        if(computerGame.getFlopCards() != null) {
-            straightFlushEvaluator = new StraightFlushEvaluator(board);
-            fourOfAKindEvaluator = new FourOfAKindEvaluator(board, straightFlushEvaluator);
-            fullHouseEvaluator = new FullHouseEvaluator(board, fourOfAKindEvaluator, straightFlushEvaluator);
-            flushEvaluator = new FlushEvaluator(board, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
-            straightEvaluator = new StraightEvaluator(board, flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator,
-                    straightFlushEvaluator);
-            threeOfAKindEvaluator = new ThreeOfAKindEvaluator(board, straightEvaluator, flushEvaluator, fullHouseEvaluator,
-                    fourOfAKindEvaluator, straightFlushEvaluator);
-            twoPairEvaluator = new TwoPairEvaluator(board, threeOfAKindEvaluator, straightEvaluator, flushEvaluator,
-                    fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
-            pairEvaluator = new PairEvaluator(board, twoPairEvaluator, threeOfAKindEvaluator, straightEvaluator,
-                    flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
-            highCardEvaluator = new HighCardEvaluator(board, pairEvaluator, twoPairEvaluator, threeOfAKindEvaluator,
-                    straightEvaluator, flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+        straightFlushEvaluator = new StraightFlushEvaluator(board);
+        fourOfAKindEvaluator = new FourOfAKindEvaluator(board, straightFlushEvaluator);
+        fullHouseEvaluator = new FullHouseEvaluator(board, fourOfAKindEvaluator, straightFlushEvaluator);
+        flushEvaluator = new FlushEvaluator(board, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+        straightEvaluator = new StraightEvaluator(board, flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator,
+                straightFlushEvaluator);
+        threeOfAKindEvaluator = new ThreeOfAKindEvaluator(board, straightEvaluator, flushEvaluator, fullHouseEvaluator,
+                fourOfAKindEvaluator, straightFlushEvaluator);
+        twoPairEvaluator = new TwoPairEvaluator(board, threeOfAKindEvaluator, straightEvaluator, flushEvaluator,
+                fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+        pairEvaluator = new PairEvaluator(board, twoPairEvaluator, threeOfAKindEvaluator, straightEvaluator,
+                flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
+        highCardEvaluator = new HighCardEvaluator(board, pairEvaluator, twoPairEvaluator, threeOfAKindEvaluator,
+                straightEvaluator, flushEvaluator, fullHouseEvaluator, fourOfAKindEvaluator, straightFlushEvaluator);
 
-            sortedCombosNew = getSortedCombosInitialize(computerGame.getBoard());
+        sortedCombosNew = getSortedCombosInitialize(board);
 
-            highCardDrawEvaluator = new HighCardDrawEvaluator(board, straightEvaluator);
-            straightDrawEvaluator = new StraightDrawEvaluator(board);
-            flushDrawEvaluator = new FlushDrawEvaluator(board);
-        }
+        highCardDrawEvaluator = new HighCardDrawEvaluator(board, straightEvaluator);
+        straightDrawEvaluator = new StraightDrawEvaluator(board);
+        flushDrawEvaluator = new FlushDrawEvaluator(board);
     }
 
     public Map<Integer, Set<Set<Card>>> getSortedCombosNew() {
