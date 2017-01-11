@@ -9,8 +9,6 @@ import java.util.Set;
  * Created by LPO10346 on 10/12/2016.
  */
 public class Action {
-    //Future class to determine your suggestedAction
-
     private double sizing;
     private String writtenAction;
     private RangeBuilder rangeBuilder;
@@ -32,45 +30,10 @@ public class Action {
                 computerGame.getKnownGameCards());
         preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
 
-        if(computerGame.getBoard() != null) {
-            postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
-                    rangeBuilder.getHandEvaluator(), computerGame);
-        }
-
-        Set<Set<Card>> opponentRange;
-        String action;
-        switch(computerGame.getHandPath()) {
-            case "05betF1bet":
-                action = preflopActionBuilder.get05betF1bet(computerGame);
-                handPathAfterAction = action;
-                processHandPath(computerGame);
-                break;
-            case "1betF2bet":
-                action = preflopActionBuilder.get1betF2bet(computerGame);
-                handPathAfterAction = action;
-                processHandPath(computerGame);
-                break;
-            case "2betF3bet":
-                action = preflopActionBuilder.get2betF3bet(computerGame);
-                handPathAfterAction = action;
-                processHandPath(computerGame);
-                break;
-            case "2betFcheck":
-                opponentRange = rangeBuilder.getOpponentRange(computerGame.getAllHandPathsOfHand());
-                action = postFlopActionBuilder.getAction(opponentRange);
-                handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
-                processHandPath(computerGame);
-                break;
-            case "Call2bet":
-                opponentRange = rangeBuilder.getOpponentRange(computerGame.getAllHandPathsOfHand());
-                action = postFlopActionBuilder.getAction(opponentRange);
-                handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
-                processHandPath(computerGame);
-                break;
-
-            default:
-                System.out.println("no action available for handpath: " + computerGame.getHandPath());
-                sizing = 0;
+        if(computerGame.getBoard() == null) {
+            getAndProcessPreflopAction(computerGame);
+        } else {
+            getAndProcessPostFlopAction(computerGame);
         }
     }
 
@@ -83,6 +46,24 @@ public class Action {
     }
 
     //helper methods
+    private void getAndProcessPreflopAction(ComputerGame computerGame) {
+        String action;
+        action = preflopActionBuilder.getAction(computerGame);
+        handPathAfterAction = action;
+        processHandPath(computerGame);
+    }
+
+    private void getAndProcessPostFlopAction(ComputerGame computerGame) {
+        postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
+                rangeBuilder.getHandEvaluator(), computerGame);
+        Set<Set<Card>> opponentRange;
+        String action;
+        opponentRange = rangeBuilder.getOpponentRange(computerGame.getAllHandPathsOfHand());
+        action = postFlopActionBuilder.getAction(opponentRange);
+        handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
+        processHandPath(computerGame);
+    }
+
     private void processHandPath(ComputerGame computerGame) {
         newPartOfHandPath = getNewPartOfHandPath();
         computerGame.setHandPath(handPathAfterAction);

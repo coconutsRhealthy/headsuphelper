@@ -22,7 +22,39 @@ public class PreflopActionBuilder {
         preflopRangeBuilderUtil = rangeBuilder.getPreflopRangeBuilder().getPreflopRangeBuilderUtil();
     }
 
-    public String get05betF1bet(ComputerGame computerGame) {
+    public String getAction(ComputerGame computerGame) {
+        String action = null;
+
+        switch(computerGame.getHandPath()) {
+            case "05betF1bet":
+                action = get05betF1bet(computerGame);
+                break;
+            case "1betF2bet":
+                action = get1betF2bet(computerGame);
+                break;
+            case "2betF3bet":
+                action = get2betF3bet(computerGame);
+                break;
+            case "3betF4bet":
+                action = get3betF4bet(computerGame);
+                break;
+        }
+        return action;
+    }
+
+    public double getSize(ComputerGame computerGame) {
+        switch(computerGame.getHandPath()) {
+            case "2bet":
+                return 2.5 * computerGame.getBigBlind();
+            case "3bet":
+                return 3.2 * computerGame.getMyTotalBetSize();
+            case "4bet":
+                return 2.25 * computerGame.getMyTotalBetSize();
+        }
+        return 0;
+    }
+
+    private String get05betF1bet(ComputerGame computerGame) {
         Map<Integer, Set<Card>> comboMap100Percent;
         Map<Integer, Set<Card>> comboMap5Percent;
 
@@ -68,7 +100,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String get2betF3bet(ComputerGame computerGame) {
+    private String get2betF3bet(ComputerGame computerGame) {
         //Game.removeHoleCardsFromKnownGameCards();
         computerGame.removeHoleCardsFromKnownGameCards();
 
@@ -187,7 +219,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String get1betF2bet(ComputerGame computerGame) {
+    private String get1betF2bet(ComputerGame computerGame) {
         //Game.removeHoleCardsFromKnownGameCards();
         computerGame.removeHoleCardsFromKnownGameCards();
 
@@ -290,7 +322,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    public String get3betF4bet(ComputerGame computerGame) {
+    private String get3betF4bet(ComputerGame computerGame) {
         //Game.removeHoleCardsFromKnownGameCards();
         computerGame.removeHoleCardsFromKnownGameCards();
 
@@ -353,18 +385,6 @@ public class PreflopActionBuilder {
         } else {
             return "5bet";
         }
-    }
-
-    public double getSize(ComputerGame computerGame) {
-        switch(computerGame.getHandPath()) {
-            case "2bet":
-                return 2.5 * computerGame.getBigBlind();
-            case "3bet":
-                return 3.2 * computerGame.getMyTotalBetSize();
-            case "4bet":
-                return 2.25 * computerGame.getMyTotalBetSize();
-        }
-        return 0;
     }
 
     private double setPercentage(Map<Integer, Set<Card>> comboMap, Set<Card> combo, double percentage) {
