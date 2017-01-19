@@ -35,6 +35,7 @@ public class ComputerGame {
     private List<Card> board;
     private String computerWrittenAction;
     private List<String> allHandPathsOfHand;
+    private Set<Set<Card>> opponentRange;
 
     public ComputerGame() {
         //default constructor
@@ -556,5 +557,13 @@ public class ComputerGame {
 
     public void setAllHandPathsOfHand(List<String> allHandPathsOfHand) {
         this.allHandPathsOfHand = allHandPathsOfHand;
+    }
+
+    public Set<Set<Card>> getOpponentRange() {
+        return opponentRange;
+    }
+
+    public void setOpponentRange(Set<Set<Card>> opponentRange) {
+        this.opponentRange = opponentRange;
     }
 }

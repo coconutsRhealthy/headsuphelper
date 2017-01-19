@@ -46,6 +46,8 @@ public class PostFlopActionBuilder {
     }
 
     public double getSize(double potSize) {
+        //dit maken zodat je altijd tussen 2.3 en 2.5 potodds geeft..
+
         return 0.75 * potSize;
     }
 

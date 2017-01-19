@@ -22,6 +22,26 @@ public class PreflopActionBuilder {
         preflopRangeBuilderUtil = rangeBuilder.getPreflopRangeBuilder().getPreflopRangeBuilderUtil();
     }
 
+    public String getAction(String temporary, ComputerGame computerGame) {
+        String action = null;
+
+        double bbOpponentTotalBetSize = computerGame.getMyTotalBetSize() / computerGame.getBigBlind();
+
+        if(bbOpponentTotalBetSize == 1) {
+            action = get05betF1bet(computerGame);
+        } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
+            action = get1betF2bet(computerGame);
+        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
+            action = get2betF3bet(computerGame);
+        } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 22) {
+            action = get3betF4bet(computerGame);
+        } else {
+            //5bet
+        }
+
+        return action;
+    }
+
     public String getAction(ComputerGame computerGame) {
         String action = null;
 
@@ -43,6 +63,8 @@ public class PreflopActionBuilder {
     }
 
     public double getSize(ComputerGame computerGame) {
+        //dit afhankelijk maken van potgrootte ipv handpath
+
         switch(computerGame.getHandPath()) {
             case "2bet":
                 return 2.5 * computerGame.getBigBlind();

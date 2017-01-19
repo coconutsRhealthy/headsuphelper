@@ -26,8 +26,7 @@ public class Action {
 
     public Action(ComputerGame computerGame) {
         handPathBeforeAction = computerGame.getHandPath();
-        rangeBuilder = new RangeBuilder(computerGame.getComputerHoleCards(), computerGame.getBoard(),
-                computerGame.getKnownGameCards());
+        rangeBuilder = new RangeBuilder(computerGame);
         preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
 
         if(computerGame.getBoard() == null) {
@@ -58,7 +57,7 @@ public class Action {
                 rangeBuilder.getHandEvaluator(), computerGame);
         Set<Set<Card>> opponentRange;
         String action;
-        opponentRange = rangeBuilder.getOpponentRange(computerGame.getAllHandPathsOfHand());
+        opponentRange = rangeBuilder.getOpponentRange(computerGame);
         action = postFlopActionBuilder.getAction(opponentRange);
         handPathAfterAction = includePostFlopActionInHandPath(computerGame.getHandPath(), action);
         processHandPath(computerGame);

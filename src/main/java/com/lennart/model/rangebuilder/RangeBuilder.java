@@ -6,7 +6,9 @@ import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.pokergame.ComputerGame;
 import com.lennart.model.rangebuilder.postflop.FlopRangeBuilder;
+import com.lennart.model.rangebuilder.postflop.PostFlopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
@@ -28,26 +30,32 @@ public class RangeBuilder {
 
 
     private List<Card> holeCards;
+    private List<Card> board;
     private Set<Card> knownGameCards;
     private PreflopRangeBuilder preflopRangeBuilder;
     private BoardEvaluator boardEvaluator;
     private Map<Integer, Set<Set<Card>>> sortedCombos;
     private FlopRangeBuilder flopRangeBuilder;
+    private PostFlopRangeBuilder postFlopRangeBuilder;
     private FlushDrawEvaluator flushDrawEvaluator;
     private StraightDrawEvaluator straightDrawEvaluator;
     private HighCardDrawEvaluator highCardDrawEvaluator;
     private HandEvaluator handEvaluator;
+    private Set<Set<Card>> previousOpponentRange;
 
-    public RangeBuilder(List<Card> holeCards, List<Card> board, Set<Card> knownGameCards) {
-        this.holeCards = holeCards;
-        this.knownGameCards = knownGameCards;
+    public RangeBuilder(ComputerGame computerGame) {
+        holeCards = computerGame.getComputerHoleCards();
+        board = computerGame.getBoard();
+        knownGameCards = computerGame.getKnownGameCards();
 
-        preflopRangeBuilder = new PreflopRangeBuilder(knownGameCards);
+        preflopRangeBuilder = new PreflopRangeBuilder(computerGame);
 
         if(board != null) {
+            previousOpponentRange = computerGame.getOpponentRange();
             boardEvaluator = new BoardEvaluator(board);
             sortedCombos = boardEvaluator.getSortedCombosNew();
             flopRangeBuilder = new FlopRangeBuilder(this, preflopRangeBuilder);
+            postFlopRangeBuilder = new PostFlopRangeBuilder(computerGame, boardEvaluator, this);
             flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
             straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
             highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
@@ -142,6 +150,47 @@ public class RangeBuilder {
         return rangeToReturn;
     }
 
+    public Map<Integer, Set<Card>> getCombosOfDesignatedStrength(double lowLimit, double highLimit) {
+        Map<Integer, Set<Set<Card>>> sortedCombosOfDesignatedStrengthLevel = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            Set<Set<Card>> setCopy = new HashSet<>();
+            setCopy.addAll(entry.getValue());
+
+            sortedCombosOfDesignatedStrengthLevel.put(sortedCombosOfDesignatedStrengthLevel.size(), setCopy);
+        }
+
+        double numberUntillWhereYouNeedToRemoveStrongCombos = (1176 - (1176 * highLimit));
+        double numberFromWhereYouNeedToStartRemovingAgain = (1176 - (1176 * lowLimit));
+        int counter = 0;
+
+        for(Iterator<Map.Entry<Integer, Set<Set<Card>>>> it = sortedCombosOfDesignatedStrengthLevel.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, Set<Set<Card>>> entry = it.next();
+
+            for(Iterator<Set<Card>> it2 = entry.getValue().iterator(); it2.hasNext(); ) {
+                it2.next();
+                counter++;
+
+                if(counter < numberUntillWhereYouNeedToRemoveStrongCombos || counter > numberFromWhereYouNeedToStartRemovingAgain) {
+                    it2.remove();
+                }
+            }
+
+            if(entry.getValue().isEmpty()) {
+                it.remove();
+            }
+        }
+
+        Map<Integer, Set<Card>> combosOfDesignatedStrengthLevel = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosOfDesignatedStrengthLevel.entrySet()) {
+            for(Set<Card> combo : entry.getValue()) {
+                combosOfDesignatedStrengthLevel.put(combosOfDesignatedStrengthLevel.size(), combo);
+            }
+        }
+        return combosOfDesignatedStrengthLevel;
+    }
+
     public Map<Integer, Set<Card>> getCombosOfDesignatedStrength(double lowLimit, double highLimit,
                                                                  double percentageOfCombosToInclude) {
         Map<Integer, Set<Set<Card>>> sortedCombosInMethod = sortedCombos;
@@ -223,6 +272,41 @@ public class RangeBuilder {
             knownGameCardsCopy.addAll(knownGameCards);
         }
         return combosToReturn;
+    }
+
+    public Map<Integer, Set<Card>> getAir(Set<Set<Card>> previousRange, double upperLimit, double percentageToInclunde) {
+        Map<Integer, Set<Card>> airCombos = new HashMap<>();
+        Map<Integer, Set<Card>> airCombosNotCorrectedForDraws = getCombosOfDesignatedStrength(0, upperLimit);
+        Set<Set<Card>> allNonBackDoorDraws = getAllNonBackDoorDraws();
+
+        for (Map.Entry<Integer, Set<Card>> entry : airCombosNotCorrectedForDraws.entrySet()) {
+            boolean noRegularDraw = false;
+            boolean inPreviousRange = false;
+            boolean noKnownGameCards = false;
+
+            Set<Set<Card>> allRegularDrawsCopy = new HashSet<>();
+            allRegularDrawsCopy.addAll(allNonBackDoorDraws);
+
+            Set<Set<Card>> previousRangeCopy = new HashSet<>();
+            previousRangeCopy.addAll(previousRange);
+
+            if(allRegularDrawsCopy.add(entry.getValue())) {
+                noRegularDraw = true;
+            }
+            if(!previousRangeCopy.add(entry.getValue())) {
+                inPreviousRange = true;
+            }
+            if(Collections.disjoint(entry.getValue(), knownGameCards)) {
+                noKnownGameCards = true;
+            }
+
+            if(noRegularDraw && inPreviousRange && noKnownGameCards) {
+                if(Math.random() < percentageToInclunde) {
+                    airCombos.put(airCombos.size(), entry.getValue());
+                }
+            }
+        }
+        return airCombos;
     }
 
     public Map<Integer, Set<Card>> getAirRange(Map<Integer, Map<Integer, Set<Card>>> rangeThusFar,
@@ -691,13 +775,22 @@ public class RangeBuilder {
         return preflopRangeCopy;
     }
 
-    public Set<Set<Card>> convertMapToSet(Map<Integer, Set<Card>> mapToConvertToSet) {
+    public static Set<Set<Card>> convertMapToSet(Map<Integer, Set<Card>> mapToConvertToSet) {
         Set<Set<Card>> set = new HashSet<>();
 
         for (Map.Entry<Integer, Set<Card>> entry : mapToConvertToSet.entrySet()) {
             set.add(entry.getValue());
         }
         return set;
+    }
+
+    public static Map<Integer, Set<Card>> convertSetToMap(Set<Set<Card>> set) {
+        Map<Integer, Set<Card>> map = new HashMap<>();
+
+        for(Set<Card> s : set) {
+            map.put(map.size(), s);
+        }
+        return map;
     }
 
     //helper methods
@@ -821,6 +914,25 @@ public class RangeBuilder {
         return mapSimple.size();
     }
 
+    private Set<Set<Card>> getAllNonBackDoorDraws() {
+        Set<Set<Card>> allNonBackDoorDraws = new HashSet<>();
+
+        allNonBackDoorDraws.addAll(convertMapToSet(flushDrawEvaluator.getStrongFlushDrawCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(flushDrawEvaluator.getMediumFlushDrawCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(flushDrawEvaluator.getWeakFlushDrawCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(straightDrawEvaluator.getStrongBackDoorCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(straightDrawEvaluator.getMediumOosdCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(straightDrawEvaluator.getWeakOosdCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(straightDrawEvaluator.getStrongGutshotCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(straightDrawEvaluator.getMediumGutshotCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(straightDrawEvaluator.getWeakGutshotCombos()));
+        allNonBackDoorDraws.addAll(convertMapToSet(highCardDrawEvaluator.getStrongTwoOvercards()));
+        allNonBackDoorDraws.addAll(convertMapToSet(highCardDrawEvaluator.getMediumTwoOvercards()));
+        allNonBackDoorDraws.addAll(convertMapToSet(highCardDrawEvaluator.getWeakTwoOvercards()));
+
+        return allNonBackDoorDraws;
+    }
+
     private Set<Set<Card>> getAllStartHandsCorrectedForKnownGameCards() {
         Set<Set<Card>> allStartHandsToReturn = new HashSet<>();
 
@@ -837,6 +949,24 @@ public class RangeBuilder {
             }
         }
         return allStartHandsToReturn;
+    }
+
+    public Set<Set<Card>> getOpponentRange(ComputerGame computerGame) {
+        Set<Set<Card>> opponentRange;
+
+        if(board == null) {
+            //dit hoeft waarschijnlijk niet. Alleen postflop de eerste keer naar de flop heb je het nodig
+            opponentRange = preflopRangeBuilder.getOpponentPreflopRange();
+        } else {
+            if(previousOpponentRange == null) {
+                //dit betekent dat we net naar de flop zijn gegaan...
+                opponentRange = preflopRangeBuilder.getOpponentPreflopRangeFirstTimePostFlop();
+            } else {
+                opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);
+            }
+            computerGame.setOpponentRange(opponentRange);
+        }
+        return opponentRange;
     }
 
     public Set<Set<Card>> getOpponentRange(List<String> allHandPathsOfHand) {
@@ -886,7 +1016,6 @@ public class RangeBuilder {
         }
         return rangeToReturn;
     }
-
 
     public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
         Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = new HashMap<>();
