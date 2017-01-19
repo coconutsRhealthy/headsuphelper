@@ -969,54 +969,6 @@ public class RangeBuilder {
         return opponentRange;
     }
 
-    public Set<Set<Card>> getOpponentRange(List<String> allHandPathsOfHand) {
-        Set<Set<Card>> rangeToReturn;
-
-        List<String> allHandPathsOfHandCopy = new ArrayList<>();
-        allHandPathsOfHandCopy.addAll(allHandPathsOfHand);
-        String handPath = allHandPathsOfHandCopy.get(allHandPathsOfHandCopy.size());
-
-        switch(handPath) {
-            case "05betF1bet":
-                rangeToReturn = getAllStartHandsCorrectedForKnownGameCards();
-                break;
-            case "1bet":
-                rangeToReturn = getAllStartHandsCorrectedForKnownGameCards();
-                break;
-            case "1betF2bet":
-                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent2betRange());
-                break;
-            case "2betF3bet":
-                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent3betRange());
-                break;
-            case "3betF4bet":
-                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent4betRange());
-                break;
-            case "Call2bet":
-                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent2betRange());
-                break;
-            case "Call3bet":
-                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent3betRange());
-                break;
-            case "Call4bet":
-                rangeToReturn = convertMapToSet(preflopRangeBuilder.getOpponent4betRange());
-                break;
-            case "2betFcheck":
-                rangeToReturn = flopRangeBuilder.get2betCheck();
-                break;
-            default:
-                allHandPathsOfHandCopy.remove(allHandPathsOfHandCopy.size());
-
-                if(!allHandPathsOfHandCopy.isEmpty()) {
-                    return getOpponentRange(allHandPathsOfHandCopy);
-                } else {
-                    System.out.println("no usable handpath found!");
-                    return null;
-                }
-        }
-        return rangeToReturn;
-    }
-
     public Map<Integer, Set<Set<Card>>> getCopyOfSortedCombos() {
         Map<Integer, Set<Set<Card>>> allSortedCombosClearedForRange = new HashMap<>();
 

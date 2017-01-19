@@ -21,14 +21,12 @@ public class PostFlopActionBuilder {
 
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
-    private String handPath;
     private ComputerGame computerGame;
 
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, ComputerGame computerGame) {
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
         this.computerGame = computerGame;
-        handPath = computerGame.getHandPath();
     }
 
     public String getAction(Set<Set<Card>> opponentRange) {
@@ -52,32 +50,36 @@ public class PostFlopActionBuilder {
     }
 
     private String getIpAction(double handStrengthAgainstRange) {
-        if(handPath.contains("Fcheck")) {
+        //Todo: fix this method
+
+        if("...".contains("Fcheck")) {
             return getIpFCheck(handStrengthAgainstRange);
         }
-        if(handPath.contains("F1bet")) {
+        if("...".contains("F1bet")) {
             return getIpF1bet(handStrengthAgainstRange);
         }
-        if(handPath.contains("F2bet")) {
+        if("...".contains("F2bet")) {
             return getIpF2bet(handStrengthAgainstRange);
         }
-        if(handPath.contains("F3bet")) {
+        if("...".contains("F3bet")) {
             return getIpF3bet(handStrengthAgainstRange);
         }
         return null;
     }
 
     private String getOopAction(double handStrengthAgainstRange) {
-        if(!handPath.contains("F")) {
+        //Todo: fix this method
+
+        if(!"...".contains("F")) {
             return getOopFirstToAct(handStrengthAgainstRange);
         }
-        if(handPath.contains("F1bet")) {
+        if("...".contains("F1bet")) {
             return getOopF1bet(handStrengthAgainstRange);
         }
-        if(handPath.contains("F2bet")) {
+        if("...".contains("F2bet")) {
             return getOopF2bet(handStrengthAgainstRange);
         }
-        if(handPath.contains("F3bet")) {
+        if("...".contains("F3bet")) {
             return getOopF3bet(handStrengthAgainstRange);
         }
         return null;
@@ -197,7 +199,8 @@ public class PostFlopActionBuilder {
                 return passiveAction;
             }
         } else {
-            if(!computerGame.isComputerIsButton() && !handPath.contains("F")) {
+            //Todo: fix this method
+            if(!computerGame.isComputerIsButton() && "...".contains("F")) {
                 if(Math.random() < 0.8) {
                     return bettingAction;
                 } else {

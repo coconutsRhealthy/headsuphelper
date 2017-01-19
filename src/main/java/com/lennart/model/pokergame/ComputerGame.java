@@ -28,13 +28,11 @@ public class ComputerGame {
     private boolean computerIsButton;
     private Action computerAction;
     private Set<Card> knownGameCards;
-    private String handPath;
     private boolean computerIsToAct;
     private String myAction;
     private String mySize;
     private List<Card> board;
     private String computerWrittenAction;
-    private List<String> allHandPathsOfHand;
     private Set<Set<Card>> opponentRange;
 
     public ComputerGame() {
@@ -52,13 +50,10 @@ public class ComputerGame {
         calculatePotSize();
 
         if(isComputerIsButton()) {
-            handPath = "05betF1bet";
             doComputerAction();
         } else {
-            handPath = "1bet";
             computerIsToAct = false;
         }
-        //allHandPathsOfHand.add(handPath);
     }
 
     private void getNewCardDeck() {
@@ -209,7 +204,6 @@ public class ComputerGame {
             calculatePotSize();
 
             if(isComputerIsButton()) {
-                handPath = "05betF1bet";
                 doComputerAction();
             }
             return this;
@@ -217,9 +211,6 @@ public class ComputerGame {
 
         //set correct bet and stacksizes
         processMyStackAndBetsize();
-
-        //set correct handPath
-        updateHandPath();
 
         //proceed to next street/finish if necessary
         if(myAction.equals("call") || (myAction.equals("check") && !computerIsButton)) {
@@ -312,29 +303,6 @@ public class ComputerGame {
         riverCard = getAndRemoveRandomCardFromDeck();
         board.add(riverCard);
         knownGameCards.add(riverCard);
-    }
-
-    private void updateHandPath() {
-        if(myAction.equals("check")) {
-            if(computerIsButton) {
-                handPath = handPath + "Fcheck";
-            } else {
-                //handPath stays the same
-            }
-        } else if(myAction.equals("call")) {
-            //handPath stays the same
-        } else if(myAction.equals("bet")) {
-            handPath = handPath + "F1bet";
-        } else if(myAction.equals("raise")) {
-            String computerLastAction = handPath.substring(handPath.length() - 4);
-
-            if(computerLastAction.contains("1")) {
-                handPath = handPath + "F2bet";
-            } else if(computerLastAction.contains("2")) {
-                handPath = handPath + "F3bet";
-            }
-        }
-        allHandPathsOfHand.add(handPath);
     }
 
     private void resetComputerBetsize() {
@@ -455,14 +423,6 @@ public class ComputerGame {
         this.knownGameCards = knownGameCards;
     }
 
-    public String getHandPath() {
-        return handPath;
-    }
-
-    public void setHandPath(String handPath) {
-        this.handPath = handPath;
-    }
-
     public boolean isComputerIsToAct() {
         return computerIsToAct;
     }
@@ -549,14 +509,6 @@ public class ComputerGame {
 
     public void setComputerWrittenAction(String computerWrittenAction) {
         this.computerWrittenAction = computerWrittenAction;
-    }
-
-    public List<String> getAllHandPathsOfHand() {
-        return allHandPathsOfHand;
-    }
-
-    public void setAllHandPathsOfHand(List<String> allHandPathsOfHand) {
-        this.allHandPathsOfHand = allHandPathsOfHand;
     }
 
     public Set<Set<Card>> getOpponentRange() {

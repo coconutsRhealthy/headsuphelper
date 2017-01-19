@@ -42,30 +42,10 @@ public class PreflopActionBuilder {
         return action;
     }
 
-    public String getAction(ComputerGame computerGame) {
-        String action = null;
-
-        switch(computerGame.getHandPath()) {
-            case "05betF1bet":
-                action = get05betF1bet(computerGame);
-                break;
-            case "1betF2bet":
-                action = get1betF2bet(computerGame);
-                break;
-            case "2betF3bet":
-                action = get2betF3bet(computerGame);
-                break;
-            case "3betF4bet":
-                action = get3betF4bet(computerGame);
-                break;
-        }
-        return action;
-    }
-
     public double getSize(ComputerGame computerGame) {
-        //dit afhankelijk maken van potgrootte ipv handpath
+        //Todo: fix this method. Dit afhankelijk maken van potgrootte
 
-        switch(computerGame.getHandPath()) {
+        switch("...") {
             case "2bet":
                 return 2.5 * computerGame.getBigBlind();
             case "3bet":
