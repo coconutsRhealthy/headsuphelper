@@ -3,6 +3,7 @@ package com.lennart.model.rangebuilder.preflop;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.pokergame.Card;
 import com.lennart.model.pokergame.ComputerGame;
+import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip._2betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip._4betRangeBuilder;
@@ -52,37 +53,45 @@ public class PreflopRangeBuilder {
         double bbOpponentTotalBetSize = opponentTotalBetSize / bigBlind;
 
         if(bbOpponentTotalBetSize == 1) {
-
+            range = RangeBuilder.convertMapToSet(PreflopRangeBuilderUtil.getAllStartHandsAsSet());
         } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
             if(computerIsButton) {
                 //opponent callt mijn 2bet
+                range = RangeBuilder.convertMapToSet(call2betRangeBuilder.getOpponentCall2betRange());
             } else {
                 //opponent heeft ge2bet
+                range = RangeBuilder.convertMapToSet(_2betRangeBuilder.getOpponent2betRange());
             }
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
             if(computerIsButton) {
                 //opponent heeft ge3bet
+                range = RangeBuilder.convertMapToSet(_3betRangeBuilder.getOpponent3betRange());
             } else {
                 //opponent callt mijn 3bet
+                range = RangeBuilder.convertMapToSet(call3betRangeBuilder.getOpponentCall3betRange());
             }
         } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 22) {
             if(computerIsButton) {
                 //opponent callt mijn 4bet
+                range = RangeBuilder.convertMapToSet(call4betRangeBuilder.getOpponentCall4betRange());
             } else {
                 //opponent 4bet
+                range = RangeBuilder.convertMapToSet(_4betRangeBuilder.getOpponent4betRange());
             }
         } else {
             //5bet
+            range = RangeBuilder.convertMapToSet(PreflopRangeBuilderUtil.getAllStartHandsAsSet());
         }
-        return null;
+        return range;
     }
 
     public Set<Set<Card>> getOpponentPreflopRangeFirstTimePostFlop() {
-        if(computerIsButton) {
-            computerIsButton = false;
-        } else {
-            computerIsButton = true;
-        }
+        //is dit nodig?
+//        if(computerIsButton) {
+//            computerIsButton = false;
+//        } else {
+//            computerIsButton = true;
+//        }
 
         opponentTotalBetSize = potSize / 2;
 

@@ -58,7 +58,7 @@ public class ComputerGame {
             handPath = "1bet";
             computerIsToAct = false;
         }
-        allHandPathsOfHand.add(handPath);
+        //allHandPathsOfHand.add(handPath);
     }
 
     private void getNewCardDeck() {

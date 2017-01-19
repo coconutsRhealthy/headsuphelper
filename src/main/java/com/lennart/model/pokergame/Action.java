@@ -47,7 +47,8 @@ public class Action {
     //helper methods
     private void getAndProcessPreflopAction(ComputerGame computerGame) {
         String action;
-        action = preflopActionBuilder.getAction(computerGame);
+        //action = preflopActionBuilder.getAction(computerGame);
+        action = preflopActionBuilder.getAction("temporary", computerGame);
         handPathAfterAction = action;
         processHandPath(computerGame);
     }
