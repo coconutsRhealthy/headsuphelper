@@ -41,8 +41,9 @@ public class Action {
     //helper methods
     private void getAndProcessPreflopAction(ComputerGame computerGame) {
         String action;
-        //action = preflopActionBuilder.getAction(computerGame);
-        action = preflopActionBuilder.getAction("temporary", computerGame);
+        action = preflopActionBuilder.getAction(computerGame);
+        setNewWrittenAction(action);
+        setSizingIfNecessary(computerGame, action);
     }
 
     private void getAndProcessPostFlopAction(ComputerGame computerGame) {
@@ -52,33 +53,34 @@ public class Action {
         String action;
         opponentRange = rangeBuilder.getOpponentRange(computerGame);
         action = postFlopActionBuilder.getAction(opponentRange);
+        setNewWrittenAction(action);
+        setSizingIfNecessary(computerGame, action);
+
     }
 
-    private void setNewWrittenAction() {
-        //Todo: fix this method
-
-        if(StringUtils.containsIgnoreCase("...", "fold")) {
+    private void setNewWrittenAction(String action) {
+        if(action.equals("fold")) {
             writtenAction = "Computer folds";
-        } else if(StringUtils.containsIgnoreCase("...", "check")) {
+        } else if(action.equals("check")) {
             writtenAction = "Computer checks";
-        } else if(StringUtils.containsIgnoreCase("...", "call")) {
+        } else if(action.equals("call")) {
             writtenAction = "Computer calls";
-        } else if(StringUtils.containsIgnoreCase("...", "1bet")) {
+        } else if(action.equals("bet")) {
             writtenAction = "Computer bets";
-        } else if(StringUtils.containsIgnoreCase("...", "bet")) {
+        } else if(action.equals("raise")) {
             writtenAction = "Computer raises";
         }
     }
 
-    private void setSizingIfNecessary(ComputerGame computerGame) {
-        //Todo: fix this method
-
+    private void setSizingIfNecessary(ComputerGame computerGame, String myAction) {
         if(computerGame.getFlopCards() == null) {
-            if("...".contains("bet")) {
+            if(myAction.equals("raise")) {
                 sizing = preflopActionBuilder.getSize(computerGame);
             }
         } else {
-            sizing = postFlopActionBuilder.getSize(computerGame.getPotSize());
+            if(myAction.equals("bet") || myAction.equals("raise")) {
+                sizing = postFlopActionBuilder.getSize();
+            }
         }
     }
 }

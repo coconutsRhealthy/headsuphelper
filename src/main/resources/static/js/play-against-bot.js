@@ -93,6 +93,7 @@ mainApp.controller('pokerController', function($scope, $http) {
             $scope.riverCardClass = "card rank-" + $scope.riverCardConvertedRank + " " + $scope.riverCardSuitWritten;
         }
         setDealerButton();
+        setWidthOfBoardCards();
     }
 
     function setSuitWrittenAndUniCode(scopeVariableSuitWritten, scopeVariableSuitUniCode, suit) {
@@ -140,6 +141,21 @@ mainApp.controller('pokerController', function($scope, $http) {
             $scope.dealerButtonStyle = "float: right; padding-top: 30px;";
         } else {
             $scope.dealerButtonStyle = "float: left; padding-top: 30px;";
+        }
+    }
+
+    function setWidthOfBoardCards() {
+        if($scope.computerGame.flopCards != undefined) {
+            if($scope.computerGame.turnCard != undefined) {
+                if($scope.computerGame.riverCard != undefined) {
+                    $scope.boardCardsStyle = "width: 430px;";
+                    return;
+                }
+                $scope.boardCardsStyle = "width: 345px;";
+                return;
+            }
+            $scope.boardCardsStyle = "width: 254px;";
+            return;
         }
     }
 

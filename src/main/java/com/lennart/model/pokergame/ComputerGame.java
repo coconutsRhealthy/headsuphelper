@@ -215,6 +215,7 @@ public class ComputerGame {
         //proceed to next street/finish if necessary
         if(myAction.equals("call") || (myAction.equals("check") && !computerIsButton)) {
             resetComputerBetsize();
+            resetActions();
             proceedToNextStreetOrFinishHand();
             if(isComputerIsButton()) {
                 //moved to next street and it is your turn again immediately
@@ -235,9 +236,10 @@ public class ComputerGame {
             }
         }
 
-        //als computeraction call is
-        if(computerWrittenAction.contains("call")) {
+        //als computeraction call of check is
+        if(computerWrittenAction.equals("call") || computerAction.equals("check") && computerIsButton) {
             resetAllBets();
+            resetActions();
             proceedToNextStreetOrFinishHand();
 
             //als computer oop zit
@@ -315,6 +317,11 @@ public class ComputerGame {
         myTotalBetSize = 0;
         computerIncrementalBetSize = 0;
         computerTotalBetSize = 0;
+    }
+
+    private void resetActions() {
+        myAction = null;
+        computerAction = null;
     }
 
     private void roundToTwoDecimals() {

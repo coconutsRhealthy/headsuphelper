@@ -13,11 +13,9 @@ public class PostFlopActionBuilder {
 
     private final String FOLD = "fold";
     private final String CHECK = "check";
-    private final String _1BET = "1bet";
-    private final String _2BET = "2bet";
-    private final String CALL_1_BET = "call1bet";
-    private final String CALL_2_BET = "call2bet";
-    private final String CALL_3_BET = "call3bet";
+    private final String BET = "bet";
+    private final String CALL = "call";
+    private final String RAISE = "raise";
 
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
@@ -43,72 +41,69 @@ public class PostFlopActionBuilder {
         return null;
     }
 
-    public double getSize(double potSize) {
-        //dit maken zodat je altijd tussen 2.3 en 2.5 potodds geeft..
+    public double getSize() {
+        double opponentBetSize = computerGame.getMyTotalBetSize();
+        double potSize = computerGame.getPotSize();
+        double size;
 
-        return 0.75 * potSize;
+        if(opponentBetSize == 0) {
+            size = 0.75 * potSize;
+        } else {
+            size = (1.75 * opponentBetSize) + (0.75 * potSize);
+        }
+        return size;
     }
 
     private String getIpAction(double handStrengthAgainstRange) {
-        //Todo: fix this method
+        String opponentAction = computerGame.getMyAction();
 
-        if("...".contains("Fcheck")) {
+        if(opponentAction.contains(CHECK)) {
             return getIpFCheck(handStrengthAgainstRange);
         }
-        if("...".contains("F1bet")) {
-            return getIpF1bet(handStrengthAgainstRange);
+        if(opponentAction.contains(BET)) {
+            return getIpFbet(handStrengthAgainstRange);
         }
-        if("...".contains("F2bet")) {
-            return getIpF2bet(handStrengthAgainstRange);
-        }
-        if("...".contains("F3bet")) {
-            return getIpF3bet(handStrengthAgainstRange);
+        if(opponentAction.contains(RAISE)) {
+            return getIpFraise(handStrengthAgainstRange);
         }
         return null;
     }
 
     private String getOopAction(double handStrengthAgainstRange) {
-        //Todo: fix this method
+        String opponentAction = computerGame.getMyAction();
 
-        if(!"...".contains("F")) {
+        if(opponentAction == null) {
             return getOopFirstToAct(handStrengthAgainstRange);
         }
-        if("...".contains("F1bet")) {
-            return getOopF1bet(handStrengthAgainstRange);
+        if(opponentAction.contains(BET)) {
+            return getOopFbet(handStrengthAgainstRange);
         }
-        if("...".contains("F2bet")) {
-            return getOopF2bet(handStrengthAgainstRange);
-        }
-        if("...".contains("F3bet")) {
-            return getOopF3bet(handStrengthAgainstRange);
+        if(opponentAction.contains(RAISE)) {
+            return getOopFraise(handStrengthAgainstRange);
         }
         return null;
     }
 
     private String getIpFCheck(double handStrengthAgainstRange) {
         if(handStrengthAgainstRange > 0.6) {
-            return getValueAction(_1BET, CHECK);
+            return getValueAction(BET, CHECK);
         }
 
-        String drawAction = getDrawAction(_1BET);
+        String drawAction = getDrawAction(BET);
 
         if(drawAction != null) {
             return drawAction;
         } else {
-            return getBluffAction(_1BET, CHECK, handStrengthAgainstRange);
+            return getBluffAction(BET, CHECK, handStrengthAgainstRange);
         }
     }
 
-    private String getIpF1bet(double handStrengthAgainstRange) {
-        return getF1bet(handStrengthAgainstRange);
+    private String getIpFbet(double handStrengthAgainstRange) {
+        return getFbet(handStrengthAgainstRange);
     }
 
-    private String getIpF2bet(double handStrengthAgainstRange) {
-        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_2_BET);
-    }
-
-    private String getIpF3bet(double handStrengthAgainstRange) {
-        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_3_BET);
+    private String getIpFraise(double handStrengthAgainstRange) {
+        return getFraise(handStrengthAgainstRange, CALL);
     }
 
     private String getOopFirstToAct(double handStrengthAgainstRange) {
@@ -116,70 +111,66 @@ public class PostFlopActionBuilder {
             return CHECK;
         } else {
             if (handStrengthAgainstRange > 0.6) {
-                return getValueAction(_1BET, CHECK);
+                return getValueAction(BET, CHECK);
             }
 
-            String drawAction = getDrawAction(_1BET);
+            String drawAction = getDrawAction(BET);
 
             if(drawAction != null) {
                 return drawAction;
             } else {
-                return getBluffAction(_1BET, CHECK, handStrengthAgainstRange);
+                return getBluffAction(BET, CHECK, handStrengthAgainstRange);
             }
         }
     }
 
-    private String getOopF1bet(double handStrengthAgainstRange) {
-        return getF1bet(handStrengthAgainstRange);
+    private String getOopFbet(double handStrengthAgainstRange) {
+        return getFbet(handStrengthAgainstRange);
     }
 
-    private String getOopF2bet(double handStrengthAgainstRange) {
-        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_2_BET);
+    private String getOopFraise(double handStrengthAgainstRange) {
+        return getFraise(handStrengthAgainstRange, CALL);
     }
 
-    private String getOopF3bet(double handStrengthAgainstRange) {
-        return getFhigherThan1Bet(handStrengthAgainstRange, CALL_3_BET);
-    }
-
-    private String getF1bet(double handStrengthAgainstRange) {
+    private String getFbet(double handStrengthAgainstRange) {
         if(handEvaluator.isSingleBetPot()) {
             if(handStrengthAgainstRange > 0.7) {
-                return getValueAction(_2BET, CALL_1_BET);
+                return getValueAction(RAISE, CALL);
             } else {
-                String drawAction = getDrawAction(_2BET);
+                String drawAction = getDrawAction(RAISE);
                 if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
                     if(drawAction != null) {
                         return drawAction;
                     } else {
                         if(computerGame.getBoard().size() != 5) {
                             if(Math.random() < 0.8) {
-                                return CALL_1_BET;
+                                return CALL;
                             } else {
-                                return _2BET;
+                                return RAISE;
                             }
                         }
-                        return CALL_1_BET;
+                        return CALL;
                     }
                 } else {
                     if(drawAction != null) {
                         return drawAction;
                     } else {
-                        return getBluffAction(_2BET, FOLD, handStrengthAgainstRange);
+                        return getBluffAction(RAISE, FOLD, handStrengthAgainstRange);
                     }
                 }
             }
         } else {
             if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
-                return CALL_1_BET;
+                return CALL;
             }
             if(getDrawCallingAction().contains("call")) {
-                return CALL_1_BET;
+                return CALL;
             }
             return FOLD;
         }
     }
 
-    private String getFhigherThan1Bet(double handStrengthAgainstRange, String callAction) {
+    private String getFraise(double handStrengthAgainstRange, String callAction) {
         if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
             return callAction;
         } else {
@@ -199,8 +190,8 @@ public class PostFlopActionBuilder {
                 return passiveAction;
             }
         } else {
-            //Todo: fix this method
-            if(!computerGame.isComputerIsButton() && "...".contains("F")) {
+            String opponentAction = computerGame.getMyAction();
+            if(!computerGame.isComputerIsButton() && opponentAction == null) {
                 if(Math.random() < 0.8) {
                     return bettingAction;
                 } else {
@@ -213,7 +204,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getDrawAction(String bettingAction) {
-        if (bettingAction.equals(_1BET)) {
+        if (bettingAction.equals(BET)) {
             if(computerGame.getPotSize() / computerGame.getBigBlind() < 7) {
                 if (handEvaluator.hasAnyDrawNonBackDoor()) {
                     if (Math.random() < 0.68) {
@@ -250,7 +241,7 @@ public class PostFlopActionBuilder {
                 if (Math.random() < 0.50) {
                     return bettingAction;
                 } else {
-                    if (bettingAction.equals(_1BET)) {
+                    if (bettingAction.equals(BET)) {
                         return CHECK;
                     } else {
                         return getDrawCallingAction();
@@ -261,7 +252,7 @@ public class PostFlopActionBuilder {
                 if (Math.random() < 0.38) {
                     return bettingAction;
                 } else {
-                    if (bettingAction.equals(_1BET)) {
+                    if (bettingAction.equals(BET)) {
                         return CHECK;
                     } else {
                         return getDrawCallingAction();
@@ -272,7 +263,7 @@ public class PostFlopActionBuilder {
                 if (Math.random() < 0.18) {
                     return bettingAction;
                 } else {
-                    if (bettingAction.equals(_1BET)) {
+                    if (bettingAction.equals(BET)) {
                         return CHECK;
                     } else {
                         return getDrawCallingAction();
@@ -280,7 +271,7 @@ public class PostFlopActionBuilder {
                 }
             }
         }
-        if (bettingAction.equals(_1BET)) {
+        if (bettingAction.equals(BET)) {
             return CHECK;
         } else {
             return getDrawCallingAction();

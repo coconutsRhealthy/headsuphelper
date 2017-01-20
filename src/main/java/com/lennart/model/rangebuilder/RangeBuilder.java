@@ -954,18 +954,13 @@ public class RangeBuilder {
     public Set<Set<Card>> getOpponentRange(ComputerGame computerGame) {
         Set<Set<Card>> opponentRange;
 
-        if(board == null) {
-            //dit hoeft waarschijnlijk niet. Alleen postflop de eerste keer naar de flop heb je het nodig
+        if(previousOpponentRange == null) {
             opponentRange = preflopRangeBuilder.getOpponentPreflopRange();
         } else {
-            if(previousOpponentRange == null) {
-                //dit betekent dat we net naar de flop zijn gegaan...
-                opponentRange = preflopRangeBuilder.getOpponentPreflopRangeFirstTimePostFlop();
-            } else {
-                opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);
-            }
-            computerGame.setOpponentRange(opponentRange);
+            opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);
         }
+        computerGame.setOpponentRange(opponentRange);
+
         return opponentRange;
     }
 

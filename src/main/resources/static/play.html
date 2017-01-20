@@ -33,7 +33,7 @@
                         </ul>
                     </div>
                 </span>
-                <span id="flop">
+                <span id="board_cards" style={{boardCardsStyle}}>
                     <div class="playingCards">
                         <ul class="table">
                             <li>
@@ -52,6 +52,18 @@
                                 <div class={{flopCard3Class}}>
                                     <span class="rank">{{flopCard3ConvertedRank}}</span>
                                     <span class="suit">{{flopCard3SuitUniCode}}</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class={{turnCardClass}}>
+                                    <span class="rank">{{turnCardConvertedRank}}</span>
+                                    <span class="suit">{{turnCardSuitUniCode}}</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class={{riverCardClass}}>
+                                    <span class="rank">{{riverCardConvertedRank}}</span>
+                                    <span class="suit">{{riverCardSuitUniCode}}</span>
                                 </div>
                             </li>
                         </ul>

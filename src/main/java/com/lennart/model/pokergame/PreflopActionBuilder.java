@@ -22,7 +22,7 @@ public class PreflopActionBuilder {
         preflopRangeBuilderUtil = rangeBuilder.getPreflopRangeBuilder().getPreflopRangeBuilderUtil();
     }
 
-    public String getAction(String temporary, ComputerGame computerGame) {
+    public String getAction(ComputerGame computerGame) {
         String action = null;
 
         double bbOpponentTotalBetSize = computerGame.getMyTotalBetSize() / computerGame.getBigBlind();
@@ -43,17 +43,24 @@ public class PreflopActionBuilder {
     }
 
     public double getSize(ComputerGame computerGame) {
-        //Todo: fix this method. Dit afhankelijk maken van potgrootte
+        double size;
+        double bigBlind = computerGame.getBigBlind();
+        double potSizeInBb = computerGame.getPotSize() / bigBlind;
+        double computerTotalBetSizeInBb = computerGame.getComputerTotalBetSize() / bigBlind;
+        double opponentTotalBetSizeInBb = computerGame.getMyTotalBetSize() / bigBlind;
 
-        switch("...") {
-            case "2bet":
-                return 2.5 * computerGame.getBigBlind();
-            case "3bet":
-                return 3.2 * computerGame.getMyTotalBetSize();
-            case "4bet":
-                return 2.25 * computerGame.getMyTotalBetSize();
+        double potSizePlusAllBetsInBb = potSizeInBb + computerTotalBetSizeInBb + opponentTotalBetSizeInBb;
+
+        if(potSizePlusAllBetsInBb == 1.5) {
+            size = 2.5 * computerGame.getBigBlind();
+        } else if(potSizePlusAllBetsInBb > 1.5 && potSizePlusAllBetsInBb <= 4) {
+            size = 3.2 * computerGame.getMyTotalBetSize();
+        } else if(potSizePlusAllBetsInBb > 4 && potSizePlusAllBetsInBb <= 12) {
+            size = 2.25 * computerGame.getMyTotalBetSize();
+        } else {
+            size = computerGame.getComputerStack() - computerGame.getComputerTotalBetSize();
         }
-        return 0;
+        return size;
     }
 
     private String get05betF1bet(ComputerGame computerGame) {
@@ -96,7 +103,8 @@ public class PreflopActionBuilder {
         computerGame.addHoleCardsToKnownGameCards();
 
         if(Math.random() <= percentageBet) {
-            return "2bet";
+            //return "2bet";
+            return "raise";
         } else {
             return "fold";
         }
@@ -215,9 +223,11 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage4bet - percentageCall3bet) {
             return "fold";
         } else if ((random <= 1 - percentage4bet) && (random >= 1 - percentage4bet - percentageCall3bet)){
-            return "call3bet";
+            //return "call3bet";
+            return "call";
         } else {
-            return "4bet";
+            //return "4bet";
+            return "raise";
         }
     }
 
@@ -318,9 +328,11 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage3bet - percentageCall2bet) {
             return "fold";
         } else if ((random <= 1 - percentage3bet) && (random >= 1 - percentage3bet - percentageCall2bet)){
-            return "Call2bet";
+            //return "Call2bet";
+            return "call";
         } else {
-            return "3bet";
+            //return "3bet";
+            return "raise";
         }
     }
 
@@ -383,9 +395,11 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage5bet - percentageCall4bet) {
             return "fold";
         } else if ((random <= 1 - percentage5bet) && (random >= 1 - percentage5bet - percentageCall4bet)){
-            return "call4bet";
+            //return "call4bet";
+            return "call";
         } else {
-            return "5bet";
+            //return "5bet";
+            return "raise";
         }
     }
 

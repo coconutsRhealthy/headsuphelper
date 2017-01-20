@@ -40,42 +40,36 @@ public class PreflopRangeBuilder {
         computerIsButton = computerGame.isComputerIsButton();
 
         preflopRangeBuilderUtil = new PreflopRangeBuilderUtil(computerGame.getKnownGameCards());
-        _2betRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
-        call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
-        _4betRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);
-        call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
-        _3betRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
-        call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
     }
 
     public Set<Set<Card>> getOpponentPreflopRange() {
         Set<Set<Card>> range;
-        double bbOpponentTotalBetSize = opponentTotalBetSize / bigBlind;
+        double bbOpponentTotalBetSize = (potSize / 2) / bigBlind;
 
         if(bbOpponentTotalBetSize == 1) {
             range = RangeBuilder.convertMapToSet(PreflopRangeBuilderUtil.getAllStartHandsAsSet());
         } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
             if(computerIsButton) {
-                //opponent callt mijn 2bet
+                call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(call2betRangeBuilder.getOpponentCall2betRange());
             } else {
-                //opponent heeft ge2bet
+                _2betRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(_2betRangeBuilder.getOpponent2betRange());
             }
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
             if(computerIsButton) {
-                //opponent heeft ge3bet
+                _3betRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(_3betRangeBuilder.getOpponent3betRange());
             } else {
-                //opponent callt mijn 3bet
+                call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(call3betRangeBuilder.getOpponentCall3betRange());
             }
         } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 22) {
             if(computerIsButton) {
-                //opponent callt mijn 4bet
+                call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(call4betRangeBuilder.getOpponentCall4betRange());
             } else {
-                //opponent 4bet
+                _4betRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(_4betRangeBuilder.getOpponent4betRange());
             }
         } else {
@@ -85,46 +79,52 @@ public class PreflopRangeBuilder {
         return range;
     }
 
-    public Set<Set<Card>> getOpponentPreflopRangeFirstTimePostFlop() {
-        //is dit nodig?
-//        if(computerIsButton) {
-//            computerIsButton = false;
-//        } else {
-//            computerIsButton = true;
-//        }
-
-        opponentTotalBetSize = potSize / 2;
-
-        return getOpponentPreflopRange();
-    }
-
-
-
     public PreflopRangeBuilderUtil getPreflopRangeBuilderUtil() {
         return preflopRangeBuilderUtil;
     }
 
     public Map<Integer, Set<Card>> getOpponent2betRange() {
+        if(_2betRangeBuilder == null) {
+            _2betRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
+        }
         return _2betRangeBuilder.getOpponent2betRange();
     }
 
     public Map<Integer, Set<Card>> getOpponentCall3betRange() {
+        if(call3betRangeBuilder == null) {
+            call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
+        }
+
         return call3betRangeBuilder.getOpponentCall3betRange();
     }
 
     public Map<Integer, Set<Card>> getOpponent4betRange() {
+        if(_4betRangeBuilder == null) {
+            _4betRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);
+        }
+
         return _4betRangeBuilder.getOpponent4betRange();
     }
 
     public Map<Integer, Set<Card>> getOpponentCall2betRange() {
+        if(call2betRangeBuilder == null) {
+            call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
+        }
         return call2betRangeBuilder.getOpponentCall2betRange();
     }
 
     public Map<Integer, Set<Card>> getOpponent3betRange() {
+        if(_3betRangeBuilder == null) {
+            _3betRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
+        }
+
         return _3betRangeBuilder.getOpponent3betRange();
     }
 
     public Map<Integer, Set<Card>> getOpponentCall4betRange() {
+        if(call4betRangeBuilder == null) {
+            call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
+        }
         return call4betRangeBuilder.getOpponentCall4betRange();
     }
 }
