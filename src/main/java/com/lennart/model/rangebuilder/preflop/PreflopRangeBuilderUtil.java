@@ -494,10 +494,26 @@ public class PreflopRangeBuilderUtil {
     }
 
     public static Map<Integer, List<Card>> getAllPossibleStartHandsAsList() {
-        return allPossibleStartHandsAsList;
+        Map<Integer, List<Card>> allPossibleStartHandsAsListCopy = new HashMap<>();
+
+        for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsList.entrySet()) {
+            List<Card> comboCopy = new ArrayList<>();
+            comboCopy.addAll(entry.getValue());
+
+            allPossibleStartHandsAsListCopy.put(allPossibleStartHandsAsListCopy.size(), comboCopy);
+        }
+        return allPossibleStartHandsAsListCopy;
     }
 
     public static Map<Integer, Set<Card>> getAllStartHandsAsSet() {
-        return allStartHandsAsSet;
+        Map<Integer, Set<Card>> allPossibleStartHandsAsSetCopy = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Card>> entry : allStartHandsAsSet.entrySet()) {
+            Set<Card> comboCopy = new HashSet<>();
+            comboCopy.addAll(entry.getValue());
+
+            allPossibleStartHandsAsSetCopy.put(allPossibleStartHandsAsSetCopy.size(), comboCopy);
+        }
+        return allPossibleStartHandsAsSetCopy;
     }
 }

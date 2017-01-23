@@ -1,7 +1,6 @@
 package com.lennart.model.pokergame;
 
 import com.lennart.model.rangebuilder.RangeBuilder;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
@@ -82,5 +81,9 @@ public class Action {
                 sizing = postFlopActionBuilder.getSize();
             }
         }
+    }
+
+    public RangeBuilder getRangeBuilder() {
+        return rangeBuilder;
     }
 }

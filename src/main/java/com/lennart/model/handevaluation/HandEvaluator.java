@@ -57,14 +57,12 @@ public class HandEvaluator {
         double index;
         boolean myHandHasBeenPassedInSortedCombos = false;
 
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+        loop: for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
             for(Set<Card> combo : entry.getValue()) {
                 if(combo.equals(yourHoleCards)) {
                     myHandHasBeenPassedInSortedCombos = true;
+                    continue loop;
                 }
-
-                //Todo: dit moet gefixt worden want nu tel je eventueel combos die gelijk zijn qua strength aan jouwe
-                //als combos die lager zijn dan jouwe. Hierboven moet in de binnenste if een 'continue' komen oid.
 
                 Set<Set<Card>> rangeCopy = new HashSet<>();
                 rangeCopy.addAll(opponentRange);

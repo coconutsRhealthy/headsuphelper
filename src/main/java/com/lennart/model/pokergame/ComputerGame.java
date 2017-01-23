@@ -1,6 +1,7 @@
 package com.lennart.model.pokergame;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.handevaluation.HandEvaluator;
 import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
@@ -47,7 +48,6 @@ public class ComputerGame {
         computerStack = 50;
         setBlinds();
         postBlinds();
-        calculatePotSize();
 
         if(isComputerIsButton()) {
             doComputerAction();
@@ -139,9 +139,9 @@ public class ComputerGame {
             computerIsToAct = false;
         } else if (computerWrittenAction.contains("call")) {
             computerStack = computerStack - (myTotalBetSize - computerTotalBetSize);
+            computerTotalBetSize = myTotalBetSize;
             potSize = potSize + myTotalBetSize + computerTotalBetSize;
-            computerIncrementalBetSize = 0;
-            computerTotalBetSize = 0;
+            resetAllBets();
         } else if(computerWrittenAction.contains("fold")) {
             finishHand();
         } else {
@@ -157,16 +157,31 @@ public class ComputerGame {
     private void finishHand() {
         if(myAction.equals("fold")) {
             computerStack = computerStack + potSize;
-            resetGameVariablesAfterFold();
+            resetGameVariablesAfterFoldOrShowdown();
         } else if(computerAction.getWrittenAction().contains("fold")) {
             myStack = myStack + potSize;
-            resetGameVariablesAfterFold();
+            resetGameVariablesAfterFoldOrShowdown();
         } else {
-            //showdown, determine who has strongest hand
+            String handWinner = determineWinnerAtShowdown();
+
+            if(handWinner.equals("computer")) {
+                computerStack = computerStack + potSize + myTotalBetSize + computerTotalBetSize;
+                resetGameVariablesAfterFoldOrShowdown();
+                computerWrittenAction = ("Computer wins: " + getHoleCardsAsString(computerHoleCards));
+            } else if(handWinner.equals("opponent")) {
+                myStack = myStack + potSize + myTotalBetSize + computerTotalBetSize;
+                resetGameVariablesAfterFoldOrShowdown();
+                computerWrittenAction = ("You win: " + getHoleCardsAsString(computerHoleCards));
+            } else if(handWinner.equals("draw")) {
+                computerStack = computerStack + (potSize / 2) + computerTotalBetSize;
+                myStack = myStack + (potSize / 2) + myTotalBetSize;
+                resetGameVariablesAfterFoldOrShowdown();
+                computerWrittenAction = ("Draw: " + getHoleCardsAsString(computerHoleCards));
+            }
         }
     }
 
-    private void resetGameVariablesAfterFold() {
+    private void resetGameVariablesAfterFoldOrShowdown() {
         if(myStack < 50) {
             myStack = 50;
         }
@@ -201,7 +216,6 @@ public class ComputerGame {
             getNewCardDeck();
             dealHoleCards();
             postBlinds();
-            calculatePotSize();
 
             if(isComputerIsButton()) {
                 doComputerAction();
@@ -214,7 +228,8 @@ public class ComputerGame {
 
         //proceed to next street/finish if necessary
         if(myAction.equals("call") || (myAction.equals("check") && !computerIsButton)) {
-            resetComputerBetsize();
+            calculatePotSize();
+            resetAllBets();
             resetActions();
             proceedToNextStreetOrFinishHand();
             if(isComputerIsButton()) {
@@ -237,13 +252,13 @@ public class ComputerGame {
         }
 
         //als computeraction call of check is
-        if(computerWrittenAction.equals("call") || computerAction.equals("check") && computerIsButton) {
+        if(computerWrittenAction.equals("call") || computerWrittenAction.contains("check") && computerIsButton) {
             resetAllBets();
-            resetActions();
             proceedToNextStreetOrFinishHand();
+            resetActions();
 
-            //als computer oop zit
-            if(!isComputerIsButton()) {
+            //als computer oop zit en niet nieuwe hand na showdown
+            if(!isComputerIsButton() && potSize != 0) {
                 String formerComputerWrittenAction = computerWrittenAction;
                 doComputerAction();
                 computerWrittenAction = formerComputerWrittenAction + " and " + computerAction.getWrittenAction();
@@ -263,9 +278,8 @@ public class ComputerGame {
             computerIsToAct = true;
         } else if(myAction.equals("call")) {
             myStack = myStack - (computerTotalBetSize - myIncrementalBetSize);
+            myTotalBetSize = computerTotalBetSize;
             potSize = potSize + myTotalBetSize + computerTotalBetSize;
-            myIncrementalBetSize = 0;
-            myTotalBetSize = 0;
         } else {
             myIncrementalBetSize = myTotalBetSize - myIncrementalBetSize;
             myStack = myStack - myIncrementalBetSize;
@@ -280,7 +294,10 @@ public class ComputerGame {
         } else if (riverCard == null) {
             dealRiverCard();
         } else {
-            //go to showdown
+            finishHand();
+            getNewCardDeck();
+            dealHoleCards();
+            postBlinds();
         }
     }
 
@@ -330,6 +347,29 @@ public class ComputerGame {
         computerStack = Precision.round(computerStack, 2);
         myTotalBetSize = Precision.round(myTotalBetSize, 2);
         computerTotalBetSize = Precision.round(computerTotalBetSize, 2);
+    }
+
+    private String determineWinnerAtShowdown() {
+        HandEvaluator handEvaluator = computerAction.getRangeBuilder().getHandEvaluator();
+        double computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
+        double opponentHandStrength = handEvaluator.getHandStrength(myHoleCards);
+
+        if(computerHandStrength > opponentHandStrength) {
+            return "computer";
+        } else if (computerHandStrength == opponentHandStrength) {
+            return "draw";
+        } else {
+            return "opponent";
+        }
+    }
+
+    private String getHoleCardsAsString(List<Card> holeCards) {
+        String holeCard1Rank = String.valueOf(holeCards.get(0).getRank());
+        String holeCard1Suit = Character.toString(holeCards.get(0).getSuit());
+        String holeCard2Rank = String.valueOf(holeCards.get(1).getRank());
+        String holeCard2Suit = Character.toString(holeCards.get(1).getSuit());
+
+        return holeCard1Rank + holeCard1Suit + holeCard2Rank + holeCard2Suit;
     }
 
 

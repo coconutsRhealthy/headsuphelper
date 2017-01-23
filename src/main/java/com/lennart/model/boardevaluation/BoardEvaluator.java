@@ -828,25 +828,6 @@ public class BoardEvaluator {
             sortedCombos.put(sortedCombos.size(), entry.getValue());
         }
 
-        Set<Set<Card>> allStartHandsSet = new HashSet<>();
-        Map<Integer, List<Card>> allStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
-        allStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allStartHands, board);
-
-        for (Map.Entry<Integer, List<Card>> entry : allStartHands.entrySet()) {
-            Set<Card> s = new HashSet<>();
-            s.addAll(entry.getValue());
-            allStartHandsSet.add(s);
-        }
-
-        Set<Set<Card>> sortedCombosAsSet = new HashSet<>();
-        List<Set<Card>> sortedComboAsList = new ArrayList<>();
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
-            for(Set<Card> s : entry.getValue()) {
-                sortedCombosAsSet.add(s);
-                sortedComboAsList.add(s);
-            }
-        }
         return sortedCombos;
     }
 
