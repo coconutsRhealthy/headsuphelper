@@ -920,7 +920,7 @@ public class RangeBuilder {
                 Set<Card> comboCopy = new HashSet<>();
                 comboCopy.addAll(combo);
 
-                copyOfSortedCombos.get(copyOfSortedCombos.size()).add(comboCopy);
+                copyOfSortedCombos.get(copyOfSortedCombos.size() - 1).add(comboCopy);
             }
         }
         return copyOfSortedCombos;

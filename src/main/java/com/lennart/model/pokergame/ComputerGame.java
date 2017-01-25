@@ -68,16 +68,11 @@ public class ComputerGame {
 
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
-        //computerHoleCards.add(getAndRemoveRandomCardFromDeck());
-        //computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+        computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+        computerHoleCards.add(getAndRemoveRandomCardFromDeck());
 
-        //System.out.println(computerHoleCards.get(0).getRank() + "" + computerHoleCards.get(0).getSuit() + "" +
-          //                      computerHoleCards.get(1).getRank() + "" + computerHoleCards.get(1).getSuit());
-
-        //ff
-        computerHoleCards.add(new Card(9, 'h'));
-        computerHoleCards.add(new Card(14, 'h'));
-        //ff
+        System.out.println(computerHoleCards.get(0).getRank() + "" + computerHoleCards.get(0).getSuit() + "" +
+                                computerHoleCards.get(1).getRank() + "" + computerHoleCards.get(1).getSuit());
 
         knownGameCards.addAll(computerHoleCards);
     }
@@ -284,9 +279,7 @@ public class ComputerGame {
 
             //als computer oop zit en niet nieuwe hand na showdown
             if(!isComputerIsButton() && potSize != 0) {
-                String formerComputerWrittenAction = computerWrittenAction;
-                doComputerAction();
-                computerWrittenAction = formerComputerWrittenAction + " and " + computerAction.getWrittenAction();
+                computerWrittenAction = computerWrittenAction + " and Computer checks";
             }
         }
 
@@ -321,15 +314,9 @@ public class ComputerGame {
 
     private void dealFlopCards() {
         flopCards = new ArrayList<>();
-//        flopCards.add(getAndRemoveRandomCardFromDeck());
-//        flopCards.add(getAndRemoveRandomCardFromDeck());
-//        flopCards.add(getAndRemoveRandomCardFromDeck());
-
-        //ff
-        flopCards.add(new Card(8, 'h'));
-        flopCards.add(new Card(4, 'h'));
-        flopCards.add(new Card(6, 's'));
-        //ff
+        flopCards.add(getAndRemoveRandomCardFromDeck());
+        flopCards.add(getAndRemoveRandomCardFromDeck());
+        flopCards.add(getAndRemoveRandomCardFromDeck());
 
         board = new ArrayList<>();
         board.addAll(flopCards);

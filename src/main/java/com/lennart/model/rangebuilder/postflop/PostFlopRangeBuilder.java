@@ -576,7 +576,7 @@ public class PostFlopRangeBuilder {
 
             for (Map.Entry<Integer, Set<Card>> innerEntry : outerEntry.getValue().entrySet()) {
                 if(Collections.disjoint(innerEntry.getValue(), knownGameCards)) {
-                    clearedMultiMap.get(clearedMultiMap.size()).put(clearedMultiMap.get(clearedMultiMap.size()).size(),
+                    clearedMultiMap.get(clearedMultiMap.size() - 1).put(clearedMultiMap.get(clearedMultiMap.size() - 1).size(),
                             innerEntry.getValue());
                 }
             }

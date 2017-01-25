@@ -113,20 +113,16 @@ public class PostFlopActionBuilder {
     }
 
     private String getOopFirstToAct(double handStrengthAgainstRange) {
-        if(myLastActionWasCall()) {
-            return CHECK;
+        if (handStrengthAgainstRange > 0.6) {
+            return getValueAction(BET, CHECK);
+        }
+
+        String drawAction = getDrawAction(BET);
+
+        if(drawAction != null) {
+            return drawAction;
         } else {
-            if (handStrengthAgainstRange > 0.6) {
-                return getValueAction(BET, CHECK);
-            }
-
-            String drawAction = getDrawAction(BET);
-
-            if(drawAction != null) {
-                return drawAction;
-            } else {
-                return getBluffAction(BET, CHECK, handStrengthAgainstRange);
-            }
+            return getBluffAction(BET, CHECK, handStrengthAgainstRange);
         }
     }
 
@@ -169,6 +165,13 @@ public class PostFlopActionBuilder {
                 }
             }
         } else {
+            if(computerGame.getBoard().size() == 5) {
+                if(handStrengthAgainstRange > 0.7) {
+                    System.out.println("Value raise at river");
+                    return RAISE;
+                }
+            }
+
             if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
                 System.out.println("Value call in bigger pot");
                 return CALL;
