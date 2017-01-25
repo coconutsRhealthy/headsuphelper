@@ -2,6 +2,7 @@ package com.lennart.model.pokergame;
 
 import com.lennart.model.rangebuilder.RangeBuilder;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,7 +42,7 @@ public class Action {
     private void getAndProcessPreflopAction(ComputerGame computerGame) {
         String action;
         action = preflopActionBuilder.getAction(computerGame);
-        setNewWrittenAction(action);
+        setNewWrittenAction(action, computerGame.getBoard());
         setSizingIfNecessary(computerGame, action);
     }
 
@@ -52,22 +53,34 @@ public class Action {
         String action;
         opponentRange = rangeBuilder.getOpponentRange(computerGame);
         action = postFlopActionBuilder.getAction(opponentRange);
-        setNewWrittenAction(action);
+        setNewWrittenAction(action, computerGame.getBoard());
         setSizingIfNecessary(computerGame, action);
 
     }
 
-    private void setNewWrittenAction(String action) {
+    private void setNewWrittenAction(String action, List<Card> board) {
+        if(board == null) {
+            getWrittenActionFromAction(action, "Preflop");
+        } else if(board.size() == 3) {
+            getWrittenActionFromAction(action, "Flop");
+        } else if(board.size() == 4) {
+            getWrittenActionFromAction(action, "Turn");
+        } else if(board.size() == 5) {
+            getWrittenActionFromAction(action, "River");
+        }
+    }
+
+    private void getWrittenActionFromAction(String action, String street) {
         if(action.equals("fold")) {
-            writtenAction = "Computer folds";
+            writtenAction = street + ": Computer folds";
         } else if(action.equals("check")) {
-            writtenAction = "Computer checks";
+            writtenAction = street + ": Computer checks";
         } else if(action.equals("call")) {
-            writtenAction = "Computer calls";
+            writtenAction = street + ": Computer calls";
         } else if(action.equals("bet")) {
-            writtenAction = "Computer bets";
+            writtenAction = street + ": Computer bets";
         } else if(action.equals("raise")) {
-            writtenAction = "Computer raises";
+            writtenAction = street + ": Computer raises";
         }
     }
 

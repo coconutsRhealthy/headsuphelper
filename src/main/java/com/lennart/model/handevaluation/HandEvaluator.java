@@ -21,6 +21,11 @@ public class HandEvaluator {
     private HighCardDrawEvaluator highCardDrawEvaluator;
     private Map<String, Boolean> handDrawEvaluation;
 
+    public HandEvaluator(BoardEvaluator boardEvaluator) {
+        //Constructor only to be used for end of hand evalution in ComputerGame
+        this.boardEvaluator = boardEvaluator;
+    }
+
     public HandEvaluator(List<Card> holeCards, BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
         this.holeCards = holeCards;
         this.boardEvaluator = boardEvaluator;
@@ -131,8 +136,25 @@ public class HandEvaluator {
         return 0;
     }
 
-    public boolean isSingleBetPot() {
+    public boolean isSingleBetPot(List<String> actionHistory) {
         //TODO: implement this method;
+
+        //single bet pot is pot singleRaised preflop, en geen raises postflop
+        //thus, in actionHistory, 'raise' can only be present once, for the 2bet preflop
+
+        //maybe you have to make this potsize dependent instead of actionHistory dependent
+
+        int counter = 0;
+
+        for(String action : actionHistory) {
+            if(action.contains("raise")) {
+                counter++;
+            }
+        }
+
+        if(counter == 1) {
+            return true;
+        }
         return false;
     }
 

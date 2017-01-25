@@ -35,6 +35,7 @@ public class ComputerGame {
     private List<Card> board;
     private String computerWrittenAction;
     private Set<Set<Card>> opponentRange;
+    private List<String> actionHistory;
 
     public ComputerGame() {
         //default constructor
@@ -67,8 +68,17 @@ public class ComputerGame {
 
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
-        computerHoleCards.add(getAndRemoveRandomCardFromDeck());
-        computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+        //computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+        //computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+
+        //System.out.println(computerHoleCards.get(0).getRank() + "" + computerHoleCards.get(0).getSuit() + "" +
+          //                      computerHoleCards.get(1).getRank() + "" + computerHoleCards.get(1).getSuit());
+
+        //ff
+        computerHoleCards.add(new Card(9, 'h'));
+        computerHoleCards.add(new Card(14, 'h'));
+        //ff
+
         knownGameCards.addAll(computerHoleCards);
     }
 
@@ -126,6 +136,11 @@ public class ComputerGame {
     private void doComputerAction() {
         computerAction = new Action(this);
 
+        if(actionHistory == null) {
+            actionHistory = new ArrayList<>();
+        }
+        actionHistory.add(computerAction.getWrittenAction());
+
         computerWrittenAction = computerAction.getWrittenAction();
         if(computerWrittenAction.contains("bet")) {
             computerIncrementalBetSize = computerAction.getSizing();
@@ -150,15 +165,11 @@ public class ComputerGame {
         }
     }
 
-    public void calculatePotSize() {
-        potSize = myTotalBetSize + computerTotalBetSize;
-    }
-
     private void finishHand() {
-        if(myAction.equals("fold")) {
+        if(myAction != null && myAction.equals("fold")) {
             computerStack = computerStack + potSize;
             resetGameVariablesAfterFoldOrShowdown();
-        } else if(computerAction.getWrittenAction().contains("fold")) {
+        } else if(computerAction != null && computerAction.getWrittenAction().contains("fold")) {
             myStack = myStack + potSize;
             resetGameVariablesAfterFoldOrShowdown();
         } else {
@@ -207,9 +218,15 @@ public class ComputerGame {
         riverCard = null;
         board = null;
         knownGameCards = null;
+        actionHistory = null;
     }
 
     public ComputerGame submitHumanActionAndDoComputerAction() {
+        if(actionHistory == null) {
+            actionHistory = new ArrayList<>();
+        }
+
+        actionHistory.add(myAction);
 
         if(myAction.equals("fold")) {
             finishHand();
@@ -228,13 +245,17 @@ public class ComputerGame {
 
         //proceed to next street/finish if necessary
         if(myAction.equals("call") || (myAction.equals("check") && !computerIsButton)) {
-            calculatePotSize();
-            resetAllBets();
-            resetActions();
-            proceedToNextStreetOrFinishHand();
-            if(isComputerIsButton()) {
-                //moved to next street and it is your turn again immediately
+            if(board != null && board.size() == 5) {
+                finishHand();
                 return this;
+            } else {
+                resetAllBets();
+                resetActions();
+                proceedToNextStreet();
+                if(isComputerIsButton()) {
+                    //moved to next street and it is your turn again immediately
+                    return this;
+                }
             }
         }
 
@@ -243,7 +264,6 @@ public class ComputerGame {
 
         //als computeraction fold is...
         if(computerWrittenAction.contains("fold")) {
-            finishHand();
             dealHoleCards();
             postBlinds();
             if(isComputerIsButton()) {
@@ -252,9 +272,14 @@ public class ComputerGame {
         }
 
         //als computeraction call of check is
-        if(computerWrittenAction.equals("call") || computerWrittenAction.contains("check") && computerIsButton) {
+        if(computerWrittenAction.contains("call") || computerWrittenAction.contains("check") && computerIsButton) {
+            if(board != null && board.size() == 5) {
+                finishHand();
+                return this;
+            }
+
             resetAllBets();
-            proceedToNextStreetOrFinishHand();
+            proceedToNextStreet();
             resetActions();
 
             //als computer oop zit en niet nieuwe hand na showdown
@@ -262,12 +287,10 @@ public class ComputerGame {
                 String formerComputerWrittenAction = computerWrittenAction;
                 doComputerAction();
                 computerWrittenAction = formerComputerWrittenAction + " and " + computerAction.getWrittenAction();
-                //computerWrittenAction = computerWrittenAction + " and " + computerAction.getWrittenAction();
             }
         }
 
         roundToTwoDecimals();
-        //return computerGame
         return this;
     }
 
@@ -286,26 +309,27 @@ public class ComputerGame {
         }
     }
 
-    private void proceedToNextStreetOrFinishHand() {
+    private void proceedToNextStreet() {
         if(flopCards == null) {
             dealFlopCards();
         } else if (turnCard == null) {
             dealTurnCard();
         } else if (riverCard == null) {
             dealRiverCard();
-        } else {
-            finishHand();
-            getNewCardDeck();
-            dealHoleCards();
-            postBlinds();
         }
     }
 
     private void dealFlopCards() {
         flopCards = new ArrayList<>();
-        flopCards.add(getAndRemoveRandomCardFromDeck());
-        flopCards.add(getAndRemoveRandomCardFromDeck());
-        flopCards.add(getAndRemoveRandomCardFromDeck());
+//        flopCards.add(getAndRemoveRandomCardFromDeck());
+//        flopCards.add(getAndRemoveRandomCardFromDeck());
+//        flopCards.add(getAndRemoveRandomCardFromDeck());
+
+        //ff
+        flopCards.add(new Card(8, 'h'));
+        flopCards.add(new Card(4, 'h'));
+        flopCards.add(new Card(6, 's'));
+        //ff
 
         board = new ArrayList<>();
         board.addAll(flopCards);
@@ -350,9 +374,20 @@ public class ComputerGame {
     }
 
     private String determineWinnerAtShowdown() {
-        HandEvaluator handEvaluator = computerAction.getRangeBuilder().getHandEvaluator();
-        double computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
-        double opponentHandStrength = handEvaluator.getHandStrength(myHoleCards);
+        double computerHandStrength;
+        double opponentHandStrength;
+
+        if(computerAction == null) {
+            BoardEvaluator endOfHandBoardEvaluator = new BoardEvaluator(board);
+            HandEvaluator endOfHandHandEvaluator = new HandEvaluator(endOfHandBoardEvaluator);
+
+            computerHandStrength = endOfHandHandEvaluator.getHandStrength(computerHoleCards);
+            opponentHandStrength = endOfHandHandEvaluator.getHandStrength(myHoleCards);
+        } else {
+            HandEvaluator handEvaluator = computerAction.getRangeBuilder().getHandEvaluator();
+            computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
+            opponentHandStrength = handEvaluator.getHandStrength(myHoleCards);
+        }
 
         if(computerHandStrength > opponentHandStrength) {
             return "computer";
@@ -564,5 +599,13 @@ public class ComputerGame {
 
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
+    }
+
+    public List<String> getActionHistory() {
+        return actionHistory;
+    }
+
+    public void setActionHistory(List<String> actionHistory) {
+        this.actionHistory = actionHistory;
     }
 }
