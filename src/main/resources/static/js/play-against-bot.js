@@ -192,6 +192,15 @@ mainApp.controller('pokerController', function($scope, $http) {
         $scope.riverCardClass = null;
     }
 
+    $scope.showNextHandButton = function() {
+        if($scope.computerGame != null && $scope.computerGame.computerWrittenAction != null)
+            if($scope.computerGame.computerWrittenAction.includes("win") ||
+                $scope.computerGame.computerWrittenAction.includes("fold") ) {
+                return true;
+        }
+        return false;
+    }
+
     $scope.submitMyAction = function(action) {
         $scope.computerGame.myAction = action;
 

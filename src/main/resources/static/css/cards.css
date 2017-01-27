@@ -47,6 +47,10 @@
     float: right;
 }
 
+#deal_next_hand {
+    margin-top: 20px;
+    float: right;
+}
 /**
  * Styles for CSS Playing Cards
  *
