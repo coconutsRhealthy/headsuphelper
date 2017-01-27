@@ -79,19 +79,26 @@ mainApp.controller('pokerController', function($scope, $http) {
             $scope.flopCard1Class = "card rank-" + $scope.flopCard1ConvertedRank + " " + $scope.flopCard1SuitWritten;
             $scope.flopCard2Class = "card rank-" + $scope.flopCard2ConvertedRank + " " + $scope.flopCard2SuitWritten;
             $scope.flopCard3Class = "card rank-" + $scope.flopCard3ConvertedRank + " " + $scope.flopCard3SuitWritten;
+        } else {
+            resetFlopCards();
         }
 
         if($scope.computerGame.turnCard != undefined) {
             $scope.turnCardConvertedRank = convertRankFromIntegerToRank($scope.computerGame.turnCard.rank);
             setSuitWrittenAndUniCode("turnCardSuitWritten", "turnCardSuitUniCode", $scope.computerGame.turnCard.suit);
             $scope.turnCardClass = "card rank-" + $scope.turnCardConvertedRank + " " + $scope.turnCardSuitWritten;
+        } else {
+            resetTurnCard();
         }
 
         if($scope.computerGame.riverCard != undefined) {
             $scope.riverCardConvertedRank = convertRankFromIntegerToRank($scope.computerGame.riverCard.rank);
             setSuitWrittenAndUniCode("riverCardSuitWritten", "riverCardSuitUniCode", $scope.computerGame.riverCard.suit);
             $scope.riverCardClass = "card rank-" + $scope.riverCardConvertedRank + " " + $scope.riverCardSuitWritten;
+        } else {
+            resetRiverCard();
         }
+
         setDealerButton();
         setWidthOfBoardCards();
     }
@@ -157,6 +164,32 @@ mainApp.controller('pokerController', function($scope, $http) {
             $scope.boardCardsStyle = "width: 254px;";
             return;
         }
+    }
+
+    function resetFlopCards() {
+        $scope.flopCard1ConvertedRank = null;
+        $scope.flopCard2ConvertedRank = null;
+        $scope.flopCard3ConvertedRank = null;
+
+        $scope.flopCard1SuitUniCode = null;
+        $scope.flopCard2SuitUniCode = null;
+        $scope.flopCard3SuitUniCode = null;
+
+        $scope.flopCard1Class = null;
+        $scope.flopCard2Class = null;
+        $scope.flopCard3Class = null;
+    }
+
+    function resetTurnCard() {
+        $scope.turnCardConvertedRank = null;
+        $scope.turnCardSuitUniCode = null;
+        $scope.turnCardClass = null;
+    }
+
+    function resetRiverCard() {
+        $scope.riverCardConvertedRank = null;
+        $scope.riverCardSuitUniCode = null;
+        $scope.riverCardClass = null;
     }
 
     $scope.submitMyAction = function(action) {
