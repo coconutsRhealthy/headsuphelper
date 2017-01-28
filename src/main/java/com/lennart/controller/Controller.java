@@ -25,6 +25,13 @@ public class Controller {
         return computerGame;
     }
 
+    @RequestMapping(value = "/proceedToNextHand", method = RequestMethod.POST)
+    public @ResponseBody ComputerGame proceedToNextHand(@RequestBody ComputerGame computerGame) {
+        computerGame = computerGame.proceedToNextHand();
+        computerGame.setComputerAction(null);
+        return computerGame;
+    }
+
 
     public static void main(String[] args) {
         SpringApplication.run(Controller.class, args);

@@ -208,4 +208,10 @@ mainApp.controller('pokerController', function($scope, $http) {
             setScopePropertiesCorrect(data);
         })
     }
+
+    $scope.proceedToNextHand = function() {
+        $http.post('/proceedToNextHand/', $scope.computerGame).success(function(data) {
+            setScopePropertiesCorrect(data);
+        })
+    }
 });

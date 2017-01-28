@@ -99,7 +99,7 @@
 
             <div id="written_computer_action">
                 <div>{{computerGame.computerWrittenAction}}</div>
-                <div id="deal_next_hand" ng-show="showNextHandButton()"><button>Deal next hand</button></div>
+                <div id="deal_next_hand" ng-click="proceedToNextHand()" ng-show="showNextHandButton()"><button>Deal next hand</button></div>
             </div>
 
             <div><button class="action_button" ng-click="submitMyAction(fold)">fold</button></div>
