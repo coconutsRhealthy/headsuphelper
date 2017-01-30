@@ -55,6 +55,8 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.disableBetButton;
     $scope.disableRaiseButton;
 
+    $scope.showNextHandButton;
+
     $scope.startGame = function() {
         $http.get('/startGame/').success(function(data) {
             setScopePropertiesCorrect(data);
@@ -107,6 +109,7 @@ mainApp.controller('pokerController', function($scope, $http) {
 
         setDealerButton();
         setWidthOfBoardCards();
+        showNextHandButton();
         disableActionButtons();
     }
 
@@ -199,21 +202,29 @@ mainApp.controller('pokerController', function($scope, $http) {
         $scope.riverCardClass = null;
     }
 
-    $scope.showNextHandButton = function() {
-        if($scope.computerGame != null && $scope.computerGame.computerWrittenAction != null) {
-            if($scope.computerGame.computerWrittenAction.includes("win") ||
-                $scope.computerGame.computerWrittenAction.includes("fold") ||
-                $scope.computerGame.computerWrittenAction.includes("draw")) {
-                return true;
+    function showNextHandButton() {
+        if($scope.computerGame != null && $scope.computerGame.potSize != null
+            && $scope.computerGame.computerTotalBetSize != null) {
+            if($scope.computerGame.potSize != 0 && $scope.computerGame.computerTotalBetSize == 0) {
+                if($scope.computerGame.computerWrittenAction != null) {
+                    if($scope.computerGame.computerWrittenAction.includes("win") ||
+                        $scope.computerGame.computerWrittenAction.includes("fold") ||
+                        $scope.computerGame.computerWrittenAction.includes("draw")) {
+                        $scope.showNextHandButton = true;
+                    }
+                } else if($scope.computerGame.myAction != null) {
+                    if($scope.computerGame.myAction.includes("fold")) {
+                        $scope.showNextHandButton = true;
+                    }
+                } else {
+                    $scope.showNextHandButton = false;
+                }
+            } else {
+                $scope.showNextHandButton = false;
             }
+        } else {
+            $scope.showNextHandButton = false;
         }
-
-        if($scope.computerGame != null && $scope.computerGame.myAction != null) {
-            if($scope.computerGame.myAction.includes("fold")) {
-                return true;
-            }
-        }
-        return false;
     }
 
     $scope.submitMyAction = function(action) {
@@ -231,7 +242,13 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     function disableActionButtons() {
-        if($scope.computerGame.computerTotalBetSize == 0) {
+        if($scope.showNextHandButton == true) {
+            $scope.disableFoldButton = true;
+            $scope.disableCheckButton = true;
+            $scope.disableCallButton = true;
+            $scope.disableBetButton = true;
+            $scope.disableRaiseButton = true;
+        } else if($scope.computerGame.computerTotalBetSize == 0) {
             $scope.disableFoldButton = false;
             $scope.disableCheckButton = false;
             $scope.disableCallButton = true;

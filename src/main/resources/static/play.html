@@ -99,7 +99,6 @@
 
             <div id="written_computer_action">
                 <div>{{computerGame.computerWrittenAction}}</div>
-                <!--<div id="deal_next_hand" ng-click="proceedToNextHand()" ng-show="showNextHandButton()"><button>Deal next hand</button></div>-->
             </div>
 
             <div><button class="action_button" ng-disabled=disableFoldButton ng-click="submitMyAction(fold)">fold</button></div>
@@ -108,7 +107,7 @@
             <div><button class="action_button" ng-disabled=disableBetButton ng-click="submitMyAction(bet)">bet</button></div>
             <div><button class="action_button" ng-disabled=disableRaiseButton ng-click="submitMyAction(raise)">raise</button></div>
             <div><input type="text" ng-model="computerGame.myTotalBetSize"></div>
-            <div id="deal_next_hand" ng-click="proceedToNextHand()" ng-show="showNextHandButton()"><button>Deal next hand</button></div>
+            <div id="deal_next_hand" ng-click="proceedToNextHand()" ng-show=showNextHandButton><button>Deal next hand</button></div>
         </div>
     </body>
 </html>

@@ -138,8 +138,8 @@ public class ComputerGame {
             printWinnerAndHand();
         }
 
-        if(!computerIsButton) {
-            computerWrittenAction = computerWrittenAction + " and Computer checks";
+        if(board != null && board.size() != 5 && !computerIsButton) {
+            addCheckToWrittenAction();
         }
     }
 
@@ -156,6 +156,7 @@ public class ComputerGame {
     }
 
     private void processHumanFoldAction() {
+        computerWrittenAction = "You fold";
         updatePotSize("human fold");
         returnBetToPlayerAfterFold("computer");
         resetAllBets();
@@ -286,8 +287,9 @@ public class ComputerGame {
         } else if(myAction.equals("call")) {
             if(computerIsButton) {
                 computerActionNeeded = false;
+                computerWrittenAction = null;
             }
-            if(board.size() == 5) {
+            if(board != null && board.size() == 5) {
                 computerActionNeeded = false;
             }
         }
@@ -353,6 +355,7 @@ public class ComputerGame {
         actionHistory = null;
         handWinner = null;
         opponentRange = null;
+        computerWrittenAction = null;
     }
 
     private void updateActionHistory(String action) {
@@ -360,6 +363,16 @@ public class ComputerGame {
             actionHistory = new ArrayList<>();
         }
         actionHistory.add(action);
+    }
+
+    private void addCheckToWrittenAction() {
+        if(computerWrittenAction.contains("Preflop")) {
+            computerWrittenAction = computerWrittenAction + " and Flop: Computer checks";
+        } else if(computerWrittenAction.contains("Flop")) {
+            computerWrittenAction = computerWrittenAction + " and Turn: Computer checks";
+        } else if(computerWrittenAction.contains("Turn")) {
+            computerWrittenAction = computerWrittenAction + " and River: Computer checks";
+        }
     }
 
     public ComputerGame proceedToNextHand() {
