@@ -36,12 +36,14 @@ public class ComputerGame {
     private Set<Set<Card>> opponentRange;
     private List<String> actionHistory;
     private String handWinner;
+    private int numberOfHandsPlayed;
 
     public ComputerGame() {
         //default constructor
     }
 
     public ComputerGame(String initialize) {
+        numberOfHandsPlayed = 0;
         getNewCardDeck();
         dealHoleCards();
         decideWhoIsButton();
@@ -378,6 +380,7 @@ public class ComputerGame {
     public ComputerGame proceedToNextHand() {
         allocatePotToHandWinner();
         resetGameVariablesAfterFoldOrShowdown();
+        numberOfHandsPlayed++;
         getNewCardDeck();
         dealHoleCards();
         postBlinds();
@@ -686,5 +689,13 @@ public class ComputerGame {
 
     public void setHandWinner(String handWinner) {
         this.handWinner = handWinner;
+    }
+
+    public int getNumberOfHandsPlayed() {
+        return numberOfHandsPlayed;
+    }
+
+    public void setNumberOfHandsPlayed(int numberOfHandsPlayed) {
+        this.numberOfHandsPlayed = numberOfHandsPlayed;
     }
 }

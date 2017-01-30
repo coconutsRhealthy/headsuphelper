@@ -108,6 +108,8 @@
             <div><button class="action_button" ng-disabled=disableRaiseButton ng-click="submitMyAction(raise)">raise</button></div>
             <div><input type="text" ng-model="computerGame.myTotalBetSize"></div>
             <div id="deal_next_hand" ng-click="proceedToNextHand()" ng-show=showNextHandButton><button>Deal next hand</button></div>
+
+            <div>{{computerGame.numberOfHandsPlayed}}</div>
         </div>
     </body>
 </html>
