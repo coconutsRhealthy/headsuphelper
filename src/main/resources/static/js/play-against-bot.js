@@ -49,6 +49,12 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.bet = "bet";
     $scope.raise = "raise";
 
+    $scope.disableFoldButton;
+    $scope.disableCheckButton;
+    $scope.disableCallButton;
+    $scope.disableBetButton;
+    $scope.disableRaiseButton;
+
     $scope.startGame = function() {
         $http.get('/startGame/').success(function(data) {
             setScopePropertiesCorrect(data);
@@ -101,6 +107,7 @@ mainApp.controller('pokerController', function($scope, $http) {
 
         setDealerButton();
         setWidthOfBoardCards();
+        disableActionButtons();
     }
 
     function setSuitWrittenAndUniCode(scopeVariableSuitWritten, scopeVariableSuitUniCode, suit) {
@@ -193,10 +200,18 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     $scope.showNextHandButton = function() {
-        if($scope.computerGame != null && $scope.computerGame.computerWrittenAction != null)
+        if($scope.computerGame != null && $scope.computerGame.computerWrittenAction != null) {
             if($scope.computerGame.computerWrittenAction.includes("win") ||
-                $scope.computerGame.computerWrittenAction.includes("fold") ) {
+                $scope.computerGame.computerWrittenAction.includes("fold")) ||
+                $scope.computerGame.computerWrittenAction.includes("draw")) {
                 return true;
+            }
+        }
+
+        if($scope.computerGame != null && $scope.computerGame.myAction != null) {
+            if($scope.computerGame.myAction.includes("fold")) {
+                return true;
+            }
         }
         return false;
     }
@@ -213,5 +228,21 @@ mainApp.controller('pokerController', function($scope, $http) {
         $http.post('/proceedToNextHand/', $scope.computerGame).success(function(data) {
             setScopePropertiesCorrect(data);
         })
+    }
+
+    function disableActionButtons() {
+        if($scope.computerGame.computerTotalBetSize == 0) {
+            $scope.disableFoldButton = false;
+            $scope.disableCheckButton = false;
+            $scope.disableCallButton = true;
+            $scope.disableBetButton = false;
+            $scope.disableRaiseButton = true;
+        } else {
+            $scope.disableFoldButton = false;
+            $scope.disableCheckButton = true;
+            $scope.disableCallButton = false;
+            $scope.disableBetButton = true;
+            $scope.disableRaiseButton = false;
+        }
     }
 });
