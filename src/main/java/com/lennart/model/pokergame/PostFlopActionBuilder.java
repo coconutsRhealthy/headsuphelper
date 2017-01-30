@@ -50,12 +50,22 @@ public class PostFlopActionBuilder {
     public double getSize() {
         double opponentBetSize = computerGame.getMyTotalBetSize();
         double potSize = computerGame.getPotSize();
+        double computerStack = computerGame.getComputerStack();
         double size;
 
         if(opponentBetSize == 0) {
-            size = 0.75 * potSize;
+            if(0.75 * potSize < computerStack) {
+                size = 0.75 * potSize;
+            } else {
+                size = computerStack;
+            }
         } else {
-            size = (1.75 * opponentBetSize) + (0.75 * potSize);
+            if((1.75 * opponentBetSize) + (0.75 * potSize) < computerStack) {
+                size = (1.75 * opponentBetSize) + (0.75 * potSize);
+            } else {
+                size = computerStack;
+            }
+
         }
         return size;
     }

@@ -120,8 +120,14 @@ public class ComputerGame {
     }
 
     private void processComputerCallAction() {
-        computerStack = computerStack - (myTotalBetSize - computerTotalBetSize);
-        computerTotalBetSize = myTotalBetSize;
+        if(computerStack - (myTotalBetSize - computerTotalBetSize) > 0) {
+            computerStack = computerStack - (myTotalBetSize - computerTotalBetSize);
+            computerTotalBetSize = myTotalBetSize;
+        } else {
+            computerTotalBetSize = computerStack;
+            computerStack = 0;
+        }
+
         updatePotSize("call");
         resetAllBets();
 
@@ -171,8 +177,14 @@ public class ComputerGame {
     }
 
     private void processHumanCallAction() {
-        myStack = myStack - (computerTotalBetSize - myIncrementalBetSize);
-        myTotalBetSize = computerTotalBetSize;
+        if(myStack - (computerTotalBetSize - myIncrementalBetSize) > 0) {
+            myStack = myStack - (computerTotalBetSize - myIncrementalBetSize);
+            myTotalBetSize = computerTotalBetSize;
+        } else {
+            myTotalBetSize = myStack;
+            myStack = 0;
+        }
+
         updatePotSize("call");
         resetAllBets();
 
@@ -273,6 +285,9 @@ public class ComputerGame {
             }
         } else if(myAction.equals("call")) {
             if(computerIsButton) {
+                computerActionNeeded = false;
+            }
+            if(board.size() == 5) {
                 computerActionNeeded = false;
             }
         }
