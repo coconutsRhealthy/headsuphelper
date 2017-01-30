@@ -37,6 +37,10 @@ public class ComputerGame {
     private List<String> actionHistory;
     private String handWinner;
     private int numberOfHandsPlayed;
+    private double handsCompOopFacingRaise;
+    private double handsCompOopNoImmediateFold;
+    private double opponentLooseness;
+    private boolean opponentLoosenessDoneForHand;
 
     public ComputerGame() {
         //default constructor
@@ -64,6 +68,7 @@ public class ComputerGame {
 
     public ComputerGame submitHumanActionAndDoComputerAction() {
         updateActionHistory(myAction);
+        calculateOpponentLooseness();
         boolean computerActionNeeded = isComputerActionNeeded();
 
         if(myAction.equals("fold")) {
@@ -358,6 +363,7 @@ public class ComputerGame {
         handWinner = null;
         opponentRange = null;
         computerWrittenAction = null;
+        opponentLoosenessDoneForHand = false;
     }
 
     private void updateActionHistory(String action) {
@@ -487,6 +493,19 @@ public class ComputerGame {
         String holeCard2Suit = Character.toString(holeCards.get(1).getSuit());
 
         return holeCard1Rank + holeCard1Suit + holeCard2Rank + holeCard2Suit;
+    }
+
+    private void calculateOpponentLooseness() {
+        if(!opponentLoosenessDoneForHand) {
+            if(board == null && computerIsButton && computerWrittenAction.contains("raise")) {
+                handsCompOopFacingRaise++;
+                if(myAction.equals("call") || myAction.equals("raise")) {
+                    handsCompOopNoImmediateFold++;
+                }
+            }
+            opponentLooseness = handsCompOopNoImmediateFold / handsCompOopFacingRaise;
+            opponentLoosenessDoneForHand = true;
+        }
     }
 
 
@@ -697,5 +716,37 @@ public class ComputerGame {
 
     public void setNumberOfHandsPlayed(int numberOfHandsPlayed) {
         this.numberOfHandsPlayed = numberOfHandsPlayed;
+    }
+
+    public double getHandsCompOopFacingRaise() {
+        return handsCompOopFacingRaise;
+    }
+
+    public void setHandsCompOopFacingRaise(double handsCompOopFacingRaise) {
+        this.handsCompOopFacingRaise = handsCompOopFacingRaise;
+    }
+
+    public double getHandsCompOopNoImmediateFold() {
+        return handsCompOopNoImmediateFold;
+    }
+
+    public void setHandsCompOopNoImmediateFold(double handsCompOopNoImmediateFold) {
+        this.handsCompOopNoImmediateFold = handsCompOopNoImmediateFold;
+    }
+
+    public double getOpponentLooseness() {
+        return opponentLooseness;
+    }
+
+    public void setOpponentLooseness(double opponentLooseness) {
+        this.opponentLooseness = opponentLooseness;
+    }
+
+    public boolean isOpponentLoosenessDoneForHand() {
+        return opponentLoosenessDoneForHand;
+    }
+
+    public void setOpponentLoosenessDoneForHand(boolean opponentLoosenessDoneForHand) {
+        this.opponentLoosenessDoneForHand = opponentLoosenessDoneForHand;
     }
 }

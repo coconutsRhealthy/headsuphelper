@@ -41,12 +41,15 @@ public class RangeBuilder {
     private HandEvaluator handEvaluator;
     private Set<Set<Card>> previousOpponentRange;
 
+    private double opponentLooseness;
+
     public RangeBuilder(ComputerGame computerGame) {
         holeCards = computerGame.getComputerHoleCards();
         board = computerGame.getBoard();
         knownGameCards = computerGame.getKnownGameCards();
+        opponentLooseness = computerGame.getOpponentLooseness();
 
-        preflopRangeBuilder = new PreflopRangeBuilder(computerGame);
+        preflopRangeBuilder = new PreflopRangeBuilder(computerGame, this);
 
         if(board != null) {
             previousOpponentRange = computerGame.getOpponentRange();
@@ -936,5 +939,16 @@ public class RangeBuilder {
 
     public HandEvaluator getHandEvaluator() {
         return handEvaluator;
+    }
+
+    public double getOpponentLoosenessFactor(int numberOfHandsPlayed) {
+        double opponentLoosenessFactor = 0;
+
+        if(numberOfHandsPlayed > 15) {
+            if(opponentLooseness > 0.5) {
+                opponentLoosenessFactor = (opponentLooseness - 0.5) * 2;
+            }
+        }
+        return opponentLoosenessFactor;
     }
 }

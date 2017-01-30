@@ -24,6 +24,7 @@ public class PostFlopRangeBuilder {
     private double opponentTotalBetSize;
     private double potSize;
     private double bigBlind;
+    private int numberOfHandsPlayed;
     private Set<Card> knownGameCards;
 
     private Map<Integer, Set<Card>> strongFlushDraws;
@@ -51,6 +52,7 @@ public class PostFlopRangeBuilder {
         potSize = computerGame.getPotSize();
         bigBlind = computerGame.getBigBlind();
         knownGameCards = computerGame.getKnownGameCards();
+        numberOfHandsPlayed = computerGame.getNumberOfHandsPlayed();
 
         this.rangeBuilder = rangeBuilder;
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
@@ -218,7 +220,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.5, 0.4);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.5, 0.4);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.5, 0.5 +
+                rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _7to16bb50to100percent.addAll(valueRange);
@@ -249,7 +254,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7, 0.25);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7, 0.25);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7,
+                0.25 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _7to16bbAbove100percent.addAll(valueRange);
@@ -292,7 +300,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.4, 0.7);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.4, 0.7);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.4,
+                0.7 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _16to33bb20to50percent.addAll(valueRange);
@@ -329,7 +340,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.6, 0.37);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.6, 0.37);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.6,
+                0.45 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed) );
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _16to33bb50to100percent.addAll(valueRange);
@@ -360,7 +374,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.84, 0.18);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.84, 0.18);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.84,
+                0.24 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _16to33bbAbove100percent.addAll(valueRange);
@@ -395,7 +412,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7, 0.5);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7, 0.5);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7,
+                0.6 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _33to70bb20to50percent.addAll(valueRange);
@@ -426,7 +446,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8, 0.3);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8, 0.3);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8,
+                0.5 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _33to70bb50to100percent.addAll(valueRange);
@@ -457,7 +480,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8, 0.18);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8, 0.18);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8,
+                0.24 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         _33to70bbAbove100percent.addAll(valueRange);
@@ -492,7 +518,10 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.75, 0.5);
+        //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.75, 0.5);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.75,
+                0.6 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         above70bb20to50percent.addAll(valueRange);
@@ -523,7 +552,8 @@ public class PostFlopRangeBuilder {
         Set<Set<Card>> drawRange = convertMultipleMapsToSet(drawMap);
 
         //air
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.82, 0.2);
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.82,
+                0.35 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         above70bbAbove50percent.addAll(valueRange);

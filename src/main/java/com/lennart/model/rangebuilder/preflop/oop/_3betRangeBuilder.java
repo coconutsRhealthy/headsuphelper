@@ -1,6 +1,7 @@
 package com.lennart.model.rangebuilder.preflop.oop;
 
 import com.lennart.model.pokergame.Card;
+import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
@@ -190,7 +191,7 @@ public class _3betRangeBuilder {
 
     }
 
-    public Map<Integer, Set<Card>> getOpponent3betRange() {
+    public Map<Integer, Set<Card>> getOpponent3betRange(RangeBuilder rangeBuilder, int numberOfHandsPlayed) {
         Map<Integer, Set<Card>> opponent3betRange = new HashMap<>();
 
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap95Percent, 0.95);
@@ -202,7 +203,8 @@ public class _3betRangeBuilder {
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap5Percent, 0.05);
 
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMapRest7Percent, 0.07);
-        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMapAllPossibleStartHands, 0.03);
+        opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMapAllPossibleStartHands,
+                0.03 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
 
         opponent3betRange = p.removeDoubleCombos(opponent3betRange);
 
