@@ -202,7 +202,7 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.showNextHandButton = function() {
         if($scope.computerGame != null && $scope.computerGame.computerWrittenAction != null) {
             if($scope.computerGame.computerWrittenAction.includes("win") ||
-                $scope.computerGame.computerWrittenAction.includes("fold")) ||
+                $scope.computerGame.computerWrittenAction.includes("fold") ||
                 $scope.computerGame.computerWrittenAction.includes("draw")) {
                 return true;
             }
