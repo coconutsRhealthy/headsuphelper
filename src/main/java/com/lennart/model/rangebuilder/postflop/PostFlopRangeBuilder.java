@@ -84,6 +84,7 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> get7to16bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _7to16bbRange;
 
+        //TODO: opponentTotalBetSize staat hier op 0 als opponent jouw bet callt.. 
         double opponentBetToPotRatio = opponentTotalBetSize / potSize;
 
         if(opponentBetToPotRatio <= 0.2) {

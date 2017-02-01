@@ -40,6 +40,7 @@ public class Action {
 
     //helper methods
     private void getAndProcessPreflopAction(ComputerGame computerGame) {
+        rangeBuilder.getOpponentRange(computerGame);
         String action;
         action = preflopActionBuilder.getAction(computerGame);
         setNewWrittenAction(action, computerGame.getBoard());
@@ -52,10 +53,12 @@ public class Action {
         Set<Set<Card>> opponentRange;
         String action;
         opponentRange = rangeBuilder.getOpponentRange(computerGame);
-        action = postFlopActionBuilder.getAction(opponentRange);
-        setNewWrittenAction(action, computerGame.getBoard());
-        setSizingIfNecessary(computerGame, action);
 
+        if(!computerGame.isOnlyCallRangeNeeded()) {
+            action = postFlopActionBuilder.getAction(opponentRange);
+            setNewWrittenAction(action, computerGame.getBoard());
+            setSizingIfNecessary(computerGame, action);
+        }
     }
 
     private void setNewWrittenAction(String action, List<Card> board) {

@@ -40,6 +40,7 @@ public class RangeBuilder {
     private HighCardDrawEvaluator highCardDrawEvaluator;
     private HandEvaluator handEvaluator;
     private Set<Set<Card>> previousOpponentRange;
+    private boolean opponentLastActionWasPreflop;
 
     private double opponentLooseness;
 
@@ -48,6 +49,7 @@ public class RangeBuilder {
         board = computerGame.getBoard();
         knownGameCards = computerGame.getKnownGameCards();
         opponentLooseness = computerGame.getOpponentLooseness();
+        opponentLastActionWasPreflop = computerGame.isOpponentLastActionWasPreflop();
 
         preflopRangeBuilder = new PreflopRangeBuilder(computerGame, this);
 
@@ -903,7 +905,8 @@ public class RangeBuilder {
     public Set<Set<Card>> getOpponentRange(ComputerGame computerGame) {
         Set<Set<Card>> opponentRange;
 
-        if(previousOpponentRange == null) {
+        //als opponent een preflop 3bet van computer callt, dan is previousOpponentRange niet meer null...
+        if(opponentLastActionWasPreflop) {
             opponentRange = preflopRangeBuilder.getOpponentPreflopRange();
         } else {
             opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);

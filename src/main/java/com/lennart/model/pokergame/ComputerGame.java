@@ -41,6 +41,8 @@ public class ComputerGame {
     private double handsCompOopNoImmediateFold;
     private double opponentLooseness;
     private boolean opponentLoosenessDoneForHand;
+    private boolean onlyCallRangeNeeded;
+    private boolean opponentLastActionWasPreflop;
 
     public ComputerGame() {
         //default constructor
@@ -55,6 +57,7 @@ public class ComputerGame {
         computerStack = 50;
         setBlinds();
         postBlinds();
+        opponentLastActionWasPreflop = true;
 
         if(isComputerIsButton()) {
             doComputerAction();
@@ -67,6 +70,12 @@ public class ComputerGame {
     }
 
     public ComputerGame submitHumanActionAndDoComputerAction() {
+        if(board == null) {
+            opponentLastActionWasPreflop = true;
+        } else {
+            opponentLastActionWasPreflop = false;
+        }
+
         updateActionHistory(myAction);
         calculateOpponentLooseness();
         boolean computerActionNeeded = isComputerActionNeeded();
@@ -81,30 +90,36 @@ public class ComputerGame {
             processHumanBetOrRaiseAction();
         }
 
-        if(computerActionNeeded) {
+        if(computerActionNeeded || onlyCallRangeNeeded) {
             doComputerAction();
         }
         roundToTwoDecimals();
+        resetOnlyPreflopCallRangeNeeded();
         return this;
     }
 
     private void doComputerAction() {
         computerAction = new Action(this);
-        computerWrittenAction = computerAction.getWrittenAction();
-        updateActionHistory(computerWrittenAction);
 
-        if(computerWrittenAction.contains("fold")) {
-            processComputerFoldAction();
-        } else if(computerWrittenAction.contains("check")) {
-            processComputerCheckAction();
-        } else if(computerWrittenAction.contains("call")) {
-            processComputerCallAction();
-        } else if(computerWrittenAction.contains("bet")) {
-            processComputerBetAction();
-        } else if(computerWrittenAction.contains("raise")) {
-            processComputerRaiseAction();
+        if(!onlyCallRangeNeeded) {
+            computerWrittenAction = computerAction.getWrittenAction();
+            updateActionHistory(computerWrittenAction);
+
+            if(computerWrittenAction.contains("fold")) {
+                processComputerFoldAction();
+            } else if(computerWrittenAction.contains("check")) {
+                processComputerCheckAction();
+            } else if(computerWrittenAction.contains("call")) {
+                if(!onlyCallRangeNeeded) {
+                    processComputerCallAction();
+                }
+            } else if(computerWrittenAction.contains("bet")) {
+                processComputerBetAction();
+            } else if(computerWrittenAction.contains("raise")) {
+                processComputerRaiseAction();
+            }
+            roundToTwoDecimals();
         }
-        roundToTwoDecimals();
     }
 
     private void processComputerFoldAction() {
@@ -299,6 +314,9 @@ public class ComputerGame {
             if(board != null && board.size() == 5) {
                 computerActionNeeded = false;
             }
+            if(computerIsButton) {
+                onlyCallRangeNeeded = true;
+            }
         }
         return computerActionNeeded;
     }
@@ -364,6 +382,7 @@ public class ComputerGame {
         opponentRange = null;
         computerWrittenAction = null;
         opponentLoosenessDoneForHand = false;
+        opponentLastActionWasPreflop = true;
     }
 
     private void updateActionHistory(String action) {
@@ -448,6 +467,12 @@ public class ComputerGame {
         computerStack = Precision.round(computerStack, 2);
         myTotalBetSize = Precision.round(myTotalBetSize, 2);
         computerTotalBetSize = Precision.round(computerTotalBetSize, 2);
+    }
+
+    private void resetOnlyPreflopCallRangeNeeded() {
+        if(onlyCallRangeNeeded) {
+            onlyCallRangeNeeded = false;
+        }
     }
 
     private String determineWinnerAtShowdown() {
@@ -748,5 +773,21 @@ public class ComputerGame {
 
     public void setOpponentLoosenessDoneForHand(boolean opponentLoosenessDoneForHand) {
         this.opponentLoosenessDoneForHand = opponentLoosenessDoneForHand;
+    }
+
+    public boolean isOnlyCallRangeNeeded() {
+        return onlyCallRangeNeeded;
+    }
+
+    public void setOnlyCallRangeNeeded(boolean onlyCallRangeNeeded) {
+        this.onlyCallRangeNeeded = onlyCallRangeNeeded;
+    }
+
+    public boolean isOpponentLastActionWasPreflop() {
+        return opponentLastActionWasPreflop;
+    }
+
+    public void setOpponentLastActionWasPreflop(boolean opponentLastActionWasPreflop) {
+        this.opponentLastActionWasPreflop = opponentLastActionWasPreflop;
     }
 }

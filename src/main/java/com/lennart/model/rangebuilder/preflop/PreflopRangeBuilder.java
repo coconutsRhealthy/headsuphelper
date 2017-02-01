@@ -32,11 +32,13 @@ public class PreflopRangeBuilder {
     private double bigBlind;
     private boolean computerIsButton;
     private int numberOfHandsPlayed;
+    private double opponentTotalBetSize;
     private RangeBuilder rangeBuilder;
 
     public PreflopRangeBuilder(ComputerGame computerGame, RangeBuilder rangeBuilder) {
         potSize = computerGame.getPotSize();
         bigBlind = computerGame.getBigBlind();
+        opponentTotalBetSize = computerGame.getMyTotalBetSize();
         computerIsButton = computerGame.isComputerIsButton();
         numberOfHandsPlayed = computerGame.getNumberOfHandsPlayed();
 
@@ -47,10 +49,25 @@ public class PreflopRangeBuilder {
 
     public Set<Set<Card>> getOpponentPreflopRange() {
         Set<Set<Card>> range;
-        double bbOpponentTotalBetSize = (potSize / 2) / bigBlind;
+        //double bbOpponentTotalBetSize = (potSize / 2) / bigBlind;
 
-        if(bbOpponentTotalBetSize == 1) {
-            range = RangeBuilder.convertMapToSet(PreflopRangeBuilderUtil.getAllStartHandsAsSet());
+        //bovenstaande werkt niet als de pot nog 0 is...
+
+        double bbOpponentTotalBetSize;
+        if(potSize == 0) {
+            bbOpponentTotalBetSize = opponentTotalBetSize / bigBlind;
+        } else {
+            bbOpponentTotalBetSize = (potSize / 2) / bigBlind;
+        }
+
+        if(bbOpponentTotalBetSize == 0) {
+            range = null;
+        } else if(bbOpponentTotalBetSize == 1) {
+            if(computerIsButton) {
+                range = null;
+            } else {
+                range = RangeBuilder.convertMapToSet(PreflopRangeBuilderUtil.getAllStartHandsAsSet());
+            }
         } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
             if(computerIsButton) {
                 call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
