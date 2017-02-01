@@ -26,6 +26,7 @@ public class PostFlopRangeBuilder {
     private double bigBlind;
     private int numberOfHandsPlayed;
     private Set<Card> knownGameCards;
+    private double opponentFormerTotalCallAmount;
 
     private Map<Integer, Set<Card>> strongFlushDraws;
     private Map<Integer, Set<Card>> mediumFlushDraws;
@@ -53,6 +54,7 @@ public class PostFlopRangeBuilder {
         bigBlind = computerGame.getBigBlind();
         knownGameCards = computerGame.getKnownGameCards();
         numberOfHandsPlayed = computerGame.getNumberOfHandsPlayed();
+        opponentFormerTotalCallAmount = computerGame.getOpponentFormerTotalCallAmount();
 
         this.rangeBuilder = rangeBuilder;
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
@@ -84,8 +86,7 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> get7to16bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _7to16bbRange;
 
-        //TODO: opponentTotalBetSize staat hier op 0 als opponent jouw bet callt.. 
-        double opponentBetToPotRatio = opponentTotalBetSize / potSize;
+        double opponentBetToPotRatio = getOpponentBetToPotRatio();
 
         if(opponentBetToPotRatio <= 0.2) {
             _7to16bbRange = previousRange;
@@ -102,7 +103,7 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> get16to33bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _16to33bbRange;
 
-        double opponentBetToPotRatio = opponentTotalBetSize / potSize;
+        double opponentBetToPotRatio = getOpponentBetToPotRatio();
 
         if(opponentBetToPotRatio <= 0.2) {
             _16to33bbRange = previousRange;
@@ -119,7 +120,7 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> get33to70bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _33to70bbRange;
 
-        double opponentBetToPotRatio = opponentTotalBetSize / potSize;
+        double opponentBetToPotRatio = getOpponentBetToPotRatio();
 
         if(opponentBetToPotRatio <= 0.2) {
             _33to70bbRange = previousRange;
@@ -136,7 +137,7 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> getAbove70bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> above70bbRange;
 
-        double opponentBetToPotRatio = opponentTotalBetSize / potSize;
+        double opponentBetToPotRatio = getOpponentBetToPotRatio();
 
         if(opponentBetToPotRatio <= 0.2) {
             above70bbRange = previousRange;
@@ -146,6 +147,17 @@ public class PostFlopRangeBuilder {
             above70bbRange = getAbove70bbAbove50percent(previousRange);
         }
         return above70bbRange;
+    }
+
+    private double getOpponentBetToPotRatio() {
+        double opponentBetToPotRatio;
+
+        if(opponentFormerTotalCallAmount != 0) {
+            opponentBetToPotRatio = opponentFormerTotalCallAmount / potSize;
+        } else {
+            opponentBetToPotRatio = opponentTotalBetSize / potSize;
+        }
+        return opponentBetToPotRatio;
     }
 
 

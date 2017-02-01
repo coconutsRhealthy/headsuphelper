@@ -43,6 +43,7 @@ public class ComputerGame {
     private boolean opponentLoosenessDoneForHand;
     private boolean onlyCallRangeNeeded;
     private boolean opponentLastActionWasPreflop;
+    private double opponentFormerTotalCallAmount;
 
     public ComputerGame() {
         //default constructor
@@ -94,7 +95,7 @@ public class ComputerGame {
             doComputerAction();
         }
         roundToTwoDecimals();
-        resetOnlyPreflopCallRangeNeeded();
+        resetSpecificStreetVariables();
         return this;
     }
 
@@ -208,6 +209,7 @@ public class ComputerGame {
             myStack = 0;
         }
 
+        opponentFormerTotalCallAmount = myTotalBetSize;
         updatePotSize("call");
         resetAllBets();
 
@@ -469,10 +471,11 @@ public class ComputerGame {
         computerTotalBetSize = Precision.round(computerTotalBetSize, 2);
     }
 
-    private void resetOnlyPreflopCallRangeNeeded() {
+    private void resetSpecificStreetVariables() {
         if(onlyCallRangeNeeded) {
             onlyCallRangeNeeded = false;
         }
+        opponentFormerTotalCallAmount = 0;
     }
 
     private String determineWinnerAtShowdown() {
@@ -789,5 +792,13 @@ public class ComputerGame {
 
     public void setOpponentLastActionWasPreflop(boolean opponentLastActionWasPreflop) {
         this.opponentLastActionWasPreflop = opponentLastActionWasPreflop;
+    }
+
+    public double getOpponentFormerTotalCallAmount() {
+        return opponentFormerTotalCallAmount;
+    }
+
+    public void setOpponentFormerTotalCallAmount(double opponentFormerTotalCallAmount) {
+        this.opponentFormerTotalCallAmount = opponentFormerTotalCallAmount;
     }
 }

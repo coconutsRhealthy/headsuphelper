@@ -905,7 +905,6 @@ public class RangeBuilder {
     public Set<Set<Card>> getOpponentRange(ComputerGame computerGame) {
         Set<Set<Card>> opponentRange;
 
-        //als opponent een preflop 3bet van computer callt, dan is previousOpponentRange niet meer null...
         if(opponentLastActionWasPreflop) {
             opponentRange = preflopRangeBuilder.getOpponentPreflopRange();
         } else {
