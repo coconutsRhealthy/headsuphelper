@@ -18,6 +18,8 @@ public class PostFlopActionBuilder {
     private final String CALL = "call";
     private final String RAISE = "raise";
 
+    private double bigBlind;
+
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
     private ComputerGame computerGame;
@@ -25,6 +27,7 @@ public class PostFlopActionBuilder {
     private List<String> actionHistory;
 
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, ComputerGame computerGame) {
+        bigBlind = computerGame.getBigBlind();
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
         this.computerGame = computerGame;
@@ -102,12 +105,12 @@ public class PostFlopActionBuilder {
 
     private String getIpFCheck(double handStrengthAgainstRange) {
         if(handStrengthAgainstRange > 0.6) {
-            return getValueAction(BET, CHECK);
+            return getValueAction(handStrengthAgainstRange, BET, CHECK);
         }
 
         String drawAction = getDrawAction(BET);
 
-        if(drawAction != null) {
+        if(drawAction != null && !drawAction.contains(CHECK)) {
             return drawAction;
         } else {
             return getBluffAction(BET, CHECK, handStrengthAgainstRange);
@@ -124,12 +127,12 @@ public class PostFlopActionBuilder {
 
     private String getOopFirstToAct(double handStrengthAgainstRange) {
         if (handStrengthAgainstRange > 0.6) {
-            return getValueAction(BET, CHECK);
+            return getValueAction(handStrengthAgainstRange, BET, CHECK);
         }
 
         String drawAction = getDrawAction(BET);
 
-        if(drawAction != null) {
+        if(drawAction != null && !drawAction.contains(CHECK)) {
             return drawAction;
         } else {
             return getBluffAction(BET, CHECK, handStrengthAgainstRange);
@@ -146,39 +149,38 @@ public class PostFlopActionBuilder {
 
     private String getFbet(double handStrengthAgainstRange) {
         if(handEvaluator.isSingleBetPot(actionHistory)) {
-            if(handStrengthAgainstRange > 0.7) {
-                return getValueAction(RAISE, CALL);
-            } else {
-                String drawAction = getDrawAction(RAISE);
-                if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
-                    if(drawAction != null) {
-                        return drawAction;
-                    } else {
-                        if(computerGame.getBoard().size() != 5) {
-                            if(Math.random() < 0.8) {
-                                System.out.println("Value call of bet");
-                                return CALL;
-                            } else {
-                                System.out.println("Tricky raise against bet");
-                                return RAISE;
-                            }
-                        }
-                        System.out.println("Value call of bet");
-                        return CALL;
-                    }
+            if(handStrengthAgainstRange > 0.7 && handStrengthAgainstRange > getHandStrengthNeededToCall()) {
+                return getValueAction(handStrengthAgainstRange, RAISE, CALL);
+            }
+
+            String drawAction = getDrawAction(RAISE);
+            if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
+                if(drawAction != null && !drawAction.contains(FOLD)) {
+                    return drawAction;
                 } else {
-                    if(drawAction != null) {
-                        return drawAction;
-                    } else {
-                        return getBluffAction(RAISE, FOLD, handStrengthAgainstRange);
+                    if(computerGame.getBoard().size() != 5) {
+                        if(Math.random() < 0.8) {
+                            System.out.println("Value call of bet");
+                            return CALL;
+                        } else {
+                            System.out.println("Tricky raise against bet");
+                            return RAISE;
+                        }
                     }
+                    System.out.println("Value call of bet");
+                    return CALL;
+                }
+            } else {
+                if(drawAction != null && !drawAction.contains(FOLD)) {
+                    return drawAction;
+                } else {
+                    return getBluffAction(RAISE, FOLD, handStrengthAgainstRange);
                 }
             }
         } else {
             if(computerGame.getBoard().size() == 5) {
-                if(handStrengthAgainstRange > 0.7) {
-                    System.out.println("Value raise at river");
-                    return RAISE;
+                if(handStrengthAgainstRange > 0.7 && handStrengthAgainstRange > getHandStrengthNeededToCall()) {
+                    return getValueAction(handStrengthAgainstRange, RAISE, CALL);
                 }
             }
 
@@ -186,12 +188,39 @@ public class PostFlopActionBuilder {
                 System.out.println("Value call in bigger pot");
                 return CALL;
             }
-            if(getDrawCallingAction().contains("call")) {
+            if(getDrawCallingAction().contains(CALL)) {
                 return CALL;
             }
             System.out.println("No value call and no draw-call in bigger pot. Fold.");
             return FOLD;
         }
+    }
+
+    private String getValueAction(double handStrengthAgainstRange, String bettingAction, String passiveAction) {
+        String valueAction;
+        double sizing = getSize();
+        if(sizing / bigBlind <= 11) {
+            valueAction = getPassiveOrAggressiveValueAction(bettingAction, passiveAction);
+        } else if (sizing / bigBlind > 11 && sizing / bigBlind <= 22){
+            if(handStrengthAgainstRange > 0.8) {
+                valueAction = getPassiveOrAggressiveValueAction(bettingAction, passiveAction);
+            } else {
+                valueAction = passiveAction;
+            }
+        } else if (sizing / bigBlind > 22 && sizing / bigBlind <= 33) {
+            if(handStrengthAgainstRange > 0.9) {
+                valueAction = getPassiveOrAggressiveValueAction(bettingAction, passiveAction);
+            } else {
+                valueAction = passiveAction;
+            }
+        } else {
+            if(handStrengthAgainstRange > 0.95) {
+                valueAction = getPassiveOrAggressiveValueAction(bettingAction, passiveAction);
+            } else {
+                valueAction = passiveAction;
+            }
+        }
+        return valueAction;
     }
 
     private String getFraise(double handStrengthAgainstRange) {
@@ -208,7 +237,7 @@ public class PostFlopActionBuilder {
         }
     }
 
-    private String getValueAction(String bettingAction, String passiveAction) {
+    private String getPassiveOrAggressiveValueAction(String bettingAction, String passiveAction) {
         if(computerGame.getBoard().size() != 5) {
             if(Math.random() < 0.8) {
                 System.out.println("Betting value action");
@@ -228,7 +257,7 @@ public class PostFlopActionBuilder {
                     return passiveAction;
                 }
             } else {
-                System.out.println("River IP pure valuebet");
+                System.out.println("River IP pure value betting action");
                 return bettingAction;
             }
         }
@@ -276,7 +305,7 @@ public class PostFlopActionBuilder {
             if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd") ||
                     handEvaluator.hasDrawOfType("strongOvercards")) {
                 if (Math.random() < 0.50) {
-                    System.out.println("Betting action with strongFd, StrongOosd, strongOvercards");
+                    System.out.println(bettingAction + " with strongFd, StrongOosd, strongOvercards");
                     return bettingAction;
                 } else {
                     if (bettingAction.equals(BET)) {
