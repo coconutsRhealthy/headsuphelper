@@ -191,7 +191,7 @@ public class _3betRangeBuilder {
 
     }
 
-    public Map<Integer, Set<Card>> getOpponent3betRange(RangeBuilder rangeBuilder, int numberOfHandsPlayed) {
+    public Map<Integer, Set<Card>> getOpponent3betRange(RangeBuilder rangeBuilder, double handsHumanOopFacingPreflop2bet) {
         Map<Integer, Set<Card>> opponent3betRange = new HashMap<>();
 
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMap95Percent, 0.95);
@@ -204,7 +204,7 @@ public class _3betRangeBuilder {
 
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMapRest7Percent, 0.07);
         opponent3betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent3betRange, comboMapAllPossibleStartHands,
-                0.03 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                0.03 + rangeBuilder.getOpponentPreflop3betFactor(handsHumanOopFacingPreflop2bet));
 
         opponent3betRange = p.removeDoubleCombos(opponent3betRange);
 

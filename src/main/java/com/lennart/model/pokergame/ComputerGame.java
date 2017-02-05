@@ -37,10 +37,12 @@ public class ComputerGame {
     private List<String> actionHistory;
     private String handWinner;
     private int numberOfHandsPlayed;
-    private double handsCompOopFacingRaise;
-    private double handsCompOopNoImmediateFold;
-    private double opponentLooseness;
-    private boolean opponentLoosenessDoneForHand;
+    private double handsHumanOopFacingPreflop2bet;
+    private double handsHumanOopCall2bet;
+    private double handsHumanOop3bet;
+    private double opponentPreCall2betStat;
+    private double opponentPre3betStat;
+    private boolean opponentPreflopStatsDoneForHand;
     private boolean onlyCallRangeNeeded;
     private boolean opponentLastActionWasPreflop;
     private double opponentFormerTotalCallAmount;
@@ -78,7 +80,7 @@ public class ComputerGame {
         }
 
         updateActionHistory(myAction);
-        calculateOpponentLooseness();
+        calculateOpponentPreflopStats();
         boolean computerActionNeeded = isComputerActionNeeded();
 
         if(myAction.equals("fold")) {
@@ -383,7 +385,7 @@ public class ComputerGame {
         handWinner = null;
         opponentRange = null;
         computerWrittenAction = null;
-        opponentLoosenessDoneForHand = false;
+        opponentPreflopStatsDoneForHand = false;
         opponentLastActionWasPreflop = true;
     }
 
@@ -523,16 +525,20 @@ public class ComputerGame {
         return holeCard1Rank + holeCard1Suit + holeCard2Rank + holeCard2Suit;
     }
 
-    private void calculateOpponentLooseness() {
-        if(!opponentLoosenessDoneForHand) {
-            if(board == null && computerIsButton && computerWrittenAction.contains("raise")) {
-                handsCompOopFacingRaise++;
-                if(myAction.equals("call") || myAction.equals("raise")) {
-                    handsCompOopNoImmediateFold++;
+    private void calculateOpponentPreflopStats() {
+        if(!opponentPreflopStatsDoneForHand) {
+            if(board == null && computerIsButton && computerWrittenAction.contains("raise") && actionHistory.size() == 1) {
+                handsHumanOopFacingPreflop2bet++;
+                if(myAction.equals("call")) {
+                    handsHumanOopCall2bet++;
+                }
+                if(myAction.equals("raise")) {
+                    handsHumanOop3bet++;
                 }
             }
-            opponentLooseness = handsCompOopNoImmediateFold / handsCompOopFacingRaise;
-            opponentLoosenessDoneForHand = true;
+            opponentPreCall2betStat = handsHumanOopCall2bet / handsHumanOopFacingPreflop2bet;
+            opponentPre3betStat = handsHumanOop3bet / handsHumanOopFacingPreflop2bet;
+            opponentPreflopStatsDoneForHand = true;
         }
     }
 
@@ -746,36 +752,36 @@ public class ComputerGame {
         this.numberOfHandsPlayed = numberOfHandsPlayed;
     }
 
-    public double getHandsCompOopFacingRaise() {
-        return handsCompOopFacingRaise;
+    public double getHandsHumanOopFacingPreflop2bet() {
+        return handsHumanOopFacingPreflop2bet;
     }
 
-    public void setHandsCompOopFacingRaise(double handsCompOopFacingRaise) {
-        this.handsCompOopFacingRaise = handsCompOopFacingRaise;
+    public void setHandsHumanOopFacingPreflop2bet(double handsHumanOopFacingPreflop2bet) {
+        this.handsHumanOopFacingPreflop2bet = handsHumanOopFacingPreflop2bet;
     }
 
-    public double getHandsCompOopNoImmediateFold() {
-        return handsCompOopNoImmediateFold;
+    public double getHandsHumanOopCall2bet() {
+        return handsHumanOopCall2bet;
     }
 
-    public void setHandsCompOopNoImmediateFold(double handsCompOopNoImmediateFold) {
-        this.handsCompOopNoImmediateFold = handsCompOopNoImmediateFold;
+    public void setHandsHumanOopCall2bet(double handsHumanOopCall2bet) {
+        this.handsHumanOopCall2bet = handsHumanOopCall2bet;
     }
 
-    public double getOpponentLooseness() {
-        return opponentLooseness;
+    public double getOpponentPreCall2betStat() {
+        return opponentPreCall2betStat;
     }
 
-    public void setOpponentLooseness(double opponentLooseness) {
-        this.opponentLooseness = opponentLooseness;
+    public void setOpponentPreCall2betStat(double opponentPreCall2betStat) {
+        this.opponentPreCall2betStat = opponentPreCall2betStat;
     }
 
-    public boolean isOpponentLoosenessDoneForHand() {
-        return opponentLoosenessDoneForHand;
+    public boolean isOpponentPreflopStatsDoneForHand() {
+        return opponentPreflopStatsDoneForHand;
     }
 
-    public void setOpponentLoosenessDoneForHand(boolean opponentLoosenessDoneForHand) {
-        this.opponentLoosenessDoneForHand = opponentLoosenessDoneForHand;
+    public void setOpponentPreflopStatsDoneForHand(boolean opponentPreflopStatsDoneForHand) {
+        this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
     }
 
     public boolean isOnlyCallRangeNeeded() {
@@ -800,5 +806,21 @@ public class ComputerGame {
 
     public void setOpponentFormerTotalCallAmount(double opponentFormerTotalCallAmount) {
         this.opponentFormerTotalCallAmount = opponentFormerTotalCallAmount;
+    }
+
+    public double getHandsHumanOop3bet() {
+        return handsHumanOop3bet;
+    }
+
+    public void setHandsHumanOop3bet(double handsHumanOop3bet) {
+        this.handsHumanOop3bet = handsHumanOop3bet;
+    }
+
+    public double getOpponentPre3betStat() {
+        return opponentPre3betStat;
+    }
+
+    public void setOpponentPre3betStat(double opponentPre3betStat) {
+        this.opponentPre3betStat = opponentPre3betStat;
     }
 }

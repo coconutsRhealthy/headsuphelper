@@ -42,13 +42,15 @@ public class RangeBuilder {
     private Set<Set<Card>> previousOpponentRange;
     private boolean opponentLastActionWasPreflop;
 
-    private double opponentLooseness;
+    private double opponentPreCall2betStat;
+    private double opponentPre3betStat;
 
     public RangeBuilder(ComputerGame computerGame) {
         holeCards = computerGame.getComputerHoleCards();
         board = computerGame.getBoard();
         knownGameCards = computerGame.getKnownGameCards();
-        opponentLooseness = computerGame.getOpponentLooseness();
+        opponentPreCall2betStat = computerGame.getOpponentPreCall2betStat();
+        opponentPre3betStat = computerGame.getOpponentPre3betStat();
         opponentLastActionWasPreflop = computerGame.isOpponentLastActionWasPreflop();
 
         preflopRangeBuilder = new PreflopRangeBuilder(computerGame, this);
@@ -943,14 +945,38 @@ public class RangeBuilder {
         return handEvaluator;
     }
 
-    public double getOpponentLoosenessFactor(int numberOfHandsPlayed) {
-        double opponentLoosenessFactor = 0;
+    public double getOpponentPreflopCall2betFactor(double handsOpponentOopFacingPreflop2bet) {
+        double opponentCall2betFactor = 0;
+        double standardPreCall2betStat = 0.3;
 
-        if(numberOfHandsPlayed > 15) {
-            if(opponentLooseness > 0.5) {
-                opponentLoosenessFactor = (opponentLooseness - 0.5) * 2;
-            }
+        if(handsOpponentOopFacingPreflop2bet > 10) {
+            opponentCall2betFactor = opponentPreCall2betStat - standardPreCall2betStat;
         }
-        return opponentLoosenessFactor;
+        return opponentCall2betFactor;
+    }
+
+    public double getOpponentPreflop3betFactor(double handsOpponentOopFacingPreflop2bet) {
+        double opponentPreflop3betFactor = 0;
+        double standardPreflop3betStat = 0.2;
+
+        if(handsOpponentOopFacingPreflop2bet > 10) {
+            opponentPreflop3betFactor = opponentPre3betStat - standardPreflop3betStat;
+        }
+        return opponentPreflop3betFactor;
+    }
+
+    public double getOpponetPostflopLoosenessFactor(double handsOpponentOopFacingPreflop2bet) {
+        double opponentPostflopLoosenessFactor;
+        double opponentPreflopCall2betFactor = getOpponentPreflopCall2betFactor(handsOpponentOopFacingPreflop2bet);
+        double opponentPreflop3betFactor = getOpponentPreflop3betFactor(handsOpponentOopFacingPreflop2bet);
+
+        double average = (opponentPreflopCall2betFactor + opponentPreflop3betFactor) / 2;
+
+        opponentPostflopLoosenessFactor = average + 1;
+
+        if(opponentPostflopLoosenessFactor > 1) {
+            return opponentPostflopLoosenessFactor;
+        }
+        return 1;
     }
 }

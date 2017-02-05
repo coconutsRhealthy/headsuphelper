@@ -24,7 +24,7 @@ public class PostFlopRangeBuilder {
     private double opponentTotalBetSize;
     private double potSize;
     private double bigBlind;
-    private int numberOfHandsPlayed;
+    private double handsHumanOopFacingPreflop2bet;
     private Set<Card> knownGameCards;
     private double opponentFormerTotalCallAmount;
 
@@ -53,7 +53,7 @@ public class PostFlopRangeBuilder {
         potSize = computerGame.getPotSize();
         bigBlind = computerGame.getBigBlind();
         knownGameCards = computerGame.getKnownGameCards();
-        numberOfHandsPlayed = computerGame.getNumberOfHandsPlayed();
+        handsHumanOopFacingPreflop2bet = computerGame.getHandsHumanOopFacingPreflop2bet();
         opponentFormerTotalCallAmount = computerGame.getOpponentFormerTotalCallAmount();
 
         this.rangeBuilder = rangeBuilder;
@@ -234,8 +234,8 @@ public class PostFlopRangeBuilder {
 
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.5, 0.4);
-        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.5, 0.5 +
-                rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+        Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.5,
+                (0.5 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -269,7 +269,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7, 0.25);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7,
-                0.25 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.25 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -315,7 +315,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.4, 0.7);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.4,
-                0.7 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.7 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -355,7 +355,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.6, 0.37);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.6,
-                0.45 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed) );
+                (0.45 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -389,7 +389,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.84, 0.18);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.84,
-                0.24 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.24 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -427,7 +427,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7, 0.5);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.7,
-                0.6 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.6 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -461,7 +461,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8, 0.3);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8,
-                0.5 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.5 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -495,7 +495,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8, 0.18);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.8,
-                0.24 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.24 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -533,7 +533,7 @@ public class PostFlopRangeBuilder {
         //air
         //Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.75, 0.5);
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.75,
-                0.6 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.6 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
@@ -566,7 +566,7 @@ public class PostFlopRangeBuilder {
 
         //air
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.82,
-                0.35 + rangeBuilder.getOpponentLoosenessFactor(numberOfHandsPlayed));
+                (0.35 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
         above70bbAbove50percent.addAll(valueRange);
