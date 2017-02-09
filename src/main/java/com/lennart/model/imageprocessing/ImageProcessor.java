@@ -28,7 +28,7 @@ public class ImageProcessor {
         try {
             BufferedImage screenCapture = new Robot().createScreenCapture(rectangle);
             //ImageIO.write(screenCapture, "bmp", new File("D:/screenshot.bmp"));
-            ImageIO.write(screenCapture, "png", new File("D:/screenshot.png"));
+            ImageIO.write(screenCapture, "png", new File("/Users/LennartMac/Desktop/screenshot.png"));
         } catch (IOException | AWTException e) {
             System.out.println("Exception occured in createScreenShot: " + e.getMessage());
         }
@@ -84,8 +84,9 @@ public class ImageProcessor {
     public static void main(String[] args) {
         ImageProcessor imageProcessor = new ImageProcessor();
 
-        imageProcessor.createPartialSreenShot(310, 300, 300, 63);
-        String string = imageProcessor.getStringFromImageWithTesseract("D:/screenshot.png");
+        //imageProcessor.createPartialSreenShot(310, 300, 300, 63);
+        imageProcessor.createPartialSreenShot(1050, 204, 140, 80);
+        String string = imageProcessor.getStringFromImageWithTesseract("/Users/LennartMac/Desktop/screenshot.png");
 
         System.out.println(string);
     }
