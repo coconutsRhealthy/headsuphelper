@@ -758,7 +758,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
                                 if(combo1.contains(boardKickerCard)) {
                                     //als boardKickerCard boven laagste boardPairCard
                                     if(boardKickerCard > Collections.min(getRanksOfPairsOnBoard(board))) {
-                                        return 1;
+                                        return -1;
                                     }
 
                                     //als boardKickerCard onder laagste boardPairCard
