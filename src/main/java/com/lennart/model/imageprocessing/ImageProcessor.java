@@ -27,11 +27,28 @@ public class ImageProcessor {
 
         try {
             BufferedImage screenCapture = new Robot().createScreenCapture(rectangle);
-            //ImageIO.write(screenCapture, "bmp", new File("D:/screenshot.bmp"));
-            ImageIO.write(screenCapture, "png", new File("/Users/LennartMac/Desktop/screenshot.png"));
+            ImageIO.write(screenCapture, "png", new File("D:/screenshot.png"));
+            //ImageIO.write(screenCapture, "png", new File("/Users/LennartMac/Desktop/screenshot.png"));
+
+            zoomInImage(screenCapture.getWidth(), screenCapture.getHeight(), 3, screenCapture);
         } catch (IOException | AWTException e) {
             System.out.println("Exception occured in createScreenShot: " + e.getMessage());
         }
+    }
+
+    public BufferedImage getBufferedImageScreenShot(int x, int y, int width, int height) {
+        Point point = new Point(x, y);
+        Dimension dimension = new Dimension(width, height);
+        Rectangle rectangle = new Rectangle(point, dimension);
+
+        BufferedImage screenCapture = null;
+
+        try {
+            screenCapture = new Robot().createScreenCapture(rectangle);
+        } catch (AWTException e) {
+            System.out.println("Exception occured in createScreenShot: " + e.getMessage());
+        }
+        return screenCapture;
     }
 
     public int getIntRgbInScreenShot(int x, int y, String path) {
@@ -54,6 +71,22 @@ public class ImageProcessor {
         rgbList.add(color.getBlue());
 
         return rgbList;
+    }
+
+    public void zoomInImage(int imageWidth, int imageHeight, int zoomLevel, BufferedImage originalImage) {
+        int newImageWidth = imageWidth * zoomLevel;
+        int newImageHeight = imageHeight * zoomLevel;
+        BufferedImage resizedImage = new BufferedImage(newImageWidth , newImageHeight, 1);
+        Graphics2D g = resizedImage.createGraphics();
+        g.drawImage(originalImage, 0, 0, newImageWidth , newImageHeight , null);
+        g.dispose();
+
+        try {
+            ImageIO.write(resizedImage, "png", new File("D:/zoomedScreenshot.png"));
+        } catch (Exception e) {
+
+        }
+
     }
 
     public String getStringFromImageWithTesseract(String pathOfImage) {
@@ -85,9 +118,10 @@ public class ImageProcessor {
         ImageProcessor imageProcessor = new ImageProcessor();
 
         //imageProcessor.createPartialSreenShot(310, 300, 300, 63);
-        imageProcessor.createPartialSreenShot(1050, 204, 140, 80);
-        String string = imageProcessor.getStringFromImageWithTesseract("/Users/LennartMac/Desktop/screenshot.png");
+        imageProcessor.createPartialSreenShot(0, 0, 100, 100);
 
-        System.out.println(string);
+        //String string = imageProcessor.getStringFromImageWithTesseract("/Users/LennartMac/Desktop/screenshot.png");
+
+        //System.out.println(string);
     }
 }
