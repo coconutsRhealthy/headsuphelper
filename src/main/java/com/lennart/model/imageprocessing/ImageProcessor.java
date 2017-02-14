@@ -7,6 +7,7 @@ import org.bytedeco.javacpp.tesseract;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static org.bytedeco.javacpp.lept.pixDestroy;
 import static org.bytedeco.javacpp.lept.pixRead;
+import static org.bytedeco.javacpp.lept.pixReadMem;
 
 /**
  * Created by LPO21630 on 7-2-2017.
@@ -108,6 +110,34 @@ public class ImageProcessor {
         return string;
     }
 
+    public String getStringFromBufferedImageWithTesseract(BufferedImage bufferedImage) throws IOException {
+        BytePointer outText;
+
+        tesseract.TessBaseAPI api = new tesseract.TessBaseAPI();
+        if (api.Init("src/main/java/com/lennart/model/imageprocessing/tessdata", "ENG") != 0) {
+            System.err.println("Could not initialize tesseract.");
+            System.exit(1);
+        }
+
+        lept.PIX image = convertBufferedImageToPIX(bufferedImage);
+        api.SetImage(image);
+        outText = api.GetUTF8Text();
+        String string = outText.getString();
+        api.End();
+        outText.deallocate();
+        pixDestroy(image);
+
+        return string;
+    }
+
+    private lept.PIX convertBufferedImageToPIX(BufferedImage bufferedImage) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage, "tiff", baos);
+        byte[] bytes = baos.toByteArray();
+
+        return pixReadMem(bytes, bytes.length);
+    }
+
     private void saveBufferedImage(BufferedImage bufferedImage, String path) throws IOException {
         ImageIO.write(bufferedImage, "png", new File(path));
     }
@@ -156,9 +186,7 @@ public class ImageProcessor {
 
     public static void main(String[] args) throws Exception {
         ImageProcessor imageProcessor = new ImageProcessor();
-
-        imageProcessor.createPotSizeScreenShot();
-        String s = imageProcessor.getStringFromImageWithTesseract("/Users/LennartMac/Desktop/potSize.png");
-        System.out.println(s);
+        BufferedImage b = imageProcessor.getBufferedImageScreenShot(5, 75, 120, 40);
+        System.out.println(imageProcessor.getStringFromBufferedImageWithTesseract(b));
     }
 }
