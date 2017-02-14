@@ -209,6 +209,53 @@ public class ImageProcessor {
         saveBufferedImage(potSizeScreenShot, path);
     }
 
+    private BufferedImage getTopPlayerUserNameImage() throws IOException {
+        int x = 486;
+        int y = 187;
+        int width = 115;
+        int height = 27;
+
+        return getBufferedImageScreenShot(x, y, width, height);
+    }
+
+    private BufferedImage getTopPlayerStackImage() throws IOException {
+        int x = 496;
+        int y = 223;
+        int width = 95;
+        int height = 25;
+
+        return getBufferedImageScreenShot(x, y, width, height);
+    }
+
+    private BufferedImage getPotSizeImage() throws IOException{
+        int x = 440;
+        int y = 327;
+        int width = 130;
+        int height = 25;
+
+        BufferedImage potSizeScreenShot = getBufferedImageScreenShot(x, y, width, height);
+        return zoomInImage(potSizeScreenShot, 2);
+    }
+
+    private BufferedImage getTopPlayerBetSizeImage() throws IOException {
+        int x = 444;
+        int y = 266;
+        int width = 65;
+        int height = 17;
+
+        BufferedImage topPlayerBetSize = getBufferedImageScreenShot(x, y, width, height);
+        return zoomInImage(topPlayerBetSize, 2);
+    }
+
+    private BufferedImage getBottomPlayerStackImage() throws IOException {
+        int x = 505;
+        int y = 640;
+        int width = 85;
+        int height = 25;
+
+        return getBufferedImageScreenShot(x, y, width, height);
+    }
+
     public static void main(String[] args) throws Exception {
         ImageProcessor imageProcessor = new ImageProcessor();
         BufferedImage b = imageProcessor.getBufferedImageScreenShot(5, 75, 120, 40);
