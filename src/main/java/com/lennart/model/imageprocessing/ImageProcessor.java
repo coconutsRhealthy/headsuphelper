@@ -7,6 +7,9 @@ import org.bytedeco.javacpp.tesseract;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.LookupOp;
+import java.awt.image.ShortLookupTable;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -85,7 +88,7 @@ public class ImageProcessor {
         return resizedImage;
     }
 
-    public String getStringFromImageWithTesseract(String pathOfImage) {
+    public String getStringFromSavedImageWithTesseract(String pathOfImage) {
         BytePointer outText;
 
         tesseract.TessBaseAPI api = new tesseract.TessBaseAPI();
@@ -136,6 +139,28 @@ public class ImageProcessor {
         byte[] bytes = baos.toByteArray();
 
         return pixReadMem(bytes, bytes.length);
+    }
+
+    private BufferedImage makeBufferedImageBlackAndWhite(BufferedImage bufferedImage) {
+        BufferedImage blackAndWhite = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(),
+                BufferedImage.TYPE_BYTE_GRAY);
+
+        Graphics2D g = blackAndWhite.createGraphics();
+        g.drawImage(bufferedImage, 0, 0, null);
+        return blackAndWhite;
+    }
+
+    private BufferedImage invertBufferedImageColours(BufferedImage bufferedImage) {
+       short[] invertTable = new short[256];
+
+       for (int i = 0; i < 256; i++) {
+           invertTable[i] = (short) (255 - i);
+       }
+
+       BufferedImage invertedColors = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+       BufferedImageOp invertOp = new LookupOp(new ShortLookupTable(0, invertTable), null);
+       return invertOp.filter(bufferedImage, invertedColors);
     }
 
     private void saveBufferedImage(BufferedImage bufferedImage, String path) throws IOException {
