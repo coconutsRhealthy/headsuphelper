@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.bytedeco.javacpp.lept.pixDestroy;
 import static org.bytedeco.javacpp.lept.pixRead;
@@ -256,9 +257,164 @@ public class ImageProcessor {
         return getBufferedImageScreenShot(x, y, width, height);
     }
 
+    private String getFlopCard1Rank(String street) throws IOException {
+        int x = 0;
+        int y = 0;
+        int width = 0;
+        int height = 0;
+
+        if(street.equals("flop")) {
+
+        } else if(street.equals("turn")) {
+
+        } else if(street.equals("river")) {
+            x = 325;
+            y = 360;
+            width = 16;
+            height = 19;
+        }
+        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
+        return getStringFromBufferedImageWithTesseract(b);
+    }
+
+    private String getFlopCard2Rank(String street) throws IOException {
+        int x = 0;
+        int y = 0;
+        int width = 0;
+        int height = 0;
+
+        if(street.equals("flop")) {
+
+        } else if(street.equals("turn")) {
+
+        } else if(street.equals("river")) {
+            x = 394;
+            y = 360;
+            width = 16;
+            height = 19;
+        }
+        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
+        return getStringFromBufferedImageWithTesseract(b);
+    }
+
+    private String getFlopCard3Rank(String street) throws IOException {
+        int x = 0;
+        int y = 0;
+        int width = 0;
+        int height = 0;
+
+        if(street.equals("flop")) {
+
+        } else if(street.equals("turn")) {
+
+        } else if(street.equals("river")) {
+            x = 463;
+            y = 360;
+            width = 16;
+            height = 19;
+        }
+        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
+        return getStringFromBufferedImageWithTesseract(b);
+    }
+
+    private String getTurnCardRank(String street) throws IOException {
+        int x = 0;
+        int y = 0;
+        int width = 0;
+        int height = 0;
+
+        if(street.equals("turn")) {
+
+        } else if(street.equals("river")) {
+            x = 532;
+            y = 360;
+            width = 16;
+            height = 19;
+        }
+        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
+        return getStringFromBufferedImageWithTesseract(b);
+    }
+
+
+    private String getRiverCardRank() throws IOException {
+        int x = 601;
+        int y = 360;
+        int width = 16;
+        int height = 40;
+
+        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
+        return getStringFromBufferedImageWithTesseract(b);
+    }
+
+    private char getFlopCard1Suit() throws AWTException {
+        int x = 334;
+        int y = 388;
+
+        Robot robot = new Robot();
+        return compareColors(robot.getPixelColor(x, y));
+    }
+
+    private char getFlopCard2Suit() throws AWTException {
+        int x = 403;
+        int y = 389;
+
+        Robot robot = new Robot();
+        return compareColors(robot.getPixelColor(x, y));
+    }
+
+    private char getFlopCard3Suit() throws AWTException {
+        int x = 472;
+        int y = 389;
+
+        Robot robot = new Robot();
+        return compareColors(robot.getPixelColor(x, y));
+    }
+
+    private char getTurnCardSuit() throws AWTException {
+        int x = 541;
+        int y = 388;
+
+        Robot robot = new Robot();
+        return compareColors(robot.getPixelColor(x, y));
+    }
+
+    private char getRiverCardSuit() throws AWTException {
+        int x = 611;
+        int y = 388;
+
+        Robot robot = new Robot();
+        return compareColors(robot.getPixelColor(x, y));
+    }
+
+    private char compareColors(Color color) {
+        Color clubs = new Color(40, 122, 4);
+        Color spades = new Color(1, 1, 1);
+        Color hearts = new Color(200, 0, 27);
+
+        if(color.equals(clubs)) {
+            return 'c';
+        } else if(color.equals(spades)) {
+            return 's';
+        } else if(color.equals(hearts)) {
+            return 'h';
+        }
+        return 0;
+    }
+
+
+
     public static void main(String[] args) throws Exception {
         ImageProcessor imageProcessor = new ImageProcessor();
-        BufferedImage b = imageProcessor.getBufferedImageScreenShot(5, 75, 120, 40);
-        System.out.println(imageProcessor.getStringFromBufferedImageWithTesseract(b));
+
+        TimeUnit.SECONDS.sleep(3);
+
+        double x = imageProcessor.getMouseXcoordinate();
+        double y = imageProcessor.getMouseYcoordinate();
+
+        System.out.println(x);
+        System.out.println(y);
+
+        Robot robot = new Robot();
+        Color c = robot.getPixelColor(541, 388);
     }
 }
