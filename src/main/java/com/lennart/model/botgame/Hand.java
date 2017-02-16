@@ -28,6 +28,29 @@ public class Hand {
 
     private GameVariablesFiller gameVariablesFiller;
 
+    //**required variables**
+    //
+    //private List<Card> computerHoleCards;
+    //private List<Card> flopCards;
+    //private double bigBlind;
+    //private double computerStack;
+    //private double myTotalBetSize;
+    //private double computerTotalBetSize;
+    //private double potSize;
+    //private boolean computerIsButton;
+    //private Set<Card> knownGameCards;
+    //private String myAction;
+    //private List<Card> board;
+    //private Set<Set<Card>> opponentRange;
+    //private List<String> actionHistory;
+    //private double handsHumanOopFacingPreflop2bet;
+    //private double opponentPreCall2betStat;
+    //private double opponentPre3betStat;
+    //private boolean onlyCallRangeNeeded;
+    //private boolean opponentLastActionWasPreflop;
+    //private double opponentFormerTotalCallAmount;
+
+
     public Hand() {
         gameVariablesFiller = new GameVariablesFiller();
 
