@@ -1,7 +1,7 @@
 package com.lennart.model.boardevaluation.draws;
 
 import com.lennart.model.boardevaluation.FlushEvaluator;
-import com.lennart.model.pokergame.Card;
+import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;

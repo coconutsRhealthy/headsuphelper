@@ -1,6 +1,6 @@
 package com.lennart.model.rangebuilder.preflop;
 
-import com.lennart.model.pokergame.Card;
+import com.lennart.model.card.Card;
 
 import java.util.*;
 

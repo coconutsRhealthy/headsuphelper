@@ -1,7 +1,9 @@
-package com.lennart.model.pokergame;
+package com.lennart.model.computergame;
 
+import com.lennart.model.action.Action;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
+import com.lennart.model.card.Card;
 import org.apache.commons.math3.util.Precision;
 
 import java.util.*;

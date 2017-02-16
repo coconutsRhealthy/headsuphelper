@@ -1,7 +1,6 @@
 package com.lennart.model.rangebuilder.preflop.ip;
 
-import com.lennart.model.pokergame.Card;
-import com.lennart.model.rangebuilder.RangeBuilder;
+import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;

@@ -1,5 +1,7 @@
-package com.lennart.model.pokergame;
+package com.lennart.model.action.actionbuilders;
 
+import com.lennart.model.card.Card;
+import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;

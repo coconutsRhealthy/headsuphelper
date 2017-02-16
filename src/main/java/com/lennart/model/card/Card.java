@@ -1,6 +1,4 @@
-package com.lennart.model.pokergame;
-
-import com.lennart.model.boardevaluation.BoardEvaluator;
+package com.lennart.model.card;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,6 +1,6 @@
 //package com.lennart.model.rangebuilder.postflop;
 //
-//import com.lennart.model.pokergame.Card;
+//import com.lennart.model.card.Card;
 //import com.lennart.model.rangebuilder.RangeBuilder;
 //
 //import java.util.*;

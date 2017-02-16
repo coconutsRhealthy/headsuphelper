@@ -4,8 +4,8 @@ import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
-import com.lennart.model.pokergame.Card;
-import com.lennart.model.pokergame.ComputerGame;
+import com.lennart.model.card.Card;
+import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;

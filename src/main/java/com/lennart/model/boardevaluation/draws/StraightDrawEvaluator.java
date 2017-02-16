@@ -2,7 +2,7 @@ package com.lennart.model.boardevaluation.draws;
 
 import com.lennart.model.boardevaluation.ComboComparatorRankOnly;
 import com.lennart.model.boardevaluation.StraightEvaluator;
-import com.lennart.model.pokergame.Card;
+import com.lennart.model.card.Card;
 
 import java.util.*;
 

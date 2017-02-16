@@ -1,5 +1,6 @@
-package com.lennart.model.imageprocessing;
+package com.lennart.model.botgame.imageprocessing;
 
+import com.lennart.model.card.Card;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.lept;
 import org.bytedeco.javacpp.tesseract;
@@ -26,7 +27,71 @@ import static org.bytedeco.javacpp.lept.pixReadMem;
  */
 public class ImageProcessor {
 
-    public void createPartialSreenShot(int x, int y, int width, int height, String path) {
+    public double getPotSizeFromImage() {
+        return 0;
+    }
+
+    public double getOpponentStackFromImage() {
+        return 0;
+    }
+
+    public double getBotStackFromImage() {
+        return 0;
+    }
+
+    public double getOpponentTotalBetSizeFromImage() {
+        return 0;
+    }
+
+    public double getBotTotalBetSizeFromImage() {
+        return 0;
+    }
+
+    public double getSmallBlindFromImge() {
+        return 0;
+    }
+
+    public double getBigBlindFromImage() {
+        return 0;
+    }
+
+    public boolean isBotButtonFromImage() {
+        return false;
+    }
+
+    public String getOpponentPlayerNameFromImage() {
+        return null;
+    }
+
+    public Card getBotHoleCard1FromImage() {
+        return null;
+    }
+
+    public Card getBotHoleCard2FromImage() {
+        return null;
+    }
+
+    public Card getFlopCard1FromImage() {
+        return null;
+    }
+
+    public Card getFlopCard2FromImage() {
+        return null;
+    }
+
+    public Card getFlopCard3FromImage() {
+        return null;
+    }
+
+    public Card getTurnCardFromImage() {
+        return null;
+    }
+
+    public Card getRiverCardFromImage() {
+        return null;
+    }
+
+    private void createPartialSreenShot(int x, int y, int width, int height, String path) {
         Point point = new Point(x, y);
         Dimension dimension = new Dimension(width, height);
         Rectangle rectangle = new Rectangle(point, dimension);
@@ -42,7 +107,7 @@ public class ImageProcessor {
         }
     }
 
-    public BufferedImage getBufferedImageScreenShot(int x, int y, int width, int height) {
+    private BufferedImage getBufferedImageScreenShot(int x, int y, int width, int height) {
         Point point = new Point(x, y);
         Dimension dimension = new Dimension(width, height);
         Rectangle rectangle = new Rectangle(point, dimension);
@@ -57,7 +122,7 @@ public class ImageProcessor {
         return screenCapture;
     }
 
-    public int getIntRgbInScreenShot(int x, int y, String path) {
+    private int getIntRgbInScreenShot(int x, int y, String path) {
         BufferedImage bufferedImage = null;
         try {
             bufferedImage = ImageIO.read(new File(path));
@@ -67,7 +132,7 @@ public class ImageProcessor {
         return bufferedImage.getRGB(x, y);
     }
 
-    public List<Integer> getRgbInScreenShot(int x, int y, String path) {
+    private List<Integer> getRgbInScreenShot(int x, int y, String path) {
         List<Integer> rgbList = new ArrayList<>();
         int intRgb = getIntRgbInScreenShot(x, y, path);
         Color color = new Color(intRgb);
@@ -79,7 +144,7 @@ public class ImageProcessor {
         return rgbList;
     }
 
-    public BufferedImage zoomInImage(BufferedImage originalImage, int zoomLevel) {
+    private BufferedImage zoomInImage(BufferedImage originalImage, int zoomLevel) {
         int newImageWidth = originalImage.getWidth() * zoomLevel;
         int newImageHeight = originalImage.getHeight() * zoomLevel;
         BufferedImage resizedImage = new BufferedImage(newImageWidth , newImageHeight, 1);
@@ -89,7 +154,7 @@ public class ImageProcessor {
         return resizedImage;
     }
 
-    public String getStringFromSavedImageWithTesseract(String pathOfImage) {
+    private String getStringFromSavedImageWithTesseract(String pathOfImage) {
         BytePointer outText;
 
         tesseract.TessBaseAPI api = new tesseract.TessBaseAPI();
@@ -114,7 +179,7 @@ public class ImageProcessor {
         return string;
     }
 
-    public String getStringFromBufferedImageWithTesseract(BufferedImage bufferedImage) throws IOException {
+    private String getStringFromBufferedImageWithTesseract(BufferedImage bufferedImage) throws IOException {
         BytePointer outText;
 
         tesseract.TessBaseAPI api = new tesseract.TessBaseAPI();
@@ -168,11 +233,11 @@ public class ImageProcessor {
         ImageIO.write(bufferedImage, "png", new File(path));
     }
 
-    public double getMouseXcoordinate() {
+    private double getMouseXcoordinate() {
         return MouseInfo.getPointerInfo().getLocation().getX();
     }
 
-    public double getMouseYcoordinate() {
+    private double getMouseYcoordinate() {
         return MouseInfo.getPointerInfo().getLocation().getY();
     }
 
@@ -400,8 +465,6 @@ public class ImageProcessor {
         }
         return 0;
     }
-
-
 
     public static void main(String[] args) throws Exception {
         ImageProcessor imageProcessor = new ImageProcessor();
