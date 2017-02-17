@@ -8,14 +8,12 @@ import com.lennart.model.botgame.imageprocessing.ImageProcessor;
  */
 public class GameVariablesFiller {
     private double potSize;
-    private double opponentStack;
     private double botStack;
-    private double opponentTotalBetSize;
-    private double botTotalBetSize;
+    private double opponentStack;
     private double smallBlind;
     private double bigBlind;
 
-    private boolean botIsButton;
+    private Boolean botIsButton;
     private String opponentPlayerName;
 
     private Card botHoleCard1;
@@ -30,56 +28,115 @@ public class GameVariablesFiller {
 
     public GameVariablesFiller() {
         imageProcessor = new ImageProcessor();
-
-        potSize = getPotSize(true);
-        botStack = getBotStack(true);
-        opponentStack = getOpponentStack(true);
-        opponentPlayerName = getOpponentPlayerName(true);
-        botHoleCard1 = getBotHoleCard1(true);
-        botHoleCard2 = getBotHoleCard2(true);
-
-        smallBlind = potSize * (1 /3);
-        bigBlind = potSize * (2 / 3);
+        setPotSize();
+        setBotStack();
+        setOpponentStack();
+        setBotHoleCard1();
+        setBotHoleCard2();
+        setSmallBlind();
+        setBigBlind();
+        setBotIsButton();
+        setOpponentPlayerName();
     }
 
-    public double getPotSize(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            potSize = imageProcessor.getPotSizeFromImage();
-            return potSize;
+    public void initializeAndRefreshRelevantVariables(String street) {
+        setPotSize();
+        setBotStack();
+        setOpponentStack();
+        setBotIsButton();
+
+        if(opponentPlayerName == null) {
+            setOpponentPlayerName();
         }
+        if(street.equals("flop")) {
+            if (flopCard1 == null) {
+                setFlopCard1();
+            }
+            if (flopCard2 == null) {
+                setFlopCard2();
+            }
+            if (flopCard3 == null) {
+                setFlopCard3();
+            }
+        }
+        if(street.equals("turn")) {
+            if(turnCard == null) {
+                setTurnCard();
+            }
+        }
+        if(street.equals("river")) {
+            if(riverCard == null) {
+                setRiverCard();
+            }
+        }
+    }
+
+    private void setPotSize() {
+        potSize = imageProcessor.getPotSizeFromImage();
+    }
+
+    private void setBotStack() {
+        botStack = imageProcessor.getBotStackFromImage();
+    }
+
+    private void setOpponentStack() {
+        opponentStack = imageProcessor.getOpponentStackFromImage();
+    }
+
+    private void setSmallBlind() {
+        smallBlind = imageProcessor.getSmallBlindFromImage();
+    }
+
+    private void setBigBlind() {
+        bigBlind = imageProcessor.getBigBlindFromImage();
+    }
+
+    private void setBotIsButton() {
+        botIsButton = imageProcessor.isBotButtonFromImage();
+    }
+
+    private void setOpponentPlayerName() {
+        opponentPlayerName = imageProcessor.getOpponentPlayerNameFromImage();
+    }
+
+    private void setBotHoleCard1() {
+        botHoleCard1 = imageProcessor.getBotHoleCard1FromImage();
+    }
+
+    private void setBotHoleCard2() {
+        botHoleCard2 = imageProcessor.getBotHoleCard2FromImage();
+    }
+
+    private void setFlopCard1() {
+        flopCard1 = imageProcessor.getFlopCard1FromImage();
+    }
+
+    private void setFlopCard2() {
+        flopCard2 = imageProcessor.getFlopCard2FromImage();
+    }
+
+    private void setFlopCard3() {
+        flopCard3 = imageProcessor.getFlopCard3FromImage();
+    }
+
+    private void setTurnCard() {
+        turnCard = imageProcessor.getTurnCardFromImage();
+    }
+
+    private void setRiverCard() {
+        riverCard = imageProcessor.getRiverCardFromImage();
+    }
+
+    public double getPotSize() {
         return potSize;
     }
 
-    public double getOpponentStack(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            opponentStack = imageProcessor.getOpponentStackFromImage();
-            return opponentStack;
-        }
-        return opponentStack;
-    }
-
-    public double getBotStack(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            botStack = imageProcessor.getBotStackFromImage();
-            return botStack;
-        }
+    public double getBotStack() {
         return botStack;
     }
 
-    public double getOpponentTotalBetSize(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            opponentTotalBetSize = imageProcessor.getOpponentTotalBetSizeFromImage();
-            return opponentTotalBetSize;
-        }
-        return opponentTotalBetSize;
-    }
-
-    public double getBotTotalBetSize(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            botTotalBetSize = imageProcessor.getBotTotalBetSizeFromImage();
-            return botTotalBetSize;
-        }
-        return botTotalBetSize;
+    public double getOpponentStack() {
+        return opponentStack;
     }
 
     public double getSmallBlind() {
@@ -90,75 +147,39 @@ public class GameVariablesFiller {
         return bigBlind;
     }
 
-    public boolean isBotIsButton(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            botIsButton = imageProcessor.isBotButtonFromImage();
-            return botIsButton;
-        }
+    public Boolean isBotIsButton() {
         return botIsButton;
     }
 
-    public String getOpponentPlayerName(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            opponentPlayerName = imageProcessor.getOpponentPlayerNameFromImage();
-            return opponentPlayerName;
-        }
+    public String getOpponentPlayerName() {
         return opponentPlayerName;
     }
 
-    public Card getBotHoleCard1(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            botHoleCard1 = imageProcessor.getBotHoleCard1FromImage();
-            return botHoleCard1;
-        }
+    public Card getBotHoleCard1() {
         return botHoleCard1;
     }
 
-    public Card getBotHoleCard2(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            botHoleCard2 = imageProcessor.getBotHoleCard2FromImage();
-            return botHoleCard2;
-        }
+    public Card getBotHoleCard2() {
         return botHoleCard2;
     }
 
-    public Card getFlopCard1(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            flopCard1 = imageProcessor.getFlopCard1FromImage();
-            return flopCard1;
-        }
+    public Card getFlopCard1() {
         return flopCard1;
     }
 
-    public Card getFlopCard2(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            flopCard2 = imageProcessor.getFlopCard2FromImage();
-            return flopCard2;
-        }
+    public Card getFlopCard2() {
         return flopCard2;
     }
 
-    public Card getFlopCard3(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            flopCard3 = imageProcessor.getFlopCard3FromImage();
-            return flopCard3;
-        }
+    public Card getFlopCard3() {
         return flopCard3;
     }
 
-    public Card getTurnCard(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            turnCard = imageProcessor.getTurnCardFromImage();
-            return turnCard;
-        }
+    public Card getTurnCard() {
         return turnCard;
     }
 
-    public Card getRiverCard(boolean initializeOrRefreshNeeded) {
-        if(initializeOrRefreshNeeded) {
-            riverCard = imageProcessor.getRiverCardFromImage();
-            return riverCard;
-        }
+    public Card getRiverCard() {
         return riverCard;
     }
 }

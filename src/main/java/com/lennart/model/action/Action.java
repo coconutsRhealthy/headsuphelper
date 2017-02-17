@@ -2,6 +2,7 @@ package com.lennart.model.action;
 
 import com.lennart.model.action.actionbuilders.PostFlopActionBuilder;
 import com.lennart.model.action.actionbuilders.PreflopActionBuilder;
+import com.lennart.model.botgame.Hand;
 import com.lennart.model.card.Card;
 import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.rangebuilder.RangeBuilder;
@@ -32,6 +33,10 @@ public class Action {
         } else {
             getAndProcessPostFlopAction(computerGame);
         }
+    }
+
+    public Action(Hand hand) {
+
     }
 
     public double getSizing() {

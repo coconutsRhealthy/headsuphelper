@@ -47,7 +47,7 @@ public class ImageProcessor {
         return 0;
     }
 
-    public double getSmallBlindFromImge() {
+    public double getSmallBlindFromImage() {
         return 0;
     }
 
