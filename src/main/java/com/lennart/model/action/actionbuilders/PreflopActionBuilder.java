@@ -1,7 +1,7 @@
 package com.lennart.model.action.actionbuilders;
 
+import com.lennart.model.action.Actionable;
 import com.lennart.model.card.Card;
-import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;
@@ -24,19 +24,19 @@ public class PreflopActionBuilder {
         preflopRangeBuilderUtil = rangeBuilder.getPreflopRangeBuilder().getPreflopRangeBuilderUtil();
     }
 
-    public String getAction(ComputerGame computerGame) {
+    public String getAction(Actionable actionable) {
         String action = null;
 
-        double bbOpponentTotalBetSize = computerGame.getMyTotalBetSize() / computerGame.getBigBlind();
+        double bbOpponentTotalBetSize = actionable.getOpponentTotalBetSize() / actionable.getBigBlind();
 
         if(bbOpponentTotalBetSize == 1) {
-            action = get05betF1bet(computerGame);
+            action = get05betF1bet(actionable);
         } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
-            action = get1betF2bet(computerGame);
+            action = get1betF2bet(actionable);
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
-            action = get2betF3bet(computerGame);
+            action = get2betF3bet(actionable);
         } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 22) {
-            action = get3betF4bet(computerGame);
+            action = get3betF4bet(actionable);
         } else {
             //5bet
         }
@@ -44,33 +44,32 @@ public class PreflopActionBuilder {
         return action;
     }
 
-    public double getSize(ComputerGame computerGame) {
+    public double getSize(Actionable actionable) {
         double size;
-        double bigBlind = computerGame.getBigBlind();
-        double potSizeInBb = computerGame.getPotSize() / bigBlind;
-        double computerTotalBetSizeInBb = computerGame.getComputerTotalBetSize() / bigBlind;
-        double opponentTotalBetSizeInBb = computerGame.getMyTotalBetSize() / bigBlind;
+        double bigBlind = actionable.getBigBlind();
+        double potSizeInBb = actionable.getPotSize() / bigBlind;
+        double computerTotalBetSizeInBb = actionable.getBotTotalBetSize() / bigBlind;
+        double opponentTotalBetSizeInBb = actionable.getOpponentTotalBetSize() / bigBlind;
 
         double potSizePlusAllBetsInBb = potSizeInBb + computerTotalBetSizeInBb + opponentTotalBetSizeInBb;
 
         if(potSizePlusAllBetsInBb == 1.5) {
-            size = 2.5 * computerGame.getBigBlind();
+            size = 2.5 * actionable.getBigBlind();
         } else if(potSizePlusAllBetsInBb > 1.5 && potSizePlusAllBetsInBb <= 4) {
-            size = 3.2 * computerGame.getMyTotalBetSize();
+            size = 3.2 * actionable.getOpponentTotalBetSize();
         } else if(potSizePlusAllBetsInBb > 4 && potSizePlusAllBetsInBb <= 12) {
-            size = 2.25 * computerGame.getMyTotalBetSize();
+            size = 2.25 * actionable.getOpponentTotalBetSize();
         } else {
-            size = computerGame.getComputerStack() - computerGame.getComputerTotalBetSize();
+            size = actionable.getBotStack() - actionable.getBotTotalBetSize();
         }
         return size;
     }
 
-    private String get05betF1bet(ComputerGame computerGame) {
+    private String get05betF1bet(Actionable actionable) {
         Map<Integer, Set<Card>> comboMap100Percent;
         Map<Integer, Set<Card>> comboMap5Percent;
 
-        //Game.removeHoleCardsFromKnownGameCards();
-        computerGame.removeHoleCardsFromKnownGameCards();
+        actionable.removeHoleCardsFromKnownGameCards();
 
         _2betRangeBuilder x2BetRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
 
@@ -83,7 +82,7 @@ public class PreflopActionBuilder {
         double percentageBet = 0;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
+        holeCardsAsSet.addAll(actionable.getBotHoleCards());
 
         for (Map.Entry<Integer, Set<Card>> entry : comboMap100Percent.entrySet()) {
             if(entry.getValue().equals(holeCardsAsSet)) {
@@ -101,20 +100,17 @@ public class PreflopActionBuilder {
             }
         }
 
-        //Game.addHoleCardsToKnownGameCards();
-        computerGame.addHoleCardsToKnownGameCards();
+        actionable.addHoleCardsToKnownGameCards();
 
         if(Math.random() <= percentageBet) {
-            //return "2bet";
             return "raise";
         } else {
             return "fold";
         }
     }
 
-    private String get2betF3bet(ComputerGame computerGame) {
-        //Game.removeHoleCardsFromKnownGameCards();
-        computerGame.removeHoleCardsFromKnownGameCards();
+    private String get2betF3bet(Actionable actionable) {
+        actionable.removeHoleCardsFromKnownGameCards();
 
         Call3betRangeBuilder call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
         _4betRangeBuilder x4BetRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);
@@ -162,7 +158,7 @@ public class PreflopActionBuilder {
         double percentage4bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
+        holeCardsAsSet.addAll(actionable.getBotHoleCards());
 
         percentageCall3bet = setPercentage(call3bet_comboMap100Percent, holeCardsAsSet, 1);
 
@@ -218,24 +214,20 @@ public class PreflopActionBuilder {
             percentage4bet = setPercentage(x4bet_comboMap6Percent, holeCardsAsSet, 0.06);
         }
 
-        //Game.addHoleCardsToKnownGameCards();
-        computerGame.addHoleCardsToKnownGameCards();
+        actionable.addHoleCardsToKnownGameCards();
 
         double random = Math.random();
         if(random <= 1 - percentage4bet - percentageCall3bet) {
             return "fold";
         } else if ((random <= 1 - percentage4bet) && (random >= 1 - percentage4bet - percentageCall3bet)){
-            //return "call3bet";
             return "call";
         } else {
-            //return "4bet";
             return "raise";
         }
     }
 
-    private String get1betF2bet(ComputerGame computerGame) {
-        //Game.removeHoleCardsFromKnownGameCards();
-        computerGame.removeHoleCardsFromKnownGameCards();
+    private String get1betF2bet(Actionable actionable) {
+        actionable.removeHoleCardsFromKnownGameCards();
 
         Call2betRangeBuilder call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
         _3betRangeBuilder x3BetRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
@@ -276,7 +268,7 @@ public class PreflopActionBuilder {
         double percentage3bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
+        holeCardsAsSet.addAll(actionable.getBotHoleCards());
 
         percentageCall2bet = setPercentage(call2bet_comboMap90Percent, holeCardsAsSet, 0.90);
 
@@ -323,24 +315,20 @@ public class PreflopActionBuilder {
             percentage3bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
 
-        //Game.addHoleCardsToKnownGameCards();
-        computerGame.addHoleCardsToKnownGameCards();
+        actionable.addHoleCardsToKnownGameCards();
 
         double random = Math.random();
         if(random <= 1 - percentage3bet - percentageCall2bet) {
             return "fold";
         } else if ((random <= 1 - percentage3bet) && (random >= 1 - percentage3bet - percentageCall2bet)){
-            //return "Call2bet";
             return "call";
         } else {
-            //return "3bet";
             return "raise";
         }
     }
 
-    private String get3betF4bet(ComputerGame computerGame) {
-        //Game.removeHoleCardsFromKnownGameCards();
-        computerGame.removeHoleCardsFromKnownGameCards();
+    private String get3betF4bet(Actionable actionable) {
+        actionable.removeHoleCardsFromKnownGameCards();
 
         Call4betRangeBuilder call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
 
@@ -365,7 +353,7 @@ public class PreflopActionBuilder {
         double percentage5bet = 0;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(computerGame.getComputerHoleCards());
+        holeCardsAsSet.addAll(actionable.getBotHoleCards());
 
         percentageCall4bet = setPercentage(call4bet_comboMap100Percent, holeCardsAsSet, 1.0);
 
@@ -390,17 +378,14 @@ public class PreflopActionBuilder {
 
         //nog 5bet hier//
 
-        //Game.addHoleCardsToKnownGameCards();
-        computerGame.addHoleCardsToKnownGameCards();
+        actionable.addHoleCardsToKnownGameCards();
 
         double random = Math.random();
         if(random <= 1 - percentage5bet - percentageCall4bet) {
             return "fold";
         } else if ((random <= 1 - percentage5bet) && (random >= 1 - percentage5bet - percentageCall4bet)){
-            //return "call4bet";
             return "call";
         } else {
-            //return "5bet";
             return "raise";
         }
     }

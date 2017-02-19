@@ -1,13 +1,12 @@
 package com.lennart.model.rangebuilder;
 
+import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
-import com.lennart.model.botgame.BotHand;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.rangebuilder.postflop.PostFlopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
 
@@ -45,21 +44,21 @@ public class RangeBuilder {
     private double opponentPreCall2betStat;
     private double opponentPre3betStat;
 
-    public RangeBuilder(ComputerGame computerGame) {
-        holeCards = computerGame.getComputerHoleCards();
-        board = computerGame.getBoard();
-        knownGameCards = computerGame.getKnownGameCards();
-        opponentPreCall2betStat = computerGame.getOpponentPreCall2betStat();
-        opponentPre3betStat = computerGame.getOpponentPre3betStat();
-        opponentLastActionWasPreflop = computerGame.isOpponentLastActionWasPreflop();
+    public RangeBuilder(RangeBuildable rangeBuildable) {
+        holeCards = rangeBuildable.getBotHoleCards();
+        board = rangeBuildable.getBoard();
+        knownGameCards = rangeBuildable.getKnownGameCards();
+        opponentPreCall2betStat = rangeBuildable.getOpponentPreCall2betStat();
+        opponentPre3betStat = rangeBuildable.getOpponentPre3betStat();
+        opponentLastActionWasPreflop = rangeBuildable.isOpponentLastActionWasPreflop();
 
-        preflopRangeBuilder = new PreflopRangeBuilder(computerGame, this);
+        preflopRangeBuilder = new PreflopRangeBuilder(rangeBuildable, this);
 
         if(board != null) {
-            previousOpponentRange = computerGame.getOpponentRange();
+            previousOpponentRange = rangeBuildable.getOpponentRange();
             boardEvaluator = new BoardEvaluator(board);
             sortedCombos = boardEvaluator.getSortedCombosNew();
-            postFlopRangeBuilder = new PostFlopRangeBuilder(computerGame, boardEvaluator, this);
+            postFlopRangeBuilder = new PostFlopRangeBuilder(rangeBuildable, boardEvaluator, this);
             flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
             straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
             highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
@@ -67,11 +66,7 @@ public class RangeBuilder {
         }
     }
 
-    public RangeBuilder(BotHand botHand) {
-
-    }
-
-    public Set<Set<Card>> getOpponentRange(ComputerGame computerGame) {
+    public Set<Set<Card>> getOpponentRange(Actionable actionable) {
         Set<Set<Card>> opponentRange;
 
         if(opponentLastActionWasPreflop) {
@@ -79,7 +74,7 @@ public class RangeBuilder {
         } else {
             opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);
         }
-        computerGame.setOpponentRange(opponentRange);
+        actionable.setOpponentRange(opponentRange);
 
         return opponentRange;
     }

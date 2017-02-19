@@ -1,10 +1,9 @@
 package com.lennart.model.action.actionbuilders;
 
+import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.computergame.ComputerGame;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -24,38 +23,38 @@ public class PostFlopActionBuilder {
 
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
-    private ComputerGame computerGame;
+    private Actionable actionable;
 
     private List<String> actionHistory;
 
-    public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, ComputerGame computerGame) {
-        bigBlind = computerGame.getBigBlind();
+    public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
+        bigBlind = actionable.getBigBlind();
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
-        this.computerGame = computerGame;
-        actionHistory = computerGame.getActionHistory();
+        this.actionable = actionable;
+        actionHistory = actionable.getActionHistory();
     }
 
     public String getAction(Set<Set<Card>> opponentRange) {
-        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRange(computerGame.getComputerHoleCards(),
+        double handStrengthAgainstRange = handEvaluator.getHandStrengthAgainstRange(actionable.getBotHoleCards(),
                 opponentRange, boardEvaluator.getSortedCombosNew());
 
         System.out.println("Computer handstrength: " + handStrengthAgainstRange);
 
-        if(computerGame.isComputerIsButton()) {
+        if(actionable.isBotIsButton()) {
             return getIpAction(handStrengthAgainstRange);
         }
 
-        if(!computerGame.isComputerIsButton()) {
+        if(!actionable.isBotIsButton()) {
             return getOopAction(handStrengthAgainstRange);
         }
         return null;
     }
 
     public double getSize() {
-        double opponentBetSize = computerGame.getMyTotalBetSize();
-        double potSize = computerGame.getPotSize();
-        double computerStack = computerGame.getComputerStack();
+        double opponentBetSize = actionable.getOpponentTotalBetSize();
+        double potSize = actionable.getPotSize();
+        double computerStack = actionable.getBotStack();
         double size;
 
         if(opponentBetSize == 0) {
@@ -76,7 +75,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getIpAction(double handStrengthAgainstRange) {
-        String opponentAction = computerGame.getMyAction();
+        String opponentAction = actionable.getOpponentAction();
 
         if(opponentAction.contains(CHECK)) {
             return getIpFCheck(handStrengthAgainstRange);
@@ -91,7 +90,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getOopAction(double handStrengthAgainstRange) {
-        String opponentAction = computerGame.getMyAction();
+        String opponentAction = actionable.getOpponentAction();
 
         if(opponentAction == null) {
             return getOopFirstToAct(handStrengthAgainstRange);
@@ -160,7 +159,7 @@ public class PostFlopActionBuilder {
                 if(drawAction != null && !drawAction.contains(FOLD)) {
                     return drawAction;
                 } else {
-                    if(computerGame.getBoard().size() != 5) {
+                    if(actionable.getBoard().size() != 5) {
                         if(Math.random() < 0.8) {
                             System.out.println("Value call of bet");
                             return CALL;
@@ -180,7 +179,7 @@ public class PostFlopActionBuilder {
                 }
             }
         } else {
-            if(computerGame.getBoard().size() == 5) {
+            if(actionable.getBoard().size() == 5) {
                 if(handStrengthAgainstRange > 0.7 && handStrengthAgainstRange > getHandStrengthNeededToCall()) {
                     return getValueAction(handStrengthAgainstRange, RAISE, CALL);
                 }
@@ -240,7 +239,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getPassiveOrAggressiveValueAction(String bettingAction, String passiveAction) {
-        if(computerGame.getBoard().size() != 5) {
+        if(actionable.getBoard().size() != 5) {
             if(Math.random() < 0.8) {
                 System.out.println("Betting value action");
                 return bettingAction;
@@ -249,8 +248,8 @@ public class PostFlopActionBuilder {
                 return passiveAction;
             }
         } else {
-            String opponentAction = computerGame.getMyAction();
-            if(!computerGame.isComputerIsButton() && opponentAction == null) {
+            String opponentAction = actionable.getOpponentAction();
+            if(!actionable.isBotIsButton() && opponentAction == null) {
                 if(Math.random() < 0.8) {
                     System.out.println("Betting value action at river OOP");
                     return bettingAction;
@@ -266,7 +265,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getDrawAction(String bettingAction) {
-        if (bettingAction.equals(BET) && computerGame.getPotSize() / computerGame.getBigBlind() < 7) {
+        if (bettingAction.equals(BET) && actionable.getPotSize() / actionable.getBigBlind() < 7) {
             if (handEvaluator.hasAnyDrawNonBackDoor()) {
                 if (Math.random() < 0.68) {
                     System.out.println("Betting action with any draw non backdoor");
@@ -382,7 +381,7 @@ public class PostFlopActionBuilder {
 //                }
 //            }
 //
-//            if(computerGame.getBoard().size() == 3) {
+//            if(actionable.getBoard().size() == 3) {
 //                if(percentageOfYourPerceivedRangeThatHitsFlopRanks > 0.5) {
 //                    if(Math.random() < 0.8) {
 //                        return bettingAction;
@@ -399,26 +398,19 @@ public class PostFlopActionBuilder {
 //        return passiveAction;
     }
 
-    private boolean myLastActionWasCall() {
-        if(StringUtils.containsIgnoreCase(computerGame.getComputerWrittenAction(), "call")) {
-            return true;
-        }
-        return false;
-    }
-
     private boolean boardIsSingleRaisedAndNoBettingPostFlop() {
         //TODO: implement this method
         return false;
     }
 
     private double getHandStrengthNeededToCall() {
-        double amountToCall = computerGame.getMyTotalBetSize() - computerGame.getComputerTotalBetSize();
-        double potSize = computerGame.getPotSize();
+        double amountToCall = actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize();
+        double potSize = actionable.getPotSize();
         return (0.01 + amountToCall) / (potSize + amountToCall);
     }
 
     private String getDrawCallingAction() {
-        double potSizeInBb = computerGame.getPotSize() / computerGame.getBigBlind();
+        double potSizeInBb = actionable.getPotSize() / actionable.getBigBlind();
 
         if(potSizeInBb <= 7) {
             if(handEvaluator.hasAnyDrawNonBackDoor()) {

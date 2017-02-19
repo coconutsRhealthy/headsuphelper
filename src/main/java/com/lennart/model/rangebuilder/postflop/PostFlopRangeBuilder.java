@@ -5,7 +5,7 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.computergame.ComputerGame;
+import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
@@ -48,13 +48,13 @@ public class PostFlopRangeBuilder {
     private Map<Integer, Set<Card>> weakBackDoorStraightCombos;
 
 
-    public PostFlopRangeBuilder(ComputerGame computerGame, BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
-        opponentTotalBetSize = computerGame.getMyTotalBetSize();
-        potSize = computerGame.getPotSize();
-        bigBlind = computerGame.getBigBlind();
-        knownGameCards = computerGame.getKnownGameCards();
-        handsHumanOopFacingPreflop2bet = computerGame.getHandsHumanOopFacingPreflop2bet();
-        opponentFormerTotalCallAmount = computerGame.getOpponentFormerTotalCallAmount();
+    public PostFlopRangeBuilder(RangeBuildable rangeBuildable, BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
+        opponentTotalBetSize = rangeBuildable.getOpponentTotalBetSize();
+        potSize = rangeBuildable.getPotSize();
+        bigBlind = rangeBuildable.getBigBlind();
+        knownGameCards = rangeBuildable.getKnownGameCards();
+        handsHumanOopFacingPreflop2bet = rangeBuildable.getHandsOpponentOopFacingPreflop2bet();
+        opponentFormerTotalCallAmount = rangeBuildable.getOpponentFormerTotalCallAmount();
 
         this.rangeBuilder = rangeBuilder;
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();

@@ -1,7 +1,7 @@
 package com.lennart.model.rangebuilder.preflop;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.computergame.ComputerGame;
+import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip._2betRangeBuilder;
@@ -28,21 +28,21 @@ public class PreflopRangeBuilder {
 
     private double potSize;
     private double bigBlind;
-    private boolean computerIsButton;
+    private boolean botIsButton;
     private double handsHumanOopFacingPreflop2bet;
     private double opponentTotalBetSize;
     private RangeBuilder rangeBuilder;
 
-    public PreflopRangeBuilder(ComputerGame computerGame, RangeBuilder rangeBuilder) {
-        potSize = computerGame.getPotSize();
-        bigBlind = computerGame.getBigBlind();
-        opponentTotalBetSize = computerGame.getMyTotalBetSize();
-        computerIsButton = computerGame.isComputerIsButton();
-        handsHumanOopFacingPreflop2bet = computerGame.getHandsHumanOopFacingPreflop2bet();
+    public PreflopRangeBuilder(RangeBuildable rangeBuildable, RangeBuilder rangeBuilder) {
+        potSize = rangeBuildable.getPotSize();
+        bigBlind = rangeBuildable.getBigBlind();
+        opponentTotalBetSize = rangeBuildable.getOpponentTotalBetSize();
+        botIsButton = rangeBuildable.isBotIsButton();
+        handsHumanOopFacingPreflop2bet = rangeBuildable.getHandsOpponentOopFacingPreflop2bet();
 
         this.rangeBuilder = rangeBuilder;
 
-        preflopRangeBuilderUtil = new PreflopRangeBuilderUtil(computerGame.getKnownGameCards());
+        preflopRangeBuilderUtil = new PreflopRangeBuilderUtil(rangeBuildable.getKnownGameCards());
     }
 
     public Set<Set<Card>> getOpponentPreflopRange() {
@@ -61,13 +61,13 @@ public class PreflopRangeBuilder {
         if(bbOpponentTotalBetSize == 0) {
             range = null;
         } else if(bbOpponentTotalBetSize == 1) {
-            if(computerIsButton) {
+            if(botIsButton) {
                 range = null;
             } else {
                 range = RangeBuilder.convertMapToSet(PreflopRangeBuilderUtil.getAllStartHandsAsSet());
             }
         } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
-            if(computerIsButton) {
+            if(botIsButton) {
                 call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(call2betRangeBuilder.getOpponentCall2betRange(rangeBuilder,
                         handsHumanOopFacingPreflop2bet));
@@ -76,7 +76,7 @@ public class PreflopRangeBuilder {
                 range = RangeBuilder.convertMapToSet(_2betRangeBuilder.getOpponent2betRange());
             }
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
-            if(computerIsButton) {
+            if(botIsButton) {
                 _3betRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(_3betRangeBuilder.getOpponent3betRange(rangeBuilder,
                         handsHumanOopFacingPreflop2bet));
@@ -85,7 +85,7 @@ public class PreflopRangeBuilder {
                 range = RangeBuilder.convertMapToSet(call3betRangeBuilder.getOpponentCall3betRange());
             }
         } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 22) {
-            if(computerIsButton) {
+            if(botIsButton) {
                 call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(call4betRangeBuilder.getOpponentCall4betRange());
             } else {

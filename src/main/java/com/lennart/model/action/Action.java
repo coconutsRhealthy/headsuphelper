@@ -2,9 +2,7 @@ package com.lennart.model.action;
 
 import com.lennart.model.action.actionbuilders.PostFlopActionBuilder;
 import com.lennart.model.action.actionbuilders.PreflopActionBuilder;
-import com.lennart.model.botgame.BotHand;
 import com.lennart.model.card.Card;
-import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.List;
@@ -24,21 +22,14 @@ public class Action {
         //default constructor
     }
 
-    public Action(ComputerGame computerGame, RangeBuilder rangeBuilder) {
+    public Action(Actionable actionable, RangeBuilder rangeBuilder) {
         this.rangeBuilder = rangeBuilder;
 
-        if(computerGame.getBoard() == null) {
-            getAndProcessPreflopAction(computerGame);
+        if(actionable.getBoard() == null) {
+            getAndProcessPreflopAction(actionable);
         } else {
-            getAndProcessPostFlopAction(computerGame);
+            getAndProcessPostFlopAction(actionable);
         }
-    }
-
-    public Action(BotHand botHand, RangeBuilder rangeBuilder) {
-        this.rangeBuilder = rangeBuilder;
-
-
-
     }
 
     public double getSizing() {
@@ -50,26 +41,26 @@ public class Action {
     }
 
     //helper methods
-    private void getAndProcessPreflopAction(ComputerGame computerGame) {
+    private void getAndProcessPreflopAction(Actionable actionable) {
         preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
-        rangeBuilder.getOpponentRange(computerGame);
+        rangeBuilder.getOpponentRange(actionable);
         String action;
-        action = preflopActionBuilder.getAction(computerGame);
-        setNewWrittenAction(action, computerGame.getBoard());
-        setSizingIfNecessary(computerGame, action);
+        action = preflopActionBuilder.getAction(actionable);
+        setNewWrittenAction(action, actionable.getBoard());
+        setSizingIfNecessary(actionable, action);
     }
 
-    private void getAndProcessPostFlopAction(ComputerGame computerGame) {
+    private void getAndProcessPostFlopAction(Actionable actionable) {
         postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
-                rangeBuilder.getHandEvaluator(), computerGame);
+                rangeBuilder.getHandEvaluator(), actionable);
         Set<Set<Card>> opponentRange;
         String action;
-        opponentRange = rangeBuilder.getOpponentRange(computerGame);
+        opponentRange = rangeBuilder.getOpponentRange(actionable);
 
-        if(!computerGame.isOnlyCallRangeNeeded()) {
+        if(!actionable.isOnlyCallRangeNeeded()) {
             action = postFlopActionBuilder.getAction(opponentRange);
-            setNewWrittenAction(action, computerGame.getBoard());
-            setSizingIfNecessary(computerGame, action);
+            setNewWrittenAction(action, actionable.getBoard());
+            setSizingIfNecessary(actionable, action);
         }
     }
 
@@ -99,10 +90,10 @@ public class Action {
         }
     }
 
-    private void setSizingIfNecessary(ComputerGame computerGame, String myAction) {
-        if(computerGame.getFlopCards() == null) {
+    private void setSizingIfNecessary(Actionable actionable, String myAction) {
+        if(actionable.getFlopCards() == null) {
             if(myAction.equals("raise")) {
-                sizing = preflopActionBuilder.getSize(computerGame);
+                sizing = preflopActionBuilder.getSize(actionable);
             }
         } else {
             if(myAction.equals("bet") || myAction.equals("raise")) {

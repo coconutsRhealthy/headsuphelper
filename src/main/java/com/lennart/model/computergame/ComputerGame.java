@@ -1,9 +1,11 @@
 package com.lennart.model.computergame;
 
 import com.lennart.model.action.Action;
+import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import org.apache.commons.math3.util.Precision;
 
@@ -12,7 +14,7 @@ import java.util.*;
 /**
  * Created by lennart on 11-12-16.
  */
-public class ComputerGame {
+public class ComputerGame implements RangeBuildable, Actionable {
 
     private List<Card> deck;
     private List<Card> myHoleCards;
@@ -24,8 +26,8 @@ public class ComputerGame {
     private double bigBlind;
     private double myStack;
     private double computerStack;
-    private double myIncrementalBetSize;
-    private double myTotalBetSize;
+    private double opponentIncrementalBetSize;
+    private double opponentTotalBetSize;
     private double computerIncrementalBetSize;
     private double computerTotalBetSize;
     private double potSize;
@@ -149,9 +151,9 @@ public class ComputerGame {
     }
 
     private void processComputerCallAction() {
-        if(computerStack - (myTotalBetSize - computerTotalBetSize) > 0) {
-            computerStack = computerStack - (myTotalBetSize - computerTotalBetSize);
-            computerTotalBetSize = myTotalBetSize;
+        if(computerStack - (opponentTotalBetSize - computerTotalBetSize) > 0) {
+            computerStack = computerStack - (opponentTotalBetSize - computerTotalBetSize);
+            computerTotalBetSize = opponentTotalBetSize;
         } else {
             computerTotalBetSize = computerStack;
             computerStack = 0;
@@ -207,15 +209,15 @@ public class ComputerGame {
     }
 
     private void processHumanCallAction() {
-        if(myStack - (computerTotalBetSize - myIncrementalBetSize) > 0) {
-            myStack = myStack - (computerTotalBetSize - myIncrementalBetSize);
-            myTotalBetSize = computerTotalBetSize;
+        if(myStack - (computerTotalBetSize - opponentIncrementalBetSize) > 0) {
+            myStack = myStack - (computerTotalBetSize - opponentIncrementalBetSize);
+            opponentTotalBetSize = computerTotalBetSize;
         } else {
-            myTotalBetSize = myStack;
+            opponentTotalBetSize = myStack;
             myStack = 0;
         }
 
-        opponentFormerTotalCallAmount = myTotalBetSize;
+        opponentFormerTotalCallAmount = opponentTotalBetSize;
         updatePotSize("call");
         resetAllBets();
 
@@ -228,8 +230,8 @@ public class ComputerGame {
     }
 
     private void processHumanBetOrRaiseAction() {
-        myIncrementalBetSize = myTotalBetSize - myIncrementalBetSize;
-        myStack = myStack - myIncrementalBetSize;
+        opponentIncrementalBetSize = opponentTotalBetSize - opponentIncrementalBetSize;
+        myStack = myStack - opponentIncrementalBetSize;
     }
 
     private void getNewCardDeck() {
@@ -277,25 +279,27 @@ public class ComputerGame {
     private void postBlinds() {
         if(computerIsButton) {
             myStack = myStack - bigBlind;
-            myIncrementalBetSize = bigBlind;
-            myTotalBetSize = bigBlind;
+            opponentIncrementalBetSize = bigBlind;
+            opponentTotalBetSize = bigBlind;
             computerStack = computerStack - smallBlind;
             computerIncrementalBetSize = smallBlind;
             computerTotalBetSize = smallBlind;
         } else {
             myStack = myStack - smallBlind;
-            myIncrementalBetSize = smallBlind;
-            myTotalBetSize = smallBlind;
+            opponentIncrementalBetSize = smallBlind;
+            opponentTotalBetSize = smallBlind;
             computerStack = computerStack - bigBlind;
             computerIncrementalBetSize = bigBlind;
             computerTotalBetSize = bigBlind;
         }
     }
 
+    @Override
     public void removeHoleCardsFromKnownGameCards() {
         knownGameCards.removeAll(computerHoleCards);
     }
 
+    @Override
     public void addHoleCardsToKnownGameCards() {
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(computerHoleCards);
@@ -331,7 +335,7 @@ public class ComputerGame {
 
     private void returnBetToPlayerAfterFold(String player) {
         if(player.equals("human")) {
-            myStack = myStack + myTotalBetSize;
+            myStack = myStack + opponentTotalBetSize;
         } else if(player.equals("computer")) {
             computerStack = computerStack + computerTotalBetSize;
         }
@@ -339,11 +343,11 @@ public class ComputerGame {
 
     private void updatePotSize(String action) {
         if(action.equals("call")) {
-            potSize = potSize + myTotalBetSize + computerTotalBetSize;
+            potSize = potSize + opponentTotalBetSize + computerTotalBetSize;
         } else if(action.equals("computer fold")) {
             potSize = potSize + computerTotalBetSize;
         } else if(action.equals("human fold")) {
-            potSize = potSize + myTotalBetSize;
+            potSize = potSize + opponentTotalBetSize;
         }
     }
 
@@ -369,8 +373,8 @@ public class ComputerGame {
         }
 
         potSize = 0;
-        myIncrementalBetSize = 0;
-        myTotalBetSize = 0;
+        opponentIncrementalBetSize = 0;
+        opponentTotalBetSize = 0;
         computerIncrementalBetSize = 0;
         computerTotalBetSize = 0;
 
@@ -458,8 +462,8 @@ public class ComputerGame {
     }
 
     private void resetAllBets() {
-        myIncrementalBetSize = 0;
-        myTotalBetSize = 0;
+        opponentIncrementalBetSize = 0;
+        opponentTotalBetSize = 0;
         computerIncrementalBetSize = 0;
         computerTotalBetSize = 0;
     }
@@ -473,7 +477,7 @@ public class ComputerGame {
         potSize = Precision.round(potSize, 2);
         myStack = Precision.round(myStack, 2);
         computerStack = Precision.round(computerStack, 2);
-        myTotalBetSize = Precision.round(myTotalBetSize, 2);
+        opponentTotalBetSize = Precision.round(opponentTotalBetSize, 2);
         computerTotalBetSize = Precision.round(computerTotalBetSize, 2);
     }
 
@@ -564,6 +568,11 @@ public class ComputerGame {
         this.myHoleCards = myHoleCards;
     }
 
+    @Override
+    public List<Card> getBotHoleCards() {
+        return getComputerHoleCards();
+    }
+
     public List<Card> getComputerHoleCards() {
         return computerHoleCards;
     }
@@ -580,6 +589,7 @@ public class ComputerGame {
         this.smallBlind = smallBlind;
     }
 
+    @Override
     public double getBigBlind() {
         return bigBlind;
     }
@@ -596,6 +606,11 @@ public class ComputerGame {
         this.myStack = myStack;
     }
 
+    @Override
+    public double getBotStack() {
+        return getComputerStack();
+    }
+
     public double getComputerStack() {
         return computerStack;
     }
@@ -604,12 +619,18 @@ public class ComputerGame {
         this.computerStack = computerStack;
     }
 
-    public double getMyTotalBetSize() {
-        return myTotalBetSize;
+    @Override
+    public double getOpponentTotalBetSize() {
+        return opponentTotalBetSize;
     }
 
-    public void setMyTotalBetSize(double myTotalBetSize) {
-        this.myTotalBetSize = myTotalBetSize;
+    public void setOpponentTotalBetSize(double opponentTotalBetSize) {
+        this.opponentTotalBetSize = opponentTotalBetSize;
+    }
+
+    @Override
+    public double getBotTotalBetSize() {
+        return getComputerTotalBetSize();
     }
 
     public double getComputerTotalBetSize() {
@@ -620,6 +641,7 @@ public class ComputerGame {
         this.computerTotalBetSize = computerTotalBetSize;
     }
 
+    @Override
     public double getPotSize() {
         return potSize;
     }
@@ -636,12 +658,18 @@ public class ComputerGame {
         this.computerAction = computerAction;
     }
 
+    @Override
     public Set<Card> getKnownGameCards() {
         return knownGameCards;
     }
 
     public void setKnownGameCards(Set<Card> knownGameCards) {
         this.knownGameCards = knownGameCards;
+    }
+
+    @Override
+    public String getOpponentAction() {
+        return getMyAction();
     }
 
     public String getMyAction() {
@@ -660,6 +688,11 @@ public class ComputerGame {
         this.mySize = mySize;
     }
 
+    @Override
+    public boolean isBotIsButton() {
+        return isComputerIsButton();
+    }
+
     public boolean isComputerIsButton() {
         return computerIsButton;
     }
@@ -668,12 +701,12 @@ public class ComputerGame {
         this.computerIsButton = computerIsButton;
     }
 
-    public double getMyIncrementalBetSize() {
-        return myIncrementalBetSize;
+    public double getOpponentIncrementalBetSize() {
+        return opponentIncrementalBetSize;
     }
 
-    public void setMyIncrementalBetSize(double myIncrementalBetSize) {
-        this.myIncrementalBetSize = myIncrementalBetSize;
+    public void setOpponentIncrementalBetSize(double opponentIncrementalBetSize) {
+        this.opponentIncrementalBetSize = opponentIncrementalBetSize;
     }
 
     public double getComputerIncrementalBetSize() {
@@ -684,6 +717,7 @@ public class ComputerGame {
         this.computerIncrementalBetSize = computerIncrementalBetSize;
     }
 
+    @Override
     public List<Card> getFlopCards() {
         return flopCards;
     }
@@ -708,6 +742,7 @@ public class ComputerGame {
         this.riverCard = riverCard;
     }
 
+    @Override
     public List<Card> getBoard() {
         return board;
     }
@@ -724,14 +759,17 @@ public class ComputerGame {
         this.computerWrittenAction = computerWrittenAction;
     }
 
+    @Override
     public Set<Set<Card>> getOpponentRange() {
         return opponentRange;
     }
 
+    @Override
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
     }
 
+    @Override
     public List<String> getActionHistory() {
         return actionHistory;
     }
@@ -756,6 +794,11 @@ public class ComputerGame {
         this.numberOfHandsPlayed = numberOfHandsPlayed;
     }
 
+    @Override
+    public double getHandsOpponentOopFacingPreflop2bet() {
+        return getHandsHumanOopFacingPreflop2bet();
+    }
+
     public double getHandsHumanOopFacingPreflop2bet() {
         return handsHumanOopFacingPreflop2bet;
     }
@@ -772,6 +815,7 @@ public class ComputerGame {
         this.handsHumanOopCall2bet = handsHumanOopCall2bet;
     }
 
+    @Override
     public double getOpponentPreCall2betStat() {
         return opponentPreCall2betStat;
     }
@@ -788,6 +832,7 @@ public class ComputerGame {
         this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
     }
 
+    @Override
     public boolean isOnlyCallRangeNeeded() {
         return onlyCallRangeNeeded;
     }
@@ -796,6 +841,7 @@ public class ComputerGame {
         this.onlyCallRangeNeeded = onlyCallRangeNeeded;
     }
 
+    @Override
     public boolean isOpponentLastActionWasPreflop() {
         return opponentLastActionWasPreflop;
     }
@@ -804,6 +850,7 @@ public class ComputerGame {
         this.opponentLastActionWasPreflop = opponentLastActionWasPreflop;
     }
 
+    @Override
     public double getOpponentFormerTotalCallAmount() {
         return opponentFormerTotalCallAmount;
     }
@@ -820,6 +867,7 @@ public class ComputerGame {
         this.handsHumanOop3bet = handsHumanOop3bet;
     }
 
+    @Override
     public double getOpponentPre3betStat() {
         return opponentPre3betStat;
     }

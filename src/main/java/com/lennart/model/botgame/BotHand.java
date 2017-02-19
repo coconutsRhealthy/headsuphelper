@@ -1,7 +1,9 @@
 package com.lennart.model.botgame;
 
 import com.lennart.model.action.Action;
+import com.lennart.model.action.Actionable;
 import com.lennart.model.card.Card;
+import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ import java.util.Set;
 /**
  * Created by LPO21630 on 16-2-2017.
  */
-public class BotHand {
+public class BotHand implements RangeBuildable, Actionable {
 
     private GameVariablesFiller gameVariablesFiller;
 
@@ -305,6 +307,24 @@ public class BotHand {
         }
     }
 
+    @Override
+    public void removeHoleCardsFromKnownGameCards() {
+        knownGameCards.removeAll(botHoleCards);
+    }
+
+    @Override
+    public void addHoleCardsToKnownGameCards() {
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(botHoleCards);
+
+        knownGameCards.addAll(holeCardsAsSet);
+    }
+
+    @Override
+    public boolean isOnlyCallRangeNeeded() {
+        return false;
+    }
+
     //default getters and setters
     public GameVariablesFiller getGameVariablesFiller() {
         return gameVariablesFiller;
@@ -314,6 +334,7 @@ public class BotHand {
         this.gameVariablesFiller = gameVariablesFiller;
     }
 
+    @Override
     public double getPotSize() {
         return potSize;
     }
@@ -322,6 +343,7 @@ public class BotHand {
         this.potSize = potSize;
     }
 
+    @Override
     public double getBotStack() {
         return botStack;
     }
@@ -338,6 +360,7 @@ public class BotHand {
         this.opponentStack = opponentStack;
     }
 
+    @Override
     public double getBotTotalBetSize() {
         return botTotalBetSize;
     }
@@ -346,6 +369,7 @@ public class BotHand {
         this.botTotalBetSize = botTotalBetSize;
     }
 
+    @Override
     public double getOpponentTotalBetSize() {
         return opponentTotalBetSize;
     }
@@ -362,6 +386,7 @@ public class BotHand {
         this.smallBlind = smallBlind;
     }
 
+    @Override
     public double getBigBlind() {
         return bigBlind;
     }
@@ -370,6 +395,7 @@ public class BotHand {
         this.bigBlind = bigBlind;
     }
 
+    @Override
     public boolean isBotIsButton() {
         return botIsButton;
     }
@@ -386,6 +412,7 @@ public class BotHand {
         this.opponentPlayerName = opponentPlayerName;
     }
 
+    @Override
     public String getOpponentAction() {
         return opponentAction;
     }
@@ -458,6 +485,7 @@ public class BotHand {
         this.botAction = botAction;
     }
 
+    @Override
     public List<Card> getBotHoleCards() {
         return botHoleCards;
     }
@@ -466,6 +494,7 @@ public class BotHand {
         this.botHoleCards = botHoleCards;
     }
 
+    @Override
     public List<Card> getFlopCards() {
         return flopCards;
     }
@@ -474,6 +503,7 @@ public class BotHand {
         this.flopCards = flopCards;
     }
 
+    @Override
     public Set<Card> getKnownGameCards() {
         return knownGameCards;
     }
@@ -482,6 +512,7 @@ public class BotHand {
         this.knownGameCards = knownGameCards;
     }
 
+    @Override
     public List<Card> getBoard() {
         return board;
     }
@@ -490,14 +521,17 @@ public class BotHand {
         this.board = board;
     }
 
+    @Override
     public Set<Set<Card>> getOpponentRange() {
         return opponentRange;
     }
 
+    @Override
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
     }
 
+    @Override
     public List<String> getActionHistory() {
         return actionHistory;
     }
@@ -514,6 +548,7 @@ public class BotHand {
         this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
     }
 
+    @Override
     public double getHandsOpponentOopFacingPreflop2bet() {
         return handsOpponentOopFacingPreflop2bet;
     }
@@ -538,6 +573,7 @@ public class BotHand {
         this.handsOpponentOop3bet = handsOpponentOop3bet;
     }
 
+    @Override
     public double getOpponentPreCall2betStat() {
         return opponentPreCall2betStat;
     }
@@ -546,6 +582,7 @@ public class BotHand {
         this.opponentPreCall2betStat = opponentPreCall2betStat;
     }
 
+    @Override
     public double getOpponentPre3betStat() {
         return opponentPre3betStat;
     }
@@ -554,6 +591,7 @@ public class BotHand {
         this.opponentPre3betStat = opponentPre3betStat;
     }
 
+    @Override
     public boolean isOpponentLastActionWasPreflop() {
         return opponentLastActionWasPreflop;
     }
@@ -562,6 +600,7 @@ public class BotHand {
         this.opponentLastActionWasPreflop = opponentLastActionWasPreflop;
     }
 
+    @Override
     public double getOpponentFormerTotalCallAmount() {
         return opponentFormerTotalCallAmount;
     }
