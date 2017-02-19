@@ -2,7 +2,7 @@ package com.lennart.model.action;
 
 import com.lennart.model.action.actionbuilders.PostFlopActionBuilder;
 import com.lennart.model.action.actionbuilders.PreflopActionBuilder;
-import com.lennart.model.botgame.Hand;
+import com.lennart.model.botgame.BotHand;
 import com.lennart.model.card.Card;
 import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.rangebuilder.RangeBuilder;
@@ -24,9 +24,8 @@ public class Action {
         //default constructor
     }
 
-    public Action(ComputerGame computerGame) {
-        rangeBuilder = new RangeBuilder(computerGame);
-        preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
+    public Action(ComputerGame computerGame, RangeBuilder rangeBuilder) {
+        this.rangeBuilder = rangeBuilder;
 
         if(computerGame.getBoard() == null) {
             getAndProcessPreflopAction(computerGame);
@@ -35,7 +34,10 @@ public class Action {
         }
     }
 
-    public Action(Hand hand) {
+    public Action(BotHand botHand, RangeBuilder rangeBuilder) {
+        this.rangeBuilder = rangeBuilder;
+
+
 
     }
 
@@ -49,6 +51,7 @@ public class Action {
 
     //helper methods
     private void getAndProcessPreflopAction(ComputerGame computerGame) {
+        preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
         rangeBuilder.getOpponentRange(computerGame);
         String action;
         action = preflopActionBuilder.getAction(computerGame);

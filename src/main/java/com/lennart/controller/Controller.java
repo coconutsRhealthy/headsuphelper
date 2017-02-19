@@ -1,6 +1,6 @@
 package com.lennart.controller;
 
-import com.lennart.model.botgame.BotGame;
+import com.lennart.model.botgame.BotTable;
 import com.lennart.model.computergame.ComputerGame;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -35,16 +35,15 @@ public class Controller {
     }
 
     //Botgame:
-    @RequestMapping(value = "/startBotGame", method = RequestMethod.GET)
-    public @ResponseBody BotGame startBotGame() {
-        BotGame botGame = new BotGame();
-        return botGame;
+    @RequestMapping(value = "/startBotTable", method = RequestMethod.GET)
+    public @ResponseBody BotTable startBotTable() {
+        return new BotTable();
     }
 
     @RequestMapping(value = "/getNewBotAction", method = RequestMethod.POST)
-    public @ResponseBody BotGame getNewBotAction(@RequestBody BotGame botGame) {
-        botGame.getNewBotAction();
-        return botGame;
+    public @ResponseBody BotTable getNewBotAction(@RequestBody BotTable botTable) {
+        botTable.getNewBotAction();
+        return botTable;
     }
 
 

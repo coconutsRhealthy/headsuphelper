@@ -10,11 +10,14 @@ public class GameVariablesFiller {
     private double potSize;
     private double botStack;
     private double opponentStack;
+    private double botTotalBetSize;
+    private double opponentTotalBetSize;
     private double smallBlind;
     private double bigBlind;
 
     private Boolean botIsButton;
     private String opponentPlayerName;
+    private String opponentAction;
 
     private Card botHoleCard1;
     private Card botHoleCard2;
@@ -31,19 +34,24 @@ public class GameVariablesFiller {
         setPotSize();
         setBotStack();
         setOpponentStack();
+        setBotTotalBetSize();
+        setOpponentTotalBetSize();
         setBotHoleCard1();
         setBotHoleCard2();
         setSmallBlind();
         setBigBlind();
         setBotIsButton();
         setOpponentPlayerName();
+        setOpponentAction();
     }
 
     public void initializeAndRefreshRelevantVariables(String street) {
         setPotSize();
         setBotStack();
         setOpponentStack();
-        setBotIsButton();
+        setBotTotalBetSize();
+        setOpponentTotalBetSize();
+        setOpponentAction();
 
         if(opponentPlayerName == null) {
             setOpponentPlayerName();
@@ -83,6 +91,14 @@ public class GameVariablesFiller {
         opponentStack = imageProcessor.getOpponentStackFromImage();
     }
 
+    public void setBotTotalBetSize() {
+        botTotalBetSize = imageProcessor.getBotTotalBetSizeFromImage();
+    }
+
+    public void setOpponentTotalBetSize() {
+        opponentTotalBetSize = imageProcessor.getOpponentTotalBetSizeFromImage();
+    }
+
     private void setSmallBlind() {
         smallBlind = imageProcessor.getSmallBlindFromImage();
     }
@@ -97,6 +113,10 @@ public class GameVariablesFiller {
 
     private void setOpponentPlayerName() {
         opponentPlayerName = imageProcessor.getOpponentPlayerNameFromImage();
+    }
+
+    private void setOpponentAction() {
+        opponentAction = imageProcessor.getOpponentActionFromImage();
     }
 
     private void setBotHoleCard1() {
@@ -139,6 +159,14 @@ public class GameVariablesFiller {
         return opponentStack;
     }
 
+    public double getBotTotalBetSize() {
+        return botTotalBetSize;
+    }
+
+    public double getOpponentTotalBetSize() {
+        return opponentTotalBetSize;
+    }
+
     public double getSmallBlind() {
         return smallBlind;
     }
@@ -153,6 +181,10 @@ public class GameVariablesFiller {
 
     public String getOpponentPlayerName() {
         return opponentPlayerName;
+    }
+
+    public String getOpponentAction() {
+        return opponentAction;
     }
 
     public Card getBotHoleCard1() {

@@ -39,12 +39,16 @@ public class ImageProcessor {
         return 0;
     }
 
+    public double getBotTotalBetSizeFromImage() {
+        return 0;
+    }
+
     public double getOpponentTotalBetSizeFromImage() {
         return 0;
     }
 
-    public double getBotTotalBetSizeFromImage() {
-        return 0;
+    public String getOpponentActionFromImage() {
+        return null;
     }
 
     public double getSmallBlindFromImage() {

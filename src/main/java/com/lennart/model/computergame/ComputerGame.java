@@ -4,6 +4,7 @@ import com.lennart.model.action.Action;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.rangebuilder.RangeBuilder;
 import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
@@ -104,7 +105,8 @@ public class ComputerGame {
     }
 
     private void doComputerAction() {
-        computerAction = new Action(this);
+        RangeBuilder rangeBuilder = new RangeBuilder(this);
+        computerAction = new Action(this, rangeBuilder);
 
         if(!onlyCallRangeNeeded) {
             computerWrittenAction = computerAction.getWrittenAction();
