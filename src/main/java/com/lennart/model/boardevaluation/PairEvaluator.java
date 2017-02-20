@@ -135,113 +135,73 @@ public class PairEvaluator extends BoardEvaluator implements ComboComparatorRank
             public int compare(List<Integer> combo1, List<Integer> combo2) {
                 List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
-                if(getNumberOfPairsOnBoard(board) == 0) {
-                    int pairedCardCombo1;
-                    int kickerCombo1;
+                List<Integer> boardPlusCombo1 = new ArrayList<>();
+                boardPlusCombo1.addAll(boardRanks);
+                boardPlusCombo1.addAll(combo1);
 
-                    int pairedCardCombo2;
-                    int kickerCombo2;
+                List<Integer> boardPlusCombo2 = new ArrayList<>();
+                boardPlusCombo2.addAll(boardRanks);
+                boardPlusCombo2.addAll(combo2);
 
-                    if(combo1.get(0) == combo1.get(1)) {
-                        pairedCardCombo1 = combo1.get(0);
-                        kickerCombo1 = combo1.get(1);
-                    } else if (boardRanks.contains(combo1.get(0))) {
-                        pairedCardCombo1 = combo1.get(0);
-                        kickerCombo1 = combo1.get(1);
-                    } else {
-                        pairedCardCombo1 = combo1.get(1);
-                        kickerCombo1 = combo1.get(0);
+                Collections.sort(boardPlusCombo1, Collections.reverseOrder());
+                Collections.sort(boardPlusCombo2, Collections.reverseOrder());
+
+                int pairRankCombo1 = 0;
+                int pairRankCombo2 = 0;
+
+                for(int i = 0; i < boardPlusCombo1.size() - 1; i++) {
+                    if(boardPlusCombo1.get(i).equals(boardPlusCombo1.get(i + 1))) {
+                        pairRankCombo1 = boardPlusCombo1.get(i);
+                        break;
                     }
+                }
 
-                    if(combo2.get(0) == combo2.get(1)) {
-                        pairedCardCombo2 = combo2.get(0);
-                        kickerCombo2 = combo2.get(1);
-                    } else if (boardRanks.contains(combo2.get(0))) {
-                        pairedCardCombo2 = combo2.get(0);
-                        kickerCombo2 = combo2.get(1);
-                    } else {
-                        pairedCardCombo2 = combo2.get(1);
-                        kickerCombo2 = combo2.get(0);
+                for(int i = 0; i < boardPlusCombo2.size() - 1; i++) {
+                    if(boardPlusCombo2.get(i).equals(boardPlusCombo2.get(i + 1))) {
+                        pairRankCombo2 = boardPlusCombo2.get(i);
+                        break;
                     }
+                }
 
-                    if(pairedCardCombo2 > pairedCardCombo1) {
+                boardPlusCombo1.removeAll(Collections.singleton(pairRankCombo1));
+                boardPlusCombo2.removeAll(Collections.singleton(pairRankCombo2));
+
+                List<Integer> highestThreeCardsNoPairCombo1;
+                List<Integer> highestThreeCardsNoPairCombo2;
+
+                if(boardPlusCombo1.size() > 3) {
+                    highestThreeCardsNoPairCombo1 = boardPlusCombo1.subList(0, 3);
+                    highestThreeCardsNoPairCombo2 = boardPlusCombo2.subList(0, 3);
+                } else {
+                    highestThreeCardsNoPairCombo1 = boardPlusCombo1;
+                    highestThreeCardsNoPairCombo2 = boardPlusCombo2;
+                }
+
+                if(pairRankCombo2 > pairRankCombo1) {
+                    return 1;
+                } else if(pairRankCombo2 == pairRankCombo1) {
+                    if(highestThreeCardsNoPairCombo2.get(0) > highestThreeCardsNoPairCombo1.get(0)) {
                         return 1;
-                    } else if (pairedCardCombo2 == pairedCardCombo1) {
-                        if(board.size() > 3) {
-                            if(boardRanks.contains(pairedCardCombo1)) {
-                                boardRanks.remove(Integer.valueOf(pairedCardCombo1));
-                            }
-
-                            int lowestRankedCardOnBoard = Collections.min(boardRanks);
-
-                            if(kickerCombo2 > kickerCombo1) {
-                                if(kickerCombo2 > lowestRankedCardOnBoard) {
-                                    return 1;
-                                } else {
-                                    return 0;
-                                }
-                            } else if(kickerCombo2 == kickerCombo1) {
-                                return 0;
-                            } else {
-                                if(kickerCombo1 > lowestRankedCardOnBoard) {
-                                    return -1;
-                                } else {
-                                    return 0;
-                                }
-                            }
-                        } else {
-                            if(kickerCombo2 > kickerCombo1) {
+                    } else if(highestThreeCardsNoPairCombo2.get(0) == highestThreeCardsNoPairCombo1.get(0)) {
+                        if(highestThreeCardsNoPairCombo2.get(1) > highestThreeCardsNoPairCombo1.get(1)) {
+                            return 1;
+                        } else if(highestThreeCardsNoPairCombo2.get(1) == highestThreeCardsNoPairCombo1.get(1)) {
+                            if(highestThreeCardsNoPairCombo2.get(2) > highestThreeCardsNoPairCombo1.get(2)) {
                                 return 1;
-                            } else if(kickerCombo2 == kickerCombo1) {
+                            } else if(highestThreeCardsNoPairCombo2.get(2) == highestThreeCardsNoPairCombo1.get(2)) {
                                 return 0;
                             } else {
                                 return -1;
                             }
+                        } else {
+                            return -1;
                         }
                     } else {
                         return -1;
                     }
-                } else if(getNumberOfPairsOnBoard(board) == 1) {
-                    int rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
-                    boardRanks.removeAll(Collections.singleton(rankOfPairOnBoard));
-
-                    List<Integer> combo1PlusUnpairedBoardCards = new ArrayList<>();
-                    List<Integer> combo2PlusUnpairedBoardCards = new ArrayList<>();
-
-                    combo1PlusUnpairedBoardCards.addAll(boardRanks);
-                    combo1PlusUnpairedBoardCards.addAll(combo1);
-
-                    combo2PlusUnpairedBoardCards.addAll(boardRanks);
-                    combo2PlusUnpairedBoardCards.addAll(combo2);
-
-                    Collections.sort(combo1PlusUnpairedBoardCards, Collections.reverseOrder());
-                    Collections.sort(combo2PlusUnpairedBoardCards, Collections.reverseOrder());
-
-                    if(combo1PlusUnpairedBoardCards.size() > 3) {
-                        combo1PlusUnpairedBoardCards = combo1PlusUnpairedBoardCards.subList(0, 3);
-                        combo2PlusUnpairedBoardCards = combo2PlusUnpairedBoardCards.subList(0, 3);
-                    }
-
-                    boolean combo1Higher = false;
-                    boolean combo2Higher = false;
-
-                    for(int i = 0; i < combo1PlusUnpairedBoardCards.size(); i++) {
-                        if(combo1PlusUnpairedBoardCards.get(i) > combo2PlusUnpairedBoardCards.get(i)) {
-                            combo1Higher = true;
-                        } else if (combo2PlusUnpairedBoardCards.get(i) > combo1PlusUnpairedBoardCards.get(i)) {
-                            combo2Higher = true;
-                        }
-                    }
-
-                    if(combo1Higher) {
-                        return -1;
-                    } else if(combo2Higher) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
+                } else {
+                    return -1;
                 }
-                return 0;
             }
         };
     }
