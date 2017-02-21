@@ -10,6 +10,7 @@ import java.util.*;
 public class StraightFlushEvaluator extends BoardEvaluator implements ComboComparator {
 
     private Map<Integer, Set<Set<Card>>> combosThatMakeStraightFlush;
+    private Map<Integer, List<Card>> allPossibleFiveConnectingSuitedCards;
 
     public StraightFlushEvaluator(List<Card> board) {
         getStraightFlushCombosInitialize(board);
@@ -39,75 +40,24 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
         }
 
         straightCombosList.retainAll(flushCombosList);
+        allPossibleFiveConnectingSuitedCards = getAllPossibleFiveConnectingSuitedCards();
+        Map<Integer, List<Card>> combosThatMakeStraightFlush = new HashMap<>();
 
-        Map<Integer, List<Card>> combosThatMakeStraightAndFlush = new HashMap<>();
+        loop: for(Set<Card> combo : straightCombosList) {
+            List<Card> comboPlusBoard = new ArrayList<>();
+            comboPlusBoard.addAll(board);
+            comboPlusBoard.addAll(combo);
 
-        for(Set<Card> s : straightCombosList) {
-            List<Card> l = new ArrayList<>();
-            l.addAll(s);
-            combosThatMakeStraightAndFlush.put(combosThatMakeStraightAndFlush.size(), l);
-        }
-
-        if(board.size() == 3 && !combosThatMakeStraightAndFlush.isEmpty()) {
-            combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, this);
-            return;
-        }
-
-        if(board.size() > 3 && !combosThatMakeStraightAndFlush.isEmpty()) {
-            Map<Integer, List<Integer>> allPossibleFiveConnectingCardRanks = getAllPossibleFiveConnectingCards();
-            Map<Integer, Set<Card>> allPossibleStraightFlushes = new HashMap<>();
-            Map<Integer, List<Card>> combosThatMakeStraightFlush = new HashMap<>();
-
-            for (Map.Entry<Integer, List<Integer>> entry : allPossibleFiveConnectingCardRanks.entrySet()) {
-                allPossibleStraightFlushes.put(allPossibleStraightFlushes.size(), new HashSet<>());
-                for (Integer rank : entry.getValue()) {
-                    Card c = new Card(rank, 's');
-                    allPossibleStraightFlushes.get(allPossibleStraightFlushes.size() - 1).add(c);
-                }
-
-                allPossibleStraightFlushes.put(allPossibleStraightFlushes.size(), new HashSet<>());
-                for (Integer rank : entry.getValue()) {
-                    Card c = new Card(rank, 'c');
-                    allPossibleStraightFlushes.get(allPossibleStraightFlushes.size() - 1).add(c);
-                }
-
-                allPossibleStraightFlushes.put(allPossibleStraightFlushes.size(), new HashSet<>());
-                for (Integer rank : entry.getValue()) {
-                    Card c = new Card(rank, 'd');
-                    allPossibleStraightFlushes.get(allPossibleStraightFlushes.size() - 1).add(c);
-                }
-
-                allPossibleStraightFlushes.put(allPossibleStraightFlushes.size(), new HashSet<>());
-                for (Integer rank : entry.getValue()) {
-                    Card c = new Card(rank, 'h');
-                    allPossibleStraightFlushes.get(allPossibleStraightFlushes.size() - 1).add(c);
+            for (Map.Entry<Integer, List<Card>> entry : allPossibleFiveConnectingSuitedCards.entrySet()) {
+                if(comboPlusBoard.containsAll(entry.getValue())) {
+                    List<Card> l = new ArrayList<>();
+                    l.addAll(combo);
+                    combosThatMakeStraightFlush.put(combosThatMakeStraightFlush.size(), l);
+                    continue loop;
                 }
             }
-
-            if (board.size() == 5) {
-                for (Map.Entry<Integer, Set<Card>> entry : allPossibleStraightFlushes.entrySet()) {
-                    if (board.containsAll(entry.getValue())) {
-                        this.combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, this);
-                        return;
-                    }
-                }
-            }
-
-            for (Map.Entry<Integer, List<Card>> entry : combosThatMakeStraightAndFlush.entrySet()) {
-                List<Card> boardPlusCombo = new ArrayList<>();
-                boardPlusCombo.addAll(board);
-                boardPlusCombo.addAll(entry.getValue());
-
-                for (Map.Entry<Integer, Set<Card>> entry2 : allPossibleStraightFlushes.entrySet()) {
-                    if (boardPlusCombo.containsAll(entry2.getValue())) {
-                        combosThatMakeStraightFlush.put(combosThatMakeStraightFlush.size(), entry.getValue());
-                    }
-                }
-            }
-            this.combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, this);
-            return;
         }
-        combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightAndFlush, board, this);
+        this.combosThatMakeStraightFlush = getSortedCardComboMap(combosThatMakeStraightFlush, board, this);
     }
 
     @Override
@@ -115,8 +65,6 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
         return new Comparator<Set<Card>>() {
             @Override
             public int compare(Set<Card> combo1, Set<Card> combo2) {
-                //List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
-
                 List<Card> combo1PlusBoard = new ArrayList<>();
                 List<Card> combo2PlusBoard = new ArrayList<>();
 
@@ -128,10 +76,7 @@ public class StraightFlushEvaluator extends BoardEvaluator implements ComboCompa
                 int highestStraightThatIsPresentInCombo1PlusBoard = 0;
                 int highestStraightThatIsPresentInCombo2PlusBoard = 0;
 
-                Map<Integer, List<Card>> allPossibleStraightFlushes = getAllPossibleFiveConnectingSuitedCards();
-
-
-                for (Map.Entry<Integer, List<Card>> entry : allPossibleStraightFlushes.entrySet()) {
+                for (Map.Entry<Integer, List<Card>> entry : allPossibleFiveConnectingSuitedCards.entrySet()) {
                     if(combo1PlusBoard.containsAll(entry.getValue())) {
                         highestStraightThatIsPresentInCombo1PlusBoard = entry.getKey();
                     }
