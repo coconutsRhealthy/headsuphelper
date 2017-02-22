@@ -17,8 +17,6 @@ public interface Actionable extends RangeBuildable {
 
     void addHoleCardsToKnownGameCards();
 
-    double getBotTotalBetSize();
-
     double getBotStack();
 
     List<Card> getFlopCards();

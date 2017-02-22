@@ -21,6 +21,7 @@ public class PostFlopRangeBuilder {
     private FlushDrawEvaluator flushDrawEvaluator;
     private StraightDrawEvaluator straightDrawEvaluator;
     private HighCardDrawEvaluator highCardDrawEvaluator;
+    private double botTotalBetSize;
     private double opponentTotalBetSize;
     private double potSize;
     private double bigBlind;
@@ -49,6 +50,7 @@ public class PostFlopRangeBuilder {
 
 
     public PostFlopRangeBuilder(RangeBuildable rangeBuildable, BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
+        botTotalBetSize = rangeBuildable.getBotTotalBetSize();
         opponentTotalBetSize = rangeBuildable.getOpponentTotalBetSize();
         potSize = rangeBuildable.getPotSize();
         bigBlind = rangeBuildable.getBigBlind();
@@ -66,102 +68,96 @@ public class PostFlopRangeBuilder {
 
     public Set<Set<Card>> getOpponentPostFlopRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> range;
-        double bbPotSize = potSize / bigBlind;
+        double bbPotSizePlusOpponentTotalBetSize = (potSize + opponentTotalBetSize) / bigBlind;
 
-        if(bbPotSize <= 7) {
+        if(bbPotSizePlusOpponentTotalBetSize <= 7) {
             range = previousRange;
-        } else if(bbPotSize > 7 && bbPotSize <= 16) {
-            range = get7to16bbRange(previousRange);
-        } else if(bbPotSize > 16 && bbPotSize <= 33) {
-            range = get16to33bbRange(previousRange);
-        } else if(bbPotSize > 33 && bbPotSize < 70) {
-            range = get33to70bbRange(previousRange);
+        } else if(bbPotSizePlusOpponentTotalBetSize > 7 && bbPotSizePlusOpponentTotalBetSize <= 20) {
+            range = get7to20bbRange(previousRange);
+        } else if(bbPotSizePlusOpponentTotalBetSize > 20 && bbPotSizePlusOpponentTotalBetSize <= 40) {
+            range = get20to40bbRange(previousRange);
+        } else if(bbPotSizePlusOpponentTotalBetSize > 40 && bbPotSizePlusOpponentTotalBetSize < 90) {
+            range = get40to90bbRange(previousRange);
         } else {
-            range = getAbove70bbRange(previousRange);
+            range = getAbove90bbRange(previousRange);
         }
         return range;
     }
 
     //helper methods
-    private Set<Set<Card>> get7to16bbRange(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _7to16bbRange;
+    private Set<Set<Card>> get7to20bbRange(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _7to20bbRange;
 
-        double opponentBetToPotRatio = getOpponentBetToPotRatio();
+        double odds = getFacingPotOdds();
 
-        if(opponentBetToPotRatio <= 0.2) {
-            _7to16bbRange = previousRange;
-        } else if(opponentBetToPotRatio > 0.2 && opponentBetToPotRatio <= 0.5) {
-            _7to16bbRange = get7to16bb20to50percent(previousRange);
-        } else if(opponentBetToPotRatio > 0.5 && opponentBetToPotRatio <= 1.0) {
-            _7to16bbRange = get7to16bb50to100percent(previousRange);
+        if(odds <= 0.167) {
+            _7to20bbRange = previousRange;
+        } else if(odds > 0.167 && odds <= 0.33) {
+            _7to20bbRange = get7to20bb16to33odds(previousRange);
+        } else if(odds > 0.33 && odds <= 0.5) {
+            _7to20bbRange = get7to20bb33to50odds(previousRange);
         } else {
-            _7to16bbRange = get7to16bbAbove100percent(previousRange);
+            _7to20bbRange = get7to20bbAbove50odds(previousRange);
         }
-        return _7to16bbRange;
+        return _7to20bbRange;
     }
 
-    private Set<Set<Card>> get16to33bbRange(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _16to33bbRange;
+    private Set<Set<Card>> get20to40bbRange(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _20to40bbRange;
 
-        double opponentBetToPotRatio = getOpponentBetToPotRatio();
+        double odds = getFacingPotOdds();
 
-        if(opponentBetToPotRatio <= 0.2) {
-            _16to33bbRange = previousRange;
-        } else if(opponentBetToPotRatio > 0.2 && opponentBetToPotRatio <= 0.5) {
-            _16to33bbRange = get16to33bb20to50percent(previousRange);
-        } else if(opponentBetToPotRatio > 0.5 && opponentBetToPotRatio <= 1.0) {
-            _16to33bbRange = get16to33bb50to100percent(previousRange);
+        if(odds <= 0.167) {
+            _20to40bbRange = previousRange;
+        } else if(odds > 0.167 && odds <= 0.33) {
+            _20to40bbRange = get20to40bb16to33odds(previousRange);
+        } else if(odds > 0.33 && odds <= 0.5) {
+            _20to40bbRange = get20to40bb33to50odds(previousRange);
         } else {
-            _16to33bbRange = get16to33bbAbove100percent(previousRange);
+            _20to40bbRange = get20to40bbAbove50odds(previousRange);
         }
-        return _16to33bbRange;
+        return _20to40bbRange;
     }
 
-    private Set<Set<Card>> get33to70bbRange(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _33to70bbRange;
+    private Set<Set<Card>> get40to90bbRange(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _40to90bbRange;
 
-        double opponentBetToPotRatio = getOpponentBetToPotRatio();
+        double odds = getFacingPotOdds();
 
-        if(opponentBetToPotRatio <= 0.2) {
-            _33to70bbRange = previousRange;
-        } else if(opponentBetToPotRatio > 0.2 && opponentBetToPotRatio <= 0.5) {
-            _33to70bbRange = get33to70bb20to50percent(previousRange);
-        } else if(opponentBetToPotRatio > 0.5 && opponentBetToPotRatio <= 1.0) {
-            _33to70bbRange = get33to70bb50to100percent(previousRange);
+        if(odds <= 0.167) {
+            _40to90bbRange = previousRange;
+        } else if(odds > 0.167 && odds <= 0.33) {
+            _40to90bbRange = get40to90bb16to33odds(previousRange);
+        } else if(odds > 0.33 && odds <= 0.5) {
+            _40to90bbRange = get40to90bb33to50odds(previousRange);
         } else {
-            _33to70bbRange = get33to70bbAbove100percent(previousRange);
+            _40to90bbRange = get40to90bbAbove50odds(previousRange);
         }
-        return _33to70bbRange;
+        return _40to90bbRange;
     }
 
-    private Set<Set<Card>> getAbove70bbRange(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> above70bbRange;
+    private Set<Set<Card>> getAbove90bbRange(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> above90bbRange;
 
-        double opponentBetToPotRatio = getOpponentBetToPotRatio();
+        double odds = getFacingPotOdds();
 
-        if(opponentBetToPotRatio <= 0.2) {
-            above70bbRange = previousRange;
-        } else if(opponentBetToPotRatio > 0.2 && opponentBetToPotRatio <= 0.5) {
-            above70bbRange = getAbove70bb20to50percent(previousRange);
+        if(odds <= 0.167) {
+            above90bbRange = previousRange;
+        } else if(odds > 0.167 && odds <= 0.33) {
+            above90bbRange = getAbove90bb16to33odds(previousRange);
         } else {
-            above70bbRange = getAbove70bbAbove50percent(previousRange);
+            above90bbRange = getAbove90bbAbove33odds(previousRange);
         }
-        return above70bbRange;
+        return above90bbRange;
     }
 
-    private double getOpponentBetToPotRatio() {
-        double opponentBetToPotRatio;
-
-        if(opponentFormerTotalCallAmount != 0) {
-            opponentBetToPotRatio = opponentFormerTotalCallAmount / potSize;
-        } else {
-            opponentBetToPotRatio = opponentTotalBetSize / potSize;
-        }
-        return opponentBetToPotRatio;
+    private double getFacingPotOdds() {
+        double amountToCall = opponentTotalBetSize - botTotalBetSize;
+        double amountToWin = potSize + opponentTotalBetSize + botTotalBetSize;
+        return amountToCall / amountToWin;
     }
 
-
-    private Set<Set<Card>> get7to16bb20to50percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get7to20bb16to33odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _7to16bb20to50percent = new HashSet<>();
 
         //value
@@ -204,7 +200,7 @@ public class PostFlopRangeBuilder {
         return _7to16bb20to50percent;
     }
 
-    private Set<Set<Card>> get7to16bb50to100percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get7to20bb33to50odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _7to16bb50to100percent = new HashSet<>();
 
         //value
@@ -248,7 +244,7 @@ public class PostFlopRangeBuilder {
         return _7to16bb50to100percent;
     }
 
-    private Set<Set<Card>> get7to16bbAbove100percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get7to20bbAbove50odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _7to16bbAbove100percent = new HashSet<>();
 
         //value
@@ -282,7 +278,7 @@ public class PostFlopRangeBuilder {
         return _7to16bbAbove100percent;
     }
 
-    private Set<Set<Card>> get16to33bb20to50percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get20to40bb16to33odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _16to33bb20to50percent = new HashSet<>();
 
         //value
@@ -328,7 +324,7 @@ public class PostFlopRangeBuilder {
         return _16to33bb20to50percent;
     }
 
-    private Set<Set<Card>> get16to33bb50to100percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get20to40bb33to50odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _16to33bb50to100percent = new HashSet<>();
 
         //value
@@ -368,7 +364,7 @@ public class PostFlopRangeBuilder {
         return _16to33bb50to100percent;
     }
 
-    private Set<Set<Card>> get16to33bbAbove100percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get20to40bbAbove50odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _16to33bbAbove100percent = new HashSet<>();
 
         //value
@@ -402,7 +398,7 @@ public class PostFlopRangeBuilder {
         return _16to33bbAbove100percent;
     }
 
-    private Set<Set<Card>> get33to70bb20to50percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get40to90bb16to33odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _33to70bb20to50percent = new HashSet<>();
 
         //value
@@ -440,7 +436,7 @@ public class PostFlopRangeBuilder {
         return _33to70bb20to50percent;
     }
 
-    private Set<Set<Card>> get33to70bb50to100percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get40to90bb33to50odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _33to70bb50to100percent = new HashSet<>();
 
         //value
@@ -474,7 +470,7 @@ public class PostFlopRangeBuilder {
         return _33to70bb50to100percent;
     }
 
-    private Set<Set<Card>> get33to70bbAbove100percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> get40to90bbAbove50odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _33to70bbAbove100percent = new HashSet<>();
 
         //value
@@ -508,7 +504,7 @@ public class PostFlopRangeBuilder {
         return _33to70bbAbove100percent;
     }
 
-    private Set<Set<Card>> getAbove70bb20to50percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> getAbove90bb16to33odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> above70bb20to50percent = new HashSet<>();
 
         //value
@@ -546,7 +542,7 @@ public class PostFlopRangeBuilder {
         return above70bb20to50percent;
     }
 
-    private Set<Set<Card>> getAbove70bbAbove50percent(Set<Set<Card>> previousRange) {
+    private Set<Set<Card>> getAbove90bbAbove33odds(Set<Set<Card>> previousRange) {
         Set<Set<Card>> above70bbAbove50percent = new HashSet<>();
 
         //value

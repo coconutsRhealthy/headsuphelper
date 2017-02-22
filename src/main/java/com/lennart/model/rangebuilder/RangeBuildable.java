@@ -28,6 +28,8 @@ public interface RangeBuildable {
 
     double getBigBlind();
 
+    double getBotTotalBetSize();
+
     double getOpponentTotalBetSize();
 
     boolean isBotIsButton();

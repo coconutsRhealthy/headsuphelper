@@ -230,8 +230,14 @@ public class PostFlopActionBuilder {
             } else {
                 valueAction = null;
             }
-        } else {
+        } else if (sizing / bigBlind > 40 && sizing / bigBlind <= 70) {
             if(handStrengthAgainstRange > 0.80) {
+                valueAction = getPassiveOrAggressiveValueAction(bettingAction, passiveAction);
+            } else {
+                valueAction = null;
+            }
+        } else {
+            if(handStrengthAgainstRange > 0.95) {
                 valueAction = getPassiveOrAggressiveValueAction(bettingAction, passiveAction);
             } else {
                 valueAction = null;
