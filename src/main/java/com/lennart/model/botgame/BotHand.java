@@ -352,6 +352,7 @@ public class BotHand implements RangeBuildable, Actionable {
         this.botStack = botStack;
     }
 
+    @Override
     public double getOpponentStack() {
         return opponentStack;
     }

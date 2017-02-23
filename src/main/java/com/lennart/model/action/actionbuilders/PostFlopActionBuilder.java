@@ -51,27 +51,181 @@ public class PostFlopActionBuilder {
         return null;
     }
 
-    public double getSize() {
+    public double getSizing() {
+        double sizing = 0;
+        List<Card> board = boardEvaluator.getBoard();
+
+        if(board.size() == 3) {
+            sizing = getFlopSizing();
+        } else if(board.size() == 4) {
+            sizing = getTurnSizing();
+        } else if(board.size() == 5) {
+            sizing = getRiverSizing();
+        }
+        return sizing;
+    }
+
+    private double getFlopSizing() {
+        double flopSizing;
+
         double opponentBetSize = actionable.getOpponentTotalBetSize();
         double potSize = actionable.getPotSize();
-        double computerStack = actionable.getBotStack();
-        double size;
+        double potSizeBb = potSize / bigBlind;
+        double botStack = actionable.getBotStack();
+        double opponentStack = actionable.getOpponentStack();
+        double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
-        if(opponentBetSize == 0) {
-            if(0.75 * potSize < computerStack) {
-                size = 0.75 * potSize;
+        if(botStack <= 1.2 * potSize) {
+            flopSizing = botStack;
+        } else if(opponentStack <= 1.2 * potSize) {
+            if(botStack > opponentStack) {
+                flopSizing = opponentStack;
             } else {
-                size = computerStack;
+                flopSizing = botStack;
             }
         } else {
-            if((1.75 * opponentBetSize) + (0.75 * potSize) < computerStack) {
-                size = (1.75 * opponentBetSize) + (0.75 * potSize);
-            } else {
-                size = computerStack;
-            }
+            if(opponentBetSize == 0) {
+                if(potSizeBb <= 8) {
+                    flopSizing = 0.75 * potSize;
+                } else if(potSizeBb > 8 && potSizeBb <= 24) {
+                    double flopBetPercentage = getFlopBetPercentage(effectiveStack, potSize, 0.7, 0.75);
 
+                    if(flopBetPercentage < 0.37) {
+                        flopBetPercentage = 0.5;
+                    }
+
+                    flopSizing = flopBetPercentage * potSize;
+                } else {
+                    double flopBetPercentage = getFlopBetPercentage(effectiveStack, potSize, 0.33, 0.51);
+
+                    if(flopBetPercentage < 0.2) {
+                        flopBetPercentage = 0.2;
+                    }
+
+                    flopSizing = flopBetPercentage * potSize;
+                }
+            } else {
+                double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
+
+                //todo: fixen als raise amount heel klein is relative to pot
+
+                if(raiseAmount > botStack) {
+                    flopSizing = botStack;
+                } else {
+                    flopSizing = raiseAmount;
+                }
+            }
         }
-        return size;
+
+        return flopSizing;
+    }
+
+    private double getTurnSizing() {
+        double turnSizing;
+
+        double opponentBetSize = actionable.getOpponentTotalBetSize();
+        double potSize = actionable.getPotSize();
+        double botStack = actionable.getBotStack();
+        double opponentStack = actionable.getOpponentStack();
+        double effectiveStack = getEffectiveStack(botStack, opponentStack);
+
+        if(botStack <= 1.2 * potSize) {
+            turnSizing = botStack;
+        } else if(opponentStack <= 1.2 * potSize) {
+            if(botStack > opponentStack) {
+                turnSizing = opponentStack;
+            } else {
+                turnSizing = botStack;
+            }
+        } else {
+            if(opponentBetSize == 0) {
+                double turnBetPercentage3bet = getTurnBetPercentage(effectiveStack, potSize, 0.75);
+                double turnBetPercentage4bet = getTurnBetPercentage(effectiveStack, potSize, 0.51);
+
+                if(turnBetPercentage3bet > 0.75) {
+                    turnSizing = 0.75 * potSize;
+                } else if(turnBetPercentage3bet > 0.5) {
+                    turnSizing = turnBetPercentage3bet * potSize;
+                } else if(turnBetPercentage3bet > 0.4) {
+                    turnSizing = getTurnBetPercentage(effectiveStack, potSize, 0.67) * potSize;
+                } else if(turnBetPercentage4bet > 0.2) {
+                    turnSizing = turnBetPercentage4bet * potSize;
+                } else {
+                    turnSizing = 0.2 * potSize;
+                }
+            } else {
+                double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
+
+                //todo: fixen als raise amount heel klein is relative to pot
+
+                if(raiseAmount > botStack) {
+                    turnSizing = botStack;
+                } else {
+                    turnSizing = raiseAmount;
+                }
+            }
+        }
+
+        return turnSizing;
+    }
+
+    private double getRiverSizing() {
+        double riverSizing;
+
+        double potSize = actionable.getPotSize();
+        double botStack = actionable.getBotStack();
+
+        if(botStack <= 1.2 * potSize) {
+            riverSizing = botStack;
+        } else {
+            riverSizing = 0.75 * potSize;
+        }
+        return riverSizing;
+    }
+
+    private double getEffectiveStack(double botStack, double opponentStack) {
+        if(botStack > opponentStack) {
+            return opponentStack;
+        } else {
+            return botStack;
+        }
+    }
+
+    private double calculateRaiseAmount(double facingBetSize, double potSize, double odds) {
+        return (potSize / (odds - 1)) + (((odds + 1) * facingBetSize) / (odds - 1));
+    }
+
+    private double getFlopBetPercentage(double effectiveStackSize, double potSize, double turnBetPercentage, double riverBetPercentage) {
+        double flopBetPercentage;
+
+        double s = effectiveStackSize;
+        double p = potSize;
+        double t = turnBetPercentage;
+        double r = riverBetPercentage;
+
+        flopBetPercentage = (s - (2 * t * p * r) - (p * r) - (t * p)) / ((4 * t * p * r) + (2 * p * r) + (2 * t * p) + p);
+
+        if(flopBetPercentage <= 0) {
+            return 0;
+        } else {
+            return flopBetPercentage;
+        }
+    }
+
+    private double getTurnBetPercentage(double effectiveStackSize, double potSize, double riverBetPercentage) {
+        double turnBetPercentage;
+
+        double s = effectiveStackSize;
+        double p = potSize;
+        double r = riverBetPercentage;
+
+        turnBetPercentage = (s - (r * p)) / ((2 * r * p) + p);
+
+        if (turnBetPercentage <= 0) {
+            return 0;
+        } else {
+            return turnBetPercentage;
+        }
     }
 
     private String getIpAction(double handStrengthAgainstRange) {
@@ -211,7 +365,7 @@ public class PostFlopActionBuilder {
 
     private String getValueAction(double handStrengthAgainstRange, String bettingAction, String passiveAction) {
         String valueAction;
-        double sizing = getSize();
+        double sizing = getSizing();
         if(sizing / bigBlind <= 5) {
             if(handStrengthAgainstRange > 0.44) {
                 valueAction = getPassiveOrAggressiveValueAction(bettingAction, passiveAction);

@@ -19,6 +19,8 @@ public interface Actionable extends RangeBuildable {
 
     double getBotStack();
 
+    double getOpponentStack();
+
     List<Card> getFlopCards();
 
     boolean isOnlyCallRangeNeeded();

@@ -598,6 +598,11 @@ public class ComputerGame implements RangeBuildable, Actionable {
         this.bigBlind = bigBlind;
     }
 
+    @Override
+    public double getOpponentStack() {
+        return getMyStack();
+    }
+
     public double getMyStack() {
         return myStack;
     }

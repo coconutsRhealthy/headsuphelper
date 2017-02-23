@@ -97,7 +97,7 @@ public class Action {
             }
         } else {
             if(myAction.equals("bet") || myAction.equals("raise")) {
-                sizing = postFlopActionBuilder.getSize();
+                sizing = postFlopActionBuilder.getSizing();
             }
         }
     }

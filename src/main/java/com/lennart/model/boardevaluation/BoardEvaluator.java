@@ -885,6 +885,10 @@ public class BoardEvaluator {
         return flushDrawEvaluator;
     }
 
+    public List<Card> getBoard() {
+        return board;
+    }
+
     public int getNumberOfArrivedDraws() {
         if(board.size() == 3) {
             return straightEvaluator.getNumberOfStraightsOnFlop() + flushEvaluator.getNumberOfFlushesOnFlop();
