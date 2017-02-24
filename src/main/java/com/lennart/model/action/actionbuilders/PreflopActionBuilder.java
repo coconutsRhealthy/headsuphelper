@@ -30,7 +30,11 @@ public class PreflopActionBuilder {
         double bbOpponentTotalBetSize = actionable.getOpponentTotalBetSize() / actionable.getBigBlind();
 
         if(bbOpponentTotalBetSize == 1) {
-            action = get05betF1bet(actionable);
+            if(actionable.isBotIsButton()) {
+                action = get05betF1bet(actionable);
+            } else {
+                action = get1betFcheck(actionable);
+            }
         } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
             action = get1betF2bet(actionable);
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
@@ -55,7 +59,9 @@ public class PreflopActionBuilder {
 
         if(potSizePlusAllBetsInBb == 1.5) {
             size = 2.5 * actionable.getBigBlind();
-        } else if(potSizePlusAllBetsInBb > 1.5 && potSizePlusAllBetsInBb <= 4) {
+        } else if(potSizePlusAllBetsInBb == 2) {
+            size = 3.5 * actionable.getBigBlind();
+        } else if(potSizePlusAllBetsInBb > 2 && potSizePlusAllBetsInBb <= 4) {
             size = 3.2 * actionable.getOpponentTotalBetSize();
         } else if(potSizePlusAllBetsInBb > 4 && potSizePlusAllBetsInBb <= 12) {
             size = 2.25 * actionable.getOpponentTotalBetSize();
@@ -106,6 +112,62 @@ public class PreflopActionBuilder {
             return "raise";
         } else {
             return "fold";
+        }
+    }
+
+    private String get1betFcheck(Actionable actionable) {
+        actionable.removeHoleCardsFromKnownGameCards();
+
+        _3betRangeBuilder x3BetRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
+
+        Map<Integer, Set<Card>> x3bet_comboMap95Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3BetRangeBuilder.getComboMap95Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap70Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3BetRangeBuilder.getComboMap70Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap50Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3BetRangeBuilder.getComboMap50Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap35Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3BetRangeBuilder.getComboMap35Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap20Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3BetRangeBuilder.getComboMap20Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap10Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3BetRangeBuilder.getComboMap10Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3BetRangeBuilder.getComboMap5Percent());
+
+        double percentage2bet;
+
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+
+        percentage2bet = setPercentage(x3bet_comboMap95Percent, holeCardsAsSet, 0.95);
+
+        if(percentage2bet == 0) {
+            percentage2bet = setPercentage(x3bet_comboMap70Percent, holeCardsAsSet, 0.70);
+        }
+        if(percentage2bet == 0) {
+            percentage2bet = setPercentage(x3bet_comboMap50Percent, holeCardsAsSet, 0.50);
+        }
+        if(percentage2bet == 0) {
+            percentage2bet = setPercentage(x3bet_comboMap35Percent, holeCardsAsSet, 0.35);
+        }
+        if(percentage2bet == 0) {
+            percentage2bet = setPercentage(x3bet_comboMap20Percent, holeCardsAsSet, 0.20);
+        }
+        if(percentage2bet == 0) {
+            percentage2bet = setPercentage(x3bet_comboMap10Percent, holeCardsAsSet, 0.10);
+        }
+        if(percentage2bet == 0) {
+            percentage2bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
+        }
+
+        actionable.addHoleCardsToKnownGameCards();
+
+        double random = Math.random();
+        if(random <= 1 - percentage2bet) {
+            return "check";
+        } else {
+            return "raise";
         }
     }
 

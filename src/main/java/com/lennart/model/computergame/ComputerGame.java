@@ -147,6 +147,9 @@ public class ComputerGame implements RangeBuildable, Actionable {
                 resetActions();
                 proceedToNextStreet();
             }
+        } else if(board == null && opponentTotalBetSize == bigBlind && computerTotalBetSize == bigBlind){
+            resetActions();
+            proceedToNextStreet();
         }
     }
 
@@ -218,10 +221,20 @@ public class ComputerGame implements RangeBuildable, Actionable {
         }
 
         opponentFormerTotalCallAmount = opponentTotalBetSize;
-        updatePotSize("call");
-        resetAllBets();
 
-        if(board == null || (board.size() < 5)) {
+        //don't updatPotSize and resetAllBets if opponent is button and calls bb
+        if(board != null || computerIsButton || opponentTotalBetSize != bigBlind || computerTotalBetSize != bigBlind) {
+            updatePotSize("call");
+            resetAllBets();
+        }
+
+        if(board == null) {
+            //don't resetActions and proceedToNextStreet if opponent is button and calls bb
+            if(computerIsButton || opponentTotalBetSize != bigBlind || computerTotalBetSize != bigBlind) {
+                resetActions();
+                proceedToNextStreet();
+            }
+        } else if(board.size() < 5) {
             resetActions();
             proceedToNextStreet();
         } else if(board.size() == 5) {
@@ -570,7 +583,9 @@ public class ComputerGame implements RangeBuildable, Actionable {
 
     @Override
     public List<Card> getBotHoleCards() {
-        return getComputerHoleCards();
+        List<Card> computerHoleCardsCopy = new ArrayList<>();
+        computerHoleCardsCopy.addAll(computerHoleCards);
+        return computerHoleCardsCopy;
     }
 
     public List<Card> getComputerHoleCards() {
