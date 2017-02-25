@@ -152,6 +152,9 @@ public class ComputerGame implements RangeBuildable, Actionable {
                 proceedToNextStreet();
             }
         } else if(board == null && opponentTotalBetSize == bigBlind && computerTotalBetSize == bigBlind){
+            String checkThatShouldBeTreatedAsCall = "call";
+            updatePotSize(checkThatShouldBeTreatedAsCall);
+            resetAllBets();
             resetActions();
             proceedToNextStreet();
         }
