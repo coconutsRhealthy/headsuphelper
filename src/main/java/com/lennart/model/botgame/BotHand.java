@@ -82,6 +82,7 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public BotHand getNewBotAction() {
         RangeBuilder rangeBuilder = new RangeBuilder(this);
+        opponentRange = rangeBuilder.getOpponentRange();
         botAction = new Action(this, rangeBuilder);
         updateActionHistory(botAction.getWrittenAction());
         return this;
@@ -320,7 +321,6 @@ public class BotHand implements RangeBuildable, Actionable {
         knownGameCards.addAll(holeCardsAsSet);
     }
 
-    @Override
     public boolean isOnlyCallRangeNeeded() {
         return false;
     }
@@ -527,7 +527,6 @@ public class BotHand implements RangeBuildable, Actionable {
         return opponentRange;
     }
 
-    @Override
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
     }

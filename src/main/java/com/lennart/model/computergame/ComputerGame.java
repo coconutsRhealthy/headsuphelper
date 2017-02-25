@@ -108,9 +108,10 @@ public class ComputerGame implements RangeBuildable, Actionable {
 
     private void doComputerAction() {
         RangeBuilder rangeBuilder = new RangeBuilder(this);
-        computerAction = new Action(this, rangeBuilder);
+        opponentRange = rangeBuilder.getOpponentRange();
 
         if(!onlyCallRangeNeeded) {
+            computerAction = new Action(this, rangeBuilder);
             computerWrittenAction = computerAction.getWrittenAction();
             updateActionHistory(computerWrittenAction);
 
@@ -119,9 +120,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
             } else if(computerWrittenAction.contains("check")) {
                 processComputerCheckAction();
             } else if(computerWrittenAction.contains("call")) {
-                if(!onlyCallRangeNeeded) {
-                    processComputerCallAction();
-                }
+                processComputerCallAction();
             } else if(computerWrittenAction.contains("bet")) {
                 processComputerBetAction();
             } else if(computerWrittenAction.contains("raise")) {
@@ -784,7 +783,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
         return opponentRange;
     }
 
-    @Override
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
     }
@@ -852,7 +850,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
         this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
     }
 
-    @Override
     public boolean isOnlyCallRangeNeeded() {
         return onlyCallRangeNeeded;
     }

@@ -43,9 +43,7 @@ public class Action {
     //helper methods
     private void getAndProcessPreflopAction(Actionable actionable) {
         preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
-        rangeBuilder.getOpponentRange(actionable);
-        String action;
-        action = preflopActionBuilder.getAction(actionable);
+        String action = preflopActionBuilder.getAction(actionable);
         setNewWrittenAction(action, actionable.getBoard());
         setSizingIfNecessary(actionable, action);
     }
@@ -53,15 +51,9 @@ public class Action {
     private void getAndProcessPostFlopAction(Actionable actionable) {
         postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
                 rangeBuilder.getHandEvaluator(), actionable);
-        Set<Set<Card>> opponentRange;
-        String action;
-        opponentRange = rangeBuilder.getOpponentRange(actionable);
-
-        if(!actionable.isOnlyCallRangeNeeded()) {
-            action = postFlopActionBuilder.getAction(opponentRange);
-            setNewWrittenAction(action, actionable.getBoard());
-            setSizingIfNecessary(actionable, action);
-        }
+        String action = postFlopActionBuilder.getAction(actionable.getOpponentRange());
+        setNewWrittenAction(action, actionable.getBoard());
+        setSizingIfNecessary(actionable, action);
     }
 
     private void setNewWrittenAction(String action, List<Card> board) {

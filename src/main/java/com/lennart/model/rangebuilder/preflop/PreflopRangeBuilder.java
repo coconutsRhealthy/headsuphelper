@@ -47,9 +47,6 @@ public class PreflopRangeBuilder {
 
     public Set<Set<Card>> getOpponentPreflopRange() {
         Set<Set<Card>> range;
-        //double bbOpponentTotalBetSize = (potSize / 2) / bigBlind;
-
-        //bovenstaande werkt niet als de pot nog 0 is...
 
         double bbOpponentTotalBetSize;
         if(potSize == 0) {

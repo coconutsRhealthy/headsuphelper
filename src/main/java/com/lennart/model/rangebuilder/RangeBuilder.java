@@ -1,6 +1,5 @@
 package com.lennart.model.rangebuilder;
 
-import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
@@ -44,6 +43,8 @@ public class RangeBuilder {
     private double opponentPreCall2betStat;
     private double opponentPre3betStat;
 
+    private Set<Set<Card>> opponentRange;
+
     public RangeBuilder(RangeBuildable rangeBuildable) {
         holeCards = rangeBuildable.getBotHoleCards();
         board = rangeBuildable.getBoard();
@@ -64,18 +65,11 @@ public class RangeBuilder {
             highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
             handEvaluator = new HandEvaluator(holeCards, boardEvaluator, this);
         }
+
+        opponentRange = getOpponentRangeInitialize();
     }
 
-    public Set<Set<Card>> getOpponentRange(Actionable actionable) {
-        Set<Set<Card>> opponentRange;
-
-        if(opponentLastActionWasPreflop) {
-            opponentRange = preflopRangeBuilder.getOpponentPreflopRange();
-        } else {
-            opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);
-        }
-        actionable.setOpponentRange(opponentRange);
-
+    public Set<Set<Card>> getOpponentRange() {
         return opponentRange;
     }
 
@@ -205,6 +199,17 @@ public class RangeBuilder {
     }
 
     //helper methods
+    private Set<Set<Card>> getOpponentRangeInitialize() {
+        Set<Set<Card>> opponentRange;
+
+        if(opponentLastActionWasPreflop) {
+            opponentRange = preflopRangeBuilder.getOpponentPreflopRange();
+        } else {
+            opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);
+        }
+        return opponentRange;
+    }
+
     private Set<Set<Card>> getAllNonBackDoorDraws() {
         Set<Set<Card>> allNonBackDoorDraws = new HashSet<>();
 
