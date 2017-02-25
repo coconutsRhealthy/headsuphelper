@@ -77,12 +77,6 @@ public class PostFlopActionBuilder {
 
         if(botStack <= 1.2 * potSize) {
             flopSizing = botStack;
-        } else if(opponentStack <= 1.2 * potSize) {
-            if(botStack > opponentStack) {
-                flopSizing = opponentStack;
-            } else {
-                flopSizing = botStack;
-            }
         } else {
             if(opponentBetSize == 0) {
                 if(potSizeBb <= 8) {
@@ -93,6 +87,9 @@ public class PostFlopActionBuilder {
                     if(flopBetPercentage < 0.37) {
                         flopBetPercentage = 0.5;
                     }
+                    if(flopBetPercentage > 0.75) {
+                        flopBetPercentage = 0.75;
+                    }
 
                     flopSizing = flopBetPercentage * potSize;
                 } else {
@@ -101,22 +98,22 @@ public class PostFlopActionBuilder {
                     if(flopBetPercentage < 0.2) {
                         flopBetPercentage = 0.2;
                     }
+                    if(flopBetPercentage > 0.75) {
+                        flopBetPercentage = 0.75;
+                    }
 
                     flopSizing = flopBetPercentage * potSize;
                 }
             } else {
                 double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
 
-                //todo: fixen als raise amount heel klein is relative to pot
-
-                if(raiseAmount > botStack) {
+                if(botStack <= 1.2 * raiseAmount) {
                     flopSizing = botStack;
                 } else {
                     flopSizing = raiseAmount;
                 }
             }
         }
-
         return flopSizing;
     }
 
@@ -131,12 +128,6 @@ public class PostFlopActionBuilder {
 
         if(botStack <= 1.2 * potSize) {
             turnSizing = botStack;
-        } else if(opponentStack <= 1.2 * potSize) {
-            if(botStack > opponentStack) {
-                turnSizing = opponentStack;
-            } else {
-                turnSizing = botStack;
-            }
         } else {
             if(opponentBetSize == 0) {
                 double turnBetPercentage3bet = getTurnBetPercentage(effectiveStack, potSize, 0.75);
@@ -156,29 +147,37 @@ public class PostFlopActionBuilder {
             } else {
                 double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
 
-                //todo: fixen als raise amount heel klein is relative to pot
-
-                if(raiseAmount > botStack) {
+                if(botStack <= 1.2 * raiseAmount) {
                     turnSizing = botStack;
                 } else {
                     turnSizing = raiseAmount;
                 }
             }
         }
-
         return turnSizing;
     }
 
     private double getRiverSizing() {
         double riverSizing;
 
+        double opponentBetSize = actionable.getOpponentTotalBetSize();
         double potSize = actionable.getPotSize();
         double botStack = actionable.getBotStack();
 
-        if(botStack <= 1.2 * potSize) {
-            riverSizing = botStack;
+        if(opponentBetSize == 0) {
+            if(botStack <= 1.2 * potSize) {
+                riverSizing = botStack;
+            } else {
+                riverSizing = 0.75 * potSize;
+            }
         } else {
-            riverSizing = 0.75 * potSize;
+            double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
+
+            if(botStack <= 1.2 * raiseAmount) {
+                riverSizing = botStack;
+            } else {
+                riverSizing = raiseAmount;
+            }
         }
         return riverSizing;
     }
