@@ -118,7 +118,12 @@ public class ComputerGame implements RangeBuildable, Actionable {
             if(computerWrittenAction.contains("fold")) {
                 processComputerFoldAction();
             } else if(computerWrittenAction.contains("check")) {
+                boolean preflopCheck = isPreflopCheck();
                 processComputerCheckAction();
+
+                if(preflopCheck) {
+                    doComputerAction();
+                }
             } else if(computerWrittenAction.contains("call")) {
                 processComputerCallAction();
             } else if(computerWrittenAction.contains("bet")) {
@@ -560,6 +565,13 @@ public class ComputerGame implements RangeBuildable, Actionable {
             opponentPre3betStat = handsHumanOop3bet / handsHumanOopFacingPreflop2bet;
             opponentPreflopStatsDoneForHand = true;
         }
+    }
+
+    private boolean isPreflopCheck() {
+        if(board == null) {
+            return true;
+        }
+        return false;
     }
 
 
