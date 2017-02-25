@@ -72,7 +72,7 @@ public class PreflopRangeBuilder {
                 _2betRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(_2betRangeBuilder.getOpponent2betRange());
             }
-        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
+        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 12) {
             if(botIsButton) {
                 _3betRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(_3betRangeBuilder.getOpponent3betRange(rangeBuilder,
@@ -81,7 +81,7 @@ public class PreflopRangeBuilder {
                 call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(call3betRangeBuilder.getOpponentCall3betRange());
             }
-        } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 22) {
+        } else {
             if(botIsButton) {
                 call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(call4betRangeBuilder.getOpponentCall4betRange());
@@ -89,9 +89,6 @@ public class PreflopRangeBuilder {
                 _4betRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);
                 range = RangeBuilder.convertMapToSet(_4betRangeBuilder.getOpponent4betRange());
             }
-        } else {
-            //5bet
-            range = RangeBuilder.convertMapToSet(PreflopRangeBuilderUtil.getAllStartHandsAsSet());
         }
         return range;
     }

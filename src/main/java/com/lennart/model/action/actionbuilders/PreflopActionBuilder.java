@@ -5,6 +5,7 @@ import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.ip.Call5betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip._2betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.ip._4betRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.oop.Call2betRangeBuilder;
@@ -39,10 +40,10 @@ public class PreflopActionBuilder {
             action = get1betF2bet(actionable);
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
             action = get2betF3bet(actionable);
-        } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 22) {
+        } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 40) {
             action = get3betF4bet(actionable);
         } else {
-            //5bet
+            action = get4betF5bet(actionable);
         }
 
         return action;
@@ -449,6 +450,29 @@ public class PreflopActionBuilder {
             return "call";
         } else {
             return "raise";
+        }
+    }
+
+    private String get4betF5bet(Actionable actionable) {
+        actionable.removeHoleCardsFromKnownGameCards();
+
+        Call5betRangeBuilder call5betRangeBuilder = new Call5betRangeBuilder(preflopRangeBuilderUtil);
+
+        Map<Integer, Set<Card>> call5bet_comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call5betRangeBuilder.getComboMap100Percent());
+
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+
+        double percentageCall5bet = setPercentage(call5bet_comboMap100Percent, holeCardsAsSet, 1.0);
+
+        actionable.addHoleCardsToKnownGameCards();
+
+        double random = Math.random();
+        if(random < percentageCall5bet) {
+            return "call";
+        } else {
+            return "fold";
         }
     }
 
