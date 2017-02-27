@@ -56,32 +56,37 @@ public class HandEvaluator {
 
     public double getHandStrengthAgainstRange(List<Card> yourHoleCardsAsList, Set<Set<Card>> opponentRange, Map<Integer,
             Set<Set<Card>>> sortedCombos) {
-        Set<Card> yourHoleCards = convertListToSet(yourHoleCardsAsList);
+        Map<Integer, Set<Set<Card>>> rangeSortedCombos = new HashMap<>();
+        Set<Card> myHoleCards = new HashSet<>();
+        myHoleCards.addAll(yourHoleCardsAsList);
 
-        double combosInOpponentRangeBelowYourHand = 0;
-        double index;
-        boolean myHandHasBeenPassedInSortedCombos = false;
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            rangeSortedCombos.put(entry.getKey(), new HashSet<>());
 
-        loop: for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
             for(Set<Card> combo : entry.getValue()) {
-                if(combo.equals(yourHoleCards)) {
-                    myHandHasBeenPassedInSortedCombos = true;
-                    continue loop;
+                if(combo.equals(myHoleCards)) {
+                    rangeSortedCombos.get(entry.getKey()).add(combo);
                 }
 
                 Set<Set<Card>> rangeCopy = new HashSet<>();
                 rangeCopy.addAll(opponentRange);
 
                 if(!rangeCopy.add(combo)) {
-                    if(myHandHasBeenPassedInSortedCombos) {
-                        combosInOpponentRangeBelowYourHand++;
-                    }
+                    rangeSortedCombos.get(entry.getKey()).add(combo);
                 }
             }
         }
 
-        index = combosInOpponentRangeBelowYourHand / (opponentRange.size());
-        return index;
+        double handStrength = -1;
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : rangeSortedCombos.entrySet()) {
+            for(Set<Card> s : entry.getValue()) {
+                if(s.equals(myHoleCards)) {
+                    handStrength = getIndexOfHandInSortedCombos(entry.getKey(), rangeSortedCombos);
+                }
+            }
+        }
+        return handStrength;
     }
 
 //    public int getNumberOfArrivedDrawsInRange(String opponentRangeOrMyPerceivedRange) {
