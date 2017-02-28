@@ -5,7 +5,6 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
 
@@ -15,7 +14,6 @@ import java.util.*;
 public class HandEvaluator {
     private List<Card> holeCards;
     private BoardEvaluator boardEvaluator;
-    private RangeBuilder rangeBuilder;
     private StraightDrawEvaluator straightDrawEvaluator;
     private FlushDrawEvaluator flushDrawEvaluator;
     private HighCardDrawEvaluator highCardDrawEvaluator;
@@ -26,10 +24,9 @@ public class HandEvaluator {
         this.boardEvaluator = boardEvaluator;
     }
 
-    public HandEvaluator(List<Card> holeCards, BoardEvaluator boardEvaluator, RangeBuilder rangeBuilder) {
+    public HandEvaluator(List<Card> holeCards, BoardEvaluator boardEvaluator) {
         this.holeCards = holeCards;
         this.boardEvaluator = boardEvaluator;
-        this.rangeBuilder = rangeBuilder;
         straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
         highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
@@ -87,84 +84,6 @@ public class HandEvaluator {
             }
         }
         return handStrength;
-    }
-
-//    public int getNumberOfArrivedDrawsInRange(String opponentRangeOrMyPerceivedRange) {
-//        Map<Integer, Set<Card>> arrivedStraightDraws = boardEvaluator.getArrivedStraightDraws();
-//        Map<Integer, Set<Card>> arrivedFlushDraws = boardEvaluator.getArrivedFlushDraws();
-//        Map<Integer, Set<Set<Card>>> myPerceivedRange = rangeBuilder.getRange(opponentRangeOrMyPerceivedRange);
-//
-//        int counter = 0;
-//
-//        //de straights
-//        for (Map.Entry<Integer, Set<Card>> entry : arrivedStraightDraws.entrySet()) {
-//            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
-//                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
-//                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
-//                        counter ++;
-//                    }
-//                }
-//            }
-//        }
-//
-//        //de flushes
-//        for (Map.Entry<Integer, Set<Card>> entry : arrivedFlushDraws.entrySet()) {
-//            for (Map.Entry<Integer, Set<Set<Card>>> entry2 : myPerceivedRange.entrySet()) {
-//                for(Set<Card> myPerceivedRangeCombo : entry2.getValue()) {
-//                    if(entry.getValue().equals(myPerceivedRangeCombo)) {
-//                        counter ++;
-//                    }
-//                }
-//            }
-//        }
-//
-//        return counter;
-//    }
-
-    public double getPercentageOfYourPerceivedRangeThatHitsFlopRanks() {
-        //TODO: implement this method
-        return 0;
-    }
-
-    public double getPercentageOfYourPerceivedRangeThatHitsNewCard() {
-        //TODO: implement this method
-        return 0;
-    }
-
-//    public double getHandStrengthNeededToCall() {
-//        //TODO: implement this method
-//        return 0;
-//    }
-
-    public int getDrawEquityOfYourHand() {
-        //TODO: implement this method
-        return 0;
-    }
-
-    public boolean isSingleBetPot(List<String> actionHistory) {
-        //TODO: implement this method;
-
-        //single bet pot is pot singleRaised preflop, en geen raises postflop
-        //thus, in actionHistory, 'raise' can only be present once, for the 2bet preflop
-
-        //maybe you have to make this potsize dependent instead of actionHistory dependent
-
-        int counter = 0;
-
-        for(String action : actionHistory) {
-            if(action.contains("raise")) {
-                counter++;
-            }
-        }
-
-        if(counter == 1) {
-            return true;
-        }
-        return false;
-    }
-
-    public Map<String, Boolean> getHandDrawEvaluation() {
-        return handDrawEvaluation;
     }
 
     public boolean hasAnyDrawNonBackDoor() {

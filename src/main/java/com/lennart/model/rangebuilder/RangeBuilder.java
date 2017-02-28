@@ -63,7 +63,7 @@ public class RangeBuilder {
             flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
             straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
             highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
-            handEvaluator = new HandEvaluator(holeCards, boardEvaluator, this);
+            handEvaluator = new HandEvaluator(holeCards, boardEvaluator);
         }
 
         opponentRange = getOpponentRangeInitialize();
