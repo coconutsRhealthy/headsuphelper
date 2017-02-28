@@ -337,7 +337,7 @@ public class PostFlopActionBuilder {
         String drawCallingAction = null;
 
         double amountToCall = (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize());
-        double odds = amountToCall / actionable.getPotSize();
+        double odds = amountToCall / (actionable.getPotSize() + actionable.getOpponentTotalBetSize() + actionable.getBotTotalBetSize());
         boolean botIsButton = actionable.isBotIsButton();
 
         if(board.size() == 3 || board.size() == 4) {
@@ -353,7 +353,7 @@ public class PostFlopActionBuilder {
                     drawCallingAction = CALL;
                 }
                 if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(odds <= 0.75) {
+                    if(odds <= 0.45) {
                         if(board.size() == 3) {
                             drawCallingAction = CALL;
                         } else {
@@ -370,7 +370,7 @@ public class PostFlopActionBuilder {
                     }
                 }
                 if(handEvaluator.hasDrawOfType("strongOvercards")) {
-                    if(odds <= 0.75) {
+                    if(odds <= 0.45) {
                         if(board.size() == 3) {
                             if(Math.random() < 0.3) {
                                 drawCallingAction = CALL;
@@ -390,7 +390,7 @@ public class PostFlopActionBuilder {
                 }
             } else if (amountToCall / bigBlind > 20 && amountToCall / bigBlind < 40) {
                 if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(odds <= 0.75) {
+                    if(odds <= 0.45) {
                         if(board.size() == 3) {
                             drawCallingAction = CALL;
                         } else {
