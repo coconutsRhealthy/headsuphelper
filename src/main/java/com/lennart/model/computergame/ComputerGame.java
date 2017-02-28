@@ -39,7 +39,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
     private List<Card> board;
     private String computerWrittenAction;
     private Set<Set<Card>> opponentRange;
-    private List<String> actionHistory;
     private String handWinner;
     private int numberOfHandsPlayed;
     private double handsHumanOopFacingPreflop2bet;
@@ -84,7 +83,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
             opponentLastActionWasPreflop = false;
         }
 
-        updateActionHistory(myAction);
         calculateOpponentPreflopStats();
         boolean computerActionNeeded = isComputerActionNeeded();
 
@@ -113,7 +111,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
         if(!onlyCallRangeNeeded) {
             computerAction = new Action(this, rangeBuilder);
             computerWrittenAction = computerAction.getWrittenAction();
-            updateActionHistory(computerWrittenAction);
 
             if(computerWrittenAction.contains("fold")) {
                 processComputerFoldAction();
@@ -409,19 +406,11 @@ public class ComputerGame implements RangeBuildable, Actionable {
         riverCard = null;
         board = null;
         knownGameCards = null;
-        actionHistory = null;
         handWinner = null;
         opponentRange = null;
         computerWrittenAction = null;
         opponentPreflopStatsDoneForHand = false;
         opponentLastActionWasPreflop = true;
-    }
-
-    private void updateActionHistory(String action) {
-        if(actionHistory == null) {
-            actionHistory = new ArrayList<>();
-        }
-        actionHistory.add(action);
     }
 
     private void addCheckToWrittenAction() {
@@ -555,7 +544,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
 
     private void calculateOpponentPreflopStats() {
         if(!opponentPreflopStatsDoneForHand) {
-            if(board == null && computerIsButton && computerWrittenAction.contains("raise") && actionHistory.size() == 1) {
+            if(board == null && computerIsButton && computerWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
                 handsHumanOopFacingPreflop2bet++;
                 if(myAction.equals("call")) {
                     handsHumanOopCall2bet++;
@@ -800,15 +789,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
 
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
-    }
-
-    @Override
-    public List<String> getActionHistory() {
-        return actionHistory;
-    }
-
-    public void setActionHistory(List<String> actionHistory) {
-        this.actionHistory = actionHistory;
     }
 
     public String getHandWinner() {

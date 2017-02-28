@@ -20,7 +20,5 @@ public interface Actionable extends RangeBuildable {
 
     List<Card> getFlopCards();
 
-    List<String> getActionHistory();
-
     String getOpponentAction();
 }

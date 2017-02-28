@@ -25,14 +25,11 @@ public class PostFlopActionBuilder {
     private HandEvaluator handEvaluator;
     private Actionable actionable;
 
-    private List<String> actionHistory;
-
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
         bigBlind = actionable.getBigBlind();
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
         this.actionable = actionable;
-        actionHistory = actionable.getActionHistory();
     }
 
     public String getAction(Set<Set<Card>> opponentRange) {

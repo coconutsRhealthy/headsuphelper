@@ -46,7 +46,6 @@ public class BotHand implements RangeBuildable, Actionable {
     private Set<Card> knownGameCards;
     private List<Card> board;
     private Set<Set<Card>> opponentRange;
-    private List<String> actionHistory;
     private boolean opponentPreflopStatsDoneForHand;
     private double handsOpponentOopFacingPreflop2bet;
     private double handsOpponentOopCall2bet;
@@ -84,7 +83,6 @@ public class BotHand implements RangeBuildable, Actionable {
         RangeBuilder rangeBuilder = new RangeBuilder(this);
         opponentRange = rangeBuilder.getOpponentRange();
         botAction = new Action(this, rangeBuilder);
-        updateActionHistory(botAction.getWrittenAction());
         return this;
     }
 
@@ -140,7 +138,6 @@ public class BotHand implements RangeBuildable, Actionable {
 
     private void setOpponentAction() {
         opponentAction = gameVariablesFiller.getOpponentAction();
-        updateActionHistory(opponentAction);
     }
 
     private void setBotHoleCard1() {
@@ -255,16 +252,9 @@ public class BotHand implements RangeBuildable, Actionable {
         }
     }
 
-    private void updateActionHistory(String action) {
-        if(actionHistory == null) {
-            actionHistory = new ArrayList<>();
-        }
-        actionHistory.add(action);
-    }
-
     private void calculateOpponentPreflopStats() {
         if(!opponentPreflopStatsDoneForHand) {
-            if(board == null && botIsButton && botAction.getWrittenAction().contains("raise") && actionHistory.size() == 1) {
+            if(board == null && botIsButton && botAction.getWrittenAction().contains("raise") && opponentTotalBetSize == bigBlind) {
                 handsOpponentOopFacingPreflop2bet++;
                 if(botAction.equals("call")) {
                     handsOpponentOopCall2bet++;
@@ -529,15 +519,6 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
-    }
-
-    @Override
-    public List<String> getActionHistory() {
-        return actionHistory;
-    }
-
-    public void setActionHistory(List<String> actionHistory) {
-        this.actionHistory = actionHistory;
     }
 
     public boolean isOpponentPreflopStatsDoneForHand() {
