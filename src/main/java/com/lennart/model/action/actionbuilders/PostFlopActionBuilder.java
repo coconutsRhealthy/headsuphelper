@@ -20,6 +20,7 @@ public class PostFlopActionBuilder {
     private final String RAISE = "raise";
 
     private double bigBlind;
+    private List<Card> board;
 
     private BoardEvaluator boardEvaluator;
     private HandEvaluator handEvaluator;
@@ -27,6 +28,7 @@ public class PostFlopActionBuilder {
 
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
         bigBlind = actionable.getBigBlind();
+        board = actionable.getBoard();
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
         this.actionable = actionable;
@@ -146,7 +148,7 @@ public class PostFlopActionBuilder {
     private String getFraise(double handStrengthAgainstRange) {
         String action;
 
-        if(actionable.getBoard().size() < 5) {
+        if(board.size() < 5) {
             action = getValueCallAction(handStrengthAgainstRange);
 
             if(action == null) {
@@ -206,7 +208,6 @@ public class PostFlopActionBuilder {
 
     private String getDrawBettingAction(String bettingAction) {
         String drawBettingAction = null;
-        List<Card> board = boardEvaluator.getBoard();
 
         if(board.size() == 3 || board.size() == 4) {
             double sizing = getSizing();
@@ -266,7 +267,6 @@ public class PostFlopActionBuilder {
 
     private String getTrickyRaiseAction(double handStrengthAgainstRange) {
         String trickyRaiseAction = null;
-        List<Card> board = actionable.getBoard();
         double sizing = getSizing();
 
         if(handStrengthAgainstRange >= 0.6 && handStrengthAgainstRange < 0.8) {
@@ -296,7 +296,7 @@ public class PostFlopActionBuilder {
         String bluffAction = null;
         double sizing = getSizing();
 
-        if(actionable.getBoard().size() == 5 && bluffOddsAreOk(sizing)) {
+        if(board.size() == 5 && bluffOddsAreOk(sizing)) {
             if(handStrengthAgainstRange < 0.7) {
                 if(sizing / bigBlind <= 20) {
                     if(Math.random() < 0.21) {
@@ -335,7 +335,6 @@ public class PostFlopActionBuilder {
 
     private String getDrawCallingAction() {
         String drawCallingAction = null;
-        List<Card> board = boardEvaluator.getBoard();
 
         double amountToCall = (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize());
         double odds = amountToCall / actionable.getPotSize();
@@ -417,7 +416,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getPassiveOrAggressiveValueAction(String bettingAction) {
-        if(actionable.getBoard().size() != 5) {
+        if(board.size() != 5) {
             if(Math.random() < 0.8) {
                 return bettingAction;
             } else {
@@ -463,7 +462,6 @@ public class PostFlopActionBuilder {
 
     public double getSizing() {
         double sizing = 0;
-        List<Card> board = boardEvaluator.getBoard();
 
         if(board.size() == 3) {
             sizing = getFlopSizing();
@@ -516,6 +514,7 @@ public class PostFlopActionBuilder {
                 }
             } else {
                 double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
+                raiseAmount = reduceRaiseAmountIfNecessary(raiseAmount);
 
                 if(botStack <= 1.2 * raiseAmount) {
                     flopSizing = botStack;
@@ -556,6 +555,7 @@ public class PostFlopActionBuilder {
                 }
             } else {
                 double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
+                raiseAmount = reduceRaiseAmountIfNecessary(raiseAmount);
 
                 if(botStack <= 1.2 * raiseAmount) {
                     turnSizing = botStack;
@@ -602,6 +602,30 @@ public class PostFlopActionBuilder {
 
     private double calculateRaiseAmount(double facingBetSize, double potSize, double odds) {
         return (potSize / (odds - 1)) + (((odds + 1) * facingBetSize) / (odds - 1));
+    }
+
+    private double reduceRaiseAmountIfNecessary(double raiseAmount) {
+        double opponentBetSize = actionable.getOpponentTotalBetSize();
+        double potSize = actionable.getPotSize();
+        double effectiveStack = getEffectiveStack(actionable.getBotStack(), actionable.getOpponentStack());
+        double minimumRaiseAmount = 2 * opponentBetSize;
+
+        if(board.size() == 3) {
+            double flopBetSizeIn4betPot = getFlopBetPercentage(effectiveStack, potSize, 0.33, 0.51) * potSize;
+            if(raiseAmount > flopBetSizeIn4betPot) {
+                if(flopBetSizeIn4betPot > minimumRaiseAmount) {
+                    raiseAmount = flopBetSizeIn4betPot;
+                }
+            }
+        } else if(board.size() == 4) {
+            double turnBetSizeIn4betPot = getTurnBetPercentage(effectiveStack, potSize, 0.51);
+            if(raiseAmount > turnBetSizeIn4betPot) {
+                if(turnBetSizeIn4betPot > minimumRaiseAmount) {
+                    raiseAmount = turnBetSizeIn4betPot;
+                }
+            }
+        }
+        return raiseAmount;
     }
 
     private double getFlopBetPercentage(double effectiveStackSize, double potSize, double turnBetPercentage, double riverBetPercentage) {
