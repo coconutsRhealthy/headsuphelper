@@ -152,9 +152,16 @@ public class PostFlopRangeBuilder {
     }
 
     private double getFacingPotOdds() {
-        double amountToCall = opponentTotalBetSize - botTotalBetSize;
-        double amountToWin = potSize + opponentTotalBetSize + botTotalBetSize;
-        return amountToCall / amountToWin;
+        double odds;
+
+        if(opponentFormerTotalCallAmount != 0) {
+            odds = opponentFormerTotalCallAmount / (potSize - opponentFormerTotalCallAmount);
+        } else {
+            double amountToCall = opponentTotalBetSize - botTotalBetSize;
+            double amountToWin = potSize + opponentTotalBetSize + botTotalBetSize;
+            odds = amountToCall / amountToWin;
+        }
+        return odds;
     }
 
     private Set<Set<Card>> get7to20bb16to33odds(Set<Set<Card>> previousRange) {
