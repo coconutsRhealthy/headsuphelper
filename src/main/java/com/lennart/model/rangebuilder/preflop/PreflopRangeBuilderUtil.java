@@ -1,5 +1,7 @@
 package com.lennart.model.rangebuilder.preflop;
 
+import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.boardevaluation.ComboComparator;
 import com.lennart.model.card.Card;
 
 import java.util.*;
@@ -7,7 +9,7 @@ import java.util.*;
 /**
  * Created by LennartMac on 15/10/16.
  */
-public class PreflopRangeBuilderUtil {
+public class PreflopRangeBuilderUtil implements ComboComparator {
 
     private static final Map<Integer, List<Card>> allPossibleStartHandsAsList = getAllPossibleStartHandsInitialize();
     private static final Map<Integer, Set<Card>> allStartHandsAsSet = fillAllStartHands();
@@ -515,5 +517,47 @@ public class PreflopRangeBuilderUtil {
             allPossibleStartHandsAsSetCopy.put(allPossibleStartHandsAsSetCopy.size(), comboCopy);
         }
         return allPossibleStartHandsAsSetCopy;
+    }
+
+    private static List<Integer> getSortedCardRanks(List<Card> combo) {
+        List<Integer> sortedCardRanks = new ArrayList<>();
+        for(Card c : combo) {
+            sortedCardRanks.add(c.getRank());
+        }
+        Collections.sort(sortedCardRanks);
+        return sortedCardRanks;
+    }
+
+    public static Map<Integer, Set<Set<Card>>> getAllPossibleStartHandsSorted() {
+        Map<Integer, List<Card>> allPossibleStartHandsAsListCopy = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+        return new BoardEvaluator().getSortedCardComboMap(allPossibleStartHandsAsListCopy, null, new PreflopRangeBuilderUtil(null));
+    }
+
+    @Override
+    public Comparator<Set<Card>> getComboComparator(List<Card> board) {
+        return new Comparator<Set<Card>>() {
+            @Override
+            public int compare(Set<Card> xCombo1, Set<Card> xCombo2) {
+                List<Card> combo1 = new ArrayList<>();
+                List<Card> combo2 = new ArrayList<>();
+
+                combo1.addAll(xCombo1);
+                combo2.addAll(xCombo2);
+
+                List<Integer> combo1rankOnly = getSortedCardRanks(combo1);
+                List<Integer> combo2rankOnly = getSortedCardRanks(combo2);
+
+                if(Collections.max(combo2rankOnly) > Collections.max(combo1rankOnly)) {
+                    return 1;
+                } else if(Collections.max(combo2rankOnly) == Collections.max(combo1rankOnly)) {
+                    if(Collections.min(combo2rankOnly) > Collections.min(combo1rankOnly)) {
+                        return 1;
+                    } else if(Collections.min(combo2rankOnly) == Collections.min(combo1rankOnly)) {
+                        return 0;
+                    }
+                }
+                return -1;
+            }
+        };
     }
 }

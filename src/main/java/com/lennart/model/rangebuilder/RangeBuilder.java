@@ -8,6 +8,7 @@ import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.postflop.PostFlopRangeBuilder;
 import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -243,5 +244,37 @@ public class RangeBuilder {
             }
         }
         return copyOfSortedCombos;
+    }
+
+    public double getOpponentRangeAverageStrengthAfterNewCardDealt(RangeBuildable rangeBuildable) {
+        Map<Integer, Set<Set<Card>>> sortedCombos;
+        if(opponentLastActionWasPreflop) {
+            sortedCombos = PreflopRangeBuilderUtil.getAllPossibleStartHandsSorted();
+        } else {
+            sortedCombos = boardEvaluator.getSortedCombosNew();
+        }
+
+        List<Double> handStrengthsOfCombosInRange = new ArrayList<>();
+
+        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
+            for(Set<Card> combo : entry.getValue()) {
+                Set<Set<Card>> opponentRangeCopy = new HashSet<>();
+                opponentRangeCopy.addAll(rangeBuildable.getOpponentRange());
+
+                if(!opponentRangeCopy.add(combo)) {
+                    List<Card> comboInRangeAsList = new ArrayList<>();
+                    comboInRangeAsList.addAll(combo);
+
+                    handStrengthsOfCombosInRange.add(handEvaluator.getHandStrength(comboInRangeAsList));
+                }
+            }
+        }
+
+        double sumOfHandStrengths = 0;
+
+        for(Double handStrength : handStrengthsOfCombosInRange) {
+            sumOfHandStrengths = sumOfHandStrengths + handStrength;
+        }
+        return sumOfHandStrengths / handStrengthsOfCombosInRange.size();
     }
 }
