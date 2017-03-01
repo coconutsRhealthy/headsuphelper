@@ -111,7 +111,7 @@ public class PostFlopActionBuilder {
             action = getDrawBettingAction(BET);
         }
         if(action == null) {
-            action = getBluffAction(handStrengthAgainstRange);
+            action = getBluffAction(BET, handStrengthAgainstRange);
         }
         if(action == null) {
             System.out.println("default check in getFcheckOrFirstToAct()");
@@ -130,7 +130,7 @@ public class PostFlopActionBuilder {
             action = getTrickyRaiseAction(handStrengthAgainstRange);
         }
         if(action == null) {
-            action = getBluffAction(handStrengthAgainstRange);
+            action = getBluffAction(RAISE, handStrengthAgainstRange);
         }
         if(action == null) {
             action = getValueCallAction(handStrengthAgainstRange);
@@ -162,7 +162,7 @@ public class PostFlopActionBuilder {
             action = getValueAction(handStrengthAgainstRange, RAISE);
 
             if(action == null) {
-                action = getBluffAction(handStrengthAgainstRange);
+                action = getBluffAction(RAISE, handStrengthAgainstRange);
             }
             if(action == null) {
                 action = getValueCallAction(handStrengthAgainstRange);
@@ -292,23 +292,25 @@ public class PostFlopActionBuilder {
         return trickyRaiseAction;
     }
 
-    private String getBluffAction(double handStrengthAgainstRange) {
+    private String getBluffAction(String bettingAction, double handStrengthAgainstRange) {
         String bluffAction = null;
         double sizing = getSizing();
 
-        if(board.size() == 5 && bluffOddsAreOk(sizing)) {
-            if(handStrengthAgainstRange < 0.7) {
-                if(sizing / bigBlind <= 20) {
-                    if(Math.random() < 0.21) {
-                        bluffAction = RAISE;
-                    }
-                } else if(sizing / bigBlind > 20 && sizing <= 40) {
-                    if(Math.random() < 0.15) {
-                        bluffAction = RAISE;
-                    }
+        if(!actionable.isPreviousBluffAction()) {
+            if(bluffOddsAreOk(sizing) && handStrengthAgainstRange < 0.7) {
+                if(Math.random() < 0.10) {
+                    bluffAction = bettingAction;
+                    actionable.setPreviousBluffAction(true);
+                }
+            }
+        } else {
+            if(bluffOddsAreOk(sizing) && handStrengthAgainstRange < 0.7) {
+                if(bettingAction.equals(BET)) {
+                    bluffAction = bettingAction;
                 } else {
-                    if(Math.random() < 0.10) {
-                        bluffAction = RAISE;
+                    if(Math.random() < 0.05) {
+                        bluffAction = bettingAction;
+                        actionable.setPreviousBluffAction(true);
                     }
                 }
             }
@@ -323,8 +325,23 @@ public class PostFlopActionBuilder {
     private String getValueCallAction(double handStrengthAgainstRange) {
         String valueCallAction = null;
 
-        if(handStrengthAgainstRange > getHandStrengthNeededToCall()) {
-            valueCallAction = CALL;
+        double amountToCallBb = (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize()) / bigBlind;
+        double handStrengthNeededToCall = getHandStrengthNeededToCall();
+
+        if(amountToCallBb < 4) {
+            if(handStrengthAgainstRange > handStrengthNeededToCall) {
+                valueCallAction = CALL;
+            }
+        } else if(amountToCallBb <= 75) {
+            if(handStrengthAgainstRange > handStrengthNeededToCall) {
+                if(handStrengthAgainstRange >= 0.4) {
+                    valueCallAction = CALL;
+                }
+            }
+        } else {
+            if(handStrengthAgainstRange > handStrengthNeededToCall && handStrengthAgainstRange >= 0.93) {
+                valueCallAction = CALL;
+            }
         }
 
         if(valueCallAction != null) {
@@ -454,7 +471,7 @@ public class PostFlopActionBuilder {
 
         double opponentOdds = amountOpponentHasToCall / (potSize + opponentBetSize + sizing);
 
-        if(opponentOdds >= 0.7) {
+        if(opponentOdds >= 0.40) {
             return true;
         }
         return false;

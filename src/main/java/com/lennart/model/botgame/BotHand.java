@@ -55,6 +55,7 @@ public class BotHand implements RangeBuildable, Actionable {
     private boolean opponentLastActionWasPreflop;
     private double opponentFormerTotalCallAmount;
     private String street;
+    private boolean previousBluffAction;
 
     public BotHand() {
         gameVariablesFiller = new GameVariablesFiller();
@@ -596,5 +597,15 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    @Override
+    public boolean isPreviousBluffAction() {
+        return previousBluffAction;
+    }
+
+    @Override
+    public void setPreviousBluffAction(boolean previousBluffAction) {
+        this.previousBluffAction = previousBluffAction;
     }
 }

@@ -643,7 +643,7 @@ public class BoardEvaluator {
         return sortedComboMapRankOnly;
     }
 
-    public <T extends ComboComparator> Map<Integer, Set<Set<Card>>> getSortedCardComboMap
+    protected <T extends ComboComparator> Map<Integer, Set<Set<Card>>> getSortedCardComboMap
             (Map<Integer, List<Card>> comboMap, List<Card> board, T evaluatorClass) {
         Map<Integer, Set<Set<Card>>> sortedComboMap = new HashMap<>();
         Set<Set<Card>> comboSetUnsorted = new HashSet<>();
