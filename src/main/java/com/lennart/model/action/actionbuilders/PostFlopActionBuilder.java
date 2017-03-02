@@ -146,31 +146,23 @@ public class PostFlopActionBuilder {
     }
 
     private String getFraise(double handStrengthAgainstRange) {
-        String action;
+        String action = getValueAction(handStrengthAgainstRange, RAISE);
 
-        if(board.size() < 5) {
+        if(action == null) {
+            action = getDrawBettingAction(RAISE);
+        }
+        if(action == null) {
+            action = getBluffAction(RAISE, handStrengthAgainstRange);
+        }
+        if(action == null) {
             action = getValueCallAction(handStrengthAgainstRange);
-
-            if(action == null) {
-                action = getDrawCallingAction();
-            }
-            if(action == null) {
-                System.out.println("default fold in getFraise()");
-                action = FOLD;
-            }
-        } else {
-            action = getValueAction(handStrengthAgainstRange, RAISE);
-
-            if(action == null) {
-                action = getBluffAction(RAISE, handStrengthAgainstRange);
-            }
-            if(action == null) {
-                action = getValueCallAction(handStrengthAgainstRange);
-            }
-            if(action == null) {
-                System.out.println("default fold in getFraise()");
-                action = FOLD;
-            }
+        }
+        if(action == null) {
+            action = getDrawCallingAction();
+        }
+        if(action == null) {
+            System.out.println("default fold in getFraise()");
+            action = FOLD;
         }
         return action;
     }
@@ -207,62 +199,93 @@ public class PostFlopActionBuilder {
     }
 
     private String getDrawBettingAction(String bettingAction) {
-        String drawBettingAction = null;
+        String drawBettingAction = getDraw2ndBarrelAction(bettingAction);
 
-        if(board.size() == 3 || board.size() == 4) {
-            double sizing = getSizing();
+        if(drawBettingAction == null) {
+            if(board.size() == 3 || board.size() == 4) {
+                double sizing = getSizing();
 
-            if(sizing / bigBlind <= 5) {
-                if(handEvaluator.hasAnyDrawNonBackDoor()) {
-                    if(Math.random() < 0.5) {
-                        drawBettingAction = bettingAction;
+                if(sizing / bigBlind <= 5) {
+                    if(handEvaluator.hasAnyDrawNonBackDoor()) {
+                        if(Math.random() < 0.5) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
-                }
-            } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(Math.random() < 0.5) {
-                        drawBettingAction = bettingAction;
+                } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        if(Math.random() < 0.5) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(Math.random() < 0.2) {
-                        drawBettingAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                        if(Math.random() < 0.2) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongOvercards")) {
-                    if(Math.random() < 0.15) {
-                        drawBettingAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongOvercards")) {
+                        if(Math.random() < 0.15) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongBackDoor")) {
-                    if(Math.random() < 0.07) {
-                        drawBettingAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                        if(Math.random() < 0.07) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
-                }
-            } else if (sizing / bigBlind > 20 && sizing / bigBlind <= 40) {
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(Math.random() < 0.2) {
-                        drawBettingAction = bettingAction;
+                } else if (sizing / bigBlind > 20 && sizing / bigBlind <= 40) {
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        if(Math.random() < 0.2) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(Math.random() < 0.07) {
-                        drawBettingAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                        if(Math.random() < 0.07) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
-                }
-            } else {
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(Math.random() < 0.1) {
-                        drawBettingAction = bettingAction;
+                } else {
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        if(Math.random() < 0.1) {
+                            drawBettingAction = bettingAction;
+                            actionable.setDrawBettingActionDone(true);
+                        }
                     }
                 }
             }
         }
 
-        if(drawBettingAction != null) {
+        if(drawBettingAction == null) {
+            actionable.setDrawBettingActionDone(false);
+        } else {
             System.out.println("draw betting action");
         }
         return drawBettingAction;
+    }
+
+    private String getDraw2ndBarrelAction(String bettingAction) {
+        String draw2ndBarrelAction = null;
+
+        if(actionable.isDrawBettingActionDone()) {
+            if(bettingAction.equals(BET)) {
+                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                    if(Math.random() < 0.85) {
+                        draw2ndBarrelAction = BET;
+                    }
+                } else if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                    if(Math.random() < 0.6) {
+                        draw2ndBarrelAction = BET;
+                    }
+                }
+            }
+        }
+        return draw2ndBarrelAction;
     }
 
     private String getTrickyRaiseAction(double handStrengthAgainstRange) {
@@ -296,22 +319,60 @@ public class PostFlopActionBuilder {
         String bluffAction = null;
         double sizing = getSizing();
 
-        if(!actionable.isPreviousBluffAction()) {
+        if(actionable.isPreviousBluffAction()) {
             if(bluffOddsAreOk(sizing) && handStrengthAgainstRange < 0.7) {
-                if(Math.random() < 0.10) {
-                    bluffAction = bettingAction;
-                    actionable.setPreviousBluffAction(true);
+                if(bettingAction.equals(BET)) {
+                    if(actionable.isBotIsButton()) {
+                        if(Math.random() <= 0.9) {
+                            bluffAction = bettingAction;
+                        }
+                    } else {
+                        if(Math.random() <= 0.5) {
+                            bluffAction = bettingAction;
+                        }
+                    }
+                } else {
+                    if(board.size() == 5) {
+                        if(Math.random() < 0.05) {
+                            bluffAction = bettingAction;
+                            actionable.setPreviousBluffAction(true);
+                        }
+                    }
                 }
             }
         } else {
             if(bluffOddsAreOk(sizing) && handStrengthAgainstRange < 0.7) {
                 if(bettingAction.equals(BET)) {
-                    bluffAction = bettingAction;
-                } else {
-                    if(Math.random() < 0.05) {
-                        bluffAction = bettingAction;
-                        actionable.setPreviousBluffAction(true);
+                    if(actionable.isBotIsButton()) {
+                        if(Math.random() < 0.18) {
+                            bluffAction = bettingAction;
+                            actionable.setPreviousBluffAction(true);
+                        }
+                    } else {
+                        if(Math.random() < 0.07) {
+                            bluffAction = bettingAction;
+                            actionable.setPreviousBluffAction(true);
+                        }
                     }
+                } else {
+                    if(board.size() == 5) {
+                        if(Math.random() < 0.10) {
+                            bluffAction = bettingAction;
+                            actionable.setPreviousBluffAction(true);
+                        }
+                    }
+                }
+            }
+        }
+
+        if(actionable.isDrawBettingActionDone() && bluffAction == null) {
+            if(actionable.isBotIsButton()) {
+                if(Math.random() <= 0.65 && bettingAction.equals(BET)) {
+                    bluffAction = bettingAction;
+                }
+            } else {
+                if(Math.random() <= 0.35 && bettingAction.equals(BET)) {
+                    bluffAction = bettingAction;
                 }
             }
         }
@@ -434,7 +495,7 @@ public class PostFlopActionBuilder {
 
     private String getPassiveOrAggressiveValueAction(String bettingAction) {
         if(board.size() != 5) {
-            if(Math.random() < 0.8) {
+            if(Math.random() < 0.92) {
                 return bettingAction;
             } else {
                 return null;
@@ -442,7 +503,7 @@ public class PostFlopActionBuilder {
         } else {
             String opponentAction = actionable.getOpponentAction();
             if(!actionable.isBotIsButton() && opponentAction == null) {
-                if(Math.random() < 0.8) {
+                if(Math.random() < 0.92) {
                     return bettingAction;
                 } else {
                     return null;
@@ -530,14 +591,7 @@ public class PostFlopActionBuilder {
                     flopSizing = flopBetPercentage * potSize;
                 }
             } else {
-                double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
-                raiseAmount = reduceRaiseAmountIfNecessary(raiseAmount);
-
-                if(botStack <= 1.2 * raiseAmount) {
-                    flopSizing = botStack;
-                } else {
-                    flopSizing = raiseAmount;
-                }
+                flopSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, botStack, 2.33);
             }
         }
         return flopSizing;
@@ -571,14 +625,7 @@ public class PostFlopActionBuilder {
                     turnSizing = 0.2 * potSize;
                 }
             } else {
-                double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
-                raiseAmount = reduceRaiseAmountIfNecessary(raiseAmount);
-
-                if(botStack <= 1.2 * raiseAmount) {
-                    turnSizing = botStack;
-                } else {
-                    turnSizing = raiseAmount;
-                }
+                turnSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, botStack, 2.33);
             }
         }
         return turnSizing;
@@ -590,6 +637,8 @@ public class PostFlopActionBuilder {
         double opponentBetSize = actionable.getOpponentTotalBetSize();
         double potSize = actionable.getPotSize();
         double botStack = actionable.getBotStack();
+        double opponentStack = actionable.getOpponentStack();
+        double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
         if(opponentBetSize == 0) {
             if(botStack <= 1.2 * potSize) {
@@ -598,13 +647,7 @@ public class PostFlopActionBuilder {
                 riverSizing = 0.75 * potSize;
             }
         } else {
-            double raiseAmount = calculateRaiseAmount(opponentBetSize, potSize, 2.33);
-
-            if(botStack <= 1.2 * raiseAmount) {
-                riverSizing = botStack;
-            } else {
-                riverSizing = raiseAmount;
-            }
+            riverSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, botStack, 2.33);
         }
         return riverSizing;
     }
@@ -617,15 +660,23 @@ public class PostFlopActionBuilder {
         }
     }
 
-    private double calculateRaiseAmount(double facingBetSize, double potSize, double odds) {
-        return (potSize / (odds - 1)) + (((odds + 1) * facingBetSize) / (odds - 1));
+    private double calculateRaiseAmount(double facingBetSize, double potSize, double effectiveStack, double botStack, double odds) {
+        double raiseAmount = (potSize / (odds - 1)) + (((odds + 1) * facingBetSize) / (odds - 1));
+        double potSizeAfterRaiseAndCall = potSize + raiseAmount + raiseAmount;
+        double effectiveStackRemainingAfterRaise = effectiveStack - raiseAmount;
+
+        if(effectiveStackRemainingAfterRaise / potSizeAfterRaiseAndCall < 0.51) {
+            if(Math.random() < 0.5) {
+                raiseAmount = reduceRaiseAmountIfNecessary(raiseAmount, facingBetSize, potSize, effectiveStack);
+            } else {
+                raiseAmount = botStack;
+            }
+        }
+        return raiseAmount;
     }
 
-    private double reduceRaiseAmountIfNecessary(double raiseAmount) {
-        double opponentBetSize = actionable.getOpponentTotalBetSize();
-        double potSize = actionable.getPotSize();
-        double effectiveStack = getEffectiveStack(actionable.getBotStack(), actionable.getOpponentStack());
-        double minimumRaiseAmount = 2 * opponentBetSize;
+    private double reduceRaiseAmountIfNecessary(double raiseAmount, double facingBetSize, double potSize, double effectiveStack) {
+        double minimumRaiseAmount = 2 * facingBetSize;
 
         if(board.size() == 3) {
             double flopBetSizeIn4betPot = getFlopBetPercentage(effectiveStack, potSize, 0.33, 0.51) * potSize;

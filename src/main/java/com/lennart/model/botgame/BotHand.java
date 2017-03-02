@@ -56,6 +56,7 @@ public class BotHand implements RangeBuildable, Actionable {
     private double opponentFormerTotalCallAmount;
     private String street;
     private boolean previousBluffAction;
+    private boolean drawBettingActionDone;
 
     public BotHand() {
         gameVariablesFiller = new GameVariablesFiller();
@@ -607,5 +608,15 @@ public class BotHand implements RangeBuildable, Actionable {
     @Override
     public void setPreviousBluffAction(boolean previousBluffAction) {
         this.previousBluffAction = previousBluffAction;
+    }
+
+    @Override
+    public boolean isDrawBettingActionDone() {
+        return drawBettingActionDone;
+    }
+
+    @Override
+    public void setDrawBettingActionDone(boolean drawBettingActionDone) {
+        this.drawBettingActionDone = drawBettingActionDone;
     }
 }

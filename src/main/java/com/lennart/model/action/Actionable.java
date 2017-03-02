@@ -25,4 +25,8 @@ public interface Actionable extends RangeBuildable {
     boolean isPreviousBluffAction();
 
     void setPreviousBluffAction(boolean previousBluffAction);
+
+    boolean isDrawBettingActionDone();
+
+    void setDrawBettingActionDone(boolean drawBettingActionDone);
 }
