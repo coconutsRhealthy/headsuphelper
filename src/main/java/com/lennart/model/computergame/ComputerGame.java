@@ -51,7 +51,9 @@ public class ComputerGame implements RangeBuildable, Actionable {
     private boolean opponentLastActionWasPreflop;
     private double opponentFormerTotalCallAmount;
     private boolean previousBluffAction;
-    private boolean drawBettingActionDone;
+    private boolean previousDrawBettingAction;
+    private boolean previousFloatAction;
+    private boolean previousValueAction;
 
     public ComputerGame() {
         //default constructor
@@ -414,7 +416,8 @@ public class ComputerGame implements RangeBuildable, Actionable {
         opponentPreflopStatsDoneForHand = false;
         opponentLastActionWasPreflop = true;
         previousBluffAction = false;
-        drawBettingActionDone = false;
+        previousDrawBettingAction = false;
+        previousFloatAction = false;
     }
 
     private void addCheckToWrittenAction() {
@@ -903,12 +906,32 @@ public class ComputerGame implements RangeBuildable, Actionable {
     }
 
     @Override
-    public boolean isDrawBettingActionDone() {
-        return drawBettingActionDone;
+    public boolean isPreviousDrawBettingAction() {
+        return previousDrawBettingAction;
     }
 
     @Override
-    public void setDrawBettingActionDone(boolean drawBettingActionDone) {
-        this.drawBettingActionDone = drawBettingActionDone;
+    public void setPreviousDrawBettingAction(boolean previousDrawBettingAction) {
+        this.previousDrawBettingAction = previousDrawBettingAction;
+    }
+
+    @Override
+    public boolean isPreviousFloatAction() {
+        return previousFloatAction;
+    }
+
+    @Override
+    public void setPreviousFloatAction(boolean previousFloatAction) {
+        this.previousFloatAction = previousFloatAction;
+    }
+
+    @Override
+    public boolean isPreviousValueAction() {
+        return previousValueAction;
+    }
+
+    @Override
+    public void setPreviousValueAction(boolean previousValueAction) {
+        this.previousValueAction = previousValueAction;
     }
 }
