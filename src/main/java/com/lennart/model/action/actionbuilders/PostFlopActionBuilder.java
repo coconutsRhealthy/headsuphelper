@@ -28,13 +28,13 @@ public class PostFlopActionBuilder {
     private Actionable actionable;
 
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
-        bigBlind = actionable.getBigBlind();
-        board = actionable.getBoard();
-        sizing = getSizing();
-
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
         this.actionable = actionable;
+
+        bigBlind = actionable.getBigBlind();
+        board = actionable.getBoard();
+        sizing = getSizing();
     }
 
     public String getAction(Set<Set<Card>> opponentRange) {
