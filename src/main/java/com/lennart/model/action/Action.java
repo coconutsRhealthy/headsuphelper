@@ -2,11 +2,11 @@ package com.lennart.model.action;
 
 import com.lennart.model.action.actionbuilders.PostFlopActionBuilder;
 import com.lennart.model.action.actionbuilders.PreflopActionBuilder;
+import com.lennart.model.botgame.BotHand;
 import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by LPO10346 on 10/12/2016.
@@ -44,27 +44,36 @@ public class Action {
     private void getAndProcessPreflopAction(Actionable actionable) {
         preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
         String action = preflopActionBuilder.getAction(actionable);
-        setNewWrittenAction(action, actionable.getBoard());
         setSizingIfNecessary(actionable, action);
+        setNewWrittenAction(action, actionable);
     }
 
     private void getAndProcessPostFlopAction(Actionable actionable) {
         postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
                 rangeBuilder.getHandEvaluator(), actionable);
         String action = postFlopActionBuilder.getAction(actionable.getOpponentRange());
-        setNewWrittenAction(action, actionable.getBoard());
         setSizingIfNecessary(actionable, action);
+        setNewWrittenAction(action, actionable);
     }
 
-    private void setNewWrittenAction(String action, List<Card> board) {
-        if(board == null) {
-            getWrittenActionFromAction(action, "Preflop");
-        } else if(board.size() == 3) {
-            getWrittenActionFromAction(action, "Flop");
-        } else if(board.size() == 4) {
-            getWrittenActionFromAction(action, "Turn");
-        } else if(board.size() == 5) {
-            getWrittenActionFromAction(action, "River");
+    private void setNewWrittenAction(String action, Actionable actionable) {
+        if(actionable instanceof BotHand) {
+            if(sizing == 0) {
+                writtenAction = action;
+            } else {
+                writtenAction = action + " " + sizing;
+            }
+        } else {
+            List<Card> board = actionable.getBoard();
+            if(board == null) {
+                getWrittenActionFromAction(action, "Preflop");
+            } else if(board.size() == 3) {
+                getWrittenActionFromAction(action, "Flop");
+            } else if(board.size() == 4) {
+                getWrittenActionFromAction(action, "Turn");
+            } else if(board.size() == 5) {
+                getWrittenActionFromAction(action, "River");
+            }
         }
     }
 

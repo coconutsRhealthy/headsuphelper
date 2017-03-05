@@ -1,0 +1,104 @@
+<html>
+    <head>
+        <title>Heads Up NLHE bottable</title>
+        <link rel="stylesheet" type="text/css" href="/css/cards.css" />
+        <script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+        <script src="/js/botgame.js"></script>
+    </head>
+
+    <body>
+    <div ng-app = "mainApp" ng-controller = "pokerController">
+        <div>
+            <button ng-click="startBotTable()">Start bottable</button>
+        </div>
+        <div style={{dealerButtonStyle}}>
+            <strong>D</strong>
+        </div>
+        <div class="cards_wrapper">
+            <span id="left_player_hand">
+                <div class="playingCards">
+                    <ul class="table">
+                        <li>
+                            <div class={{holeCard1Class}}>
+                                <span class="rank">{{holeCard1ConvertedRank}}</span>
+                                <span class="suit">{{holeCard1SuitUniCode}}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class={{holeCard2Class}}>
+                                <span class="rank">{{holeCard2ConvertedRank}}</span>
+                                <span class="suit">{{holeCard2SuitUniCode}}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </span>
+            <span id="board_cards" style={{boardCardsStyle}}>
+                <div class="playingCards">
+                    <ul class="table">
+                        <li>
+                            <div class={{flopCard1Class}}>
+                                <span class="rank">{{flopCard1ConvertedRank}}</span>
+                                <span class="suit">{{flopCard1SuitUniCode}}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class={{flopCard2Class}}>
+                                <span class="rank">{{flopCard2ConvertedRank}}</span>
+                                <span class="suit">{{flopCard2SuitUniCode}}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class={{flopCard3Class}}>
+                                <span class="rank">{{flopCard3ConvertedRank}}</span>
+                                <span class="suit">{{flopCard3SuitUniCode}}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class={{turnCardClass}}>
+                                <span class="rank">{{turnCardConvertedRank}}</span>
+                                <span class="suit">{{turnCardSuitUniCode}}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class={{riverCardClass}}>
+                                <span class="rank">{{riverCardConvertedRank}}</span>
+                                <span class="suit">{{riverCardSuitUniCode}}</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </span>
+            <span id="right_player_hand">
+                <div class="playingCards">
+                    <ul class="table">
+                        <li>
+                            <div class="card back">*</div>
+                        </li>
+                        <li>
+                            <div class="card back">*</div>
+                        </li>
+                    </ul>
+                </div>
+            </span>
+        </div>
+
+        <div>
+            <span id="left_player_stack">{{botTable.botHand.botStack}}</span>
+            <span id="right_player_stack">{{botTable.botHand.opponentStack}}</span>
+        </div>
+
+        <div>
+            <span id="left_player_bet_size">{{botTable.botHand.botTotalBetSize}}</span>
+            <span id="right_player_bet_size">{{botTable.botHand.opponentTotalBetSize}}</span>
+        </div>
+
+        <div id="pot">
+            {{botTable.botHand.potSize}}
+        </div>
+
+        <div>Action: </div>
+        <div>{{botTable.botHand.botWrittenAction}}</div>
+    </div>
+    </body>
+</html>

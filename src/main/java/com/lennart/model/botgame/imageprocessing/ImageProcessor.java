@@ -32,19 +32,19 @@ public class ImageProcessor {
     }
 
     public double getOpponentStackFromImage() {
-        return 0;
+        return 49.50;
     }
 
     public double getBotStackFromImage() {
-        return 0;
+        return 49.75;
     }
 
     public double getBotTotalBetSizeFromImage() {
-        return 0;
+        return 0.25;
     }
 
     public double getOpponentTotalBetSizeFromImage() {
-        return 0;
+        return 0.50;
     }
 
     public String getOpponentActionFromImage() {
@@ -52,15 +52,15 @@ public class ImageProcessor {
     }
 
     public double getSmallBlindFromImage() {
-        return 0;
+        return 0.25;
     }
 
     public double getBigBlindFromImage() {
-        return 0;
+        return 0.50;
     }
 
     public boolean isBotButtonFromImage() {
-        return false;
+        return true;
     }
 
     public String getOpponentPlayerNameFromImage() {
@@ -68,11 +68,11 @@ public class ImageProcessor {
     }
 
     public Card getBotHoleCard1FromImage() {
-        return null;
+        return new Card(9, 'c');
     }
 
     public Card getBotHoleCard2FromImage() {
-        return null;
+        return new Card(12, 'd');
     }
 
     public Card getFlopCard1FromImage() {
@@ -470,18 +470,18 @@ public class ImageProcessor {
         return 0;
     }
 
-    public static void main(String[] args) throws Exception {
-        ImageProcessor imageProcessor = new ImageProcessor();
-
-        TimeUnit.SECONDS.sleep(3);
-
-        double x = imageProcessor.getMouseXcoordinate();
-        double y = imageProcessor.getMouseYcoordinate();
-
-        System.out.println(x);
-        System.out.println(y);
-
-        Robot robot = new Robot();
-        Color c = robot.getPixelColor(541, 388);
-    }
+//    public static void main(String[] args) throws Exception {
+//        ImageProcessor imageProcessor = new ImageProcessor();
+//
+//        TimeUnit.SECONDS.sleep(3);
+//
+//        double x = imageProcessor.getMouseXcoordinate();
+//        double y = imageProcessor.getMouseYcoordinate();
+//
+//        System.out.println(x);
+//        System.out.println(y);
+//
+//        Robot robot = new Robot();
+//        Color c = robot.getPixelColor(541, 388);
+//    }
 }

@@ -12,27 +12,27 @@
     width: 50px;
 }
 
-#my_hand {
+#left_player_hand {
     float: left;
     width: 170px;
 }
 
-#computer_hand {
+#right_player_hand {
     float: right;
     width: 170px;
 }
 
-#my_stack {
+#left_player_stack {
     float: left;
     padding-right: 200px;
 }
 
-#computer_stack {
+#right_player_stack {
     float: right;
     padding-left: 200px;
 }
 
-#computer_bet_size {
+#right_player_bet_size {
     float: right;
 }
 

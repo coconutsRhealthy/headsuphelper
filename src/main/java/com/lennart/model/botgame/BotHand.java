@@ -57,8 +57,13 @@ public class BotHand implements RangeBuildable, Actionable {
     private String street;
     private boolean previousBluffAction;
     private boolean drawBettingActionDone;
+    private String botWrittenAction;
 
     public BotHand() {
+        //default constructor
+    }
+
+    public BotHand(String initialize) {
         gameVariablesFiller = new GameVariablesFiller();
 
         setPotSize();
@@ -78,14 +83,18 @@ public class BotHand implements RangeBuildable, Actionable {
         knownGameCards.add(botHoleCard1);
         knownGameCards.add(botHoleCard2);
 
+        botHoleCards = new ArrayList<>();
+        botHoleCards.add(botHoleCard1);
+        botHoleCards.add(botHoleCard2);
+
         setOpponentLastActionWasPreflop();
     }
 
-    public BotHand getNewBotAction() {
+    public void getNewBotAction() {
         RangeBuilder rangeBuilder = new RangeBuilder(this);
         opponentRange = rangeBuilder.getOpponentRange();
         botAction = new Action(this, rangeBuilder);
-        return this;
+        botWrittenAction = botAction.getWrittenAction();
     }
 
     public BotHand updateVariables() {
@@ -94,7 +103,7 @@ public class BotHand implements RangeBuildable, Actionable {
         setOpponentAction();
 
         if(opponentAction.equals("fold") || (opponentAction.equals("call") && street.equals("river"))) {
-            return new BotHand();
+            return new BotHand("initialize");
         }
 
         setPotSize();
@@ -618,5 +627,13 @@ public class BotHand implements RangeBuildable, Actionable {
     @Override
     public void setDrawBettingActionDone(boolean drawBettingActionDone) {
         this.drawBettingActionDone = drawBettingActionDone;
+    }
+
+    public String getBotWrittenAction() {
+        return botWrittenAction;
+    }
+
+    public void setBotWrittenAction(String botWrittenAction) {
+        this.botWrittenAction = botWrittenAction;
     }
 }

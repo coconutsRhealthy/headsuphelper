@@ -12,7 +12,11 @@ public class BotTable {
     private BotHand botHand;
 
     public BotTable() {
-        botHand = new BotHand();
+        //default constructor
+    }
+
+    public BotTable(String initialize) {
+        botHand = new BotHand("initialize");
         botHand.getNewBotAction();
     }
 
