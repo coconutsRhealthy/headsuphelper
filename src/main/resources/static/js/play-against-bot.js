@@ -57,9 +57,12 @@ mainApp.controller('pokerController', function($scope, $http) {
 
     $scope.showNextHandButton;
 
+    $scope.showGame;
+
     $scope.startGame = function() {
         $http.get('/startGame/').success(function(data) {
             setScopePropertiesCorrect(data);
+            $scope.showGame = true;
         })
     }
 
