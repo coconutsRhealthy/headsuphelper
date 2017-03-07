@@ -98,7 +98,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
             processHumanBetOrRaiseAction();
         }
 
-        if(computerActionNeeded || onlyCallRangeNeeded) {
+        if((computerActionNeeded || onlyCallRangeNeeded) && isComputerActionNeededIfPlayerIsAllIn()) {
             doComputerAction();
         }
         roundToTwoDecimals();
@@ -218,7 +218,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
     }
 
     private void processHumanCallAction() {
-        if(myStack - (computerTotalBetSize - opponentIncrementalBetSize) > 0) {
+        if(myStack - (computerTotalBetSize - opponentIncrementalBetSize) >= 0) {
             myStack = myStack - (computerTotalBetSize - opponentIncrementalBetSize);
             opponentTotalBetSize = computerTotalBetSize;
         } else {
@@ -352,6 +352,18 @@ public class ComputerGame implements RangeBuildable, Actionable {
         return computerActionNeeded;
     }
 
+    private boolean isComputerActionNeededIfPlayerIsAllIn() {
+        if((myAction != null && (myAction.equals("bet") || myAction.equals("raise"))) && myStack == 0) {
+            return true;
+        } else {
+            if(playerIsAllIn()) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
     private void returnBetToPlayerAfterFold(String player) {
         if(player.equals("human")) {
             myStack = myStack + opponentTotalBetSize;
@@ -442,12 +454,37 @@ public class ComputerGame implements RangeBuildable, Actionable {
     }
 
     private void proceedToNextStreet() {
-        if(flopCards == null) {
-            dealFlopCards();
-        } else if (turnCard == null) {
-            dealTurnCard();
-        } else if (riverCard == null) {
-            dealRiverCard();
+        dealRestOfHandAndFinishHandWhenPlayerIsAllIn();
+
+        if(!playerIsAllIn()) {
+            if(flopCards == null) {
+                dealFlopCards();
+            } else if (turnCard == null) {
+                dealTurnCard();
+            } else if (riverCard == null) {
+                dealRiverCard();
+            }
+        }
+    }
+
+    private boolean playerIsAllIn() {
+        return computerStack == 0 || myStack == 0;
+    }
+
+    private void dealRestOfHandAndFinishHandWhenPlayerIsAllIn() {
+        if(playerIsAllIn()) {
+            if(flopCards == null) {
+                dealFlopCards();
+                dealTurnCard();
+                dealRiverCard();
+            } else if (turnCard == null) {
+                dealTurnCard();
+                dealRiverCard();
+            } else if (riverCard == null) {
+                dealRiverCard();
+            }
+
+            printWinnerAndHand();
         }
     }
 
