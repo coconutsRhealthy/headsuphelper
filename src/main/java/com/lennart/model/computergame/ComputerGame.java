@@ -249,8 +249,13 @@ public class ComputerGame implements RangeBuildable, Actionable {
     }
 
     private void processHumanBetOrRaiseAction() {
-        opponentIncrementalBetSize = opponentTotalBetSize - opponentIncrementalBetSize;
-        myStack = myStack - opponentIncrementalBetSize;
+        if(opponentTotalBetSize > myStack) {
+            opponentTotalBetSize = opponentIncrementalBetSize + myStack;
+            myStack = 0;
+        } else {
+            opponentIncrementalBetSize = opponentTotalBetSize - opponentIncrementalBetSize;
+            myStack = myStack - opponentIncrementalBetSize;
+        }
     }
 
     private void getNewCardDeck() {

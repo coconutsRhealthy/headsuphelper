@@ -46,6 +46,10 @@ public class PreflopActionBuilder {
             action = get4betF5bet(actionable);
         }
 
+        if(actionable.getOpponentStack() == 0 && (action.equals("bet") || action.equals("raise"))) {
+            action = "call";
+        }
+
         return action;
     }
 
