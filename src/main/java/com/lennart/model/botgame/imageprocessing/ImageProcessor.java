@@ -27,6 +27,10 @@ import static org.bytedeco.javacpp.lept.pixReadMem;
  */
 public class ImageProcessor {
 
+    static {
+        System.setProperty("java.awt.headless", "false");
+    }
+
     public double getPotSizeFromImage() {
         return 0;
     }
@@ -468,6 +472,25 @@ public class ImageProcessor {
             return 'h';
         }
         return 0;
+    }
+
+    public void readLinesFromChat() throws Exception {
+        BufferedImage bufferedImage1 = getBufferedImageScreenShot(56, 824, 285, 21);
+        bufferedImage1 = makeBufferedImageBlackAndWhite(bufferedImage1);
+        bufferedImage1 = zoomInImage(bufferedImage1, 2);
+        String line1 = getStringFromBufferedImageWithTesseract(bufferedImage1);
+
+        BufferedImage bufferedImage2 = getBufferedImageScreenShot(56, 850, 285, 21);
+        bufferedImage2 = makeBufferedImageBlackAndWhite(bufferedImage2);
+        bufferedImage2 = zoomInImage(bufferedImage2, 2);
+        String line2 = getStringFromBufferedImageWithTesseract(bufferedImage2);
+
+        BufferedImage bufferedImage3 = getBufferedImageScreenShot(56, 875, 285, 21);
+        bufferedImage3 = makeBufferedImageBlackAndWhite(bufferedImage3);
+        bufferedImage3 = zoomInImage(bufferedImage3, 2);
+        String line3 = getStringFromBufferedImageWithTesseract(bufferedImage3);
+
+        System.out.println(line1 + line2 + line3);
     }
 
 //    public static void main(String[] args) throws Exception {
