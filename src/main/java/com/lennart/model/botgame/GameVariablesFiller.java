@@ -1,7 +1,7 @@
 package com.lennart.model.botgame;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.botgame.imageprocessing.ImageProcessor;
+import com.lennart.model.imageprocessing.ImageProcessor;
 
 /**
  * Created by LPO21630 on 16-2-2017.

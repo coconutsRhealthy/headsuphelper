@@ -1,4 +1,4 @@
-package com.lennart.model.botgame.imageprocessing;
+package com.lennart.model.imageprocessing;
 
 import com.lennart.model.card.Card;
 import org.bytedeco.javacpp.BytePointer;
@@ -493,18 +493,157 @@ public class ImageProcessor {
         System.out.println(line1 + line2 + line3);
     }
 
-//    public static void main(String[] args) throws Exception {
-//        ImageProcessor imageProcessor = new ImageProcessor();
-//
-//        TimeUnit.SECONDS.sleep(3);
-//
+    private void readTopLine() throws IOException {
+        //x: 13, y: 603
+        //x: 322, y: 625
+
+        //createPartialSreenShot(13, 604, 309, 24, "C:/Users/Lennart/screenshot.png");
+
+        BufferedImage bufferedImage = getBufferedImageScreenShot(13, 604, 309, 24);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
+    private String readFirstFlopCardRankFromBoard() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(332, 289, 17, 19);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+        return getStringFromBufferedImageWithTesseract(bufferedImage);
+    }
+
+    private String readSecondFlopCardRankFromBoard() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(403, 289, 17, 19);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+        return getStringFromBufferedImageWithTesseract(bufferedImage);
+    }
+
+    private String readThirdFlopCardRankFromBoard() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(474, 289, 17, 19);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+        return getStringFromBufferedImageWithTesseract(bufferedImage);
+    }
+
+    private String readTurnCardRankFromBoard() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(545, 289, 17, 19);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+        return getStringFromBufferedImageWithTesseract(bufferedImage);
+    }
+
+    private String readRiverCardRankFromBoard() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(616, 289, 17, 19);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+        return getStringFromBufferedImageWithTesseract(bufferedImage);
+    }
+
+    private char readFirstFlopCardSuitFromBoard() {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(341, 318, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        return getSuitFromIntRgb(suitRgb);
+    }
+
+    private char readSecondFlopCardSuitFromBoard() {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(411, 318, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        return getSuitFromIntRgb(suitRgb);
+    }
+
+    private char readThirdFlopCardSuitFromBoard() {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(481, 318, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        return getSuitFromIntRgb(suitRgb);
+    }
+
+    private char readTurnCardSuitFromBoard() {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(551, 318, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        return getSuitFromIntRgb(suitRgb);
+    }
+
+    private char readRiverCardSuitFromBoard() {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(621, 318, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        return getSuitFromIntRgb(suitRgb);
+    }
+
+    private char getSuitFromIntRgb(int rgb) {
+        char suit = 'x';
+        rgb = rgb / 1_000_000;
+
+        if(rgb == -13) {
+            suit = 'c';
+        } else if(rgb == -2) {
+            suit = 'h';
+        } else if(rgb == -16) {
+            suit = 's';
+        } else if(rgb == -15) {
+            suit = 'd';
+        }
+        return suit;
+    }
+
+    private void readTopPlayerStack() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(500, 147, 109, 28);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
+    private void readBottomPlayerStack() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(500, 574, 109, 28);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
+    //spades: -16711422
+    //clubs: -13596926
+    //diamonds: -15773740
+    //hearts: -2811358
+
+    public static void main(String[] args) throws Exception {
+        ImageProcessor imageProcessor = new ImageProcessor();
+
+        String firstFlopCardRank = imageProcessor.readFirstFlopCardRankFromBoard();
+        firstFlopCardRank = firstFlopCardRank.replaceAll("\\s+","");
+        String secondFlopCardRank = imageProcessor.readSecondFlopCardRankFromBoard();
+        secondFlopCardRank = secondFlopCardRank.replaceAll("\\s+","");
+        String thirdFlopCardRank = imageProcessor.readThirdFlopCardRankFromBoard();
+        thirdFlopCardRank = thirdFlopCardRank.replaceAll("\\s+","");
+
+        char firstFlopCardSuit = imageProcessor.readFirstFlopCardSuitFromBoard();
+        char secondFlopCardSuit = imageProcessor.readSecondFlopCardSuitFromBoard();
+        char thirdFlopCardSuit = imageProcessor.readThirdFlopCardSuitFromBoard();
+
+        System.out.println("Flop: " + firstFlopCardRank + firstFlopCardSuit + secondFlopCardRank + secondFlopCardSuit +
+                thirdFlopCardRank + thirdFlopCardSuit);
+        imageProcessor.readTopPlayerStack();
+        imageProcessor.readBottomPlayerStack();
+
+
+        //TimeUnit.SECONDS.sleep(3);
+
 //        double x = imageProcessor.getMouseXcoordinate();
 //        double y = imageProcessor.getMouseYcoordinate();
 //
 //        System.out.println(x);
 //        System.out.println(y);
-//
+
 //        Robot robot = new Robot();
 //        Color c = robot.getPixelColor(541, 388);
-//    }
+
+        //332, 289
+
+        //349, 308
+    }
 }

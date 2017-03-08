@@ -102,11 +102,11 @@
                     <div>{{computerGame.computerWrittenAction}}</div>
                 </div>
 
-                <div><button class="action_button" ng-disabled=disableFoldButton ng-show="disableFoldButton" ng-click="submitMyAction(fold)">fold</button></div>
-                <div><button class="action_button" ng-disabled=disableCheckButton ng-show="disableCheckButton" ng-click="submitMyAction(check)">check</button></div>
-                <div><button class="action_button" ng-disabled=disableCallButton ng-show="disableCallButton" ng-click="submitMyAction(call)">call</button></div>
-                <div><button class="action_button" ng-disabled=disableBetButton ng-show="disableBetButton" ng-click="submitMyAction(bet)">bet</button></div>
-                <div><button class="action_button" ng-disabled=disableRaiseButton ng-show="disableRaiseButton" ng-click="submitMyAction(raise)">raise</button></div>
+                <div><button class="action_button" ng-disabled=disableFoldButton ng-click="submitMyAction(fold)">fold</button></div>
+                <div><button class="action_button" ng-disabled=disableCheckButton ng-click="submitMyAction(check)">check</button></div>
+                <div><button class="action_button" ng-disabled=disableCallButton ng-click="submitMyAction(call)">call</button></div>
+                <div><button class="action_button" ng-disabled=disableBetButton ng-click="submitMyAction(bet)">bet</button></div>
+                <div><button class="action_button" ng-disabled=disableRaiseButton ng-click="submitMyAction(raise)">raise</button></div>
                 <div><input type="text" ng-model="computerGame.opponentTotalBetSize"></div>
                 <div id="deal_next_hand" ng-click="proceedToNextHand()" ng-show=showNextHandButton><button>Deal next hand</button></div>
 
