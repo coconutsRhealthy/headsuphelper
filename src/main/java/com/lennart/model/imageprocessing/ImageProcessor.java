@@ -7,6 +7,8 @@ import org.bytedeco.javacpp.tesseract;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.LookupOp;
@@ -493,19 +495,33 @@ public class ImageProcessor {
         System.out.println(line1 + line2 + line3);
     }
 
-    private void readTopLine() throws IOException {
-        //x: 13, y: 603
-        //x: 322, y: 625
-
-        //createPartialSreenShot(13, 604, 309, 24, "C:/Users/Lennart/screenshot.png");
-
+    private void readTopChatLine() throws IOException {
         BufferedImage bufferedImage = getBufferedImageScreenShot(13, 604, 309, 24);
         bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
+        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
 
         String s = getStringFromBufferedImageWithTesseract(bufferedImage);
         System.out.println(s);
     }
+
+    private void readMiddleChatLine() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(13, 630, 309, 24);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
+    private void readBottomChatLine() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(13, 654, 309, 24);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
 
     private String readFirstFlopCardRankFromBoard() throws IOException {
         BufferedImage bufferedImage = getBufferedImageScreenShot(332, 289, 17, 19);
@@ -606,44 +622,79 @@ public class ImageProcessor {
         System.out.println(s);
     }
 
+    private void readPotSize() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(430, 255, 167, 28);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
+    private void readBottomPlayerTotalBetSize() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(460, 448, 80, 23);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
+    private void readTopPlayerTotalBetSize() throws IOException {
+        BufferedImage bufferedImage = getBufferedImageScreenShot(451, 191, 66, 18);
+        bufferedImage = zoomInImage(bufferedImage, 2);
+        bufferedImage = invertBufferedImageColours(bufferedImage);
+
+        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println(s);
+    }
+
     //spades: -16711422
     //clubs: -13596926
     //diamonds: -15773740
     //hearts: -2811358
 
-    public static void main(String[] args) throws Exception {
-        ImageProcessor imageProcessor = new ImageProcessor();
+    public static void click(int x, int y) throws AWTException {
+        Robot bot = new Robot();
+        bot.mouseMove(x, y);
+        bot.mousePress(InputEvent.BUTTON1_MASK);
+        bot.mouseRelease(InputEvent.BUTTON1_MASK);
 
-        String firstFlopCardRank = imageProcessor.readFirstFlopCardRankFromBoard();
-        firstFlopCardRank = firstFlopCardRank.replaceAll("\\s+","");
-        String secondFlopCardRank = imageProcessor.readSecondFlopCardRankFromBoard();
-        secondFlopCardRank = secondFlopCardRank.replaceAll("\\s+","");
-        String thirdFlopCardRank = imageProcessor.readThirdFlopCardRankFromBoard();
-        thirdFlopCardRank = thirdFlopCardRank.replaceAll("\\s+","");
+        bot.keyPress(KeyEvent.VK_1);
+        bot.keyRelease(KeyEvent.VK_1);
+        bot.keyPress(KeyEvent.VK_PERIOD);
+        bot.keyRelease(KeyEvent.VK_PERIOD);
+        bot.keyPress(KeyEvent.VK_5);
+        bot.keyRelease(KeyEvent.VK_5);
+        bot.keyPress(KeyEvent.VK_1);
+        bot.keyRelease(KeyEvent.VK_1);
+    }
 
-        char firstFlopCardSuit = imageProcessor.readFirstFlopCardSuitFromBoard();
-        char secondFlopCardSuit = imageProcessor.readSecondFlopCardSuitFromBoard();
-        char thirdFlopCardSuit = imageProcessor.readThirdFlopCardSuitFromBoard();
-
-        System.out.println("Flop: " + firstFlopCardRank + firstFlopCardSuit + secondFlopCardRank + secondFlopCardSuit +
-                thirdFlopCardRank + thirdFlopCardSuit);
-        imageProcessor.readTopPlayerStack();
-        imageProcessor.readBottomPlayerStack();
-
-
-        //TimeUnit.SECONDS.sleep(3);
-
+//    public static void main(String[] args) throws Exception {
+//        ImageProcessor imageProcessor = new ImageProcessor();
+//
+////        String firstFlopCardRank = imageProcessor.readFirstFlopCardRankFromBoard();
+////        firstFlopCardRank = firstFlopCardRank.replaceAll("\\s+","");
+////        String secondFlopCardRank = imageProcessor.readSecondFlopCardRankFromBoard();
+////        secondFlopCardRank = secondFlopCardRank.replaceAll("\\s+","");
+////        String thirdFlopCardRank = imageProcessor.readThirdFlopCardRankFromBoard();
+////        thirdFlopCardRank = thirdFlopCardRank.replaceAll("\\s+","");
+////
+////        char firstFlopCardSuit = imageProcessor.readFirstFlopCardSuitFromBoard();
+////        char secondFlopCardSuit = imageProcessor.readSecondFlopCardSuitFromBoard();
+////        char thirdFlopCardSuit = imageProcessor.readThirdFlopCardSuitFromBoard();
+////
+////        System.out.println("Flop: " + firstFlopCardRank + firstFlopCardSuit + secondFlopCardRank + secondFlopCardSuit +
+////                thirdFlopCardRank + thirdFlopCardSuit);
+////        imageProcessor.readTopPlayerStack();
+////        imageProcessor.readBottomPlayerStack();
+//
+//        TimeUnit.SECONDS.sleep(3);
+//
 //        double x = imageProcessor.getMouseXcoordinate();
 //        double y = imageProcessor.getMouseYcoordinate();
 //
 //        System.out.println(x);
 //        System.out.println(y);
-
-//        Robot robot = new Robot();
-//        Color c = robot.getPixelColor(541, 388);
-
-        //332, 289
-
-        //349, 308
-    }
+//    }
 }
