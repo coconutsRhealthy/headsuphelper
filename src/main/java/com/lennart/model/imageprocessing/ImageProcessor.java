@@ -1,14 +1,12 @@
 package com.lennart.model.imageprocessing;
 
-import com.lennart.model.card.Card;
+import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.lept;
 import org.bytedeco.javacpp.tesseract;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.LookupOp;
@@ -33,75 +31,7 @@ public class ImageProcessor {
         System.setProperty("java.awt.headless", "false");
     }
 
-    public double getPotSizeFromImage() {
-        return 0;
-    }
-
-    public double getOpponentStackFromImage() {
-        return 49.50;
-    }
-
-    public double getBotStackFromImage() {
-        return 49.75;
-    }
-
-    public double getBotTotalBetSizeFromImage() {
-        return 0.25;
-    }
-
-    public double getOpponentTotalBetSizeFromImage() {
-        return 0.50;
-    }
-
-    public String getOpponentActionFromImage() {
-        return null;
-    }
-
-    public double getSmallBlindFromImage() {
-        return 0.25;
-    }
-
-    public double getBigBlindFromImage() {
-        return 0.50;
-    }
-
-    public boolean isBotButtonFromImage() {
-        return true;
-    }
-
-    public String getOpponentPlayerNameFromImage() {
-        return null;
-    }
-
-    public Card getBotHoleCard1FromImage() {
-        return new Card(9, 'c');
-    }
-
-    public Card getBotHoleCard2FromImage() {
-        return new Card(12, 'd');
-    }
-
-    public Card getFlopCard1FromImage() {
-        return null;
-    }
-
-    public Card getFlopCard2FromImage() {
-        return null;
-    }
-
-    public Card getFlopCard3FromImage() {
-        return null;
-    }
-
-    public Card getTurnCardFromImage() {
-        return null;
-    }
-
-    public Card getRiverCardFromImage() {
-        return null;
-    }
-
-    private void createPartialSreenShot(int x, int y, int width, int height, String path) {
+    public static void createPartialSreenShot(int x, int y, int width, int height, String path) {
         Point point = new Point(x, y);
         Dimension dimension = new Dimension(width, height);
         Rectangle rectangle = new Rectangle(point, dimension);
@@ -117,7 +47,7 @@ public class ImageProcessor {
         }
     }
 
-    private BufferedImage getBufferedImageScreenShot(int x, int y, int width, int height) {
+    public static BufferedImage getBufferedImageScreenShot(int x, int y, int width, int height) {
         Point point = new Point(x, y);
         Dimension dimension = new Dimension(width, height);
         Rectangle rectangle = new Rectangle(point, dimension);
@@ -132,29 +62,27 @@ public class ImageProcessor {
         return screenCapture;
     }
 
-    private int getIntRgbInScreenShot(int x, int y, String path) {
-        BufferedImage bufferedImage = null;
-        try {
-            bufferedImage = ImageIO.read(new File(path));
-        } catch (IOException e) {
-            System.out.println("Exception occured in getRgbInScreenShot: " + e.getMessage());
+    public static String getStringFromBufferedImageWithTesseract(BufferedImage bufferedImage) {
+        BytePointer outText;
+
+        tesseract.TessBaseAPI api = new tesseract.TessBaseAPI();
+        if (api.Init("src/main/java/com/lennart/model/imageprocessing/tessdata", "ENG") != 0) {
+            System.err.println("Could not initialize tesseract.");
+            System.exit(1);
         }
-        return bufferedImage.getRGB(x, y);
+
+        lept.PIX image = convertBufferedImageToPIX(bufferedImage);
+        api.SetImage(image);
+        outText = api.GetUTF8Text();
+        String string = outText.getString();
+        api.End();
+        outText.deallocate();
+        pixDestroy(image);
+
+        return string;
     }
 
-    private List<Integer> getRgbInScreenShot(int x, int y, String path) {
-        List<Integer> rgbList = new ArrayList<>();
-        int intRgb = getIntRgbInScreenShot(x, y, path);
-        Color color = new Color(intRgb);
-
-        rgbList.add(color.getRed());
-        rgbList.add(color.getGreen());
-        rgbList.add(color.getBlue());
-
-        return rgbList;
-    }
-
-    private BufferedImage zoomInImage(BufferedImage originalImage, int zoomLevel) {
+    public static BufferedImage zoomInImage(BufferedImage originalImage, int zoomLevel) {
         int newImageWidth = originalImage.getWidth() * zoomLevel;
         int newImageHeight = originalImage.getHeight() * zoomLevel;
         BufferedImage resizedImage = new BufferedImage(newImageWidth , newImageHeight, 1);
@@ -164,7 +92,37 @@ public class ImageProcessor {
         return resizedImage;
     }
 
-    private String getStringFromSavedImageWithTesseract(String pathOfImage) {
+    public static BufferedImage makeBufferedImageBlackAndWhite(BufferedImage bufferedImage) {
+        BufferedImage blackAndWhite = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(),
+                BufferedImage.TYPE_BYTE_GRAY);
+
+        Graphics2D g = blackAndWhite.createGraphics();
+        g.drawImage(bufferedImage, 0, 0, null);
+        return blackAndWhite;
+    }
+
+    public static BufferedImage invertBufferedImageColours(BufferedImage bufferedImage) {
+        short[] invertTable = new short[256];
+
+        for (int i = 0; i < 256; i++) {
+            invertTable[i] = (short) (255 - i);
+        }
+
+        BufferedImage invertedColors = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+        BufferedImageOp invertOp = new LookupOp(new ShortLookupTable(0, invertTable), null);
+        return invertOp.filter(bufferedImage, invertedColors);
+    }
+
+    public static String removeEmptySpacesFromString(String string) {
+        return string.replaceAll("\\s+","");
+    }
+
+    public static String removeAllNonNumericCharacters(String string) {
+        return string.replaceAll("[^\\d.]", "");
+    }
+
+    public static String getStringFromSavedImageWithTesseract(String pathOfImage) {
         BytePointer outText;
 
         tesseract.TessBaseAPI api = new tesseract.TessBaseAPI();
@@ -189,489 +147,70 @@ public class ImageProcessor {
         return string;
     }
 
-    private String getStringFromBufferedImageWithTesseract(BufferedImage bufferedImage) throws IOException {
-        BytePointer outText;
-
-        tesseract.TessBaseAPI api = new tesseract.TessBaseAPI();
-        if (api.Init("src/main/java/com/lennart/model/imageprocessing/tessdata", "ENG") != 0) {
-            System.err.println("Could not initialize tesseract.");
-            System.exit(1);
-        }
-
-        lept.PIX image = convertBufferedImageToPIX(bufferedImage);
-        api.SetImage(image);
-        outText = api.GetUTF8Text();
-        String string = outText.getString();
-        api.End();
-        outText.deallocate();
-        pixDestroy(image);
-
-        return string;
+    public static void saveBufferedImage(BufferedImage bufferedImage, String path) throws IOException {
+        ImageIO.write(bufferedImage, "png", new File(path));
     }
 
-    private lept.PIX convertBufferedImageToPIX(BufferedImage bufferedImage) throws IOException {
+    public static int getIntRgbInScreenShot(int x, int y, String path) {
+        BufferedImage bufferedImage = null;
+        try {
+            bufferedImage = ImageIO.read(new File(path));
+        } catch (IOException e) {
+            System.out.println("Exception occured in getRgbInScreenShot: " + e.getMessage());
+        }
+        return bufferedImage.getRGB(x, y);
+    }
+
+    public static List<Integer> getRgbInScreenShot(int x, int y, String path) {
+        List<Integer> rgbList = new ArrayList<>();
+        int intRgb = getIntRgbInScreenShot(x, y, path);
+        Color color = new Color(intRgb);
+
+        rgbList.add(color.getRed());
+        rgbList.add(color.getGreen());
+        rgbList.add(color.getBlue());
+
+        return rgbList;
+    }
+
+    public static double getMouseXcoordinate() {
+        return MouseInfo.getPointerInfo().getLocation().getX();
+    }
+
+    public static double getMouseYcoordinate() {
+        return MouseInfo.getPointerInfo().getLocation().getY();
+    }
+
+    //helper methods
+    private static lept.PIX convertBufferedImageToPIX(BufferedImage bufferedImage) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "tiff", baos);
+        try {
+            ImageIO.write(bufferedImage, "tiff", baos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         byte[] bytes = baos.toByteArray();
 
         return pixReadMem(bytes, bytes.length);
     }
 
-    private BufferedImage makeBufferedImageBlackAndWhite(BufferedImage bufferedImage) {
-        BufferedImage blackAndWhite = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(),
-                BufferedImage.TYPE_BYTE_GRAY);
-
-        Graphics2D g = blackAndWhite.createGraphics();
-        g.drawImage(bufferedImage, 0, 0, null);
-        return blackAndWhite;
-    }
-
-    private BufferedImage invertBufferedImageColours(BufferedImage bufferedImage) {
-       short[] invertTable = new short[256];
-
-       for (int i = 0; i < 256; i++) {
-           invertTable[i] = (short) (255 - i);
-       }
-
-       BufferedImage invertedColors = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-
-       BufferedImageOp invertOp = new LookupOp(new ShortLookupTable(0, invertTable), null);
-       return invertOp.filter(bufferedImage, invertedColors);
-    }
-
-    private void saveBufferedImage(BufferedImage bufferedImage, String path) throws IOException {
-        ImageIO.write(bufferedImage, "png", new File(path));
-    }
-
-    private double getMouseXcoordinate() {
-        return MouseInfo.getPointerInfo().getLocation().getX();
-    }
-
-    private double getMouseYcoordinate() {
-        return MouseInfo.getPointerInfo().getLocation().getY();
-    }
-
-    private void createTopPlayerUserNameScreenShot() throws IOException {
-        int x = 486;
-        int y = 187;
-        int width = 115;
-        int height = 27;
-        String path = "/Users/LennartMac/Desktop/topPlayerUserName.png";
-
-        BufferedImage topPlayerUserName = getBufferedImageScreenShot(x, y, width, height);
-        saveBufferedImage(topPlayerUserName, path);
-    }
-
-    private void createTopPlayerStackScreenShot() throws IOException {
-        int x = 496;
-        int y = 223;
-        int width = 95;
-        int height = 25;
-        String path = "/Users/LennartMac/Desktop/topPlayerStack.png";
-
-        BufferedImage topPlayerUserName = getBufferedImageScreenShot(x, y, width, height);
-        saveBufferedImage(topPlayerUserName, path);
-    }
-
-    private void createPotSizeScreenShot() throws IOException{
-        int x = 440;
-        int y = 327;
-        int width = 130;
-        int height = 25;
-        String path = "/Users/LennartMac/Desktop/potSize.png";
-
-        BufferedImage potSizeScreenShot = getBufferedImageScreenShot(x, y, width, height);
-        potSizeScreenShot = zoomInImage(potSizeScreenShot, 2);
-        saveBufferedImage(potSizeScreenShot, path);
-    }
-
-    private BufferedImage getTopPlayerUserNameImage() throws IOException {
-        int x = 486;
-        int y = 187;
-        int width = 115;
-        int height = 27;
-
-        return getBufferedImageScreenShot(x, y, width, height);
-    }
-
-    private BufferedImage getTopPlayerStackImage() throws IOException {
-        int x = 496;
-        int y = 223;
-        int width = 95;
-        int height = 25;
-
-        return getBufferedImageScreenShot(x, y, width, height);
-    }
-
-    private BufferedImage getPotSizeImage() throws IOException{
-        int x = 440;
-        int y = 327;
-        int width = 130;
-        int height = 25;
-
-        BufferedImage potSizeScreenShot = getBufferedImageScreenShot(x, y, width, height);
-        return zoomInImage(potSizeScreenShot, 2);
-    }
-
-    private BufferedImage getTopPlayerBetSizeImage() throws IOException {
-        int x = 444;
-        int y = 266;
-        int width = 65;
-        int height = 17;
-
-        BufferedImage topPlayerBetSize = getBufferedImageScreenShot(x, y, width, height);
-        return zoomInImage(topPlayerBetSize, 2);
-    }
-
-    private BufferedImage getBottomPlayerStackImage() throws IOException {
-        int x = 505;
-        int y = 640;
-        int width = 85;
-        int height = 25;
-
-        return getBufferedImageScreenShot(x, y, width, height);
-    }
-
-    private String getFlopCard1Rank(String street) throws IOException {
-        int x = 0;
-        int y = 0;
-        int width = 0;
-        int height = 0;
-
-        if(street.equals("flop")) {
-
-        } else if(street.equals("turn")) {
-
-        } else if(street.equals("river")) {
-            x = 325;
-            y = 360;
-            width = 16;
-            height = 19;
-        }
-        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
-        return getStringFromBufferedImageWithTesseract(b);
-    }
-
-    private String getFlopCard2Rank(String street) throws IOException {
-        int x = 0;
-        int y = 0;
-        int width = 0;
-        int height = 0;
-
-        if(street.equals("flop")) {
-
-        } else if(street.equals("turn")) {
-
-        } else if(street.equals("river")) {
-            x = 394;
-            y = 360;
-            width = 16;
-            height = 19;
-        }
-        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
-        return getStringFromBufferedImageWithTesseract(b);
-    }
-
-    private String getFlopCard3Rank(String street) throws IOException {
-        int x = 0;
-        int y = 0;
-        int width = 0;
-        int height = 0;
-
-        if(street.equals("flop")) {
-
-        } else if(street.equals("turn")) {
-
-        } else if(street.equals("river")) {
-            x = 463;
-            y = 360;
-            width = 16;
-            height = 19;
-        }
-        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
-        return getStringFromBufferedImageWithTesseract(b);
-    }
-
-    private String getTurnCardRank(String street) throws IOException {
-        int x = 0;
-        int y = 0;
-        int width = 0;
-        int height = 0;
-
-        if(street.equals("turn")) {
-
-        } else if(street.equals("river")) {
-            x = 532;
-            y = 360;
-            width = 16;
-            height = 19;
-        }
-        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
-        return getStringFromBufferedImageWithTesseract(b);
-    }
-
-
-    private String getRiverCardRank() throws IOException {
-        int x = 601;
-        int y = 360;
-        int width = 16;
-        int height = 40;
-
-        BufferedImage b = getBufferedImageScreenShot(x, y, width, height);
-        return getStringFromBufferedImageWithTesseract(b);
-    }
-
-    private char getFlopCard1Suit() throws AWTException {
-        int x = 334;
-        int y = 388;
-
-        Robot robot = new Robot();
-        return compareColors(robot.getPixelColor(x, y));
-    }
-
-    private char getFlopCard2Suit() throws AWTException {
-        int x = 403;
-        int y = 389;
-
-        Robot robot = new Robot();
-        return compareColors(robot.getPixelColor(x, y));
-    }
-
-    private char getFlopCard3Suit() throws AWTException {
-        int x = 472;
-        int y = 389;
-
-        Robot robot = new Robot();
-        return compareColors(robot.getPixelColor(x, y));
-    }
-
-    private char getTurnCardSuit() throws AWTException {
-        int x = 541;
-        int y = 388;
-
-        Robot robot = new Robot();
-        return compareColors(robot.getPixelColor(x, y));
-    }
-
-    private char getRiverCardSuit() throws AWTException {
-        int x = 611;
-        int y = 388;
-
-        Robot robot = new Robot();
-        return compareColors(robot.getPixelColor(x, y));
-    }
-
-    private char compareColors(Color color) {
-        Color clubs = new Color(40, 122, 4);
-        Color spades = new Color(1, 1, 1);
-        Color hearts = new Color(200, 0, 27);
-
-        if(color.equals(clubs)) {
-            return 'c';
-        } else if(color.equals(spades)) {
-            return 's';
-        } else if(color.equals(hearts)) {
-            return 'h';
-        }
-        return 0;
-    }
-
-    public void readLinesFromChat() throws Exception {
-        BufferedImage bufferedImage1 = getBufferedImageScreenShot(56, 824, 285, 21);
-        bufferedImage1 = makeBufferedImageBlackAndWhite(bufferedImage1);
-        bufferedImage1 = zoomInImage(bufferedImage1, 2);
-        String line1 = getStringFromBufferedImageWithTesseract(bufferedImage1);
-
-        BufferedImage bufferedImage2 = getBufferedImageScreenShot(56, 850, 285, 21);
-        bufferedImage2 = makeBufferedImageBlackAndWhite(bufferedImage2);
-        bufferedImage2 = zoomInImage(bufferedImage2, 2);
-        String line2 = getStringFromBufferedImageWithTesseract(bufferedImage2);
-
-        BufferedImage bufferedImage3 = getBufferedImageScreenShot(56, 875, 285, 21);
-        bufferedImage3 = makeBufferedImageBlackAndWhite(bufferedImage3);
-        bufferedImage3 = zoomInImage(bufferedImage3, 2);
-        String line3 = getStringFromBufferedImageWithTesseract(bufferedImage3);
-
-        System.out.println(line1 + line2 + line3);
-    }
-
-    private void readTopChatLine() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(13, 604, 309, 24);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-    private void readMiddleChatLine() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(13, 630, 309, 24);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-    private void readBottomChatLine() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(13, 654, 309, 24);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-
-    private String readFirstFlopCardRankFromBoard() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(332, 289, 17, 19);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
-        return getStringFromBufferedImageWithTesseract(bufferedImage);
-    }
-
-    private String readSecondFlopCardRankFromBoard() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(403, 289, 17, 19);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
-        return getStringFromBufferedImageWithTesseract(bufferedImage);
-    }
-
-    private String readThirdFlopCardRankFromBoard() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(474, 289, 17, 19);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
-        return getStringFromBufferedImageWithTesseract(bufferedImage);
-    }
-
-    private String readTurnCardRankFromBoard() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(545, 289, 17, 19);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
-        return getStringFromBufferedImageWithTesseract(bufferedImage);
-    }
-
-    private String readRiverCardRankFromBoard() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(616, 289, 17, 19);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
-        return getStringFromBufferedImageWithTesseract(bufferedImage);
-    }
-
-    private char readFirstFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(341, 318, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
-    }
-
-    private char readSecondFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(411, 318, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
-    }
-
-    private char readThirdFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(481, 318, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
-    }
-
-    private char readTurnCardSuitFromBoard() {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(551, 318, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
-    }
-
-    private char readRiverCardSuitFromBoard() {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(621, 318, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
-    }
-
-    private char getSuitFromIntRgb(int rgb) {
-        char suit = 'x';
-        rgb = rgb / 1_000_000;
-
-        if(rgb == -13) {
-            suit = 'c';
-        } else if(rgb == -2) {
-            suit = 'h';
-        } else if(rgb == -16) {
-            suit = 's';
-        } else if(rgb == -15) {
-            suit = 'd';
-        }
-        return suit;
-    }
-
-    private void readTopPlayerStack() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(500, 147, 109, 28);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-    private void readBottomPlayerStack() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(500, 574, 109, 28);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-    private void readPotSize() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(430, 255, 167, 28);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = makeBufferedImageBlackAndWhite(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-    private void readBottomPlayerTotalBetSize() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(460, 448, 80, 23);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-    private void readTopPlayerTotalBetSize() throws IOException {
-        BufferedImage bufferedImage = getBufferedImageScreenShot(451, 191, 66, 18);
-        bufferedImage = zoomInImage(bufferedImage, 2);
-        bufferedImage = invertBufferedImageColours(bufferedImage);
-
-        String s = getStringFromBufferedImageWithTesseract(bufferedImage);
-        System.out.println(s);
-    }
-
-    //spades: -16711422
-    //clubs: -13596926
-    //diamonds: -15773740
-    //hearts: -2811358
-
-    public static void click(int x, int y) throws AWTException {
-        Robot bot = new Robot();
-        bot.mouseMove(x, y);
-        bot.mousePress(InputEvent.BUTTON1_MASK);
-        bot.mouseRelease(InputEvent.BUTTON1_MASK);
-
-        bot.keyPress(KeyEvent.VK_1);
-        bot.keyRelease(KeyEvent.VK_1);
-        bot.keyPress(KeyEvent.VK_PERIOD);
-        bot.keyRelease(KeyEvent.VK_PERIOD);
-        bot.keyPress(KeyEvent.VK_5);
-        bot.keyRelease(KeyEvent.VK_5);
-        bot.keyPress(KeyEvent.VK_1);
-        bot.keyRelease(KeyEvent.VK_1);
-    }
-
 //    public static void main(String[] args) throws Exception {
-//        ImageProcessor imageProcessor = new ImageProcessor();
+//
+////        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(461, 506, 1, 1);
+////        int suitRgb = bufferedImage.getRGB(0, 0);
+////        System.out.println(suitRgb);
+//
+//        NetBetTableReader netBetTableReader = new NetBetTableReader();
+//
+//        System.out.println(netBetTableReader.getPotSizeFromImage());
+//
+//        //createPartialSreenShot(238, 9, 79, 18, "C:/Users/Lennart/screenshot.png");
+//
+////        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(238, 9, 79, 18);
+////        //bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 3);
+////        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+////        System.out.println(ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage));
+//
 //
 ////        String firstFlopCardRank = imageProcessor.readFirstFlopCardRankFromBoard();
 ////        firstFlopCardRank = firstFlopCardRank.replaceAll("\\s+","");
@@ -689,12 +228,12 @@ public class ImageProcessor {
 ////        imageProcessor.readTopPlayerStack();
 ////        imageProcessor.readBottomPlayerStack();
 //
-//        TimeUnit.SECONDS.sleep(3);
-//
-//        double x = imageProcessor.getMouseXcoordinate();
-//        double y = imageProcessor.getMouseYcoordinate();
-//
-//        System.out.println(x);
-//        System.out.println(y);
+////        TimeUnit.SECONDS.sleep(3);
+////
+////        double x = ImageProcessor.getMouseXcoordinate();
+////        double y = ImageProcessor.getMouseYcoordinate();
+////
+////        System.out.println(x);
+////        System.out.println(y);
 //    }
 }

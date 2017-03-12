@@ -1,7 +1,7 @@
 package com.lennart.model.botgame;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.imageprocessing.ImageProcessor;
+import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
 /**
  * Created by LPO21630 on 16-2-2017.
@@ -27,10 +27,10 @@ public class GameVariablesFiller {
     private Card turnCard;
     private Card riverCard;
 
-    private ImageProcessor imageProcessor;
+    private NetBetTableReader netBetTableReader;
 
     public GameVariablesFiller() {
-        imageProcessor = new ImageProcessor();
+        netBetTableReader = new NetBetTableReader();
         setPotSize();
         setBotStack();
         setOpponentStack();
@@ -41,7 +41,7 @@ public class GameVariablesFiller {
         setSmallBlind();
         setBigBlind();
         setBotIsButton();
-        setOpponentPlayerName();
+        //setOpponentPlayerName();
         setOpponentAction();
     }
 
@@ -54,7 +54,7 @@ public class GameVariablesFiller {
         setOpponentAction();
 
         if(opponentPlayerName == null) {
-            setOpponentPlayerName();
+            //setOpponentPlayerName();
         }
         if(street.equals("flop")) {
             if (flopCard1 == null) {
@@ -80,71 +80,71 @@ public class GameVariablesFiller {
     }
 
     private void setPotSize() {
-        potSize = imageProcessor.getPotSizeFromImage();
+        potSize = netBetTableReader.getPotSizeFromImage();
     }
 
     private void setBotStack() {
-        botStack = imageProcessor.getBotStackFromImage();
+        botStack = netBetTableReader.getBotStackFromImage();
     }
 
     private void setOpponentStack() {
-        opponentStack = imageProcessor.getOpponentStackFromImage();
+        opponentStack = netBetTableReader.getOpponentStackFromImage();
     }
 
     public void setBotTotalBetSize() {
-        botTotalBetSize = imageProcessor.getBotTotalBetSizeFromImage();
+        botTotalBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
     }
 
     public void setOpponentTotalBetSize() {
-        opponentTotalBetSize = imageProcessor.getOpponentTotalBetSizeFromImage();
+        opponentTotalBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
     }
 
     private void setSmallBlind() {
-        smallBlind = imageProcessor.getSmallBlindFromImage();
+        smallBlind = 0.01;
     }
 
     private void setBigBlind() {
-        bigBlind = imageProcessor.getBigBlindFromImage();
+        bigBlind = 0.02;
     }
 
     private void setBotIsButton() {
-        botIsButton = imageProcessor.isBotButtonFromImage();
+        botIsButton = netBetTableReader.isBotButtonFromImage();
     }
 
-    private void setOpponentPlayerName() {
-        opponentPlayerName = imageProcessor.getOpponentPlayerNameFromImage();
-    }
+//    private void setOpponentPlayerName() {
+//        opponentPlayerName = netBetTableReader.getOpponentPlayerNameFromImage();
+//    }
 
     private void setOpponentAction() {
-        opponentAction = imageProcessor.getOpponentActionFromImage();
+        opponentAction = netBetTableReader.getOpponentActionFromImage();
     }
 
     private void setBotHoleCard1() {
-        botHoleCard1 = imageProcessor.getBotHoleCard1FromImage();
+        botHoleCard1 = netBetTableReader.getBotHoleCard1FromImage();
     }
 
     private void setBotHoleCard2() {
-        botHoleCard2 = imageProcessor.getBotHoleCard2FromImage();
+        botHoleCard2 = netBetTableReader.getBotHoleCard2FromImage();
     }
 
     private void setFlopCard1() {
-        flopCard1 = imageProcessor.getFlopCard1FromImage();
+        flopCard1 = netBetTableReader.getFlopCard1FromImage();
     }
 
     private void setFlopCard2() {
-        flopCard2 = imageProcessor.getFlopCard2FromImage();
+        flopCard2 = netBetTableReader.getFlopCard2FromImage();
     }
 
     private void setFlopCard3() {
-        flopCard3 = imageProcessor.getFlopCard3FromImage();
+        flopCard3 = netBetTableReader.getFlopCard3FromImage();
     }
 
     private void setTurnCard() {
-        turnCard = imageProcessor.getTurnCardFromImage();
+        turnCard = netBetTableReader.getTurnCardFromImage();
     }
 
     private void setRiverCard() {
-        riverCard = imageProcessor.getRiverCardFromImage();
+        riverCard = netBetTableReader.getRiverCardFromImage();
     }
 
     public double getPotSize() {
