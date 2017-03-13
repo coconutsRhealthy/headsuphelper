@@ -99,6 +99,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
         }
 
         if((computerActionNeeded || onlyCallRangeNeeded) && isComputerActionNeededIfPlayerIsAllIn()) {
+            //TODO: fixen dat bij onlyCallRangeNeeded nog niet de nieuwe straat gedeeld is als je de range berekent
             doComputerAction();
         }
         roundToTwoDecimals();

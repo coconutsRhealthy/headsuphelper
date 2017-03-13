@@ -4,6 +4,8 @@ import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
 
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Lennart on 3/12/2017.
@@ -30,20 +32,17 @@ public class NetBetTableReader {
         return Double.parseDouble(readTopPlayerTotalBetSize());
     }
 
-    public String getOpponentActionFromImage() {
-        String action = null;
+    public Map<String, String> getActionsFromLastThreeChatLines() {
+        Map<String, String> actionsFromChat = new HashMap<>();
+        String topChatLine = readTopChatLine();
+        String middleChatLine = readMiddleChatLine();
         String bottomChatLine = readBottomChatLine();
 
-        if(bottomChatLine.contains("check")) {
-            action = "check";
-        } else if(bottomChatLine.contains("call")) {
-            action = "call";
-        } else if(bottomChatLine.contains("bet")) {
-            action = "bet";
-        } else if(bottomChatLine.contains("raise")) {
-            action = "raise";
-        }
-        return action;
+        actionsFromChat.put("top", getActionFromChatLine(topChatLine));
+        actionsFromChat.put("middle", getActionFromChatLine(middleChatLine));
+        actionsFromChat.put("bottom", getActionFromChatLine(bottomChatLine));
+
+        return actionsFromChat;
     }
 
     public boolean isBotButtonFromImage() {
@@ -328,5 +327,22 @@ public class NetBetTableReader {
                 break;
         }
         return cardRank;
+    }
+
+    private String getActionFromChatLine(String chatLine) {
+        String action = null;
+
+        if(chatLine.contains("check")) {
+            action = "check";
+        } else if(chatLine.contains("call")) {
+            action = "call";
+        } else if(chatLine.contains("bet")) {
+            action = "bet";
+        } else if(chatLine.contains("raise")) {
+            action = "raise";
+        } else if(chatLine.contains("post")) {
+            action = "post";
+        }
+        return action;
     }
 }

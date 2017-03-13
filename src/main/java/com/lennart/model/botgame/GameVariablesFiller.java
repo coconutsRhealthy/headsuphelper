@@ -3,6 +3,8 @@ package com.lennart.model.botgame;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
+import java.util.Map;
+
 /**
  * Created by LPO21630 on 16-2-2017.
  */
@@ -17,7 +19,7 @@ public class GameVariablesFiller {
 
     private Boolean botIsButton;
     private String opponentPlayerName;
-    private String opponentAction;
+    private Map<String, String> actionsFromLastThreeChatLines;
 
     private Card botHoleCard1;
     private Card botHoleCard2;
@@ -31,27 +33,27 @@ public class GameVariablesFiller {
 
     public GameVariablesFiller() {
         netBetTableReader = new NetBetTableReader();
-        setPotSize();
         setBotStack();
         setOpponentStack();
         setBotTotalBetSize();
         setOpponentTotalBetSize();
+        setCorrectedPotSize();
         setBotHoleCard1();
         setBotHoleCard2();
         setSmallBlind();
         setBigBlind();
         setBotIsButton();
         //setOpponentPlayerName();
-        setOpponentAction();
+        setActionsFromLastThreeChatLines();
     }
 
     public void initializeAndRefreshRelevantVariables(String street) {
-        setPotSize();
         setBotStack();
         setOpponentStack();
         setBotTotalBetSize();
         setOpponentTotalBetSize();
-        setOpponentAction();
+        setCorrectedPotSize();
+        setActionsFromLastThreeChatLines();
 
         if(opponentPlayerName == null) {
             //setOpponentPlayerName();
@@ -79,8 +81,9 @@ public class GameVariablesFiller {
         }
     }
 
-    private void setPotSize() {
-        potSize = netBetTableReader.getPotSizeFromImage();
+    private void setCorrectedPotSize() {
+        double potSizeIncludingAllBets = netBetTableReader.getPotSizeFromImage();
+        potSize = potSizeIncludingAllBets - botTotalBetSize - opponentTotalBetSize;
     }
 
     private void setBotStack() {
@@ -115,8 +118,8 @@ public class GameVariablesFiller {
 //        opponentPlayerName = netBetTableReader.getOpponentPlayerNameFromImage();
 //    }
 
-    private void setOpponentAction() {
-        opponentAction = netBetTableReader.getOpponentActionFromImage();
+    private void setActionsFromLastThreeChatLines() {
+        actionsFromLastThreeChatLines = netBetTableReader.getActionsFromLastThreeChatLines();
     }
 
     private void setBotHoleCard1() {
@@ -183,8 +186,8 @@ public class GameVariablesFiller {
         return opponentPlayerName;
     }
 
-    public String getOpponentAction() {
-        return opponentAction;
+    public Map<String, String> getActionsFromLastThreeChatLines() {
+        return actionsFromLastThreeChatLines;
     }
 
     public Card getBotHoleCard1() {

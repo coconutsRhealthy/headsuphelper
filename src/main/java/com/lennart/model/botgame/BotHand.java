@@ -6,10 +6,7 @@ import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by LPO21630 on 16-2-2017.
@@ -58,6 +55,8 @@ public class BotHand implements RangeBuildable, Actionable {
     private boolean previousBluffAction;
     private boolean drawBettingActionDone;
     private String botWrittenAction;
+    private String streetAtPreviousActionRequest;
+    private String opponentPreviousStreetActionOnlyRangeNeeded;
 
     public BotHand() {
         //default constructor
@@ -72,22 +71,45 @@ public class BotHand implements RangeBuildable, Actionable {
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setOpponentPlayerName();
-        setOpponentAction();
         setBotIsButton();
         setBotHoleCard1();
         setBotHoleCard2();
         setSmallBlind();
         setBigBlind();
-
-        knownGameCards = new HashSet<>();
-        knownGameCards.add(botHoleCard1);
-        knownGameCards.add(botHoleCard2);
-
-        botHoleCards = new ArrayList<>();
-        botHoleCards.add(botHoleCard1);
-        botHoleCards.add(botHoleCard2);
-
+        setKnownGameCards();
+        setBotHoleCards();
+        setStreetAndPreviousStreet();
+        setOpponentAction();
         setOpponentLastActionWasPreflop();
+    }
+
+    public BotHand updateVariables() {
+        gameVariablesFiller.initializeAndRefreshRelevantVariables(street);
+
+        if(foldOrShowdownOccured()) {
+            return new BotHand("initialize");
+        }
+
+        setFlopCard1IfNecessary();
+        setFlopCard2IfNecessary();
+        setFlopCard3IfNecessary();
+        setTurnCardIfNecessary();
+        setRiverCardIfNecessary();
+        setFlopCards();
+        setKnownGameCards();
+        setBoard();
+        setPotSize();
+        setBotStack();
+        setOpponentStack();
+        setBotTotalBetSize();
+        setOpponentTotalBetSize();
+        setStreetAndPreviousStreet();
+        setOpponentAction();
+        setOpponentFormerTotalCallAmount();
+        calculateOpponentPreflopStats();
+        setOpponentLastActionWasPreflop();
+
+        return this;
     }
 
     public void getNewBotAction() {
@@ -95,31 +117,6 @@ public class BotHand implements RangeBuildable, Actionable {
         opponentRange = rangeBuilder.getOpponentRange();
         botAction = new Action(this, rangeBuilder);
         botWrittenAction = botAction.getWrittenAction();
-    }
-
-    public BotHand updateVariables() {
-        gameVariablesFiller.initializeAndRefreshRelevantVariables(street);
-
-        setOpponentAction();
-
-        if(opponentAction.equals("fold") || (opponentAction.equals("call") && street.equals("river"))) {
-            return new BotHand("initialize");
-        }
-
-        setPotSize();
-        setBotStack();
-        setOpponentStack();
-        setBotTotalBetSize();
-        setOpponentTotalBetSize();
-
-        setFlopCard1IfNecessary();
-        setFlopCard2IfNecessary();
-        setFlopCard3IfNecessary();
-        setTurnCardIfNecessary();
-        setRiverCardIfNecessary();
-
-        setDerivedVariables();
-        return this;
     }
 
     //main variables
@@ -148,7 +145,53 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     private void setOpponentAction() {
-        opponentAction = gameVariablesFiller.getOpponentAction();
+        Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
+
+        for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
+            if(entry.getValue().equals("post")) {
+                opponentAction = "post";
+                return;
+            }
+        }
+
+        if(street.equals(streetAtPreviousActionRequest)) {
+            if(street.equals("preflop") && botIsButton) {
+                opponentAction = null;
+            } else {
+                opponentAction = actionsFromLastThreeChatLines.get("bottom");
+            }
+        } else {
+            if(botIsButton) {
+                opponentPreviousStreetActionOnlyRangeNeeded = actionsFromLastThreeChatLines.get("top");
+                opponentAction = actionsFromLastThreeChatLines.get("bottom");
+            } else {
+                opponentAction = actionsFromLastThreeChatLines.get("middle");
+            }
+        }
+    }
+
+    private void processPreviousCallActionIfNeccesary() {
+        //TODO: implement this method after the fix in ComputerGame regarding previous street calls and range
+
+        if(opponentPreviousStreetActionOnlyRangeNeeded != null) {
+            String opponentActionBackUp = opponentAction;
+            double botTotalBetSizeBackUp = botTotalBetSize;
+            double opponentTotalBetSizeBackUp = opponentTotalBetSize;
+
+            opponentAction = opponentPreviousStreetActionOnlyRangeNeeded;
+            //botTotalBetSize
+        }
+    }
+
+    private boolean foldOrShowdownOccured() {
+        Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
+
+        for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
+            if(entry.getValue().equals("post")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setBotHoleCard1() {
@@ -203,23 +246,16 @@ public class BotHand implements RangeBuildable, Actionable {
 
     //derived variables form main variables
     private void setDerivedVariables() {
-        setBotHoleCards();
-        setFlopCards();
-        setKnownGameCards();
-        setOpponentAction();
-        setBoard();
-        calculateOpponentPreflopStats();
-        setOpponentLastActionWasPreflop();
-        setOpponentFormerTotalCallAmount();
-        setStreet();
+
+
+
+
     }
 
     private void setBotHoleCards() {
-        if(botHoleCards == null && botHoleCard1 != null && botHoleCard2 != null) {
-            botHoleCards = new ArrayList<>();
-            botHoleCards.add(botHoleCard1);
-            botHoleCards.add(botHoleCard2);
-        }
+        botHoleCards = new ArrayList<>();
+        botHoleCards.add(botHoleCard1);
+        botHoleCards.add(botHoleCard2);
     }
 
     private void setFlopCards() {
@@ -232,6 +268,12 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     private void setKnownGameCards() {
+        if(knownGameCards == null) {
+            knownGameCards = new HashSet<>();
+            knownGameCards.add(botHoleCard1);
+            knownGameCards.add(botHoleCard2);
+        }
+
         if(flopCards != null) {
             knownGameCards.addAll(flopCards);
         }
@@ -294,17 +336,21 @@ public class BotHand implements RangeBuildable, Actionable {
         }
     }
 
-    private void setStreet() {
+    private void setStreetAndPreviousStreet() {
         if(flopCard1 == null) {
+            streetAtPreviousActionRequest = "preflop";
             street = "preflop";
         }
         if(flopCard1 != null && turnCard == null) {
+            streetAtPreviousActionRequest = street;
             street = "flop";
         }
         if(turnCard != null && riverCard == null) {
+            streetAtPreviousActionRequest = street;
             street = "turn";
         }
         if(riverCard != null) {
+            streetAtPreviousActionRequest = street;
             street = "river";
         }
     }
@@ -635,5 +681,21 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void setBotWrittenAction(String botWrittenAction) {
         this.botWrittenAction = botWrittenAction;
+    }
+
+    public String getStreetAtPreviousActionRequest() {
+        return streetAtPreviousActionRequest;
+    }
+
+    public void setStreetAtPreviousActionRequest(String streetAtPreviousActionRequest) {
+        this.streetAtPreviousActionRequest = streetAtPreviousActionRequest;
+    }
+
+    public String getOpponentPreviousStreetActionOnlyRangeNeeded() {
+        return opponentPreviousStreetActionOnlyRangeNeeded;
+    }
+
+    public void setOpponentPreviousStreetActionOnlyRangeNeeded(String opponentPreviousStreetActionOnlyRangeNeeded) {
+        this.opponentPreviousStreetActionOnlyRangeNeeded = opponentPreviousStreetActionOnlyRangeNeeded;
     }
 }
