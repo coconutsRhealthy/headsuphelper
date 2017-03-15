@@ -24,6 +24,8 @@ public interface RangeBuildable {
 
     Set<Set<Card>> getOpponentRange();
 
+    void setOpponentRange(Set<Set<Card>> opponentRange);
+
     double getPotSize();
 
     double getBigBlind();

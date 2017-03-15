@@ -574,6 +574,7 @@ public class BotHand implements RangeBuildable, Actionable {
         return opponentRange;
     }
 
+    @Override
     public void setOpponentRange(Set<Set<Card>> opponentRange) {
         this.opponentRange = opponentRange;
     }
