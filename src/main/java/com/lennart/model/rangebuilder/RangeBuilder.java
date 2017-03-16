@@ -196,6 +196,10 @@ public class RangeBuilder {
         return handEvaluator;
     }
 
+    public List<Card> getBoard() {
+        return board;
+    }
+
     //helper methods
     private Set<Set<Card>> getOpponentRangeInitialize() {
         Set<Set<Card>> opponentRange;

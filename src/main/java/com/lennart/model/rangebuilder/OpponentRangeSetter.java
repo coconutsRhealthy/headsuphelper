@@ -1,8 +1,6 @@
-package com.lennart.model.computergame;
+package com.lennart.model.rangebuilder;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.RangeBuildable;
-import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,6 +17,7 @@ public class OpponentRangeSetter {
     private Card currentRiverCard;
     private List<Card> currentBoard;
     private Set<Card> currentKnownGameCards;
+    private RangeBuilder rangeBuilder;
 
     public void setCorrectOpponentRange(RangeBuildable rangeBuildable) {
         String streetOfBotLastAction = getStreetOfBotLastAction(rangeBuildable);
@@ -167,8 +166,11 @@ public class OpponentRangeSetter {
     }
 
     private void setRange(RangeBuildable rangeBuildable) {
-        RangeBuilder rangeBuilder = new RangeBuilder(rangeBuildable);
+        rangeBuilder = new RangeBuilder(rangeBuildable);
         rangeBuildable.setOpponentRange(rangeBuilder.getOpponentRange());
-        rangeBuildable.setRangeBuilder(rangeBuilder);
+    }
+
+    public RangeBuilder getRangeBuilder() {
+        return rangeBuilder;
     }
 }

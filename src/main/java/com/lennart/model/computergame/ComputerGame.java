@@ -5,6 +5,7 @@ import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.rangebuilder.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 import org.apache.commons.math3.util.Precision;
@@ -102,8 +103,8 @@ public class ComputerGame implements RangeBuildable, Actionable {
     private void doComputerAction() {
         OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
         opponentRangeSetter.setCorrectOpponentRange(this);
+        setRangeBuilder(opponentRangeSetter);
 
-        //todo: fix dat soms in de constructor van RangeBuilder nog niet boardEvaluator etc gevuld is..
         computerAction = new Action(this, rangeBuilder);
         computerWrittenAction = computerAction.getWrittenAction();
 
@@ -139,6 +140,28 @@ public class ComputerGame implements RangeBuildable, Actionable {
             botActionHistory.add("turn " + action.getAction());
         } else if(board.size() == 5) {
             botActionHistory.add("river " + action.getAction());
+        }
+    }
+
+    private boolean rangeSetterChangedBoard(OpponentRangeSetter opponentRangeSetter) {
+        List<Card> rangeSetterBoard = opponentRangeSetter.getRangeBuilder().getBoard();
+        Set<Card> rangeSetterBoardAsSet = new HashSet<>();
+        rangeSetterBoardAsSet.addAll(rangeSetterBoard);
+
+        Set<Card> currentBoardAsSet = new HashSet<>();
+        currentBoardAsSet.addAll(board);
+
+        if(rangeSetterBoardAsSet.equals(currentBoardAsSet)) {
+            return false;
+        }
+        return true;
+    }
+
+    private void setRangeBuilder(OpponentRangeSetter opponentRangeSetter) {
+        if(rangeSetterChangedBoard(opponentRangeSetter)) {
+            rangeBuilder = new RangeBuilder(this);
+        } else {
+            rangeBuilder = opponentRangeSetter.getRangeBuilder();
         }
     }
 
