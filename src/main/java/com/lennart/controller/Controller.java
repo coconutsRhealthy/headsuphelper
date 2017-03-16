@@ -17,6 +17,7 @@ public class Controller {
     public @ResponseBody ComputerGame startGame() {
         ComputerGame computerGame = new ComputerGame("initialize");
         computerGame.setComputerAction(null);
+        computerGame.setRangeBuilder(null);
         return computerGame;
     }
 
@@ -24,6 +25,7 @@ public class Controller {
     public @ResponseBody ComputerGame submitMyAction(@RequestBody ComputerGame computerGame) {
         computerGame = computerGame.submitHumanActionAndDoComputerAction();
         computerGame.setComputerAction(null);
+        computerGame.setRangeBuilder(null);
         return computerGame;
     }
 

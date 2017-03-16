@@ -44,7 +44,7 @@ public class RangeBuilder {
 
     private Set<Set<Card>> opponentRange;
 
-    public RangeBuilder(RangeBuildable rangeBuildable) {
+    public RangeBuilder(RangeBuildable rangeBuildable, boolean initializeRange) {
         holeCards = rangeBuildable.getBotHoleCards();
         board = rangeBuildable.getBoard();
         knownGameCards = rangeBuildable.getKnownGameCards();
@@ -64,7 +64,9 @@ public class RangeBuilder {
             handEvaluator = new HandEvaluator(holeCards, boardEvaluator);
         }
 
-        opponentRange = getOpponentRangeInitialize();
+        if(initializeRange) {
+            opponentRange = getOpponentRangeInitialize();
+        }
     }
 
     public Set<Set<Card>> getOpponentRange() {

@@ -41,16 +41,21 @@ public class OpponentRangeSetter {
     private String getStreetOfBotLastAction(RangeBuildable rangeBuildable) {
         String streetOfBotLastAction = null;
         List<String> botActionHistory = rangeBuildable.getBotActionHistory();
-        String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
 
-        if(botLastAction.contains("preflop")) {
+        if(botActionHistory != null) {
+            String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
+
+            if(botLastAction.contains("preflop")) {
+                streetOfBotLastAction = "preflop";
+            } else if(botLastAction.contains("flop")) {
+                streetOfBotLastAction = "flop";
+            } else if(botLastAction.contains("turn")) {
+                streetOfBotLastAction = "turn";
+            } else if(botLastAction.contains("river")) {
+                streetOfBotLastAction = "river";
+            }
+        } else {
             streetOfBotLastAction = "preflop";
-        } else if(botLastAction.contains("flop")) {
-            streetOfBotLastAction = "flop";
-        } else if(botLastAction.contains("turn")) {
-            streetOfBotLastAction = "turn";
-        } else if(botLastAction.contains("river")) {
-            streetOfBotLastAction = "river";
         }
         return streetOfBotLastAction;
     }
@@ -166,7 +171,7 @@ public class OpponentRangeSetter {
     }
 
     private void setRange(RangeBuildable rangeBuildable) {
-        rangeBuilder = new RangeBuilder(rangeBuildable);
+        rangeBuilder = new RangeBuilder(rangeBuildable, true);
         rangeBuildable.setOpponentRange(rangeBuilder.getOpponentRange());
     }
 

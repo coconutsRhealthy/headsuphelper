@@ -112,7 +112,7 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public void getNewBotAction() {
-        RangeBuilder rangeBuilder = new RangeBuilder(this);
+        RangeBuilder rangeBuilder = new RangeBuilder(this, true);
         opponentRange = rangeBuilder.getOpponentRange();
         botAction = new Action(this, rangeBuilder);
         botWrittenAction = botAction.getWrittenAction();

@@ -158,7 +158,7 @@ public class PostFlopRangeBuilder {
 
     private double getPercentagePotIncrease() {
         double percentagePotIncrease;
-        double currentPotSize = potSize;
+        double currentPotSize = potSize + botTotalBetSize + opponentTotalBetSize;
 
         if(botLastAction.equals("check")) {
             percentagePotIncrease = ((currentPotSize / previousPotSize) - 1);

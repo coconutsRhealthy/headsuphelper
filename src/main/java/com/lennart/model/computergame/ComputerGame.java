@@ -103,7 +103,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
     private void doComputerAction() {
         OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
         opponentRangeSetter.setCorrectOpponentRange(this);
-        setRangeBuilder(opponentRangeSetter);
+        setOrInitializeRangeBuilder(opponentRangeSetter);
 
         computerAction = new Action(this, rangeBuilder);
         computerWrittenAction = computerAction.getWrittenAction();
@@ -126,12 +126,16 @@ public class ComputerGame implements RangeBuildable, Actionable {
         } else if(computerWrittenAction.contains("raise")) {
             processComputerRaiseAction();
         }
-        potSizeAfterLastBotAction = potSize;
+        potSizeAfterLastBotAction = potSize + computerTotalBetSize + opponentTotalBetSize;
         rangeBuilder = null;
         roundToTwoDecimals();
     }
 
     private void updateBotActionHistory(Action action) {
+        if(botActionHistory == null) {
+            botActionHistory = new ArrayList<>();
+        }
+
         if(board == null) {
             botActionHistory.add("preflop " + action.getAction());
         } else if(board.size() == 3) {
@@ -144,22 +148,29 @@ public class ComputerGame implements RangeBuildable, Actionable {
     }
 
     private boolean rangeSetterChangedBoard(OpponentRangeSetter opponentRangeSetter) {
-        List<Card> rangeSetterBoard = opponentRangeSetter.getRangeBuilder().getBoard();
-        Set<Card> rangeSetterBoardAsSet = new HashSet<>();
-        rangeSetterBoardAsSet.addAll(rangeSetterBoard);
+        if(opponentRangeSetter.getRangeBuilder().getBoard() != null) {
+            List<Card> rangeSetterBoard = opponentRangeSetter.getRangeBuilder().getBoard();
+            Set<Card> rangeSetterBoardAsSet = new HashSet<>();
+            rangeSetterBoardAsSet.addAll(rangeSetterBoard);
 
-        Set<Card> currentBoardAsSet = new HashSet<>();
-        currentBoardAsSet.addAll(board);
+            Set<Card> currentBoardAsSet = new HashSet<>();
+            currentBoardAsSet.addAll(board);
 
-        if(rangeSetterBoardAsSet.equals(currentBoardAsSet)) {
-            return false;
+            if(rangeSetterBoardAsSet.equals(currentBoardAsSet)) {
+                return false;
+            }
+            return true;
+        } else {
+            if(board == null) {
+                return false;
+            }
+            return true;
         }
-        return true;
     }
 
-    private void setRangeBuilder(OpponentRangeSetter opponentRangeSetter) {
+    private void setOrInitializeRangeBuilder(OpponentRangeSetter opponentRangeSetter) {
         if(rangeSetterChangedBoard(opponentRangeSetter)) {
-            rangeBuilder = new RangeBuilder(this);
+            rangeBuilder = new RangeBuilder(this, false);
         } else {
             rangeBuilder = opponentRangeSetter.getRangeBuilder();
         }

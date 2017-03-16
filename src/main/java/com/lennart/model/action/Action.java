@@ -52,7 +52,7 @@ public class Action {
     private void getAndProcessPostFlopAction(Actionable actionable) {
         postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
                 rangeBuilder.getHandEvaluator(), actionable);
-        String action = postFlopActionBuilder.getAction(actionable.getOpponentRange());
+        action = postFlopActionBuilder.getAction(actionable.getOpponentRange());
         setSizingIfNecessary(actionable, action);
         setNewWrittenAction(action, actionable);
     }
