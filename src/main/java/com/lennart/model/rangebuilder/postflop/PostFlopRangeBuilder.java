@@ -102,6 +102,44 @@ public class PostFlopRangeBuilder {
         return _7to20bbRange;
     }
 
+    private Set<Set<Card>> get7to20bbRangeNew(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _7to20bbRange;
+
+        double increase = getPotIncreaseDivNonCheckActions();
+
+        if(increase <= 0.2) {
+            _7to20bbRange = previousRange;
+        } else if(increase > 0.2 && increase <= 0.5) {
+            _7to20bbRange = get7to20bb16to33odds(previousRange);
+        } else if(increase > 0.5 && increase <= 1) {
+            _7to20bbRange = get7to20bb33to50odds(previousRange);
+        } else {
+            _7to20bbRange = get7to20bbAbove50odds(previousRange);
+        }
+        return _7to20bbRange;
+    }
+
+    private double getPotIncreaseDivNonCheckActions() {
+        //potIncrease / numberOfNonCheckActions
+
+        //je kunt hier zelfs doen -voor simplificatie- dat je enkel kijkt naar de potgroei in %...
+            //en dan evt als extra variabele of jouw laatste actie check of bet/calling was
+
+        return 0;
+    }
+
+    //leg een lijst aan met jouw actie historie en de straat waarop het gebeurde
+
+    //als jouw laatste actie bet of raise was, en nu bij nieuwe actie zit je op volgende straat, weet je
+    //dat opponent gecallt heeft op vorige straat. In dit geval voor rangeberekening board dus aanpassen naar
+    //vorige straat
+
+    //vervolgens: kijk naar de % pot increase sinds jouw vorige actieronde. Als jij bij je vorige actieronde
+    //NIET checkte, maar bijv bette, raiste of callde, dan moet je de % pot increase door 2 delen.
+
+    //deze percentage % inrease gebruik je vervolgens in deze klassen voor de range build methodes zoals hierboven in
+    //get7to20bbRangeNew()
+
     private Set<Set<Card>> get20to40bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _20to40bbRange;
 

@@ -25,23 +25,8 @@ public class OpponentRangeSetter {
 
         if(streetOfBotLastAction.equals(currentStreet)) {
             //calculate range with current board
-            RangeBuilder rangeBuilder = new RangeBuilder(rangeBuildable);
-            rangeBuildable.setOpponentRange(rangeBuilder.getOpponentRange());
         } else {
-            int numberOfActionsDoneByOpponentSinceBotLastAction = getNumberOfActionsDoneByOpponentSinceBotLastAction();
-            if(numberOfActionsDoneByOpponentSinceBotLastAction == 1) {
-                String streetAtWhichOpponentLastActed = getStreetAtWhichOpponentLastActed();
-                if(streetAtWhichOpponentLastActed.equals(currentStreet)) {
-                    RangeBuilder rangeBuilder = new RangeBuilder(rangeBuildable);
-                    rangeBuildable.setOpponentRange(rangeBuilder.getOpponentRange());
-                } else {
-
-                    //calculate range based on previous board
-                }
-            } else if(numberOfActionsDoneByOpponentSinceBotLastAction == 2) {
-                //first calculate opponent range based on action #1 and previous street
-                //then calculate opponent range based on action #2 and current street
-            }
+            //calculate range with previous street board
         }
     }
 
