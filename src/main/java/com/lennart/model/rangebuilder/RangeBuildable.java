@@ -12,15 +12,29 @@ public interface RangeBuildable {
 
     List<Card> getBotHoleCards();
 
+    List<Card> getFlopCards();
+
+    void setFlopCards(List<Card> flopCards);
+
+    Card getTurnCard();
+
+    void setTurnCard(Card turnCard);
+
+    Card getRiverCard();
+
+    void setRiverCard(Card riverCard);
+
     List<Card> getBoard();
 
+    void setBoard(List<Card> board);
+
     Set<Card> getKnownGameCards();
+
+    void setKnownGameCards(Set<Card> knownGameCards);
 
     double getOpponentPreCall2betStat();
 
     double getOpponentPre3betStat();
-
-    boolean isOpponentLastActionWasPreflop();
 
     Set<Set<Card>> getOpponentRange();
 
@@ -38,5 +52,9 @@ public interface RangeBuildable {
 
     double getHandsOpponentOopFacingPreflop2bet();
 
-    double getOpponentFormerTotalCallAmount();
+    List<String> getBotActionHistory();
+
+    void setRangeBuilder(RangeBuilder rangeBuilder);
+
+    double getPotSizeAfterLastBotAction();
 }

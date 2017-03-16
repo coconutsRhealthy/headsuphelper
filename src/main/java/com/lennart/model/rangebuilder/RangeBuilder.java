@@ -38,7 +38,6 @@ public class RangeBuilder {
     private HighCardDrawEvaluator highCardDrawEvaluator;
     private HandEvaluator handEvaluator;
     private Set<Set<Card>> previousOpponentRange;
-    private boolean opponentLastActionWasPreflop;
 
     private double opponentPreCall2betStat;
     private double opponentPre3betStat;
@@ -51,7 +50,6 @@ public class RangeBuilder {
         knownGameCards = rangeBuildable.getKnownGameCards();
         opponentPreCall2betStat = rangeBuildable.getOpponentPreCall2betStat();
         opponentPre3betStat = rangeBuildable.getOpponentPre3betStat();
-        opponentLastActionWasPreflop = rangeBuildable.isOpponentLastActionWasPreflop();
 
         preflopRangeBuilder = new PreflopRangeBuilder(rangeBuildable, this);
 
@@ -202,7 +200,7 @@ public class RangeBuilder {
     private Set<Set<Card>> getOpponentRangeInitialize() {
         Set<Set<Card>> opponentRange;
 
-        if(opponentLastActionWasPreflop) {
+        if(board == null) {
             opponentRange = preflopRangeBuilder.getOpponentPreflopRange();
         } else {
             opponentRange = postFlopRangeBuilder.getOpponentPostFlopRange(previousOpponentRange);

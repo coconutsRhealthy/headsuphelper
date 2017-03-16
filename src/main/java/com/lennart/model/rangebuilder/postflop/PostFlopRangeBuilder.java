@@ -5,6 +5,7 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.computergame.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
@@ -27,7 +28,9 @@ public class PostFlopRangeBuilder {
     private double bigBlind;
     private double handsHumanOopFacingPreflop2bet;
     private Set<Card> knownGameCards;
-    private double opponentFormerTotalCallAmount;
+
+    private double previousPotSize;
+    private String botLastAction;
 
     private Map<Integer, Set<Card>> strongFlushDraws;
     private Map<Integer, Set<Card>> mediumFlushDraws;
@@ -56,7 +59,9 @@ public class PostFlopRangeBuilder {
         bigBlind = rangeBuildable.getBigBlind();
         knownGameCards = rangeBuildable.getKnownGameCards();
         handsHumanOopFacingPreflop2bet = rangeBuildable.getHandsOpponentOopFacingPreflop2bet();
-        opponentFormerTotalCallAmount = rangeBuildable.getOpponentFormerTotalCallAmount();
+
+        previousPotSize = rangeBuildable.getPotSizeAfterLastBotAction();
+        botLastAction = OpponentRangeSetter.getBotLastAction(rangeBuildable);
 
         this.rangeBuilder = rangeBuilder;
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
@@ -88,71 +93,33 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> get7to20bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _7to20bbRange;
 
-        double odds = getFacingPotOdds();
+        double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(odds <= 0.167) {
+        if(percentagePotIncrease <= 0.20) {
             _7to20bbRange = previousRange;
-        } else if(odds > 0.167 && odds <= 0.33) {
-            _7to20bbRange = get7to20bb16to33odds(previousRange);
-        } else if(odds > 0.33 && odds <= 0.5) {
-            _7to20bbRange = get7to20bb33to50odds(previousRange);
+        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+            _7to20bbRange = get7to20bb20to50percent(previousRange);
+        } else if(percentagePotIncrease > 0.50 && percentagePotIncrease <= 1.0) {
+            _7to20bbRange = get7to20bb50to100percent(previousRange);
         } else {
-            _7to20bbRange = get7to20bbAbove50odds(previousRange);
+            _7to20bbRange = get7to20bbAbove100percent(previousRange);
         }
         return _7to20bbRange;
     }
-
-    private Set<Set<Card>> get7to20bbRangeNew(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _7to20bbRange;
-
-        double increase = getPotIncreaseDivNonCheckActions();
-
-        if(increase <= 0.2) {
-            _7to20bbRange = previousRange;
-        } else if(increase > 0.2 && increase <= 0.5) {
-            _7to20bbRange = get7to20bb16to33odds(previousRange);
-        } else if(increase > 0.5 && increase <= 1) {
-            _7to20bbRange = get7to20bb33to50odds(previousRange);
-        } else {
-            _7to20bbRange = get7to20bbAbove50odds(previousRange);
-        }
-        return _7to20bbRange;
-    }
-
-    private double getPotIncreaseDivNonCheckActions() {
-        //potIncrease / numberOfNonCheckActions
-
-        //je kunt hier zelfs doen -voor simplificatie- dat je enkel kijkt naar de potgroei in %...
-            //en dan evt als extra variabele of jouw laatste actie check of bet/calling was
-
-        return 0;
-    }
-
-    //leg een lijst aan met jouw actie historie en de straat waarop het gebeurde
-
-    //als jouw laatste actie bet of raise was, en nu bij nieuwe actie zit je op volgende straat, weet je
-    //dat opponent gecallt heeft op vorige straat. In dit geval voor rangeberekening board dus aanpassen naar
-    //vorige straat
-
-    //vervolgens: kijk naar de % pot increase sinds jouw vorige actieronde. Als jij bij je vorige actieronde
-    //NIET checkte, maar bijv bette, raiste of callde, dan moet je de % pot increase door 2 delen.
-
-    //deze percentage % inrease gebruik je vervolgens in deze klassen voor de range build methodes zoals hierboven in
-    //get7to20bbRangeNew()
 
     private Set<Set<Card>> get20to40bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _20to40bbRange;
 
-        double odds = getFacingPotOdds();
+        double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(odds <= 0.167) {
+        if(percentagePotIncrease <= 0.20) {
             _20to40bbRange = previousRange;
-        } else if(odds > 0.167 && odds <= 0.33) {
-            _20to40bbRange = get20to40bb16to33odds(previousRange);
-        } else if(odds > 0.33 && odds <= 0.5) {
-            _20to40bbRange = get20to40bb33to50odds(previousRange);
+        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+            _20to40bbRange = get20to40bb20to50percent(previousRange);
+        } else if(percentagePotIncrease > 0.50 && percentagePotIncrease <= 1.0) {
+            _20to40bbRange = get20to40bb50to100percent(previousRange);
         } else {
-            _20to40bbRange = get20to40bbAbove50odds(previousRange);
+            _20to40bbRange = get20to40bbAbove100percent(previousRange);
         }
         return _20to40bbRange;
     }
@@ -160,16 +127,16 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> get40to90bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> _40to90bbRange;
 
-        double odds = getFacingPotOdds();
+        double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(odds <= 0.167) {
+        if(percentagePotIncrease <= 0.20) {
             _40to90bbRange = previousRange;
-        } else if(odds > 0.167 && odds <= 0.33) {
-            _40to90bbRange = get40to90bb16to33odds(previousRange);
-        } else if(odds > 0.33 && odds <= 0.5) {
-            _40to90bbRange = get40to90bb33to50odds(previousRange);
+        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+            _40to90bbRange = get40to90bb20to50percent(previousRange);
+        } else if(percentagePotIncrease > 0.50 && percentagePotIncrease <= 1.0) {
+            _40to90bbRange = get40to90bb50to100percent(previousRange);
         } else {
-            _40to90bbRange = get40to90bbAbove50odds(previousRange);
+            _40to90bbRange = get40to90bbAbove100percent(previousRange);
         }
         return _40to90bbRange;
     }
@@ -177,33 +144,32 @@ public class PostFlopRangeBuilder {
     private Set<Set<Card>> getAbove90bbRange(Set<Set<Card>> previousRange) {
         Set<Set<Card>> above90bbRange;
 
-        double odds = getFacingPotOdds();
+        double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(odds <= 0.167) {
+        if(percentagePotIncrease <= 0.20) {
             above90bbRange = previousRange;
-        } else if(odds > 0.167 && odds <= 0.33) {
-            above90bbRange = getAbove90bb16to33odds(previousRange);
+        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+            above90bbRange = getAbove90bb20to50percent(previousRange);
         } else {
-            above90bbRange = getAbove90bbAbove33odds(previousRange);
+            above90bbRange = getAbove90bbAbove50percent(previousRange);
         }
         return above90bbRange;
     }
 
-    private double getFacingPotOdds() {
-        double odds;
+    private double getPercentagePotIncrease() {
+        double percentagePotIncrease;
+        double currentPotSize = potSize;
 
-        if(opponentFormerTotalCallAmount != 0) {
-            odds = opponentFormerTotalCallAmount / (potSize - opponentFormerTotalCallAmount);
+        if(botLastAction.equals("check")) {
+            percentagePotIncrease = ((currentPotSize / previousPotSize) - 1);
         } else {
-            double amountToCall = opponentTotalBetSize - botTotalBetSize;
-            double amountToWin = potSize + opponentTotalBetSize + botTotalBetSize;
-            odds = amountToCall / amountToWin;
+            percentagePotIncrease = ((currentPotSize / previousPotSize) - 1) / 2;
         }
-        return odds;
+        return percentagePotIncrease;
     }
 
-    private Set<Set<Card>> get7to20bb16to33odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _7to16bb20to50percent = new HashSet<>();
+    private Set<Set<Card>> get7to20bb20to50percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _7to20bb20to50percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.4, 1);
@@ -236,17 +202,17 @@ public class PostFlopRangeBuilder {
         Map<Integer, Set<Card>> airRangeAsMap = rangeBuilder.getAir(previousRange, 0.4, 0.7);
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _7to16bb20to50percent.addAll(valueRange);
-        _7to16bb20to50percent.addAll(drawRange);
-        _7to16bb20to50percent.addAll(airRange);
+        _7to20bb20to50percent.addAll(valueRange);
+        _7to20bb20to50percent.addAll(drawRange);
+        _7to20bb20to50percent.addAll(airRange);
 
-        _7to16bb20to50percent.retainAll(previousRange);
+        _7to20bb20to50percent.retainAll(previousRange);
 
-        return _7to16bb20to50percent;
+        return _7to20bb20to50percent;
     }
 
-    private Set<Set<Card>> get7to20bb33to50odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _7to16bb50to100percent = new HashSet<>();
+    private Set<Set<Card>> get7to20bb50to100percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _7to20bb50to100percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.5, 1);
@@ -280,17 +246,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _7to16bb50to100percent.addAll(valueRange);
-        _7to16bb50to100percent.addAll(drawRange);
-        _7to16bb50to100percent.addAll(airRange);
+        _7to20bb50to100percent.addAll(valueRange);
+        _7to20bb50to100percent.addAll(drawRange);
+        _7to20bb50to100percent.addAll(airRange);
 
-        _7to16bb50to100percent.retainAll(previousRange);
+        _7to20bb50to100percent.retainAll(previousRange);
 
-        return _7to16bb50to100percent;
+        return _7to20bb50to100percent;
     }
 
-    private Set<Set<Card>> get7to20bbAbove50odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _7to16bbAbove100percent = new HashSet<>();
+    private Set<Set<Card>> get7to20bbAbove100percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _7to20bbAbove100percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.7, 1);
@@ -314,17 +280,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _7to16bbAbove100percent.addAll(valueRange);
-        _7to16bbAbove100percent.addAll(drawRange);
-        _7to16bbAbove100percent.addAll(airRange);
+        _7to20bbAbove100percent.addAll(valueRange);
+        _7to20bbAbove100percent.addAll(drawRange);
+        _7to20bbAbove100percent.addAll(airRange);
 
-        _7to16bbAbove100percent.retainAll(previousRange);
+        _7to20bbAbove100percent.retainAll(previousRange);
 
-        return _7to16bbAbove100percent;
+        return _7to20bbAbove100percent;
     }
 
-    private Set<Set<Card>> get20to40bb16to33odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _16to33bb20to50percent = new HashSet<>();
+    private Set<Set<Card>> get20to40bb20to50percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _20to40bb20to50percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.4, 1);
@@ -360,17 +326,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _16to33bb20to50percent.addAll(valueRange);
-        _16to33bb20to50percent.addAll(drawRange);
-        _16to33bb20to50percent.addAll(airRange);
+        _20to40bb20to50percent.addAll(valueRange);
+        _20to40bb20to50percent.addAll(drawRange);
+        _20to40bb20to50percent.addAll(airRange);
 
-        _16to33bb20to50percent.retainAll(previousRange);
+        _20to40bb20to50percent.retainAll(previousRange);
 
-        return _16to33bb20to50percent;
+        return _20to40bb20to50percent;
     }
 
-    private Set<Set<Card>> get20to40bb33to50odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _16to33bb50to100percent = new HashSet<>();
+    private Set<Set<Card>> get20to40bb50to100percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _20to40bb50to100percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.6, 1);
@@ -400,17 +366,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _16to33bb50to100percent.addAll(valueRange);
-        _16to33bb50to100percent.addAll(drawRange);
-        _16to33bb50to100percent.addAll(airRange);
+        _20to40bb50to100percent.addAll(valueRange);
+        _20to40bb50to100percent.addAll(drawRange);
+        _20to40bb50to100percent.addAll(airRange);
 
-        _16to33bb50to100percent.retainAll(previousRange);
+        _20to40bb50to100percent.retainAll(previousRange);
 
-        return _16to33bb50to100percent;
+        return _20to40bb50to100percent;
     }
 
-    private Set<Set<Card>> get20to40bbAbove50odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _16to33bbAbove100percent = new HashSet<>();
+    private Set<Set<Card>> get20to40bbAbove100percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _20to40bbAbove100percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.84, 1);
@@ -434,17 +400,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _16to33bbAbove100percent.addAll(valueRange);
-        _16to33bbAbove100percent.addAll(drawRange);
-        _16to33bbAbove100percent.addAll(airRange);
+        _20to40bbAbove100percent.addAll(valueRange);
+        _20to40bbAbove100percent.addAll(drawRange);
+        _20to40bbAbove100percent.addAll(airRange);
 
-        _16to33bbAbove100percent.retainAll(previousRange);
+        _20to40bbAbove100percent.retainAll(previousRange);
 
-        return _16to33bbAbove100percent;
+        return _20to40bbAbove100percent;
     }
 
-    private Set<Set<Card>> get40to90bb16to33odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _33to70bb20to50percent = new HashSet<>();
+    private Set<Set<Card>> get40to90bb20to50percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _40to90bb20to50percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.7, 1);
@@ -472,17 +438,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _33to70bb20to50percent.addAll(valueRange);
-        _33to70bb20to50percent.addAll(drawRange);
-        _33to70bb20to50percent.addAll(airRange);
+        _40to90bb20to50percent.addAll(valueRange);
+        _40to90bb20to50percent.addAll(drawRange);
+        _40to90bb20to50percent.addAll(airRange);
 
-        _33to70bb20to50percent.retainAll(previousRange);
+        _40to90bb20to50percent.retainAll(previousRange);
 
-        return _33to70bb20to50percent;
+        return _40to90bb20to50percent;
     }
 
-    private Set<Set<Card>> get40to90bb33to50odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _33to70bb50to100percent = new HashSet<>();
+    private Set<Set<Card>> get40to90bb50to100percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _40to90bb50to100percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.8, 1);
@@ -506,17 +472,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _33to70bb50to100percent.addAll(valueRange);
-        _33to70bb50to100percent.addAll(drawRange);
-        _33to70bb50to100percent.addAll(airRange);
+        _40to90bb50to100percent.addAll(valueRange);
+        _40to90bb50to100percent.addAll(drawRange);
+        _40to90bb50to100percent.addAll(airRange);
 
-        _33to70bb50to100percent.retainAll(previousRange);
+        _40to90bb50to100percent.retainAll(previousRange);
 
-        return _33to70bb50to100percent;
+        return _40to90bb50to100percent;
     }
 
-    private Set<Set<Card>> get40to90bbAbove50odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> _33to70bbAbove100percent = new HashSet<>();
+    private Set<Set<Card>> get40to90bbAbove100percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> _40to90bbAbove100percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.89, 1);
@@ -540,17 +506,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        _33to70bbAbove100percent.addAll(valueRange);
-        _33to70bbAbove100percent.addAll(drawRange);
-        _33to70bbAbove100percent.addAll(airRange);
+        _40to90bbAbove100percent.addAll(valueRange);
+        _40to90bbAbove100percent.addAll(drawRange);
+        _40to90bbAbove100percent.addAll(airRange);
 
-        _33to70bbAbove100percent.retainAll(previousRange);
+        _40to90bbAbove100percent.retainAll(previousRange);
 
-        return _33to70bbAbove100percent;
+        return _40to90bbAbove100percent;
     }
 
-    private Set<Set<Card>> getAbove90bb16to33odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> above70bb20to50percent = new HashSet<>();
+    private Set<Set<Card>> getAbove90bb20to50percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> above90bb20to50percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.75, 1);
@@ -578,17 +544,17 @@ public class PostFlopRangeBuilder {
 
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        above70bb20to50percent.addAll(valueRange);
-        above70bb20to50percent.addAll(drawRange);
-        above70bb20to50percent.addAll(airRange);
+        above90bb20to50percent.addAll(valueRange);
+        above90bb20to50percent.addAll(drawRange);
+        above90bb20to50percent.addAll(airRange);
 
-        above70bb20to50percent.retainAll(previousRange);
+        above90bb20to50percent.retainAll(previousRange);
 
-        return above70bb20to50percent;
+        return above90bb20to50percent;
     }
 
-    private Set<Set<Card>> getAbove90bbAbove33odds(Set<Set<Card>> previousRange) {
-        Set<Set<Card>> above70bbAbove50percent = new HashSet<>();
+    private Set<Set<Card>> getAbove90bbAbove50percent(Set<Set<Card>> previousRange) {
+        Set<Set<Card>> above90bbAbove50percent = new HashSet<>();
 
         //value
         Map<Integer, Set<Card>> valueRangeAsMap = rangeBuilder.getCombosOfDesignatedStrength(0.82, 1);
@@ -610,13 +576,13 @@ public class PostFlopRangeBuilder {
                 (0.35 * rangeBuilder.getOpponetPostflopLoosenessFactor(handsHumanOopFacingPreflop2bet)));
         Set<Set<Card>> airRange = convertMapToSet(airRangeAsMap);
 
-        above70bbAbove50percent.addAll(valueRange);
-        above70bbAbove50percent.addAll(drawRange);
-        above70bbAbove50percent.addAll(airRange);
+        above90bbAbove50percent.addAll(valueRange);
+        above90bbAbove50percent.addAll(drawRange);
+        above90bbAbove50percent.addAll(airRange);
 
-        above70bbAbove50percent.retainAll(previousRange);
+        above90bbAbove50percent.retainAll(previousRange);
 
-        return above70bbAbove50percent;
+        return above90bbAbove50percent;
     }
 
     private void initializeDrawMap() {

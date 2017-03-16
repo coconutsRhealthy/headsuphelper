@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class Action {
     private double sizing;
+    private String action;
     private String writtenAction;
     private RangeBuilder rangeBuilder;
     private PreflopActionBuilder preflopActionBuilder;
@@ -43,7 +44,7 @@ public class Action {
     //helper methods
     private void getAndProcessPreflopAction(Actionable actionable) {
         preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
-        String action = preflopActionBuilder.getAction(actionable);
+        action = preflopActionBuilder.getAction(actionable);
         setSizingIfNecessary(actionable, action);
         setNewWrittenAction(action, actionable);
     }
@@ -105,5 +106,9 @@ public class Action {
 
     public RangeBuilder getRangeBuilder() {
         return rangeBuilder;
+    }
+
+    public String getAction() {
+        return action;
     }
 }

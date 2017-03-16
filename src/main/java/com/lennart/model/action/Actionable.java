@@ -18,8 +18,6 @@ public interface Actionable extends RangeBuildable {
 
     double getOpponentStack();
 
-    List<Card> getFlopCards();
-
     String getOpponentAction();
 
     boolean isPreviousBluffAction();

@@ -49,14 +49,16 @@ public class BotHand implements RangeBuildable, Actionable {
     private double handsOpponentOop3bet;
     private double opponentPreCall2betStat;
     private double opponentPre3betStat;
-    private boolean opponentLastActionWasPreflop;
-    private double opponentFormerTotalCallAmount;
     private String street;
     private boolean previousBluffAction;
     private boolean drawBettingActionDone;
     private String botWrittenAction;
     private String streetAtPreviousActionRequest;
     private String opponentPreviousStreetActionOnlyRangeNeeded;
+
+    private List<String> botActionHistory;
+    private RangeBuilder rangeBuilder;
+    private double potSizeAfterLastBotAction;
 
     public BotHand() {
         //default constructor
@@ -80,7 +82,6 @@ public class BotHand implements RangeBuildable, Actionable {
         setBotHoleCards();
         setStreetAndPreviousStreet();
         setOpponentAction();
-        setOpponentLastActionWasPreflop();
     }
 
     public BotHand updateVariables() {
@@ -105,9 +106,7 @@ public class BotHand implements RangeBuildable, Actionable {
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
         setOpponentAction();
-        setOpponentFormerTotalCallAmount();
         calculateOpponentPreflopStats();
-        setOpponentLastActionWasPreflop();
 
         return this;
     }
@@ -322,20 +321,6 @@ public class BotHand implements RangeBuildable, Actionable {
         }
     }
 
-    private void setOpponentLastActionWasPreflop() {
-        if(flopCard1 == null) {
-            opponentLastActionWasPreflop = true;
-        } else {
-            opponentLastActionWasPreflop = false;
-        }
-    }
-
-    private void setOpponentFormerTotalCallAmount() {
-        if(opponentAction.equals("call")) {
-            opponentFormerTotalCallAmount = botTotalBetSize;
-        }
-    }
-
     private void setStreetAndPreviousStreet() {
         if(flopCard1 == null) {
             streetAtPreviousActionRequest = "preflop";
@@ -366,10 +351,6 @@ public class BotHand implements RangeBuildable, Actionable {
         holeCardsAsSet.addAll(botHoleCards);
 
         knownGameCards.addAll(holeCardsAsSet);
-    }
-
-    public boolean isOnlyCallRangeNeeded() {
-        return false;
     }
 
     //default getters and setters
@@ -509,18 +490,22 @@ public class BotHand implements RangeBuildable, Actionable {
         this.flopCard3 = flopCard3;
     }
 
+    @Override
     public Card getTurnCard() {
         return turnCard;
     }
 
+    @Override
     public void setTurnCard(Card turnCard) {
         this.turnCard = turnCard;
     }
 
+    @Override
     public Card getRiverCard() {
         return riverCard;
     }
 
+    @Override
     public void setRiverCard(Card riverCard) {
         this.riverCard = riverCard;
     }
@@ -547,6 +532,7 @@ public class BotHand implements RangeBuildable, Actionable {
         return flopCards;
     }
 
+    @Override
     public void setFlopCards(List<Card> flopCards) {
         this.flopCards = flopCards;
     }
@@ -556,6 +542,7 @@ public class BotHand implements RangeBuildable, Actionable {
         return knownGameCards;
     }
 
+    @Override
     public void setKnownGameCards(Set<Card> knownGameCards) {
         this.knownGameCards = knownGameCards;
     }
@@ -565,6 +552,7 @@ public class BotHand implements RangeBuildable, Actionable {
         return board;
     }
 
+    @Override
     public void setBoard(List<Card> board) {
         this.board = board;
     }
@@ -630,24 +618,6 @@ public class BotHand implements RangeBuildable, Actionable {
         this.opponentPre3betStat = opponentPre3betStat;
     }
 
-    @Override
-    public boolean isOpponentLastActionWasPreflop() {
-        return opponentLastActionWasPreflop;
-    }
-
-    public void setOpponentLastActionWasPreflop(boolean opponentLastActionWasPreflop) {
-        this.opponentLastActionWasPreflop = opponentLastActionWasPreflop;
-    }
-
-    @Override
-    public double getOpponentFormerTotalCallAmount() {
-        return opponentFormerTotalCallAmount;
-    }
-
-    public void setOpponentFormerTotalCallAmount(double opponentFormerTotalCallAmount) {
-        this.opponentFormerTotalCallAmount = opponentFormerTotalCallAmount;
-    }
-
     public String getStreet() {
         return street;
     }
@@ -698,5 +668,32 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void setOpponentPreviousStreetActionOnlyRangeNeeded(String opponentPreviousStreetActionOnlyRangeNeeded) {
         this.opponentPreviousStreetActionOnlyRangeNeeded = opponentPreviousStreetActionOnlyRangeNeeded;
+    }
+
+    @Override
+    public List<String> getBotActionHistory() {
+        return botActionHistory;
+    }
+
+    public void setBotActionHistory(List<String> botActionHistory) {
+        this.botActionHistory = botActionHistory;
+    }
+
+    public RangeBuilder getRangeBuilder() {
+        return rangeBuilder;
+    }
+
+    @Override
+    public void setRangeBuilder(RangeBuilder rangeBuilder) {
+        this.rangeBuilder = rangeBuilder;
+    }
+
+    @Override
+    public double getPotSizeAfterLastBotAction() {
+        return potSizeAfterLastBotAction;
+    }
+
+    public void setPotSizeAfterLastBotAction(double potSizeAfterLastBotAction) {
+        this.potSizeAfterLastBotAction = potSizeAfterLastBotAction;
     }
 }

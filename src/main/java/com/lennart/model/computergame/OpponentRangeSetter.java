@@ -4,35 +4,45 @@ import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by lpo21630 on 15-3-2017.
  */
 public class OpponentRangeSetter {
 
-    private Map<String, String> actionHistoryOfHand;
-    private int actionCounter;
-    private int botActionCounter;
-    private int opponentActionCounter;
-    private List<Card> board;
+    private List<Card> currentFlopCards;
+    private Card currentTurnCard;
+    private Card currentRiverCard;
+    private List<Card> currentBoard;
+    private Set<Card> currentKnownGameCards;
 
-    private void setCorrectOpponentRange(RangeBuildable rangeBuildable) {
-        String streetOfBotLastAction = getStreetOfBotLastAction();
-        String currentStreet = getCurrentStreet();
+    public void setCorrectOpponentRange(RangeBuildable rangeBuildable) {
+        String streetOfBotLastAction = getStreetOfBotLastAction(rangeBuildable);
+        String currentStreet = getCurrentStreet(rangeBuildable);
 
         if(streetOfBotLastAction.equals(currentStreet)) {
-            //calculate range with current board
+            setRange(rangeBuildable);
         } else {
-            //calculate range with previous street board
+            String botLastAction = getBotLastAction(rangeBuildable);
+
+            if(botLastAction.equals("bet") || botLastAction.equals("raise")) {
+                setBoardToPreviousStreet(rangeBuildable);
+                setRange(rangeBuildable);
+                setBoardBackToCurrentStreet(rangeBuildable);
+            } else {
+                setRange(rangeBuildable);
+            }
         }
     }
 
-    private String getStreetOfBotLastAction() {
+    private String getStreetOfBotLastAction(RangeBuildable rangeBuildable) {
         String streetOfBotLastAction = null;
-        String botLastAction = actionHistoryOfHand.get(botActionCounter + " computer");
+        List<String> botActionHistory = rangeBuildable.getBotActionHistory();
+        String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
 
         if(botLastAction.contains("preflop")) {
             streetOfBotLastAction = "preflop";
@@ -46,39 +56,28 @@ public class OpponentRangeSetter {
         return streetOfBotLastAction;
     }
 
-    private void updateActionHistoryOfHand(String player, String action) {
-        if(actionHistoryOfHand == null) {
-            actionHistoryOfHand = new HashMap<>();
-            actionCounter = 0;
-            botActionCounter = 0;
-            opponentActionCounter = 0;
-        }
+    public static String getBotLastAction(RangeBuildable rangeBuildable) {
+        String action = null;
+        List<String> botActionHistory = rangeBuildable.getBotActionHistory();
+        String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
 
-        actionCounter++;
-        if(player.equals("computer")) {
-            botActionCounter++;
-        } else if(player.equals("opponent")) {
-            opponentActionCounter++;
+        if(botLastAction.contains("fold")) {
+            action = "fold";
+        } else if(botLastAction.contains("check")) {
+            action = "check";
+        } else if(botLastAction.contains("call")) {
+            action = "call";
+        } else if(botLastAction.contains("bet")) {
+            action = "bet";
+        } else if(botLastAction.contains("raise")) {
+            action = "raise";
         }
-
-        if(player.equals("computer")) {
-            action = setActionToCorrectFormat(action);
-        }
-
-        actionHistoryOfHand.put(getActionHistoryOfHandKey(player), actionCounter + " " + getCurrentStreet() + " " + action);
+        return action;
     }
 
-    private String getActionHistoryOfHandKey(String player) {
-        String key = null;
-        if(player.equals("computer")) {
-            key = botActionCounter + " " + player;
-        } else if(player.equals("opponent")) {
-            key = opponentActionCounter + " " + player;
-        }
-        return key;
-    }
+    private String getCurrentStreet(RangeBuildable rangeBuildable) {
+        List<Card> board = rangeBuildable.getBoard();
 
-    private String getCurrentStreet() {
         String street = null;
         if(board == null) {
             street = "preflop";
@@ -92,42 +91,84 @@ public class OpponentRangeSetter {
         return street;
     }
 
-    private String setActionToCorrectFormat(String action) {
-        if(action.contains("fold")) {
-            action = "fold";
-        } else if(action.contains("check")) {
-            action = "check";
-        } else if(action.contains("call")) {
-            action = "call";
-        } else if(action.contains("bet")) {
-            action = "bet";
-        } else if(action.contains("raise")) {
-            action = "raise";
+    private void setBoardToPreviousStreet(RangeBuildable rangeBuildable) {
+        if(rangeBuildable.getFlopCards() != null) {
+            currentFlopCards = new ArrayList<>();
+            currentFlopCards.addAll(rangeBuildable.getFlopCards());
         }
-        return action;
-    }
-
-    private int getNumberOfActionsDoneByOpponentSinceBotLastAction() {
-        String valueCorrespondingToLastBotActionKey = actionHistoryOfHand.get(botActionCounter + " computer");
-        int actionCounterCorrespondingToLastBotAction = Integer.valueOf(valueCorrespondingToLastBotActionKey.substring(0, 1));
-        return actionCounter - actionCounterCorrespondingToLastBotAction;
-    }
-
-    private String getStreetAtWhichOpponentLastActed() {
-        String streetAtWhichOpponentLastActed = null;
-        String lastActionHistoryValueOfOpponent = actionHistoryOfHand.get(opponentActionCounter + " opponent");
-
-        if(lastActionHistoryValueOfOpponent.contains("preflop")) {
-            streetAtWhichOpponentLastActed = "preflop";
-        } else if(lastActionHistoryValueOfOpponent.contains("flop")) {
-            streetAtWhichOpponentLastActed = "flop";
-        } else if(lastActionHistoryValueOfOpponent.contains("turn")) {
-            streetAtWhichOpponentLastActed = "turn";
-        } else if(lastActionHistoryValueOfOpponent.contains("river")) {
-            streetAtWhichOpponentLastActed = "river";
+        if(rangeBuildable.getTurnCard() != null) {
+            currentTurnCard = new Card(rangeBuildable.getTurnCard().getRank(), rangeBuildable.getTurnCard().getSuit());
         }
-        return streetAtWhichOpponentLastActed;
+        if(rangeBuildable.getRiverCard() != null) {
+            currentRiverCard = new Card(rangeBuildable.getRiverCard().getRank(), rangeBuildable.getRiverCard().getSuit());
+        }
+        if(rangeBuildable.getBoard() != null) {
+            currentBoard = new ArrayList<>();
+            currentBoard.addAll(rangeBuildable.getBoard());
+        }
+        if(rangeBuildable.getKnownGameCards() != null) {
+            currentKnownGameCards = new HashSet<>();
+            currentKnownGameCards.addAll(rangeBuildable.getKnownGameCards());
+        }
+
+        if(currentBoard == null) {
+            //Should never come here
+        } else if(currentBoard.size() == 3) {
+            Set<Card> modifiedKnownGameCards = new HashSet<>();
+            modifiedKnownGameCards.addAll(currentKnownGameCards);
+            modifiedKnownGameCards.removeAll(currentFlopCards);
+            rangeBuildable.setKnownGameCards(modifiedKnownGameCards);
+
+            rangeBuildable.setFlopCards(null);
+            rangeBuildable.setBoard(null);
+        } else if(currentBoard.size() == 4) {
+            Set<Card> modifiedKnownGameCards = new HashSet<>();
+            modifiedKnownGameCards.addAll(currentKnownGameCards);
+            modifiedKnownGameCards.remove(currentTurnCard);
+            rangeBuildable.setKnownGameCards(modifiedKnownGameCards);
+
+            List<Card> modifiedBoard = new ArrayList<>();
+            modifiedBoard.addAll(currentBoard);
+            modifiedBoard.remove(currentTurnCard);
+            rangeBuildable.setBoard(modifiedBoard);
+
+            rangeBuildable.setTurnCard(null);
+        } else if(currentBoard.size() == 5) {
+            Set<Card> modifiedKnownGameCards = new HashSet<>();
+            modifiedKnownGameCards.addAll(currentKnownGameCards);
+            modifiedKnownGameCards.remove(currentRiverCard);
+            rangeBuildable.setKnownGameCards(modifiedKnownGameCards);
+
+            List<Card> modifiedBoard = new ArrayList<>();
+            modifiedBoard.addAll(currentBoard);
+            modifiedBoard.remove(currentRiverCard);
+            rangeBuildable.setBoard(modifiedBoard);
+
+            rangeBuildable.setRiverCard(null);
+        }
     }
 
+    private void setBoardBackToCurrentStreet(RangeBuildable rangeBuildable) {
+        if(currentFlopCards != null) {
+            rangeBuildable.setFlopCards(currentFlopCards);
+        }
+        if(currentTurnCard != null) {
+            rangeBuildable.setTurnCard(currentTurnCard);
+        }
+        if(currentRiverCard != null) {
+            rangeBuildable.setRiverCard(currentRiverCard);
+        }
+        if(currentBoard != null) {
+            rangeBuildable.setBoard(currentBoard);
+        }
+        if(currentKnownGameCards != null) {
+            rangeBuildable.setKnownGameCards(currentKnownGameCards);
+        }
+    }
 
+    private void setRange(RangeBuildable rangeBuildable) {
+        RangeBuilder rangeBuilder = new RangeBuilder(rangeBuildable);
+        rangeBuildable.setOpponentRange(rangeBuilder.getOpponentRange());
+        rangeBuildable.setRangeBuilder(rangeBuilder);
+    }
 }
