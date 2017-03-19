@@ -31,28 +31,28 @@ public class GameVariablesFiller {
 
     private NetBetTableReader netBetTableReader;
 
-    public GameVariablesFiller() {
+    public GameVariablesFiller(BotHand botHand) {
         netBetTableReader = new NetBetTableReader();
         setBotStack();
         setOpponentStack();
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setCorrectedPotSize();
-        setBotHoleCard1();
-        setBotHoleCard2();
+        setBotHoleCard1(botHand.getBotHoleCard1());
+        setBotHoleCard2(botHand.getBotHoleCard2());
         setSmallBlind();
         setBigBlind();
         setBotIsButton();
         //setOpponentPlayerName();
         setActionsFromLastThreeChatLines();
 
-        setFlopCard1();
+        setFlopCard1(botHand.getFlopCard1());
         if(flopCard1 != null) {
-            setFlopCard2();
-            setFlopCard3();
-            setTurnCard();
+            setFlopCard2(botHand.getFlopCard2());
+            setFlopCard3(botHand.getFlopCard3());
+            setTurnCard(botHand.getTurnCard());
             if(turnCard != null) {
-                setRiverCard();
+                setRiverCard(botHand.getRiverCard());
             }
         }
     }
@@ -102,32 +102,60 @@ public class GameVariablesFiller {
         actionsFromLastThreeChatLines = netBetTableReader.getActionsFromLastThreeChatLines();
     }
 
-    private void setBotHoleCard1() {
-        botHoleCard1 = netBetTableReader.getBotHoleCard1FromImage();
+    private void setBotHoleCard1(Card holeCard1) {
+        if(holeCard1 == null) {
+            botHoleCard1 = netBetTableReader.getBotHoleCard1FromImage();
+        } else {
+            botHoleCard1 = holeCard1;
+        }
     }
 
-    private void setBotHoleCard2() {
-        botHoleCard2 = netBetTableReader.getBotHoleCard2FromImage();
+    private void setBotHoleCard2(Card holeCard2) {
+        if(holeCard2 == null) {
+            botHoleCard2 = netBetTableReader.getBotHoleCard2FromImage();
+        } else {
+            botHoleCard2 = holeCard2;
+        }
     }
 
-    private void setFlopCard1() {
-        flopCard1 = netBetTableReader.getFlopCard1FromImage();
+    private void setFlopCard1(Card flopCard1) {
+        if(flopCard1 == null) {
+            this.flopCard1 = netBetTableReader.getFlopCard1FromImage();
+        } else {
+            this.flopCard1 = flopCard1;
+        }
     }
 
-    private void setFlopCard2() {
-        flopCard2 = netBetTableReader.getFlopCard2FromImage();
+    private void setFlopCard2(Card flopCard2) {
+        if(flopCard2 == null) {
+            this.flopCard2 = netBetTableReader.getFlopCard2FromImage();
+        } else {
+            this.flopCard2 = flopCard2;
+        }
     }
 
-    private void setFlopCard3() {
-        flopCard3 = netBetTableReader.getFlopCard3FromImage();
+    private void setFlopCard3(Card flopCard3) {
+        if(flopCard3 == null) {
+            this.flopCard3 = netBetTableReader.getFlopCard3FromImage();
+        } else {
+            this.flopCard3 = flopCard3;
+        }
     }
 
-    private void setTurnCard() {
-        turnCard = netBetTableReader.getTurnCardFromImage();
+    private void setTurnCard(Card turnCard) {
+        if(turnCard == null) {
+            this.turnCard = netBetTableReader.getTurnCardFromImage();
+        } else {
+            this.turnCard = turnCard;
+        }
     }
 
-    private void setRiverCard() {
-        riverCard = netBetTableReader.getRiverCardFromImage();
+    private void setRiverCard(Card riverCard) {
+        if(riverCard == null) {
+            this.riverCard = netBetTableReader.getRiverCardFromImage();
+        } else {
+            this.riverCard = riverCard;
+        }
     }
 
     public double getPotSize() {

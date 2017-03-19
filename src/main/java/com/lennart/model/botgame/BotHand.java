@@ -66,7 +66,7 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public BotHand(String initialize) {
-        gameVariablesFiller = new GameVariablesFiller();
+        gameVariablesFiller = new GameVariablesFiller(this);
 
         setPotSize();
         setBotStack();
@@ -86,7 +86,7 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public BotHand updateVariables() {
-        gameVariablesFiller = new GameVariablesFiller();
+        gameVariablesFiller = new GameVariablesFiller(this);
 
         if(foldOrShowdownOccured()) {
             return new BotHand("initialize");
@@ -222,10 +222,12 @@ public class BotHand implements RangeBuildable, Actionable {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
         for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
-            if(entry.getValue() != null && entry.getValue().equals("post")) {
+            if(entry.getValue() != null && entry.getValue().equals("deal")) {
+                System.out.println("Fold or showdown occured: true");
                 return true;
             }
         }
+        System.out.println("Fold or showdown occured: false");
         return false;
     }
 

@@ -399,6 +399,8 @@ public class NetBetTableReader {
             action = "raise";
         } else if(chatLine.contains("post")) {
             action = "post";
+        } else if(chatLine.contains("deal")) {
+            action = "deal";
         }
         return action;
     }
