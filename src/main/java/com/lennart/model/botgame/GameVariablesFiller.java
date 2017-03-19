@@ -84,6 +84,10 @@ public class GameVariablesFiller {
     private void setCorrectedPotSize() {
         double potSizeIncludingAllBets = netBetTableReader.getPotSizeFromImage();
         potSize = potSizeIncludingAllBets - botTotalBetSize - opponentTotalBetSize;
+
+        if(potSize < 0.01) {
+            potSize = 0;
+        }
     }
 
     private void setBotStack() {

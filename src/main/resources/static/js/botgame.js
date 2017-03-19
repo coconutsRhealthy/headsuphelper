@@ -43,9 +43,12 @@ mainApp.controller('pokerController', function($scope, $http) {
 
     $scope.dealerButtonStyle;
 
+    $scope.showGame;
+
     $scope.startBotTable = function() {
         $http.get('/startBotTable/').success(function(data) {
             setScopePropertiesCorrect(data);
+            $scope.showGame = true;
         })
     }
 

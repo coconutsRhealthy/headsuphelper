@@ -147,7 +147,7 @@ public class BotHand implements RangeBuildable, Actionable {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
         for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
-            if(entry.getValue().equals("post")) {
+            if(entry.getValue() != null && entry.getValue().equals("post")) {
                 opponentAction = "post";
                 return;
             }
