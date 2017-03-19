@@ -13,23 +13,58 @@ import java.util.Map;
 public class NetBetTableReader {
 
     public double getPotSizeFromImage() {
-        return Double.parseDouble(readPotSize());
+        double potSize;
+        String potSizeAsString = readPotSize();
+        if(potSizeAsString.matches(".*\\d.*")){
+            potSize = Double.parseDouble(potSizeAsString);
+        } else {
+            potSize = -1;
+        }
+        return potSize;
     }
 
     public double getOpponentStackFromImage() {
-        return Double.parseDouble(readTopPlayerStack());
+        double opponentStack;
+        String opponentStackAsString = readTopPlayerStack();
+        if(opponentStackAsString.matches(".*\\d.*")){
+            opponentStack = Double.parseDouble(opponentStackAsString);
+        } else {
+            opponentStack = -1;
+        }
+        return opponentStack;
     }
 
     public double getBotStackFromImage() {
-        return Double.parseDouble(readBottomPlayerStack());
+        double botStack;
+        String botStackAsString = readBottomPlayerStack();
+        if(botStackAsString.matches(".*\\d.*")){
+            botStack = Double.parseDouble(botStackAsString);
+        } else{
+            botStack = -1;
+        }
+        return botStack;
     }
 
     public double getBotTotalBetSizeFromImage() {
-        return Double.parseDouble(readBottomPlayerTotalBetSize());
+        double botTotalBetSize;
+        String botTotalBetSizeAsString = readBottomPlayerTotalBetSize();
+        if(botTotalBetSizeAsString.matches(".*\\d.*")){
+            botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
+        } else {
+            botTotalBetSize = 0;
+        }
+        return botTotalBetSize;
     }
 
     public double getOpponentTotalBetSizeFromImage() {
-        return Double.parseDouble(readTopPlayerTotalBetSize());
+        double opponentTotalBetSize;
+        String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
+        if(opponentTotalBetSizeAsString.matches(".*\\d.*")){
+            opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
+        } else {
+            opponentTotalBetSize = 0;
+        }
+        return opponentTotalBetSize;
     }
 
     public Map<String, String> getActionsFromLastThreeChatLines() {
@@ -63,32 +98,52 @@ public class NetBetTableReader {
 
     public Card getFlopCard1FromImage() {
         int cardRank = getIntCardRank(readFirstFlopCardRankFromBoard());
-        char cardSuit = readFirstFlopCardSuitFromBoard();
-        return new Card(cardRank, cardSuit);
+
+        if(cardRank != -1) {
+            char cardSuit = readFirstFlopCardSuitFromBoard();
+            return new Card(cardRank, cardSuit);
+        }
+        return null;
     }
 
     public Card getFlopCard2FromImage() {
         int cardRank = getIntCardRank(readSecondFlopCardRankFromBoard());
-        char cardSuit = readSecondFlopCardSuitFromBoard();
-        return new Card(cardRank, cardSuit);
+
+        if(cardRank != -1) {
+            char cardSuit = readSecondFlopCardSuitFromBoard();
+            return new Card(cardRank, cardSuit);
+        }
+        return null;
     }
 
     public Card getFlopCard3FromImage() {
         int cardRank = getIntCardRank(readThirdFlopCardRankFromBoard());
-        char cardSuit = readThirdFlopCardSuitFromBoard();
-        return new Card(cardRank, cardSuit);
+
+        if(cardRank != -1) {
+            char cardSuit = readThirdFlopCardSuitFromBoard();
+            return new Card(cardRank, cardSuit);
+        }
+        return null;
     }
 
     public Card getTurnCardFromImage() {
         int cardRank = getIntCardRank(readTurnCardRankFromBoard());
-        char cardSuit = readTurnCardSuitFromBoard();
-        return new Card(cardRank, cardSuit);
+
+        if(cardRank != -1) {
+            char cardSuit = readTurnCardSuitFromBoard();
+            return new Card(cardRank, cardSuit);
+        }
+        return null;
     }
 
     public Card getRiverCardFromImage() {
         int cardRank = getIntCardRank(readRiverCardRankFromBoard());
-        char cardSuit = readRiverCardSuitFromBoard();
-        return new Card(cardRank, cardSuit);
+
+        if(cardRank != -1) {
+            char cardSuit = readRiverCardSuitFromBoard();
+            return new Card(cardRank, cardSuit);
+        }
+        return null;
     }
 
     //helper methods
@@ -325,6 +380,8 @@ public class NetBetTableReader {
             case "A":
                 cardRank = 14;
                 break;
+            default:
+                cardRank = -1;
         }
         return cardRank;
     }

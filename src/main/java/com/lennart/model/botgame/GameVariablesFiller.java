@@ -45,37 +45,13 @@ public class GameVariablesFiller {
         setBotIsButton();
         //setOpponentPlayerName();
         setActionsFromLastThreeChatLines();
-    }
 
-    public void initializeAndRefreshRelevantVariables(String street) {
-        setBotStack();
-        setOpponentStack();
-        setBotTotalBetSize();
-        setOpponentTotalBetSize();
-        setCorrectedPotSize();
-        setActionsFromLastThreeChatLines();
-
-        if(opponentPlayerName == null) {
-            //setOpponentPlayerName();
-        }
-        if(street.equals("flop")) {
-            if (flopCard1 == null) {
-                setFlopCard1();
-            }
-            if (flopCard2 == null) {
-                setFlopCard2();
-            }
-            if (flopCard3 == null) {
-                setFlopCard3();
-            }
-        }
-        if(street.equals("turn")) {
-            if(turnCard == null) {
-                setTurnCard();
-            }
-        }
-        if(street.equals("river")) {
-            if(riverCard == null) {
+        setFlopCard1();
+        if(flopCard1 != null) {
+            setFlopCard2();
+            setFlopCard3();
+            setTurnCard();
+            if(turnCard != null) {
                 setRiverCard();
             }
         }

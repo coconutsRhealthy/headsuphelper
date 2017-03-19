@@ -41,12 +41,17 @@ public class Controller {
     public @ResponseBody BotTable startBotTable() {
         BotTable botTable = new BotTable("initialize");
         botTable.getBotHand().setBotAction(null);
+        botTable.getBotHand().setRangeBuilder(null);
+        botTable.getBotHand().setGameVariablesFiller(null);
         return botTable;
     }
 
     @RequestMapping(value = "/getNewBotAction", method = RequestMethod.POST)
     public @ResponseBody BotTable getNewBotAction(@RequestBody BotTable botTable) {
         botTable.getNewBotAction();
+        botTable.getBotHand().setBotAction(null);
+        botTable.getBotHand().setRangeBuilder(null);
+        botTable.getBotHand().setGameVariablesFiller(null);
         return botTable;
     }
 

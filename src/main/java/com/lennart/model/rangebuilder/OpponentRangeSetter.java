@@ -60,7 +60,7 @@ public class OpponentRangeSetter {
         return streetOfBotLastAction;
     }
 
-    private static String getBotLastAction(RangeBuildable rangeBuildable) {
+    private String getBotLastAction(RangeBuildable rangeBuildable) {
         String action = null;
         List<String> botActionHistory = rangeBuildable.getBotActionHistory();
         String botLastAction = botActionHistory.get(botActionHistory.size() - 1);

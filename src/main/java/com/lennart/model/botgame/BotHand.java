@@ -3,6 +3,7 @@ package com.lennart.model.botgame;
 import com.lennart.model.action.Action;
 import com.lennart.model.action.Actionable;
 import com.lennart.model.card.Card;
+import com.lennart.model.rangebuilder.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
@@ -85,7 +86,7 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public BotHand updateVariables() {
-        gameVariablesFiller.initializeAndRefreshRelevantVariables(street);
+        gameVariablesFiller = new GameVariablesFiller();
 
         if(foldOrShowdownOccured()) {
             return new BotHand("initialize");
@@ -112,10 +113,58 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public void getNewBotAction() {
-        RangeBuilder rangeBuilder = new RangeBuilder(this, true);
-        opponentRange = rangeBuilder.getOpponentRange();
+        OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
+        opponentRangeSetter.setCorrectOpponentRange(this);
+        setOrInitializeRangeBuilder(opponentRangeSetter);
+
         botAction = new Action(this, rangeBuilder);
+        updateBotActionHistory(botAction);
         botWrittenAction = botAction.getWrittenAction();
+    }
+
+    private void updateBotActionHistory(Action action) {
+        if(botActionHistory == null) {
+            botActionHistory = new ArrayList<>();
+        }
+
+        if(board == null) {
+            botActionHistory.add("preflop " + action.getAction());
+        } else if(board.size() == 3) {
+            botActionHistory.add("flop " + action.getAction());
+        } else if(board.size() == 4) {
+            botActionHistory.add("turn " + action.getAction());
+        } else if(board.size() == 5) {
+            botActionHistory.add("river " + action.getAction());
+        }
+    }
+
+    private void setOrInitializeRangeBuilder(OpponentRangeSetter opponentRangeSetter) {
+        if(rangeSetterChangedBoard(opponentRangeSetter)) {
+            rangeBuilder = new RangeBuilder(this, false);
+        } else {
+            rangeBuilder = opponentRangeSetter.getRangeBuilder();
+        }
+    }
+
+    private boolean rangeSetterChangedBoard(OpponentRangeSetter opponentRangeSetter) {
+        if(opponentRangeSetter.getRangeBuilder().getBoard() != null) {
+            List<Card> rangeSetterBoard = opponentRangeSetter.getRangeBuilder().getBoard();
+            Set<Card> rangeSetterBoardAsSet = new HashSet<>();
+            rangeSetterBoardAsSet.addAll(rangeSetterBoard);
+
+            Set<Card> currentBoardAsSet = new HashSet<>();
+            currentBoardAsSet.addAll(board);
+
+            if(rangeSetterBoardAsSet.equals(currentBoardAsSet)) {
+                return false;
+            }
+            return true;
+        } else {
+            if(board == null) {
+                return false;
+            }
+            return true;
+        }
     }
 
     //main variables
@@ -169,24 +218,11 @@ public class BotHand implements RangeBuildable, Actionable {
         }
     }
 
-    private void processPreviousCallActionIfNeccesary() {
-        //TODO: implement this method after the fix in ComputerGame regarding previous street calls and range
-
-        if(opponentPreviousStreetActionOnlyRangeNeeded != null) {
-            String opponentActionBackUp = opponentAction;
-            double botTotalBetSizeBackUp = botTotalBetSize;
-            double opponentTotalBetSizeBackUp = opponentTotalBetSize;
-
-            opponentAction = opponentPreviousStreetActionOnlyRangeNeeded;
-            //botTotalBetSize
-        }
-    }
-
     private boolean foldOrShowdownOccured() {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
         for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
-            if(entry.getValue().equals("post")) {
+            if(entry.getValue() != null && entry.getValue().equals("post")) {
                 return true;
             }
         }
@@ -243,14 +279,6 @@ public class BotHand implements RangeBuildable, Actionable {
         }
     }
 
-    //derived variables form main variables
-    private void setDerivedVariables() {
-
-
-
-
-    }
-
     private void setBotHoleCards() {
         botHoleCards = new ArrayList<>();
         botHoleCards.add(botHoleCard1);
@@ -285,7 +313,7 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     private void setBoard() {
-        if(board == null) {
+        if(board == null && flopCard1 != null) {
             board = new ArrayList<>();
         }
 
@@ -306,12 +334,12 @@ public class BotHand implements RangeBuildable, Actionable {
 
     private void calculateOpponentPreflopStats() {
         if(!opponentPreflopStatsDoneForHand) {
-            if(board == null && botIsButton && botAction.getWrittenAction().contains("raise") && opponentTotalBetSize == bigBlind) {
+            if(board == null && botIsButton && botWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
                 handsOpponentOopFacingPreflop2bet++;
-                if(botAction.equals("call")) {
+                if(opponentAction.equals("call")) {
                     handsOpponentOopCall2bet++;
                 }
-                if(botAction.equals("raise")) {
+                if(opponentAction.equals("raise")) {
                     handsOpponentOop3bet++;
                 }
             }
