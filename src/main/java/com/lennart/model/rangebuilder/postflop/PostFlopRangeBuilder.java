@@ -29,8 +29,8 @@ public class PostFlopRangeBuilder {
     private double handsHumanOopFacingPreflop2bet;
     private Set<Card> knownGameCards;
 
-    private double previousPotSize;
-    private String botLastAction;
+    private double potSizeAfterLastBotAction;
+    private String opponentAction;
 
     private Map<Integer, Set<Card>> strongFlushDraws;
     private Map<Integer, Set<Card>> mediumFlushDraws;
@@ -60,8 +60,8 @@ public class PostFlopRangeBuilder {
         knownGameCards = rangeBuildable.getKnownGameCards();
         handsHumanOopFacingPreflop2bet = rangeBuildable.getHandsOpponentOopFacingPreflop2bet();
 
-        previousPotSize = rangeBuildable.getPotSizeAfterLastBotAction();
-        botLastAction = OpponentRangeSetter.getBotLastAction(rangeBuildable);
+        potSizeAfterLastBotAction = rangeBuildable.getPotSizeAfterLastBotAction();
+        opponentAction = rangeBuildable.getOpponentAction();
 
         this.rangeBuilder = rangeBuilder;
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
@@ -95,11 +95,11 @@ public class PostFlopRangeBuilder {
 
         double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(percentagePotIncrease <= 0.20) {
+        if(percentagePotIncrease <= 0.167) {
             _7to20bbRange = previousRange;
-        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+        } else if(percentagePotIncrease > 0.167 && percentagePotIncrease <= 0.33) {
             _7to20bbRange = get7to20bb20to50percent(previousRange);
-        } else if(percentagePotIncrease > 0.50 && percentagePotIncrease <= 1.0) {
+        } else if(percentagePotIncrease > 0.33 && percentagePotIncrease <= 0.5) {
             _7to20bbRange = get7to20bb50to100percent(previousRange);
         } else {
             _7to20bbRange = get7to20bbAbove100percent(previousRange);
@@ -112,11 +112,11 @@ public class PostFlopRangeBuilder {
 
         double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(percentagePotIncrease <= 0.20) {
+        if(percentagePotIncrease <= 0.167) {
             _20to40bbRange = previousRange;
-        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+        } else if(percentagePotIncrease > 0.167 && percentagePotIncrease <= 0.33) {
             _20to40bbRange = get20to40bb20to50percent(previousRange);
-        } else if(percentagePotIncrease > 0.50 && percentagePotIncrease <= 1.0) {
+        } else if(percentagePotIncrease > 0.33 && percentagePotIncrease <= 0.5) {
             _20to40bbRange = get20to40bb50to100percent(previousRange);
         } else {
             _20to40bbRange = get20to40bbAbove100percent(previousRange);
@@ -129,11 +129,11 @@ public class PostFlopRangeBuilder {
 
         double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(percentagePotIncrease <= 0.20) {
+        if(percentagePotIncrease <= 0.167) {
             _40to90bbRange = previousRange;
-        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+        } else if(percentagePotIncrease > 0.167 && percentagePotIncrease <= 0.33) {
             _40to90bbRange = get40to90bb20to50percent(previousRange);
-        } else if(percentagePotIncrease > 0.50 && percentagePotIncrease <= 1.0) {
+        } else if(percentagePotIncrease > 0.33 && percentagePotIncrease <= 0.5) {
             _40to90bbRange = get40to90bb50to100percent(previousRange);
         } else {
             _40to90bbRange = get40to90bbAbove100percent(previousRange);
@@ -146,9 +146,9 @@ public class PostFlopRangeBuilder {
 
         double percentagePotIncrease = getPercentagePotIncrease();
 
-        if(percentagePotIncrease <= 0.20) {
+        if(percentagePotIncrease <= 0.167) {
             above90bbRange = previousRange;
-        } else if(percentagePotIncrease > 0.20 && percentagePotIncrease <= 0.50) {
+        } else if(percentagePotIncrease > 0.167 && percentagePotIncrease <= 0.33) {
             above90bbRange = getAbove90bb20to50percent(previousRange);
         } else {
             above90bbRange = getAbove90bbAbove50percent(previousRange);
@@ -160,10 +160,11 @@ public class PostFlopRangeBuilder {
         double percentagePotIncrease;
         double currentPotSize = potSize + botTotalBetSize + opponentTotalBetSize;
 
-        if(botLastAction.equals("check")) {
-            percentagePotIncrease = ((currentPotSize / previousPotSize) - 1);
+        if(opponentAction != null && (opponentAction.equals("bet") || opponentAction.equals("raise"))) {
+            double amountToCall = opponentTotalBetSize - botTotalBetSize;
+            percentagePotIncrease = amountToCall / currentPotSize;
         } else {
-            percentagePotIncrease = ((currentPotSize / previousPotSize) - 1) / 2;
+            percentagePotIncrease = (currentPotSize / potSizeAfterLastBotAction) - 1;
         }
         return percentagePotIncrease;
     }

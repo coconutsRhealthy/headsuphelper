@@ -130,19 +130,19 @@ public class PostFlopActionBuilder {
                     valueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
-                if(handStrengthAgainstRange > 0.66) {
+                if(handStrengthAgainstRange > 0.67) {
                     valueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else if (sizing / bigBlind > 20 && sizing / bigBlind <= 40) {
-                if(handStrengthAgainstRange > 0.75) {
+                if(handStrengthAgainstRange > 0.78) {
                     valueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else if (sizing / bigBlind > 40 && sizing / bigBlind <= 70) {
-                if(handStrengthAgainstRange > 0.80) {
+                if(handStrengthAgainstRange > 0.83) {
                     valueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else {
-                if(handStrengthAgainstRange > 0.95) {
+                if(handStrengthAgainstRange > 0.96) {
                     valueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             }

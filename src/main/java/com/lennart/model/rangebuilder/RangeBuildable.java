@@ -57,4 +57,6 @@ public interface RangeBuildable {
     void setRangeBuilder(RangeBuilder rangeBuilder);
 
     double getPotSizeAfterLastBotAction();
+
+    String getOpponentAction();
 }
