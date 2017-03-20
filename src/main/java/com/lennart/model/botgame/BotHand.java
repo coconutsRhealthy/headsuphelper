@@ -120,6 +120,18 @@ public class BotHand implements RangeBuildable, Actionable {
         botAction = new Action(this, rangeBuilder);
         updateBotActionHistory(botAction);
         botWrittenAction = botAction.getWrittenAction();
+
+        performActionOnSite();
+
+    }
+
+    public void performActionOnSite() {
+        if(botAction.getSizing() != 0) {
+            MouseKeyboard.click(0, 0);
+            MouseKeyboard.enterText(String.valueOf(botAction.getSizing()));
+        }
+
+        //en nog mouse/click logic
     }
 
     private void updateBotActionHistory(Action action) {
