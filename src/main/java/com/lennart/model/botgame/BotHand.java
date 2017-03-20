@@ -55,7 +55,6 @@ public class BotHand implements RangeBuildable, Actionable {
     private boolean drawBettingActionDone;
     private String botWrittenAction;
     private String streetAtPreviousActionRequest;
-    private String opponentPreviousStreetActionOnlyRangeNeeded;
 
     private List<String> botActionHistory;
     private RangeBuilder rangeBuilder;
@@ -113,16 +112,18 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public void getNewBotAction() {
-        OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
-        opponentRangeSetter.setCorrectOpponentRange(this);
-        setOrInitializeRangeBuilder(opponentRangeSetter);
+        if(defaultCheckActionAfterCallNeeded()) {
+            updateBotActionHistory(null);
+            botWrittenAction = "check";
+        } else {
+            OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
+            opponentRangeSetter.setCorrectOpponentRange(this);
+            setOrInitializeRangeBuilder(opponentRangeSetter);
 
-        botAction = new Action(this, rangeBuilder);
-        updateBotActionHistory(botAction);
-        botWrittenAction = botAction.getWrittenAction();
-
-        performActionOnSite();
-
+            botAction = new Action(this, rangeBuilder);
+            updateBotActionHistory(botAction);
+            botWrittenAction = botAction.getWrittenAction();
+        }
     }
 
     public void performActionOnSite() {
@@ -134,19 +135,26 @@ public class BotHand implements RangeBuildable, Actionable {
         //en nog mouse/click logic
     }
 
+    private boolean defaultCheckActionAfterCallNeeded() {
+        if(botActionHistory != null) {
+            String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
+
+            if(botLastAction.contains("call")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void updateBotActionHistory(Action action) {
         if(botActionHistory == null) {
             botActionHistory = new ArrayList<>();
         }
 
-        if(board == null) {
-            botActionHistory.add("preflop " + action.getAction());
-        } else if(board.size() == 3) {
-            botActionHistory.add("flop " + action.getAction());
-        } else if(board.size() == 4) {
-            botActionHistory.add("turn " + action.getAction());
-        } else if(board.size() == 5) {
-            botActionHistory.add("river " + action.getAction());
+        if(action == null) {
+            botActionHistory.add(street + " check");
+        } else {
+            botActionHistory.add(street + " " + action.getAction());
         }
     }
 
@@ -207,12 +215,12 @@ public class BotHand implements RangeBuildable, Actionable {
     private void setOpponentAction() {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
-        for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
-            if(entry.getValue() != null && entry.getValue().equals("post")) {
-                opponentAction = "post";
-                return;
-            }
-        }
+//        for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
+//            if(entry.getValue() != null && entry.getValue().equals("post")) {
+//                opponentAction = "post";
+//                return;
+//            }
+//        }
 
         if(street.equals(streetAtPreviousActionRequest)) {
             if(street.equals("preflop") && botIsButton) {
@@ -222,10 +230,17 @@ public class BotHand implements RangeBuildable, Actionable {
             }
         } else {
             if(botIsButton) {
-                opponentPreviousStreetActionOnlyRangeNeeded = actionsFromLastThreeChatLines.get("top");
                 opponentAction = actionsFromLastThreeChatLines.get("bottom");
             } else {
-                opponentAction = actionsFromLastThreeChatLines.get("middle");
+                String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
+
+                if(botLastAction.contains("call")) {
+                    opponentAction = null;
+                } else if(botLastAction.contains("check")) {
+                    opponentAction = null;
+                } else if(botLastAction.contains("bet") || botLastAction.contains("raise")) {
+                    opponentAction = null;
+                }
             }
         }
     }
@@ -702,14 +717,6 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void setStreetAtPreviousActionRequest(String streetAtPreviousActionRequest) {
         this.streetAtPreviousActionRequest = streetAtPreviousActionRequest;
-    }
-
-    public String getOpponentPreviousStreetActionOnlyRangeNeeded() {
-        return opponentPreviousStreetActionOnlyRangeNeeded;
-    }
-
-    public void setOpponentPreviousStreetActionOnlyRangeNeeded(String opponentPreviousStreetActionOnlyRangeNeeded) {
-        this.opponentPreviousStreetActionOnlyRangeNeeded = opponentPreviousStreetActionOnlyRangeNeeded;
     }
 
     @Override

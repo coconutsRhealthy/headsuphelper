@@ -399,7 +399,7 @@ public class NetBetTableReader {
             action = "raise";
         } else if(chatLine.contains("post")) {
             action = "post";
-        } else if(chatLine.contains("deal")) {
+        } else if(chatLine.contains("Deal") && chatLine.contains("car")) {
             action = "deal";
         }
         return action;
