@@ -98,7 +98,7 @@ public class GameVariablesFiller {
 //        opponentPlayerName = netBetTableReader.getOpponentPlayerNameFromImage();
 //    }
 
-    private void setActionsFromLastThreeChatLines() {
+    public void setActionsFromLastThreeChatLines() {
         actionsFromLastThreeChatLines = netBetTableReader.getActionsFromLastThreeChatLines();
     }
 

@@ -8,6 +8,7 @@ import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by LPO21630 on 16-2-2017.
@@ -46,8 +47,6 @@ public class BotHand implements RangeBuildable, Actionable {
     private Set<Set<Card>> opponentRange;
     private boolean opponentPreflopStatsDoneForHand;
     private double handsOpponentOopFacingPreflop2bet;
-    private double handsOpponentOopCall2bet;
-    private double handsOpponentOop3bet;
     private double opponentPreCall2betStat;
     private double opponentPre3betStat;
     private String street;
@@ -85,12 +84,13 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public BotHand updateVariables() {
-        gameVariablesFiller = new GameVariablesFiller(this);
+        gameVariablesFiller.setActionsFromLastThreeChatLines();
 
         if(foldOrShowdownOccured()) {
             return new BotHand("initialize");
         }
 
+        gameVariablesFiller = new GameVariablesFiller(this);
         setFlopCard1IfNecessary();
         setFlopCard2IfNecessary();
         setFlopCard3IfNecessary();
@@ -106,7 +106,6 @@ public class BotHand implements RangeBuildable, Actionable {
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
         setOpponentAction();
-        calculateOpponentPreflopStats();
 
         return this;
     }
@@ -124,15 +123,34 @@ public class BotHand implements RangeBuildable, Actionable {
             updateBotActionHistory(botAction);
             botWrittenAction = botAction.getWrittenAction();
         }
+        performActionOnSite();
     }
 
     public void performActionOnSite() {
         if(botAction.getSizing() != 0) {
-            MouseKeyboard.click(0, 0);
-            MouseKeyboard.enterText(String.valueOf(botAction.getSizing()));
+            try {
+                MouseKeyboard.click(674, 647);
+                TimeUnit.MILLISECONDS.sleep(150);
+                MouseKeyboard.enterText(String.valueOf(botAction.getSizing()));
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
-        //en nog mouse/click logic
+        String action = botAction.getAction();
+
+        if(action.equals("fold")) {
+            MouseKeyboard.click(721, 685);
+        } else if(action.equals("check")) {
+            MouseKeyboard.click(841, 682);
+        } else if(action.equals("call")) {
+            MouseKeyboard.click(837, 686);
+        } else if(action.equals("bet")) {
+            MouseKeyboard.click(957, 683);
+        } else if(action.equals("raise")) {
+            MouseKeyboard.click(959, 687);
+        }
     }
 
     private boolean defaultCheckActionAfterCallNeeded() {
@@ -215,13 +233,6 @@ public class BotHand implements RangeBuildable, Actionable {
     private void setOpponentAction() {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
-//        for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
-//            if(entry.getValue() != null && entry.getValue().equals("post")) {
-//                opponentAction = "post";
-//                return;
-//            }
-//        }
-
         if(street.equals(streetAtPreviousActionRequest)) {
             if(street.equals("preflop") && botIsButton) {
                 opponentAction = null;
@@ -232,15 +243,7 @@ public class BotHand implements RangeBuildable, Actionable {
             if(botIsButton) {
                 opponentAction = actionsFromLastThreeChatLines.get("bottom");
             } else {
-                String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
-
-                if(botLastAction.contains("call")) {
-                    opponentAction = null;
-                } else if(botLastAction.contains("check")) {
-                    opponentAction = null;
-                } else if(botLastAction.contains("bet") || botLastAction.contains("raise")) {
-                    opponentAction = null;
-                }
+                opponentAction = null;
             }
         }
     }
@@ -358,23 +361,6 @@ public class BotHand implements RangeBuildable, Actionable {
 
         if(riverCard != null && !board.contains(riverCard)) {
             board.add(riverCard);
-        }
-    }
-
-    private void calculateOpponentPreflopStats() {
-        if(!opponentPreflopStatsDoneForHand) {
-            if(board == null && botIsButton && botWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
-                handsOpponentOopFacingPreflop2bet++;
-                if(opponentAction.equals("call")) {
-                    handsOpponentOopCall2bet++;
-                }
-                if(opponentAction.equals("raise")) {
-                    handsOpponentOop3bet++;
-                }
-            }
-            opponentPreCall2betStat = handsOpponentOopCall2bet / handsOpponentOopFacingPreflop2bet;
-            opponentPre3betStat = handsOpponentOop3bet / handsOpponentOopFacingPreflop2bet;
-            opponentPreflopStatsDoneForHand = true;
         }
     }
 
@@ -639,22 +625,6 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void setHandsOpponentOopFacingPreflop2bet(double handsOpponentOopFacingPreflop2bet) {
         this.handsOpponentOopFacingPreflop2bet = handsOpponentOopFacingPreflop2bet;
-    }
-
-    public double getHandsOpponentOopCall2bet() {
-        return handsOpponentOopCall2bet;
-    }
-
-    public void setHandsOpponentOopCall2bet(double handsOpponentOopCall2bet) {
-        this.handsOpponentOopCall2bet = handsOpponentOopCall2bet;
-    }
-
-    public double getHandsOpponentOop3bet() {
-        return handsOpponentOop3bet;
-    }
-
-    public void setHandsOpponentOop3bet(double handsOpponentOop3bet) {
-        this.handsOpponentOop3bet = handsOpponentOop3bet;
     }
 
     @Override
