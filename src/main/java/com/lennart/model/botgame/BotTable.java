@@ -3,6 +3,7 @@ package com.lennart.model.botgame;
 import com.lennart.model.card.Card;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by LPO21630 on 16-2-2017.
@@ -24,6 +25,23 @@ public class BotTable {
     public BotTable(String initialize) {
         botHand = new BotHand("initialize");
         botHand.getNewBotAction();
+    }
+
+    public BotTable(boolean continuously) {
+        botHand = new BotHand("initialize");
+        botHand.getNewBotAction();
+
+        while(true) {
+            if(botHand.botIsToAct()) {
+                getNewBotAction();
+            }
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(700);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void getNewBotAction() {

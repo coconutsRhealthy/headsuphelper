@@ -9,7 +9,8 @@
 <body>
     <div ng-app = "mainApp" ng-controller = "pokerController">
         <div>
-            <button ng-click="startBotTable()">Start bottable</button>
+            <span><button ng-click="startBotTable()">Start bottable</button></span>
+            <span><button ng-click="runBotTableContinuously()">Run bottable continuously</button></span>
         </div>
         <div ng-show=showGame>
             <div style={{dealerButtonStyle}}>

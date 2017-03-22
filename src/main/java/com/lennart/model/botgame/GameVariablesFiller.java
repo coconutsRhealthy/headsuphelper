@@ -225,4 +225,8 @@ public class GameVariablesFiller {
     public Card getRiverCard() {
         return riverCard;
     }
+
+    public NetBetTableReader getNetBetTableReader() {
+        return netBetTableReader;
+    }
 }

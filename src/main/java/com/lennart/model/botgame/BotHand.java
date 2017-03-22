@@ -6,6 +6,7 @@ import com.lennart.model.card.Card;
 import com.lennart.model.rangebuilder.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
+import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -84,13 +85,12 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public BotHand updateVariables() {
-        gameVariablesFiller.setActionsFromLastThreeChatLines();
+        gameVariablesFiller = new GameVariablesFiller(this);
 
         if(foldOrShowdownOccured()) {
             return new BotHand("initialize");
         }
 
-        gameVariablesFiller = new GameVariablesFiller(this);
         setFlopCard1IfNecessary();
         setFlopCard2IfNecessary();
         setFlopCard3IfNecessary();
@@ -131,7 +131,7 @@ public class BotHand implements RangeBuildable, Actionable {
             try {
                 MouseKeyboard.click(674, 647);
                 TimeUnit.MILLISECONDS.sleep(150);
-                MouseKeyboard.enterText(String.valueOf(botAction.getSizing()));
+                MouseKeyboard.enterText(String.valueOf(Precision.round(botAction.getSizing(), 2)));
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -151,6 +151,10 @@ public class BotHand implements RangeBuildable, Actionable {
         } else if(action.equals("raise")) {
             MouseKeyboard.click(959, 687);
         }
+    }
+
+    public boolean botIsToAct() {
+        return gameVariablesFiller.getNetBetTableReader().botIsToAct();
     }
 
     private boolean defaultCheckActionAfterCallNeeded() {

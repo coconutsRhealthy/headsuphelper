@@ -146,6 +146,16 @@ public class NetBetTableReader {
         return null;
     }
 
+    public boolean botIsToAct() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 0, 0);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        if(suitRgb / 1000 == -10) {
+            //expected rgb: xxx
+            return true;
+        }
+        return false;
+    }
+
     //helper methods
     private String readTopChatLine() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(13, 604, 309, 24);

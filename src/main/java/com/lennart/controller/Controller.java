@@ -55,6 +55,11 @@ public class Controller {
         return botTable;
     }
 
+    @RequestMapping(value = "/runBotTableContinuously", method = RequestMethod.GET)
+    public void runBotTableContinuously() {
+        new BotTable(true);
+    }
+
 
     public static void main(String[] args) {
         SpringApplication.run(Controller.class, args);

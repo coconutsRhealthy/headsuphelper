@@ -58,6 +58,10 @@ mainApp.controller('pokerController', function($scope, $http) {
         })
     }
 
+    $scope.runBotTableContinuously = function() {
+        $http.get('/runBotTableContinuously/')
+    }
+
     function setScopePropertiesCorrect(data) {
         $scope.botTable = data;
 
