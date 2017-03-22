@@ -34,4 +34,13 @@ public class MouseKeyboard {
             e.printStackTrace();
         }
     }
+
+    public static void moveMouseToLocation(int x, int y) {
+        try {
+            Robot bot = new Robot();
+            bot.mouseMove(x, y);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
 }

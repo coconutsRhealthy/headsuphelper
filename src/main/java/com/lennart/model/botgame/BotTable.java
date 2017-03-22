@@ -1,6 +1,7 @@
 package com.lennart.model.botgame;
 
 import com.lennart.model.card.Card;
+import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,16 +29,29 @@ public class BotTable {
     }
 
     public BotTable(boolean continuously) {
-        botHand = new BotHand("initialize");
-        botHand.getNewBotAction();
+        boolean initializationNeeded = true;
+
+        while(initializationNeeded) {
+            if(NetBetTableReader.botIsToAct()) {
+                botHand = new BotHand("initialize");
+                botHand.getNewBotAction();
+                initializationNeeded = false;
+            }
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(5000);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         while(true) {
-            if(botHand.botIsToAct()) {
+            if(NetBetTableReader.botIsToAct()) {
                 getNewBotAction();
             }
 
             try {
-                TimeUnit.MILLISECONDS.sleep(700);
+                TimeUnit.MILLISECONDS.sleep(2000);
             } catch(InterruptedException e) {
                 e.printStackTrace();
             }
@@ -48,6 +62,7 @@ public class BotTable {
         botHand = botHand.updateVariables();
         calculateOpponentPreflopStats();
         botHand.getNewBotAction();
+        System.out.println();
     }
 
     private void calculateOpponentPreflopStats() {
@@ -59,7 +74,7 @@ public class BotTable {
             double opponentTotalBetSize = botHand.getOpponentTotalBetSize();
             double bigBlind = botHand.getBigBlind();
 
-            if(board == null && botIsButton && botWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
+            if(board == null && botIsButton && botWrittenAction != null && botWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
                 handsOpponentOopFacingPreflop2bet++;
                 if(opponentAction.equals("call")) {
                     handsOpponentOopCall2bet++;

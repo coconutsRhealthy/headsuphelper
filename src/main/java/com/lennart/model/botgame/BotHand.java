@@ -3,6 +3,7 @@ package com.lennart.model.botgame;
 import com.lennart.model.action.Action;
 import com.lennart.model.action.Actionable;
 import com.lennart.model.card.Card;
+import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 import com.lennart.model.rangebuilder.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
@@ -127,7 +128,7 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     public void performActionOnSite() {
-        if(botAction.getSizing() != 0) {
+        if(botAction != null && botAction.getSizing() != 0) {
             try {
                 MouseKeyboard.click(674, 647);
                 TimeUnit.MILLISECONDS.sleep(150);
@@ -138,9 +139,16 @@ public class BotHand implements RangeBuildable, Actionable {
             }
         }
 
-        String action = botAction.getAction();
+        String action;
+        if(botAction != null) {
+            action = botAction.getAction();
+        } else {
+            action = null;
+        }
 
-        if(action.equals("fold")) {
+        if(action == null) {
+            MouseKeyboard.click(841, 682);
+        } else if(action.equals("fold")) {
             MouseKeyboard.click(721, 685);
         } else if(action.equals("check")) {
             MouseKeyboard.click(841, 682);
@@ -151,17 +159,18 @@ public class BotHand implements RangeBuildable, Actionable {
         } else if(action.equals("raise")) {
             MouseKeyboard.click(959, 687);
         }
+        MouseKeyboard.moveMouseToLocation(20, 20);
     }
 
     public boolean botIsToAct() {
-        return gameVariablesFiller.getNetBetTableReader().botIsToAct();
+        return NetBetTableReader.botIsToAct();
     }
 
     private boolean defaultCheckActionAfterCallNeeded() {
         if(botActionHistory != null) {
             String botLastAction = botActionHistory.get(botActionHistory.size() - 1);
 
-            if(botLastAction.contains("call")) {
+            if(botLastAction.contains("call") && !botIsButton) {
                 return true;
             }
         }

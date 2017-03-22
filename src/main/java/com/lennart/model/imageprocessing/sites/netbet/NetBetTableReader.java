@@ -146,13 +146,14 @@ public class NetBetTableReader {
         return null;
     }
 
-    public boolean botIsToAct() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 0, 0);
+    public static boolean botIsToAct() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(686, 679, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-        if(suitRgb / 1000 == -10) {
-            //expected rgb: xxx
+        if(suitRgb / 100_000 == -167) {
+            //expected rgb: -16743748
             return true;
         }
+        System.out.print(".");
         return false;
     }
 
