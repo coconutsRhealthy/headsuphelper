@@ -43,7 +43,7 @@ public class GameVariablesFiller {
         setBotHoleCard1(botHand.getBotHoleCard1());
         setBotHoleCard2(botHand.getBotHoleCard2());
         setBotIsButton();
-        //setOpponentPlayerName();
+        setOpponentPlayerName();
         setActionsFromLastThreeChatLines();
 
         setFlopCard1(botHand.getFlopCard1());
@@ -94,9 +94,9 @@ public class GameVariablesFiller {
         botIsButton = netBetTableReader.isBotButtonFromImage();
     }
 
-//    private void setOpponentPlayerName() {
-//        opponentPlayerName = netBetTableReader.getOpponentPlayerNameFromImage();
-//    }
+    private void setOpponentPlayerName() {
+        opponentPlayerName = netBetTableReader.getOpponentPlayerNameFromImage();
+    }
 
     public void setActionsFromLastThreeChatLines() {
         actionsFromLastThreeChatLines = netBetTableReader.getActionsFromLastThreeChatLines();

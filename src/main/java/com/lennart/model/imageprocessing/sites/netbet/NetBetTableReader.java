@@ -1,13 +1,17 @@
 package com.lennart.model.imageprocessing.sites.netbet;
 
+import com.lennart.model.action.Action;
+import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
+import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Lennart on 3/12/2017.
@@ -38,6 +42,7 @@ public class NetBetTableReader {
         if(potSize / bigBlind > 50) {
             String timeStamp = getCurrentTimeStamp();
             System.out.println("potSize: " + potSize + " ---bigger than 50bb, screenshot saved: " + timeStamp);
+            //todo: fill in path
             ImageProcessor.createPartialSreenShot(430, 255, 167, 28, "path" + timeStamp);
         }
         return potSize;
@@ -66,6 +71,7 @@ public class NetBetTableReader {
         if(opponentStack / bigBlind > 300) {
             String timeStamp = getCurrentTimeStamp();
             System.out.println("opponentStack: " + opponentStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
+            //todo: fill in path
             ImageProcessor.createPartialSreenShot(500, 147, 109, 28, "path" + timeStamp);
         }
         return opponentStack;
@@ -89,6 +95,7 @@ public class NetBetTableReader {
         if(botStack / bigBlind > 300) {
             String timeStamp = getCurrentTimeStamp();
             System.out.println("botStack: " + botStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
+            //todo: fill in path
             ImageProcessor.createPartialSreenShot(500, 574, 109, 28, "path" + timeStamp);
         }
         return botStack;
@@ -106,6 +113,7 @@ public class NetBetTableReader {
         if(botTotalBetSize / bigBlind > 40) {
             String timeStamp = getCurrentTimeStamp();
             System.out.println("botTotalBetSize: " + botTotalBetSize + " ---bigger than 40bb, screenshot saved: " + timeStamp);
+            //todo: fill in path
             ImageProcessor.createPartialSreenShot(460, 448, 80, 23, "path" + timeStamp);
         }
         return botTotalBetSize;
@@ -123,6 +131,7 @@ public class NetBetTableReader {
         if(opponentTotalBetSize / bigBlind > 40) {
             String timeStamp = getCurrentTimeStamp();
             System.out.println("opponentTotalBetSize: " + opponentTotalBetSize + " ---bigger than 40bb, screenshot saved: " + timeStamp);
+            //todo: fill in path
             ImageProcessor.createPartialSreenShot(451, 191, 66, 18, "path" + timeStamp);
         }
         return opponentTotalBetSize;
@@ -216,6 +225,50 @@ public class NetBetTableReader {
         }
         System.out.print(".");
         return false;
+    }
+
+    public String getOpponentPlayerNameFromImage() {
+        //todo: fill in coordinates
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 0, 0);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
+    }
+
+    public static void performActionOnSite(Action botAction) {
+        if(botAction != null && botAction.getSizing() != 0) {
+            try {
+                MouseKeyboard.click(674, 647);
+                TimeUnit.MILLISECONDS.sleep(150);
+                MouseKeyboard.enterText(String.valueOf(Precision.round(botAction.getSizing(), 2)));
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        String action;
+        if(botAction != null) {
+            action = botAction.getAction();
+        } else {
+            action = null;
+        }
+
+        if(action == null) {
+            MouseKeyboard.click(841, 682);
+        } else if(action.equals("fold")) {
+            MouseKeyboard.click(721, 685);
+        } else if(action.equals("check")) {
+            MouseKeyboard.click(841, 682);
+        } else if(action.equals("call")) {
+            MouseKeyboard.click(837, 686);
+        } else if(action.equals("bet")) {
+            MouseKeyboard.click(957, 683);
+        } else if(action.equals("raise")) {
+            MouseKeyboard.click(959, 687);
+        }
+        MouseKeyboard.moveMouseToLocation(20, 20);
     }
 
     //helper methods

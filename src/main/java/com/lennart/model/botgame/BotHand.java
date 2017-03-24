@@ -5,13 +5,12 @@ import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
+import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 import com.lennart.model.rangebuilder.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
-import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by LPO21630 on 16-2-2017.
@@ -133,42 +132,7 @@ public class BotHand implements RangeBuildable, Actionable {
 
         double sizing = getSizing();
         potSizeAfterLastBotAction = potSize + sizing + opponentTotalBetSize;
-        performActionOnSite();
-    }
-
-    private void performActionOnSite() {
-        if(botAction != null && botAction.getSizing() != 0) {
-            try {
-                MouseKeyboard.click(674, 647);
-                TimeUnit.MILLISECONDS.sleep(150);
-                MouseKeyboard.enterText(String.valueOf(Precision.round(botAction.getSizing(), 2)));
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        String action;
-        if(botAction != null) {
-            action = botAction.getAction();
-        } else {
-            action = null;
-        }
-
-        if(action == null) {
-            MouseKeyboard.click(841, 682);
-        } else if(action.equals("fold")) {
-            MouseKeyboard.click(721, 685);
-        } else if(action.equals("check")) {
-            MouseKeyboard.click(841, 682);
-        } else if(action.equals("call")) {
-            MouseKeyboard.click(837, 686);
-        } else if(action.equals("bet")) {
-            MouseKeyboard.click(957, 683);
-        } else if(action.equals("raise")) {
-            MouseKeyboard.click(959, 687);
-        }
-        MouseKeyboard.moveMouseToLocation(20, 20);
+        NetBetTableReader.performActionOnSite(botAction);
     }
 
     private double getSizing() {

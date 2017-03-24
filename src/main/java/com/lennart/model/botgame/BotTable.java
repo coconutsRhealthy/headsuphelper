@@ -3,7 +3,10 @@ package com.lennart.model.botgame;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,6 +20,8 @@ public class BotTable {
     private double handsOpponentOopCall2bet;
     private double handsOpponentOop3bet;
     private double handsOpponentOopFacingPreflop2bet;
+
+    private Map<String, List<Double>> opponentPlayerNamesAndStats;
 
 
     public BotTable() {
@@ -90,6 +95,56 @@ public class BotTable {
         }
     }
 
+    private void calculateOpponentPreflopStatsNew() {
+        if(!botHand.isOpponentPreflopStatsDoneForHand()) {
+            addPlayerToMapIfNecessary();
+
+            if(opponentPlayerNamesAndStats.get(botHand.getOpponentPlayerName()) != null) {
+                List<Card> board = botHand.getBoard();
+                String botWrittenAction = botHand.getBotWrittenAction();
+                String opponentAction = botHand.getOpponentAction();
+                String playerName = botHand.getOpponentPlayerName();
+                boolean botIsButton = botHand.isBotIsButton();
+                double opponentTotalBetSize = botHand.getOpponentTotalBetSize();
+                double bigBlind = botHand.getBigBlind();
+
+                if(board == null && botIsButton && botWrittenAction != null && botWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
+                    //add 1 to handsOpponentOopFacingPreflop2bet:
+                    opponentPlayerNamesAndStats.get(playerName).set(0, opponentPlayerNamesAndStats.get(playerName).get(0) + 1);
+                    if(opponentAction.equals("call")) {
+                        //add 1 to handsOpponentOopCall2bet:
+                        opponentPlayerNamesAndStats.get(playerName).set(1, opponentPlayerNamesAndStats.get(playerName).get(1) + 1);
+                    }
+                    if(opponentAction.equals("raise")) {
+                        //add 1 to handsOpponentOop3bet:
+                        opponentPlayerNamesAndStats.get(playerName).set(2, opponentPlayerNamesAndStats.get(playerName).get(2) + 1);
+                    }
+                }
+                botHand.setHandsOpponentOopFacingPreflop2bet(opponentPlayerNamesAndStats.get(playerName).get(0));
+                botHand.setOpponentPreCall2betStat(opponentPlayerNamesAndStats.get(playerName).get(1) /
+                        opponentPlayerNamesAndStats.get(playerName).get(0));
+                botHand.setOpponentPre3betStat(opponentPlayerNamesAndStats.get(playerName).get(2) /
+                        opponentPlayerNamesAndStats.get(playerName).get(0));
+                botHand.setOpponentPreflopStatsDoneForHand(true);
+            }
+        }
+    }
+
+    private void addPlayerToMapIfNecessary() {
+        if(opponentPlayerNamesAndStats == null) {
+            opponentPlayerNamesAndStats = new HashMap<>();
+        }
+
+        String playerName = botHand.getOpponentPlayerName();
+
+        if(playerName != null && opponentPlayerNamesAndStats.get(playerName) == null) {
+            opponentPlayerNamesAndStats.put(playerName, new ArrayList<>());
+            for(int i = 0; i < 3; i++) {
+                opponentPlayerNamesAndStats.get(playerName).add(0d);
+            }
+        }
+    }
+
     public BotHand getBotHand() {
         return botHand;
     }
@@ -136,5 +191,13 @@ public class BotTable {
 
     public void setHandsOpponentOopFacingPreflop2bet(double handsOpponentOopFacingPreflop2bet) {
         this.handsOpponentOopFacingPreflop2bet = handsOpponentOopFacingPreflop2bet;
+    }
+
+    public Map<String, List<Double>> getOpponentPlayerNamesAndStats() {
+        return opponentPlayerNamesAndStats;
+    }
+
+    public void setOpponentPlayerNamesAndStats(Map<String, List<Double>> opponentPlayerNamesAndStats) {
+        this.opponentPlayerNamesAndStats = opponentPlayerNamesAndStats;
     }
 }
