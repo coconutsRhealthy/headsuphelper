@@ -18,7 +18,13 @@ public class NetBetTableReader {
         if(potSizeAsString.matches(".*\\d.*")){
             potSize = Double.parseDouble(potSizeAsString);
         } else {
-            potSize = -1;
+            potSizeAsString = readPotSize();
+            if(potSizeAsString.matches(".*\\d.*")){
+                potSize = Double.parseDouble(potSizeAsString);
+            } else {
+                potSize = -1;
+                System.out.println("potSize not read well: -1");
+            }
         }
         return potSize;
     }
@@ -29,7 +35,18 @@ public class NetBetTableReader {
         if(opponentStackAsString.matches(".*\\d.*")){
             opponentStack = Double.parseDouble(opponentStackAsString);
         } else {
-            opponentStack = -1;
+            if(opponentStackAsString.contains("in")) {
+                //opponent is all-in
+                opponentStack = 0;
+            } else {
+                opponentStackAsString = readTopPlayerStack();
+                if(opponentStackAsString.matches(".*\\d.*")){
+                    opponentStack = Double.parseDouble(opponentStackAsString);
+                } else {
+                    opponentStack = -1;
+                    System.out.println("opponentStack not read well: -1");
+                }
+            }
         }
         return opponentStack;
     }
@@ -40,7 +57,13 @@ public class NetBetTableReader {
         if(botStackAsString.matches(".*\\d.*")){
             botStack = Double.parseDouble(botStackAsString);
         } else{
-            botStack = -1;
+            botStackAsString = readBottomPlayerStack();
+            if(botStackAsString.matches(".*\\d.*")){
+                botStack = Double.parseDouble(botStackAsString);
+            } else {
+                botStack = -1;
+                System.out.println("botStack not read well: -1");
+            }
         }
         return botStack;
     }

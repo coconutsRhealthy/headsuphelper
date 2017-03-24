@@ -115,6 +115,16 @@ public class BotHand implements RangeBuildable, Actionable {
         if(defaultCheckActionAfterCallNeeded()) {
             updateBotActionHistory(null);
             botWrittenAction = "check";
+        } else if(potSize == -1 || opponentStack == -1 || botStack == -1) {
+            if(opponentTotalBetSize == 0) {
+                updateBotActionHistory(null);
+                botWrittenAction = "check";
+                System.out.println("Default check because of misread board: -1");
+            } else {
+                botAction = new Action();
+                botAction.setAction("fold");
+                System.out.println("Default fold because of misread board: -1");
+            }
         } else {
             OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
             opponentRangeSetter.setCorrectOpponentRange(this);
@@ -124,6 +134,14 @@ public class BotHand implements RangeBuildable, Actionable {
             updateBotActionHistory(botAction);
             botWrittenAction = botAction.getWrittenAction();
         }
+        double sizing;
+        if(botAction != null) {
+            sizing = botAction.getSizing();
+        } else {
+            sizing = 0;
+        }
+
+        potSizeAfterLastBotAction = potSize + sizing + opponentTotalBetSize;
         performActionOnSite();
     }
 

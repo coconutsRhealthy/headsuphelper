@@ -124,7 +124,7 @@ public class PostFlopActionBuilder {
     private String getValueAction(double handStrengthAgainstRange, String bettingAction) {
         String valueAction = null;
 
-        if(getAmountToCall() < actionable.getBotStack()) {
+        if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
             if(sizing / bigBlind <= 5) {
                 if(handStrengthAgainstRange > 0.44) {
                     valueAction = getPassiveOrAggressiveValueAction(bettingAction);
@@ -157,7 +157,7 @@ public class PostFlopActionBuilder {
     private String getDrawBettingAction(String bettingAction) {
         String drawBettingAction = null;
 
-        if(getAmountToCall() < actionable.getBotStack()) {
+        if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
             drawBettingAction = getDraw2ndBarrelAction(bettingAction);
 
             if(drawBettingAction == null) {
@@ -257,7 +257,7 @@ public class PostFlopActionBuilder {
     private String getTrickyRaiseAction(double handStrengthAgainstRange) {
         String trickyRaiseAction = null;
 
-        if(getAmountToCall() < actionable.getBotStack()) {
+        if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
             if(handStrengthAgainstRange >= 0.6 && handStrengthAgainstRange < 0.8) {
                 if(board.size() == 3) {
                     if(sizing / bigBlind <= 20) {
@@ -285,7 +285,7 @@ public class PostFlopActionBuilder {
     private String getBluffAction(String bettingAction, double handStrengthAgainstRange) {
         String bluffAction = null;
 
-        if(getAmountToCall() < actionable.getBotStack()) {
+        if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
             bluffAction = getBluffBarrelAction(bettingAction, handStrengthAgainstRange);
 
             if(bluffAction == null) {
