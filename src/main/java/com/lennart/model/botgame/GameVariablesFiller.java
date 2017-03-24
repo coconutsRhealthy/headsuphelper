@@ -32,7 +32,9 @@ public class GameVariablesFiller {
     private NetBetTableReader netBetTableReader;
 
     public GameVariablesFiller(BotHand botHand) {
-        netBetTableReader = new NetBetTableReader();
+        setSmallBlind();
+        setBigBlind();
+        netBetTableReader = new NetBetTableReader(bigBlind);
         setBotStack();
         setOpponentStack();
         setBotTotalBetSize();
@@ -40,8 +42,6 @@ public class GameVariablesFiller {
         setCorrectedPotSize();
         setBotHoleCard1(botHand.getBotHoleCard1());
         setBotHoleCard2(botHand.getBotHoleCard2());
-        setSmallBlind();
-        setBigBlind();
         setBotIsButton();
         //setOpponentPlayerName();
         setActionsFromLastThreeChatLines();

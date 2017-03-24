@@ -20,7 +20,7 @@ public class HandEvaluator {
     private Map<String, Boolean> handDrawEvaluation;
 
     public HandEvaluator(BoardEvaluator boardEvaluator) {
-        //Constructor only to be used for end of hand evalution in ComputerGame
+        //Constructor to be used for end of hand evalution in ComputerGame and when table is misread in BotHand
         this.boardEvaluator = boardEvaluator;
     }
 

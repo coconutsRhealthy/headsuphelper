@@ -4,6 +4,8 @@ import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
 
 import java.awt.image.BufferedImage;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,12 @@ import java.util.Map;
  * Created by Lennart on 3/12/2017.
  */
 public class NetBetTableReader {
+
+    private double bigBlind;
+
+    public NetBetTableReader(double bigBlind) {
+        this.bigBlind = bigBlind;
+    }
 
     public double getPotSizeFromImage() {
         double potSize;
@@ -25,6 +33,12 @@ public class NetBetTableReader {
                 potSize = -1;
                 System.out.println("potSize not read well: -1");
             }
+        }
+
+        if(potSize / bigBlind > 50) {
+            String timeStamp = getCurrentTimeStamp();
+            System.out.println("potSize: " + potSize + " ---bigger than 50bb, screenshot saved: " + timeStamp);
+            ImageProcessor.createPartialSreenShot(430, 255, 167, 28, "path" + timeStamp);
         }
         return potSize;
     }
@@ -48,6 +62,12 @@ public class NetBetTableReader {
                 }
             }
         }
+
+        if(opponentStack / bigBlind > 300) {
+            String timeStamp = getCurrentTimeStamp();
+            System.out.println("opponentStack: " + opponentStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
+            ImageProcessor.createPartialSreenShot(500, 147, 109, 28, "path" + timeStamp);
+        }
         return opponentStack;
     }
 
@@ -65,6 +85,12 @@ public class NetBetTableReader {
                 System.out.println("botStack not read well: -1");
             }
         }
+
+        if(botStack / bigBlind > 300) {
+            String timeStamp = getCurrentTimeStamp();
+            System.out.println("botStack: " + botStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
+            ImageProcessor.createPartialSreenShot(500, 574, 109, 28, "path" + timeStamp);
+        }
         return botStack;
     }
 
@@ -76,6 +102,12 @@ public class NetBetTableReader {
         } else {
             botTotalBetSize = 0;
         }
+
+        if(botTotalBetSize / bigBlind > 40) {
+            String timeStamp = getCurrentTimeStamp();
+            System.out.println("botTotalBetSize: " + botTotalBetSize + " ---bigger than 40bb, screenshot saved: " + timeStamp);
+            ImageProcessor.createPartialSreenShot(460, 448, 80, 23, "path" + timeStamp);
+        }
         return botTotalBetSize;
     }
 
@@ -86,6 +118,12 @@ public class NetBetTableReader {
             opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
         } else {
             opponentTotalBetSize = 0;
+        }
+
+        if(opponentTotalBetSize / bigBlind > 40) {
+            String timeStamp = getCurrentTimeStamp();
+            System.out.println("opponentTotalBetSize: " + opponentTotalBetSize + " ---bigger than 40bb, screenshot saved: " + timeStamp);
+            ImageProcessor.createPartialSreenShot(451, 191, 66, 18, "path" + timeStamp);
         }
         return opponentTotalBetSize;
     }
@@ -437,5 +475,9 @@ public class NetBetTableReader {
             action = "deal";
         }
         return action;
+    }
+
+    private String getCurrentTimeStamp() {
+        return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
     }
 }

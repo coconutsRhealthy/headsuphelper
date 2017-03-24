@@ -2,8 +2,9 @@ package com.lennart.model.botgame;
 
 import com.lennart.model.action.Action;
 import com.lennart.model.action.Actionable;
+import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
+import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.rangebuilder.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
@@ -61,6 +62,9 @@ public class BotHand implements RangeBuildable, Actionable {
     private RangeBuilder rangeBuilder;
     private double potSizeAfterLastBotAction;
 
+    private double botStackAtBeginningOfHand;
+    private double opponentStackAtBeginningOfHand;
+
     public BotHand() {
         //default constructor
     }
@@ -68,17 +72,17 @@ public class BotHand implements RangeBuildable, Actionable {
     public BotHand(String initialize) {
         gameVariablesFiller = new GameVariablesFiller(this);
 
+        setSmallBlind();
+        setBigBlind();
+        setBotStack(true);
+        setOpponentStack(true);
         setPotSize();
-        setBotStack();
-        setOpponentStack();
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setOpponentPlayerName();
         setBotIsButton();
         setBotHoleCard1();
         setBotHoleCard2();
-        setSmallBlind();
-        setBigBlind();
         setKnownGameCards();
         setBotHoleCards();
         setStreetAndPreviousStreet();
@@ -100,9 +104,9 @@ public class BotHand implements RangeBuildable, Actionable {
         setFlopCards();
         setKnownGameCards();
         setBoard();
+        setBotStack(false);
+        setOpponentStack(false);
         setPotSize();
-        setBotStack();
-        setOpponentStack();
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
@@ -113,18 +117,10 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void getNewBotAction() {
         if(defaultCheckActionAfterCallNeeded()) {
-            updateBotActionHistory(null);
-            botWrittenAction = "check";
-        } else if(potSize == -1 || opponentStack == -1 || botStack == -1) {
-            if(opponentTotalBetSize == 0) {
-                updateBotActionHistory(null);
-                botWrittenAction = "check";
-                System.out.println("Default check because of misread board: -1");
-            } else {
-                botAction = new Action();
-                botAction.setAction("fold");
-                System.out.println("Default fold because of misread board: -1");
-            }
+            doDefaultCheck();
+        } else if(potSize == -1 || opponentStack == -1 || botStack == -1 || opponentTotalBetSize == -1 || botTotalBetSize == -1) {
+            getActionWhenTableIsMisread();
+            System.out.println("Default check or call action because of misread table: -1");
         } else {
             OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
             opponentRangeSetter.setCorrectOpponentRange(this);
@@ -134,18 +130,13 @@ public class BotHand implements RangeBuildable, Actionable {
             updateBotActionHistory(botAction);
             botWrittenAction = botAction.getWrittenAction();
         }
-        double sizing;
-        if(botAction != null) {
-            sizing = botAction.getSizing();
-        } else {
-            sizing = 0;
-        }
 
+        double sizing = getSizing();
         potSizeAfterLastBotAction = potSize + sizing + opponentTotalBetSize;
         performActionOnSite();
     }
 
-    public void performActionOnSite() {
+    private void performActionOnSite() {
         if(botAction != null && botAction.getSizing() != 0) {
             try {
                 MouseKeyboard.click(674, 647);
@@ -180,8 +171,14 @@ public class BotHand implements RangeBuildable, Actionable {
         MouseKeyboard.moveMouseToLocation(20, 20);
     }
 
-    public boolean botIsToAct() {
-        return NetBetTableReader.botIsToAct();
+    private double getSizing() {
+        double sizing;
+        if(botAction != null) {
+            sizing = botAction.getSizing();
+        } else {
+            sizing = 0;
+        }
+        return sizing;
     }
 
     private boolean defaultCheckActionAfterCallNeeded() {
@@ -193,6 +190,11 @@ public class BotHand implements RangeBuildable, Actionable {
             }
         }
         return false;
+    }
+
+    private void doDefaultCheck() {
+        updateBotActionHistory(null);
+        botWrittenAction = "check";
     }
 
     private void updateBotActionHistory(Action action) {
@@ -213,6 +215,47 @@ public class BotHand implements RangeBuildable, Actionable {
         } else {
             rangeBuilder = opponentRangeSetter.getRangeBuilder();
         }
+    }
+
+    private void getActionWhenTableIsMisread() {
+        if(opponentTotalBetSize == 0) {
+            doDefaultCheck();
+        } else {
+            getCallActionOnMisreadBoard();
+        }
+    }
+
+    private void getCallActionOnMisreadBoard() {
+        BoardEvaluator boardEvaluatorMisreadTable = new BoardEvaluator(board);
+        HandEvaluator handEvaluator = new HandEvaluator(boardEvaluatorMisreadTable);
+        double handStrengthAgainstRange = handEvaluator.getHandStrength(botHoleCards);
+        botAction = new Action();
+
+        if((botTotalBetSize / bigBlind) < 10) {
+            if(handStrengthAgainstRange >= 0.7) {
+                setActionToCall();
+            }
+        } else if((botTotalBetSize / bigBlind) < 20) {
+            if(handStrengthAgainstRange >= 0.8) {
+                setActionToCall();
+            }
+        } else if((botTotalBetSize / bigBlind) < 40) {
+            if(handStrengthAgainstRange >= 0.95) {
+                setActionToCall();
+            }
+        } else if((botTotalBetSize / bigBlind) < 70) {
+            if(handStrengthAgainstRange >= 0.99) {
+                setActionToCall();
+            }
+        } else {
+            botAction.setAction("fold");
+        }
+    }
+
+    private void setActionToCall() {
+        botAction.setAction("call");
+        updateBotActionHistory(botAction);
+        botWrittenAction = "call";
     }
 
     private boolean rangeSetterChangedBoard(OpponentRangeSetter opponentRangeSetter) {
@@ -237,24 +280,78 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     //main variables
+    private void setBotStack(boolean initialize) {
+        botStack = gameVariablesFiller.getBotStack();
+
+        if(initialize) {
+            botStackAtBeginningOfHand = botStack;
+        }
+        validateBotStack();
+    }
+
+    private void validateBotStack() {
+        if(botStack > botStackAtBeginningOfHand) {
+            botStack = -1;
+        } else if(botStack / bigBlind > 1000) {
+            botStack = -1;
+        }
+    }
+
+    private void setOpponentStack(boolean initialize) {
+        opponentStack = gameVariablesFiller.getOpponentStack();
+
+        if(initialize) {
+            opponentStackAtBeginningOfHand = opponentStack;
+        }
+        validateOpponentStack();
+    }
+
+    private void validateOpponentStack() {
+        if(opponentStack > opponentStackAtBeginningOfHand) {
+            opponentStack = -1;
+        } else if(opponentStack / bigBlind > 1000) {
+            opponentStack = -1;
+        }
+    }
+
     private void setPotSize() {
         potSize = gameVariablesFiller.getPotSize();
+        validatePotSize();
+        System.out.println("Potsize: " + potSize);
     }
 
-    private void setBotStack() {
-        botStack = gameVariablesFiller.getBotStack();
-    }
-
-    private void setOpponentStack() {
-        opponentStack = gameVariablesFiller.getOpponentStack();
+    private void validatePotSize() {
+        if(potSize > (botStackAtBeginningOfHand + opponentStackAtBeginningOfHand)) {
+            potSize = -1;
+        } else if(potSize / bigBlind > 1000) {
+            potSize = -1;
+        }
     }
 
     private void setBotTotalBetSize() {
         botTotalBetSize = gameVariablesFiller.getBotTotalBetSize();
+        validateBotTotalBetSize();
+    }
+
+    private void validateBotTotalBetSize() {
+        if(botTotalBetSize > botStackAtBeginningOfHand) {
+            botTotalBetSize = -1;
+        } else if(botTotalBetSize / bigBlind > 1000) {
+            botTotalBetSize = -1;
+        }
     }
 
     private void setOpponentTotalBetSize() {
         opponentTotalBetSize = gameVariablesFiller.getOpponentTotalBetSize();
+        validateOpponentTotalBetSize();
+    }
+
+    private void validateOpponentTotalBetSize() {
+        if(opponentTotalBetSize > opponentStackAtBeginningOfHand) {
+            opponentTotalBetSize = -1;
+        } else if(opponentTotalBetSize / bigBlind > 1000) {
+            opponentTotalBetSize = -1;
+        }
     }
 
     private void setOpponentPlayerName() {
@@ -745,5 +842,21 @@ public class BotHand implements RangeBuildable, Actionable {
 
     public void setPotSizeAfterLastBotAction(double potSizeAfterLastBotAction) {
         this.potSizeAfterLastBotAction = potSizeAfterLastBotAction;
+    }
+
+    public double getBotStackAtBeginningOfHand() {
+        return botStackAtBeginningOfHand;
+    }
+
+    public void setBotStackAtBeginningOfHand(double botStackAtBeginningOfHand) {
+        this.botStackAtBeginningOfHand = botStackAtBeginningOfHand;
+    }
+
+    public double getOpponentStackAtBeginningOfHand() {
+        return opponentStackAtBeginningOfHand;
+    }
+
+    public void setOpponentStackAtBeginningOfHand(double opponentStackAtBeginningOfHand) {
+        this.opponentStackAtBeginningOfHand = opponentStackAtBeginningOfHand;
     }
 }
