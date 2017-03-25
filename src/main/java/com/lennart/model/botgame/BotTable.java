@@ -1,12 +1,8 @@
 package com.lennart.model.botgame;
 
-import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -71,61 +67,51 @@ public class BotTable {
     }
 
     private void calculateOpponentPreflopStats() {
-        if(!botHand.isOpponentPreflopStatsDoneForHand()) {
-            List<Card> board = botHand.getBoard();
-            String botWrittenAction = botHand.getBotWrittenAction();
-            String opponentAction = botHand.getOpponentAction();
-            boolean botIsButton = botHand.isBotIsButton();
-            double opponentTotalBetSize = botHand.getOpponentTotalBetSize();
-            double bigBlind = botHand.getBigBlind();
-
-            if(board == null && botIsButton && botWrittenAction != null && botWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
-                handsOpponentOopFacingPreflop2bet++;
-                if(opponentAction.equals("call")) {
-                    handsOpponentOopCall2bet++;
-                }
-                if(opponentAction.equals("raise")) {
-                    handsOpponentOop3bet++;
-                }
-            }
-            botHand.setHandsOpponentOopFacingPreflop2bet(handsOpponentOopFacingPreflop2bet);
-            botHand.setOpponentPreCall2betStat(handsOpponentOopCall2bet / handsOpponentOopFacingPreflop2bet);
-            botHand.setOpponentPre3betStat(handsOpponentOop3bet / handsOpponentOopFacingPreflop2bet);
-            botHand.setOpponentPreflopStatsDoneForHand(true);
-        }
-    }
-
-    private void calculateOpponentPreflopStatsNew() {
-        if(!botHand.isOpponentPreflopStatsDoneForHand()) {
+        List<String> botActionHistory = botHand.getBotActionHistory();
+        if(botActionHistory != null && botActionHistory.size() < 2) {
             addPlayerToMapIfNecessary();
 
             if(opponentPlayerNamesAndStats.get(botHand.getOpponentPlayerName()) != null) {
-                List<Card> board = botHand.getBoard();
-                String botWrittenAction = botHand.getBotWrittenAction();
                 String opponentAction = botHand.getOpponentAction();
                 String playerName = botHand.getOpponentPlayerName();
                 boolean botIsButton = botHand.isBotIsButton();
-                double opponentTotalBetSize = botHand.getOpponentTotalBetSize();
-                double bigBlind = botHand.getBigBlind();
+                String currentStreet = botHand.getStreet();
+                String streetAtPreviousAction = botHand.getStreetAtPreviousActionRequest();
 
-                if(board == null && botIsButton && botWrittenAction != null && botWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
-                    //add 1 to handsOpponentOopFacingPreflop2bet:
-                    opponentPlayerNamesAndStats.get(playerName).set(0, opponentPlayerNamesAndStats.get(playerName).get(0) + 1);
-                    if(opponentAction.equals("call")) {
-                        //add 1 to handsOpponentOopCall2bet:
-                        opponentPlayerNamesAndStats.get(playerName).set(1, opponentPlayerNamesAndStats.get(playerName).get(1) + 1);
-                    }
-                    if(opponentAction.equals("raise")) {
-                        //add 1 to handsOpponentOop3bet:
-                        opponentPlayerNamesAndStats.get(playerName).set(2, opponentPlayerNamesAndStats.get(playerName).get(2) + 1);
+                if(botIsButton && botActionHistory.size() == 1 && botActionHistory.get(0).contains("raise")) {
+                    double handsOpponentOopFacingPreflop2bet = opponentPlayerNamesAndStats.get(playerName).get(0) + 1;
+                    System.out.println("handsOpponentOopFacingPreflop2bet: " + handsOpponentOopFacingPreflop2bet);
+                    opponentPlayerNamesAndStats.get(playerName).set(0, handsOpponentOopFacingPreflop2bet);
+                }
+
+                if(botIsButton) {
+                    if(streetAtPreviousAction != null && streetAtPreviousAction.equals("preflop")) {
+                        if(currentStreet != null && currentStreet.equals("preflop")) {
+                            if(botActionHistory.size() == 1 && botActionHistory.get(0).contains("raise")) {
+                                if(opponentAction != null && opponentAction.equals("raise")) {
+                                    double handsOpponentOop3bet = opponentPlayerNamesAndStats.get(playerName).get(2) + 1;
+                                    opponentPlayerNamesAndStats.get(playerName).set(2, handsOpponentOop3bet);
+                                }
+                            }
+                        } else if(currentStreet != null && currentStreet.equals("flop")) {
+                            if(botActionHistory.size() == 1 && botActionHistory.get(0).contains("raise")) {
+                                double handsOpponentOopCall2bet = opponentPlayerNamesAndStats.get(playerName).get(1) + 1;
+                                opponentPlayerNamesAndStats.get(playerName).set(1, handsOpponentOopCall2bet);
+                            }
+                        }
                     }
                 }
+
                 botHand.setHandsOpponentOopFacingPreflop2bet(opponentPlayerNamesAndStats.get(playerName).get(0));
                 botHand.setOpponentPreCall2betStat(opponentPlayerNamesAndStats.get(playerName).get(1) /
                         opponentPlayerNamesAndStats.get(playerName).get(0));
                 botHand.setOpponentPre3betStat(opponentPlayerNamesAndStats.get(playerName).get(2) /
                         opponentPlayerNamesAndStats.get(playerName).get(0));
                 botHand.setOpponentPreflopStatsDoneForHand(true);
+
+                for (Map.Entry<String, List<Double>> entry : opponentPlayerNamesAndStats.entrySet()) {
+                    System.out.println(entry.getKey() + " " + entry.getValue());
+                }
             }
         }
     }
