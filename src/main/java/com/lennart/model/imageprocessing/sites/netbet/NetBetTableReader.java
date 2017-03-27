@@ -260,7 +260,7 @@ public class NetBetTableReader {
         return null;
     }
 
-    public static void performActionOnSite(Action botAction, boolean iGoAllInWhenIcall) {
+    public static void performActionOnSite(Action botAction) {
         if(botAction != null && botAction.getSizing() != 0) {
             try {
                 MouseKeyboard.click(674, 647);
@@ -279,27 +279,109 @@ public class NetBetTableReader {
             action = null;
         }
 
+        boolean clickActionDone = false;
+
         if(action == null) {
-            MouseKeyboard.click(841, 682);
+            clickActionDone = clickCheckActionButton();
         } else if(action.equals("fold")) {
-            MouseKeyboard.click(721, 685);
+            clickActionDone = clickFoldActionButton();
         } else if(action.equals("check")) {
-            MouseKeyboard.click(841, 682);
+            clickActionDone = clickCheckActionButton();
         } else if(action.equals("call")) {
-            if(iGoAllInWhenIcall) {
-                MouseKeyboard.click(959, 687);
-            } else {
-                MouseKeyboard.click(837, 686);
-            }
+            clickActionDone = clickCallActionButton();
         } else if(action.equals("bet")) {
-            MouseKeyboard.click(957, 683);
+            clickActionDone = clickBetActionButton();
         } else if(action.equals("raise")) {
-            MouseKeyboard.click(959, 687);
+            clickActionDone = clickRaiseActionButton();
         }
+
+        if(!clickActionDone) {
+            doDefaultClickAction();
+        }
+
         MouseKeyboard.moveMouseToLocation(20, 20);
     }
 
     //helper methods
+    private static boolean clickFoldActionButton() {
+        if(readLeftActionButton().contains("Fold")) {
+            MouseKeyboard.click(721, 685);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean clickCheckActionButton() {
+        if(readMiddleActionButton().contains("Check")) {
+            MouseKeyboard.click(841, 682);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean clickCallActionButton() {
+        String middleActionButton = readMiddleActionButton();
+        String rightActionButton = readRightActionButton();
+
+        if(middleActionButton.contains("Call")) {
+            MouseKeyboard.click(841, 682);
+            return true;
+        } else if(middleActionButtonIsNotPresent() && rightActionButton.contains("All")) {
+            MouseKeyboard.click(959, 687);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean clickBetActionButton() {
+        String middleActionButton = readMiddleActionButton();
+        String rightActionButton = readRightActionButton();
+
+        if(rightActionButton.contains("Bet")) {
+            MouseKeyboard.click(959, 687);
+            return true;
+        } else if(middleActionButton.contains("Check") && rightActionButton.contains("All")) {
+            MouseKeyboard.click(959, 687);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean clickRaiseActionButton() {
+        String rightActionButton = readRightActionButton();
+
+        if(rightActionButton.contains("Raise")) {
+            MouseKeyboard.click(959, 687);
+            return true;
+        } else if(rightActionButton.contains("All")) {
+            MouseKeyboard.click(959, 687);
+            return true;
+        }
+        return false;
+    }
+
+    private static void doDefaultClickAction() {
+        if(readMiddleActionButton().contains("Check")) {
+            System.out.println("Default click action was necessary. Check");
+            MouseKeyboard.click(841, 682);
+        } else {
+            System.out.println("Default click action was necessary. Fold");
+            MouseKeyboard.click(721, 685);
+        }
+    }
+
+    private static boolean middleActionButtonIsNotPresent() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(786, 712, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+
+        if(suitRgb / 1000 == -16673) {
+            //expected: -16673794
+            return false;
+        }
+        //when not present, expected: -16641770
+        return true;
+    }
+
     private String readTopChatLine() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(13, 604, 309, 24);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
@@ -466,6 +548,27 @@ public class NetBetTableReader {
         String topPlayerTotalBetSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         topPlayerTotalBetSize = ImageProcessor.removeEmptySpacesFromString(topPlayerTotalBetSize);
         return ImageProcessor.removeAllNonNumericCharacters(topPlayerTotalBetSize);
+    }
+
+    private static String readLeftActionButton() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(664, 662, 111, 54);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String leftActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
+    }
+
+    public static String readMiddleActionButton() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(783, 662, 111, 54);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String leftActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
+    }
+
+    private static String readRightActionButton() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(903, 662, 111, 54);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String leftActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
     }
 
     private boolean bottomPlayerIsButton() {

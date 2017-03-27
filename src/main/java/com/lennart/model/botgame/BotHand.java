@@ -121,7 +121,6 @@ public class BotHand implements RangeBuildable, Actionable {
 
         if (potSize == -1 || opponentStack == -1 || botStack == -1 || opponentTotalBetSize == -1 || botTotalBetSize == -1) {
             getActionWhenTableIsMisread();
-            System.out.println("Default check or call action because of misread table: -1");
         } else if(defaultCheckActionAfterCallNeeded()) {
             doDefaultCheck();
         } else {
@@ -135,7 +134,7 @@ public class BotHand implements RangeBuildable, Actionable {
         }
 
         setPotSizeAfterLastBotAction();
-        NetBetTableReader.performActionOnSite(botAction, iGoAllInWhenICall());
+        NetBetTableReader.performActionOnSite(botAction);
     }
 
     private void setPotSizeAfterLastBotAction() {
@@ -193,15 +192,7 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     private void getActionWhenTableIsMisread() {
-        if(board != null && (opponentAction == null || opponentAction.equals("check"))) {
-            doDefaultCheck();
-            System.out.println("default check in getActionWhenTableIsMisread()");
-        } else if(board != null && (opponentAction.equals("bet") || opponentAction.equals("raise"))){
-            getCallActionOnMisreadBoard();
-        }
-    }
-
-    private void getCallActionOnMisreadBoard() {
+        boolean clickActionDone = false;
         if(board != null && opponentTotalBetSize != 0) {
             BoardEvaluator boardEvaluatorMisreadTable = new BoardEvaluator(board);
             HandEvaluator handEvaluator = new HandEvaluator(boardEvaluatorMisreadTable);
@@ -209,32 +200,45 @@ public class BotHand implements RangeBuildable, Actionable {
             botAction = new Action();
 
             if((opponentTotalBetSize / bigBlind) < 10) {
-                if(handStrength >= 0.75) {
+                if(handStrength >= 0.72) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 10: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
+                    clickActionDone = true;
                 }
             } else if((opponentTotalBetSize / bigBlind) < 20) {
-                if(handStrength >= 0.85) {
+                if(handStrength >= 0.82) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 20: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
+                    clickActionDone = true;
                 }
             } else if((opponentTotalBetSize / bigBlind) < 40) {
-                if(handStrength >= 0.95) {
+                if(handStrength >= 0.94) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 40: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
+                    clickActionDone = true;
                 }
             } else if((opponentTotalBetSize / bigBlind) < 70) {
                 if(handStrength >= 0.99) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 70: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
+                    clickActionDone = true;
                 }
             }
-        } else {
+        }
+
+        if(!clickActionDone && NetBetTableReader.readMiddleActionButton().contains("Check")) {
+            botAction.setAction("check");
+            System.out.println("check on misread board");
+            clickActionDone = true;
+        }
+
+        if(!clickActionDone) {
             botAction.setAction("fold");
+            System.out.println("fold on misread board");
         }
     }
 
@@ -263,14 +267,6 @@ public class BotHand implements RangeBuildable, Actionable {
             }
             return true;
         }
-    }
-
-    private boolean iGoAllInWhenICall() {
-        double amountToCall = opponentTotalBetSize - botTotalBetSize;
-        if(amountToCall >= botStack) {
-            return true;
-        }
-        return false;
     }
 
     //main variables
