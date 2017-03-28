@@ -31,8 +31,10 @@ public class BotTable {
 
     public BotTable(boolean continuously) {
         boolean initializationNeeded = true;
+        int counter = 0;
 
         while(initializationNeeded) {
+            counter++;
             if(NetBetTableReader.botIsToAct()) {
                 botHand = new BotHand("initialize");
                 botHand.getNewBotAction();
@@ -44,9 +46,17 @@ public class BotTable {
             } catch(InterruptedException e) {
                 e.printStackTrace();
             }
+
+            if(counter > 60) {
+                MouseKeyboard.moveMouseToLocation(1565, 909);
+                MouseKeyboard.click(1565, 909);
+                MouseKeyboard.moveMouseToLocation(20, 20);
+                counter = 0;
+            }
         }
 
         while(true) {
+            counter++;
             if(NetBetTableReader.botIsToAct()) {
                 getNewBotAction();
             }
@@ -55,6 +65,13 @@ public class BotTable {
                 TimeUnit.MILLISECONDS.sleep(2000);
             } catch(InterruptedException e) {
                 e.printStackTrace();
+            }
+
+            if(counter > 60) {
+                MouseKeyboard.moveMouseToLocation(1565, 909);
+                MouseKeyboard.click(1565, 909);
+                MouseKeyboard.moveMouseToLocation(20, 20);
+                counter = 0;
             }
         }
     }
@@ -87,11 +104,9 @@ public class BotTable {
                 if(botIsButton) {
                     if(streetAtPreviousAction != null && streetAtPreviousAction.equals("preflop")) {
                         if(currentStreet != null && currentStreet.equals("preflop")) {
-                            if(botActionHistory.size() == 1 && botActionHistory.get(0).contains("raise")) {
-                                if(opponentAction != null && opponentAction.equals("raise")) {
-                                    double handsOpponentOop3bet = opponentPlayerNamesAndStats.get(playerName).get(2) + 1;
-                                    opponentPlayerNamesAndStats.get(playerName).set(2, handsOpponentOop3bet);
-                                }
+                            if(opponentAction != null && opponentAction.contains("raise")) {
+                                double handsOpponentOop3bet = opponentPlayerNamesAndStats.get(playerName).get(2) + 1;
+                                opponentPlayerNamesAndStats.get(playerName).set(2, handsOpponentOop3bet);
                             }
                         } else if(currentStreet != null && currentStreet.equals("flop")) {
                             if(botActionHistory.size() == 1 && botActionHistory.get(0).contains("raise")) {

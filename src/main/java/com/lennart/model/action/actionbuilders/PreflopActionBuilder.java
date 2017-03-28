@@ -38,9 +38,9 @@ public class PreflopActionBuilder {
             }
         } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
             action = get1betF2bet(actionable);
-        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 11) {
+        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
             action = get2betF3bet(actionable);
-        } else if(bbOpponentTotalBetSize > 11 && bbOpponentTotalBetSize <= 40) {
+        } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
             action = get3betF4bet(actionable);
         } else {
             action = get4betF5bet(actionable);
@@ -68,7 +68,7 @@ public class PreflopActionBuilder {
             size = 3.5 * actionable.getBigBlind();
         } else if(potSizePlusAllBetsInBb > 2 && potSizePlusAllBetsInBb <= 4) {
             size = 3.2 * actionable.getOpponentTotalBetSize();
-        } else if(potSizePlusAllBetsInBb > 4 && potSizePlusAllBetsInBb <= 12) {
+        } else if(potSizePlusAllBetsInBb > 4 && potSizePlusAllBetsInBb <= 16) {
             size = 2.25 * actionable.getOpponentTotalBetSize();
         } else {
             size = actionable.getBotStack() - actionable.getBotTotalBetSize();
