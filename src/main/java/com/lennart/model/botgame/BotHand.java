@@ -193,11 +193,12 @@ public class BotHand implements RangeBuildable, Actionable {
 
     private void getActionWhenTableIsMisread() {
         boolean clickActionDone = false;
+        botAction = new Action();
+
         if(board != null && opponentTotalBetSize != 0) {
             BoardEvaluator boardEvaluatorMisreadTable = new BoardEvaluator(board);
             HandEvaluator handEvaluator = new HandEvaluator(boardEvaluatorMisreadTable);
             double handStrength = handEvaluator.getHandStrength(botHoleCards);
-            botAction = new Action();
 
             if((opponentTotalBetSize / bigBlind) < 10) {
                 if(handStrength >= 0.72) {

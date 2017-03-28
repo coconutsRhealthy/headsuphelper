@@ -140,7 +140,8 @@ public class NetBetTableReader {
         return botTotalBetSize;
     }
 
-    public double getOpponentTotalBetSizeFromImage() {
+    public double getOpponentTotalBetSizeFromImage(double opponentCurrentStack, double opponentPreviousStack,
+                                                   double opponentPreviousTotalBetSize) {
         double opponentTotalBetSize;
         String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
         if(opponentTotalBetSizeAsString.matches(".*\\d.*")){
@@ -153,6 +154,15 @@ public class NetBetTableReader {
             String timeStamp = getCurrentTimeStamp();
             System.out.println("opponentTotalBetSize: " + opponentTotalBetSize + " ---bigger than 40bb, screenshot saved: " + timeStamp);
             ImageProcessor.createPartialSreenShot(451, 191, 66, 18, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
+
+            if(opponentTotalBetSize / bigBlind > 300) {
+                if(opponentPreviousStack != -1 && opponentPreviousTotalBetSize != -1 && opponentCurrentStack != -1) {
+                    if(((opponentPreviousStack + opponentPreviousTotalBetSize) - opponentCurrentStack) / bigBlind < 300) {
+                        opponentTotalBetSize = (opponentPreviousStack + opponentPreviousTotalBetSize) - opponentCurrentStack;
+                        System.out.println("Adjusted opponentTotalBetSize. OpponentTotalBetSize is now: " + opponentTotalBetSize + ", at timestamp: " + timeStamp);
+                    }
+                }
+            }
         }
         return opponentTotalBetSize;
     }
