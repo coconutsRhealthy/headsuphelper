@@ -92,11 +92,11 @@ public class NetBetTableReader {
             }
         }
 
-        if(opponentStack / bigBlind > 300) {
-            String timeStamp = getCurrentTimeStamp();
-            System.out.println("opponentStack: " + opponentStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
-            ImageProcessor.createPartialSreenShot(500, 147, 109, 28, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
-        }
+//        if(opponentStack / bigBlind > 300) {
+//            String timeStamp = getCurrentTimeStamp();
+//            System.out.println("opponentStack: " + opponentStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
+//            ImageProcessor.createPartialSreenShot(500, 147, 109, 28, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
+//        }
         return opponentStack;
     }
 
@@ -115,11 +115,11 @@ public class NetBetTableReader {
             }
         }
 
-        if(botStack / bigBlind > 300) {
-            String timeStamp = getCurrentTimeStamp();
-            System.out.println("botStack: " + botStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
-            ImageProcessor.createPartialSreenShot(500, 574, 109, 28, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
-        }
+//        if(botStack / bigBlind > 300) {
+//            String timeStamp = getCurrentTimeStamp();
+//            System.out.println("botStack: " + botStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
+//            ImageProcessor.createPartialSreenShot(500, 574, 109, 28, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
+//        }
         return botStack;
     }
 
@@ -165,6 +165,26 @@ public class NetBetTableReader {
             }
         }
         return opponentTotalBetSize;
+    }
+
+    public static double getAmountToCall() {
+        double callAmount = -1;
+        String middleActionButton = readMiddleActionButton();
+        String rightActionButton = readRightActionButton();
+
+        if(middleActionButton.contains("Call") && middleActionButton.matches(".*\\d.*")) {
+            callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(middleActionButton));
+        }
+
+        if(rightActionButton.contains("Call") && rightActionButton.matches(".*\\d.*")) {
+            callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
+        }
+
+        if(middleActionButtonIsNotPresent() && rightActionButton.matches(".*\\d.*")) {
+            callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
+        }
+        System.out.println("Amount to call according to getAmountToCall: " + callAmount);
+        return callAmount;
     }
 
     public Map<String, String> getActionsFromLastThreeChatLines() {

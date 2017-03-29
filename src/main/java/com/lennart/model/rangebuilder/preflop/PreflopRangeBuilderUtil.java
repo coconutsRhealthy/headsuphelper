@@ -516,4 +516,43 @@ public class PreflopRangeBuilderUtil {
         }
         return allPossibleStartHandsAsSetCopy;
     }
+
+    public static boolean handIsJjPlusOrAk(List<Card> hand, Set<Card> knownGameCards) {
+        Set<Set<Card>> combosJjPlusOrAk = new HashSet<>();
+        Set<Card> handAsSet = new HashSet<>();
+        handAsSet.addAll(hand);
+
+        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil(knownGameCards);
+        Map<Integer, Set<Card>> combosAa = p.getPocketPairCombosOfGivenRank(14);
+        Map<Integer, Set<Card>> combosKk = p.getPocketPairCombosOfGivenRank(13);
+        Map<Integer, Set<Card>> combosQq = p.getPocketPairCombosOfGivenRank(12);
+        Map<Integer, Set<Card>> combosJj = p.getPocketPairCombosOfGivenRank(11);
+        Map<Integer, Set<Card>> combosAks = p.getSuitedCombosOfGivenRanks(14, 13);
+        Map<Integer, Set<Card>> combosAko = p.getOffSuitCombosOfGivenRanks(14, 13);
+
+        for (Map.Entry<Integer, Set<Card>> entry : combosAa.entrySet()) {
+            combosJjPlusOrAk.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosKk.entrySet()) {
+            combosJjPlusOrAk.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosQq.entrySet()) {
+            combosJjPlusOrAk.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosJj.entrySet()) {
+            combosJjPlusOrAk.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosAks.entrySet()) {
+            combosJjPlusOrAk.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosAko.entrySet()) {
+            combosJjPlusOrAk.add(entry.getValue());
+        }
+
+        if(!combosJjPlusOrAk.add(handAsSet)) {
+            //combo is JJ+ or AK
+            return true;
+        }
+        return false;
+    }
 }

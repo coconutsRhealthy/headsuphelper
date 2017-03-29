@@ -9,6 +9,7 @@ import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 import com.lennart.model.rangebuilder.OpponentRangeSetter;
 import com.lennart.model.rangebuilder.RangeBuildable;
 import com.lennart.model.rangebuilder.RangeBuilder;
+import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
 
 import java.util.*;
 
@@ -124,6 +125,13 @@ public class BotHand implements RangeBuildable, Actionable {
         } else if(defaultCheckActionAfterCallNeeded()) {
             doDefaultCheck();
         } else {
+            if(opponentAction == null) {
+                if(opponentTotalBetSize > 0 && !(opponentTotalBetSize == bigBlind && botTotalBetSize == smallBlind)) {
+                    opponentAction = "bet";
+                    System.out.println("opponentAction was wrongfully set to null. Changed to 'bet'");
+                }
+            }
+
             OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
             opponentRangeSetter.setCorrectOpponentRange(this);
             setOrInitializeRangeBuilder(opponentRangeSetter);
@@ -194,35 +202,46 @@ public class BotHand implements RangeBuildable, Actionable {
     private void getActionWhenTableIsMisread() {
         boolean clickActionDone = false;
         botAction = new Action();
+        double amountToCall = NetBetTableReader.getAmountToCall();
 
-        if(board != null && opponentTotalBetSize != 0) {
+        if(board == null) {
+            if(botHoleCards != null && knownGameCards != null) {
+                if(PreflopRangeBuilderUtil.handIsJjPlusOrAk(botHoleCards, knownGameCards)) {
+                    System.out.println("Call on misread board. Preflop, and hand is JJ+ or AK" );
+                    setActionToCall();
+                    clickActionDone = true;
+                }
+            }
+        }
+
+        if(!clickActionDone && board != null && amountToCall > 0) {
             BoardEvaluator boardEvaluatorMisreadTable = new BoardEvaluator(board);
             HandEvaluator handEvaluator = new HandEvaluator(boardEvaluatorMisreadTable);
             double handStrength = handEvaluator.getHandStrength(botHoleCards);
 
-            if((opponentTotalBetSize / bigBlind) < 10) {
-                if(handStrength >= 0.72) {
+            if((amountToCall / bigBlind) < 10) {
+                if(handStrength >= 0.67) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 10: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
                     clickActionDone = true;
                 }
-            } else if((opponentTotalBetSize / bigBlind) < 20) {
-                if(handStrength >= 0.82) {
+            } else if((amountToCall / bigBlind) < 20) {
+                if(handStrength >= 0.77) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 20: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
                     clickActionDone = true;
                 }
-            } else if((opponentTotalBetSize / bigBlind) < 40) {
-                if(handStrength >= 0.94) {
+            } else if((amountToCall / bigBlind) < 40) {
+                if(handStrength >= 0.90) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 40: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
                     clickActionDone = true;
                 }
-            } else if((opponentTotalBetSize / bigBlind) < 70) {
-                if(handStrength >= 0.99) {
+            } else if((amountToCall / bigBlind) < 70) {
+                if(handStrength >= 0.97) {
                     System.out.println("Call on misread board. Opponent total betsize / bigblind < 70: " + (opponentTotalBetSize / bigBlind)
                             + " handstrength: " + handStrength);
                     setActionToCall();
@@ -342,6 +361,8 @@ public class BotHand implements RangeBuildable, Actionable {
             opponentTotalBetSize = -1;
         } else if(opponentTotalBetSize / bigBlind > 1000) {
             opponentTotalBetSize = -1;
+        } else if(opponentTotalBetSize > botStack) {
+            opponentTotalBetSize = botStack;
         }
     }
 
@@ -354,7 +375,11 @@ public class BotHand implements RangeBuildable, Actionable {
 
         if(street.equals(streetAtPreviousActionRequest)) {
             if(street.equals("preflop") && botIsButton) {
-                opponentAction = null;
+                if(botActionHistory == null) {
+                    opponentAction = null;
+                } else {
+                    opponentAction = actionsFromLastThreeChatLines.get("bottom");
+                }
             } else {
                 opponentAction = actionsFromLastThreeChatLines.get("bottom");
             }
