@@ -118,11 +118,14 @@ public class BotTable {
                 }
 
                 botHand.setHandsOpponentOopFacingPreflop2bet(opponentPlayerNamesAndStats.get(playerName).get(0));
-                botHand.setOpponentPreCall2betStat(opponentPlayerNamesAndStats.get(playerName).get(1) /
-                        opponentPlayerNamesAndStats.get(playerName).get(0));
-                botHand.setOpponentPre3betStat(opponentPlayerNamesAndStats.get(playerName).get(2) /
-                        opponentPlayerNamesAndStats.get(playerName).get(0));
-                botHand.setOpponentPreflopStatsDoneForHand(true);
+
+                if(botHand.getHandsOpponentOopFacingPreflop2bet() > 10) {
+                    botHand.setOpponentPreCall2betStat(opponentPlayerNamesAndStats.get(playerName).get(1) /
+                            opponentPlayerNamesAndStats.get(playerName).get(0));
+                    botHand.setOpponentPre3betStat(opponentPlayerNamesAndStats.get(playerName).get(2) /
+                            opponentPlayerNamesAndStats.get(playerName).get(0));
+                    botHand.setOpponentPreflopStatsDoneForHand(true);
+                }
 
                 for (Map.Entry<String, List<Double>> entry : opponentPlayerNamesAndStats.entrySet()) {
                     System.out.println(entry.getKey() + " " + entry.getValue());

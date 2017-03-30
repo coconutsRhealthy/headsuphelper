@@ -124,34 +124,114 @@ public class PostFlopActionBuilder {
     private String getValueAction(double handStrengthAgainstRange, String bettingAction) {
         String valueAction = null;
 
+        if(bettingAction.equals(BET)) {
+            valueAction = getBetOrRaiseNoStatsValueAction(handStrengthAgainstRange, bettingAction);
+        } else if(bettingAction.equals(RAISE)) {
+            valueAction = getValueRaiseAction(handStrengthAgainstRange);
+        }
+        return valueAction;
+    }
+
+    private String getBetOrRaiseNoStatsValueAction(double handStrengthAgainstRange, String bettingAction) {
+        String betValueAction = null;
+
         if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
             if(sizing / bigBlind <= 5) {
                 if(handStrengthAgainstRange > 0.44) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
+                    betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
                 if(handStrengthAgainstRange > 0.67) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
+                    betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else if (sizing / bigBlind > 20 && sizing / bigBlind <= 40) {
                 if(handStrengthAgainstRange > 0.78) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
+                    betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else if (sizing / bigBlind > 40 && sizing / bigBlind <= 70) {
                 if(handStrengthAgainstRange > 0.83) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
+                    betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else {
                 if(handStrengthAgainstRange > 0.96) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
+                    betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             }
 
-            if(valueAction != null) {
-                System.out.println("value action");
+            if(betValueAction != null) {
+                System.out.println("value bet or raise no stats action");
             }
         }
-        return valueAction;
+        return betValueAction;
+    }
+
+    private String getValueRaiseAction(double handStrengthAgainstRange) {
+        String valueRaiseAction = null;
+        double handsOpponentOopFacingPreflop2bet = actionable.getHandsOpponentOopFacingPreflop2bet();
+        double opponentPre3betStat = actionable.getOpponentPre3betStat();
+
+        if(handsOpponentOopFacingPreflop2bet <= 10) {
+            getBetOrRaiseNoStatsValueAction(handStrengthAgainstRange, RAISE);
+        } else {
+            if (getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
+                if (sizing / bigBlind <= 5) {
+                    getBetOrRaiseNoStatsValueAction(handStrengthAgainstRange, RAISE);
+                } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20) {
+                    if(opponentPre3betStat < 7) {
+                        if(handStrengthAgainstRange > 0.75) {
+                            valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                        } else {
+                            valueRaiseAction = null;
+                        }
+                    } else if(opponentPre3betStat < 13) {
+                        if(handStrengthAgainstRange > 0.70) {
+                            valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                        } else {
+                            valueRaiseAction = null;
+                        }
+                    } else {
+                        valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                    }
+                } else if (sizing / bigBlind > 20 && sizing / bigBlind <= 40) {
+                    if(opponentPre3betStat < 7) {
+                        if(handStrengthAgainstRange > 0.88) {
+                            valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                        } else {
+                            valueRaiseAction = null;
+                        }
+                    } else if(opponentPre3betStat < 13) {
+                        if(handStrengthAgainstRange > 0.80) {
+                            valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                        } else {
+                            valueRaiseAction = null;
+                        }
+                    } else {
+                        valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                    }
+                } else {
+                    if(opponentPre3betStat < 7) {
+                        if(handStrengthAgainstRange > 0.92) {
+                            valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                        } else {
+                            valueRaiseAction = null;
+                        }
+                    } else if(opponentPre3betStat < 13) {
+                        if(handStrengthAgainstRange > 0.85) {
+                            valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                        } else {
+                            valueRaiseAction = null;
+                        }
+                    } else {
+                        valueRaiseAction = getPassiveOrAggressiveValueAction(RAISE);
+                    }
+                }
+            }
+        }
+
+        if (valueRaiseAction != null) {
+            System.out.println("value raise action");
+        }
+        return valueRaiseAction;
     }
 
     private String getDrawBettingAction(String bettingAction) {
@@ -528,9 +608,58 @@ public class PostFlopActionBuilder {
     }
 
     private double getHandStrengthNeededToCall() {
+        double handStrengthNeededToCall;
         double amountToCall = actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize();
         double potSize = actionable.getPotSize();
-        return (0.01 + amountToCall) / (potSize + amountToCall);
+        double handsOpponentOopFacingPreflop2bet = actionable.getHandsOpponentOopFacingPreflop2bet();
+        double opponentPre3betStat = actionable.getOpponentPre3betStat();
+
+        if(handsOpponentOopFacingPreflop2bet > 10) {
+            if(opponentPre3betStat < 0.05) {
+                if(amountToCall / bigBlind < 7) {
+                    handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+                } else if(amountToCall / bigBlind < 20) {
+                    if((0.01 + amountToCall) / (potSize + amountToCall) > 0.7) {
+                        handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+                    } else {
+                        handStrengthNeededToCall = 0.7;
+                    }
+                } else if(amountToCall / bigBlind < 40) {
+                    if((0.01 + amountToCall) / (potSize + amountToCall) > 0.8) {
+                        handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+                    } else {
+                        handStrengthNeededToCall = 0.8;
+                    }
+                } else {
+                    if((0.01 + amountToCall) / (potSize + amountToCall) > 0.9) {
+                        handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+                    } else {
+                        handStrengthNeededToCall = 0.9;
+                    }
+                }
+            } else if(opponentPre3betStat < 0.13) {
+                if(amountToCall / bigBlind < 20) {
+                    handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+                } else if(amountToCall / bigBlind < 40) {
+                    if((0.01 + amountToCall) / (potSize + amountToCall) > 0.5) {
+                        handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+                    } else {
+                        handStrengthNeededToCall = 0.5;
+                    }
+                } else {
+                    if((0.01 + amountToCall) / (potSize + amountToCall) > 0.65) {
+                        handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+                    } else {
+                        handStrengthNeededToCall = 0.65;
+                    }
+                }
+            } else {
+                handStrengthNeededToCall = (0.01 + amountToCall) / (potSize + amountToCall);
+            }
+        } else {
+            return (0.01 + amountToCall) / (potSize + amountToCall);
+        }
+        return handStrengthNeededToCall;
     }
 
     private boolean bluffOddsAreOk() {
