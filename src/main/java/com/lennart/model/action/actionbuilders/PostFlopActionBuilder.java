@@ -153,7 +153,7 @@ public class PostFlopActionBuilder {
                     betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else {
-                if(handStrengthAgainstRange > 0.96) {
+                if(handStrengthAgainstRange > 0.87) {
                     betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             }
@@ -431,6 +431,7 @@ public class PostFlopActionBuilder {
                 }
             }
         }
+        System.out.println("in getBluffAfterMissedDrawAction() 'drawBettingActionDone' = " + actionable.isDrawBettingActionDone());
         return bluffAfterMissedDrawAction;
     }
 
@@ -493,8 +494,10 @@ public class PostFlopActionBuilder {
                 }
             }
         } else {
-            if(handStrengthAgainstRange > handStrengthNeededToCall && handStrengthAgainstRange >= 0.93) {
-                valueCallAction = CALL;
+            if(handStrengthAgainstRange > handStrengthNeededToCall) {
+                if(handStrengthAgainstRange >= 0.4) {
+                    valueCallAction = CALL;
+                }
             }
         }
 

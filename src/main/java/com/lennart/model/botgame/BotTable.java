@@ -130,6 +130,8 @@ public class BotTable {
                 for (Map.Entry<String, List<Double>> entry : opponentPlayerNamesAndStats.entrySet()) {
                     System.out.println(entry.getKey() + " " + entry.getValue());
                 }
+                System.out.println("opponentPreCall2betStat: " + botHand.getOpponentPreCall2betStat());
+                System.out.println("opponentPre3betStat: " + botHand.getOpponentPre3betStat());
             }
         }
     }

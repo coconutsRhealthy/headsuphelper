@@ -112,6 +112,8 @@ public class BotHand implements RangeBuildable, Actionable {
         setStreetAndPreviousStreet();
         setOpponentAction();
 
+        System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
+
         return this;
     }
 
@@ -120,10 +122,10 @@ public class BotHand implements RangeBuildable, Actionable {
             potSize = NetBetTableReader.getPotSizeCheckFromImage();
         }
 
-        if (potSize == -1 || opponentStack == -1 || botStack == -1 || opponentTotalBetSize == -1 || botTotalBetSize == -1) {
-            getActionWhenTableIsMisread();
-        } else if(defaultCheckActionAfterCallNeeded()) {
+        if(defaultCheckActionAfterCallNeeded()) {
             doDefaultCheck();
+        } else if (potSize == -1 || opponentStack == -1 || botStack == -1 || opponentTotalBetSize == -1 || botTotalBetSize == -1) {
+            getActionWhenTableIsMisread();
         } else {
             if(opponentAction == null) {
                 if(opponentTotalBetSize > 0 && !(opponentTotalBetSize == bigBlind && botTotalBetSize == smallBlind)) {
@@ -175,8 +177,10 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     private void doDefaultCheck() {
+        botAction = null;
         updateBotActionHistory(null);
         botWrittenAction = "check";
+        System.out.println("default check from doDefaultCheck()");
     }
 
     private void updateBotActionHistory(Action action) {
@@ -218,6 +222,7 @@ public class BotHand implements RangeBuildable, Actionable {
             BoardEvaluator boardEvaluatorMisreadTable = new BoardEvaluator(board);
             HandEvaluator handEvaluator = new HandEvaluator(boardEvaluatorMisreadTable);
             double handStrength = handEvaluator.getHandStrength(botHoleCards);
+            System.out.println("Handstrength in getActionWhenTableIsMisread(): " + handStrength);
 
             if((amountToCall / bigBlind) < 10) {
                 if(handStrength >= 0.67) {
@@ -250,8 +255,13 @@ public class BotHand implements RangeBuildable, Actionable {
             }
         }
 
+        if(!clickActionDone && board != null) {
+            clickActionDone = extraCallCheckOnMisreadBoardPostFlop();
+        }
+
         if(!clickActionDone && NetBetTableReader.readMiddleActionButton().contains("Check")) {
             botAction.setAction("check");
+            updateBotActionHistory(botAction);
             System.out.println("check on misread board");
             clickActionDone = true;
         }
@@ -260,6 +270,32 @@ public class BotHand implements RangeBuildable, Actionable {
             botAction.setAction("fold");
             System.out.println("fold on misread board");
         }
+    }
+
+    private boolean extraCallCheckOnMisreadBoardPostFlop() {
+        if(board != null) {
+            String middleActionButton = NetBetTableReader.readMiddleActionButton();
+            String rightActionButton = NetBetTableReader.readRightActionButton();
+
+            BoardEvaluator boardEvaluatorMisreadTable = new BoardEvaluator(board);
+            HandEvaluator handEvaluator = new HandEvaluator(boardEvaluatorMisreadTable);
+            double handStrength = handEvaluator.getHandStrength(botHoleCards);
+            System.out.println("Handstrength in extraCallCheckOnMisreadBoardPostFlop(): " + handStrength);
+
+            if(middleActionButton.contains("Call") || rightActionButton.contains("Call") ||
+                    (NetBetTableReader.middleActionButtonIsNotPresent() && rightActionButton.contains("All"))) {
+                if(handStrength >= 0.9) {
+                    setActionToCall();
+                    System.out.println("Handstrength >= 0.9: call in extraCallCheckOnMisreadBoardPostFlop()");
+                    return true;
+                } else if(botStack < 0.15 * botStackAtBeginningOfHand) {
+                    setActionToCall();
+                    System.out.println("Pot committed according to extaCallCheckOnMisreadBoardPostFlop()");
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void setActionToCall() {

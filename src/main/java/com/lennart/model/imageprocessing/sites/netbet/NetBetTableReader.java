@@ -311,23 +311,25 @@ public class NetBetTableReader {
 
         boolean clickActionDone = false;
 
+        System.out.println("action going into clickaction: " + action);
+
         if(action == null) {
             clickActionDone = clickCheckActionButton();
-        } else if(action.equals("fold")) {
+        } else if(action.contains("fold")) {
             clickActionDone = clickFoldActionButton();
-        } else if(action.equals("check")) {
+        } else if(action.contains("check")) {
             clickActionDone = clickCheckActionButton();
-        } else if(action.equals("call")) {
+        } else if(action.contains("call")) {
             clickActionDone = clickCallActionButton();
-        } else if(action.equals("bet")) {
+        } else if(action.contains("bet")) {
             clickActionDone = clickBetActionButton();
-        } else if(action.equals("raise")) {
+        } else if(action.contains("raise")) {
             clickActionDone = clickRaiseActionButton();
         }
 
-        if(!clickActionDone) {
-            doDefaultClickAction();
-        }
+//        if(!clickActionDone) {
+//            doDefaultClickAction();
+//        }
 
         MouseKeyboard.moveMouseToLocation(20, 20);
     }
@@ -400,7 +402,7 @@ public class NetBetTableReader {
         }
     }
 
-    private static boolean middleActionButtonIsNotPresent() {
+    public static boolean middleActionButtonIsNotPresent() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(786, 712, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
 
@@ -594,7 +596,7 @@ public class NetBetTableReader {
         return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
     }
 
-    private static String readRightActionButton() {
+    public static String readRightActionButton() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(903, 662, 111, 54);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String leftActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
