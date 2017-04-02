@@ -149,11 +149,11 @@ public class PostFlopActionBuilder {
                     betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else if (sizing / bigBlind > 40 && sizing / bigBlind <= 70) {
-                if(handStrengthAgainstRange > 0.83) {
+                if(handStrengthAgainstRange > 0.87) {
                     betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             } else {
-                if(handStrengthAgainstRange > 0.87) {
+                if(handStrengthAgainstRange > 0.92) {
                     betValueAction = getPassiveOrAggressiveValueAction(bettingAction);
                 }
             }
@@ -171,11 +171,11 @@ public class PostFlopActionBuilder {
         double opponentPre3betStat = actionable.getOpponentPre3betStat();
 
         if(handsOpponentOopFacingPreflop2bet <= 10) {
-            getBetOrRaiseNoStatsValueAction(handStrengthAgainstRange, RAISE);
+            valueRaiseAction = getBetOrRaiseNoStatsValueAction(handStrengthAgainstRange, RAISE);
         } else {
             if (getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
                 if (sizing / bigBlind <= 5) {
-                    getBetOrRaiseNoStatsValueAction(handStrengthAgainstRange, RAISE);
+                    valueRaiseAction = getBetOrRaiseNoStatsValueAction(handStrengthAgainstRange, RAISE);
                 } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20) {
                     if(opponentPre3betStat < 7) {
                         if(handStrengthAgainstRange > 0.75) {
@@ -237,17 +237,20 @@ public class PostFlopActionBuilder {
     private String getDrawBettingAction(String bettingAction) {
         String drawBettingAction = null;
 
-        if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
-            drawBettingAction = getDraw2ndBarrelAction(bettingAction);
+        if(board.size() == 3 || board.size() == 4) {
+            if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
+                drawBettingAction = getDraw2ndBarrelAction(bettingAction);
 
-            if(drawBettingAction == null) {
-                drawBettingAction = getDrawBettingInitializeAction(bettingAction);
-            }
+                if(drawBettingAction == null) {
+                    drawBettingAction = getDrawBettingInitializeAction(bettingAction);
+                }
 
-            if(drawBettingAction == null) {
-                actionable.setDrawBettingActionDone(false);
-            } else {
-                System.out.println("draw betting action");
+                if(drawBettingAction == null) {
+                    actionable.setDrawBettingActionDone(false);
+                    System.out.println("now drawBettingActionDone is set to 'false' in getDrawBettingAction(): " + actionable.isDrawBettingActionDone());
+                } else {
+                    System.out.println("draw betting action");
+                }
             }
         }
         return drawBettingAction;

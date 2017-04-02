@@ -149,6 +149,29 @@ public class PreflopRangeBuilderUtil {
         return suitedCombosOfGivenRanks;
     }
 
+    public Map<Integer, Set<Card>> getSuitedCombosOfGivenRanksIgnoreKnownGameCards(int rankCard1, int rankCard2) {
+        Map<Integer, Set<Card>> suitedCombosOfGivenRanks = new HashMap<>();
+        List<Character> suits = new ArrayList<>();
+
+        suits.add('s');
+        suits.add('c');
+        suits.add('d');
+        suits.add('h');
+
+        for(Character suit : suits) {
+            Set<Card> combo = new HashSet<>();
+            Card holeCard1 = new Card(rankCard1, suit);
+            Card holeCard2 = new Card(rankCard2, suit);
+            combo.add(holeCard1);
+            combo.add(holeCard2);
+
+            if (combo.size() == 2) {
+                suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
+            }
+        }
+        return suitedCombosOfGivenRanks;
+    }
+
     public Map<Integer, Set<Card>> getOffSuitCombosOfGivenRanks(int rankCard1, int rankCard2) {
         Map<Integer, Set<Card>> offSuitCombosOfGivenRanks = new HashMap<>();
         List<Character> suits = new ArrayList<>();
@@ -177,6 +200,31 @@ public class PreflopRangeBuilderUtil {
                     }
                     knownGameCardsCopy.clear();
                     knownGameCardsCopy.addAll(knownGameCards);
+                }
+            }
+        }
+        return offSuitCombosOfGivenRanks;
+    }
+
+    public Map<Integer, Set<Card>> getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(int rankCard1, int rankCard2) {
+        Map<Integer, Set<Card>> offSuitCombosOfGivenRanks = new HashMap<>();
+        List<Character> suits = new ArrayList<>();
+
+        suits.add('s');
+        suits.add('c');
+        suits.add('d');
+        suits.add('h');
+
+        for(Character suit1 : suits) {
+            for(Character suit2 : suits) {
+                if(suit1 != suit2) {
+                    Set<Card> combo = new HashSet<>();
+                    Card holeCard1 = new Card(rankCard1, suit1);
+                    Card holeCard2 = new Card(rankCard2, suit2);
+                    combo.add(holeCard1);
+                    combo.add(holeCard2);
+
+                    offSuitCombosOfGivenRanks.put(offSuitCombosOfGivenRanks.size(), combo);
                 }
             }
         }
@@ -214,6 +262,34 @@ public class PreflopRangeBuilderUtil {
                     }
                     knownGameCardsCopy.clear();
                     knownGameCardsCopy.addAll(knownGameCards);
+                }
+            }
+        }
+        return pocketPairCombosOfGivenRanks;
+    }
+
+    public Map<Integer, Set<Card>> getPocketPairCombosOfGivenRankIgnoreKnownGameCards(int rank) {
+        Map<Integer, Set<Card>> pocketPairCombosOfGivenRanks = new HashMap<>();
+        Set<Set<Card>> setToTestForUniqueness = new HashSet<>();
+        List<Character> suits = new ArrayList<>();
+
+        suits.add('s');
+        suits.add('c');
+        suits.add('d');
+        suits.add('h');
+
+        for(Character suit1 : suits) {
+            for(Character suit2 : suits) {
+                if(suit1 != suit2) {
+                    Set<Card> combo = new HashSet<>();
+                    Card holeCard1 = new Card(rank, suit1);
+                    Card holeCard2 = new Card(rank, suit2);
+                    combo.add(holeCard1);
+                    combo.add(holeCard2);
+
+                    if (setToTestForUniqueness.add(combo)) {
+                        pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
+                    }
                 }
             }
         }
@@ -523,12 +599,12 @@ public class PreflopRangeBuilderUtil {
         handAsSet.addAll(hand);
 
         PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil(knownGameCards);
-        Map<Integer, Set<Card>> combosAa = p.getPocketPairCombosOfGivenRank(14);
-        Map<Integer, Set<Card>> combosKk = p.getPocketPairCombosOfGivenRank(13);
-        Map<Integer, Set<Card>> combosQq = p.getPocketPairCombosOfGivenRank(12);
-        Map<Integer, Set<Card>> combosJj = p.getPocketPairCombosOfGivenRank(11);
-        Map<Integer, Set<Card>> combosAks = p.getSuitedCombosOfGivenRanks(14, 13);
-        Map<Integer, Set<Card>> combosAko = p.getOffSuitCombosOfGivenRanks(14, 13);
+        Map<Integer, Set<Card>> combosAa = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(14);
+        Map<Integer, Set<Card>> combosKk = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(13);
+        Map<Integer, Set<Card>> combosQq = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(12);
+        Map<Integer, Set<Card>> combosJj = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(11);
+        Map<Integer, Set<Card>> combosAks = p.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 13);
+        Map<Integer, Set<Card>> combosAko = p.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 13);
 
         for (Map.Entry<Integer, Set<Card>> entry : combosAa.entrySet()) {
             combosJjPlusOrAk.add(entry.getValue());

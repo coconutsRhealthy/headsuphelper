@@ -85,11 +85,11 @@ public class GameVariablesFiller {
     }
 
     private void setSmallBlind() {
-        smallBlind = 0.01;
+        smallBlind = 0.02;
     }
 
     private void setBigBlind() {
-        bigBlind = 0.02;
+        bigBlind = 0.04;
     }
 
     private void setBotIsButton() {

@@ -143,8 +143,33 @@ public class BotHand implements RangeBuildable, Actionable {
             botWrittenAction = botAction.getWrittenAction();
         }
 
+        preflopFinalPreventFoldCheck();
+        postFlopFinalPreventFoldCheck();
+
         setPotSizeAfterLastBotAction();
         NetBetTableReader.performActionOnSite(botAction);
+    }
+
+    private void preflopFinalPreventFoldCheck() {
+        if(board == null) {
+            if(botHoleCards != null && knownGameCards != null) {
+                if(PreflopRangeBuilderUtil.handIsJjPlusOrAk(botHoleCards, knownGameCards)) {
+                    if(botAction != null && botAction.getAction() != null && botAction.getAction().contains("fold")) {
+                        System.out.println("changed action from: " + botAction.getAction() + " to 'call' in preflopFinalPreventFoldCheck()");
+                        setActionToCall();
+                    }
+                }
+            }
+        }
+    }
+
+    private void postFlopFinalPreventFoldCheck() {
+        if(board != null) {
+            if(botAction != null && botAction.getAction() != null && botAction.getAction().contains("fold")) {
+                System.out.println("doing final check before fold in postFlopFinalPreventFoldCheck()");
+                extraCallCheckOnMisreadBoardPostFlop();
+            }
+        }
     }
 
     private void setPotSizeAfterLastBotAction() {
@@ -284,9 +309,9 @@ public class BotHand implements RangeBuildable, Actionable {
 
             if(middleActionButton.contains("Call") || rightActionButton.contains("Call") ||
                     (NetBetTableReader.middleActionButtonIsNotPresent() && rightActionButton.contains("All"))) {
-                if(handStrength >= 0.9) {
+                if(handStrength >= 0.8) {
                     setActionToCall();
-                    System.out.println("Handstrength >= 0.9: call in extraCallCheckOnMisreadBoardPostFlop()");
+                    System.out.println("Handstrength >= 0.8: call in extraCallCheckOnMisreadBoardPostFlop()");
                     return true;
                 } else if(botStack < 0.15 * botStackAtBeginningOfHand) {
                     setActionToCall();
@@ -299,6 +324,10 @@ public class BotHand implements RangeBuildable, Actionable {
     }
 
     private void setActionToCall() {
+        if(botAction == null) {
+            botAction = new Action();
+        }
+
         botAction.setAction("call");
         updateBotActionHistory(botAction);
         botWrittenAction = "call";

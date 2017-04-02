@@ -30,26 +30,35 @@ public class PreflopActionBuilder {
 
         double bbOpponentTotalBetSize = actionable.getOpponentTotalBetSize() / actionable.getBigBlind();
 
-        if(bbOpponentTotalBetSize == 1) {
-            if(actionable.isBotIsButton()) {
-                action = get05betF1bet(actionable);
-            } else {
-                action = get1betFcheck(actionable);
+        if(actionable.getOpponentStack() > -1 && actionable.getOpponentStack() < actionable.getBigBlind()) {
+            //opponent is all in
+            if(bbOpponentTotalBetSize <= 20) {
+                action = getFallInShortStack(actionable);
             }
-        } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
-            action = get1betF2bet(actionable);
-        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
-            action = get2betF3bet(actionable);
-        } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
-            action = get3betF4bet(actionable);
-        } else {
-            action = get4betF5bet(actionable);
         }
 
-        if(actionable.getOpponentStack() == 0 && (action.equals("bet") || action.equals("raise"))) {
-            action = "call";
-        }
+        if(action == null) {
+            if(bbOpponentTotalBetSize == 1) {
+                if(actionable.isBotIsButton()) {
+                    action = get05betF1bet(actionable);
+                } else {
+                    action = get1betFcheck(actionable);
+                }
+            } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
+                action = get1betF2bet(actionable);
+            } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
+                action = get2betF3bet(actionable);
+            } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
+                action = get3betF4bet(actionable);
+            } else {
+                action = get4betF5bet(actionable);
+            }
 
+            if(actionable.getOpponentStack() > -1 && actionable.getOpponentStack() < actionable.getBigBlind()
+                    && (action.equals("bet") || action.equals("raise"))) {
+                action = "call";
+            }
+        }
         return action;
     }
 
@@ -478,6 +487,38 @@ public class PreflopActionBuilder {
         } else {
             return "fold";
         }
+    }
+
+    private String getFallInShortStack(Actionable actionable) {
+        Set<Set<Card>> combosToCallAllInWithVersusShortStack = new HashSet<>();
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(7).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(8).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(9).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(10).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(11).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(12).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(13).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(14).values());
+
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
+
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 8).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 9).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 10).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
+        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
+
+        if(!combosToCallAllInWithVersusShortStack.add(holeCardsAsSet)) {
+            //holecards are a combo to call shortstack shove with
+            return "call";
+        }
+        return null;
     }
 
     private double setPercentage(Map<Integer, Set<Card>> comboMap, Set<Card> combo, double percentage) {
