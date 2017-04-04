@@ -301,14 +301,14 @@ public class PostFlopActionBuilder {
         String bluffBarrelAction = null;
 
         if(actionable.isPreviousBluffAction()) {
-            if (bluffOddsAreOk() && handStrength < 0.65) {
+            if (bluffOddsAreOk() && handStrength < 0.62) {
                 if (bettingAction.equals(BET)) {
                     if (actionable.isBotIsButton()) {
-                        if (Math.random() <= 0.9) {
+                        if (Math.random() <= 0.75) {
                             bluffBarrelAction = bettingAction;
                         }
                     } else {
-                        if (Math.random() <= 0.5) {
+                        if (Math.random() <= 0.45) {
                             bluffBarrelAction = bettingAction;
                         }
                     }
@@ -416,6 +416,12 @@ public class PostFlopActionBuilder {
 
         double amountToCallBb = (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize()) / bigBlind;
 
+        if(amountToCallBb / actionable.getPotSize() > 0 && amountToCallBb / actionable.getPotSize() <= 0.2) {
+            if(handStrength >= 30) {
+                valueCallAction = CALL;
+            }
+        }
+
         if(amountToCallBb <= 5) {
             if(handStrength >= 0.50) {
                 valueCallAction = CALL;
@@ -425,15 +431,15 @@ public class PostFlopActionBuilder {
                 valueCallAction = CALL;
             }
         } else if (amountToCallBb <= 40) {
-            if(handStrength >= 0.75) {
+            if(handStrength >= 0.65) {
                 valueCallAction = CALL;
             }
         } else if (amountToCallBb <= 70) {
-            if(handStrength >= 0.80) {
+            if(handStrength >= 0.70) {
                 valueCallAction = CALL;
             }
         } else {
-            if(handStrength >= 0.84) {
+            if(handStrength >= 0.75) {
                 valueCallAction = CALL;
             }
         }
