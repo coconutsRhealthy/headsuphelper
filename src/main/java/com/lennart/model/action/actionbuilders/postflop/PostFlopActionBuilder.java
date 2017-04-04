@@ -1,4 +1,4 @@
-package com.lennart.model.action.actionbuilders;
+package com.lennart.model.action.actionbuilders.postflop;
 
 import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
@@ -39,7 +39,7 @@ public class PostFlopActionBuilder {
         potSize = actionable.getPotSize();
     }
 
-    public String getAction(Set<Set<Card>> opponentRange) {
+    public String getAction() {
         String action = null;
         String opponentAction = actionable.getOpponentAction();
 

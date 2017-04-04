@@ -1,7 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.*;
 
@@ -34,7 +34,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
 
     private void getThreeOfAKindCombosInitialize(List<Card> board) {
         Map<Integer, List<Card>> threeOfAKindCombos = new HashMap<>();
-        Map<Integer, List<Card>> allPocketPairStartHands = PreflopRangeBuilderUtil.getAllPocketPairStartHands();
+        Map<Integer, List<Card>> allPocketPairStartHands = ActionBuilderUtil.getAllPocketPairStartHands();
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
         Map<Integer, Set<Set<Card>>> sortedCombos;
 
@@ -53,7 +53,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             combosThatMakeThreeOfAKind = sortedCombos;
             return;
         } else if(getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+            Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
             Integer rankOfPairOnBoard = getRanksOfPairsOnBoard(board).get(0);
@@ -78,7 +78,7 @@ public class ThreeOfAKindEvaluator extends BoardEvaluator implements ComboCompar
             //alle combos die niet met de andere kaarten op het board pairen, geen pocket pair zijn, en niet met de trips
             //op het board pairen
 
-            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+            Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, Integer> frequencyOfRanksOnBoard = getFrequencyOfRanksOnBoard(board);
             Integer rankOfTripsOnBoard = 0;

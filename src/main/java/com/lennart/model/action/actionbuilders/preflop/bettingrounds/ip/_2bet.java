@@ -1,7 +1,7 @@
-package com.lennart.model.rangebuilder.preflop.ip;
+package com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,14 +10,14 @@ import java.util.Set;
 /**
  * Created by lennart on 24-10-16.
  */
-public class _2betRangeBuilder {
+public class _2bet {
 
     private Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
-    private PreflopRangeBuilderUtil p;
+    private ActionBuilderUtil p;
 
-    public _2betRangeBuilder(PreflopRangeBuilderUtil p) {
+    public _2bet(ActionBuilderUtil p) {
         this.p = p;
 
         comboMap100Percent.put(1, p.getSuitedHoleCards(2, 2, 100));
@@ -60,15 +60,6 @@ public class _2betRangeBuilder {
         comboMap5Percent.put(12, p.getOffSuitCombosOfGivenRanks(7, 3));
         comboMap5Percent.put(13, p.getOffSuitCombosOfGivenRanks(7, 2));
         comboMap5Percent.put(14, p.getOffSuitCombosOfGivenRanks(6, 2));
-    }
-
-    public Map<Integer, Set<Card>> getOpponent2betRange() {
-        Map<Integer, Set<Card>> opponent2betRange = new HashMap<>();
-
-        opponent2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent2betRange, comboMap100Percent, 1);
-        opponent2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponent2betRange, comboMap5Percent, 0.05);
-
-        return opponent2betRange;
     }
 
     public Map<Integer, Map<Integer, Set<Card>>> getComboMap100Percent() {

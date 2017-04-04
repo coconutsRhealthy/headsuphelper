@@ -1,7 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.*;
 
@@ -104,7 +104,7 @@ public class StraightEvaluator extends BoardEvaluator implements ComboComparator
             }
 
             if(isBoardConnected(board)) {
-                Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+                Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
                 allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
                 Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 

@@ -1,7 +1,7 @@
-package com.lennart.model.rangebuilder.preflop.oop;
+package com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Created by lpo10346 on 10/25/2016.
  */
-public class Call4betRangeBuilder {
+public class Call4bet {
 
     private Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap80Percent = new HashMap<>();
@@ -20,9 +20,9 @@ public class Call4betRangeBuilder {
     private Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
-    private PreflopRangeBuilderUtil p;
+    private ActionBuilderUtil p;
 
-    public Call4betRangeBuilder(PreflopRangeBuilderUtil p) {
+    public Call4bet(ActionBuilderUtil p) {
         this.p = p;
 
         comboMap100Percent.put(1, p.getOffSuitCombosOfGivenRanks(14, 12));
@@ -103,20 +103,6 @@ public class Call4betRangeBuilder {
         comboMap5Percent.put(3, p.getPocketPairCombosOfGivenRank(12));
         comboMap5Percent.put(4, p.getOffSuitCombosOfGivenRanks(14, 13));
         comboMap5Percent.put(5, p.getSuitedCombosOfGivenRanks(14, 13));
-    }
-
-    public Map<Integer, Set<Card>> getOpponentCall4betRange() {
-        Map<Integer, Set<Card>> opponentCall4betRange = new HashMap<>();
-
-        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap100Percent, 1);
-        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap80Percent, 0.8);
-        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap70Percent, 0.7);
-        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap62Percent, 0.62);
-        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap60Percent, 0.6);
-        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap50Percent, 0.5);
-        opponentCall4betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall4betRange, comboMap5Percent, 0.05);
-
-        return opponentCall4betRange;
     }
 
     public Map<Integer, Map<Integer, Set<Card>>> getComboMap100Percent() {

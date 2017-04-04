@@ -1,10 +1,11 @@
 package com.lennart.model.action;
 
-import com.lennart.model.action.actionbuilders.PostFlopActionBuilder;
-import com.lennart.model.action.actionbuilders.PreflopActionBuilder;
+import com.lennart.model.action.actionbuilders.postflop.PostFlopActionBuilder;
+import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
+import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.botgame.BotHand;
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.RangeBuilder;
+import com.lennart.model.handevaluation.HandEvaluator;
 
 import java.util.List;
 
@@ -15,7 +16,8 @@ public class Action {
     private double sizing;
     private String action;
     private String writtenAction;
-    private RangeBuilder rangeBuilder;
+    private BoardEvaluator boardEvaluator;
+    private HandEvaluator handEvaluator;
     private PreflopActionBuilder preflopActionBuilder;
     private PostFlopActionBuilder postFlopActionBuilder;
 
@@ -23,9 +25,7 @@ public class Action {
         //default constructor
     }
 
-    public Action(Actionable actionable, RangeBuilder rangeBuilder) {
-        this.rangeBuilder = rangeBuilder;
-
+    public Action(Actionable actionable) {
         if(actionable.getBoard() == null) {
             getAndProcessPreflopAction(actionable);
         } else {
@@ -43,16 +43,18 @@ public class Action {
 
     //helper methods
     private void getAndProcessPreflopAction(Actionable actionable) {
-        preflopActionBuilder = new PreflopActionBuilder(rangeBuilder);
+        preflopActionBuilder = new PreflopActionBuilder(actionable.getKnownGameCards());
         action = preflopActionBuilder.getAction(actionable);
         setSizingIfNecessary(actionable, action);
         setNewWrittenAction(action, actionable);
     }
 
     private void getAndProcessPostFlopAction(Actionable actionable) {
-        postFlopActionBuilder = new PostFlopActionBuilder(rangeBuilder.getBoardEvaluator(),
-                rangeBuilder.getHandEvaluator(), actionable);
-        action = postFlopActionBuilder.getAction(actionable.getOpponentRange());
+        boardEvaluator = new BoardEvaluator(actionable.getBoard());
+        handEvaluator = new HandEvaluator(actionable.getBotHoleCards(), boardEvaluator);
+
+        postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, actionable);
+        action = postFlopActionBuilder.getAction();
         setSizingIfNecessary(actionable, action);
         setNewWrittenAction(action, actionable);
     }
@@ -104,15 +106,19 @@ public class Action {
         }
     }
 
-    public RangeBuilder getRangeBuilder() {
-        return rangeBuilder;
-    }
-
     public String getAction() {
         return action;
     }
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public BoardEvaluator getBoardEvaluator() {
+        return boardEvaluator;
+    }
+
+    public HandEvaluator getHandEvaluator() {
+        return handEvaluator;
     }
 }

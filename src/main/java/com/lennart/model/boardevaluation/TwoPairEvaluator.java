@@ -1,7 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.*;
 
@@ -41,7 +41,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
         List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
 
         if(getNumberOfPairsOnBoard(board) == 0 && !boardContainsTrips(board) && !boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+            Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -66,7 +66,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
             this.combosThatMakeTwoPair = sortedCombos;
             return;
         } else if (getNumberOfPairsOnBoard(board) == 1 && !boardContainsTrips(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+            Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -95,7 +95,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
             }
 
             //voeg pocket pairs toe
-            Map<Integer, List<Card>> allPocketPairs = PreflopRangeBuilderUtil.getAllPocketPairStartHands();
+            Map<Integer, List<Card>> allPocketPairs = ActionBuilderUtil.getAllPocketPairStartHands();
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(0).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(1).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(2).getRank());
@@ -125,7 +125,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
             return;
         } else if (getNumberOfPairsOnBoard(board) == 2) {
             //alle combos die niet een boat maken. Dus op 4499J ook J combos.
-            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+            Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             Map<Integer, List<Integer>> allPossibleStartHandsRankOnly = getAllPossibleStartHandsRankOnly(allPossibleStartHands);
 
@@ -151,7 +151,7 @@ public class TwoPairEvaluator extends BoardEvaluator implements ComboComparatorR
             //get laagste boardpair kaart
             int rankOfLowestPairOnBoard = Collections.min(ranksOfPairsOnBoard);
 
-            Map<Integer, List<Card>> allPocketPairs = PreflopRangeBuilderUtil.getAllPocketPairStartHands();
+            Map<Integer, List<Card>> allPocketPairs = ActionBuilderUtil.getAllPocketPairStartHands();
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(0).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(1).getRank());
             allPocketPairs = clearStartHandsMapOfStartHandsThatContainCardOfSpecificRank(allPocketPairs, board.get(2).getRank());

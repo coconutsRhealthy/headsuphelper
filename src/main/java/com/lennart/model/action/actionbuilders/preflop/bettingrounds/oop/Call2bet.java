@@ -1,15 +1,14 @@
-package com.lennart.model.rangebuilder.preflop.oop;
+package com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.RangeBuilder;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.*;
 
 /**
  * Created by lpo10346 on 10/21/2016.
  */
-public class Call2betRangeBuilder {
+public class Call2bet {
 
     private Map<Integer, Map<Integer, Set<Card>>> comboMap90Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap80Percent = new HashMap<>();
@@ -19,13 +18,10 @@ public class Call2betRangeBuilder {
     private Map<Integer, Map<Integer, Set<Card>>> comboMap30Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap10Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
-    private Map<Integer, Map<Integer, Set<Card>>> comboMapRest7Percent = new HashMap<>();
-    private Map<Integer, Map<Integer, Set<Card>>> comboMapAllPossibleStartHands = new HashMap<>();
-    private List<Map<Integer, Map<Integer, Set<Card>>>> allCombosNoRestCombos = new ArrayList<>();
 
-    private PreflopRangeBuilderUtil p;
+    private ActionBuilderUtil p;
 
-    public Call2betRangeBuilder(PreflopRangeBuilderUtil p) {
+    public Call2bet(ActionBuilderUtil p) {
         this.p = p;
 
         comboMap90Percent.put(1, p.getSuitedCombosOfGivenRanks(10, 6));
@@ -169,39 +165,6 @@ public class Call2betRangeBuilder {
         comboMap5Percent.put(8, p.getSuitedCombosOfGivenRanks(14, 11));
         comboMap5Percent.put(9, p.getPocketPairCombosOfGivenRank(11));
         comboMap5Percent.put(10, p.getPocketPairCombosOfGivenRank(10));
-
-        allCombosNoRestCombos.add(comboMap90Percent);
-        allCombosNoRestCombos.add(comboMap80Percent);
-        allCombosNoRestCombos.add(comboMap65Percent);
-        allCombosNoRestCombos.add(comboMap50Percent);
-        allCombosNoRestCombos.add(comboMap33Percent);
-        allCombosNoRestCombos.add(comboMap30Percent);
-        allCombosNoRestCombos.add(comboMap10Percent);
-        allCombosNoRestCombos.add(comboMap5Percent);
-
-        comboMapRest7Percent.put(1, p.removeCombosThatCouldBeInOtherMapsFromRestMap(allCombosNoRestCombos));
-
-        comboMapAllPossibleStartHands.put(1, p.getAllPossibleStartHandsAsSets());
-    }
-
-    public Map<Integer, Set<Card>> getOpponentCall2betRange(RangeBuilder rangeBuilder, double handsHumanOopFacingPreflop2bet) {
-        Map<Integer, Set<Card>> opponentCall2betRange = new HashMap<>();
-
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap90Percent, 0.90);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap80Percent, 0.80);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap65Percent, 0.65);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap50Percent, 0.50);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap33Percent, 0.33);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap30Percent, 0.30);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap10Percent, 0.10);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMap5Percent, 0.05);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMapRest7Percent, 0.07);
-        opponentCall2betRange = p.addCombosToIncludeInOpponentPreflopRange(opponentCall2betRange, comboMapAllPossibleStartHands,
-                0.03 + rangeBuilder.getOpponentPreflopCall2betFactor(handsHumanOopFacingPreflop2bet));
-
-        opponentCall2betRange = p.removeDoubleCombos(opponentCall2betRange);
-
-        return opponentCall2betRange;
     }
 
     public Map<Integer, Map<Integer, Set<Card>>> getComboMap90Percent() {

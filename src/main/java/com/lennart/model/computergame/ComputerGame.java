@@ -5,9 +5,6 @@ import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.OpponentRangeSetter;
-import com.lennart.model.rangebuilder.RangeBuildable;
-import com.lennart.model.rangebuilder.RangeBuilder;
 import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
@@ -15,7 +12,7 @@ import java.util.*;
 /**
  * Created by lennart on 11-12-16.
  */
-public class ComputerGame implements RangeBuildable, Actionable {
+public class ComputerGame implements Actionable {
 
     private List<Card> deck;
     private List<Card> myHoleCards;
@@ -39,21 +36,12 @@ public class ComputerGame implements RangeBuildable, Actionable {
     private String mySize;
     private List<Card> board;
     private String computerWrittenAction;
-    private Set<Set<Card>> opponentRange;
     private String handWinner;
     private int numberOfHandsPlayed;
-    private double handsHumanOopFacingPreflop2bet;
-    private double handsHumanOopCall2bet;
-    private double handsHumanOop3bet;
-    private double opponentPreCall2betStat;
-    private double opponentPre3betStat;
-    private boolean opponentPreflopStatsDoneForHand;
     private boolean previousBluffAction;
     private boolean drawBettingActionDone;
 
     private List<String> botActionHistory;
-    private RangeBuilder rangeBuilder;
-    private double potSizeAfterLastBotAction;
 
     public ComputerGame() {
         //default constructor
@@ -80,7 +68,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
     }
 
     public ComputerGame submitHumanActionAndDoComputerAction() {
-        calculateOpponentPreflopStats();
         boolean computerActionNeeded = isComputerActionNeeded();
 
         if(myAction.equals("fold")) {
@@ -101,11 +88,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
     }
 
     private void doComputerAction() {
-        OpponentRangeSetter opponentRangeSetter = new OpponentRangeSetter();
-        opponentRangeSetter.setCorrectOpponentRange(this);
-        setOrInitializeRangeBuilder(opponentRangeSetter);
-
-        computerAction = new Action(this, rangeBuilder);
+        computerAction = new Action(this);
         computerWrittenAction = computerAction.getWrittenAction();
 
         updateBotActionHistory(computerAction);
@@ -126,8 +109,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
         } else if(computerWrittenAction.contains("raise")) {
             processComputerRaiseAction();
         }
-        potSizeAfterLastBotAction = potSize + computerTotalBetSize + opponentTotalBetSize;
-        rangeBuilder = null;
         roundToTwoDecimals();
     }
 
@@ -144,35 +125,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
             botActionHistory.add("turn " + action.getAction());
         } else if(board.size() == 5) {
             botActionHistory.add("river " + action.getAction());
-        }
-    }
-
-    private boolean rangeSetterChangedBoard(OpponentRangeSetter opponentRangeSetter) {
-        if(opponentRangeSetter.getRangeBuilder().getBoard() != null) {
-            List<Card> rangeSetterBoard = opponentRangeSetter.getRangeBuilder().getBoard();
-            Set<Card> rangeSetterBoardAsSet = new HashSet<>();
-            rangeSetterBoardAsSet.addAll(rangeSetterBoard);
-
-            Set<Card> currentBoardAsSet = new HashSet<>();
-            currentBoardAsSet.addAll(board);
-
-            if(rangeSetterBoardAsSet.equals(currentBoardAsSet)) {
-                return false;
-            }
-            return true;
-        } else {
-            if(board == null) {
-                return false;
-            }
-            return true;
-        }
-    }
-
-    private void setOrInitializeRangeBuilder(OpponentRangeSetter opponentRangeSetter) {
-        if(rangeSetterChangedBoard(opponentRangeSetter)) {
-            rangeBuilder = new RangeBuilder(this, false);
-        } else {
-            rangeBuilder = opponentRangeSetter.getRangeBuilder();
         }
     }
 
@@ -463,9 +415,7 @@ public class ComputerGame implements RangeBuildable, Actionable {
         board = null;
         knownGameCards = null;
         handWinner = null;
-        opponentRange = null;
         computerWrittenAction = null;
-        opponentPreflopStatsDoneForHand = false;
         previousBluffAction = false;
         drawBettingActionDone = false;
     }
@@ -583,9 +533,10 @@ public class ComputerGame implements RangeBuildable, Actionable {
             computerHandStrength = endOfHandHandEvaluator.getHandStrength(computerHoleCards);
             opponentHandStrength = endOfHandHandEvaluator.getHandStrength(myHoleCards);
         } else {
-            HandEvaluator handEvaluator = computerAction.getRangeBuilder().getHandEvaluator();
-            computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
-            opponentHandStrength = handEvaluator.getHandStrength(myHoleCards);
+            HandEvaluator endOfHandHandEvaluator = computerAction.getHandEvaluator();
+
+            computerHandStrength = endOfHandHandEvaluator.getHandStrength(computerHoleCards);
+            opponentHandStrength = endOfHandHandEvaluator.getHandStrength(myHoleCards);
         }
 
         if(computerHandStrength > opponentHandStrength) {
@@ -615,23 +566,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
         String holeCard2Suit = Character.toString(holeCards.get(1).getSuit());
 
         return holeCard1Rank + holeCard1Suit + holeCard2Rank + holeCard2Suit;
-    }
-
-    private void calculateOpponentPreflopStats() {
-        if(!opponentPreflopStatsDoneForHand) {
-            if(board == null && computerIsButton && computerWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
-                handsHumanOopFacingPreflop2bet++;
-                if(myAction.equals("call")) {
-                    handsHumanOopCall2bet++;
-                }
-                if(myAction.equals("raise")) {
-                    handsHumanOop3bet++;
-                }
-            }
-            opponentPreCall2betStat = handsHumanOopCall2bet / handsHumanOopFacingPreflop2bet;
-            opponentPre3betStat = handsHumanOop3bet / handsHumanOopFacingPreflop2bet;
-            opponentPreflopStatsDoneForHand = true;
-        }
     }
 
     private boolean isPreflopCheck() {
@@ -821,39 +755,17 @@ public class ComputerGame implements RangeBuildable, Actionable {
         return flopCards;
     }
 
-    @Override
-    public void setFlopCards(List<Card> flopCards) {
-        this.flopCards = flopCards;
-    }
-
-    @Override
     public Card getTurnCard() {
         return turnCard;
     }
 
-    @Override
-    public void setTurnCard(Card turnCard) {
-        this.turnCard = turnCard;
-    }
-
-    @Override
     public Card getRiverCard() {
         return riverCard;
     }
 
     @Override
-    public void setRiverCard(Card riverCard) {
-        this.riverCard = riverCard;
-    }
-
-    @Override
     public List<Card> getBoard() {
         return board;
-    }
-
-    @Override
-    public void setBoard(List<Card> board) {
-        this.board = board;
     }
 
     public String getComputerWrittenAction() {
@@ -862,16 +774,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
 
     public void setComputerWrittenAction(String computerWrittenAction) {
         this.computerWrittenAction = computerWrittenAction;
-    }
-
-    @Override
-    public Set<Set<Card>> getOpponentRange() {
-        return opponentRange;
-    }
-
-    @Override
-    public void setOpponentRange(Set<Set<Card>> opponentRange) {
-        this.opponentRange = opponentRange;
     }
 
     public String getHandWinner() {
@@ -888,61 +790,6 @@ public class ComputerGame implements RangeBuildable, Actionable {
 
     public void setNumberOfHandsPlayed(int numberOfHandsPlayed) {
         this.numberOfHandsPlayed = numberOfHandsPlayed;
-    }
-
-    @Override
-    public double getHandsOpponentOopFacingPreflop2bet() {
-        return getHandsHumanOopFacingPreflop2bet();
-    }
-
-    public double getHandsHumanOopFacingPreflop2bet() {
-        return handsHumanOopFacingPreflop2bet;
-    }
-
-    public void setHandsHumanOopFacingPreflop2bet(double handsHumanOopFacingPreflop2bet) {
-        this.handsHumanOopFacingPreflop2bet = handsHumanOopFacingPreflop2bet;
-    }
-
-    public double getHandsHumanOopCall2bet() {
-        return handsHumanOopCall2bet;
-    }
-
-    public void setHandsHumanOopCall2bet(double handsHumanOopCall2bet) {
-        this.handsHumanOopCall2bet = handsHumanOopCall2bet;
-    }
-
-    @Override
-    public double getOpponentPreCall2betStat() {
-        return opponentPreCall2betStat;
-    }
-
-    public void setOpponentPreCall2betStat(double opponentPreCall2betStat) {
-        this.opponentPreCall2betStat = opponentPreCall2betStat;
-    }
-
-    public boolean isOpponentPreflopStatsDoneForHand() {
-        return opponentPreflopStatsDoneForHand;
-    }
-
-    public void setOpponentPreflopStatsDoneForHand(boolean opponentPreflopStatsDoneForHand) {
-        this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
-    }
-
-    public double getHandsHumanOop3bet() {
-        return handsHumanOop3bet;
-    }
-
-    public void setHandsHumanOop3bet(double handsHumanOop3bet) {
-        this.handsHumanOop3bet = handsHumanOop3bet;
-    }
-
-    @Override
-    public double getOpponentPre3betStat() {
-        return opponentPre3betStat;
-    }
-
-    public void setOpponentPre3betStat(double opponentPre3betStat) {
-        this.opponentPre3betStat = opponentPre3betStat;
     }
 
     @Override
@@ -965,30 +812,11 @@ public class ComputerGame implements RangeBuildable, Actionable {
         this.drawBettingActionDone = drawBettingActionDone;
     }
 
-    @Override
     public List<String> getBotActionHistory() {
         return botActionHistory;
     }
 
     public void setBotActionHistory(List<String> botActionHistory) {
         this.botActionHistory = botActionHistory;
-    }
-
-    public RangeBuilder getRangeBuilder() {
-        return rangeBuilder;
-    }
-
-    @Override
-    public void setRangeBuilder(RangeBuilder rangeBuilder) {
-        this.rangeBuilder = rangeBuilder;
-    }
-
-    @Override
-    public double getPotSizeAfterLastBotAction() {
-        return potSizeAfterLastBotAction;
-    }
-
-    public void setPotSizeAfterLastBotAction(double potSizeAfterLastBotAction) {
-        this.potSizeAfterLastBotAction = potSizeAfterLastBotAction;
     }
 }

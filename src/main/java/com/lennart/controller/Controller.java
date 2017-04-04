@@ -17,7 +17,6 @@ public class Controller {
     public @ResponseBody ComputerGame startGame() {
         ComputerGame computerGame = new ComputerGame("initialize");
         computerGame.setComputerAction(null);
-        computerGame.setRangeBuilder(null);
         return computerGame;
     }
 
@@ -25,7 +24,6 @@ public class Controller {
     public @ResponseBody ComputerGame submitMyAction(@RequestBody ComputerGame computerGame) {
         computerGame = computerGame.submitHumanActionAndDoComputerAction();
         computerGame.setComputerAction(null);
-        computerGame.setRangeBuilder(null);
         return computerGame;
     }
 
@@ -41,7 +39,6 @@ public class Controller {
     public @ResponseBody BotTable startBotTable() {
         BotTable botTable = new BotTable("initialize");
         botTable.getBotHand().setBotAction(null);
-        botTable.getBotHand().setRangeBuilder(null);
         botTable.getBotHand().setGameVariablesFiller(null);
         return botTable;
     }
@@ -50,7 +47,6 @@ public class Controller {
     public @ResponseBody BotTable getNewBotAction(@RequestBody BotTable botTable) {
         botTable.getNewBotAction();
         botTable.getBotHand().setBotAction(null);
-        botTable.getBotHand().setRangeBuilder(null);
         botTable.getBotHand().setGameVariablesFiller(null);
         return botTable;
     }

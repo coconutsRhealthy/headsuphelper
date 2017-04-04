@@ -1,14 +1,36 @@
 package com.lennart.model.action;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.RangeBuildable;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by LennartMac on 19/02/17.
  */
-public interface Actionable extends RangeBuildable {
+public interface Actionable {
+
+    List<Card> getBotHoleCards();
+
+    List<Card> getFlopCards();
+
+    List<Card> getBoard();
+
+    Set<Card> getKnownGameCards();
+
+    void setKnownGameCards(Set<Card> knownGameCards);
+
+    double getPotSize();
+
+    double getBigBlind();
+
+    double getBotTotalBetSize();
+
+    double getOpponentTotalBetSize();
+
+    boolean isBotIsButton();
+
+    String getOpponentAction();
 
     void removeHoleCardsFromKnownGameCards();
 

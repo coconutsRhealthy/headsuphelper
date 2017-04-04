@@ -1,4 +1,4 @@
-package com.lennart.model.rangebuilder.preflop;
+package com.lennart.model.action.actionbuilders;
 
 import com.lennart.model.card.Card;
 
@@ -7,13 +7,13 @@ import java.util.*;
 /**
  * Created by LennartMac on 15/10/16.
  */
-public class PreflopRangeBuilderUtil {
+public class ActionBuilderUtil {
 
     private static final Map<Integer, List<Card>> allPossibleStartHandsAsList = getAllPossibleStartHandsInitialize();
     private static final Map<Integer, Set<Card>> allStartHandsAsSet = fillAllStartHands();
     private Set<Card> knownGameCards;
 
-    public PreflopRangeBuilderUtil(Set<Card> knownGameCards) {
+    public ActionBuilderUtil(Set<Card> knownGameCards) {
         this.knownGameCards = knownGameCards;
     }
 
@@ -296,21 +296,6 @@ public class PreflopRangeBuilderUtil {
         return pocketPairCombosOfGivenRanks;
     }
 
-    public Map<Integer, Set<Card>> addCombosToIncludeInOpponentPreflopRange(Map<Integer, Set<Card>> allCombosThusFar,
-                                                                            Map<Integer, Map<Integer, Set<Card>>> comboPercentageMap,
-                                                                            double percentage) {
-        for (Map.Entry<Integer, Map<Integer, Set<Card>>> entry : comboPercentageMap.entrySet()) {
-            for (Map.Entry<Integer, Set<Card>> entry2 : entry.getValue().entrySet()) {
-                if(Math.random() <= percentage) {
-                    Set<Card> comboToInclude = new HashSet<>();
-                    comboToInclude.addAll(entry2.getValue());
-                    allCombosThusFar.put(allCombosThusFar.size(), comboToInclude);
-                }
-            }
-        }
-        return allCombosThusFar;
-    }
-
     public Map<Integer, Set<Card>> removeCombosThatCouldBeInOtherMapsFromRestMap(List<Map<Integer, Map<Integer, Set<Card>>>>
                                                                                          allCombosNoRestCombos) {
         Map<Integer, Set<Card>> mapToReturn = new HashMap<>();
@@ -367,7 +352,7 @@ public class PreflopRangeBuilderUtil {
         return simpleComboMap;
     }
 
-    //Corrected for known boardCards, only use this method in RangeBuilder classes
+    //Corrected for known boardCards
     public Map<Integer, Set<Card>> getAllPossibleStartHandsAsSets() {
         Map<Integer, List<Card>> allPossibleStartHandsAsAlist = allPossibleStartHandsAsList;
         Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
@@ -559,7 +544,7 @@ public class PreflopRangeBuilderUtil {
 
     public static Map<Integer, List<Card>> getAllPocketPairStartHands() {
         Map<Integer, List<Card>> allPocketPairStartHands = new HashMap<>();
-        Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+        Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
 
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
             if(entry.getValue().get(0).getRank() == entry.getValue().get(1).getRank()) {
@@ -598,7 +583,7 @@ public class PreflopRangeBuilderUtil {
         Set<Card> handAsSet = new HashSet<>();
         handAsSet.addAll(hand);
 
-        PreflopRangeBuilderUtil p = new PreflopRangeBuilderUtil(knownGameCards);
+        ActionBuilderUtil p = new ActionBuilderUtil(knownGameCards);
         Map<Integer, Set<Card>> combosAa = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(14);
         Map<Integer, Set<Card>> combosKk = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(13);
         Map<Integer, Set<Card>> combosQq = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(12);

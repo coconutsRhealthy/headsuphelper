@@ -1,7 +1,7 @@
 package com.lennart.model.boardevaluation;
 
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.*;
 
@@ -167,7 +167,7 @@ public class FourOfAKindEvaluator extends BoardEvaluator implements ComboCompara
         }
 
         if(boardContainsQuads(board)) {
-            Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+            Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
             allPossibleStartHands = clearStartHandsMapOfStartHandsThatContainCardsOnTheBoard(allPossibleStartHands, board);
             fourOfAKindCombos = getSortedCardComboMap(allPossibleStartHands, board, this);
             fourOfAKindCombos = removeDuplicateCombos(fourOfAKindCombos);

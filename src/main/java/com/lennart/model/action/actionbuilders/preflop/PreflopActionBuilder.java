@@ -1,16 +1,15 @@
-package com.lennart.model.action.actionbuilders;
+package com.lennart.model.action.actionbuilders.preflop;
 
 import com.lennart.model.action.Actionable;
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.RangeBuilder;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
-import com.lennart.model.rangebuilder.preflop.ip.Call3betRangeBuilder;
-import com.lennart.model.rangebuilder.preflop.ip.Call5betRangeBuilder;
-import com.lennart.model.rangebuilder.preflop.ip._2betRangeBuilder;
-import com.lennart.model.rangebuilder.preflop.ip._4betRangeBuilder;
-import com.lennart.model.rangebuilder.preflop.oop.Call2betRangeBuilder;
-import com.lennart.model.rangebuilder.preflop.oop.Call4betRangeBuilder;
-import com.lennart.model.rangebuilder.preflop.oop._3betRangeBuilder;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip.Call3bet;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip.Call5bet;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip._2bet;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip._4bet;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop.Call2bet;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop.Call4bet;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._3bet;
 
 import java.util.*;
 
@@ -19,10 +18,10 @@ import java.util.*;
  */
 public class PreflopActionBuilder {
 
-    private PreflopRangeBuilderUtil preflopRangeBuilderUtil;
+    private ActionBuilderUtil actionBuilderUtil;
 
-    public PreflopActionBuilder(RangeBuilder rangeBuilder) {
-        preflopRangeBuilderUtil = rangeBuilder.getPreflopRangeBuilder().getPreflopRangeBuilderUtil();
+    public PreflopActionBuilder(Set<Card> knownGameCards) {
+        actionBuilderUtil = new ActionBuilderUtil(knownGameCards);
     }
 
     public String getAction(Actionable actionable) {
@@ -91,13 +90,13 @@ public class PreflopActionBuilder {
 
         actionable.removeHoleCardsFromKnownGameCards();
 
-        _2betRangeBuilder x2BetRangeBuilder = new _2betRangeBuilder(preflopRangeBuilderUtil);
+        _2bet x2Bet = new _2bet(actionBuilderUtil);
 
-        comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x2BetRangeBuilder.getComboMap100Percent());
+        comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x2Bet.getComboMap100Percent());
 
-        comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x2BetRangeBuilder.getComboMap5Percent());
+        comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x2Bet.getComboMap5Percent());
 
         double percentageBet = 0;
 
@@ -132,22 +131,22 @@ public class PreflopActionBuilder {
     private String get1betFcheck(Actionable actionable) {
         actionable.removeHoleCardsFromKnownGameCards();
 
-        _3betRangeBuilder x3BetRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
+        _3bet x3Bet = new _3bet(actionBuilderUtil);
 
-        Map<Integer, Set<Card>> x3bet_comboMap95Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap95Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap70Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap70Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap50Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap50Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap35Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap35Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap20Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap20Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap10Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap10Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap5Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap95Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap70Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap50Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap35Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap35Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap20Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap20Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap10Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap10Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap5Percent());
 
         double percentage2bet;
 
@@ -188,47 +187,47 @@ public class PreflopActionBuilder {
     private String get2betF3bet(Actionable actionable) {
         actionable.removeHoleCardsFromKnownGameCards();
 
-        Call3betRangeBuilder call3betRangeBuilder = new Call3betRangeBuilder(preflopRangeBuilderUtil);
-        _4betRangeBuilder x4BetRangeBuilder = new _4betRangeBuilder(preflopRangeBuilderUtil);
+        Call3bet call3Bet = new Call3bet(actionBuilderUtil);
+        _4bet x4Bet = new _4bet(actionBuilderUtil);
 
-        Map<Integer, Set<Card>> call3bet_comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap100Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap94Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap94Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap89Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap89Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap80Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap80Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap73Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap73Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap50Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap50Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap34Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap34Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap29Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap29Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap27Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap27Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap19Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap19Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap8Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap8Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap7Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap7Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3betRangeBuilder.getComboMap5Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap100Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap94Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap94Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap89Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap89Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap80Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap80Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap73Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap73Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap50Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap34Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap34Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap29Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap29Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap27Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap27Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap19Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap19Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap8Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap8Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap7Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap7Percent());
+        Map<Integer, Set<Card>> call3bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call3Bet.getComboMap5Percent());
 
 
-        Map<Integer, Set<Card>> x4bet_comboMap95Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4BetRangeBuilder.getComboMap95Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap50Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4BetRangeBuilder.getComboMap50Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap20Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4BetRangeBuilder.getComboMap20Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap11Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4BetRangeBuilder.getComboMap11Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap6Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4BetRangeBuilder.getComboMap6Percent());
+        Map<Integer, Set<Card>> x4bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x4Bet.getComboMap95Percent());
+        Map<Integer, Set<Card>> x4bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x4Bet.getComboMap50Percent());
+        Map<Integer, Set<Card>> x4bet_comboMap20Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x4Bet.getComboMap20Percent());
+        Map<Integer, Set<Card>> x4bet_comboMap11Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x4Bet.getComboMap11Percent());
+        Map<Integer, Set<Card>> x4bet_comboMap6Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x4Bet.getComboMap6Percent());
 
         double percentageCall3bet;
         double percentage4bet;
@@ -305,40 +304,40 @@ public class PreflopActionBuilder {
     private String get1betF2bet(Actionable actionable) {
         actionable.removeHoleCardsFromKnownGameCards();
 
-        Call2betRangeBuilder call2betRangeBuilder = new Call2betRangeBuilder(preflopRangeBuilderUtil);
-        _3betRangeBuilder x3BetRangeBuilder = new _3betRangeBuilder(preflopRangeBuilderUtil);
+        Call2bet call2Bet = new Call2bet(actionBuilderUtil);
+        _3bet x3Bet = new _3bet(actionBuilderUtil);
 
-        Map<Integer, Set<Card>> call2bet_comboMap90Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap90Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap80Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap80Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap65Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap65Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap50Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap50Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap33Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap33Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap30Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap30Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap10Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap10Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2betRangeBuilder.getComboMap5Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap90Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap90Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap80Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap80Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap65Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap65Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap50Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap33Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap33Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap30Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap30Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap10Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap10Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap5Percent());
 
-        Map<Integer, Set<Card>> x3bet_comboMap95Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap95Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap70Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap70Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap50Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap50Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap35Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap35Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap20Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap20Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap10Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap10Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3BetRangeBuilder.getComboMap5Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap95Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap70Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap50Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap35Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap35Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap20Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap20Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap10Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap10Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap5Percent());
 
         double percentageCall2bet;
         double percentage3bet;
@@ -406,22 +405,22 @@ public class PreflopActionBuilder {
     private String get3betF4bet(Actionable actionable) {
         actionable.removeHoleCardsFromKnownGameCards();
 
-        Call4betRangeBuilder call4betRangeBuilder = new Call4betRangeBuilder(preflopRangeBuilderUtil);
+        Call4bet call4Bet = new Call4bet(actionBuilderUtil);
 
-        Map<Integer, Set<Card>> call4bet_comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4betRangeBuilder.getComboMap100Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap80Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4betRangeBuilder.getComboMap80Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap70Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4betRangeBuilder.getComboMap70Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap62Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4betRangeBuilder.getComboMap62Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap60Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4betRangeBuilder.getComboMap60Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap50Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4betRangeBuilder.getComboMap50Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap5Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4betRangeBuilder.getComboMap5Percent());
+        Map<Integer, Set<Card>> call4bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call4Bet.getComboMap100Percent());
+        Map<Integer, Set<Card>> call4bet_comboMap80Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call4Bet.getComboMap80Percent());
+        Map<Integer, Set<Card>> call4bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call4Bet.getComboMap70Percent());
+        Map<Integer, Set<Card>> call4bet_comboMap62Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call4Bet.getComboMap62Percent());
+        Map<Integer, Set<Card>> call4bet_comboMap60Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call4Bet.getComboMap60Percent());
+        Map<Integer, Set<Card>> call4bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call4Bet.getComboMap50Percent());
+        Map<Integer, Set<Card>> call4bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call4Bet.getComboMap5Percent());
 
         //nog 5bet hier//
 
@@ -469,10 +468,10 @@ public class PreflopActionBuilder {
     private String get4betF5bet(Actionable actionable) {
         actionable.removeHoleCardsFromKnownGameCards();
 
-        Call5betRangeBuilder call5betRangeBuilder = new Call5betRangeBuilder(preflopRangeBuilderUtil);
+        Call5bet call5Bet = new Call5bet(actionBuilderUtil);
 
-        Map<Integer, Set<Card>> call5bet_comboMap100Percent = preflopRangeBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call5betRangeBuilder.getComboMap100Percent());
+        Map<Integer, Set<Card>> call5bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call5Bet.getComboMap100Percent());
 
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(actionable.getBotHoleCards());
@@ -494,25 +493,25 @@ public class PreflopActionBuilder {
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(actionable.getBotHoleCards());
 
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(7).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(8).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(9).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(10).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(11).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(12).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(13).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(14).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(7).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(8).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(9).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(10).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(11).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(12).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(13).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(14).values());
 
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
 
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 8).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 9).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 10).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
-        combosToCallAllInWithVersusShortStack.addAll(preflopRangeBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 8).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 9).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 10).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
+        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
 
         if(!combosToCallAllInWithVersusShortStack.add(holeCardsAsSet)) {
             //holecards are a combo to call shortstack shove with

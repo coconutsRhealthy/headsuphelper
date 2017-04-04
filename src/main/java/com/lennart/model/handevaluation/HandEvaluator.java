@@ -51,41 +51,6 @@ public class HandEvaluator {
         return handStrength;
     }
 
-    public double getHandStrengthAgainstRange(List<Card> yourHoleCardsAsList, Set<Set<Card>> opponentRange, Map<Integer,
-            Set<Set<Card>>> sortedCombos) {
-        Map<Integer, Set<Set<Card>>> rangeSortedCombos = new HashMap<>();
-        Set<Card> myHoleCards = new HashSet<>();
-        myHoleCards.addAll(yourHoleCardsAsList);
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
-            rangeSortedCombos.put(entry.getKey(), new HashSet<>());
-
-            for(Set<Card> combo : entry.getValue()) {
-                if(combo.equals(myHoleCards)) {
-                    rangeSortedCombos.get(entry.getKey()).add(combo);
-                }
-
-                Set<Set<Card>> rangeCopy = new HashSet<>();
-                rangeCopy.addAll(opponentRange);
-
-                if(!rangeCopy.add(combo)) {
-                    rangeSortedCombos.get(entry.getKey()).add(combo);
-                }
-            }
-        }
-
-        double handStrength = -1;
-
-        for (Map.Entry<Integer, Set<Set<Card>>> entry : rangeSortedCombos.entrySet()) {
-            for(Set<Card> s : entry.getValue()) {
-                if(s.equals(myHoleCards)) {
-                    handStrength = getIndexOfHandInSortedCombos(entry.getKey(), rangeSortedCombos);
-                }
-            }
-        }
-        return handStrength;
-    }
-
     public boolean hasAnyDrawNonBackDoor() {
         for (Map.Entry<String, Boolean> entry : handDrawEvaluation.entrySet()) {
             if(!entry.getKey().contains("BackDoor") && entry.getValue()) {

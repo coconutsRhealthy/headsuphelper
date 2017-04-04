@@ -4,7 +4,7 @@ import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.rangebuilder.preflop.PreflopRangeBuilderUtil;
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -408,7 +408,7 @@ public class BoardEvaluator {
     }
 
     protected Map<Integer, List<Card>> getAllStartHandsThatContainASpecificCard(Card card) {
-        Map<Integer, List<Card>> allPossibleStartHands = PreflopRangeBuilderUtil.getAllPossibleStartHandsAsList();
+        Map<Integer, List<Card>> allPossibleStartHands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
         Map<Integer, List<Card>> allStartHandsThatContainASpecificCard = new HashMap<>();
 
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHands.entrySet()) {
