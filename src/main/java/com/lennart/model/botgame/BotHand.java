@@ -302,10 +302,15 @@ public class BotHand implements Actionable {
     }
 
     private void validateBotStack() {
-        if(botStack > botStackAtBeginningOfHand) {
-            botStack = -1;
+        if(botStack < 0) {
+            System.out.println("set botstack to default value of 100bb in validateBotStack because botStack < 0");
+            botStack = 100 * bigBlind;
+        } else if(botStack > botStackAtBeginningOfHand) {
+            System.out.println("set botstack to default value of 100bb in validateBotStack because botStack > botStackAtBeginningOfHand");
+            botStack = 100 * bigBlind;
         } else if(botStack / bigBlind > 1000) {
-            botStack = -1;
+            System.out.println("set botstack to default value of 100bb in validateBotStack because botStack > 1000bb");
+            botStack = 100 * bigBlind;
         }
     }
 
@@ -319,10 +324,16 @@ public class BotHand implements Actionable {
     }
 
     private void validateOpponentStack() {
-        if(opponentStack > opponentStackAtBeginningOfHand) {
-            opponentStack = -1;
+        if(opponentStack < 0) {
+            System.out.println("set opponentStack to default value of 100bb in validateOpponentStack because opponentStack < 0");
+            opponentStack = 100 * bigBlind;
+        } else if(opponentStack > opponentStackAtBeginningOfHand) {
+            System.out.println("set opponentStack to default value of 100bb in validateOpponentStack because opponentStack >" +
+                    " opponentStackAtBeginningOfHand");
+            opponentStack = 100 * bigBlind;
         } else if(opponentStack / bigBlind > 1000) {
-            opponentStack = -1;
+            System.out.println("set opponentStack to default value of 100bb in validateOpponentStack because opponentStack > 1000bb");
+            opponentStack = 100 * bigBlind;
         }
     }
 
@@ -333,10 +344,16 @@ public class BotHand implements Actionable {
     }
 
     private void validatePotSize() {
-        if(potSize > (botStackAtBeginningOfHand + opponentStackAtBeginningOfHand)) {
-            potSize = -1;
+        if(potSize < 0) {
+            System.out.println("set potSize to default value of 18bb in validatePotSize because potSize < 0");
+            potSize = 18 * bigBlind;
+        } else if(potSize > (botStackAtBeginningOfHand + opponentStackAtBeginningOfHand)) {
+            System.out.println("set potSize to default value of 18bb in validatePotSize because potSize > " +
+                    "(botStackAtBeginningOfHand + opponentStackAtBeginningOfHand)");
+            potSize = 18 * bigBlind;
         } else if(potSize / bigBlind > 1000) {
-            potSize = -1;
+            System.out.println("set potSize to default value of 18bb in validatePotSize because potSize / bigBlind > 1000");
+            potSize = 18 * bigBlind;
         }
     }
 
@@ -346,10 +363,15 @@ public class BotHand implements Actionable {
     }
 
     private void validateBotTotalBetSize() {
-        if(botTotalBetSize > botStackAtBeginningOfHand) {
-            botTotalBetSize = -1;
+        if(botTotalBetSize < 0) {
+            System.out.println("set botTotalBetSize to default value of 0 in validateBotTotalBetSize because botTotalBetSize < 0");
+            botTotalBetSize = 0;
+        } else if(botTotalBetSize > botStackAtBeginningOfHand) {
+            System.out.println("set botTotalBetSize to default value of 0 in validateBotTotalBetSize because botTotalBetSize > botStackAtBeginningOfHand");
+            botTotalBetSize = 0;
         } else if(botTotalBetSize / bigBlind > 1000) {
-            botTotalBetSize = -1;
+            System.out.println("set botTotalBetSize to default value of 0 in validateBotTotalBetSize because botTotalBetSize / bigBlind > 1000");
+            botTotalBetSize = 0;
         }
     }
 
