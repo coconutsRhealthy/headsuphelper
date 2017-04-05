@@ -210,12 +210,12 @@ public class PostFlopActionBuilder {
                 }
             } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
                 if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(Math.random() < 0.5) {
+                    if(Math.random() < 0.80) {
                         drawBettingInitializeAction = bettingAction;
                     }
                 }
                 if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(Math.random() < 0.2) {
+                    if(Math.random() < 0.22) {
                         drawBettingInitializeAction = bettingAction;
                     }
                 }
@@ -231,12 +231,12 @@ public class PostFlopActionBuilder {
                 }
             } else {
                 if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(Math.random() < 0.5) {
+                    if(Math.random() < 0.90) {
                         drawBettingInitializeAction = bettingAction;
                     }
                 }
                 if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(Math.random() < 0.2) {
+                    if(Math.random() < 0.27) {
                         drawBettingInitializeAction = bettingAction;
                     }
                 }
