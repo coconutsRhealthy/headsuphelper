@@ -135,18 +135,18 @@ public class PreflopActionBuilder {
 
         Map<Integer, Set<Card>> x3bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x3Bet.getComboMap95Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap70Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap90Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap90Percent());
         Map<Integer, Set<Card>> x3bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x3Bet.getComboMap50Percent());
         Map<Integer, Set<Card>> x3bet_comboMap35Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x3Bet.getComboMap35Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap20Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap20Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap10Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap10Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap5Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap30Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap30Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap15Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap15Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap8Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap8Percent());
 
         double percentage2bet;
 
@@ -156,7 +156,7 @@ public class PreflopActionBuilder {
         percentage2bet = setPercentage(x3bet_comboMap95Percent, holeCardsAsSet, 0.95);
 
         if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap70Percent, holeCardsAsSet, 0.70);
+            percentage2bet = setPercentage(x3bet_comboMap90Percent, holeCardsAsSet, 0.90);
         }
         if(percentage2bet == 0) {
             percentage2bet = setPercentage(x3bet_comboMap50Percent, holeCardsAsSet, 0.50);
@@ -165,13 +165,13 @@ public class PreflopActionBuilder {
             percentage2bet = setPercentage(x3bet_comboMap35Percent, holeCardsAsSet, 0.35);
         }
         if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap20Percent, holeCardsAsSet, 0.20);
+            percentage2bet = setPercentage(x3bet_comboMap30Percent, holeCardsAsSet, 0.30);
         }
         if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap10Percent, holeCardsAsSet, 0.10);
+            percentage2bet = setPercentage(x3bet_comboMap15Percent, holeCardsAsSet, 0.15);
         }
         if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
+            percentage2bet = setPercentage(x3bet_comboMap8Percent, holeCardsAsSet, 0.08);
         }
 
         actionable.addHoleCardsToKnownGameCards();
@@ -307,37 +307,32 @@ public class PreflopActionBuilder {
         Call2bet call2Bet = new Call2bet(actionBuilderUtil);
         _3bet x3Bet = new _3bet(actionBuilderUtil);
 
-        Map<Integer, Set<Card>> call2bet_comboMap90Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2Bet.getComboMap90Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap80Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2Bet.getComboMap80Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap65Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2Bet.getComboMap65Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap85Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap85Percent());
+        Map<Integer, Set<Card>> call2bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (call2Bet.getComboMap70Percent());
         Map<Integer, Set<Card>> call2bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call2Bet.getComboMap50Percent());
         Map<Integer, Set<Card>> call2bet_comboMap33Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call2Bet.getComboMap33Percent());
-        Map<Integer, Set<Card>> call2bet_comboMap30Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call2Bet.getComboMap30Percent());
         Map<Integer, Set<Card>> call2bet_comboMap10Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call2Bet.getComboMap10Percent());
         Map<Integer, Set<Card>> call2bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call2Bet.getComboMap5Percent());
-
         Map<Integer, Set<Card>> x3bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x3Bet.getComboMap95Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap70Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap90Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap90Percent());
         Map<Integer, Set<Card>> x3bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x3Bet.getComboMap50Percent());
         Map<Integer, Set<Card>> x3bet_comboMap35Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x3Bet.getComboMap35Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap20Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap20Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap10Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap10Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap5Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap30Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap30Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap15Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap15Percent());
+        Map<Integer, Set<Card>> x3bet_comboMap8Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x3Bet.getComboMap8Percent());
 
         double percentageCall2bet;
         double percentage3bet;
@@ -345,22 +340,16 @@ public class PreflopActionBuilder {
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(actionable.getBotHoleCards());
 
-        percentageCall2bet = setPercentage(call2bet_comboMap90Percent, holeCardsAsSet, 0.90);
+        percentageCall2bet = setPercentage(call2bet_comboMap85Percent, holeCardsAsSet, 0.85);
 
         if(percentageCall2bet == 0) {
-            percentageCall2bet = setPercentage(call2bet_comboMap80Percent, holeCardsAsSet, 0.80);
-        }
-        if(percentageCall2bet == 0) {
-            percentageCall2bet = setPercentage(call2bet_comboMap65Percent, holeCardsAsSet, 0.65);
+            percentageCall2bet = setPercentage(call2bet_comboMap70Percent, holeCardsAsSet, 0.70);
         }
         if(percentageCall2bet == 0) {
             percentageCall2bet = setPercentage(call2bet_comboMap50Percent, holeCardsAsSet, 0.50);
         }
         if(percentageCall2bet == 0) {
             percentageCall2bet = setPercentage(call2bet_comboMap33Percent, holeCardsAsSet, 0.33);
-        }
-        if(percentageCall2bet == 0) {
-            percentageCall2bet = setPercentage(call2bet_comboMap30Percent, holeCardsAsSet, 0.30);
         }
         if(percentageCall2bet == 0) {
             percentageCall2bet = setPercentage(call2bet_comboMap10Percent, holeCardsAsSet, 0.10);
@@ -372,7 +361,7 @@ public class PreflopActionBuilder {
         percentage3bet = setPercentage(x3bet_comboMap95Percent, holeCardsAsSet, 0.95);
 
         if(percentage3bet == 0) {
-            percentage3bet = setPercentage(x3bet_comboMap70Percent, holeCardsAsSet, 0.70);
+            percentage3bet = setPercentage(x3bet_comboMap90Percent, holeCardsAsSet, 0.90);
         }
         if(percentage3bet == 0) {
             percentage3bet = setPercentage(x3bet_comboMap50Percent, holeCardsAsSet, 0.50);
@@ -381,13 +370,13 @@ public class PreflopActionBuilder {
             percentage3bet = setPercentage(x3bet_comboMap35Percent, holeCardsAsSet, 0.35);
         }
         if(percentage3bet == 0) {
-            percentage3bet = setPercentage(x3bet_comboMap20Percent, holeCardsAsSet, 0.20);
+            percentage3bet = setPercentage(x3bet_comboMap30Percent, holeCardsAsSet, 0.30);
         }
         if(percentage3bet == 0) {
-            percentage3bet = setPercentage(x3bet_comboMap10Percent, holeCardsAsSet, 0.10);
+            percentage3bet = setPercentage(x3bet_comboMap15Percent, holeCardsAsSet, 0.15);
         }
         if(percentage3bet == 0) {
-            percentage3bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
+            percentage3bet = setPercentage(x3bet_comboMap8Percent, holeCardsAsSet, 0.08);
         }
 
         actionable.addHoleCardsToKnownGameCards();
