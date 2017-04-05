@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.preflop;
 
 import com.lennart.model.action.Actionable;
+import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._5bet;
 import com.lennart.model.card.Card;
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip.Call3bet;
@@ -371,10 +372,15 @@ public class PreflopActionBuilder {
         Map<Integer, Set<Card>> call4bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4Bet.getComboMap5Percent());
 
-        //nog 5bet hier//
+        _5bet x5bet = new _5bet(actionBuilderUtil);
+
+        Map<Integer, Set<Card>> x5bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x5bet.getComboMap95Percent());
+        Map<Integer, Set<Card>> x5bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
+                (x5bet.getComboMap50Percent());
 
         double percentageCall4bet;
-        double percentage5bet = 0;
+        double percentage5bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(actionable.getBotHoleCards());
@@ -385,7 +391,11 @@ public class PreflopActionBuilder {
             percentageCall4bet = setPercentage(call4bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
 
-        //nog 5bet hier//
+        percentage5bet = setPercentage(x5bet_comboMap95Percent, holeCardsAsSet, 0.95);
+
+        if(percentage5bet == 0) {
+            percentage5bet = setPercentage(x5bet_comboMap50Percent, holeCardsAsSet, 0.50);
+        }
 
         actionable.addHoleCardsToKnownGameCards();
 
