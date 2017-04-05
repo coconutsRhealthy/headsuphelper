@@ -121,4 +121,8 @@ public class Action {
     public HandEvaluator getHandEvaluator() {
         return handEvaluator;
     }
+
+    public PostFlopActionBuilder getPostFlopActionBuilder() {
+        return postFlopActionBuilder;
+    }
 }

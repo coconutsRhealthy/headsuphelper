@@ -28,6 +28,8 @@ public class PostFlopActionBuilder {
     private HandEvaluator handEvaluator;
     private Actionable actionable;
 
+    private double handStrength;
+
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
@@ -43,7 +45,7 @@ public class PostFlopActionBuilder {
         String action = null;
         String opponentAction = actionable.getOpponentAction();
 
-        double handStrength = handEvaluator.getHandStrength(actionable.getBotHoleCards());
+        handStrength = handEvaluator.getHandStrength(actionable.getBotHoleCards());
 
         System.out.println("Computer handstrength: " + handStrength);
 
@@ -794,5 +796,9 @@ public class PostFlopActionBuilder {
         } else {
             return turnBetPercentage;
         }
+    }
+
+    public double getHandStrength() {
+        return handStrength;
     }
 }
