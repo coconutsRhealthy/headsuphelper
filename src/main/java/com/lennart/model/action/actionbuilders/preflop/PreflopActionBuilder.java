@@ -368,16 +368,6 @@ public class PreflopActionBuilder {
 
         Map<Integer, Set<Card>> call4bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4Bet.getComboMap100Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap80Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4Bet.getComboMap80Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4Bet.getComboMap70Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap62Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4Bet.getComboMap62Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap60Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4Bet.getComboMap60Percent());
-        Map<Integer, Set<Card>> call4bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call4Bet.getComboMap50Percent());
         Map<Integer, Set<Card>> call4bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4Bet.getComboMap5Percent());
 
@@ -391,21 +381,6 @@ public class PreflopActionBuilder {
 
         percentageCall4bet = setPercentage(call4bet_comboMap100Percent, holeCardsAsSet, 1.0);
 
-        if(percentageCall4bet == 0) {
-            percentageCall4bet = setPercentage(call4bet_comboMap80Percent, holeCardsAsSet, 0.80);
-        }
-        if(percentageCall4bet == 0) {
-            percentageCall4bet = setPercentage(call4bet_comboMap70Percent, holeCardsAsSet, 0.70);
-        }
-        if(percentageCall4bet == 0) {
-            percentageCall4bet = setPercentage(call4bet_comboMap62Percent, holeCardsAsSet, 0.62);
-        }
-        if(percentageCall4bet == 0) {
-            percentageCall4bet = setPercentage(call4bet_comboMap60Percent, holeCardsAsSet, 0.60);
-        }
-        if(percentageCall4bet == 0) {
-            percentageCall4bet = setPercentage(call4bet_comboMap50Percent, holeCardsAsSet, 0.50);
-        }
         if(percentageCall4bet == 0) {
             percentageCall4bet = setPercentage(call4bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
