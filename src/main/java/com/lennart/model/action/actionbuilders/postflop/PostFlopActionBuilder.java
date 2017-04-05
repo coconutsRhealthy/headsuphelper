@@ -507,7 +507,9 @@ public class PostFlopActionBuilder {
                 }
             } else if (amountToCall / bigBlind > 20 && amountToCall / bigBlind < 40) {
                 if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(odds <= 0.45) {
+                    if(odds <= 0.22) {
+                        drawCallingAction = CALL;
+                    } else if(odds <= 0.45) {
                         if(board.size() == 3) {
                             drawCallingAction = CALL;
                         } else {
@@ -521,6 +523,12 @@ public class PostFlopActionBuilder {
                                 }
                             }
                         }
+                    }
+                }
+            } else {
+                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                    if(odds <= 0.22) {
+                        drawCallingAction = CALL;
                     }
                 }
             }

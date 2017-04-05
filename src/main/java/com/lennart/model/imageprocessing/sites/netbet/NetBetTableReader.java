@@ -28,11 +28,21 @@ public class NetBetTableReader {
         double potSize;
         String potSizeAsString = readPotSize(true);
         if(potSizeAsString.matches(".*\\d.*")){
-            potSize = Double.parseDouble(potSizeAsString);
+            try {
+                potSize = Double.parseDouble(potSizeAsString);
+            } catch(NumberFormatException e) {
+                potSize = -1;
+                System.out.println("NumberFormatException occurred in getPotSizeFromImage(), set to -1");
+            }
         } else {
             potSizeAsString = readPotSize(true);
             if(potSizeAsString.matches(".*\\d.*")){
-                potSize = Double.parseDouble(potSizeAsString);
+                try {
+                    potSize = Double.parseDouble(potSizeAsString);
+                } catch(NumberFormatException e) {
+                    potSize = -1;
+                    System.out.println("NumberFormatException occurred in getPotSizeFromImage(), set to -1");
+                }
             } else {
                 potSize = -1;
                 System.out.println("potSize not read well: -1");
@@ -44,18 +54,17 @@ public class NetBetTableReader {
             String potSizeCheckAsString = readPotSize(false);
 
             if(potSizeCheckAsString.matches(".*\\d.*")){
-                potSizeCheck = Double.parseDouble(potSizeCheckAsString);
+                try {
+                    potSizeCheck = Double.parseDouble(potSizeCheckAsString);
 
-                if(potSizeCheck / bigBlind < 200) {
-                    potSize = potSizeCheck;
+                    if(potSizeCheck / bigBlind < 200) {
+                        potSize = potSizeCheck;
+                    }
+                } catch(NumberFormatException e) {
+                    potSize = -1;
+                    System.out.println("NumberFormatException occurred in getPotSizeFromImage(), set to -1");
                 }
             }
-        }
-
-        if(potSize / bigBlind > 50) {
-            String timeStamp = getCurrentTimeStamp();
-            System.out.println("potSize: " + potSize + " ---bigger than 50bb, screenshot saved: " + timeStamp);
-            ImageProcessor.createPartialSreenShot(430, 255, 167, 28, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
         }
         return potSize;
     }
@@ -65,7 +74,12 @@ public class NetBetTableReader {
         String potSizeCheckAsString = readPotSize(false);
 
         if(potSizeCheckAsString.matches(".*\\d.*")){
-            potSizeCheck = Double.parseDouble(potSizeCheckAsString);
+            try {
+                potSizeCheck = Double.parseDouble(potSizeCheckAsString);
+            } catch(NumberFormatException e) {
+                potSizeCheck = -1;
+                System.out.println("NumberFormatException occurred in getPotSizeCheckFromImage(), set to -1");
+            }
         } else {
             potSizeCheck = -1;
         }
@@ -76,7 +90,12 @@ public class NetBetTableReader {
         double opponentStack;
         String opponentStackAsString = readTopPlayerStack();
         if(opponentStackAsString.matches(".*\\d.*")){
-            opponentStack = Double.parseDouble(opponentStackAsString);
+            try {
+                opponentStack = Double.parseDouble(opponentStackAsString);
+            } catch(NumberFormatException e) {
+                opponentStack = -1;
+                System.out.println("NumberFormatException occurred in getOpponentStackFromImage(), set to -1");
+            }
         } else {
             if(opponentStackAsString.contains("in")) {
                 //opponent is all-in
@@ -84,19 +103,18 @@ public class NetBetTableReader {
             } else {
                 opponentStackAsString = readTopPlayerStack();
                 if(opponentStackAsString.matches(".*\\d.*")){
-                    opponentStack = Double.parseDouble(opponentStackAsString);
+                    try {
+                        opponentStack = Double.parseDouble(opponentStackAsString);
+                    } catch(NumberFormatException e) {
+                        opponentStack = -1;
+                        System.out.println("NumberFormatException occurred in getOpponentStackFromImage(), set to -1");
+                    }
                 } else {
                     opponentStack = -1;
                     System.out.println("opponentStack not read well: -1");
                 }
             }
         }
-
-//        if(opponentStack / bigBlind > 300) {
-//            String timeStamp = getCurrentTimeStamp();
-//            System.out.println("opponentStack: " + opponentStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
-//            ImageProcessor.createPartialSreenShot(500, 147, 109, 28, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
-//        }
         return opponentStack;
     }
 
@@ -104,22 +122,26 @@ public class NetBetTableReader {
         double botStack;
         String botStackAsString = readBottomPlayerStack();
         if(botStackAsString.matches(".*\\d.*")){
-            botStack = Double.parseDouble(botStackAsString);
-        } else{
+            try {
+                botStack = Double.parseDouble(botStackAsString);
+            } catch(NumberFormatException e) {
+                botStack = -1;
+                System.out.println("NumberFormatException occurred in getBotStackFromImage(), set to -1");
+            }
+        } else {
             botStackAsString = readBottomPlayerStack();
             if(botStackAsString.matches(".*\\d.*")){
-                botStack = Double.parseDouble(botStackAsString);
+                try {
+                    botStack = Double.parseDouble(botStackAsString);
+                } catch(NumberFormatException e) {
+                    botStack = -1;
+                    System.out.println("NumberFormatException occurred in getBotStackFromImage(), set to -1");
+                }
             } else {
                 botStack = -1;
                 System.out.println("botStack not read well: -1");
             }
         }
-
-//        if(botStack / bigBlind > 300) {
-//            String timeStamp = getCurrentTimeStamp();
-//            System.out.println("botStack: " + botStack + " ---bigger than 300bb, screenshot saved: " + timeStamp);
-//            ImageProcessor.createPartialSreenShot(500, 574, 109, 28, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
-//        }
         return botStack;
     }
 
@@ -127,15 +149,14 @@ public class NetBetTableReader {
         double botTotalBetSize;
         String botTotalBetSizeAsString = readBottomPlayerTotalBetSize();
         if(botTotalBetSizeAsString.matches(".*\\d.*")){
-            botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
+            try {
+                botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
+            } catch(NumberFormatException e) {
+                botTotalBetSize = -1;
+                System.out.println("NumberFormatException occurred in getBotTotalBetSizeFromImage(), set to -1");
+            }
         } else {
             botTotalBetSize = 0;
-        }
-
-        if(botTotalBetSize / bigBlind > 40) {
-            String timeStamp = getCurrentTimeStamp();
-            System.out.println("botTotalBetSize: " + botTotalBetSize + " ---bigger than 40bb, screenshot saved: " + timeStamp);
-            ImageProcessor.createPartialSreenShot(460, 448, 80, 23, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
         }
         return botTotalBetSize;
     }
@@ -145,21 +166,22 @@ public class NetBetTableReader {
         double opponentTotalBetSize;
         String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
         if(opponentTotalBetSizeAsString.matches(".*\\d.*")){
-            opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
+            try {
+                opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
+            } catch(NumberFormatException e) {
+                opponentTotalBetSize = -1;
+                System.out.println("NumberFormatException occurred in getOpponentTotalBetSizeFromImage(), set to -1");
+            }
         } else {
             opponentTotalBetSize = 0;
         }
 
         if(opponentTotalBetSize / bigBlind > 40) {
-            String timeStamp = getCurrentTimeStamp();
-            System.out.println("opponentTotalBetSize: " + opponentTotalBetSize + " ---bigger than 40bb, screenshot saved: " + timeStamp);
-            ImageProcessor.createPartialSreenShot(451, 191, 66, 18, "C:/Users/Lennart/Documents/netbetscreens/" + timeStamp + ".png");
-
             if(opponentTotalBetSize / bigBlind > 300) {
                 if(opponentPreviousStack != -1 && opponentPreviousTotalBetSize != -1 && opponentCurrentStack != -1) {
                     if(((opponentPreviousStack + opponentPreviousTotalBetSize) - opponentCurrentStack) / bigBlind < 300) {
                         opponentTotalBetSize = (opponentPreviousStack + opponentPreviousTotalBetSize) - opponentCurrentStack;
-                        System.out.println("Adjusted opponentTotalBetSize. OpponentTotalBetSize is now: " + opponentTotalBetSize + ", at timestamp: " + timeStamp);
+                        System.out.println("Adjusted opponentTotalBetSize. OpponentTotalBetSize is now: " + opponentTotalBetSize);
                     }
                 }
             }
@@ -173,15 +195,30 @@ public class NetBetTableReader {
         String rightActionButton = readRightActionButton();
 
         if(middleActionButton.contains("Call") && middleActionButton.matches(".*\\d.*")) {
-            callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(middleActionButton));
+            try {
+                callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(middleActionButton));
+            } catch(NumberFormatException e) {
+                callAmount = -1;
+                System.out.println("NumberFormatException occurred in getAmountToCall(), set to -1");
+            }
         }
 
         if(rightActionButton.contains("Call") && rightActionButton.matches(".*\\d.*")) {
-            callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
+            try {
+                callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
+            } catch(NumberFormatException e) {
+                callAmount = -1;
+                System.out.println("NumberFormatException occurred in getAmountToCall(), set to -1");
+            }
         }
 
         if(middleActionButtonIsNotPresent() && rightActionButton.matches(".*\\d.*")) {
-            callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
+            try {
+                callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
+            } catch(NumberFormatException e) {
+                callAmount = -1;
+                System.out.println("NumberFormatException occurred in getAmountToCall(), set to -1");
+            }
         }
         System.out.println("Amount to call according to getAmountToCall: " + callAmount);
         return callAmount;
