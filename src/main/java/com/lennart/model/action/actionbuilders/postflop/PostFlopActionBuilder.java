@@ -28,6 +28,8 @@ public class PostFlopActionBuilder {
     private HandEvaluator handEvaluator;
     private Actionable actionable;
 
+    private double handStrength;
+
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
@@ -43,7 +45,7 @@ public class PostFlopActionBuilder {
         String action = null;
         String opponentAction = actionable.getOpponentAction();
 
-        double handStrength = handEvaluator.getHandStrength(actionable.getBotHoleCards());
+        handStrength = handEvaluator.getHandStrength(actionable.getBotHoleCards());
 
         System.out.println("Computer handstrength: " + handStrength);
 
@@ -507,7 +509,9 @@ public class PostFlopActionBuilder {
                 }
             } else if (amountToCall / bigBlind > 20 && amountToCall / bigBlind < 40) {
                 if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(odds <= 0.45) {
+                    if(odds <= 0.22) {
+                        drawCallingAction = CALL;
+                    } else if(odds <= 0.45) {
                         if(board.size() == 3) {
                             drawCallingAction = CALL;
                         } else {
@@ -521,6 +525,12 @@ public class PostFlopActionBuilder {
                                 }
                             }
                         }
+                    }
+                }
+            } else {
+                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                    if(odds <= 0.22) {
+                        drawCallingAction = CALL;
                     }
                 }
             }
@@ -786,5 +796,9 @@ public class PostFlopActionBuilder {
         } else {
             return turnBetPercentage;
         }
+    }
+
+    public double getHandStrength() {
+        return handStrength;
     }
 }
