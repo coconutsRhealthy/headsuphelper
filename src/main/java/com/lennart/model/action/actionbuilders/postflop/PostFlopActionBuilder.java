@@ -477,9 +477,7 @@ public class PostFlopActionBuilder {
                             drawCallingAction = CALL;
                         } else {
                             if(botIsButton) {
-                                if(Math.random() < 0.7) {
-                                    drawCallingAction = CALL;
-                                }
+                                drawCallingAction = CALL;
                             } else {
                                 if(Math.random() < 0.3) {
                                     drawCallingAction = CALL;
@@ -491,8 +489,12 @@ public class PostFlopActionBuilder {
                 if(handEvaluator.hasDrawOfType("strongOvercards")) {
                     if(odds <= 0.45) {
                         if(board.size() == 3) {
-                            if(Math.random() < 0.3) {
+                            if(botIsButton) {
                                 drawCallingAction = CALL;
+                            } else {
+                                if(Math.random() < 0.3) {
+                                    drawCallingAction = CALL;
+                                }
                             }
                         } else {
                             if(botIsButton) {
@@ -516,9 +518,7 @@ public class PostFlopActionBuilder {
                             drawCallingAction = CALL;
                         } else {
                             if(botIsButton) {
-                                if(Math.random() < 0.67) {
-                                    drawCallingAction = CALL;
-                                }
+                                drawCallingAction = CALL;
                             } else {
                                 if(Math.random() < 0.23) {
                                     drawCallingAction = CALL;
@@ -531,6 +531,22 @@ public class PostFlopActionBuilder {
                 if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
                     if(odds <= 0.22) {
                         drawCallingAction = CALL;
+                    } else if(odds <= 0.45) {
+                        if(board.size() == 3) {
+                            if(afterDrawCall66PercentBetStillPossible()) {
+                                if(botIsButton) {
+                                    drawCallingAction = CALL;
+                                }
+                            }
+                        } else {
+                            if(afterDrawCall66PercentBetStillPossible()) {
+                                if(botIsButton) {
+                                    if(Math.random() <= 0.12) {
+                                        drawCallingAction = CALL;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -540,6 +556,17 @@ public class PostFlopActionBuilder {
             System.out.println("draw call action");
         }
         return drawCallingAction;
+    }
+
+    private boolean afterDrawCall66PercentBetStillPossible() {
+        double potSizeAfterCall = potSize + (2 * actionable.getOpponentTotalBetSize());
+        double botStackAfterCall = actionable.getBotStack() -
+                (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize());
+
+        if(botStackAfterCall >= (0.66 * potSizeAfterCall) && actionable.getOpponentStack() >= (0.66 * potSizeAfterCall)) {
+            return true;
+        }
+        return false;
     }
 
     private String getPassiveOrAggressiveValueAction(String bettingAction) {

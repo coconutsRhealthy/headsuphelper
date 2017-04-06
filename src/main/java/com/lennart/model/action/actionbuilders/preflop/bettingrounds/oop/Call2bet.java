@@ -13,7 +13,7 @@ public class Call2bet {
     private Map<Integer, Map<Integer, Set<Card>>> comboMap85Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap70Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap50Percent = new HashMap<>();
-    private Map<Integer, Map<Integer, Set<Card>>> comboMap33Percent = new HashMap<>();
+    private Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap10Percent = new HashMap<>();
     private Map<Integer, Map<Integer, Set<Card>>> comboMap5Percent = new HashMap<>();
 
@@ -63,23 +63,23 @@ public class Call2bet {
         comboMap50Percent.put(15, p.getSuitedCombosOfGivenRanks(14, 6));
         comboMap50Percent.put(16, p.getPocketPairCombosOfGivenRank(6));
 
-        comboMap33Percent.put(1, p.getOffSuitCombosOfGivenRanks(13, 7));
-        comboMap33Percent.put(2, p.getOffSuitCombosOfGivenRanks(13, 6));
-        comboMap33Percent.put(3, p.getOffSuitCombosOfGivenRanks(9, 7));
-        comboMap33Percent.put(4, p.getOffSuitCombosOfGivenRanks(8, 7));
-        comboMap33Percent.put(5, p.getOffSuitCombosOfGivenRanks(8, 6));
-        comboMap33Percent.put(6, p.getOffSuitCombosOfGivenRanks(7, 6));
-        comboMap33Percent.put(7, p.getSuitedCombosOfGivenRanks(11, 6));
-        comboMap33Percent.put(8, p.getOffSuitCombosOfGivenRanks(6, 5));
-        comboMap33Percent.put(9, p.getSuitedCombosOfGivenRanks(11, 5));
-        comboMap33Percent.put(10, p.getOffSuitCombosOfGivenRanks(5, 4));
-        comboMap33Percent.put(11, p.getSuitedCombosOfGivenRanks(13, 4));
-        comboMap33Percent.put(12, p.getSuitedCombosOfGivenRanks(12, 4));
-        comboMap33Percent.put(13, p.getSuitedCombosOfGivenRanks(13, 3));
-        comboMap33Percent.put(14, p.getSuitedCombosOfGivenRanks(12, 3));
-        comboMap33Percent.put(15, p.getSuitedCombosOfGivenRanks(13, 2));
-        comboMap33Percent.put(16, p.getSuitedCombosOfGivenRanks(12, 2));
-        comboMap33Percent.put(17, p.getSuitedCombosOfGivenRanks(6, 2));
+        comboMap100Percent.put(1, p.getOffSuitCombosOfGivenRanks(13, 7));
+        comboMap100Percent.put(2, p.getOffSuitCombosOfGivenRanks(13, 6));
+        comboMap100Percent.put(3, p.getOffSuitCombosOfGivenRanks(9, 7));
+        comboMap100Percent.put(4, p.getOffSuitCombosOfGivenRanks(8, 7));
+        comboMap100Percent.put(5, p.getOffSuitCombosOfGivenRanks(8, 6));
+        comboMap100Percent.put(6, p.getOffSuitCombosOfGivenRanks(7, 6));
+        comboMap100Percent.put(7, p.getSuitedCombosOfGivenRanks(11, 6));
+        comboMap100Percent.put(8, p.getOffSuitCombosOfGivenRanks(6, 5));
+        comboMap100Percent.put(9, p.getSuitedCombosOfGivenRanks(11, 5));
+        comboMap100Percent.put(10, p.getOffSuitCombosOfGivenRanks(5, 4));
+        comboMap100Percent.put(11, p.getSuitedCombosOfGivenRanks(13, 4));
+        comboMap100Percent.put(12, p.getSuitedCombosOfGivenRanks(12, 4));
+        comboMap100Percent.put(13, p.getSuitedCombosOfGivenRanks(13, 3));
+        comboMap100Percent.put(14, p.getSuitedCombosOfGivenRanks(12, 3));
+        comboMap100Percent.put(15, p.getSuitedCombosOfGivenRanks(13, 2));
+        comboMap100Percent.put(16, p.getSuitedCombosOfGivenRanks(12, 2));
+        comboMap100Percent.put(17, p.getSuitedCombosOfGivenRanks(6, 2));
 
         comboMap10Percent.put(1, p.getSuitedCombosOfGivenRanks(5, 2));
         comboMap10Percent.put(2, p.getSuitedCombosOfGivenRanks(4, 2));
@@ -175,8 +175,8 @@ public class Call2bet {
         return comboMap50Percent;
     }
 
-    public Map<Integer, Map<Integer, Set<Card>>> getComboMap33Percent() {
-        return comboMap33Percent;
+    public Map<Integer, Map<Integer, Set<Card>>> getComboMap100Percent() {
+        return comboMap100Percent;
     }
 
     public Map<Integer, Map<Integer, Set<Card>>> getComboMap10Percent() {
