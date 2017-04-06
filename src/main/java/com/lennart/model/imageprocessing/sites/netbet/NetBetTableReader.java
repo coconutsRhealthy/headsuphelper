@@ -346,8 +346,6 @@ public class NetBetTableReader {
             action = null;
         }
 
-        action = checkIfRaiseOrBetActionShouldBeCall(action, botAction);
-
         boolean clickActionDone = false;
 
         System.out.println("action going into clickaction: " + action);
@@ -361,9 +359,9 @@ public class NetBetTableReader {
         } else if(action.contains("call")) {
             clickActionDone = clickCallActionButton();
         } else if(action.contains("bet")) {
-            clickActionDone = clickBetActionButton();
+            clickActionDone = clickBetActionButton(botAction);
         } else if(action.contains("raise")) {
-            clickActionDone = clickRaiseActionButton();
+            clickActionDone = clickRaiseActionButton(botAction);
         }
 
         MouseKeyboard.moveMouseToLocation(20, 20);
@@ -400,31 +398,49 @@ public class NetBetTableReader {
         return false;
     }
 
-    private static boolean clickBetActionButton() {
+    private static boolean clickBetActionButton(Action botAction) {
         String middleActionButton = readMiddleActionButton();
         String rightActionButton = readRightActionButton();
 
+        boolean clickActionDone = false;
+
         if(rightActionButton.contains("Bet")) {
             MouseKeyboard.click(959, 687);
-            return true;
+            clickActionDone = true;
         } else if(middleActionButton.contains("Check") && rightActionButton.contains("All")) {
             MouseKeyboard.click(959, 687);
-            return true;
+            clickActionDone = true;
         }
-        return false;
+
+        if(!clickActionDone) {
+            if (botAction != null && botAction.getPostFlopActionBuilder().getHandStrength() >= 0.65) {
+                clickActionDone = clickCallActionButton();
+                System.out.println("clickCallActionButton was called from clickBetActionButton()");
+            }
+        }
+        return clickActionDone;
     }
 
-    private static boolean clickRaiseActionButton() {
+    private static boolean clickRaiseActionButton(Action botAction) {
         String rightActionButton = readRightActionButton();
+
+        boolean clickActionDone = false;
 
         if(rightActionButton.contains("Raise")) {
             MouseKeyboard.click(959, 687);
-            return true;
+            clickActionDone = true;
         } else if(rightActionButton.contains("All")) {
             MouseKeyboard.click(959, 687);
-            return true;
+            clickActionDone = true;
         }
-        return false;
+
+        if(!clickActionDone) {
+            if (botAction != null && botAction.getPostFlopActionBuilder().getHandStrength() >= 0.65) {
+                clickActionDone = clickCallActionButton();
+                System.out.println("clickCallActionButton was called from clickRaiseActionButton()");
+            }
+        }
+        return clickActionDone;
     }
 
     public static boolean middleActionButtonIsNotPresent() {
@@ -720,37 +736,6 @@ public class NetBetTableReader {
             action = "deal";
         }
         return action;
-    }
-
-    private static String checkIfRaiseOrBetActionShouldBeCall(String action, Action botAction) {
-        if(action != null) {
-            String actionInMethod = action;
-            if(actionInMethod.contains("bet")) {
-                String rightActionButton = readRightActionButton();
-                if (!rightActionButton.contains("Bet")) {
-                    String middleActionButton = readMiddleActionButton();
-                    if (!middleActionButton.contains("Check") && !rightActionButton.contains("All")) {
-                        if (botAction.getPostFlopActionBuilder().getHandStrength() >= 0.65) {
-                            actionInMethod = "call";
-                            System.out.println("Action was wrongfully set to 'bet'. Buttons indicate that it should be call");
-                        }
-                    }
-                }
-            } else if(actionInMethod.contains("raise")) {
-                String rightActionButton = readRightActionButton();
-                if (!rightActionButton.contains("Raise")) {
-                    if (!rightActionButton.contains("All")) {
-                        if (botAction.getPostFlopActionBuilder().getHandStrength() >= 0.65) {
-                            actionInMethod = "call";
-                            System.out.println("Action was wrongfully set to 'raise'. Buttons indicate that it should be call");
-                        }
-                    }
-                }
-            }
-            return actionInMethod;
-        } else {
-            return null;
-        }
     }
 
     private String getCurrentTimeStamp() {
