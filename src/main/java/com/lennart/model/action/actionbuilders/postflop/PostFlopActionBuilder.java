@@ -30,6 +30,8 @@ public class PostFlopActionBuilder {
 
     private double handStrength;
 
+    private String opponentType;
+
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
         this.boardEvaluator = boardEvaluator;
         this.handEvaluator = handEvaluator;
@@ -62,7 +64,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getFcheckOrFirstToAct(double handStrength) {
-        String action = getValueAction(handStrength, BET);
+        String action = getValueAction(BET);
 
         if(action == null) {
             action = getDrawBettingAction(BET);
@@ -78,7 +80,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getFbet(double handStrength) {
-        String action = getValueAction(handStrength, RAISE);
+        String action = getValueAction(RAISE);
 
         if(action == null) {
             action = getDrawBettingAction(RAISE);
@@ -103,7 +105,7 @@ public class PostFlopActionBuilder {
     }
 
     private String getFraise(double handStrength) {
-        String action = getValueAction(handStrength, RAISE);
+        String action = getValueAction(RAISE);
 
         if(action == null) {
             action = getDrawBettingAction(RAISE);
@@ -124,30 +126,14 @@ public class PostFlopActionBuilder {
         return action;
     }
 
-    private String getValueAction(double handStrength, String bettingAction) {
+    private String getValueAction(String bettingAction) {
         String valueAction = null;
 
         if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
-            if(sizing / bigBlind <= 5) {
-                if(handStrength > 0.50) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
-                }
-            } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
-                if(handStrength > 0.62) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
-                }
-            } else if (sizing / bigBlind > 20 && sizing / bigBlind <= 40) {
-                if(handStrength > 0.80) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
-                }
-            } else if (sizing / bigBlind > 40 && sizing / bigBlind <= 70) {
-                if(handStrength > 0.85) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
-                }
-            } else {
-                if(handStrength >= 0.88) {
-                    valueAction = getPassiveOrAggressiveValueAction(bettingAction);
-                }
+            if(bettingAction.equals(BET)) {
+                valueAction = getBetValueAction();
+            } else if(bettingAction.equals(RAISE)) {
+                valueAction = getRaiseValueAction();
             }
 
             if(valueAction != null) {
@@ -155,6 +141,150 @@ public class PostFlopActionBuilder {
             }
         }
         return valueAction;
+    }
+
+    private String getBetValueAction() {
+        String betValueAction = null;
+
+        switch(opponentType) {
+            case "tightPassive":
+                betValueAction = getBetValueActionVsTightPassive();
+                break;
+            case "tightMedium":
+                betValueAction = getBetValueActionVsTightMedium();
+                break;
+            case "tightAggressive":
+                betValueAction = getBetValueActionVsTightAggressive();
+                break;
+            case "mediumPassive":
+                betValueAction = getBetValueActionVsMediumPassive();
+                break;
+            case "mediumMedium":
+                betValueAction = getBetValueActionVsMediumMedium();
+                break;
+            case "mediumAggressive":
+                betValueAction = getBetValueActionVsMediumAggressive();
+                break;
+            case "loosePassive":
+                betValueAction = getBetValueActionVsLoosePassive();
+                break;
+            case "looseMedium":
+                betValueAction = getBetValueActionVsLooseMedium();
+                break;
+            case "looseAggressive":
+                betValueAction = getBetValueAtionVsLooseAggressive();
+                break;
+        }
+        return betValueAction;
+    }
+
+    private String getBetValueActionVsTightPassive() {
+        String betValueActionVsTightPassive = null;
+
+        if(sizing / bigBlind <= 5) {
+            if(handStrength > 0.50) {
+                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 20){
+            if(handStrength > 0.70) {
+                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 40) {
+            if(handStrength > 0.80) {
+                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 70) {
+            if(handStrength > 0.85) {
+                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else {
+            if(handStrength > 0.87) {
+                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+            }
+        }
+        return betValueActionVsTightPassive;
+    }
+
+    private String getBetValueActionVsTightMedium() {
+        String betValueActionVsTightMedium = null;
+
+        if(sizing / bigBlind <= 5) {
+            if(handStrength > 0.50) {
+                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 20){
+            if(handStrength > 0.70) {
+                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 40) {
+            if(handStrength > 0.80) {
+                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 70) {
+            if(handStrength > 0.85) {
+                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else {
+            if(handStrength >= 0.87) {
+                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
+            }
+        }
+        return betValueActionVsTightMedium;
+    }
+
+    private String getBetValueActionVsTightAggressive() {
+        String betValueActionVsTightAggressive = null;
+
+        if(sizing / bigBlind <= 5) {
+            if(handStrength > 0.50) {
+                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 20){
+            if(handStrength > 0.70) {
+                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 40) {
+            if(handStrength > 0.80) {
+                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else if (sizing / bigBlind <= 70) {
+            if(handStrength > 0.85) {
+                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
+            }
+        } else {
+            if(handStrength >= 0.87) {
+                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
+            }
+        }
+        return betValueActionVsTightAggressive;
+    }
+
+    private String getBetValueActionVsMediumPassive() {
+        return null;
+    }
+
+    private String getBetValueActionVsMediumMedium() {
+        return null;
+    }
+
+    private String getBetValueActionVsMediumAggressive() {
+        return null;
+    }
+
+    private String getBetValueActionVsLoosePassive() {
+        return null;
+    }
+
+    private String getBetValueActionVsLooseMedium() {
+        return null;
+    }
+
+    private String getBetValueAtionVsLooseAggressive() {
+        return null;
+    }
+
+    private String getRaiseValueAction() {
+        return null;
     }
 
     private String getDrawBettingAction(String bettingAction) {
