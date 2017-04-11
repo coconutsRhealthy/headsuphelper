@@ -8,9 +8,7 @@ import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -367,6 +365,26 @@ public class NetBetTableReader {
         MouseKeyboard.moveMouseToLocation(20, 20);
     }
 
+    public static boolean middleActionButtonIsNotPresent() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(786, 712, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+
+        if(suitRgb / 1000 == -16673) {
+            //expected: -16673794
+            return false;
+        }
+        //when not present, expected: -16641770
+        return true;
+    }
+
+    public int getOpponentVPIPFromImage() {
+        return 0;
+    }
+
+    public int getOpponent3betFromImage() {
+        return 0;
+    }
+
     //helper methods
     private static boolean clickFoldActionButton() {
         if(readLeftActionButton().contains("Fold")) {
@@ -441,18 +459,6 @@ public class NetBetTableReader {
             }
         }
         return clickActionDone;
-    }
-
-    public static boolean middleActionButtonIsNotPresent() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(786, 712, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-
-        if(suitRgb / 1000 == -16673) {
-            //expected: -16673794
-            return false;
-        }
-        //when not present, expected: -16641770
-        return true;
     }
 
     private String readTopChatLine() {

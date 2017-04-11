@@ -55,6 +55,9 @@ public class BotHand implements Actionable {
     private double botStackAtBeginningOfHand;
     private double opponentStackAtBeginningOfHand;
 
+    private List<Integer> opponentStats;
+    private String opponentType;
+
     public BotHand() {
         //default constructor
     }
@@ -77,6 +80,8 @@ public class BotHand implements Actionable {
         setBotHoleCards();
         setStreetAndPreviousStreet();
         setOpponentAction();
+        setOpponentStats();
+        setOpponentType();
     }
 
     public BotHand updateVariables() {
@@ -551,6 +556,36 @@ public class BotHand implements Actionable {
         }
     }
 
+    private void setOpponentStats() {
+        opponentStats = gameVariablesFiller.getOpponentStats();
+    }
+
+    private void setOpponentType() {
+        int vpip = opponentStats.get(0);
+        int _3bet = opponentStats.get(1);
+
+        String tightness;
+        String aggressiveness;
+
+        if(vpip < 63) {
+            tightness = "tight";
+        } else if(vpip < 77) {
+            tightness = "medium";
+        } else {
+            tightness = "loose";
+        }
+
+        if(_3bet < 14) {
+            aggressiveness = "Passive";
+        } else if(_3bet < 26) {
+            aggressiveness = "Medium";
+        } else {
+            aggressiveness = "Aggressive";
+        }
+
+        opponentType = tightness + aggressiveness;
+    }
+
     @Override
     public void removeHoleCardsFromKnownGameCards() {
         knownGameCards.removeAll(botHoleCards);
@@ -812,5 +847,22 @@ public class BotHand implements Actionable {
 
     public void setOpponentStackAtBeginningOfHand(double opponentStackAtBeginningOfHand) {
         this.opponentStackAtBeginningOfHand = opponentStackAtBeginningOfHand;
+    }
+
+    @Override
+    public String getOpponentType() {
+        return opponentType;
+    }
+
+    public void setOpponentType(String opponentType) {
+        this.opponentType = opponentType;
+    }
+
+    public List<Integer> getOpponentStats() {
+        return opponentStats;
+    }
+
+    public void setOpponentStats(List<Integer> opponentStats) {
+        this.opponentStats = opponentStats;
     }
 }

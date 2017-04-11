@@ -3,6 +3,8 @@ package com.lennart.model.botgame;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +33,8 @@ public class GameVariablesFiller {
 
     private NetBetTableReader netBetTableReader;
 
+    private List<Integer> opponentStats;
+
     public GameVariablesFiller(BotHand botHand) {
         setSmallBlind();
         setBigBlind();
@@ -45,6 +49,8 @@ public class GameVariablesFiller {
         setBotIsButton();
         setOpponentPlayerName();
         setActionsFromLastThreeChatLines();
+
+        setOpponentStats(botHand.getOpponentStats());
 
         setFlopCard1(botHand.getFlopCard1());
         if(flopCard1 != null) {
@@ -160,6 +166,17 @@ public class GameVariablesFiller {
         }
     }
 
+    private void setOpponentStats(List<Integer> opponentStats) {
+        if(opponentStats == null) {
+            opponentStats = new ArrayList<>();
+
+            opponentStats.add(netBetTableReader.getOpponentVPIPFromImage());
+            opponentStats.add(netBetTableReader.getOpponent3betFromImage());
+        } else {
+            this.opponentStats = opponentStats;
+        }
+    }
+
     public double getPotSize() {
         return potSize;
     }
@@ -230,5 +247,9 @@ public class GameVariablesFiller {
 
     public NetBetTableReader getNetBetTableReader() {
         return netBetTableReader;
+    }
+
+    public List<Integer> getOpponentStats() {
+        return opponentStats;
     }
 }

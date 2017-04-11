@@ -43,6 +43,8 @@ public class ComputerGame implements Actionable {
 
     private List<String> botActionHistory;
 
+    private String opponentType;
+
     public ComputerGame() {
         //default constructor
     }
@@ -818,5 +820,14 @@ public class ComputerGame implements Actionable {
 
     public void setBotActionHistory(List<String> botActionHistory) {
         this.botActionHistory = botActionHistory;
+    }
+
+    @Override
+    public String getOpponentType() {
+        return opponentType;
+    }
+
+    public void setOpponentType(String opponentType) {
+        this.opponentType = opponentType;
     }
 }

@@ -47,4 +47,6 @@ public interface Actionable {
     boolean isDrawBettingActionDone();
 
     void setDrawBettingActionDone(boolean drawBettingActionDone);
+
+    String getOpponentType();
 }
