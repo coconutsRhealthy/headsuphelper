@@ -1,14 +1,13 @@
 package com.lennart.model.action.actionbuilders.postflop;
 
 import com.lennart.model.action.Actionable;
+import com.lennart.model.action.actionbuilders.postflop.opponetprofile.OpponentProfiler;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by LPO21630 on 2-12-2016.
@@ -33,36 +32,7 @@ public class PostFlopActionBuilder {
     private double handStrength;
 
     private String opponentType;
-
-    Map<Integer, Double> tightPassiveBet;
-    Map<Integer, Double> tightMediumBet;
-    Map<Integer, Double> tightAggressiveBet;
-    Map<Integer, Double> mediumPassiveBet;
-    Map<Integer, Double> mediumMediumBet;
-    Map<Integer, Double> mediumAggressiveBet;
-    Map<Integer, Double> loosePassiveBet;
-    Map<Integer, Double> looseMediumBet;
-    Map<Integer, Double> looseAggressiveBet;
-
-    Map<Integer, Double> tightPassiveRaise;
-    Map<Integer, Double> tightMediumRaise;
-    Map<Integer, Double> tightAggressiveRaise;
-    Map<Integer, Double> mediumPassiveRaise;
-    Map<Integer, Double> mediumMediumRaise;
-    Map<Integer, Double> mediumAggressiveRaise;
-    Map<Integer, Double> loosePassiveRaise;
-    Map<Integer, Double> looseMediumRaise;
-    Map<Integer, Double> looseAggressiveRaise;
-
-    Map<Integer, Double> tightPassiveCall;
-    Map<Integer, Double> tightMediumCall;
-    Map<Integer, Double> tightAggressiveCall;
-    Map<Integer, Double> mediumPassiveCall;
-    Map<Integer, Double> mediumMediumCall;
-    Map<Integer, Double> mediumAggressiveCall;
-    Map<Integer, Double> loosePassiveCall;
-    Map<Integer, Double> looseMediumCall;
-    Map<Integer, Double> looseAggressiveCall;
+    private OpponentProfiler opponentProfiler;
 
     public PostFlopActionBuilder(BoardEvaluator boardEvaluator, HandEvaluator handEvaluator, Actionable actionable) {
         this.boardEvaluator = boardEvaluator;
@@ -73,113 +43,8 @@ public class PostFlopActionBuilder {
         board = actionable.getBoard();
         sizing = getSizing();
         potSize = actionable.getPotSize();
-    }
 
-    private void initializeOpponentTypeMaps() {
-        tightPassiveBet = new HashMap<>();
-        tightMediumBet = new HashMap<>();
-        tightAggressiveBet = new HashMap<>();
-        mediumPassiveBet = new HashMap<>();
-        mediumMediumBet = new HashMap<>();
-        mediumAggressiveBet = new HashMap<>();
-        loosePassiveBet = new HashMap<>();
-        looseMediumBet = new HashMap<>();
-        looseAggressiveBet = new HashMap<>();
-
-        tightPassiveRaise = new HashMap<>();
-        tightMediumRaise = new HashMap<>();
-        tightAggressiveRaise = new HashMap<>();
-        mediumPassiveRaise = new HashMap<>();
-        mediumMediumRaise = new HashMap<>();
-        mediumAggressiveRaise = new HashMap<>();
-        loosePassiveRaise = new HashMap<>();
-        looseMediumRaise = new HashMap<>();
-        looseAggressiveRaise = new HashMap<>();
-
-        tightPassiveCall = new HashMap<>();
-        tightMediumCall = new HashMap<>();
-        tightAggressiveCall = new HashMap<>();
-        mediumPassiveCall = new HashMap<>();
-        mediumMediumCall = new HashMap<>();
-        mediumAggressiveCall = new HashMap<>();
-        loosePassiveCall = new HashMap<>();
-        looseMediumCall = new HashMap<>();
-        looseAggressiveCall = new HashMap<>();
-
-        tightPassiveBet.put(5, 0.50);
-        tightPassiveBet.put(20, 0.70);
-        tightPassiveBet.put(40, 0.80);
-        tightPassiveBet.put(70, 0.85);
-        tightPassiveBet.put(71, 0.87);
-
-        tightMediumBet.put(5, 0.50);
-        tightMediumBet.put(20, 0.70);
-        tightMediumBet.put(40, 0.80);
-        tightMediumBet.put(70, 0.85);
-        tightMediumBet.put(71, 0.87);
-
-        tightAggressiveBet.put(5, 0.50);
-        tightAggressiveBet.put(20, 0.70);
-        tightAggressiveBet.put(40, 0.80);
-        tightAggressiveBet.put(70, 0.85);
-        tightAggressiveBet.put(71, 0.87);
-
-        mediumPassiveBet.put(5, 0.50);
-        mediumPassiveBet.put(20, 0.60);
-        mediumPassiveBet.put(40, 0.75);
-        mediumPassiveBet.put(70, 0.80);
-        mediumPassiveBet.put(71, 0.85);
-
-        mediumMediumBet.put(5, 0.50);
-        mediumMediumBet.put(20, 0.60);
-        mediumMediumBet.put(40, 0.75);
-        mediumMediumBet.put(70, 0.80);
-        mediumMediumBet.put(71, 0.85);
-
-        mediumAggressiveBet.put(5, 0.50);
-        mediumAggressiveBet.put(20, 0.60);
-        mediumAggressiveBet.put(40, 0.75);
-        mediumAggressiveBet.put(70, 0.80);
-        mediumAggressiveBet.put(71, 0.85);
-
-        loosePassiveBet.put(5, 0.50);
-        loosePassiveBet.put(20, 0.60);
-        loosePassiveBet.put(40, 0.67);
-        loosePassiveBet.put(70, 0.75);
-        loosePassiveBet.put(71, 0.80);
-
-        looseMediumBet.put(5, 0.50);
-        looseMediumBet.put(20, 0.60);
-        looseMediumBet.put(40, 0.67);
-        looseMediumBet.put(70, 0.75);
-        looseMediumBet.put(71, 0.80);
-
-        looseAggressiveBet.put(5, 0.50);
-        looseAggressiveBet.put(20, 0.60);
-        looseAggressiveBet.put(40, 0.65);
-        looseAggressiveBet.put(70, 0.75);
-        looseAggressiveBet.put(71, 0.80);
-
-
-        tightPassiveRaise.put(5, 0.85);
-        tightPassiveRaise.put(20, 0.87);
-        tightPassiveRaise.put(40, 0.90);
-        tightPassiveRaise.put(70, 0.90);
-        tightPassiveRaise.put(71, 0.90);
-
-        tightMediumRaise.put(5, 0.85);
-        tightMediumRaise.put(20, 0.85);
-        tightMediumRaise.put(40, 0.90);
-        tightMediumRaise.put(70, 0.90);
-        tightMediumRaise.put(71, 0.90);
-
-        tightAggressiveRaise.put(5, 0.85);
-        tightAggressiveRaise.put(20, 0.85);
-        tightAggressiveRaise.put(40, 0.90);
-        tightAggressiveRaise.put(70, 0.90);
-        tightAggressiveRaise.put(71, 0.90);
-
-
+        opponentType = actionable.getOpponentType();
     }
 
     public String getAction() {
@@ -191,25 +56,25 @@ public class PostFlopActionBuilder {
         System.out.println("Computer handstrength: " + handStrength);
 
         if(opponentAction == null || opponentAction.contains(CHECK)) {
-            action = getFcheckOrFirstToAct(handStrength);
+            action = getFcheckOrFirstToAct();
         }
         if(opponentAction != null && opponentAction.contains(BET)) {
-            action = getFbet(handStrength);
+            action = getFbet();
         }
         if(opponentAction != null && opponentAction.contains(RAISE)) {
-            action = getFraise(handStrength);
+            action = getFraise();
         }
         return action;
     }
 
-    private String getFcheckOrFirstToAct(double handStrength) {
+    private String getFcheckOrFirstToAct() {
         String action = getValueAction(BET);
 
         if(action == null) {
             action = getDrawBettingAction(BET);
         }
         if(action == null) {
-            action = getBluffAction(BET, handStrength);
+            action = getBluffAction(BET);
         }
         if(action == null) {
             System.out.println("default check in getFcheckOrFirstToAct()");
@@ -218,20 +83,20 @@ public class PostFlopActionBuilder {
         return action;
     }
 
-    private String getFbet(double handStrength) {
+    private String getFbet() {
         String action = getValueAction(RAISE);
 
         if(action == null) {
             action = getDrawBettingAction(RAISE);
         }
         if(action == null) {
-            action = getTrickyRaiseAction(handStrength);
+            action = getTrickyRaiseAction();
         }
         if(action == null) {
-            action = getBluffAction(RAISE, handStrength);
+            action = getBluffAction(RAISE);
         }
         if(action == null) {
-            action = getValueCallAction(handStrength);
+            action = getValueCallAction();
         }
         if(action == null) {
             action = getDrawCallingAction();
@@ -243,17 +108,17 @@ public class PostFlopActionBuilder {
         return action;
     }
 
-    private String getFraise(double handStrength) {
+    private String getFraise() {
         String action = getValueAction(RAISE);
 
         if(action == null) {
             action = getDrawBettingAction(RAISE);
         }
         if(action == null) {
-            action = getBluffAction(RAISE, handStrength);
+            action = getBluffAction(RAISE);
         }
         if(action == null) {
-            action = getValueCallAction(handStrength);
+            action = getValueCallAction();
         }
         if(action == null) {
             action = getDrawCallingAction();
@@ -269,6 +134,8 @@ public class PostFlopActionBuilder {
         String valueAction = null;
 
         if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
+            opponentProfiler = new OpponentProfiler();
+
             if(bettingAction.equals(BET)) {
                 valueAction = getBetValueAction();
             } else if(bettingAction.equals(RAISE)) {
@@ -287,187 +154,96 @@ public class PostFlopActionBuilder {
 
         switch(opponentType) {
             case "tightPassive":
-                betValueAction = getBetValueActionVsTightPassive();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveBet(), BET);
                 break;
             case "tightMedium":
-                betValueAction = getBetValueActionVsTightMedium();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumBet(), BET);
                 break;
             case "tightAggressive":
-                betValueAction = getBetValueActionVsTightAggressive();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveBet(), BET);
                 break;
             case "mediumPassive":
-                betValueAction = getBetValueActionVsMediumPassive();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveBet(), BET);
                 break;
             case "mediumMedium":
-                betValueAction = getBetValueActionVsMediumMedium();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumBet(), BET);
                 break;
             case "mediumAggressive":
-                betValueAction = getBetValueActionVsMediumAggressive();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveBet(), BET);
                 break;
             case "loosePassive":
-                betValueAction = getBetValueActionVsLoosePassive();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveBet(), BET);
                 break;
             case "looseMedium":
-                betValueAction = getBetValueActionVsLooseMedium();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumBet(), BET);
                 break;
             case "looseAggressive":
-                betValueAction = getBetValueAtionVsLooseAggressive();
+                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveBet(), BET);
                 break;
         }
         return betValueAction;
     }
 
-    private void fillMaps() {
-        Map<Integer, Double> tightPassiveBet = new HashMap<>();
+    private String getRaiseValueAction() {
+        String raiseValueAction = null;
 
-        tightPassiveBet.put(5, 0.50);
-        tightPassiveBet.put(20, 0.70);
-        tightPassiveBet.put(40, 0.80);
-        tightPassiveBet.put(70, 0.85);
-        tightPassiveBet.put(71, 0.87);
-
-
-
-
-
-
+        switch(opponentType) {
+            case "tightPassive":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveRaise(), RAISE);
+                break;
+            case "tightMedium":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumRaise(), RAISE);
+                break;
+            case "tightAggressive":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveRaise(), RAISE);
+                break;
+            case "mediumPassive":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveRaise(), RAISE);
+                break;
+            case "mediumMedium":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumRaise(), RAISE);
+                break;
+            case "mediumAggressive":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveRaise(), RAISE);
+                break;
+            case "loosePassive":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveRaise(), RAISE);
+                break;
+            case "looseMedium":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumRaise(), RAISE);
+                break;
+            case "looseAggressive":
+                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveRaise(), RAISE);
+                break;
+        }
+        return raiseValueAction;
     }
 
-    private String getBetValueAction(Map<Integer, Double> opponentTypeMap) {
-        String betValueActionVsTightPassive = null;
+    private String getBetOrRaiseValueActionFromMap(Map<Integer, Double> opponentTypeMap, String bettingAction) {
+        String betOrRaiseValueActionFromMap = null;
 
         if(sizing / bigBlind <= 5) {
             if(handStrength > opponentTypeMap.get(5)) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+                betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
             }
         } else if (sizing / bigBlind <= 20){
             if(handStrength > opponentTypeMap.get(20)) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+                betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
             }
         } else if (sizing / bigBlind <= 40) {
             if(handStrength > opponentTypeMap.get(40)) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+                betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
             }
         } else if (sizing / bigBlind <= 70) {
-            if(handStrength > opponentTypeMap.get(85)) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+            if(handStrength > opponentTypeMap.get(70)) {
+                betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
             }
         } else {
-            if(handStrength > opponentTypeMap.get(87)) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
+            if(handStrength > opponentTypeMap.get(71)) {
+                betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
             }
         }
-        return betValueActionVsTightPassive;
-    }
-
-
-    private String getBetValueActionVsTightPassive() {
-        String betValueActionVsTightPassive = null;
-
-        if(sizing / bigBlind <= 5) {
-            if(handStrength > 0.50) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 20){
-            if(handStrength > 0.70) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 40) {
-            if(handStrength > 0.80) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 70) {
-            if(handStrength > 0.85) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else {
-            if(handStrength > 0.87) {
-                betValueActionVsTightPassive = getPassiveOrAggressiveValueAction(BET);
-            }
-        }
-        return betValueActionVsTightPassive;
-    }
-
-    private String getBetValueActionVsTightMedium() {
-        String betValueActionVsTightMedium = null;
-
-        if(sizing / bigBlind <= 5) {
-            if(handStrength > 0.50) {
-                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 20){
-            if(handStrength > 0.70) {
-                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 40) {
-            if(handStrength > 0.80) {
-                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 70) {
-            if(handStrength > 0.85) {
-                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else {
-            if(handStrength >= 0.87) {
-                betValueActionVsTightMedium = getPassiveOrAggressiveValueAction(BET);
-            }
-        }
-        return betValueActionVsTightMedium;
-    }
-
-    private String getBetValueActionVsTightAggressive() {
-        String betValueActionVsTightAggressive = null;
-
-        if(sizing / bigBlind <= 5) {
-            if(handStrength > 0.50) {
-                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 20){
-            if(handStrength > 0.70) {
-                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 40) {
-            if(handStrength > 0.80) {
-                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else if (sizing / bigBlind <= 70) {
-            if(handStrength > 0.85) {
-                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
-            }
-        } else {
-            if(handStrength >= 0.87) {
-                betValueActionVsTightAggressive = getPassiveOrAggressiveValueAction(BET);
-            }
-        }
-        return betValueActionVsTightAggressive;
-    }
-
-    private String getBetValueActionVsMediumPassive() {
-        return null;
-    }
-
-    private String getBetValueActionVsMediumMedium() {
-        return null;
-    }
-
-    private String getBetValueActionVsMediumAggressive() {
-        return null;
-    }
-
-    private String getBetValueActionVsLoosePassive() {
-        return null;
-    }
-
-    private String getBetValueActionVsLooseMedium() {
-        return null;
-    }
-
-    private String getBetValueAtionVsLooseAggressive() {
-        return null;
-    }
-
-    private String getRaiseValueAction() {
-        return null;
+        return betOrRaiseValueActionFromMap;
     }
 
     private String getDrawBettingAction(String bettingAction) {
@@ -564,7 +340,7 @@ public class PostFlopActionBuilder {
         return drawBettingInitializeAction;
     }
 
-    private String getTrickyRaiseAction(double handStrength) {
+    private String getTrickyRaiseAction() {
         String trickyRaiseAction = null;
 
         if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
@@ -592,17 +368,17 @@ public class PostFlopActionBuilder {
         return trickyRaiseAction;
     }
 
-    private String getBluffAction(String bettingAction, double handStrength) {
+    private String getBluffAction(String bettingAction) {
         String bluffAction = null;
 
         if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
-            bluffAction = getBluffBarrelAction(bettingAction, handStrength);
+            bluffAction = getBluffBarrelAction(bettingAction);
 
             if(bluffAction == null) {
                 bluffAction = getBluffAfterMissedDrawAction(bettingAction);
             }
             if(bluffAction == null) {
-                bluffAction = getBluffInitializeAction(bettingAction, handStrength);
+                bluffAction = getBluffInitializeAction(bettingAction);
             }
 
             if(bluffAction != null) {
@@ -612,7 +388,7 @@ public class PostFlopActionBuilder {
         return bluffAction;
     }
 
-    private String getBluffBarrelAction(String bettingAction, double handStrength) {
+    private String getBluffBarrelAction(String bettingAction) {
         String bluffBarrelAction = null;
 
         if(actionable.isPreviousBluffAction()) {
@@ -664,7 +440,7 @@ public class PostFlopActionBuilder {
         return bluffAfterMissedDrawAction;
     }
 
-    private String getBluffInitializeAction(String bettingAction, double handStrength) {
+    private String getBluffInitializeAction(String bettingAction) {
         String bluffInitializeAction = null;
 
         if(bluffOddsAreOk() && handStrength < 0.65) {
@@ -726,7 +502,7 @@ public class PostFlopActionBuilder {
         return bluffInitializeAction;
     }
 
-    private String getValueCallAction(double handStrength) {
+    private String getValueCallAction() {
         String valueCallAction = null;
 
         double amountToCallBb = (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize()) / bigBlind;
@@ -737,32 +513,74 @@ public class PostFlopActionBuilder {
             }
         }
 
-        if(amountToCallBb <= 5) {
-            if(handStrength >= 0.50) {
-                valueCallAction = CALL;
+        if(valueCallAction == null) {
+            if(opponentProfiler == null) {
+                opponentProfiler = new OpponentProfiler();
             }
-        } else if (amountToCallBb <= 20){
-            if(handStrength >= 0.60) {
-                valueCallAction = CALL;
-            }
-        } else if (amountToCallBb <= 40) {
-            if(handStrength >= 0.65) {
-                valueCallAction = CALL;
-            }
-        } else if (amountToCallBb <= 70) {
-            if(handStrength >= 0.70) {
-                valueCallAction = CALL;
-            }
-        } else {
-            if(handStrength >= 0.75) {
-                valueCallAction = CALL;
+
+            switch(opponentType) {
+                case "tightPassive":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightPassiveCall());
+                    break;
+                case "tightMedium":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightMediumCall());
+                    break;
+                case "tightAggressive":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightAggressiveCall());
+                    break;
+                case "mediumPassive":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumPassiveCall());
+                    break;
+                case "mediumMedium":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumMediumCall());
+                    break;
+                case "mediumAggressive":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumAggressiveCall());
+                    break;
+                case "loosePassive":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLoosePassiveCall());
+                    break;
+                case "looseMedium":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLooseMediumCall());
+                    break;
+                case "looseAggressive":
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLooseAggressiveCall());
+                    break;
             }
         }
 
         if(valueCallAction != null) {
             System.out.println("value call action");
         }
+
         return valueCallAction;
+    }
+
+    private String getValueCallActionFromMap(Map<Integer, Double> opponentTypeMap) {
+        String valueCallActionFromMap = null;
+
+        if(sizing / bigBlind <= 5) {
+            if(handStrength > opponentTypeMap.get(5)) {
+                valueCallActionFromMap = CALL;
+            }
+        } else if (sizing / bigBlind <= 20){
+            if(handStrength > opponentTypeMap.get(20)) {
+                valueCallActionFromMap = CALL;
+            }
+        } else if (sizing / bigBlind <= 40) {
+            if(handStrength > opponentTypeMap.get(40)) {
+                valueCallActionFromMap = CALL;
+            }
+        } else if (sizing / bigBlind <= 70) {
+            if(handStrength > opponentTypeMap.get(70)) {
+                valueCallActionFromMap = CALL;
+            }
+        } else {
+            if(handStrength > opponentTypeMap.get(71)) {
+                valueCallActionFromMap = CALL;
+            }
+        }
+        return valueCallActionFromMap;
     }
 
     private String getDrawCallingAction() {
