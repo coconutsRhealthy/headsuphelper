@@ -187,36 +187,49 @@ public class PostFlopActionBuilder {
     private String getRaiseValueAction() {
         String raiseValueAction = null;
 
-        switch(opponentType) {
-            case "tightPassive":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveRaise(), RAISE);
-                break;
-            case "tightMedium":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumRaise(), RAISE);
-                break;
-            case "tightAggressive":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveRaise(), RAISE);
-                break;
-            case "mediumPassive":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveRaise(), RAISE);
-                break;
-            case "mediumMedium":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumRaise(), RAISE);
-                break;
-            case "mediumAggressive":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveRaise(), RAISE);
-                break;
-            case "loosePassive":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveRaise(), RAISE);
-                break;
-            case "looseMedium":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumRaise(), RAISE);
-                break;
-            case "looseAggressive":
-                raiseValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveRaise(), RAISE);
-                break;
+        if(board.size() < 5) {
+            if(actionable.getOpponentAction() == null || (actionable.getOpponentAction() != null && !actionable.getOpponentAction().contains("raise"))) {
+                raiseValueAction = getRaiseValueActionPerOpponentType();
+            }
+        } else {
+            raiseValueAction = getRaiseValueActionPerOpponentType();
         }
         return raiseValueAction;
+    }
+
+    private String getRaiseValueActionPerOpponentType() {
+        String raiseValueActionPerOpponentType = null;
+
+        switch(opponentType) {
+            case "tightPassive":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveRaise(), RAISE);
+                break;
+            case "tightMedium":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumRaise(), RAISE);
+                break;
+            case "tightAggressive":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveRaise(), RAISE);
+                break;
+            case "mediumPassive":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveRaise(), RAISE);
+                break;
+            case "mediumMedium":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumRaise(), RAISE);
+                break;
+            case "mediumAggressive":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveRaise(), RAISE);
+                break;
+            case "loosePassive":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveRaise(), RAISE);
+                break;
+            case "looseMedium":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumRaise(), RAISE);
+                break;
+            case "looseAggressive":
+                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveRaise(), RAISE);
+                break;
+        }
+        return raiseValueActionPerOpponentType;
     }
 
     private String getBetOrRaiseValueActionFromMap(Map<Integer, Double> opponentTypeMap, String bettingAction) {
@@ -288,47 +301,49 @@ public class PostFlopActionBuilder {
         String drawBettingInitializeAction = null;
 
         if(board.size() == 3 || board.size() == 4) {
-            if(sizing / bigBlind <= 5) {
-                if(handEvaluator.hasAnyDrawNonBackDoor()) {
-                    if(Math.random() < 0.5) {
-                        drawBettingInitializeAction = bettingAction;
+            if(actionable.getOpponentAction() == null || (actionable.getOpponentAction() != null && !actionable.getOpponentAction().contains("raise"))) {
+                if(sizing / bigBlind <= 5) {
+                    if(handEvaluator.hasAnyDrawNonBackDoor()) {
+                        if(Math.random() < 0.5) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongBackDoor")) {
-                    if(Math.random() < 0.01) {
-                        drawBettingInitializeAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                        if(Math.random() < 0.01) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
-                }
-            } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(Math.random() < 0.80) {
-                        drawBettingInitializeAction = bettingAction;
+                } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        if(Math.random() < 0.80) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(Math.random() < 0.22) {
-                        drawBettingInitializeAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                        if(Math.random() < 0.22) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongOvercards")) {
-                    if(Math.random() < 0.15) {
-                        drawBettingInitializeAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongOvercards")) {
+                        if(Math.random() < 0.15) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongBackDoor")) {
-                    if(Math.random() < 0.07) {
-                        drawBettingInitializeAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                        if(Math.random() < 0.07) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
-                }
-            } else {
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(Math.random() < 0.90) {
-                        drawBettingInitializeAction = bettingAction;
+                } else {
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        if(Math.random() < 0.90) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
-                }
-                if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(Math.random() < 0.27) {
-                        drawBettingInitializeAction = bettingAction;
+                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                        if(Math.random() < 0.27) {
+                            drawBettingInitializeAction = bettingAction;
+                        }
                     }
                 }
             }
@@ -343,26 +358,28 @@ public class PostFlopActionBuilder {
     private String getTrickyRaiseAction() {
         String trickyRaiseAction = null;
 
-        if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
-            if(handStrength >= 0.6 && handStrength < 0.8) {
-                if(board.size() == 3) {
-                    if(sizing / bigBlind <= 20) {
-                        if(Math.random() < 0.2) {
-                            trickyRaiseAction = RAISE;
+        if(actionable.getOpponentAction() == null || (actionable.getOpponentAction() != null && !actionable.getOpponentAction().contains("raise"))) {
+            if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
+                if(handStrength >= 0.6 && handStrength < 0.8) {
+                    if(board.size() == 3) {
+                        if(sizing / bigBlind <= 20) {
+                            if(Math.random() < 0.2) {
+                                trickyRaiseAction = RAISE;
+                            }
+                        }
+                    }
+                    if(board.size() == 4) {
+                        if(sizing / bigBlind <= 15) {
+                            if(Math.random() < 0.1) {
+                                trickyRaiseAction = RAISE;
+                            }
                         }
                     }
                 }
-                if(board.size() == 4) {
-                    if(sizing / bigBlind <= 15) {
-                        if(Math.random() < 0.1) {
-                            trickyRaiseAction = RAISE;
-                        }
-                    }
-                }
-            }
 
-            if(trickyRaiseAction != null) {
-                System.out.println("tricky raise action");
+                if(trickyRaiseAction != null) {
+                    System.out.println("tricky raise action");
+                }
             }
         }
         return trickyRaiseAction;

@@ -372,7 +372,7 @@ public class PreflopActionBuilder {
         Map<Integer, Set<Card>> call4bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4Bet.getComboMap5Percent());
 
-        _5bet x5bet = new _5bet(actionBuilderUtil);
+        _5bet x5bet = new _5bet(actionable, actionBuilderUtil);
 
         Map<Integer, Set<Card>> x5bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x5bet.getComboMap95Percent());
@@ -412,7 +412,7 @@ public class PreflopActionBuilder {
     private String get4betF5bet(Actionable actionable) {
         actionable.removeHoleCardsFromKnownGameCards();
 
-        Call5bet call5Bet = new Call5bet(actionBuilderUtil);
+        Call5bet call5Bet = new Call5bet(actionable, actionBuilderUtil);
 
         Map<Integer, Set<Card>> call5bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call5Bet.getComboMap100Percent());
