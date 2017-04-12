@@ -45,6 +45,10 @@ public class PostFlopActionBuilder {
         potSize = actionable.getPotSize();
 
         opponentType = actionable.getOpponentType();
+
+        if(opponentType == null) {
+            opponentType = "mediumMedium";
+        }
     }
 
     public String getAction() {
@@ -537,31 +541,31 @@ public class PostFlopActionBuilder {
 
             switch(opponentType) {
                 case "tightPassive":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightPassiveCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightPassiveCall(), amountToCallBb);
                     break;
                 case "tightMedium":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightMediumCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightMediumCall(), amountToCallBb);
                     break;
                 case "tightAggressive":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightAggressiveCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getTightAggressiveCall(), amountToCallBb);
                     break;
                 case "mediumPassive":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumPassiveCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumPassiveCall(), amountToCallBb);
                     break;
                 case "mediumMedium":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumMediumCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumMediumCall(), amountToCallBb);
                     break;
                 case "mediumAggressive":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumAggressiveCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getMediumAggressiveCall(), amountToCallBb);
                     break;
                 case "loosePassive":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLoosePassiveCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLoosePassiveCall(), amountToCallBb);
                     break;
                 case "looseMedium":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLooseMediumCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLooseMediumCall(), amountToCallBb);
                     break;
                 case "looseAggressive":
-                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLooseAggressiveCall());
+                    valueCallAction = getValueCallActionFromMap(opponentProfiler.getLooseAggressiveCall(), amountToCallBb);
                     break;
             }
         }
@@ -573,22 +577,22 @@ public class PostFlopActionBuilder {
         return valueCallAction;
     }
 
-    private String getValueCallActionFromMap(Map<Integer, Double> opponentTypeMap) {
+    private String getValueCallActionFromMap(Map<Integer, Double> opponentTypeMap, double amountToCallBb) {
         String valueCallActionFromMap = null;
 
-        if(sizing / bigBlind <= 5) {
+        if(amountToCallBb <= 5) {
             if(handStrength > opponentTypeMap.get(5)) {
                 valueCallActionFromMap = CALL;
             }
-        } else if (sizing / bigBlind <= 20){
+        } else if (amountToCallBb <= 20){
             if(handStrength > opponentTypeMap.get(20)) {
                 valueCallActionFromMap = CALL;
             }
-        } else if (sizing / bigBlind <= 40) {
+        } else if (amountToCallBb <= 40) {
             if(handStrength > opponentTypeMap.get(40)) {
                 valueCallActionFromMap = CALL;
             }
-        } else if (sizing / bigBlind <= 70) {
+        } else if (amountToCallBb <= 70) {
             if(handStrength > opponentTypeMap.get(70)) {
                 valueCallActionFromMap = CALL;
             }
