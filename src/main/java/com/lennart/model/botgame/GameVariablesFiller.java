@@ -168,10 +168,11 @@ public class GameVariablesFiller {
 
     private void setOpponentStats(List<Integer> opponentStats) {
         if(opponentStats == null) {
-            opponentStats = new ArrayList<>();
+            this.opponentStats = new ArrayList<>();
 
-            opponentStats.add(netBetTableReader.getOpponentVPIPFromImage());
-            opponentStats.add(netBetTableReader.getOpponent3betFromImage());
+            this.opponentStats.add(netBetTableReader.getOpponentVPIPFromImage());
+            this.opponentStats.add(netBetTableReader.getOpponent3betFromImage());
+            this.opponentStats.add(netBetTableReader.getOpponentHandsFromImage());
         } else {
             this.opponentStats = opponentStats;
         }

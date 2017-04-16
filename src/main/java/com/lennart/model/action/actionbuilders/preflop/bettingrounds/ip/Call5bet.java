@@ -23,7 +23,8 @@ public class Call5bet {
         comboMap100Percent.put(5, p.getSuitedCombosOfGivenRanks(14, 13));
         comboMap100Percent.put(6, p.getOffSuitCombosOfGivenRanks(14, 13));
 
-        if(actionable.getOpponentType() == null || (actionable.getOpponentType() != null && !actionable.getOpponentType().contains("Passive"))) {
+        if((actionable.getBotStack() / actionable.getBigBlind() < 50) || actionable.getOpponentType() == null ||
+                (actionable.getOpponentType() != null && !actionable.getOpponentType().contains("Passive"))) {
             comboMap100Percent.put(7, p.getPocketPairCombosOfGivenRank(10));
             comboMap100Percent.put(8, p.getPocketPairCombosOfGivenRank(9));
             comboMap100Percent.put(9, p.getPocketPairCombosOfGivenRank(8));

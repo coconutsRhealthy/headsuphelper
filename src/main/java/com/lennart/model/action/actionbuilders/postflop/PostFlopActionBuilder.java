@@ -529,8 +529,16 @@ public class PostFlopActionBuilder {
         double amountToCallBb = (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize()) / bigBlind;
 
         if(amountToCallBb / actionable.getPotSize() > 0 && amountToCallBb / actionable.getPotSize() <= 0.2) {
-            if(handStrength >= 30) {
+            if(handStrength >= 0.30) {
                 valueCallAction = CALL;
+            }
+        }
+
+        if(valueCallAction == null) {
+            if(actionable.getBotStack() <= 27 * bigBlind) {
+                if(handStrength >= 0.20) {
+                    valueCallAction = CALL;
+                }
             }
         }
 

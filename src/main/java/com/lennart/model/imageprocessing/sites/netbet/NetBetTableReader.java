@@ -378,11 +378,66 @@ public class NetBetTableReader {
     }
 
     public int getOpponentVPIPFromImage() {
-        return 0;
+        int vpip;
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(627, 430, 29, 17);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        String vpipAsString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        if(vpipAsString.matches(".*\\d.*")) {
+            try {
+                vpip = Integer.parseInt(vpipAsString);
+            } catch(NumberFormatException e) {
+                vpip = -1;
+                System.out.println("NumberFormatException occurred in getOpponentVPIPFromImage(), set to -1");
+            }
+        } else {
+            vpip = -1;
+            System.out.println("String didn't match .*\\d.* in getOpponentVPIPFromImage(), set to -1");
+        }
+        System.out.println("vpip: " + vpip);
+        return vpip;
     }
 
     public int getOpponent3betFromImage() {
-        return 0;
+        int _3bet;
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(627, 448, 29, 17);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        String _3betAsString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        if(_3betAsString.matches(".*\\d.*")) {
+            try {
+                _3bet = Integer.parseInt(_3betAsString);
+            } catch(NumberFormatException e) {
+                _3bet = -1;
+                System.out.println("NumberFormatException occurred in getOpponent3betFromImage(), set to -1");
+            }
+        } else {
+            _3bet = -1;
+            System.out.println("String didn't match .*\\d.* in getOpponent3betFromImage(), set to -1");
+        }
+        System.out.println("3bet stat: " + _3bet);
+        return _3bet;
+    }
+
+    public int getOpponentHandsFromImage() {
+        int opponentHands;
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(627, 468, 29, 17);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        String opponentHandsAsString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        if(opponentHandsAsString.matches(".*\\d.*")) {
+            try {
+                opponentHands = Integer.parseInt(opponentHandsAsString);
+            } catch(NumberFormatException e) {
+                opponentHands = -1;
+                System.out.println("NumberFormatException occurred in getOpponentHandsFromImage(), set to -1");
+            }
+        } else {
+            opponentHands = -1;
+            System.out.println("String didn't match .*\\d.* in getOpponentHandsFromImage(), set to -1");
+        }
+        System.out.println("opponentHands: " + opponentHands);
+        return opponentHands;
     }
 
     //helper methods

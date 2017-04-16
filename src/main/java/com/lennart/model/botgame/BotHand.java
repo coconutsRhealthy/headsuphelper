@@ -561,29 +561,40 @@ public class BotHand implements Actionable {
     }
 
     private void setOpponentType() {
-        int vpip = opponentStats.get(0);
-        int _3bet = opponentStats.get(1);
+//        int vpip = opponentStats.get(0);
+//        int _3bet = opponentStats.get(1);
+//        int opponentHands = opponentStats.get(2);
+//
+//        String tightness;
+//        String aggressiveness;
+//
+//        if(opponentHands > 20) {
+//            if(vpip < 0) {
+//                tightness = "medium";
+//            } else if(vpip < 63) {
+//                tightness = "tight";
+//            } else if(vpip < 77) {
+//                tightness = "medium";
+//            } else {
+//                tightness = "loose";
+//            }
+//
+//            if(_3bet < 0) {
+//                aggressiveness = "Medium";
+//            } else if(_3bet < 14) {
+//                aggressiveness = "Passive";
+//            } else if(_3bet < 26) {
+//                aggressiveness = "Medium";
+//            } else {
+//                aggressiveness = "Aggressive";
+//            }
+//        } else {
+//            tightness = "medium";
+//            aggressiveness = "medium";
+//        }
 
-        String tightness;
-        String aggressiveness;
-
-        if(vpip < 63) {
-            tightness = "tight";
-        } else if(vpip < 77) {
-            tightness = "medium";
-        } else {
-            tightness = "loose";
-        }
-
-        if(_3bet < 14) {
-            aggressiveness = "Passive";
-        } else if(_3bet < 26) {
-            aggressiveness = "Medium";
-        } else {
-            aggressiveness = "Aggressive";
-        }
-
-        opponentType = tightness + aggressiveness;
+        opponentType = "mediumMedium";
+        System.out.println("opponentType: " + opponentType);
     }
 
     @Override
