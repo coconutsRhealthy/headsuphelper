@@ -45,6 +45,8 @@ public class ComputerGame implements Actionable {
 
     private String opponentType;
 
+    private boolean pre3betOrPostRaisedPot;
+
     public ComputerGame() {
         //default constructor
     }
@@ -829,5 +831,14 @@ public class ComputerGame implements Actionable {
 
     public void setOpponentType(String opponentType) {
         this.opponentType = opponentType;
+    }
+
+    @Override
+    public boolean isPre3betOrPostRaisedPot() {
+        return pre3betOrPostRaisedPot;
+    }
+
+    public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
+        this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
     }
 }

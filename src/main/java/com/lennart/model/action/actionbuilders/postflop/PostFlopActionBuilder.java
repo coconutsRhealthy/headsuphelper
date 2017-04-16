@@ -305,48 +305,50 @@ public class PostFlopActionBuilder {
         String drawBettingInitializeAction = null;
 
         if(board.size() == 3 || board.size() == 4) {
-            if(actionable.getOpponentAction() == null || (actionable.getOpponentAction() != null && !actionable.getOpponentAction().contains("raise"))) {
-                if(sizing / bigBlind <= 5) {
-                    if(handEvaluator.hasAnyDrawNonBackDoor()) {
-                        if(Math.random() < 0.5) {
-                            drawBettingInitializeAction = bettingAction;
+            if(!(bettingAction.equals(RAISE) && actionable.isPre3betOrPostRaisedPot())) {
+                if(actionable.getOpponentAction() == null || (actionable.getOpponentAction() != null && !actionable.getOpponentAction().contains("raise"))) {
+                    if(sizing / bigBlind <= 5) {
+                        if(handEvaluator.hasAnyDrawNonBackDoor()) {
+                            if(Math.random() < 0.5) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
-                    }
-                    if(handEvaluator.hasDrawOfType("strongBackDoor")) {
-                        if(Math.random() < 0.01) {
-                            drawBettingInitializeAction = bettingAction;
+                        if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                            if(Math.random() < 0.01) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
-                    }
-                } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
-                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                        if(Math.random() < 0.80) {
-                            drawBettingInitializeAction = bettingAction;
+                    } else if (sizing / bigBlind > 5 && sizing / bigBlind <= 20){
+                        if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                            if(Math.random() < 0.80) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
-                    }
-                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                        if(Math.random() < 0.22) {
-                            drawBettingInitializeAction = bettingAction;
+                        if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                            if(Math.random() < 0.22) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
-                    }
-                    if(handEvaluator.hasDrawOfType("strongOvercards")) {
-                        if(Math.random() < 0.15) {
-                            drawBettingInitializeAction = bettingAction;
+                        if(handEvaluator.hasDrawOfType("strongOvercards")) {
+                            if(Math.random() < 0.15) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
-                    }
-                    if(handEvaluator.hasDrawOfType("strongBackDoor")) {
-                        if(Math.random() < 0.07) {
-                            drawBettingInitializeAction = bettingAction;
+                        if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                            if(Math.random() < 0.07) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
-                    }
-                } else {
-                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                        if(Math.random() < 0.90) {
-                            drawBettingInitializeAction = bettingAction;
+                    } else {
+                        if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                            if(Math.random() < 0.90) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
-                    }
-                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                        if(Math.random() < 0.27) {
-                            drawBettingInitializeAction = bettingAction;
+                        if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                            if(Math.random() < 0.27) {
+                                drawBettingInitializeAction = bettingAction;
+                            }
                         }
                     }
                 }
@@ -731,10 +733,14 @@ public class PostFlopActionBuilder {
 
     private String getPassiveOrAggressiveValueAction(String bettingAction) {
         if(board.size() != 5) {
-            if(Math.random() < 0.92) {
-                return bettingAction;
-            } else {
+            if(bettingAction.equals(RAISE) && actionable.isPre3betOrPostRaisedPot()) {
                 return null;
+            } else {
+                if(Math.random() < 0.92) {
+                    return bettingAction;
+                } else {
+                    return null;
+                }
             }
         } else {
             String opponentAction = actionable.getOpponentAction();

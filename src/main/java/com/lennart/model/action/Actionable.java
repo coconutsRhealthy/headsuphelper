@@ -49,4 +49,6 @@ public interface Actionable {
     void setDrawBettingActionDone(boolean drawBettingActionDone);
 
     String getOpponentType();
+
+    boolean isPre3betOrPostRaisedPot();
 }

@@ -58,6 +58,8 @@ public class BotHand implements Actionable {
     private List<Integer> opponentStats;
     private String opponentType;
 
+    private boolean pre3betOrPostRaisedPot;
+
     public BotHand() {
         //default constructor
     }
@@ -82,6 +84,7 @@ public class BotHand implements Actionable {
         setOpponentAction();
         setOpponentStats();
         setOpponentType();
+        checkIfPre3betOrPostRaisedPot();
     }
 
     public BotHand updateVariables() {
@@ -106,6 +109,7 @@ public class BotHand implements Actionable {
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
         setOpponentAction();
+        checkIfPre3betOrPostRaisedPot();
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
 
@@ -134,6 +138,7 @@ public class BotHand implements Actionable {
             botWrittenAction = botAction.getWrittenAction();
         }
 
+        checkIfPre3betOrPostRaisedPot();
         preflopFinalPreventFoldCheck();
         postFlopFinalPreventFoldCheck();
         NetBetTableReader.performActionOnSite(botAction);
@@ -597,6 +602,20 @@ public class BotHand implements Actionable {
         System.out.println("opponentType: " + opponentType);
     }
 
+    private void checkIfPre3betOrPostRaisedPot() {
+        if(opponentAction != null && botAction != null && botAction.getAction() != null) {
+            if(board == null) {
+                if(opponentAction.contains("raise") && botAction.getAction().contains("raise")) {
+                    pre3betOrPostRaisedPot = true;
+                }
+            } else {
+                if(opponentAction.contains("raise") || botAction.getAction().contains("raise")) {
+                    pre3betOrPostRaisedPot = true;
+                }
+            }
+        }
+    }
+
     @Override
     public void removeHoleCardsFromKnownGameCards() {
         knownGameCards.removeAll(botHoleCards);
@@ -875,5 +894,14 @@ public class BotHand implements Actionable {
 
     public void setOpponentStats(List<Integer> opponentStats) {
         this.opponentStats = opponentStats;
+    }
+
+    @Override
+    public boolean isPre3betOrPostRaisedPot() {
+        return pre3betOrPostRaisedPot;
+    }
+
+    public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
+        this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
     }
 }
