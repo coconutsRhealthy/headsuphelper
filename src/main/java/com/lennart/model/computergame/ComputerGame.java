@@ -47,6 +47,13 @@ public class ComputerGame implements Actionable {
 
     private boolean pre3betOrPostRaisedPot;
 
+    private double handsHumanOopFacingPreflop2bet;
+    private double handsHumanOopCall2bet;
+    private double handsHumanOop3bet;
+    private double opponentPreCall2betStat;
+    private double opponentPre3betStat;
+    private boolean opponentPreflopStatsDoneForHand;
+
     public ComputerGame() {
         //default constructor
     }
@@ -72,6 +79,7 @@ public class ComputerGame implements Actionable {
     }
 
     public ComputerGame submitHumanActionAndDoComputerAction() {
+        calculateOpponentPreflopStats();
         boolean computerActionNeeded = isComputerActionNeeded();
 
         if(myAction.equals("fold")) {
@@ -420,6 +428,7 @@ public class ComputerGame implements Actionable {
         knownGameCards = null;
         handWinner = null;
         computerWrittenAction = null;
+        opponentPreflopStatsDoneForHand = false;
         previousBluffAction = false;
         drawBettingActionDone = false;
     }
@@ -570,6 +579,23 @@ public class ComputerGame implements Actionable {
         String holeCard2Suit = Character.toString(holeCards.get(1).getSuit());
 
         return holeCard1Rank + holeCard1Suit + holeCard2Rank + holeCard2Suit;
+    }
+
+    private void calculateOpponentPreflopStats() {
+        if(!opponentPreflopStatsDoneForHand) {
+            if(board == null && computerIsButton && computerWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
+                handsHumanOopFacingPreflop2bet++;
+                if(myAction.equals("call")) {
+                    handsHumanOopCall2bet++;
+                }
+                if(myAction.equals("raise")) {
+                    handsHumanOop3bet++;
+                }
+            }
+            opponentPreCall2betStat = handsHumanOopCall2bet / handsHumanOopFacingPreflop2bet;
+            opponentPre3betStat = handsHumanOop3bet / handsHumanOopFacingPreflop2bet;
+            opponentPreflopStatsDoneForHand = true;
+        }
     }
 
     private boolean isPreflopCheck() {
@@ -794,6 +820,61 @@ public class ComputerGame implements Actionable {
 
     public void setNumberOfHandsPlayed(int numberOfHandsPlayed) {
         this.numberOfHandsPlayed = numberOfHandsPlayed;
+    }
+
+    @Override
+    public double getHandsOpponentOopFacingPreflop2bet() {
+        return getHandsHumanOopFacingPreflop2bet();
+    }
+
+    public double getHandsHumanOopFacingPreflop2bet() {
+        return handsHumanOopFacingPreflop2bet;
+    }
+
+    public void setHandsHumanOopFacingPreflop2bet(double handsHumanOopFacingPreflop2bet) {
+        this.handsHumanOopFacingPreflop2bet = handsHumanOopFacingPreflop2bet;
+    }
+
+    public double getHandsHumanOopCall2bet() {
+        return handsHumanOopCall2bet;
+    }
+
+    public void setHandsHumanOopCall2bet(double handsHumanOopCall2bet) {
+        this.handsHumanOopCall2bet = handsHumanOopCall2bet;
+    }
+
+    @Override
+    public double getOpponentPreCall2betStat() {
+        return opponentPreCall2betStat;
+    }
+
+    public void setOpponentPreCall2betStat(double opponentPreCall2betStat) {
+        this.opponentPreCall2betStat = opponentPreCall2betStat;
+    }
+
+    public boolean isOpponentPreflopStatsDoneForHand() {
+        return opponentPreflopStatsDoneForHand;
+    }
+
+    public void setOpponentPreflopStatsDoneForHand(boolean opponentPreflopStatsDoneForHand) {
+        this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
+    }
+
+    public double getHandsHumanOop3bet() {
+        return handsHumanOop3bet;
+    }
+
+    public void setHandsHumanOop3bet(double handsHumanOop3bet) {
+        this.handsHumanOop3bet = handsHumanOop3bet;
+    }
+
+    @Override
+    public double getOpponentPre3betStat() {
+        return opponentPre3betStat;
+    }
+
+    public void setOpponentPre3betStat(double opponentPre3betStat) {
+        this.opponentPre3betStat = opponentPre3betStat;
     }
 
     @Override

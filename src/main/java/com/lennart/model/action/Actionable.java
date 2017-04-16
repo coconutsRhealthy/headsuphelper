@@ -51,4 +51,12 @@ public interface Actionable {
     String getOpponentType();
 
     boolean isPre3betOrPostRaisedPot();
+
+    double getHandsOpponentOopFacingPreflop2bet();
+
+    double getOpponentPreCall2betStat();
+
+    double getOpponentPre3betStat();
+
+
 }

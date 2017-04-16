@@ -60,6 +60,11 @@ public class BotHand implements Actionable {
 
     private boolean pre3betOrPostRaisedPot;
 
+    private boolean opponentPreflopStatsDoneForHand;
+    private double handsOpponentOopFacingPreflop2bet;
+    private double opponentPreCall2betStat;
+    private double opponentPre3betStat;
+
     public BotHand() {
         //default constructor
     }
@@ -903,5 +908,40 @@ public class BotHand implements Actionable {
 
     public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
         this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
+    }
+
+    public boolean isOpponentPreflopStatsDoneForHand() {
+        return opponentPreflopStatsDoneForHand;
+    }
+
+    public void setOpponentPreflopStatsDoneForHand(boolean opponentPreflopStatsDoneForHand) {
+        this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
+    }
+
+    @Override
+    public double getHandsOpponentOopFacingPreflop2bet() {
+        return handsOpponentOopFacingPreflop2bet;
+    }
+
+    public void setHandsOpponentOopFacingPreflop2bet(double handsOpponentOopFacingPreflop2bet) {
+        this.handsOpponentOopFacingPreflop2bet = handsOpponentOopFacingPreflop2bet;
+    }
+
+    @Override
+    public double getOpponentPreCall2betStat() {
+        return opponentPreCall2betStat;
+    }
+
+    public void setOpponentPreCall2betStat(double opponentPreCall2betStat) {
+        this.opponentPreCall2betStat = opponentPreCall2betStat;
+    }
+
+    @Override
+    public double getOpponentPre3betStat() {
+        return opponentPre3betStat;
+    }
+
+    public void setOpponentPre3betStat(double opponentPre3betStat) {
+        this.opponentPre3betStat = opponentPre3betStat;
     }
 }
