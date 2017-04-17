@@ -50,7 +50,7 @@ public class GameVariablesFiller {
         setOpponentPlayerName();
         setActionsFromLastThreeChatLines();
 
-        setOpponentStats(botHand.getOpponentStats());
+        //setOpponentStats(botHand.getOpponentStats());
 
         setFlopCard1(botHand.getFlopCard1());
         if(flopCard1 != null) {

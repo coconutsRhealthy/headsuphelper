@@ -52,11 +52,7 @@ public interface Actionable {
 
     boolean isPre3betOrPostRaisedPot();
 
-    double getHandsOpponentOopFacingPreflop2bet();
-
     double getOpponentPreCall2betStat();
 
     double getOpponentPre3betStat();
-
-
 }

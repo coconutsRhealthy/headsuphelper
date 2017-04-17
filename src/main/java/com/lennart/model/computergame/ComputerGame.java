@@ -822,11 +822,6 @@ public class ComputerGame implements Actionable {
         this.numberOfHandsPlayed = numberOfHandsPlayed;
     }
 
-    @Override
-    public double getHandsOpponentOopFacingPreflop2bet() {
-        return getHandsHumanOopFacingPreflop2bet();
-    }
-
     public double getHandsHumanOopFacingPreflop2bet() {
         return handsHumanOopFacingPreflop2bet;
     }

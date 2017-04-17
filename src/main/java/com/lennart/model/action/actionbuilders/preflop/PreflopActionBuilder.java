@@ -58,6 +58,12 @@ public class PreflopActionBuilder {
                     && (action.equals("bet") || action.equals("raise"))) {
                 action = "call";
             }
+
+            if(actionable.getBotStack() >= 0 && actionable.getBotStack() <= 40 * actionable.getBigBlind()) {
+                if(action.equals("fold")) {
+                    action = "call";
+                }
+            }
         }
         return action;
     }

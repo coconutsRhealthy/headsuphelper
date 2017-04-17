@@ -394,7 +394,7 @@ public class NetBetTableReader {
             vpip = -1;
             System.out.println("String didn't match .*\\d.* in getOpponentVPIPFromImage(), set to -1");
         }
-        System.out.println("vpip: " + vpip);
+        //System.out.println("vpip: " + vpip);
         return vpip;
     }
 
@@ -415,7 +415,7 @@ public class NetBetTableReader {
             _3bet = -1;
             System.out.println("String didn't match .*\\d.* in getOpponent3betFromImage(), set to -1");
         }
-        System.out.println("3bet stat: " + _3bet);
+        //System.out.println("3bet stat: " + _3bet);
         return _3bet;
     }
 
