@@ -15,6 +15,7 @@ public class BotTable {
     private BotHand botHand;
 
     private Map<String, List<Double>> opponentPlayerNamesAndStats;
+    private Map<String, List<Boolean>> botIsButtonHistoryPerOpponentMap;
 
     public BotTable() {
         //default constructor
@@ -79,30 +80,30 @@ public class BotTable {
     }
 
     public void addHandToHandsEligibleForVpip(String opponentPlayerName) {
-        addPlayerToMapIfNecessary(opponentPlayerName);
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
         double handsEligibleForVpip = opponentPlayerNamesAndStats.get(opponentPlayerName).get(0) + 1;
         opponentPlayerNamesAndStats.get(opponentPlayerName).set(0, handsEligibleForVpip);
     }
 
     public void addHandToHandsVpip(String opponentPlayerName) {
-        addPlayerToMapIfNecessary(opponentPlayerName);
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
         double handsVpip = opponentPlayerNamesAndStats.get(opponentPlayerName).get(1) + 1;
         opponentPlayerNamesAndStats.get(opponentPlayerName).set(1, handsVpip);
     }
 
     public void addHandToHandsEligibleFor3bet(String opponentPlayerName) {
-        addPlayerToMapIfNecessary(opponentPlayerName);
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
         double handsEligibleFor3bet = opponentPlayerNamesAndStats.get(opponentPlayerName).get(2) + 1;
         opponentPlayerNamesAndStats.get(opponentPlayerName).set(2, handsEligibleFor3bet);
     }
 
     public void addHandToHands3bet(String opponentPlayerName) {
-        addPlayerToMapIfNecessary(opponentPlayerName);
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
         double hands3bet = opponentPlayerNamesAndStats.get(opponentPlayerName).get(3) + 1;
         opponentPlayerNamesAndStats.get(opponentPlayerName).set(3, hands3bet);
     }
 
-    public void addPlayerToMapIfNecessary(String opponentPlayerName) {
+    private void addPlayerToStatsMapIfNecessary(String opponentPlayerName) {
         if(opponentPlayerNamesAndStats == null) {
             opponentPlayerNamesAndStats = new HashMap<>();
         }
@@ -112,6 +113,24 @@ public class BotTable {
             for(int i = 0; i < 4; i++) {
                 opponentPlayerNamesAndStats.get(opponentPlayerName).add(0d);
             }
+        }
+    }
+
+    public void addBooleanToBotIsButtonHistoryPerOpponentMap(String opponentPlayerName, Boolean botIsButton) {
+        addPlayerToBotIsButtonHistoryPerOpponentMapIfNecessary(opponentPlayerName);
+
+        if(opponentPlayerName != null && botIsButtonHistoryPerOpponentMap.get(opponentPlayerName) == null) {
+            botIsButtonHistoryPerOpponentMap.get(opponentPlayerName).add(botIsButton);
+        }
+    }
+
+    private void addPlayerToBotIsButtonHistoryPerOpponentMapIfNecessary(String opponentPlayerName) {
+        if(botIsButtonHistoryPerOpponentMap == null) {
+            botIsButtonHistoryPerOpponentMap = new HashMap<>();
+        }
+
+        if(opponentPlayerName != null && botIsButtonHistoryPerOpponentMap.get(opponentPlayerName) == null) {
+            botIsButtonHistoryPerOpponentMap.put(opponentPlayerName, new ArrayList<>());
         }
     }
 
@@ -145,5 +164,13 @@ public class BotTable {
 
     public void setOpponentPlayerNamesAndStats(Map<String, List<Double>> opponentPlayerNamesAndStats) {
         this.opponentPlayerNamesAndStats = opponentPlayerNamesAndStats;
+    }
+
+    public Map<String, List<Boolean>> getBotIsButtonHistoryPerOpponentMap() {
+        return botIsButtonHistoryPerOpponentMap;
+    }
+
+    public void setBotIsButtonHistoryPerOpponentMap(Map<String, List<Boolean>> botIsButtonHistoryPerOpponentMap) {
+        this.botIsButtonHistoryPerOpponentMap = botIsButtonHistoryPerOpponentMap;
     }
 }

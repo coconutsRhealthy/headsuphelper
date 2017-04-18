@@ -783,13 +783,13 @@ public class NetBetTableReader {
     private String getActionFromChatLine(String chatLine) {
         String action = null;
 
-        if(chatLine.contains("check")) {
+        if(chatLine.contains("checks")) {
             action = "check";
-        } else if(chatLine.contains("call")) {
+        } else if(chatLine.contains("calls")) {
             action = "call";
-        } else if(chatLine.contains("bet")) {
+        } else if(chatLine.contains("bets")) {
             action = "bet";
-        } else if(chatLine.contains("raise")) {
+        } else if(chatLine.contains("raises")) {
             action = "raise";
         } else if(chatLine.contains("post")) {
             action = "post";
