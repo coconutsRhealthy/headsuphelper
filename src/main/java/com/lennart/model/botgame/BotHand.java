@@ -55,17 +55,11 @@ public class BotHand implements Actionable {
     private double botStackAtBeginningOfHand;
     private double opponentStackAtBeginningOfHand;
 
-    private List<Integer> opponentStats;
     private String opponentType;
 
     private boolean pre3betOrPostRaisedPot;
 
-    private double opponentPreCall2betStat;
-    private double opponentPre3betStat;
-    private double opponentVpipStat;
-    private double handsPlayedVersusOpponent;
-
-    private String firstOpponentActionOfHand;
+    private List<String> opponentActionHistory;
 
     public BotHand() {
         //default constructor
@@ -88,10 +82,8 @@ public class BotHand implements Actionable {
         setKnownGameCards();
         setBotHoleCards();
         setStreetAndPreviousStreet();
-        setOpponentAction(botTable);
-        setOpponentStats();
+        setOpponentAction();
         checkIfPre3betOrPostRaisedPot();
-        updateNumberOfHandsPlayed(botTable);
         setOpponentType(botTable);
     }
 
@@ -99,7 +91,7 @@ public class BotHand implements Actionable {
         gameVariablesFiller = new GameVariablesFiller(this);
 
         if(foldOrShowdownOccured()) {
-            updateNumberOfHandsIfopponentFoldsPreflopFirstToAct(botTable);
+            updateStats(botTable);
             return new BotHand(botTable);
         }
 
@@ -117,18 +109,12 @@ public class BotHand implements Actionable {
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
-        setOpponentAction(botTable);
+        setOpponentAction();
         checkIfPre3betOrPostRaisedPot();
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
 
         return this;
-    }
-
-    private void updateNumberOfHandsIfopponentFoldsPreflopFirstToAct(BotTable botTable) {
-        if(flopCards == null && botActionHistory == null && !botIsButton) {
-            updateNumberOfHandsPlayed(botTable);
-        }
     }
 
     public void getNewBotAction() {
@@ -208,6 +194,18 @@ public class BotHand implements Actionable {
             botActionHistory.add(street + " check");
         } else {
             botActionHistory.add(street + " " + action.getAction());
+        }
+    }
+
+    private void updateOpponentActionHistory(String action) {
+        if(opponentActionHistory == null) {
+            opponentActionHistory = new ArrayList<>();
+        }
+
+        if(action == null) {
+            opponentActionHistory.add(street + " null");
+        } else {
+            opponentActionHistory.add(street + " " + action);
         }
     }
 
@@ -419,7 +417,7 @@ public class BotHand implements Actionable {
         opponentPlayerName = gameVariablesFiller.getOpponentPlayerName();
     }
 
-    private void setOpponentAction(BotTable botTable) {
+    private void setOpponentAction() {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
         if(street.equals(streetAtPreviousActionRequest)) {
@@ -439,42 +437,7 @@ public class BotHand implements Actionable {
                 opponentAction = null;
             }
         }
-
-        if(firstOpponentActionOfHand == null) {
-            firstOpponentActionOfHand = opponentAction;
-            updateVpipStatsAfterFirstOpponentAction(botTable);
-        }
-    }
-
-    private void updateVpipStatsAfterFirstOpponentAction(BotTable botTable) {
-        System.out.println("inside updateVpipStatsAfterFirstOpponentAction(). firstOpponentActionOfHand = " + firstOpponentActionOfHand);
-
-        botTable.addPlayerToMapIfNecessary(this);
-
-        if(firstOpponentActionOfHand != null) {
-            if(firstOpponentActionOfHand.contains("call") || firstOpponentActionOfHand.contains("raise")) {
-
-                double handsOpponentVPIP = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(4) + 1;
-
-                System.out.println("in the inner most if preflop. handsOpponentVPIP = " + handsOpponentVPIP);
-
-                botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).set(4, handsOpponentVPIP);
-
-                System.out.println("hands opponent VPIP in the map is: " + botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(4));
-            }
-
-            if(flopCards != null && (firstOpponentActionOfHand.contains("check") || firstOpponentActionOfHand.contains("bet"))) {
-
-                double handsOpponentVPIP = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(4) + 1;
-
-                System.out.println("in the inner most if postlop. handsOpponentVPIP = " + handsOpponentVPIP);
-
-                botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).set(4, handsOpponentVPIP);
-
-                System.out.println("hands opponent VPIP in the map is: " + botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(4));
-
-            }
-        }
+        updateOpponentActionHistory(opponentAction);
     }
 
     private boolean foldOrShowdownOccured() {
@@ -612,24 +575,69 @@ public class BotHand implements Actionable {
         }
     }
 
-    private void setOpponentStats() {
-        opponentStats = gameVariablesFiller.getOpponentStats();
+    private void updateStats(BotTable botTable) {
+        updateHandsEligibleForVpip(botTable);
+        updateHandsVpip(botTable);
+        updateHandsEligibleFor3bet(botTable);
+        udpateHands3bet(botTable);
+    }
+
+    private void updateHandsEligibleForVpip(BotTable botTable) {
+        if(!botIsButton) {
+            botTable.addHandToHandsEligibleForVpip(opponentPlayerName);
+        } else {
+            if(botActionHistory.size() == 1 && botActionHistory.get(0).contains("fold")) {
+                //keep equal
+            } else {
+                botTable.addHandToHandsEligibleForVpip(opponentPlayerName);
+            }
+        }
+    }
+
+    private void updateHandsVpip(BotTable botTable) {
+        if(opponentActionHistory.size() == 1 &&
+                (opponentActionHistory.get(0).contains("call") ||  opponentActionHistory.get(0).contains("raise"))) {
+            botTable.addHandToHandsVpip(opponentPlayerName);
+        } else if(opponentActionHistory.size() > 1) {
+            botTable.addHandToHandsVpip(opponentPlayerName);
+        }
+    }
+
+    private void updateHandsEligibleFor3bet(BotTable botTable) {
+        if(botIsButton) {
+            if(botActionHistory.size() == 1 && botActionHistory.get(0).contains("raise")) {
+                botTable.addHandToHandsEligibleFor3bet(opponentPlayerName);
+            } else if(botActionHistory.size() > 1) {
+                botTable.addHandToHandsEligibleFor3bet(opponentPlayerName);
+            }
+        }
+    }
+
+    private void udpateHands3bet(BotTable botTable) {
+        if(botIsButton) {
+            if(opponentActionHistory.get(0).contains("raise")) {
+                botTable.addHandToHands3bet(opponentPlayerName);
+            }
+        }
     }
 
     private void setOpponentType(BotTable botTable) {
-        double vpip = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(4) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(3);
-        double _3bet = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(2) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
-        double opponentHands = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(3);
+        double vpip = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(1) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
+        double _3bet = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(3) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(2);
+        double opponentHands = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
 
         String tightness;
         String aggressiveness;
+
+        for (Map.Entry<String, List<Double>> entry : botTable.getOpponentPlayerNamesAndStats().entrySet()) {
+            System.out.println(entry.getKey() + " " + entry.getValue());
+        }
 
         System.out.println("vpip in setOpponentType(): " + vpip);
         System.out.println("_3bet in setOpponentType(): " + _3bet);
         System.out.println("opponentHands in setOpponentType(): " + opponentHands);
 
         if(opponentHands > 20) {
-            System.out.println("hij komt in opponentHands > 20");
             if(vpip < 0) {
                 tightness = "medium";
             } else if(vpip < 0.63) {
@@ -670,14 +678,6 @@ public class BotHand implements Actionable {
                 }
             }
         }
-    }
-
-    private void updateNumberOfHandsPlayed(BotTable botTable) {
-        botTable.addPlayerToMapIfNecessary(this);
-        double handsPlayedVersusOpponent = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(3) + 1;
-        botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).set(3, handsPlayedVersusOpponent);
-        setHandsPlayedVersusOpponent(handsPlayedVersusOpponent);
-        System.out.println("hands played versus " + opponentPlayerName + ": " + botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(3));
     }
 
     @Override
@@ -952,14 +952,6 @@ public class BotHand implements Actionable {
         this.opponentType = opponentType;
     }
 
-    public List<Integer> getOpponentStats() {
-        return opponentStats;
-    }
-
-    public void setOpponentStats(List<Integer> opponentStats) {
-        this.opponentStats = opponentStats;
-    }
-
     @Override
     public boolean isPre3betOrPostRaisedPot() {
         return pre3betOrPostRaisedPot;
@@ -967,47 +959,5 @@ public class BotHand implements Actionable {
 
     public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
         this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
-    }
-
-    @Override
-    public double getOpponentPreCall2betStat() {
-        return opponentPreCall2betStat;
-    }
-
-    public void setOpponentPreCall2betStat(double opponentPreCall2betStat) {
-        this.opponentPreCall2betStat = opponentPreCall2betStat;
-    }
-
-    @Override
-    public double getOpponentPre3betStat() {
-        return opponentPre3betStat;
-    }
-
-    public void setOpponentPre3betStat(double opponentPre3betStat) {
-        this.opponentPre3betStat = opponentPre3betStat;
-    }
-
-    public double getOpponentVpipStat() {
-        return opponentVpipStat;
-    }
-
-    public void setOpponentVpipStat(double opponentVpipStat) {
-        this.opponentVpipStat = opponentVpipStat;
-    }
-
-    public double getHandsPlayedVersusOpponent() {
-        return handsPlayedVersusOpponent;
-    }
-
-    public void setHandsPlayedVersusOpponent(double handsPlayedVersusOpponent) {
-        this.handsPlayedVersusOpponent = handsPlayedVersusOpponent;
-    }
-
-    public String getFirstOpponentActionOfHand() {
-        return firstOpponentActionOfHand;
-    }
-
-    public void setFirstOpponentActionOfHand(String firstOpponentActionOfHand) {
-        this.firstOpponentActionOfHand = firstOpponentActionOfHand;
     }
 }

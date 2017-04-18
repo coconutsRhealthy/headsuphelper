@@ -43,9 +43,9 @@ public class Controller {
         return botTable;
     }
 
-    @RequestMapping(value = "/getNewBotAction", method = RequestMethod.POST)
+    @RequestMapping(value = "/getNewBotActionInBotTable", method = RequestMethod.POST)
     public @ResponseBody BotTable getNewBotAction(@RequestBody BotTable botTable) {
-        botTable.getNewBotAction();
+        botTable.getNewBotActionInBotTable();
         botTable.getBotHand().setBotAction(null);
         botTable.getBotHand().setGameVariablesFiller(null);
         return botTable;

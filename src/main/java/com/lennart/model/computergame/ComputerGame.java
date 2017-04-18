@@ -838,15 +838,6 @@ public class ComputerGame implements Actionable {
         this.handsHumanOopCall2bet = handsHumanOopCall2bet;
     }
 
-    @Override
-    public double getOpponentPreCall2betStat() {
-        return opponentPreCall2betStat;
-    }
-
-    public void setOpponentPreCall2betStat(double opponentPreCall2betStat) {
-        this.opponentPreCall2betStat = opponentPreCall2betStat;
-    }
-
     public boolean isOpponentPreflopStatsDoneForHand() {
         return opponentPreflopStatsDoneForHand;
     }
@@ -861,15 +852,6 @@ public class ComputerGame implements Actionable {
 
     public void setHandsHumanOop3bet(double handsHumanOop3bet) {
         this.handsHumanOop3bet = handsHumanOop3bet;
-    }
-
-    @Override
-    public double getOpponentPre3betStat() {
-        return opponentPre3betStat;
-    }
-
-    public void setOpponentPre3betStat(double opponentPre3betStat) {
-        this.opponentPre3betStat = opponentPre3betStat;
     }
 
     @Override
