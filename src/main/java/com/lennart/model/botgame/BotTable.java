@@ -81,26 +81,42 @@ public class BotTable {
 
     public void addHandToHandsEligibleForVpip(String opponentPlayerName) {
         addPlayerToStatsMapIfNecessary(opponentPlayerName);
-        double handsEligibleForVpip = opponentPlayerNamesAndStats.get(opponentPlayerName).get(0) + 1;
-        opponentPlayerNamesAndStats.get(opponentPlayerName).set(0, handsEligibleForVpip);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(0) != null) {
+            double handsEligibleForVpip = opponentPlayerNamesAndStats.get(opponentPlayerName).get(0) + 1;
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(0, handsEligibleForVpip);
+        }
     }
 
     public void addHandToHandsVpip(String opponentPlayerName) {
         addPlayerToStatsMapIfNecessary(opponentPlayerName);
-        double handsVpip = opponentPlayerNamesAndStats.get(opponentPlayerName).get(1) + 1;
-        opponentPlayerNamesAndStats.get(opponentPlayerName).set(1, handsVpip);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(1) != null) {
+            double handsVpip = opponentPlayerNamesAndStats.get(opponentPlayerName).get(1) + 1;
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(1, handsVpip);
+        }
     }
 
     public void addHandToHandsEligibleFor3bet(String opponentPlayerName) {
         addPlayerToStatsMapIfNecessary(opponentPlayerName);
-        double handsEligibleFor3bet = opponentPlayerNamesAndStats.get(opponentPlayerName).get(2) + 1;
-        opponentPlayerNamesAndStats.get(opponentPlayerName).set(2, handsEligibleFor3bet);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(2) != null) {
+            double handsEligibleFor3bet = opponentPlayerNamesAndStats.get(opponentPlayerName).get(2) + 1;
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(2, handsEligibleFor3bet);
+        }
     }
 
     public void addHandToHands3bet(String opponentPlayerName) {
         addPlayerToStatsMapIfNecessary(opponentPlayerName);
-        double hands3bet = opponentPlayerNamesAndStats.get(opponentPlayerName).get(3) + 1;
-        opponentPlayerNamesAndStats.get(opponentPlayerName).set(3, hands3bet);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(3) != null) {
+            double hands3bet = opponentPlayerNamesAndStats.get(opponentPlayerName).get(3) + 1;
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(3, hands3bet);
+        }
     }
 
     private void addPlayerToStatsMapIfNecessary(String opponentPlayerName) {

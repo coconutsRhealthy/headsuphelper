@@ -651,8 +651,11 @@ public class BotHand implements Actionable {
 
     private void udpateHands3bet(BotTable botTable) {
         if(botIsButton) {
-            if(opponentActionHistory.get(0).contains("raise")) {
-                botTable.addHandToHands3bet(opponentPlayerName);
+            //opponentActionHistory.get(1) because get(0) is always 'preflop null' when botIsButton
+            if(opponentActionHistory.size() >= 2) {
+                if(opponentActionHistory.get(1).contains("raise")) {
+                    botTable.addHandToHands3bet(opponentPlayerName);
+                }
             }
         }
     }
