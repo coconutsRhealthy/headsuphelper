@@ -423,7 +423,7 @@ public class PostFlopActionBuilder {
     private String resetBluffActionIfNecessary(String bluffAction) {
         if(actionable.isBettingActionDoneByPassivePlayer()) {
             bluffAction = null;
-        } else if(sizing / bigBlind >= 100) {
+        } else if(sizing / bigBlind >= 118) {
             bluffAction = null;
         } else if(opponentType != null) {
             if(opponentType.equals("loosePassive")) {

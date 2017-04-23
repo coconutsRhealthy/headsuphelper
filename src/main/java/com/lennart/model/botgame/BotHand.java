@@ -446,7 +446,7 @@ public class BotHand implements Actionable {
 
     private void checkIfBettingActionIsDoneByPassivePlayer(String action) {
         if(opponentType != null && opponentType.contains("Passive")) {
-            if(action.contains("bet") || action.contains("raise")) {
+            if(action != null && (action.contains("bet") || action.contains("raise"))) {
                 if(!botIsButton) {
                     if(opponentActionHistory != null && opponentActionHistory.size() > 1) {
                         //to check if the betting action done by villain is not an initial PFR, which we don't count

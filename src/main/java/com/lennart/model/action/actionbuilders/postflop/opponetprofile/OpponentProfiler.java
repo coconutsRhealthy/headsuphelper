@@ -76,6 +76,9 @@ public class OpponentProfiler {
         looseMediumCall = new HashMap<>();
         looseAggressiveCall = new HashMap<>();
 
+        passiveDidBettingActionBet = new HashMap<>();
+        passiveDidBettingActionRaise = new HashMap<>();
+
         tightPassiveBet.put(5, 0.50);
         tightPassiveBet.put(20, 0.70);
         tightPassiveBet.put(40, 0.80);
