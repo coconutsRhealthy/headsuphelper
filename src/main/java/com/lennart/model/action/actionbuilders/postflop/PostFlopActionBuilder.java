@@ -138,7 +138,7 @@ public class PostFlopActionBuilder {
         String valueAction = null;
 
         if(getAmountToCall() < actionable.getBotStack() && actionable.getOpponentStack() > 0) {
-            opponentProfiler = new OpponentProfiler();
+            opponentProfiler = new OpponentProfiler(actionable.getBoard());
 
             if(bettingAction.equals(BET)) {
                 valueAction = getBetValueAction();
@@ -577,7 +577,7 @@ public class PostFlopActionBuilder {
 
         if(valueCallAction == null) {
             if(opponentProfiler == null) {
-                opponentProfiler = new OpponentProfiler();
+                opponentProfiler = new OpponentProfiler(actionable.getBoard());
             }
 
             switch(opponentType) {
