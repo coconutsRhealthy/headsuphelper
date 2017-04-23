@@ -51,4 +51,8 @@ public interface Actionable {
     String getOpponentType();
 
     boolean isPre3betOrPostRaisedPot();
+
+    boolean isBettingActionDoneByPassivePlayer();
+
+    double getHandsPlayedAgainstOpponent();
 }

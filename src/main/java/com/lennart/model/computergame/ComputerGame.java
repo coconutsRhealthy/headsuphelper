@@ -54,6 +54,9 @@ public class ComputerGame implements Actionable {
     private double opponentPre3betStat;
     private boolean opponentPreflopStatsDoneForHand;
 
+    private boolean bettingActionDoneByPassivePlayer;
+    private double handsPlayedAgainstOpponent;
+
     public ComputerGame() {
         //default constructor
     }
@@ -898,5 +901,23 @@ public class ComputerGame implements Actionable {
 
     public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
         this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
+    }
+
+    @Override
+    public boolean isBettingActionDoneByPassivePlayer() {
+        return bettingActionDoneByPassivePlayer;
+    }
+
+    public void setBettingActionDoneByPassivePlayer(boolean bettingActionDoneByPassivePlayer) {
+        this.bettingActionDoneByPassivePlayer = bettingActionDoneByPassivePlayer;
+    }
+
+    @Override
+    public double getHandsPlayedAgainstOpponent() {
+        return handsPlayedAgainstOpponent;
+    }
+
+    public void setHandsPlayedAgainstOpponent(double handsPlayedAgainstOpponent) {
+        this.handsPlayedAgainstOpponent = handsPlayedAgainstOpponent;
     }
 }

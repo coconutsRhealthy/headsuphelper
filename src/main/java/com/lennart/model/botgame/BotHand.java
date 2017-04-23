@@ -61,6 +61,9 @@ public class BotHand implements Actionable {
 
     private List<String> opponentActionHistory;
 
+    private boolean bettingActionDoneByPassivePlayer;
+    private double handsPlayedAgainstOpponent;
+
     public BotHand() {
         //default constructor
     }
@@ -438,6 +441,24 @@ public class BotHand implements Actionable {
             }
         }
         updateOpponentActionHistory(opponentAction);
+        checkIfBettingActionIsDoneByPassivePlayer(opponentAction);
+    }
+
+    private void checkIfBettingActionIsDoneByPassivePlayer(String action) {
+        if(opponentType != null && opponentType.contains("Passive")) {
+            if(action.contains("bet") || action.contains("raise")) {
+                if(!botIsButton) {
+                    if(opponentActionHistory != null && opponentActionHistory.size() > 1) {
+                        //to check if the betting action done by villain is not an initial PFR, which we don't count
+                        bettingActionDoneByPassivePlayer = true;
+                        System.out.println("bettingActionDoneByPassivePlayer set to true");
+                    }
+                } else {
+                    bettingActionDoneByPassivePlayer = true;
+                    System.out.println("bettingActionDoneByPassivePlayer set to true");
+                }
+            }
+        }
     }
 
     private boolean foldOrShowdownOccured() {
@@ -680,6 +701,8 @@ public class BotHand implements Actionable {
             opponentHands = 0;
             System.out.println("opponentPlayerNamesAndStats is null or the opponent is not yet in there");
         }
+
+        handsPlayedAgainstOpponent = opponentHands;
 
         String tightness;
         String aggressiveness;
@@ -1023,5 +1046,23 @@ public class BotHand implements Actionable {
 
     public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
         this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
+    }
+
+    @Override
+    public boolean isBettingActionDoneByPassivePlayer() {
+        return bettingActionDoneByPassivePlayer;
+    }
+
+    public void setBettingActionDoneByPassivePlayer(boolean bettingActionDoneByPassivePlayer) {
+        this.bettingActionDoneByPassivePlayer = bettingActionDoneByPassivePlayer;
+    }
+
+    @Override
+    public double getHandsPlayedAgainstOpponent() {
+        return handsPlayedAgainstOpponent;
+    }
+
+    public void setHandsPlayedAgainstOpponent(double handsPlayedAgainstOpponent) {
+        this.handsPlayedAgainstOpponent = handsPlayedAgainstOpponent;
     }
 }

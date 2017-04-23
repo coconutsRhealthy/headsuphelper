@@ -8,35 +8,38 @@ import java.util.Map;
  */
 public class OpponentProfiler {
 
-    Map<Integer, Double> tightPassiveBet;
-    Map<Integer, Double> tightMediumBet;
-    Map<Integer, Double> tightAggressiveBet;
-    Map<Integer, Double> mediumPassiveBet;
-    Map<Integer, Double> mediumMediumBet;
-    Map<Integer, Double> mediumAggressiveBet;
-    Map<Integer, Double> loosePassiveBet;
-    Map<Integer, Double> looseMediumBet;
-    Map<Integer, Double> looseAggressiveBet;
+    private Map<Integer, Double> tightPassiveBet;
+    private Map<Integer, Double> tightMediumBet;
+    private Map<Integer, Double> tightAggressiveBet;
+    private Map<Integer, Double> mediumPassiveBet;
+    private Map<Integer, Double> mediumMediumBet;
+    private Map<Integer, Double> mediumAggressiveBet;
+    private Map<Integer, Double> loosePassiveBet;
+    private Map<Integer, Double> looseMediumBet;
+    private Map<Integer, Double> looseAggressiveBet;
 
-    Map<Integer, Double> tightPassiveRaise;
-    Map<Integer, Double> tightMediumRaise;
-    Map<Integer, Double> tightAggressiveRaise;
-    Map<Integer, Double> mediumPassiveRaise;
-    Map<Integer, Double> mediumMediumRaise;
-    Map<Integer, Double> mediumAggressiveRaise;
-    Map<Integer, Double> loosePassiveRaise;
-    Map<Integer, Double> looseMediumRaise;
-    Map<Integer, Double> looseAggressiveRaise;
+    private Map<Integer, Double> tightPassiveRaise;
+    private Map<Integer, Double> tightMediumRaise;
+    private Map<Integer, Double> tightAggressiveRaise;
+    private Map<Integer, Double> mediumPassiveRaise;
+    private Map<Integer, Double> mediumMediumRaise;
+    private Map<Integer, Double> mediumAggressiveRaise;
+    private Map<Integer, Double> loosePassiveRaise;
+    private Map<Integer, Double> looseMediumRaise;
+    private Map<Integer, Double> looseAggressiveRaise;
 
-    Map<Integer, Double> tightPassiveCall;
-    Map<Integer, Double> tightMediumCall;
-    Map<Integer, Double> tightAggressiveCall;
-    Map<Integer, Double> mediumPassiveCall;
-    Map<Integer, Double> mediumMediumCall;
-    Map<Integer, Double> mediumAggressiveCall;
-    Map<Integer, Double> loosePassiveCall;
-    Map<Integer, Double> looseMediumCall;
-    Map<Integer, Double> looseAggressiveCall;
+    private Map<Integer, Double> tightPassiveCall;
+    private Map<Integer, Double> tightMediumCall;
+    private Map<Integer, Double> tightAggressiveCall;
+    private Map<Integer, Double> mediumPassiveCall;
+    private Map<Integer, Double> mediumMediumCall;
+    private Map<Integer, Double> mediumAggressiveCall;
+    private Map<Integer, Double> loosePassiveCall;
+    private Map<Integer, Double> looseMediumCall;
+    private Map<Integer, Double> looseAggressiveCall;
+
+    private Map<Integer, Double> passiveDidBettingActionBet;
+    private Map<Integer, Double> passiveDidBettingActionRaise;
 
     public OpponentProfiler() {
         fillMaps();
@@ -126,7 +129,6 @@ public class OpponentProfiler {
         looseAggressiveBet.put(40, 0.65);
         looseAggressiveBet.put(70, 0.75);
         looseAggressiveBet.put(71, 0.80);
-
 
         tightPassiveRaise.put(5, 0.85);
         tightPassiveRaise.put(20, 0.87);
@@ -235,6 +237,18 @@ public class OpponentProfiler {
         looseAggressiveCall.put(40, 0.65);
         looseAggressiveCall.put(70, 0.70);
         looseAggressiveCall.put(71, 0.80);
+
+        passiveDidBettingActionBet.put(5, 0.85);
+        passiveDidBettingActionBet.put(20, 0.87);
+        passiveDidBettingActionBet.put(40, 0.90);
+        passiveDidBettingActionBet.put(70, 0.90);
+        passiveDidBettingActionBet.put(71, 0.91);
+
+        passiveDidBettingActionRaise.put(5, 0.85);
+        passiveDidBettingActionRaise.put(20, 0.87);
+        passiveDidBettingActionRaise.put(40, 0.90);
+        passiveDidBettingActionRaise.put(70, 0.90);
+        passiveDidBettingActionRaise.put(71, 0.91);
     }
 
     public Map<Integer, Double> getTightPassiveBet() {
@@ -343,5 +357,13 @@ public class OpponentProfiler {
 
     public Map<Integer, Double> getLooseAggressiveCall() {
         return looseAggressiveCall;
+    }
+
+    public Map<Integer, Double> getPassiveDidBettingActionBet() {
+        return passiveDidBettingActionBet;
+    }
+
+    public Map<Integer, Double> getPassiveDidBettingActionRaise() {
+        return passiveDidBettingActionRaise;
     }
 }

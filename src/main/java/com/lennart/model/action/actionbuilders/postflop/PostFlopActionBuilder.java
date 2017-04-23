@@ -156,34 +156,38 @@ public class PostFlopActionBuilder {
     private String getBetValueAction() {
         String betValueAction = null;
 
-        switch(opponentType) {
-            case "tightPassive":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveBet(), BET);
-                break;
-            case "tightMedium":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumBet(), BET);
-                break;
-            case "tightAggressive":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveBet(), BET);
-                break;
-            case "mediumPassive":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveBet(), BET);
-                break;
-            case "mediumMedium":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumBet(), BET);
-                break;
-            case "mediumAggressive":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveBet(), BET);
-                break;
-            case "loosePassive":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveBet(), BET);
-                break;
-            case "looseMedium":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumBet(), BET);
-                break;
-            case "looseAggressive":
-                betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveBet(), BET);
-                break;
+        if(actionable.isBettingActionDoneByPassivePlayer()) {
+            betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getPassiveDidBettingActionBet(), BET);
+        } else {
+            switch(opponentType) {
+                case "tightPassive":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveBet(), BET);
+                    break;
+                case "tightMedium":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumBet(), BET);
+                    break;
+                case "tightAggressive":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveBet(), BET);
+                    break;
+                case "mediumPassive":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveBet(), BET);
+                    break;
+                case "mediumMedium":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumBet(), BET);
+                    break;
+                case "mediumAggressive":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveBet(), BET);
+                    break;
+                case "loosePassive":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveBet(), BET);
+                    break;
+                case "looseMedium":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumBet(), BET);
+                    break;
+                case "looseAggressive":
+                    betValueAction = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveBet(), BET);
+                    break;
+            }
         }
         return betValueAction;
     }
@@ -204,34 +208,38 @@ public class PostFlopActionBuilder {
     private String getRaiseValueActionPerOpponentType() {
         String raiseValueActionPerOpponentType = null;
 
-        switch(opponentType) {
-            case "tightPassive":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveRaise(), RAISE);
-                break;
-            case "tightMedium":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumRaise(), RAISE);
-                break;
-            case "tightAggressive":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveRaise(), RAISE);
-                break;
-            case "mediumPassive":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveRaise(), RAISE);
-                break;
-            case "mediumMedium":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumRaise(), RAISE);
-                break;
-            case "mediumAggressive":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveRaise(), RAISE);
-                break;
-            case "loosePassive":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveRaise(), RAISE);
-                break;
-            case "looseMedium":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumRaise(), RAISE);
-                break;
-            case "looseAggressive":
-                raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveRaise(), RAISE);
-                break;
+        if(actionable.isBettingActionDoneByPassivePlayer()) {
+            raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getPassiveDidBettingActionRaise(), RAISE);
+        } else {
+            switch(opponentType) {
+                case "tightPassive":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightPassiveRaise(), RAISE);
+                    break;
+                case "tightMedium":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightMediumRaise(), RAISE);
+                    break;
+                case "tightAggressive":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getTightAggressiveRaise(), RAISE);
+                    break;
+                case "mediumPassive":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumPassiveRaise(), RAISE);
+                    break;
+                case "mediumMedium":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumMediumRaise(), RAISE);
+                    break;
+                case "mediumAggressive":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getMediumAggressiveRaise(), RAISE);
+                    break;
+                case "loosePassive":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLoosePassiveRaise(), RAISE);
+                    break;
+                case "looseMedium":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseMediumRaise(), RAISE);
+                    break;
+                case "looseAggressive":
+                    raiseValueActionPerOpponentType = getBetOrRaiseValueActionFromMap(opponentProfiler.getLooseAggressiveRaise(), RAISE);
+                    break;
+            }
         }
         return raiseValueActionPerOpponentType;
     }
@@ -408,6 +416,29 @@ public class PostFlopActionBuilder {
                 System.out.println("bluff action");
             }
         }
+        bluffAction = resetBluffActionIfNecessary(bluffAction);
+        return bluffAction;
+    }
+
+    private String resetBluffActionIfNecessary(String bluffAction) {
+        if(actionable.isBettingActionDoneByPassivePlayer()) {
+            bluffAction = null;
+        } else if(sizing / bigBlind >= 100) {
+            bluffAction = null;
+        } else if(opponentType != null) {
+            if(opponentType.equals("loosePassive")) {
+                if(sizing / bigBlind >= 20) {
+                    bluffAction = null;
+                }
+            } else if(opponentType.equals("looseMedium")) {
+                if(sizing / bigBlind >= 30) {
+                    bluffAction = null;
+                }
+            }
+        } else if(actionable.getHandsPlayedAgainstOpponent() < 20 && sizing / bigBlind >= 30) {
+            bluffAction = null;
+        }
+
         return bluffAction;
     }
 
