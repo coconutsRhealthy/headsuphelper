@@ -64,6 +64,9 @@ public class BotHand implements Actionable {
     private boolean bettingActionDoneByPassivePlayer;
     private double handsPlayedAgainstOpponent;
 
+    private boolean instaFoldHappened;
+    private boolean opponentIsDecentThinking;
+
     public BotHand() {
         //default constructor
     }
@@ -85,9 +88,11 @@ public class BotHand implements Actionable {
         setKnownGameCards();
         setBotHoleCards();
         setStreetAndPreviousStreet();
-        setOpponentAction();
+        setOpponentAction(botTable);
         checkIfPre3betOrPostRaisedPot();
+        setTheInitialStackSizeOfOpponentIfNotYetSet(botTable);
         setOpponentType(botTable);
+        checkIfOpponentIsDecentThinking(botTable);
     }
 
     public BotHand updateVariables(BotTable botTable) {
@@ -112,7 +117,7 @@ public class BotHand implements Actionable {
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
-        setOpponentAction();
+        setOpponentAction(botTable);
         checkIfPre3betOrPostRaisedPot();
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
@@ -420,7 +425,7 @@ public class BotHand implements Actionable {
         opponentPlayerName = gameVariablesFiller.getOpponentPlayerName();
     }
 
-    private void setOpponentAction() {
+    private void setOpponentAction(BotTable botTable) {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
         if(street.equals(streetAtPreviousActionRequest)) {
@@ -432,6 +437,9 @@ public class BotHand implements Actionable {
                 }
             } else {
                 opponentAction = actionsFromLastThreeChatLines.get("bottom");
+                if(opponentAction.contains("raise")) {
+                    botTable.setLastPfrSizingOfOpponent(opponentPlayerName, opponentTotalBetSize / bigBlind);
+                }
             }
         } else {
             if(botIsButton) {
@@ -602,6 +610,8 @@ public class BotHand implements Actionable {
         updateHandsVpip(botTable);
         updateHandsEligibleFor3bet(botTable);
         udpateHands3bet(botTable);
+        updateHandsEligibleForIpPfr(botTable);
+        updateHandsIpPfr(botTable);
     }
 
     private void updateHandsEligibleForVpip(BotTable botTable) {
@@ -614,6 +624,7 @@ public class BotHand implements Actionable {
 
                 if(buttonHistoryAgainstOpponent.get(buttonHistoryAgainstOpponent.size() - 1).
                         equals(buttonHistoryAgainstOpponent.get(buttonHistoryAgainstOpponent.size() - 2))) {
+                    instaFoldHappened = true;
                     botTable.addHandToHandsEligibleForVpip(opponentPlayerName);
                     System.out.println("botIsButton same as previous hand, so opponent insta folded last hand preflop. " +
                             "Hand added to vpip eligible count");
@@ -636,23 +647,9 @@ public class BotHand implements Actionable {
     }
 
     private void updateHandsVpip(BotTable botTable) {
-        Map<String, List<Boolean>> botIsButtonHistoryPerOpponentMap = botTable.getBotIsButtonHistoryPerOpponentMap();
-        boolean countActionDone = false;
-
-        if(botIsButtonHistoryPerOpponentMap != null && botIsButtonHistoryPerOpponentMap.get(opponentPlayerName) != null) {
-            if(botIsButtonHistoryPerOpponentMap.get(opponentPlayerName).size() >= 2) {
-                List<Boolean> buttonHistoryAgainstOpponent = botIsButtonHistoryPerOpponentMap.get(opponentPlayerName);
-
-                if(buttonHistoryAgainstOpponent.get(buttonHistoryAgainstOpponent.size() - 1).
-                        equals(buttonHistoryAgainstOpponent.get(buttonHistoryAgainstOpponent.size() - 2))) {
-                    //do nothing, insta fold happened previous hand
-                    System.out.println("no hand added to vpip count, insta fold happened previous hand");
-                    countActionDone = true;
-                }
-            }
-        }
-
-        if(!countActionDone) {
+        if(instaFoldHappened) {
+            System.out.println("no hand added to vpip count, insta fold happened previous hand");
+        } else {
             if(opponentActionHistory.size() == 1 &&
                     (opponentActionHistory.get(0).contains("call") ||  opponentActionHistory.get(0).contains("raise"))) {
                 botTable.addHandToHandsVpip(opponentPlayerName);
@@ -678,6 +675,18 @@ public class BotHand implements Actionable {
                     botTable.addHandToHands3bet(opponentPlayerName);
                 }
             }
+        }
+    }
+
+    private void updateHandsEligibleForIpPfr(BotTable botTable) {
+        if(instaFoldHappened || !botIsButton) {
+            botTable.addHandToHandsEligibleForIpPfr(opponentPlayerName);
+        }
+    }
+
+    private void updateHandsIpPfr(BotTable botTable) {
+        if(!botIsButton && opponentActionHistory.get(0).contains("raise")) {
+            botTable.addHandToHandsIpPfr(opponentPlayerName);
         }
     }
 
@@ -740,6 +749,39 @@ public class BotHand implements Actionable {
         System.out.println("opponentType: " + opponentType);
     }
 
+    private void checkIfOpponentIsDecentThinking(BotTable botTable) {
+        double opponentHands = 0;
+        double vpip = 0;
+        double pfr = 0;
+        double _3bet = 0;
+        double pfrSizing = 0;
+        double initialStackSize = 0;
+
+        if(botTable.getOpponentPlayerNamesAndStats() != null &&
+                botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName) != null) {
+            opponentHands = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
+            vpip = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(1) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
+            pfr = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(5) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(4);
+            _3bet = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(3) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(2);
+            pfrSizing = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(7);
+            initialStackSize = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(6);
+        }
+
+        if(opponentHands > 20) {
+            if(initialStackSize == 100) {
+                if(pfrSizing >= 2 && pfrSizing <= 5) {
+                    if(vpip > 40 && vpip <= 90) {
+                        if(pfr > 40 && pfr <= 85) {
+                            if(_3bet >= 9 && _3bet < 40) {
+                                opponentIsDecentThinking = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void checkIfPre3betOrPostRaisedPot() {
         if(!pre3betOrPostRaisedPot) {
             if(board == null) {
@@ -765,6 +807,10 @@ public class BotHand implements Actionable {
             }
         }
         System.out.println("pre3betOrPostRaisedPot is: " + pre3betOrPostRaisedPot);
+    }
+
+    private void setTheInitialStackSizeOfOpponentIfNotYetSet(BotTable botTable) {
+        botTable.setInitialStackSizeOfOpponent(opponentPlayerName, opponentStack / bigBlind);
     }
 
     @Override
@@ -1064,5 +1110,14 @@ public class BotHand implements Actionable {
 
     public void setHandsPlayedAgainstOpponent(double handsPlayedAgainstOpponent) {
         this.handsPlayedAgainstOpponent = handsPlayedAgainstOpponent;
+    }
+
+    @Override
+    public boolean isOpponentIsDecentThinking() {
+        return opponentIsDecentThinking;
+    }
+
+    public void setOpponentIsDecentThinking(boolean opponentIsDecentThinking) {
+        this.opponentIsDecentThinking = opponentIsDecentThinking;
     }
 }

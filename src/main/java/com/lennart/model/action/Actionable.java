@@ -55,4 +55,6 @@ public interface Actionable {
     boolean isBettingActionDoneByPassivePlayer();
 
     double getHandsPlayedAgainstOpponent();
+
+    boolean isOpponentIsDecentThinking();
 }

@@ -119,6 +119,46 @@ public class BotTable {
         }
     }
 
+    public void addHandToHandsEligibleForIpPfr(String opponentPlayerName) {
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(4) != null) {
+            double handsEligibleForIpPfr = opponentPlayerNamesAndStats.get(opponentPlayerName).get(4) + 1;
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(4, handsEligibleForIpPfr);
+        }
+    }
+
+    public void addHandToHandsIpPfr(String opponentPlayerName) {
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(5) != null) {
+            double handsIpPfr = opponentPlayerNamesAndStats.get(opponentPlayerName).get(5) + 1;
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(5, handsIpPfr);
+        }
+    }
+
+    public void setInitialStackSizeOfOpponent(String opponentPlayerName, double stackSizeBb) {
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(6) != null) {
+            if(opponentPlayerNamesAndStats.get(opponentPlayerName).get(6) == 0) {
+                opponentPlayerNamesAndStats.get(opponentPlayerName).set(6, stackSizeBb);
+            }
+        }
+    }
+
+    public void setLastPfrSizingOfOpponent(String opponentPlayerName, double pfrSizingBb) {
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(7) != null) {
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(7, pfrSizingBb);
+        }
+    }
+
     private void addPlayerToStatsMapIfNecessary(String opponentPlayerName) {
         if(opponentPlayerNamesAndStats == null) {
             opponentPlayerNamesAndStats = new HashMap<>();
@@ -126,7 +166,7 @@ public class BotTable {
 
         if(opponentPlayerName != null && opponentPlayerNamesAndStats.get(opponentPlayerName) == null) {
             opponentPlayerNamesAndStats.put(opponentPlayerName, new ArrayList<>());
-            for(int i = 0; i < 4; i++) {
+            for(int i = 0; i < 8; i++) {
                 opponentPlayerNamesAndStats.get(opponentPlayerName).add(0d);
             }
         }

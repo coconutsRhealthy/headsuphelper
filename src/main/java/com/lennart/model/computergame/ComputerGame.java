@@ -57,6 +57,8 @@ public class ComputerGame implements Actionable {
     private boolean bettingActionDoneByPassivePlayer;
     private double handsPlayedAgainstOpponent;
 
+    private boolean opponentIsDecentThinking;
+
     public ComputerGame() {
         //default constructor
     }
@@ -919,5 +921,14 @@ public class ComputerGame implements Actionable {
 
     public void setHandsPlayedAgainstOpponent(double handsPlayedAgainstOpponent) {
         this.handsPlayedAgainstOpponent = handsPlayedAgainstOpponent;
+    }
+
+    @Override
+    public boolean isOpponentIsDecentThinking() {
+        return opponentIsDecentThinking;
+    }
+
+    public void setOpponentIsDecentThinking(boolean opponentIsDecentThinking) {
+        this.opponentIsDecentThinking = opponentIsDecentThinking;
     }
 }

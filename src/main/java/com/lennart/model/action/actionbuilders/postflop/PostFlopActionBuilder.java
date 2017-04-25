@@ -287,6 +287,20 @@ public class PostFlopActionBuilder {
                 System.out.println("draw betting action");
             }
         }
+        drawBettingAction = resetDrawBettingActionIfNecessary(drawBettingAction);
+        return drawBettingAction;
+    }
+
+    private String resetDrawBettingActionIfNecessary(String drawBettingAction) {
+        if(actionable.isOpponentIsDecentThinking()) {
+            if(sizing / bigBlind > 90) {
+                drawBettingAction = null;
+            }
+        } else {
+            if(sizing / bigBlind > 20) {
+                drawBettingAction = null;
+            }
+        }
         return drawBettingAction;
     }
 
@@ -421,23 +435,34 @@ public class PostFlopActionBuilder {
     }
 
     private String resetBluffActionIfNecessary(String bluffAction) {
-        if(actionable.isBettingActionDoneByPassivePlayer()) {
-            bluffAction = null;
-        } else if(sizing / bigBlind >= 118) {
-            bluffAction = null;
-        } else if(opponentType != null) {
-            if(opponentType.equals("loosePassive")) {
-                if(sizing / bigBlind >= 20) {
-                    bluffAction = null;
-                }
-            } else if(opponentType.equals("looseMedium")) {
-                if(sizing / bigBlind >= 30) {
-                    bluffAction = null;
-                }
+        if(actionable.isOpponentIsDecentThinking()) {
+            if(sizing / bigBlind > 90) {
+                bluffAction = null;
             }
-        } else if(actionable.getHandsPlayedAgainstOpponent() < 20 && sizing / bigBlind >= 30) {
-            bluffAction = null;
+        } else {
+            if(sizing / bigBlind > 20) {
+                bluffAction = null;
+            }
         }
+
+        //comment this out for now, because of new isOpponentDecentThinkingApproach
+//        if(actionable.isBettingActionDoneByPassivePlayer()) {
+//            bluffAction = null;
+//        } else if(sizing / bigBlind >= 20) {
+//            bluffAction = null;
+//        } else if(opponentType != null) {
+//            if(opponentType.equals("loosePassive")) {
+//                if(sizing / bigBlind >= 20) {
+//                    bluffAction = null;
+//                }
+//            } else if(opponentType.equals("looseMedium")) {
+//                if(sizing / bigBlind >= 30) {
+//                    bluffAction = null;
+//                }
+//            }
+//        } else if(actionable.getHandsPlayedAgainstOpponent() < 20 && sizing / bigBlind >= 30) {
+//            bluffAction = null;
+//        }
 
         return bluffAction;
     }
