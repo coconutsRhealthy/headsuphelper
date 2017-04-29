@@ -93,6 +93,8 @@ public class BotHand implements Actionable {
         setTheInitialStackSizeOfOpponentIfNotYetSet(botTable);
         setOpponentType(botTable);
         checkIfOpponentIsDecentThinking(botTable);
+
+        forceQuitIfEffectiveStackSizeAbove100bb();
     }
 
     public BotHand updateVariables(BotTable botTable) {
@@ -121,6 +123,8 @@ public class BotHand implements Actionable {
         checkIfPre3betOrPostRaisedPot();
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
+
+        forceQuitIfEffectiveStackSizeAbove100bb();
 
         return this;
     }
@@ -437,9 +441,6 @@ public class BotHand implements Actionable {
                 }
             } else {
                 opponentAction = actionsFromLastThreeChatLines.get("bottom");
-                if(opponentAction.contains("raise")) {
-                    botTable.setLastPfrSizingOfOpponent(opponentPlayerName, opponentTotalBetSize / bigBlind);
-                }
             }
         } else {
             if(botIsButton) {
@@ -450,6 +451,11 @@ public class BotHand implements Actionable {
         }
         updateOpponentActionHistory(opponentAction);
         checkIfBettingActionIsDoneByPassivePlayer(opponentAction);
+
+        if(!botIsButton && opponentActionHistory != null && opponentActionHistory.size() == 1 &&
+                opponentActionHistory.get(0).contains("raise")) {
+            botTable.setLastPfrSizingOfOpponent(opponentPlayerName, opponentTotalBetSize / bigBlind);
+        }
     }
 
     private void checkIfBettingActionIsDoneByPassivePlayer(String action) {
@@ -761,19 +767,20 @@ public class BotHand implements Actionable {
                 botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName) != null) {
             opponentHands = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
             vpip = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(1) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
-            pfr = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(5) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(4);
+            pfr = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(5) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(0);
             _3bet = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(3) / botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(2);
             pfrSizing = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(7);
             initialStackSize = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(6);
         }
 
         if(opponentHands > 20) {
-            if(initialStackSize == 100) {
+            if(initialStackSize >= 90) {
                 if(pfrSizing >= 2 && pfrSizing <= 5) {
                     if(vpip > 40 && vpip <= 90) {
                         if(pfr > 40 && pfr <= 85) {
                             if(_3bet >= 9 && _3bet < 40) {
-                                opponentIsDecentThinking = true;
+                                opponentIsDecentThinking = false;
+                                System.out.println("opponentIsDecentThinking is true! (but kept at false)");
                             }
                         }
                     }
@@ -797,7 +804,14 @@ public class BotHand implements Actionable {
                     }
                 }
             } else {
-                if(street.equals(streetAtPreviousActionRequest)) {
+                if(opponentAction != null && opponentAction.contains("bet")) {
+                    if(opponentTotalBetSize > potSize) {
+                        //overbet occurred
+                        pre3betOrPostRaisedPot = true;
+                    }
+                }
+
+                if(!pre3betOrPostRaisedPot && street.equals(streetAtPreviousActionRequest)) {
                     if(opponentAction != null && opponentAction.contains("raise")) {
                         pre3betOrPostRaisedPot = true;
                     } else if(botAction != null && botAction.getAction() != null && botAction.getAction().contains("raise")) {
@@ -811,6 +825,13 @@ public class BotHand implements Actionable {
 
     private void setTheInitialStackSizeOfOpponentIfNotYetSet(BotTable botTable) {
         botTable.setInitialStackSizeOfOpponent(opponentPlayerName, opponentStack / bigBlind);
+    }
+
+    private void forceQuitIfEffectiveStackSizeAbove100bb() {
+        if(botStack / bigBlind >= 100 || opponentStack / bigBlind >= 100) {
+            System.out.println("Effective stacksize became 100bb or more. Forced quit.");
+            throw new RuntimeException();
+        }
     }
 
     @Override

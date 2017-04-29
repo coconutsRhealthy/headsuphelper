@@ -90,174 +90,203 @@ public class OpponentProfiler {
         tightPassiveBet.put(40, getTpScore());
         tightPassiveBet.put(70, getTpTkScore());
         tightPassiveBet.put(71, getOpScore());
+        tightPassiveBet.put(150, getDeepStackScore());
 
         tightMediumBet.put(5, get50PercentScore());
         tightMediumBet.put(20, getMpScore());
         tightMediumBet.put(40, getTpScore());
         tightMediumBet.put(70, getTpTkScore());
         tightMediumBet.put(71, getOpScore());
+        tightMediumBet.put(150, getDeepStackScore());
 
         tightAggressiveBet.put(5, get50PercentScore());
         tightAggressiveBet.put(20, getMpScore());
         tightAggressiveBet.put(40, getTpScore());
         tightAggressiveBet.put(70, getTpTkScore());
         tightAggressiveBet.put(71, getOpScore());
+        tightAggressiveBet.put(150, getDeepStackScore());
 
         mediumPassiveBet.put(5, get50PercentScore());
         mediumPassiveBet.put(20, getBpScore());
         mediumPassiveBet.put(40, getMpGkScore());
         mediumPassiveBet.put(70, getTpScore());
         mediumPassiveBet.put(71, getTpTkScore());
+        mediumPassiveBet.put(150, getDeepStackScore());
 
         mediumMediumBet.put(5, get50PercentScore());
         mediumMediumBet.put(20, getBpScore());
         mediumMediumBet.put(40, getMpGkScore());
         mediumMediumBet.put(70, getTpScore());
         mediumMediumBet.put(71, getTpTkScore());
+        mediumMediumBet.put(150, getDeepStackScore());
 
         mediumAggressiveBet.put(5, get50PercentScore());
         mediumAggressiveBet.put(20, getBpScore());
         mediumAggressiveBet.put(40, getMpGkScore());
         mediumAggressiveBet.put(70, getTpScore());
         mediumAggressiveBet.put(71, getTpTkScore());
+        mediumAggressiveBet.put(150, getDeepStackScore());
 
         loosePassiveBet.put(5, get50PercentScore());
         loosePassiveBet.put(20, getBpScore());
         loosePassiveBet.put(40, getBpTkScore());
         loosePassiveBet.put(70, getMpGkScore());
         loosePassiveBet.put(71, getTpScore());
+        loosePassiveBet.put(150, getDeepStackScore());
 
         looseMediumBet.put(5, get50PercentScore());
         looseMediumBet.put(20, getBpScore());
         looseMediumBet.put(40, getBpTkScore());
         looseMediumBet.put(70, getMpGkScore());
         looseMediumBet.put(71, getTpScore());
+        looseMediumBet.put(150, getDeepStackScore());
 
         looseAggressiveBet.put(5, get50PercentScore());
         looseAggressiveBet.put(20, getBpScore());
         looseAggressiveBet.put(40, getBpGkScore());
         looseAggressiveBet.put(70, getMpGkScore());
         looseAggressiveBet.put(71, getTpScore());
+        looseAggressiveBet.put(150, getDeepStackScore());
 
         tightPassiveRaise.put(5, getTpTkScore());
         tightPassiveRaise.put(20, getOpScore());
         tightPassiveRaise.put(40, get2pairScore());
         tightPassiveRaise.put(70, get2pairScore());
         tightPassiveRaise.put(71, get2pairScore());
+        tightPassiveRaise.put(150, getDeepStackScore());
 
         tightMediumRaise.put(5, getTpTkScore());
         tightMediumRaise.put(20, getTpTkScore());
         tightMediumRaise.put(40, get2pairScore());
         tightMediumRaise.put(70, get2pairScore());
         tightMediumRaise.put(71, get2pairScore());
+        tightMediumRaise.put(150, getDeepStackScore());
 
         tightAggressiveRaise.put(5, getTpTkScore());
         tightAggressiveRaise.put(20, getTpTkScore());
         tightAggressiveRaise.put(40, get2pairScore());
         tightAggressiveRaise.put(70, get2pairScore());
         tightAggressiveRaise.put(71, get2pairScore());
+        tightAggressiveRaise.put(150, getDeepStackScore());
 
         mediumPassiveRaise.put(5, getTpTkScore());
         mediumPassiveRaise.put(20, getOpScore());
         mediumPassiveRaise.put(40, get2pairScore());
         mediumPassiveRaise.put(70, get2pairScore());
         mediumPassiveRaise.put(71, get2pairScore());
+        mediumPassiveRaise.put(150, getDeepStackScore());
 
         mediumMediumRaise.put(5, getTpScore());
         mediumMediumRaise.put(20, getTpGkScore());
         mediumMediumRaise.put(40, getTpTkScore());
         mediumMediumRaise.put(70, getTpTkScore());
         mediumMediumRaise.put(71, get2pairScore());
+        mediumMediumRaise.put(150, getDeepStackScore());
 
         mediumAggressiveRaise.put(5, getTpScore());
         mediumAggressiveRaise.put(20, getTpGkScore());
         mediumAggressiveRaise.put(40, getTpTkScore());
         mediumAggressiveRaise.put(70, getTpTkScore());
         mediumAggressiveRaise.put(71, get2pairScore());
+        mediumAggressiveRaise.put(150, getDeepStackScore());
 
         loosePassiveRaise.put(5, getTpTkScore());
         loosePassiveRaise.put(20, getOpScore());
         loosePassiveRaise.put(40, get2pairScore());
         loosePassiveRaise.put(70, get2pairScore());
         loosePassiveRaise.put(71, get2pairScore());
+        loosePassiveRaise.put(150, getDeepStackScore());
 
         looseMediumRaise.put(5, getTpScore());
         looseMediumRaise.put(20, getTpGkScore());
         looseMediumRaise.put(40, getTpTkScore());
         looseMediumRaise.put(70, getTpTkScore());
         looseMediumRaise.put(71, get2pairScore());
+        looseMediumRaise.put(150, getDeepStackScore());
 
         looseAggressiveRaise.put(5, getTpScore());
         looseAggressiveRaise.put(20, getTpGkScore());
         looseAggressiveRaise.put(40, getTpGkScore());
         looseAggressiveRaise.put(70, getTpGkScore());
         looseAggressiveRaise.put(71, get2pairScore());
+        looseAggressiveRaise.put(150, getDeepStackScore());
 
         tightPassiveCall.put(5, get50PercentScore());
         tightPassiveCall.put(20, getTpGkScore());
         tightPassiveCall.put(40, getTpGkScore());
         tightPassiveCall.put(70, getTpTkScore());
         tightPassiveCall.put(71, get2pairScore());
+        tightPassiveCall.put(150, getDeepStackScore());
 
         tightMediumCall.put(5, get50PercentScore());
         tightMediumCall.put(20, getTpScore());
         tightMediumCall.put(40, getTpScore());
         tightMediumCall.put(70, getTpGkScore());
         tightMediumCall.put(71, getTpTkScore());
+        tightMediumCall.put(150, getDeepStackScore());
 
         tightAggressiveCall.put(5, get50PercentScore());
         tightAggressiveCall.put(20, getTpScore());
         tightAggressiveCall.put(40, getTpScore());
         tightAggressiveCall.put(70, getTpGkScore());
         tightAggressiveCall.put(71, getTpTkScore());
+        tightAggressiveCall.put(150, getDeepStackScore());
 
         mediumPassiveCall.put(5, get50PercentScore());
         mediumPassiveCall.put(20, getTpGkScore());
         mediumPassiveCall.put(40, getTpGkScore());
         mediumPassiveCall.put(70, getTpTkScore());
         mediumPassiveCall.put(71, get2pairScore());
+        mediumPassiveCall.put(150, getDeepStackScore());
 
         mediumMediumCall.put(5, get50PercentScore());
         mediumMediumCall.put(20, getMpScore());
         mediumMediumCall.put(40, getMpGkScore());
         mediumMediumCall.put(70, getTpScore());
         mediumMediumCall.put(71, getTpMkScore());
+        mediumMediumCall.put(150, getDeepStackScore());
 
         mediumAggressiveCall.put(5, get50PercentScore());
         mediumAggressiveCall.put(20, getBpGkScore());
         mediumAggressiveCall.put(40, getMpScore());
         mediumAggressiveCall.put(70, getTpScore());
         mediumAggressiveCall.put(71, getTpMkScore());
+        mediumAggressiveCall.put(150, getDeepStackScore());
 
         loosePassiveCall.put(5, get50PercentScore());
         loosePassiveCall.put(20, getTpGkScore());
         loosePassiveCall.put(40, getTpGkScore());
         loosePassiveCall.put(70, getTpTkScore());
         loosePassiveCall.put(71, get2pairScore());
+        loosePassiveCall.put(150, getDeepStackScore());
 
         looseMediumCall.put(5, get50PercentScore());
         looseMediumCall.put(20, getBpScore());
         looseMediumCall.put(40, getMpScore());
         looseMediumCall.put(70, getTpScore());
         looseMediumCall.put(71, getTpGkScore());
+        looseMediumCall.put(150, getDeepStackScore());
 
         looseAggressiveCall.put(5, get50PercentScore());
         looseAggressiveCall.put(20, getBpScore());
         looseAggressiveCall.put(40, getBpGkScore());
         looseAggressiveCall.put(70, getMpScore());
         looseAggressiveCall.put(71, getTpScore());
+        looseAggressiveCall.put(150, getDeepStackScore());
 
         passiveDidBettingActionBet.put(5, getTpTkScore());
         passiveDidBettingActionBet.put(20, getOpScore());
         passiveDidBettingActionBet.put(40, get2pairScore());
         passiveDidBettingActionBet.put(70, get2pairScore());
         passiveDidBettingActionBet.put(71, get2pairScore());
+        passiveDidBettingActionBet.put(150, getDeepStackScore());
 
         passiveDidBettingActionRaise.put(5, getTpTkScore());
         passiveDidBettingActionRaise.put(20, getOpScore());
         passiveDidBettingActionRaise.put(40, get2pairScore());
         passiveDidBettingActionRaise.put(70, get2pairScore());
         passiveDidBettingActionRaise.put(71, get2pairScore());
+        passiveDidBettingActionRaise.put(150, getDeepStackScore());
     }
 
     private double get50PercentScore() {
@@ -406,6 +435,18 @@ public class OpponentProfiler {
             _2pairScore = 0.90;
         }
         return _2pairScore;
+    }
+
+    private double getDeepStackScore() {
+        double deepStackScore = 1;
+        if(board.size() == 3) {
+            deepStackScore = 0.97;
+        } else if(board.size() == 4) {
+            deepStackScore = 0.95;
+        } else if(board.size() == 5) {
+            deepStackScore = 0.93;
+        }
+        return deepStackScore;
     }
 
     public Map<Integer, Double> getTightPassiveBet() {

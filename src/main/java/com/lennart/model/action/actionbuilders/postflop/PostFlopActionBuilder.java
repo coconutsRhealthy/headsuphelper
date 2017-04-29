@@ -263,8 +263,12 @@ public class PostFlopActionBuilder {
             if(handStrength > opponentTypeMap.get(70)) {
                 betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
             }
-        } else {
+        } else if (sizing / bigBlind <= 150) {
             if(handStrength > opponentTypeMap.get(71)) {
+                betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
+            }
+        } else {
+            if(handStrength > opponentTypeMap.get(150)) {
                 betOrRaiseValueActionFromMap = getPassiveOrAggressiveValueAction(bettingAction);
             }
         }
@@ -280,27 +284,31 @@ public class PostFlopActionBuilder {
             if(drawBettingAction == null) {
                 drawBettingAction = getDrawBettingInitializeAction(bettingAction);
             }
-
-            if(drawBettingAction == null) {
-                actionable.setDrawBettingActionDone(false);
-            } else {
-                System.out.println("draw betting action");
-            }
         }
         drawBettingAction = resetDrawBettingActionIfNecessary(drawBettingAction);
+
+        if(drawBettingAction == null) {
+            actionable.setDrawBettingActionDone(false);
+        } else {
+            System.out.println("draw betting action");
+        }
         return drawBettingAction;
     }
 
     private String resetDrawBettingActionIfNecessary(String drawBettingAction) {
-        if(actionable.isOpponentIsDecentThinking()) {
-            if(sizing / bigBlind > 90) {
-                drawBettingAction = null;
-            }
-        } else {
-            if(sizing / bigBlind > 20) {
-                drawBettingAction = null;
-            }
+        if(sizing / bigBlind > 100) {
+            drawBettingAction = null;
         }
+
+//        if(actionable.isOpponentIsDecentThinking()) {
+//            if(sizing / bigBlind > 90) {
+//                drawBettingAction = null;
+//            }
+//        } else {
+//            if(sizing / bigBlind > 20) {
+//                drawBettingAction = null;
+//            }
+//        }
         return drawBettingAction;
     }
 
@@ -425,25 +433,31 @@ public class PostFlopActionBuilder {
             if(bluffAction == null) {
                 bluffAction = getBluffInitializeAction(bettingAction);
             }
-
-            if(bluffAction != null) {
-                System.out.println("bluff action");
-            }
         }
         bluffAction = resetBluffActionIfNecessary(bluffAction);
+
+        if(bluffAction != null) {
+            System.out.println("bluff action");
+        }
         return bluffAction;
     }
 
     private String resetBluffActionIfNecessary(String bluffAction) {
-        if(actionable.isOpponentIsDecentThinking()) {
-            if(sizing / bigBlind > 90) {
-                bluffAction = null;
-            }
-        } else {
-            if(sizing / bigBlind > 20) {
-                bluffAction = null;
-            }
+        if(actionable.isBettingActionDoneByPassivePlayer()) {
+            bluffAction = null;
+        } else if (sizing / bigBlind > 100) {
+            bluffAction = null;
         }
+
+//        if(actionable.isOpponentIsDecentThinking()) {
+//            if(sizing / bigBlind > 90) {
+//                bluffAction = null;
+//            }
+//        } else {
+//            if(sizing / bigBlind > 20) {
+//                bluffAction = null;
+//            }
+//        }
 
         //comment this out for now, because of new isOpponentDecentThinkingApproach
 //        if(actionable.isBettingActionDoneByPassivePlayer()) {
@@ -662,8 +676,12 @@ public class PostFlopActionBuilder {
             if(handStrength > opponentTypeMap.get(70)) {
                 valueCallActionFromMap = CALL;
             }
-        } else {
+        } else if (amountToCallBb <= 150) {
             if(handStrength > opponentTypeMap.get(71)) {
+                valueCallActionFromMap = CALL;
+            }
+        } else {
+            if(handStrength > opponentTypeMap.get(150)) {
                 valueCallActionFromMap = CALL;
             }
         }
