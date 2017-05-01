@@ -160,7 +160,7 @@ public class BotHand implements Actionable {
     private void preflopFinalPreventFoldCheck() {
         if(board == null) {
             if(botHoleCards != null && knownGameCards != null) {
-                if(ActionBuilderUtil.handIsJjPlusOrAk(botHoleCards, knownGameCards)) {
+                if(ActionBuilderUtil.handIsTtPlusATsPlusOrAJoPlus(botHoleCards, knownGameCards)) {
                     if(botAction != null && botAction.getAction() != null && botAction.getAction().contains("fold")) {
                         System.out.println("changed action from: " + botAction.getAction() + " to 'call' in preflopFinalPreventFoldCheck()");
                         setActionToCall();
@@ -228,7 +228,7 @@ public class BotHand implements Actionable {
 
         if(board == null) {
             if(botHoleCards != null && knownGameCards != null) {
-                if(ActionBuilderUtil.handIsJjPlusOrAk(botHoleCards, knownGameCards)) {
+                if(ActionBuilderUtil.handIsTtPlusATsPlusOrAJoPlus(botHoleCards, knownGameCards)) {
                     System.out.println("Call on misread board. Preflop, and hand is JJ+ or AK" );
                     setActionToCall();
                     clickActionDone = true;
@@ -338,14 +338,14 @@ public class BotHand implements Actionable {
 
     private void validateBotStack() {
         if(botStack < 0) {
-            System.out.println("set botstack to default value of 100bb in validateBotStack because botStack < 0");
-            botStack = 100 * bigBlind;
+            System.out.println("set botstack to default value of 95bb in validateBotStack because botStack < 0");
+            botStack = 95 * bigBlind;
         } else if(botStack > botStackAtBeginningOfHand) {
-            System.out.println("set botstack to default value of 100bb in validateBotStack because botStack > botStackAtBeginningOfHand");
-            botStack = 100 * bigBlind;
+            System.out.println("set botstack to default value of 95bb in validateBotStack because botStack > botStackAtBeginningOfHand");
+            botStack = 95 * bigBlind;
         } else if(botStack / bigBlind > 1000) {
-            System.out.println("set botstack to default value of 100bb in validateBotStack because botStack > 1000bb");
-            botStack = 100 * bigBlind;
+            System.out.println("set botstack to default value of 95bb in validateBotStack because botStack > 1000bb");
+            botStack = 95 * bigBlind;
         }
     }
 
@@ -360,15 +360,15 @@ public class BotHand implements Actionable {
 
     private void validateOpponentStack() {
         if(opponentStack < 0) {
-            System.out.println("set opponentStack to default value of 100bb in validateOpponentStack because opponentStack < 0");
-            opponentStack = 100 * bigBlind;
+            System.out.println("set opponentStack to default value of 95bb in validateOpponentStack because opponentStack < 0");
+            opponentStack = 95 * bigBlind;
         } else if(opponentStack > opponentStackAtBeginningOfHand) {
-            System.out.println("set opponentStack to default value of 100bb in validateOpponentStack because opponentStack >" +
+            System.out.println("set opponentStack to default value of 95bb in validateOpponentStack because opponentStack >" +
                     " opponentStackAtBeginningOfHand");
-            opponentStack = 100 * bigBlind;
+            opponentStack = 95 * bigBlind;
         } else if(opponentStack / bigBlind > 1000) {
-            System.out.println("set opponentStack to default value of 100bb in validateOpponentStack because opponentStack > 1000bb");
-            opponentStack = 100 * bigBlind;
+            System.out.println("set opponentStack to default value of 95bb in validateOpponentStack because opponentStack > 1000bb");
+            opponentStack = 95 * bigBlind;
         }
     }
 
@@ -828,7 +828,7 @@ public class BotHand implements Actionable {
     }
 
     private void forceQuitIfEffectiveStackSizeAbove100bb() {
-        if(botStack / bigBlind >= 100 || opponentStack / bigBlind >= 100) {
+        if(botStack / bigBlind >= 100 && botStack / bigBlind <= 1000 && opponentStack / bigBlind >= 100 && opponentStack / bigBlind <= 1000) {
             System.out.println("Effective stacksize became 100bb or more. Forced quit.");
             throw new RuntimeException();
         }

@@ -344,7 +344,7 @@ public class OpponentProfiler {
     private double getBpScore() {
         double bpScore = 1;
         if(board.size() == 3) {
-            bpScore = 0.63;
+            bpScore = 0.62;
         } else if(board.size() == 4) {
             bpScore = 0.62;
         } else if(board.size() == 5) {

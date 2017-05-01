@@ -23,22 +23,26 @@ public class Call5bet {
         comboMap100Percent.put(5, p.getSuitedCombosOfGivenRanks(14, 13));
         comboMap100Percent.put(6, p.getOffSuitCombosOfGivenRanks(14, 13));
 
+        comboMap100Percent.put(11, p.getSuitedCombosOfGivenRanks(14, 12));
+        comboMap100Percent.put(12, p.getSuitedCombosOfGivenRanks(14, 11));
+        comboMap100Percent.put(13, p.getSuitedCombosOfGivenRanks(14, 10));
+
+        comboMap100Percent.put(17, p.getOffSuitCombosOfGivenRanks(14, 12));
+        comboMap100Percent.put(18, p.getOffSuitCombosOfGivenRanks(14, 11));
+
+        comboMap100Percent.put(7, p.getPocketPairCombosOfGivenRank(10));
+
         if((actionable.getBotStack() / actionable.getBigBlind() < 50) || actionable.getOpponentType() == null ||
                 (actionable.getOpponentType() != null && !actionable.getOpponentType().contains("Passive"))) {
-            comboMap100Percent.put(7, p.getPocketPairCombosOfGivenRank(10));
+
             comboMap100Percent.put(8, p.getPocketPairCombosOfGivenRank(9));
             comboMap100Percent.put(9, p.getPocketPairCombosOfGivenRank(8));
             comboMap100Percent.put(10, p.getPocketPairCombosOfGivenRank(7));
 
-            comboMap100Percent.put(11, p.getSuitedCombosOfGivenRanks(14, 12));
-            comboMap100Percent.put(12, p.getSuitedCombosOfGivenRanks(14, 11));
-            comboMap100Percent.put(13, p.getSuitedCombosOfGivenRanks(14, 10));
             comboMap100Percent.put(14, p.getSuitedCombosOfGivenRanks(14, 9));
             comboMap100Percent.put(15, p.getSuitedCombosOfGivenRanks(14, 8));
             comboMap100Percent.put(16, p.getSuitedCombosOfGivenRanks(13, 12));
 
-            comboMap100Percent.put(17, p.getOffSuitCombosOfGivenRanks(14, 12));
-            comboMap100Percent.put(18, p.getOffSuitCombosOfGivenRanks(14, 11));
             comboMap100Percent.put(19, p.getOffSuitCombosOfGivenRanks(14, 10));
         }
     }

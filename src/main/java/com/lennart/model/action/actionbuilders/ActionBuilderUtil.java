@@ -578,8 +578,8 @@ public class ActionBuilderUtil {
         return allPossibleStartHandsAsSetCopy;
     }
 
-    public static boolean handIsJjPlusOrAk(List<Card> hand, Set<Card> knownGameCards) {
-        Set<Set<Card>> combosJjPlusOrAk = new HashSet<>();
+    public static boolean handIsTtPlusATsPlusOrAJoPlus(List<Card> hand, Set<Card> knownGameCards) {
+        Set<Set<Card>> combosTtPlusATsPlusOrAJoPlus = new HashSet<>();
         Set<Card> handAsSet = new HashSet<>();
         handAsSet.addAll(hand);
 
@@ -591,26 +591,53 @@ public class ActionBuilderUtil {
         Map<Integer, Set<Card>> combosAks = p.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 13);
         Map<Integer, Set<Card>> combosAko = p.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 13);
 
+        Map<Integer, Set<Card>> combosTt = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(10);
+        Map<Integer, Set<Card>> combosAqs = p.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 12);
+        Map<Integer, Set<Card>> combosAjs = p.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 11);
+        Map<Integer, Set<Card>> combosAts = p.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 10);
+        Map<Integer, Set<Card>> combosAqo = p.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 12);
+        Map<Integer, Set<Card>> combosAjo = p.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 11);
+
+
         for (Map.Entry<Integer, Set<Card>> entry : combosAa.entrySet()) {
-            combosJjPlusOrAk.add(entry.getValue());
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
         }
         for (Map.Entry<Integer, Set<Card>> entry : combosKk.entrySet()) {
-            combosJjPlusOrAk.add(entry.getValue());
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
         }
         for (Map.Entry<Integer, Set<Card>> entry : combosQq.entrySet()) {
-            combosJjPlusOrAk.add(entry.getValue());
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
         }
         for (Map.Entry<Integer, Set<Card>> entry : combosJj.entrySet()) {
-            combosJjPlusOrAk.add(entry.getValue());
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
         }
         for (Map.Entry<Integer, Set<Card>> entry : combosAks.entrySet()) {
-            combosJjPlusOrAk.add(entry.getValue());
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
         }
         for (Map.Entry<Integer, Set<Card>> entry : combosAko.entrySet()) {
-            combosJjPlusOrAk.add(entry.getValue());
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
         }
 
-        if(!combosJjPlusOrAk.add(handAsSet)) {
+        for (Map.Entry<Integer, Set<Card>> entry : combosTt.entrySet()) {
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosAqs.entrySet()) {
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosAjs.entrySet()) {
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosAts.entrySet()) {
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosAqo.entrySet()) {
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
+        }
+        for (Map.Entry<Integer, Set<Card>> entry : combosAjo.entrySet()) {
+            combosTtPlusATsPlusOrAJoPlus.add(entry.getValue());
+        }
+
+        if(!combosTtPlusATsPlusOrAJoPlus.add(handAsSet)) {
             //combo is JJ+ or AK
             return true;
         }
