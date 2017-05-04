@@ -5,10 +5,12 @@ import com.lennart.model.action.Actionable;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
+import com.lennart.model.imageprocessing.sites.netbet.NetBetTableOpener;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by LPO21630 on 16-2-2017.
@@ -830,7 +832,13 @@ public class BotHand implements Actionable {
     private void forceQuitIfEffectiveStackSizeAbove100bb() {
         if(botStack / bigBlind >= 100 && botStack / bigBlind <= 1000 && opponentStack / bigBlind >= 100 && opponentStack / bigBlind <= 1000) {
             System.out.println("Effective stacksize became 100bb or more. Forced quit.");
-            throw new RuntimeException();
+
+            try {
+                TimeUnit.SECONDS.sleep(60);
+                NetBetTableOpener.startNewTable(bigBlind);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
