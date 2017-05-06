@@ -600,9 +600,23 @@ public class PostFlopActionBuilder {
 
         double amountToCallBb = (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize()) / bigBlind;
 
-        if(amountToCallBb / actionable.getPotSize() > 0 && amountToCallBb / actionable.getPotSize() <= 0.2) {
-            if(handStrength >= 0.30) {
-                valueCallAction = CALL;
+        if(amountToCallBb < 3 && actionable.getPotSize() / bigBlind >= 8) {
+            valueCallAction = CALL;
+        }
+
+        if(valueCallAction == null) {
+            if(actionable.getBotStack() / actionable.getBigBlind() > 0 && actionable.getBotStack() / actionable.getBigBlind() <= 20) {
+                if(handStrength >= 0.20) {
+                    valueCallAction = CALL;
+                }
+            }
+        }
+
+        if(valueCallAction == null) {
+            if(amountToCallBb / actionable.getPotSize() > 0 && amountToCallBb / actionable.getPotSize() <= 0.2) {
+                if(handStrength >= 0.30) {
+                    valueCallAction = CALL;
+                }
             }
         }
 
@@ -696,89 +710,103 @@ public class PostFlopActionBuilder {
         boolean botIsButton = actionable.isBotIsButton();
 
         if(board.size() == 3 || board.size() == 4) {
-            if(amountToCall / bigBlind < 4) {
-                if(handEvaluator.hasAnyDrawNonBackDoor()) {
-                    drawCallingAction = CALL;
-                }
-                if(handEvaluator.hasDrawOfType("strongBackDoor")) {
-                    drawCallingAction = CALL;
-                }
-            } else if(amountToCall / bigBlind >= 4 && amountToCall / bigBlind < 20) {
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    drawCallingAction = CALL;
-                }
-                if(handEvaluator.hasDrawOfType("strongGutshot")) {
-                    if(odds <= 0.45) {
-                        if(board.size() == 3) {
-                            drawCallingAction = CALL;
-                        } else {
-                            if(botIsButton) {
-                                drawCallingAction = CALL;
-                            } else {
-                                if(Math.random() < 0.3) {
-                                    drawCallingAction = CALL;
-                                }
-                            }
-                        }
-                    }
-                }
-                if(handEvaluator.hasDrawOfType("strongOvercards")) {
-                    if(odds <= 0.45) {
-                        if(board.size() == 3) {
-                            if(botIsButton) {
-                                drawCallingAction = CALL;
-                            } else {
-                                if(Math.random() < 0.3) {
-                                    drawCallingAction = CALL;
-                                }
-                            }
-                        } else {
-                            if(botIsButton) {
-                                if(Math.random() < 0.5) {
-                                    drawCallingAction = CALL;
-                                }
-                            } else {
-                                if(Math.random() < 0.15) {
-                                    drawCallingAction = CALL;
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (amountToCall / bigBlind > 20 && amountToCall / bigBlind < 40) {
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(odds <= 0.22) {
+            if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                if(board.size() == 3) {
+                    if(actionable.getBotStack() / actionable.getBigBlind() > 0 && actionable.getBotStack() / actionable.getBigBlind() < 50) {
                         drawCallingAction = CALL;
-                    } else if(odds <= 0.45) {
-                        if(board.size() == 3) {
-                            drawCallingAction = CALL;
-                        } else {
-                            if(botIsButton) {
-                                drawCallingAction = CALL;
-                            } else {
-                                if(Math.random() < 0.23) {
-                                    drawCallingAction = CALL;
-                                }
-                            }
-                        }
+                    }
+                } else if(board.size() == 4) {
+                    if(actionable.getBotStack() / actionable.getBigBlind() > 0 && actionable.getBotStack() / actionable.getBigBlind() < 38) {
+                        drawCallingAction = CALL;
                     }
                 }
-            } else {
-                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
-                    if(odds <= 0.22) {
+            }
+
+            if(drawCallingAction != null) {
+                if(amountToCall / bigBlind < 4) {
+                    if(handEvaluator.hasAnyDrawNonBackDoor()) {
                         drawCallingAction = CALL;
-                    } else if(odds <= 0.45) {
-                        if(board.size() == 3) {
-                            if(afterDrawCall66PercentBetStillPossible()) {
+                    }
+                    if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                        drawCallingAction = CALL;
+                    }
+                } else if(amountToCall / bigBlind >= 4 && amountToCall / bigBlind < 20) {
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        drawCallingAction = CALL;
+                    }
+                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                        if(odds <= 0.45) {
+                            if(board.size() == 3) {
+                                drawCallingAction = CALL;
+                            } else {
                                 if(botIsButton) {
                                     drawCallingAction = CALL;
-                                }
-                            }
-                        } else {
-                            if(afterDrawCall66PercentBetStillPossible()) {
-                                if(botIsButton) {
-                                    if(Math.random() <= 0.12) {
+                                } else {
+                                    if(Math.random() < 0.3) {
                                         drawCallingAction = CALL;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if(handEvaluator.hasDrawOfType("strongOvercards")) {
+                        if(odds <= 0.45) {
+                            if(board.size() == 3) {
+                                if(botIsButton) {
+                                    drawCallingAction = CALL;
+                                } else {
+                                    if(Math.random() < 0.3) {
+                                        drawCallingAction = CALL;
+                                    }
+                                }
+                            } else {
+                                if(botIsButton) {
+                                    if(Math.random() < 0.5) {
+                                        drawCallingAction = CALL;
+                                    }
+                                } else {
+                                    if(Math.random() < 0.15) {
+                                        drawCallingAction = CALL;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (amountToCall / bigBlind > 20 && amountToCall / bigBlind < 40) {
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        if(odds <= 0.22) {
+                            drawCallingAction = CALL;
+                        } else if(odds <= 0.45) {
+                            if(board.size() == 3) {
+                                drawCallingAction = CALL;
+                            } else {
+                                if(botIsButton) {
+                                    drawCallingAction = CALL;
+                                } else {
+                                    if(Math.random() < 0.23) {
+                                        drawCallingAction = CALL;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                        if(odds <= 0.22) {
+                            drawCallingAction = CALL;
+                        } else if(odds <= 0.45) {
+                            if(board.size() == 3) {
+                                if(afterDrawCall66PercentBetStillPossible()) {
+                                    if(botIsButton) {
+                                        drawCallingAction = CALL;
+                                    }
+                                }
+                            } else {
+                                if(afterDrawCall66PercentBetStillPossible()) {
+                                    if(botIsButton) {
+                                        if(Math.random() <= 0.12) {
+                                            drawCallingAction = CALL;
+                                        }
                                     }
                                 }
                             }
