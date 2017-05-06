@@ -14,32 +14,32 @@ public class NetBetTableOpener {
     public static void startNewTable(double bigBlind) {
         try {
             clickNoWhenAskedToPlayAgainAtSitOutTable();
-            TimeUnit.MILLISECONDS.sleep(600);
+            TimeUnit.SECONDS.sleep(1);
             bringLobbyToFront();
-            TimeUnit.MILLISECONDS.sleep(600);
+            TimeUnit.SECONDS.sleep(1);
             clickMinimizeLeftTopTable();
-            TimeUnit.MILLISECONDS.sleep(600);
+            TimeUnit.SECONDS.sleep(1);
             while(!tableOpenedLeftTop()) {
-                TimeUnit.MILLISECONDS.sleep(400);
+                TimeUnit.SECONDS.sleep(1);
                 if(tableOpenedRightTop()) {
-                    TimeUnit.MILLISECONDS.sleep(300);
+                    TimeUnit.SECONDS.sleep(1);
                     closeRightTopTable();
                 }
-                TimeUnit.MILLISECONDS.sleep(300);
+                TimeUnit.SECONDS.sleep(1);
                 if(tableOpenedRightBottom()) {
-                    TimeUnit.MILLISECONDS.sleep(300);
+                    TimeUnit.SECONDS.sleep(1);
                     closeRightBottomTable();
                 }
-                TimeUnit.MILLISECONDS.sleep(300);
+                TimeUnit.SECONDS.sleep(1);
                 if(tableOpenedLeftBottom()) {
-                    TimeUnit.MILLISECONDS.sleep(300);
+                    TimeUnit.SECONDS.sleep(1);
                     closeLeftBottomTable();
                 }
 
                 clickSortByNumberOfPlayers();
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.SECONDS.sleep(1);
                 if(tablePlrsIsZero()) {
-                    TimeUnit.MILLISECONDS.sleep(300);
+                    TimeUnit.SECONDS.sleep(1);
                     openTable();
                 }
             }
@@ -52,9 +52,9 @@ public class NetBetTableOpener {
             TimeUnit.SECONDS.sleep(1);
 
             if(initialBotStackIsAbove100bb(bigBlind)) {
-                TimeUnit.MILLISECONDS.sleep(300);
+                TimeUnit.SECONDS.sleep(1);
                 clickSitOutButton1();
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.SECONDS.sleep(1);
                 clickSitOutButton2();
                 TimeUnit.SECONDS.sleep(1);
                 startNewTable(bigBlind);
