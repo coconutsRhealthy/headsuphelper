@@ -139,7 +139,7 @@ public class NetBetTableOpener {
 
     private static boolean initialBotStackIsAbove100bb(double bigBlind) {
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
-        return netBetTableReader.getBotStackFromImage() > 30 * bigBlind;
+        return netBetTableReader.getBotStackFromImage() > 100 * bigBlind;
     }
 
     private static void clickSitOutButton1() {

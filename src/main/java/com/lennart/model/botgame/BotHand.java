@@ -96,15 +96,16 @@ public class BotHand implements Actionable {
         setOpponentType(botTable);
         checkIfOpponentIsDecentThinking(botTable);
 
-        forceQuitIfEffectiveStackSizeAbove100bb();
+        //forceQuitIfEffectiveStackSizeAbove100bb();
     }
 
-    public BotHand updateVariables(BotTable botTable) {
+    public boolean updateVariables(BotTable botTable) {
         gameVariablesFiller = new GameVariablesFiller(this);
 
         if(foldOrShowdownOccured()) {
             updateStats(botTable);
-            return new BotHand(botTable);
+            botTable.setBotHand(new BotHand(botTable));
+            return true;
         }
 
         setFlopCard1IfNecessary();
@@ -126,9 +127,7 @@ public class BotHand implements Actionable {
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
 
-        forceQuitIfEffectiveStackSizeAbove100bb();
-
-        return this;
+        return !forceQuitIfEffectiveStackSizeAbove100bb();
     }
 
     public void getNewBotAction() {
@@ -829,17 +828,19 @@ public class BotHand implements Actionable {
         botTable.setInitialStackSizeOfOpponent(opponentPlayerName, opponentStack / bigBlind);
     }
 
-    private void forceQuitIfEffectiveStackSizeAbove100bb() {
+    private boolean forceQuitIfEffectiveStackSizeAbove100bb() {
         if(botStack / bigBlind >= 100 && botStack / bigBlind <= 1000 && opponentStack / bigBlind >= 100 && opponentStack / bigBlind <= 1000) {
             System.out.println("Effective stacksize became 100bb or more. Forced quit.");
 
             try {
                 TimeUnit.SECONDS.sleep(60);
                 NetBetTableOpener.startNewTable(bigBlind);
+                return true;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        return false;
     }
 
     @Override

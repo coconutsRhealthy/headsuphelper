@@ -55,7 +55,10 @@ public class BotTable {
         while(true) {
             counter++;
             if(NetBetTableReader.botIsToAct()) {
-                getNewBotActionInBotTable();
+                if(!getNewBotActionInBotTable()) {
+                    new BotTable(true);
+                    return;
+                }
             }
 
             try {
@@ -73,10 +76,13 @@ public class BotTable {
         }
     }
 
-    public void getNewBotActionInBotTable() {
-        botHand = botHand.updateVariables(this);
-        botHand.getNewBotAction();
-        System.out.println();
+    public boolean getNewBotActionInBotTable() {
+        if(botHand.updateVariables(this)) {
+            botHand.getNewBotAction();
+            System.out.println();
+            return true;
+        }
+        return false;
     }
 
     public void addHandToHandsEligibleForVpip(String opponentPlayerName) {
