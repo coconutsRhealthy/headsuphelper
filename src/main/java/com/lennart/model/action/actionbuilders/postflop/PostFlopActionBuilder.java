@@ -488,7 +488,7 @@ public class PostFlopActionBuilder {
         String bluffBarrelAction = null;
 
         if(actionable.isPreviousBluffAction()) {
-            if (bluffOddsAreOk() && handStrength < 0.62) {
+            if (handStrength < 0.62) {
                 if (bettingAction.equals(BET)) {
                     if (actionable.isBotIsButton()) {
                         if (Math.random() <= 0.75) {
@@ -522,7 +522,7 @@ public class PostFlopActionBuilder {
     private String getBluffAfterMissedDrawAction(String bettingAction) {
         String bluffAfterMissedDrawAction = null;
 
-        if(actionable.isDrawBettingActionDone() && bettingAction.equals(BET) && bluffOddsAreOk()) {
+        if(actionable.isDrawBettingActionDone() && bettingAction.equals(BET)) {
             if(actionable.isBotIsButton()) {
                 if(Math.random() <= 0.65) {
                     bluffAfterMissedDrawAction = bettingAction;
@@ -539,7 +539,7 @@ public class PostFlopActionBuilder {
     private String getBluffInitializeAction(String bettingAction) {
         String bluffInitializeAction = null;
 
-        if(bluffOddsAreOk() && handStrength < 0.65) {
+        if(handStrength < 0.65) {
             if(bettingAction.equals(BET)) {
                 if(potSize / bigBlind < 10) {
                     if(actionable.isBotIsButton()) {
@@ -976,25 +976,25 @@ public class PostFlopActionBuilder {
         return (0.01 + amountToCall) / (potSize + amountToCall);
     }
 
-    private boolean bluffOddsAreOk() {
-        double potSize = actionable.getPotSize();
-        double opponentBetSize = actionable.getOpponentTotalBetSize();
-        double opponentStack = actionable.getOpponentStack();
-        double amountOpponentHasToCall = sizing - opponentBetSize;
-        double sizingCopy = sizing;
-
-        if(amountOpponentHasToCall > opponentStack) {
-            amountOpponentHasToCall = opponentStack;
-            sizingCopy = opponentStack;
-        }
-
-        double opponentOdds = amountOpponentHasToCall / (potSize + opponentBetSize + sizingCopy);
-
-        if(opponentOdds >= 0.40) {
-            return true;
-        }
-        return false;
-    }
+//    private boolean bluffOddsAreOk() {
+//        double potSize = actionable.getPotSize();
+//        double opponentBetSize = actionable.getOpponentTotalBetSize();
+//        double opponentStack = actionable.getOpponentStack();
+//        double amountOpponentHasToCall = sizing - opponentBetSize;
+//        double sizingCopy = sizing;
+//
+//        if(amountOpponentHasToCall > opponentStack) {
+//            amountOpponentHasToCall = opponentStack;
+//            sizingCopy = opponentStack;
+//        }
+//
+//        double opponentOdds = amountOpponentHasToCall / (potSize + opponentBetSize + sizingCopy);
+//
+//        if(opponentOdds >= 0.40) {
+//            return true;
+//        }
+//        return false;
+//    }
 
     public double getSizing() {
         double sizing = 0;
