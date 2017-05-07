@@ -50,6 +50,7 @@ public class BotTable {
                 MouseKeyboard.moveMouseToLocation(20, 20);
                 counter = 0;
             }
+            System.out.print(counter);
         }
 
         while(true) {
@@ -73,6 +74,7 @@ public class BotTable {
                 MouseKeyboard.moveMouseToLocation(20, 20);
                 counter = 0;
             }
+            System.out.print(counter);
         }
     }
 
