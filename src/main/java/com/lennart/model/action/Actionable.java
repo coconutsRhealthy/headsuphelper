@@ -61,4 +61,10 @@ public interface Actionable {
     String getFloatAction();
 
     void setFloatAction(String floatAction);
+
+    boolean isBotIsPre3bettor();
+
+    void setBotIsPre3bettor(boolean botIsPre3bettor);
+
+    boolean isOpponentBetsOrRaisesPostFlop();
 }

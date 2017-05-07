@@ -81,6 +81,9 @@ public class PostFlopActionBuilder {
             action = getBluffAction(BET);
         }
         if(action == null) {
+            action = getActionWhenBotIsPre3bettorAndPostAggressor();
+        }
+        if(action == null) {
             System.out.println("default check in getFcheckOrFirstToAct()");
             action = CHECK;
         }
@@ -391,7 +394,36 @@ public class PostFlopActionBuilder {
         if(drawBettingInitializeAction != null) {
             actionable.setDrawBettingActionDone(true);
         }
+
+        //here we don't want to set drawBettingActionDone to true when we raise (for now)
+        if(drawBettingInitializeAction != null && bettingAction.equals(RAISE)) {
+            drawBettingInitializeAction = getDrawRaiseAction();
+        }
+
         return drawBettingInitializeAction;
+    }
+
+    private String getDrawRaiseAction() {
+        String drawRaiseAction = null;
+
+        if(board.size() == 3 || board.size() == 4) {
+            if(!actionable.isPre3betOrPostRaisedPot()) {
+                if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
+                    if(Math.random() < 0.50) {
+                        drawRaiseAction = RAISE;
+                        System.out.println("draw raise action with strong fd or strong oosd");
+                    }
+                }
+
+                if(drawRaiseAction == null && handEvaluator.hasDrawOfType("strongGutshot")) {
+                    if(Math.random() < 0.22) {
+                        drawRaiseAction = RAISE;
+                        System.out.println("draw raise action with strong gutshot");
+                    }
+                }
+            }
+        }
+        return drawRaiseAction;
     }
 
     private String getTrickyRaiseAction() {
@@ -770,6 +802,40 @@ public class PostFlopActionBuilder {
             }
         }
         return floatAction;
+    }
+
+    private String getActionWhenBotIsPre3bettorAndPostAggressor() {
+        String actionWhenBotIsPre3bettorAndPostAggressor = null;
+
+        if(board.size() == 3 || board.size() == 4) {
+            if(actionable.isBotIsPre3bettor() && !actionable.isOpponentBetsOrRaisesPostFlop()) {
+                if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                    if(Math.random() < 0.85) {
+                        actionWhenBotIsPre3bettorAndPostAggressor = BET;
+                    }
+                }
+
+                if(actionWhenBotIsPre3bettorAndPostAggressor == null) {
+                    if(Math.random() < 0.9) {
+                        actionWhenBotIsPre3bettorAndPostAggressor = BET;
+                    }
+                }
+
+                if(actionWhenBotIsPre3bettorAndPostAggressor == null) {
+                    if(handStrength >= 0.6 && handStrength <= 0.8) {
+                        if(Math.random() < 0.8) {
+                            actionWhenBotIsPre3bettorAndPostAggressor = BET;
+                        }
+                    }
+                }
+            }
+        }
+
+        if(actionWhenBotIsPre3bettorAndPostAggressor != null) {
+            System.out.println("aggro action because bot is pre-3bettor");
+        }
+
+        return actionWhenBotIsPre3bettorAndPostAggressor;
     }
 
     private boolean enoughBehindAfterFloat() {

@@ -70,6 +70,8 @@ public class BotHand implements Actionable {
     private boolean opponentIsDecentThinking;
 
     private String floatAction;
+    private boolean botIsPre3bettor;
+    private boolean opponentBetsOrRaisesPostFlop;
 
     public BotHand() {
         //default constructor
@@ -476,10 +478,21 @@ public class BotHand implements Actionable {
         }
         updateOpponentActionHistory(opponentAction);
         checkIfBettingActionIsDoneByPassivePlayer(opponentAction);
+        checkIfOpponentBetsOrRaisesPostFlop(opponentAction);
 
         if(!botIsButton && opponentActionHistory != null && opponentActionHistory.size() == 1 &&
                 opponentActionHistory.get(0).contains("raise")) {
             botTable.setLastPfrSizingOfOpponent(opponentPlayerName, opponentTotalBetSize / bigBlind);
+        }
+    }
+
+    private void checkIfOpponentBetsOrRaisesPostFlop(String opponentAction) {
+        if(street != null) {
+            if(street.equals("flop") || street.equals("turn") || street.equals("river")) {
+                if(opponentAction.contains("bet") || opponentAction.contains("raise")) {
+                    opponentBetsOrRaisesPostFlop = true;
+                }
+            }
         }
     }
 
@@ -1181,5 +1194,21 @@ public class BotHand implements Actionable {
 
     public void setFloatAction(String floatAction) {
         this.floatAction = floatAction;
+    }
+
+    public boolean isBotIsPre3bettor() {
+        return botIsPre3bettor;
+    }
+
+    public void setBotIsPre3bettor(boolean botIsPre3bettor) {
+        this.botIsPre3bettor = botIsPre3bettor;
+    }
+
+    public boolean isOpponentBetsOrRaisesPostFlop() {
+        return opponentBetsOrRaisesPostFlop;
+    }
+
+    public void setOpponentBetsOrRaisesPostFlop(boolean opponentBetsOrRaisesPostFlop) {
+        this.opponentBetsOrRaisesPostFlop = opponentBetsOrRaisesPostFlop;
     }
 }

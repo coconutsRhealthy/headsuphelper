@@ -397,11 +397,13 @@ public class PreflopActionBuilder {
         } else if ((random <= 1 - percentage3bet) && (random >= 1 - percentage3bet - percentageCall2bet)){
             return "call";
         } else {
+            actionable.setBotIsPre3bettor(true);
             return "raise";
         }
     }
 
     private String get3betF4bet(Actionable actionable) {
+        actionable.setBotIsPre3bettor(false);
         actionable.removeHoleCardsFromKnownGameCards();
 
         Call4bet call4Bet = new Call4bet(actionBuilderUtil);

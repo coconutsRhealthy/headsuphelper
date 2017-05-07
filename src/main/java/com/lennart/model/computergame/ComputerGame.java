@@ -60,6 +60,8 @@ public class ComputerGame implements Actionable {
     private boolean opponentIsDecentThinking;
 
     private String floatAction;
+    private boolean botIsPre3bettor;
+    private boolean opponentBetsOrRaisesPostFlop;
 
     public ComputerGame() {
         //default constructor
@@ -942,5 +944,24 @@ public class ComputerGame implements Actionable {
     @Override
     public void setFloatAction(String floatAction) {
         this.floatAction = floatAction;
+    }
+
+    @Override
+    public boolean isBotIsPre3bettor() {
+        return botIsPre3bettor;
+    }
+
+    @Override
+    public void setBotIsPre3bettor(boolean botIsPre3bettor) {
+        this.botIsPre3bettor = botIsPre3bettor;
+    }
+
+    @Override
+    public boolean isOpponentBetsOrRaisesPostFlop() {
+        return opponentBetsOrRaisesPostFlop;
+    }
+
+    public void setOpponentBetsOrRaisesPostFlop(boolean opponentBetsOrRaisesPostFlop) {
+        this.opponentBetsOrRaisesPostFlop = opponentBetsOrRaisesPostFlop;
     }
 }
