@@ -95,7 +95,6 @@ public class BotHand implements Actionable {
         setTheInitialStackSizeOfOpponentIfNotYetSet(botTable);
         setOpponentType(botTable);
         checkIfOpponentIsDecentThinking(botTable);
-        checkIfOpponentActionShouldBeBetOrRaise();
 
         //forceQuitIfEffectiveStackSizeAbove100bb();
     }
@@ -125,7 +124,6 @@ public class BotHand implements Actionable {
         setStreetAndPreviousStreet();
         setOpponentAction(botTable);
         checkIfPre3betOrPostRaisedPot();
-        checkIfOpponentActionShouldBeBetOrRaise();
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
 
@@ -146,6 +144,28 @@ public class BotHand implements Actionable {
                 if(opponentTotalBetSize > 0 && !(opponentTotalBetSize == bigBlind && botTotalBetSize == smallBlind)) {
                     opponentAction = "bet";
                     System.out.println("opponentAction was wrongfully set to null. Changed to 'bet'");
+                }
+
+                if(opponentAction == null && !(opponentTotalBetSize == bigBlind && botTotalBetSize == smallBlind)) {
+                    String middleActionButton = NetBetTableReader.readMiddleActionButton();
+                    if(middleActionButton != null && middleActionButton.contains("Call")) {
+                        if(street != null && streetAtPreviousActionRequest != null && street.equals(streetAtPreviousActionRequest)) {
+                            if(botActionHistory != null && botActionHistory.get(botActionHistory.size() - 1) != null
+                                    && botActionHistory.get(botActionHistory.size() - 1).equals("bet")) {
+                                opponentAction = "raise";
+                                opponentTotalBetSize = 0.45;
+                                System.out.println("Changed opponentAction from null to raise, with size 0.45");
+                            } else {
+                                opponentAction = "bet";
+                                opponentTotalBetSize = 0.45;
+                                System.out.println("Changed opponentAction from null to bet, with size 0.45");
+                            }
+                        } else {
+                            opponentAction = "bet";
+                            opponentTotalBetSize = 0.45;
+                            System.out.println("Changed opponentAction from null to bet, with size 0.45");
+                        }
+                    }
                 }
             }
 
@@ -843,30 +863,6 @@ public class BotHand implements Actionable {
             }
         }
         return false;
-    }
-
-    private void checkIfOpponentActionShouldBeBetOrRaise() {
-        if(opponentAction == null) {
-            String middleActionButton = NetBetTableReader.readMiddleActionButton();
-            if(middleActionButton != null && middleActionButton.contains("Call")) {
-                if(street != null && streetAtPreviousActionRequest != null && street.equals(streetAtPreviousActionRequest)) {
-                    if(botActionHistory != null && botActionHistory.get(botActionHistory.size() - 1) != null
-                            && botActionHistory.get(botActionHistory.size() - 1).equals("bet")) {
-                        opponentAction = "raise";
-                        opponentTotalBetSize = 0.45;
-                        System.out.println("Changed opponentAction from null to raise, with size 0.45");
-                    } else {
-                        opponentAction = "bet";
-                        opponentTotalBetSize = 0.45;
-                        System.out.println("Changed opponentAction from null to bet, with size 0.45");
-                    }
-                } else {
-                    opponentAction = "bet";
-                    opponentTotalBetSize = 0.45;
-                    System.out.println("Changed opponentAction from null to bet, with size 0.45");
-                }
-            }
-        }
     }
 
     @Override
