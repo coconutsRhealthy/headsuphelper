@@ -45,10 +45,16 @@ public class BotTable {
             }
 
             if(counter > 60) {
-                MouseKeyboard.moveMouseToLocation(1565, 909);
-                MouseKeyboard.click(1565, 909);
-                MouseKeyboard.moveMouseToLocation(20, 20);
-                counter = 0;
+                try {
+                    MouseKeyboard.moveMouseToLocation(1565, 909);
+                    TimeUnit.MILLISECONDS.sleep(300);
+                    MouseKeyboard.click(1565, 909);
+                    TimeUnit.MILLISECONDS.sleep(500);
+                    MouseKeyboard.moveMouseToLocation(20, 20);
+                    counter = 0;
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             System.out.print(counter);
         }
@@ -69,10 +75,16 @@ public class BotTable {
             }
 
             if(counter > 60) {
-                MouseKeyboard.moveMouseToLocation(1565, 909);
-                MouseKeyboard.click(1565, 909);
-                MouseKeyboard.moveMouseToLocation(20, 20);
-                counter = 0;
+                try {
+                    MouseKeyboard.moveMouseToLocation(1565, 909);
+                    TimeUnit.MILLISECONDS.sleep(300);
+                    MouseKeyboard.click(1565, 909);
+                    TimeUnit.MILLISECONDS.sleep(300);
+                    MouseKeyboard.moveMouseToLocation(20, 20);
+                    counter = 0;
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             System.out.print(counter);
         }

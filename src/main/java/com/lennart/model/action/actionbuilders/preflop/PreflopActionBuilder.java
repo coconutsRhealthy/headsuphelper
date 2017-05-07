@@ -83,7 +83,7 @@ public class PreflopActionBuilder {
         
         if(actionable.isBotIsButton()) {
             if(action != null && action.equals("fold")) {
-                if(amountToCall / (opponentTotalBetSize + botTotalBetSize) < 0.34) {
+                if(amountToCall / (opponentTotalBetSize + botTotalBetSize) < 0.34 && amountToCall / (opponentTotalBetSize + botTotalBetSize) > 0) {
                     if(opponentTotalBetSize != actionable.getBigBlind()) {
                         action = "call";
                         System.out.println("changed action from fold to call preflop, because of favourable odds");
@@ -92,7 +92,7 @@ public class PreflopActionBuilder {
             }
         } else {
             if(action != null && action.equals("fold")) {
-                if(amountToCall / (opponentTotalBetSize + botTotalBetSize) < 0.28) {
+                if(amountToCall / (opponentTotalBetSize + botTotalBetSize) < 0.28 && amountToCall / (opponentTotalBetSize + botTotalBetSize) > 0) {
                     action = "call";
                     System.out.println("changed action from fold to call preflop, because of favourable odds");
                 }

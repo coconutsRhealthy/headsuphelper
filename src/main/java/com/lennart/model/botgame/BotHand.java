@@ -171,6 +171,7 @@ public class BotHand implements Actionable {
                         }
                     }
                 }
+                checkIfOpponentBetsOrRaisesPostFlop(opponentAction);
             }
 
             botAction = new Action(this);
@@ -489,7 +490,7 @@ public class BotHand implements Actionable {
     private void checkIfOpponentBetsOrRaisesPostFlop(String opponentAction) {
         if(street != null) {
             if(street.equals("flop") || street.equals("turn") || street.equals("river")) {
-                if(opponentAction.contains("bet") || opponentAction.contains("raise")) {
+                if(opponentAction != null && (opponentAction.contains("bet") || opponentAction.contains("raise"))) {
                     opponentBetsOrRaisesPostFlop = true;
                 }
             }
