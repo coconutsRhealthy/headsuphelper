@@ -106,6 +106,9 @@ public class PostFlopActionBuilder {
             action = getDrawCallingAction();
         }
         if(action == null) {
+            action = getFloatAction();
+        }
+        if(action == null) {
             System.out.println("default fold in getFbet()");
             action = FOLD;
         }
@@ -540,8 +543,19 @@ public class PostFlopActionBuilder {
             if(bettingAction.equals(BET)) {
                 if(potSize / bigBlind < 10) {
                     if(actionable.isBotIsButton()) {
-                        if(Math.random() < 0.18) {
+                        double random = Math.random();
+
+                        if(actionable.getFloatAction() != null && ((actionable.getFloatAction().equals("flop") && getStreet() != null && getStreet().equals("turn"))
+                                || actionable.getFloatAction().equals("turn") && getStreet() != null && getStreet().equals("river"))) {
                             bluffInitializeAction = bettingAction;
+                            System.out.println("bluff after float on previous street");
+                        }
+
+                        if(bluffInitializeAction == null && random <= 0.54) {
+                            bluffInitializeAction = bettingAction;
+                        }
+
+                        if(random < 0.18) {
                             actionable.setPreviousBluffAction(true);
                         }
                     } else {
@@ -551,19 +565,73 @@ public class PostFlopActionBuilder {
                         }
                     }
                 } else if(potSize / bigBlind < 25) {
-                    if(Math.random() < 0.40) {
-                        bluffInitializeAction = bettingAction;
-                        actionable.setPreviousBluffAction(true);
+                    if(actionable.isBotIsButton()) {
+                        double random = Math.random();
+
+                        if(actionable.getFloatAction() != null && ((actionable.getFloatAction().equals("flop") && getStreet() != null && getStreet().equals("turn"))
+                                || actionable.getFloatAction().equals("turn") && getStreet() != null && getStreet().equals("river"))) {
+                            bluffInitializeAction = bettingAction;
+                            System.out.println("bluff after float on previous street");
+                        }
+
+                        if(bluffInitializeAction == null && random <= 0.54) {
+                            bluffInitializeAction = bettingAction;
+                        }
+
+                        if(random < 0.40) {
+                            actionable.setPreviousBluffAction(true);
+                        }
+                    } else {
+                        if(Math.random() < 0.40) {
+                            bluffInitializeAction = bettingAction;
+                            actionable.setPreviousBluffAction(true);
+                        }
                     }
                 } else if(potSize / bigBlind < 50) {
-                    if(Math.random() < 0.50) {
-                        bluffInitializeAction = bettingAction;
-                        actionable.setPreviousBluffAction(true);
+                    if(actionable.isBotIsButton()) {
+                        double random = Math.random();
+
+                        if(actionable.getFloatAction() != null && ((actionable.getFloatAction().equals("flop") && getStreet() != null && getStreet().equals("turn"))
+                                || actionable.getFloatAction().equals("turn") && getStreet() != null && getStreet().equals("river"))) {
+                            bluffInitializeAction = bettingAction;
+                            System.out.println("bluff after float on previous street");
+                        }
+
+                        if(bluffInitializeAction == null && random <= 0.54) {
+                            bluffInitializeAction = bettingAction;
+                        }
+
+                        if(random < 0.50) {
+                            actionable.setPreviousBluffAction(true);
+                        }
+                    } else {
+                        if(Math.random() < 0.50) {
+                            bluffInitializeAction = bettingAction;
+                            actionable.setPreviousBluffAction(true);
+                        }
                     }
                 } else {
-                    if(Math.random() < 0.60) {
-                        bluffInitializeAction = bettingAction;
-                        actionable.setPreviousBluffAction(true);
+                    if(actionable.isBotIsButton()) {
+                        double random = Math.random();
+
+                        if(actionable.getFloatAction() != null && ((actionable.getFloatAction().equals("flop") && getStreet() != null && getStreet().equals("turn"))
+                                || actionable.getFloatAction().equals("turn") && getStreet() != null && getStreet().equals("river"))) {
+                            bluffInitializeAction = bettingAction;
+                            System.out.println("bluff after float on previous street");
+                        }
+
+                        if(bluffInitializeAction == null && random <= 0.60) {
+                            bluffInitializeAction = bettingAction;
+                        }
+
+                        if(random < 0.60) {
+                            actionable.setPreviousBluffAction(true);
+                        }
+                    } else {
+                        if(Math.random() < 0.60) {
+                            bluffInitializeAction = bettingAction;
+                            actionable.setPreviousBluffAction(true);
+                        }
                     }
                 }
             } else {
@@ -669,6 +737,50 @@ public class PostFlopActionBuilder {
         }
 
         return valueCallAction;
+    }
+
+    private String getFloatAction() {
+        String floatAction = null;
+
+        if(board.size() == 3 || board.size() == 4) {
+            if(actionable.isBotIsButton()) {
+                if(!actionable.isBettingActionDoneByPassivePlayer()) {
+                    if(actionable.getOpponentAction().equals("bet")) {
+                        if(actionable.getBotStack() / bigBlind >= (actionable.getPotSize() / bigBlind) / 2) {
+                            if(handStrength > 0.25 || handEvaluator.hasAnyDrawNonBackDoor()) {
+                                floatAction = CALL;
+                                actionable.setFloatAction(getStreet());
+                                System.out.println("float action");
+                            }
+
+                            if(floatAction == null && board.size() == 3) {
+                                if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                                    floatAction = CALL;
+                                    actionable.setFloatAction(getStreet());
+                                    System.out.println("float action");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return floatAction;
+    }
+
+    private String getStreet() {
+        String street = null;
+
+        if(board != null) {
+            if(board.size() == 3) {
+                street = "flop";
+            } else if(board.size() == 4) {
+                street = "turn";
+            } else if(board.size() == 5) {
+                street = "river";
+            }
+        }
+        return street;
     }
 
     private String getValueCallActionFromMap(Map<Integer, Double> opponentTypeMap, double amountToCallBb) {

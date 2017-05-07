@@ -59,6 +59,8 @@ public class ComputerGame implements Actionable {
 
     private boolean opponentIsDecentThinking;
 
+    private String floatAction;
+
     public ComputerGame() {
         //default constructor
     }
@@ -930,5 +932,15 @@ public class ComputerGame implements Actionable {
 
     public void setOpponentIsDecentThinking(boolean opponentIsDecentThinking) {
         this.opponentIsDecentThinking = opponentIsDecentThinking;
+    }
+
+    @Override
+    public String getFloatAction() {
+        return floatAction;
+    }
+
+    @Override
+    public void setFloatAction(String floatAction) {
+        this.floatAction = floatAction;
     }
 }

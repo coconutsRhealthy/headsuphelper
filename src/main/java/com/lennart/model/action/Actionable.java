@@ -57,4 +57,8 @@ public interface Actionable {
     double getHandsPlayedAgainstOpponent();
 
     boolean isOpponentIsDecentThinking();
+
+    String getFloatAction();
+
+    void setFloatAction(String floatAction);
 }

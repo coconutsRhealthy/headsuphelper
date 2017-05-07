@@ -69,6 +69,8 @@ public class BotHand implements Actionable {
     private boolean instaFoldHappened;
     private boolean opponentIsDecentThinking;
 
+    private String floatAction;
+
     public BotHand() {
         //default constructor
     }
@@ -1171,5 +1173,13 @@ public class BotHand implements Actionable {
 
     public void setOpponentIsDecentThinking(boolean opponentIsDecentThinking) {
         this.opponentIsDecentThinking = opponentIsDecentThinking;
+    }
+
+    public String getFloatAction() {
+        return floatAction;
+    }
+
+    public void setFloatAction(String floatAction) {
+        this.floatAction = floatAction;
     }
 }
