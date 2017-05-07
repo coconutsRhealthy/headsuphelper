@@ -746,7 +746,7 @@ public class PostFlopActionBuilder {
             if(actionable.isBotIsButton()) {
                 if(!actionable.isBettingActionDoneByPassivePlayer()) {
                     if(actionable.getOpponentAction().equals("bet")) {
-                        if(actionable.getBotStack() / bigBlind >= (actionable.getPotSize() / bigBlind) / 2) {
+                        if(enoughBehindAfterFloat()) {
                             if(actionable.getOpponentTotalBetSize() <= actionable.getPotSize()) {
                                 if(handStrength > 0.25 || handEvaluator.hasAnyDrawNonBackDoor()) {
                                     floatAction = CALL;
@@ -770,6 +770,13 @@ public class PostFlopActionBuilder {
             }
         }
         return floatAction;
+    }
+
+    private boolean enoughBehindAfterFloat() {
+        double botStackAfterCall = actionable.getBotStack() - (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize());
+        double potSizeAfterCall = actionable.getPotSize() + (2 * actionable.getOpponentTotalBetSize());
+
+        return botStackAfterCall / potSizeAfterCall >= 0.5;
     }
 
     private String getStreet() {
