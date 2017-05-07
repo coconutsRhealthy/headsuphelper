@@ -583,7 +583,7 @@ public class PostFlopActionBuilder {
                             System.out.println("bluff after float on previous street");
                         }
 
-                        if(bluffInitializeAction == null && random <= 0.54) {
+                        if(bluffInitializeAction == null && random <= 0.25) {
                             bluffInitializeAction = bettingAction;
                         }
 
@@ -606,7 +606,7 @@ public class PostFlopActionBuilder {
                             System.out.println("bluff after float on previous street");
                         }
 
-                        if(bluffInitializeAction == null && random <= 0.54) {
+                        if(bluffInitializeAction == null && random <= 0.44) {
                             bluffInitializeAction = bettingAction;
                         }
 
