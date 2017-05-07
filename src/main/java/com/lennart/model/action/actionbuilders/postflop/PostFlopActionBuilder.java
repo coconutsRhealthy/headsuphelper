@@ -747,17 +747,21 @@ public class PostFlopActionBuilder {
                 if(!actionable.isBettingActionDoneByPassivePlayer()) {
                     if(actionable.getOpponentAction().equals("bet")) {
                         if(actionable.getBotStack() / bigBlind >= (actionable.getPotSize() / bigBlind) / 2) {
-                            if(handStrength > 0.25 || handEvaluator.hasAnyDrawNonBackDoor()) {
-                                floatAction = CALL;
-                                actionable.setFloatAction(getStreet());
-                                System.out.println("float action");
-                            }
-
-                            if(floatAction == null && board.size() == 3) {
-                                if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                            if(actionable.getOpponentTotalBetSize() <= actionable.getPotSize()) {
+                                if(handStrength > 0.25 || handEvaluator.hasAnyDrawNonBackDoor()) {
                                     floatAction = CALL;
                                     actionable.setFloatAction(getStreet());
                                     System.out.println("float action");
+                                }
+                            }
+
+                            if(floatAction == null && board.size() == 3) {
+                                if(actionable.getOpponentTotalBetSize() <= actionable.getPotSize()) {
+                                    if(handEvaluator.hasDrawOfType("strongBackDoor")) {
+                                        floatAction = CALL;
+                                        actionable.setFloatAction(getStreet());
+                                        System.out.println("float action");
+                                    }
                                 }
                             }
                         }
