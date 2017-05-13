@@ -704,6 +704,16 @@ public class PostFlopActionBuilder {
             valueCallAction = CALL;
         }
 
+        if(valueCallAction == null && actionable.getOpponentTotalBetSize() / bigBlind == 1) {
+            if(actionable.isBotIsButton()) {
+                valueCallAction = CALL;
+            } else {
+                if(Math.random() < 0.50) {
+                    valueCallAction = CALL;
+                }
+            }
+        }
+
         if(valueCallAction == null) {
             if(actionable.getBotStack() / actionable.getBigBlind() > 0 && actionable.getBotStack() / actionable.getBigBlind() <= 20) {
                 if(handStrength >= 0.20) {
