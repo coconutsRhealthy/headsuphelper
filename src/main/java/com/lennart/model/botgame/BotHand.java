@@ -478,7 +478,7 @@ public class BotHand implements Actionable {
             }
         }
         updateOpponentActionHistory(opponentAction);
-        checkIfBettingActionIsDoneByPassivePlayer(opponentAction);
+        //checkIfBettingActionIsDoneByPassivePlayer(opponentAction);
         checkIfOpponentBetsOrRaisesPostFlop(opponentAction);
 
         if(!botIsButton && opponentActionHistory != null && opponentActionHistory.size() == 1 &&
@@ -790,7 +790,8 @@ public class BotHand implements Actionable {
             aggressiveness = "Medium";
         }
 
-        opponentType = tightness + aggressiveness;
+        //opponentType = tightness + aggressiveness;
+        opponentType = "tightPassive";
         System.out.println("opponentType: " + opponentType);
     }
 
