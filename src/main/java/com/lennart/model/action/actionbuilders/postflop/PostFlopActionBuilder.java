@@ -80,9 +80,9 @@ public class PostFlopActionBuilder {
         if(action == null) {
             action = getBluffAction(BET);
         }
-        if(action == null) {
-            action = getActionWhenBotIsPre3bettorAndPostAggressor();
-        }
+//        if(action == null) {
+//            action = getActionWhenBotIsPre3bettorAndPostAggressor();
+//        }
         if(action == null) {
             System.out.println("default check in getFcheckOrFirstToAct()");
             action = CHECK;
@@ -302,7 +302,7 @@ public class PostFlopActionBuilder {
     }
 
     private String resetDrawBettingActionIfNecessary(String drawBettingAction) {
-        if(sizing / bigBlind > 100) {
+        if(sizing / bigBlind > 15) {
             drawBettingAction = null;
         }
 
@@ -480,7 +480,7 @@ public class PostFlopActionBuilder {
     private String resetBluffActionIfNecessary(String bluffAction) {
         if(actionable.isBettingActionDoneByPassivePlayer()) {
             bluffAction = null;
-        } else if (sizing / bigBlind > 100) {
+        } else if (sizing / bigBlind >= 10) {
             bluffAction = null;
         }
 
@@ -781,18 +781,24 @@ public class PostFlopActionBuilder {
                         if(enoughBehindAfterFloat()) {
                             if(actionable.getOpponentTotalBetSize() <= actionable.getPotSize()) {
                                 if(handStrength > 0.25 || handEvaluator.hasAnyDrawNonBackDoor()) {
-                                    floatAction = CALL;
-                                    actionable.setFloatAction(getStreet());
-                                    System.out.println("float action");
+                                    if((actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize() / bigBlind) > 0 &&
+                                            (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize()) / bigBlind <= 5) {
+                                        floatAction = CALL;
+                                        actionable.setFloatAction(getStreet());
+                                        System.out.println("float action");
+                                    }
                                 }
                             }
 
                             if(floatAction == null && board.size() == 3) {
                                 if(actionable.getOpponentTotalBetSize() <= actionable.getPotSize()) {
                                     if(handEvaluator.hasDrawOfType("strongBackDoor")) {
-                                        floatAction = CALL;
-                                        actionable.setFloatAction(getStreet());
-                                        System.out.println("float action");
+                                        if((actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize() / bigBlind) > 0 &&
+                                                (actionable.getOpponentTotalBetSize() - actionable.getBotTotalBetSize()) / bigBlind <= 5) {
+                                            floatAction = CALL;
+                                            actionable.setFloatAction(getStreet());
+                                            System.out.println("float action");
+                                        }
                                     }
                                 }
                             }
