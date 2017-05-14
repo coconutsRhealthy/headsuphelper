@@ -179,14 +179,24 @@ public class BotTable {
         }
     }
 
+    public void setOpponentWonMoreThan100bb(String opponentPlayerName, double trueOrFalse) {
+        addPlayerToStatsMapIfNecessary(opponentPlayerName);
+
+        if(opponentPlayerNamesAndStats != null && opponentPlayerNamesAndStats.get(opponentPlayerName) != null &&
+                opponentPlayerNamesAndStats.get(opponentPlayerName).get(8) != null) {
+            opponentPlayerNamesAndStats.get(opponentPlayerName).set(8, trueOrFalse);
+        }
+    }
+
     private void addPlayerToStatsMapIfNecessary(String opponentPlayerName) {
         if(opponentPlayerNamesAndStats == null) {
             opponentPlayerNamesAndStats = new HashMap<>();
         }
 
+        //element (8) is gonna be if opponent won more than 100bb this session. 0 if false, 1 if true
         if(opponentPlayerName != null && opponentPlayerNamesAndStats.get(opponentPlayerName) == null) {
             opponentPlayerNamesAndStats.put(opponentPlayerName, new ArrayList<>());
-            for(int i = 0; i < 8; i++) {
+            for(int i = 0; i < 9; i++) {
                 opponentPlayerNamesAndStats.get(opponentPlayerName).add(0d);
             }
         }

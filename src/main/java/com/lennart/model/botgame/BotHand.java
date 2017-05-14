@@ -100,7 +100,7 @@ public class BotHand implements Actionable {
         setOpponentType(botTable);
         checkIfOpponentIsDecentThinking(botTable);
 
-        //forceQuitIfEffectiveStackSizeAbove100bb();
+        //forceQuitIfEffectiveStackSizeAbove100bbOrOpponentWonMoreThan100bb();
     }
 
     public boolean updateVariables(BotTable botTable) {
@@ -131,7 +131,7 @@ public class BotHand implements Actionable {
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
 
-        return !forceQuitIfEffectiveStackSizeAbove100bb();
+        return !forceQuitIfEffectiveStackSizeAbove100bbOrOpponentWonMoreThan100bb(botTable);
     }
 
     public void getNewBotAction() {
@@ -883,9 +883,36 @@ public class BotHand implements Actionable {
         botTable.setInitialStackSizeOfOpponent(opponentPlayerName, opponentStack / bigBlind);
     }
 
-    private boolean forceQuitIfEffectiveStackSizeAbove100bb() {
+    private boolean forceQuitIfEffectiveStackSizeAbove100bbOrOpponentWonMoreThan100bb(BotTable botTable) {
         if(botStack / bigBlind >= 100 && botStack / bigBlind <= 1000 && opponentStack / bigBlind >= 100 && opponentStack / bigBlind <= 1000) {
             System.out.println("Effective stacksize became 100bb or more. Forced quit.");
+
+            try {
+                TimeUnit.SECONDS.sleep(60);
+                NetBetTableOpener.startNewTable(bigBlind);
+                return true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        double initialStackSizeOpponentBb = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(6);
+
+        if((opponentStack / bigBlind) > (initialStackSizeOpponentBb + 100d)) {
+            System.out.println("Opponent won more than 100bb. Forced quit.");
+            botTable.setOpponentWonMoreThan100bb(opponentPlayerName, 1);
+
+            try {
+                TimeUnit.SECONDS.sleep(60);
+                NetBetTableOpener.startNewTable(bigBlind);
+                return true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(8) == 1) {
+            System.out.println("Opponent won more than 100bb off you earlier this session. Forced quit.");
 
             try {
                 TimeUnit.SECONDS.sleep(60);
