@@ -330,11 +330,27 @@ public class BotHand implements Actionable {
 
             if(middleActionButton.contains("Call") || rightActionButton.contains("Call") ||
                     (NetBetTableReader.middleActionButtonIsNotPresent() && rightActionButton.contains("All"))) {
-                if(handStrength >= 0.8) {
-                    setActionToCall();
-                    System.out.println("Handstrength >= 0.8: call in extraCallCheckOnMisreadBoardPostFlop()");
-                    return true;
-                } else if(botStack < 0.15 * botStackAtBeginningOfHand) {
+                if(board.size() == 3) {
+                    if(handStrength >= 0.88) {
+                        setActionToCall();
+                        System.out.println("Handstrength >= 0.88: flop call in extraCallCheckOnMisreadBoardPostFlop()");
+                        return true;
+                    }
+                } else if(board.size() == 4) {
+                    if(handStrength > 0.87) {
+                        setActionToCall();
+                        System.out.println("Handstrength >= 0.87: turn call in extraCallCheckOnMisreadBoardPostFlop()");
+                        return true;
+                    }
+                } else if(board.size() == 5) {
+                    if(handStrength > 0.85) {
+                        setActionToCall();
+                        System.out.println("Handstrength >= 0.85: river call in extraCallCheckOnMisreadBoardPostFlop()");
+                        return true;
+                    }
+                }
+
+                if(botStack < 0.15 * botStackAtBeginningOfHand && botStack > 0) {
                     setActionToCall();
                     System.out.println("Pot committed according to extaCallCheckOnMisreadBoardPostFlop()");
                     return true;
