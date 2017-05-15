@@ -898,9 +898,10 @@ public class BotHand implements Actionable {
 
         double initialStackSizeOpponentBb = botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(6);
 
-        if((opponentStack / bigBlind) > (initialStackSizeOpponentBb + 100d)) {
+        if((opponentStack / bigBlind) > (initialStackSizeOpponentBb + 80d)) {
             System.out.println("Opponent won more than 100bb. Forced quit.");
-            botTable.setOpponentWonMoreThan100bb(opponentPlayerName, 1);
+            //botTable.setOpponentWonMoreThan100bb(opponentPlayerName, 1);
+            BotTable.addOpponentToNotToPlayList(opponentPlayerName);
 
             try {
                 TimeUnit.SECONDS.sleep(60);
@@ -911,7 +912,7 @@ public class BotHand implements Actionable {
             }
         }
 
-        if(botTable.getOpponentPlayerNamesAndStats().get(opponentPlayerName).get(8) == 1) {
+        if(BotTable.isOpponentInNotToPlayList(opponentPlayerName)) {
             System.out.println("Opponent won more than 100bb off you earlier this session. Forced quit.");
 
             try {

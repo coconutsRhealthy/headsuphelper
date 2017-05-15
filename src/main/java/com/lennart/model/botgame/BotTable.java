@@ -17,6 +17,8 @@ public class BotTable {
     private Map<String, List<Double>> opponentPlayerNamesAndStats;
     private Map<String, List<Boolean>> botIsButtonHistoryPerOpponentMap;
 
+    private static List<String> opponentsThatWon100bbOrMore;
+
     public BotTable() {
         //default constructor
     }
@@ -218,6 +220,25 @@ public class BotTable {
         if(opponentPlayerName != null && botIsButtonHistoryPerOpponentMap.get(opponentPlayerName) == null) {
             botIsButtonHistoryPerOpponentMap.put(opponentPlayerName, new ArrayList<>());
         }
+    }
+
+    public static void addOpponentToNotToPlayList(String playerName) {
+        if(opponentsThatWon100bbOrMore == null) {
+            opponentsThatWon100bbOrMore = new ArrayList<>();
+        }
+
+        opponentsThatWon100bbOrMore.add(playerName);
+    }
+
+    public static boolean isOpponentInNotToPlayList(String playerName) {
+        if(opponentsThatWon100bbOrMore != null && playerName != null) {
+            for(String opponentPlayerName : opponentsThatWon100bbOrMore) {
+                if(playerName.equals(opponentPlayerName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public BotHand getBotHand() {
