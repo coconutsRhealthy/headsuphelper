@@ -61,9 +61,9 @@ public class Poker {
     }
 
     private void theMethod() throws Exception {
-        Map<String, Double> eije = retrieveRouteDataFromDb("Handstrength50-55StrongDrawNoPositionBTNPotsize60-100bbComputerBetsize10-15bbOpponentBetsize10-15bbEffectiveStack75-110bbBoardTextureDry");
-
-        System.out.println("jaja");
+//        Map<String, Double> eije = retrieveRouteDataFromDb("Handstrength50-55StrongDrawNoPositionBTNPotsize60-100bbComputerBetsize10-15bbOpponentBetsize10-15bbEffectiveStack75-110bbBoardTextureDry");
+//
+//        System.out.println("jaja");
 //        List<String> routesFromDb = retrieveAllRoutesFromDb();
 //
 //        List<String> routesNormal = generateTable();
@@ -73,8 +73,19 @@ public class Poker {
 //        routesFromDb.removeAll(routesNormal);
 //
 //        System.out.println("wacht2");
-//        List<String> routes = generateTable();
-//        storeRoutesInDb(routes);
+        List<String> routes = generateTable();
+        storeRoutesInDb(routes);
+    }
+
+    private String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, String position, double potSize, double computerBetSize, double opponentBetSize, double effectiveStack, String boardTexture) {
+        String route = createRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
+
+        return "";
+
+    }
+
+    private String createRoute(double handStrength, boolean strongDraw, String position, double potSize, double computerBetSize, double opponentBetSize, double effectiveStack, String boardTexture) {
+        return "";
     }
 
     private List<String> generateTable() {
@@ -210,16 +221,26 @@ public class Poker {
         ResultSet rs = st.executeQuery("SELECT * FROM standard WHERE route = '" + route + "';");
 
         while(rs.next()) {
-            routeData.put("fold", rs.getDouble("fold_times"));
-            routeData.put("check", rs.getDouble("check_times"));
-            routeData.put("call", rs.getDouble("call_times"));
-            routeData.put("bet25%", rs.getDouble("bet25%_times"));
-            routeData.put("bet50%", rs.getDouble("bet50%_times"));
-            routeData.put("bet75%", rs.getDouble("bet75%_times"));
-            routeData.put("bet100%", rs.getDouble("bet100%_times"));
-            routeData.put("bet150%", rs.getDouble("bet150%_times"));
-            routeData.put("bet200%", rs.getDouble("bet200%_times"));
-            routeData.put("raise", rs.getDouble("raise_times"));
+            routeData.put("fold_times", rs.getDouble("fold_times"));
+            routeData.put("fold_payoff", rs.getDouble("fold_payoff"));
+            routeData.put("check_times", rs.getDouble("check_times"));
+            routeData.put("check_payoff", rs.getDouble("check_payoff"));
+            routeData.put("call_times", rs.getDouble("call_times"));
+            routeData.put("call_payoff", rs.getDouble("call_payoff"));
+            routeData.put("bet25%_times", rs.getDouble("bet25%_times"));
+            routeData.put("bet25%_payoff", rs.getDouble("bet25%_payoff"));
+            routeData.put("bet50%_times", rs.getDouble("bet50%_times"));
+            routeData.put("bet50%_payoff", rs.getDouble("bet50%_payoff"));
+            routeData.put("bet75%_times", rs.getDouble("bet75%_times"));
+            routeData.put("bet75%_payoff", rs.getDouble("bet75%_payoff"));
+            routeData.put("bet100%_times", rs.getDouble("bet100%_times"));
+            routeData.put("bet100%_payoff", rs.getDouble("bet100%_payoff"));
+            routeData.put("bet150%_times", rs.getDouble("bet150%_times"));
+            routeData.put("bet150%_payoff", rs.getDouble("bet150%_payoff"));
+            routeData.put("bet200%_times", rs.getDouble("bet200%_times"));
+            routeData.put("bet200%_payoff", rs.getDouble("bet200%_payoff"));
+            routeData.put("raise_times", rs.getDouble("raise_times"));
+            routeData.put("raise_payoff", rs.getDouble("raise_payoff"));
         }
         return routeData;
     }
