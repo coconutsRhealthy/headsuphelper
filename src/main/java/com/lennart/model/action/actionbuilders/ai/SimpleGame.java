@@ -38,13 +38,10 @@ public class SimpleGame {
     public static void main(String[] args) {
         SimpleGame simpleGame = new SimpleGame();
 
-        for(int i = 0; i < 15000; i++) {
-            if(i == 14777) {
-                System.out.println("wacht");
-            }
+        for(int i = 0; i < 50000; i++) {
             simpleGame.playOneGame(i);
+            System.out.println(i + " - " + simpleGame.computerScore);
         }
-        System.out.println("wacht");
     }
 
     private Map<Integer, Map<String, List<Double>>> initializePayoffMap() {
@@ -60,83 +57,148 @@ public class SimpleGame {
         payoffMap.put(8, new HashMap<>());
         payoffMap.put(9, new HashMap<>());
 
+        payoffMap.get(1).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(1).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(1).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(1).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(1).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(1).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(1).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(1).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(1).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(1).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(1).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(2).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(2).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(2).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(2).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(2).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(2).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(2).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(2).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(2).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(2).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(2).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(3).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(3).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(3).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(3).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(3).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(3).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(3).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(3).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(3).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(3).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(3).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(4).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(4).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(4).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(4).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(4).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(4).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(4).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(4).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(4).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(4).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(4).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(5).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(5).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(5).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(5).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(5).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(5).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(5).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(5).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(5).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(5).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(5).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(6).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(6).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(6).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(6).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(6).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(6).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(6).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(6).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(6).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(6).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(6).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(7).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(7).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(7).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(7).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(7).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(7).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(7).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(7).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(7).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(7).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(7).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(8).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(8).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(8).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(8).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(8).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(8).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(8).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(8).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(8).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(8).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(8).put("raise all-in", Arrays.asList(0.0, 0.0));
 
+        payoffMap.get(9).put("fold 1", Arrays.asList(0.0, 0.0));
+        payoffMap.get(9).put("fold 2", Arrays.asList(0.0, 0.0));
+        payoffMap.get(9).put("fold 3", Arrays.asList(0.0, 0.0));
         payoffMap.get(9).put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get(9).put("bet 1", Arrays.asList(0.0, 0.0));
         payoffMap.get(9).put("bet 2", Arrays.asList(0.0, 0.0));
         payoffMap.get(9).put("bet 3", Arrays.asList(0.0, 0.0));
+        payoffMap.get(9).put("call 4", Arrays.asList(0.0, 0.0));
+        payoffMap.get(9).put("call 6", Arrays.asList(0.0, 0.0));
+        payoffMap.get(9).put("call 9", Arrays.asList(0.0, 0.0));
+        payoffMap.get(9).put("raise all-in", Arrays.asList(0.0, 0.0));
 
         return payoffMap;
     }
 
     private void playOneGame(int gameNumber) {
-        //System.out.println();
-        //System.out.println("STARTING A NEW GAME");
-        //System.out.println();
-
         int humanNumber = getRandomNumber();
         int computerNumber = getRandomNumber();
 
-        int humanStack = 3;
-        int computerStack = 3;
+        int humanStack = 19;
+        int computerStack = 19;
 
         int pot = 2;
 
-        String computerAction = doComputerAction(computerNumber, gameNumber);
-        String humanAction = doHumanAction(humanNumber, computerAction);
+        String computerAction = doComputerAction(computerNumber, gameNumber, null, null);
+        int[] stackAndPot = setStacksAndPot(computerAction, pot, computerStack);
+        pot = stackAndPot[0];
+        computerStack = stackAndPot[1];
 
-        if(humanAction.equals("call")) {
-            if(computerAction.equals("bet 1")) {
-                humanStack = 2;
-                computerStack = 2;
-                pot = 4;
-            } else if(computerAction.equals("bet 2")) {
-                humanStack = 1;
-                computerStack = 1;
-                pot = 6;
-            } else if(computerAction.equals("bet 3")) {
-                humanStack = 0;
-                computerStack = 0;
-                pot = 8;
+        String humanAction = doHumanAction(humanNumber, computerAction);
+        stackAndPot = setStacksAndPot(humanAction, pot, humanStack);
+        pot = stackAndPot[0];
+        humanStack = stackAndPot[1];
+
+        if(humanAction.contains("raise")) {
+            computerAction = doComputerAction(computerNumber, gameNumber, humanAction, computerAction);
+
+            stackAndPot = setStacksAndPot(computerAction, pot, computerStack);
+            pot = stackAndPot[0];
+            computerStack = stackAndPot[1];
+
+            if(computerAction.contains("raise")) {
+                humanAction = doHumanAction(humanNumber, computerAction);
+                stackAndPot = setStacksAndPot(humanAction, pot, humanStack);
+                pot = stackAndPot[0];
+                humanStack = stackAndPot[1];
             }
         }
 
@@ -146,11 +208,45 @@ public class SimpleGame {
         humanStack = stacks.get(0);
         computerStack = stacks.get(1);
 
-        //System.out.println("Human stack at end of game is: " + humanStack);
-        //System.out.println("Computer stack at end of game is: " + computerStack);
-
         updateScores(humanStack, computerStack);
         updatePayoffMap(computerNumber, computerAction, computerStack);
+    }
+
+    private int[] setStacksAndPot(String action, int currentPot, int currentStack) {
+        int potToReturn = currentPot;
+        int stackToReturn = currentStack;
+
+        int[] arrayToReturn = new int[2];
+
+        if(!action.contains("fold")) {
+            if(action.contains("1")) {
+                potToReturn++;
+                stackToReturn = stackToReturn - 1;
+            } else if(action.contains("2")) {
+                potToReturn = potToReturn + 2;
+                stackToReturn = stackToReturn - 2;
+            } else if(action.contains("3")) {
+                potToReturn = potToReturn + 3;
+                stackToReturn = stackToReturn - 3;
+            } else if(action.contains("4")) {
+                potToReturn = potToReturn + 4;
+                stackToReturn = stackToReturn - 4;
+            } else if(action.contains("6")) {
+                potToReturn = potToReturn + 6;
+                stackToReturn = stackToReturn - 6;
+            } else if(action.contains("9")) {
+                potToReturn = potToReturn + 9;
+                stackToReturn = stackToReturn - 9;
+            } else if(action.contains("all-in")) {
+                potToReturn = potToReturn + stackToReturn;
+                stackToReturn = 0;
+            }
+        }
+
+        arrayToReturn[0] = potToReturn;
+        arrayToReturn[1] = stackToReturn;
+
+        return arrayToReturn;
     }
 
     private int getRandomNumber() {
@@ -159,8 +255,8 @@ public class SimpleGame {
     }
 
     private void updateScores(int humanStack, int computerStack) {
-        humanScore = humanScore + (humanStack - 4);
-        computerScore = computerScore + (computerStack - 4);
+        humanScore = humanScore + (humanStack - 20);
+        computerScore = computerScore + (computerStack - 20);
 
 //        System.out.println();
 //        System.out.println("*******************");
@@ -170,7 +266,15 @@ public class SimpleGame {
 //        System.out.println();
     }
 
-    private String doComputerAction(int computerNumber, int numberOfGames) {
+    private String doComputerAction(int computerNumber, int numberOfGames, String humanAction, String earlierComputerAction) {
+        if(humanAction == null) {
+            return doInitialComputerAction(computerNumber, numberOfGames);
+        } else {
+            return doSubsequentComputerAction(computerNumber, numberOfGames, humanAction, earlierComputerAction);
+        }
+    }
+
+    private String doInitialComputerAction(int computerNumber, int numberOfGames) {
         if(numberOfGames > 5000) {
             Map<String, List<Double>> mapToUse = new HashMap<>();
             mapToUse.putAll(payoffMap.get(computerNumber));
@@ -202,8 +306,56 @@ public class SimpleGame {
         }
     }
 
+    private String doSubsequentComputerAction(int computerNumber, int numberOfGames, String humanAction, String earlierComputerAction) {
+        int earlierComputerActionNumber;
+        int raiseNumber;
+
+        if(earlierComputerAction.contains("1")) {
+            earlierComputerActionNumber = 1;
+        } else if(earlierComputerAction.contains("2")) {
+            earlierComputerActionNumber = 2;
+        } else {
+            earlierComputerActionNumber = 3;
+        }
+
+        if(humanAction.contains("4")) {
+            raiseNumber = 4;
+        } else if(humanAction.contains("6")) {
+            raiseNumber = 6;
+        } else {
+            raiseNumber = 9;
+        }
+
+        if(numberOfGames > 5000) {
+            Map<String, List<Double>> mapToUse = new HashMap<>();
+            mapToUse.putAll(payoffMap.get(computerNumber));
+
+            Map<String, Double> mapOfScores = new HashMap<>();
+            mapOfScores.put("fold " + earlierComputerActionNumber, (mapToUse.get("fold " + earlierComputerActionNumber).get(0) / mapToUse.get("fold " + earlierComputerActionNumber).get(1)));
+            mapOfScores.put("call " + raiseNumber, (mapToUse.get("call " + raiseNumber).get(0) / mapToUse.get("call " + raiseNumber).get(1)));
+            mapOfScores.put("raise all-in", (mapToUse.get("raise all-in").get(0) / mapToUse.get("raise all-in").get(1)));
+
+            mapOfScores = sortByValueHighToLow(mapOfScores);
+
+            return mapOfScores.entrySet().iterator().next().getKey();
+        } else {
+            Random rn = new Random();
+            int i = rn.nextInt(3 - 1 + 1) + 1;
+
+            if(i == 1) {
+                return "fold " + earlierComputerActionNumber;
+            } else if(i == 2) {
+                return "call " + raiseNumber;
+            } else if(i == 3) {
+                return "raise all-in";
+            }
+
+            return null;
+        }
+    }
+
     private void updatePayoffMap(int computerNumber, String computerAction, int computerStack) {
-        double payoffThisGame = computerStack - 4.0;
+        double payoffThisGame = computerStack - 20;
         double oldPayoffValue = payoffMap.get(computerNumber).get(computerAction).get(0);
         double gamesUntillNow = payoffMap.get(computerNumber).get(computerAction).get(1);
         gamesUntillNow++;
@@ -215,11 +367,15 @@ public class SimpleGame {
     private String determineWinner(String humanAction, String computerAction, int humanNumber, int computerNumber) {
         String winner = "";
 
-        if(humanAction.equals("fold")) {
+        if(humanAction.contains("fold")) {
             winner = "computer";
         }
 
-        if(computerAction.equals("check") || humanAction.equals("call")) {
+        if(computerAction.contains("fold")) {
+            winner = "human";
+        }
+
+        if(computerAction.equals("check") || humanAction.contains("call") || computerAction.contains("call")) {
             if(humanNumber > computerNumber) {
                 winner = "human";
             } else if(humanNumber == computerNumber) {
@@ -261,73 +417,45 @@ public class SimpleGame {
             return "check";
         }
 
-//        if(humanNumber <= 3) {
-//            return "fold";
-//        } else if(humanNumber == 4) {
-//            if(computerAction.equals("bet 1")) {
-//                return "call";
-//            } else {
-//                return "fold";
-//            }
-//        } else if(humanNumber == 5 || humanNumber == 6) {
-//            if(computerAction.equals("bet 1") || computerAction.equals("bet 2")) {
-//                return "call";
-//            } else {
-//                return "fold";
-//            }
-//        } else {
-//            return "call";
-//        }
-
-        if(humanNumber < 6) {
-            return "fold";
-        } else {
-            return "call";
+        if(computerAction.equals("bet 1")) {
+            if(humanNumber >= 7) {
+                return "raise 4";
+            } else if (humanNumber == 4 || humanNumber == 5 || humanNumber == 6){
+                return "call bet 1";
+            } else {
+                return "fold";
+            }
         }
 
+        if(computerAction.equals("bet 2")) {
+            if(humanNumber >= 7) {
+                return "raise 6";
+            } else if (humanNumber == 5 || humanNumber == 6){
+                return "call bet 2";
+            } else {
+                return "fold";
+            }
+        }
 
+        if(computerAction.equals("bet 3")) {
+            if(humanNumber >= 8) {
+                return "raise 9";
+            } else if (humanNumber == 6){
+                return "call bet 3";
+            } else {
+                return "fold";
+            }
+        }
 
+        if(computerAction.equals("raise all-in")) {
+            if(humanNumber >= 7) {
+                return "call all-in";
+            } else {
+                return "fold";
+            }
+        }
 
-//        System.out.println("You have: " + humanNumber);
-//        System.out.println("Computer does: " + computerAction);
-//        System.out.println("What would you like to do?");
-//        System.out.println();
-//
-//        if(computerAction.equals("check")) {
-//            System.out.println("a) check");
-//        } else {
-//            System.out.println("a) fold");
-//            System.out.println("b) call");
-//        }
-//
-//        Scanner scan = new Scanner(System.in);
-//        String input = scan.nextLine();
-//        String humanAction = null;
-//
-//        while(humanAction == null) {
-//            if(computerAction.equals("check")) {
-//                if(input.equals("a")) {
-//                    humanAction = "check";
-//                } else {
-//                    System.out.println("You did a not allowed action, try again");
-//                    input = scan.nextLine();
-//                }
-//            } else {
-//                if(input.equals("a")) {
-//                    humanAction = "fold";
-//                } else if(input.equals("b")) {
-//                    humanAction = "call";
-//                } else {
-//                    System.out.println("You did a not allowed action, try again");
-//                    input = scan.nextLine();
-//                }
-//            }
-//        }
-//
-//        System.out.println();
-//        System.out.println("you did: " + humanAction);
-//
-//        return humanAction;
+        return null;
     }
 
     private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
