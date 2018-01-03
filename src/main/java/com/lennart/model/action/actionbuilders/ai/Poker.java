@@ -77,15 +77,51 @@ public class Poker {
         storeRoutesInDb(routes);
     }
 
-    private String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, String position, double potSize, double computerBetSize, double opponentBetSize, double effectiveStack, String boardTexture) {
+    private String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, String position,
+                             double potSize, double computerBetSize, double opponentBetSize, double effectiveStack,
+                             String boardTexture) throws Exception {
         String route = createRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
 
-        return "";
+        Map<String, Double> routeData = retrieveRouteDataFromDb(route);
+        Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
+        Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
 
+        return sortedEligibleActions.entrySet().iterator().next().getKey();
     }
 
     private String createRoute(double handStrength, boolean strongDraw, String position, double potSize, double computerBetSize, double opponentBetSize, double effectiveStack, String boardTexture) {
         return "";
+    }
+
+    private Map<String, Double> getSortedAveragePayoffMapFromRouteData(Map<String, Double> routeData) {
+        Map<String, Double> sortedAveragePayoffMap = new HashMap<>();
+
+        sortedAveragePayoffMap.put("fold", (routeData.get("fold_payoff") / routeData.get("fold_times")));
+        sortedAveragePayoffMap.put("check", (routeData.get("check_payoff") / routeData.get("check_times")));
+        sortedAveragePayoffMap.put("call", (routeData.get("call_payoff") / routeData.get("call_times")));
+        sortedAveragePayoffMap.put("bet25%", (routeData.get("bet25%_payoff") / routeData.get("bet25%_times")));
+        sortedAveragePayoffMap.put("bet50%", (routeData.get("bet50%_payoff") / routeData.get("bet50%_times")));
+        sortedAveragePayoffMap.put("bet75%", (routeData.get("bet75%_payoff") / routeData.get("bet75%_times")));
+        sortedAveragePayoffMap.put("bet100%", (routeData.get("bet100%_payoff") / routeData.get("bet100%_times")));
+        sortedAveragePayoffMap.put("bet150%", (routeData.get("bet150%_payoff") / routeData.get("bet150%_times")));
+        sortedAveragePayoffMap.put("bet200%", (routeData.get("bet200%_payoff") / routeData.get("bet200%_times")));
+        sortedAveragePayoffMap.put("raise", (routeData.get("raise_payoff") / routeData.get("raise_times")));
+
+        return sortByValueHighToLow(sortedAveragePayoffMap);
+    }
+
+    private Map<String, Double> retainOnlyEligibleActions(Map<String, Double> sortedActionMap, List<String> eligibleActions) {
+        Map<String, Double> sortedEligibleActions = new HashMap<>();
+
+        for(String eligibleAction : eligibleActions) {
+            for (Map.Entry<String, Double> entry : sortedActionMap.entrySet()) {
+                if(entry.getKey().contains(eligibleAction)) {
+                    sortedEligibleActions.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
+        return sortByValueHighToLow(sortedEligibleActions);
     }
 
     private List<String> generateTable() {
@@ -271,5 +307,21 @@ public class Poker {
 
     protected void closeDbConnection() throws SQLException {
         con.close();
+    }
+
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o2.getValue() ).compareTo( o1.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 }
