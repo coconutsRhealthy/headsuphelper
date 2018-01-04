@@ -77,7 +77,7 @@ public class Poker {
         storeRoutesInDb(routes);
     }
 
-    private String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, String position,
+    private String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, boolean position,
                              double potSize, double computerBetSize, double opponentBetSize, double effectiveStack,
                              String boardTexture) throws Exception {
         String route = createRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
@@ -89,8 +89,187 @@ public class Poker {
         return sortedEligibleActions.entrySet().iterator().next().getKey();
     }
 
-    private String createRoute(double handStrength, boolean strongDraw, String position, double potSize, double computerBetSize, double opponentBetSize, double effectiveStack, String boardTexture) {
-        return "";
+    private String createRoute(double handStrength, boolean strongDraw, boolean position, double potSizeBb,
+                               double computerBetSizeBb, double opponentBetSizeBb, double effectiveStackBb,
+                               String boardTexture) {
+        String handStrengthString = getHandStrengthString(handStrength);
+        String strongDrawString = getStrongDrawString(strongDraw);
+        String positionString = getPositionString(position);
+        String potSizeString = getPotsizeString(potSizeBb);
+        String computerBetSizeString = getComputerBetSizeBbString(computerBetSizeBb);
+        String opponentBetSizeString = getOpponentBetSizeBbString(opponentBetSizeBb);
+        String effectiveStackString = getEffectiveStackBbString(effectiveStackBb);
+
+        String route = handStrengthString + strongDrawString + positionString + potSizeString + computerBetSizeString + opponentBetSizeString + effectiveStackString + boardTexture;
+
+        return route;
+    }
+
+    private String getHandStrengthString(double handStength) {
+        String handStrengthString = null;
+
+        if(handStength >= 0 && handStength < 0.05) {
+            handStrengthString = "Handstrength0-5";
+        } else if(handStength < 0.10) {
+            handStrengthString = "Handstrength5-10";
+        } else if(handStength < 0.15) {
+            handStrengthString = "Handstrength10-15";
+        } else if(handStength < 0.20) {
+            handStrengthString = "Handstrength15-20";
+        } else if(handStength < 0.25) {
+            handStrengthString = "Handstrength20-25";
+        } else if(handStength < 0.30) {
+            handStrengthString = "Handstrength25-30";
+        } else if(handStength < 0.35) {
+            handStrengthString = "Handstrength30-35";
+        } else if(handStength < 0.40) {
+            handStrengthString = "Handstrength35-40";
+        } else if(handStength < 0.45) {
+            handStrengthString = "Handstrength40-45";
+        } else if(handStength < 0.50) {
+            handStrengthString = "Handstrength45-50";
+        } else if(handStength < 0.55) {
+            handStrengthString = "Handstrength50-55";
+        } else if(handStength < 0.60) {
+            handStrengthString = "Handstrength55-60";
+        } else if(handStength < 0.65) {
+            handStrengthString = "Handstrength60-65";
+        } else if(handStength < 0.70) {
+            handStrengthString = "Handstrength65-70";
+        } else if(handStength < 0.75) {
+            handStrengthString = "Handstrength70-75";
+        } else if(handStength < 0.80) {
+            handStrengthString = "Handstrength75-80";
+        } else if(handStength < 0.85) {
+            handStrengthString = "Handstrength80-85";
+        } else if(handStength < 0.90) {
+            handStrengthString = "Handstrength85-90";
+        } else if(handStength < 0.95) {
+            handStrengthString = "Handstrength90-95";
+        } else if(handStength < 1.1){
+            handStrengthString = "Handstrength95-100";
+        }
+
+        return handStrengthString;
+    }
+
+    private String getStrongDrawString(boolean strongDraw) {
+        if(strongDraw) {
+            return "StrongDrawYes";
+        } else {
+            return "StrongDrawNo";
+        }
+    }
+
+    private String getPositionString(boolean position) {
+        if(position) {
+            return "PositionBTN";
+        } else {
+            return "PositionBB";
+        }
+    }
+
+    private String getPotsizeString(double potSizeBb) {
+        String potSizeString;
+
+        if(potSizeBb >= 0 && potSizeBb < 5) {
+            potSizeString = "Potsize0-5bb";
+        } else if(potSizeBb < 10) {
+            potSizeString = "Potsize5-10bb";
+        } else if(potSizeBb < 15) {
+            potSizeString = "Potsize10-15bb";
+        } else if(potSizeBb < 20) {
+            potSizeString = "Potsize15-20bb";
+        } else if(potSizeBb < 25) {
+            potSizeString = "Potsize20-25bb";
+        } else if(potSizeBb < 40) {
+            potSizeString = "Potsize25-40bb";
+        } else if(potSizeBb < 60) {
+            potSizeString = "Potsize40-60bb";
+        } else if(potSizeBb < 100) {
+            potSizeString = "Potsize60-100bb";
+        } else if(potSizeBb < 150) {
+            potSizeString = "Potsize100-150bb";
+        } else {
+            potSizeString = "Potsize>150bb";
+        }
+        return potSizeString;
+    }
+
+    private String getComputerBetSizeBbString(double computerBetSizeBb) {
+        String computerBetSizeBbString;
+
+        if(computerBetSizeBb >= 0 && computerBetSizeBb < 5) {
+            computerBetSizeBbString = "ComputerBetsize0-5bb";
+        } else if(computerBetSizeBb < 10) {
+            computerBetSizeBbString = "ComputerBetsize5-10bb";
+        } else if(computerBetSizeBb < 15) {
+            computerBetSizeBbString = "ComputerBetsize10-15bb";
+        } else if(computerBetSizeBb < 20) {
+            computerBetSizeBbString = "ComputerBetsize15-20bb";
+        } else if(computerBetSizeBb < 25) {
+            computerBetSizeBbString = "ComputerBetsize20-25bb";
+        } else if(computerBetSizeBb < 40) {
+            computerBetSizeBbString = "ComputerBetsize25-40bb";
+        } else if(computerBetSizeBb < 60) {
+            computerBetSizeBbString = "ComputerBetsize40-60bb";
+        } else if(computerBetSizeBb < 100) {
+            computerBetSizeBbString = "ComputerBetsize60-100bb";
+        } else if(computerBetSizeBb < 150) {
+            computerBetSizeBbString = "ComputerBetsize100-150bb";
+        } else {
+            computerBetSizeBbString = "ComputerBetsize>150bb";
+        }
+
+        return computerBetSizeBbString;
+    }
+
+    private String getOpponentBetSizeBbString(double opponentBetSizeBb) {
+        String computerBetSizeBbString;
+
+        if(opponentBetSizeBb >= 0 && opponentBetSizeBb < 5) {
+            computerBetSizeBbString = "OpponentBetsize0-5bb";
+        } else if(opponentBetSizeBb < 10) {
+            computerBetSizeBbString = "OpponentBetsize5-10bb";
+        } else if(opponentBetSizeBb < 15) {
+            computerBetSizeBbString = "OpponentBetsize10-15bb";
+        } else if(opponentBetSizeBb < 20) {
+            computerBetSizeBbString = "OpponentBetsize15-20bb";
+        } else if(opponentBetSizeBb < 25) {
+            computerBetSizeBbString = "OpponentBetsize20-25bb";
+        } else if(opponentBetSizeBb < 40) {
+            computerBetSizeBbString = "OpponentBetsize25-40bb";
+        } else if(opponentBetSizeBb < 60) {
+            computerBetSizeBbString = "OpponentBetsize40-60bb";
+        } else if(opponentBetSizeBb < 100) {
+            computerBetSizeBbString = "OpponentBetsize60-100bb";
+        } else if(opponentBetSizeBb < 150) {
+            computerBetSizeBbString = "OpponentBetsize100-150bb";
+        } else {
+            computerBetSizeBbString = "OpponentBetsize>150bb";
+        }
+
+        return computerBetSizeBbString;
+    }
+
+    private String getEffectiveStackBbString(double effectiveStackBb) {
+        String effectiveStackBbString;
+
+        if(effectiveStackBb >= 0 && effectiveStackBb < 20) {
+            effectiveStackBbString = "EffectiveStack0-20bb";
+        } else if(effectiveStackBb < 50) {
+            effectiveStackBbString = "EffectiveStack20-50bb";
+        } else if(effectiveStackBb < 75) {
+            effectiveStackBbString = "EffectiveStack50-75bb";
+        } else if(effectiveStackBb < 110) {
+            effectiveStackBbString = "EffectiveStack75-110bb";
+        } else if(effectiveStackBb < 150) {
+            effectiveStackBbString = "EffectiveStack110-150bb";
+        } else {
+            effectiveStackBbString = "EffectiveStack>150bb";
+        }
+
+        return effectiveStackBbString;
     }
 
     private Map<String, Double> getSortedAveragePayoffMapFromRouteData(Map<String, Double> routeData) {
@@ -305,7 +484,7 @@ public class Poker {
         con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "");
     }
 
-    protected void closeDbConnection() throws SQLException {
+    private void closeDbConnection() throws SQLException {
         con.close();
     }
 
