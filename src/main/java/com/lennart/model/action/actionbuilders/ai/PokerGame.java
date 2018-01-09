@@ -90,14 +90,14 @@ public class PokerGame {
     }
 
 
-    private Card getAndRemoveRandomCardFromDeck(List) {
-        Random randomGenerator = new Random();
-        int random = randomGenerator.nextInt(deck.size());
-        Card cardToReturn = deck.get(random);
-        deck.remove(random);
-
-        return cardToReturn;
-    }
+//    private Card getAndRemoveRandomCardFromDeck(List) {
+//        Random randomGenerator = new Random();
+//        int random = randomGenerator.nextInt(deck.size());
+//        Card cardToReturn = deck.get(random);
+//        deck.remove(random);
+//
+//        return cardToReturn;
+//    }
 
     //2 bots
 

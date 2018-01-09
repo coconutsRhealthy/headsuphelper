@@ -40,13 +40,15 @@ public class SimulatedHand {
 
     private Map<Integer, List<String>> aiBotActionHistory = new TreeMap<>(Collections.reverseOrder());
 
+    private static int numberOfHandsPlayed = 0;
+
     public static void main(String[] args) {
         double aiBotTotalScore = 0;
         double ruleBotTotalScore = 0;
 
         SimulatedHand.initializePayoffMap();
 
-        for(int i = 0; i < 100; i++) {
+        for(int i = 0; i < 30000; i++) {
             Random rn = new Random();
             int y = rn.nextInt(2 - 1 + 1) + 1;
 
@@ -57,6 +59,8 @@ public class SimulatedHand {
 
             aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
             ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
+
+            System.out.println(i + "        " + aiBotTotalScore);
         }
 
         System.out.println("aiBot total score: " + aiBotTotalScore);
@@ -88,225 +92,127 @@ public class SimulatedHand {
         payoffMap.get("0-5").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("0-5").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("0-5").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("0-5").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("0-5").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("0-5").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("0-5").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("0-5").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("0-5").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("0-5").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("5-10").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("5-10").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("5-10").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("5-10").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("5-10").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("5-10").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("5-10").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("5-10").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("5-10").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("5-10").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("10-15").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("10-15").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("10-15").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("10-15").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("10-15").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("10-15").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("10-15").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("10-15").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("10-15").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("10-15").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("15-20").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("15-20").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("15-20").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("15-20").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("15-20").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("15-20").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("15-20").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("15-20").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("15-20").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("15-20").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("20-25").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("20-25").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("20-25").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("20-25").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("20-25").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("20-25").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("20-25").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("20-25").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("20-25").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("20-25").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("25-30").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("25-30").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("25-30").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("25-30").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("25-30").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("25-30").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("25-30").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("25-30").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("25-30").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("25-30").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("30-35").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("30-35").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("30-35").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("30-35").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("30-35").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("30-35").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("30-35").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("30-35").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("30-35").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("30-35").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("35-40").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("35-40").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("35-40").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("35-40").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("35-40").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("35-40").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("35-40").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("35-40").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("35-40").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("35-40").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("40-45").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("40-45").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("40-45").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("40-45").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("40-45").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("40-45").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("40-45").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("40-45").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("40-45").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("40-45").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("45-50").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("45-50").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("45-50").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("45-50").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("45-50").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("45-50").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("45-50").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("45-50").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("45-50").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("45-50").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("50-55").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("50-55").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("50-55").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("50-55").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("50-55").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("50-55").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("50-55").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("50-55").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("50-55").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("50-55").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("55-60").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("55-60").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("55-60").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("55-60").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("55-60").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("55-60").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("55-60").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("55-60").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("55-60").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("55-60").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("60-65").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("60-65").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("60-65").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("60-65").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("60-65").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("60-65").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("60-65").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("60-65").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("60-65").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("60-65").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("65-70").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("65-70").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("65-70").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("65-70").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("65-70").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("65-70").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("65-70").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("65-70").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("65-70").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("65-70").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("70-75").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("70-75").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("70-75").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("70-75").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("70-75").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("70-75").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("70-75").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("70-75").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("70-75").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("70-75").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("75-80").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("75-80").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("75-80").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("75-80").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("75-80").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("75-80").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("75-80").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("75-80").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("75-80").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("75-80").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("80-85").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("80-85").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("80-85").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("80-85").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("80-85").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("80-85").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("80-85").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("80-85").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("80-85").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("80-85").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("85-90").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("85-90").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("85-90").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("85-90").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("85-90").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("85-90").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("85-90").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("85-90").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("85-90").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("85-90").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("90-95").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("90-95").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("90-95").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("90-95").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("90-95").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("90-95").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("90-95").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("90-95").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("90-95").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("90-95").put("raise", Arrays.asList(0.0, 0.0));
 
         payoffMap.get("95-100").put("fold", Arrays.asList(0.0, 0.0));
         payoffMap.get("95-100").put("check", Arrays.asList(0.0, 0.0));
         payoffMap.get("95-100").put("call", Arrays.asList(0.0, 0.0));
-        payoffMap.get("95-100").put("bet25%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("95-100").put("bet50%", Arrays.asList(0.0, 0.0));
         payoffMap.get("95-100").put("bet75%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("95-100").put("bet100%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("95-100").put("bet150%", Arrays.asList(0.0, 0.0));
-        payoffMap.get("95-100").put("bet200%", Arrays.asList(0.0, 0.0));
         payoffMap.get("95-100").put("raise", Arrays.asList(0.0, 0.0));
     }
 
     public SimulatedHand(int numberOfHandsPlayed) {
+        SimulatedHand.numberOfHandsPlayed++;
+
         aiBotHolecards.add(getAndRemoveRandomCardFromDeck());
         aiBotHolecards.add(getAndRemoveRandomCardFromDeck());
         ruleBotHolecards.add(getAndRemoveRandomCardFromDeck());
@@ -424,42 +330,12 @@ public class SimulatedHand {
 
                     payoffMap.get("0-5").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("0-5").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("0-5").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("0-5").get("bet25%").get(1);
-
-                    payoffMap.get("0-5").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("0-5").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("0-5").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("0-5").get("bet50%").get(1);
-
-                    payoffMap.get("0-5").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("0-5").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("0-5").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("0-5").get("bet75%").get(1);
 
                     payoffMap.get("0-5").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("0-5").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("0-5").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("0-5").get("bet100%").get(1);
-
-                    payoffMap.get("0-5").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("0-5").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("0-5").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("0-5").get("bet150%").get(1);
-
-                    payoffMap.get("0-5").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("0-5").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("0-5").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("0-5").get("bet200%").get(1);
-
-                    payoffMap.get("0-5").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("0-5").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("0-5").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("0-5").get("raise").get(1);
@@ -486,42 +362,12 @@ public class SimulatedHand {
 
                     payoffMap.get("5-10").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("5-10").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("5-10").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("5-10").get("bet25%").get(1);
-
-                    payoffMap.get("5-10").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("5-10").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("5-10").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("5-10").get("bet50%").get(1);
-
-                    payoffMap.get("5-10").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("5-10").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("5-10").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("5-10").get("bet75%").get(1);
 
                     payoffMap.get("5-10").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("5-10").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("5-10").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("5-10").get("bet100%").get(1);
-
-                    payoffMap.get("5-10").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("5-10").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("5-10").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("5-10").get("bet150%").get(1);
-
-                    payoffMap.get("5-10").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("5-10").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("5-10").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("5-10").get("bet200%").get(1);
-
-                    payoffMap.get("5-10").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("5-10").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("5-10").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("5-10").get("raise").get(1);
@@ -548,42 +394,12 @@ public class SimulatedHand {
 
                     payoffMap.get("10-15").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("10-15").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("10-15").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("10-15").get("bet25%").get(1);
-
-                    payoffMap.get("10-15").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("10-15").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("10-15").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("10-15").get("bet50%").get(1);
-
-                    payoffMap.get("10-15").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("10-15").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("10-15").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("10-15").get("bet75%").get(1);
 
                     payoffMap.get("10-15").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("10-15").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("10-15").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("10-15").get("bet100%").get(1);
-
-                    payoffMap.get("10-15").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("10-15").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("10-15").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("10-15").get("bet150%").get(1);
-
-                    payoffMap.get("10-15").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("10-15").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("10-15").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("10-15").get("bet200%").get(1);
-
-                    payoffMap.get("10-15").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("10-15").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("10-15").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("10-15").get("raise").get(1);
@@ -610,42 +426,12 @@ public class SimulatedHand {
 
                     payoffMap.get("15-20").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("15-20").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("15-20").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("15-20").get("bet25%").get(1);
-
-                    payoffMap.get("15-20").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("15-20").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("15-20").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("15-20").get("bet50%").get(1);
-
-                    payoffMap.get("15-20").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("15-20").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("15-20").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("15-20").get("bet75%").get(1);
 
                     payoffMap.get("15-20").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("15-20").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("15-20").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("15-20").get("bet100%").get(1);
-
-                    payoffMap.get("15-20").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("15-20").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("15-20").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("15-20").get("bet150%").get(1);
-
-                    payoffMap.get("15-20").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("15-20").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("15-20").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("15-20").get("bet200%").get(1);
-
-                    payoffMap.get("15-20").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("15-20").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("15-20").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("15-20").get("raise").get(1);
@@ -672,42 +458,12 @@ public class SimulatedHand {
 
                     payoffMap.get("20-25").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("20-25").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("20-25").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("20-25").get("bet25%").get(1);
-
-                    payoffMap.get("20-25").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("20-25").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("20-25").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("20-25").get("bet50%").get(1);
-
-                    payoffMap.get("20-25").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("20-25").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("20-25").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("20-25").get("bet75%").get(1);
 
                     payoffMap.get("20-25").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("20-25").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("20-25").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("20-25").get("bet100%").get(1);
-
-                    payoffMap.get("20-25").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("20-25").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("20-25").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("20-25").get("bet150%").get(1);
-
-                    payoffMap.get("20-25").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("20-25").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("20-25").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("20-25").get("bet200%").get(1);
-
-                    payoffMap.get("20-25").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("20-25").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("20-25").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("20-25").get("raise").get(1);
@@ -734,42 +490,12 @@ public class SimulatedHand {
 
                     payoffMap.get("25-30").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("25-30").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("25-30").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("25-30").get("bet25%").get(1);
-
-                    payoffMap.get("25-30").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("25-30").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("25-30").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("25-30").get("bet50%").get(1);
-
-                    payoffMap.get("25-30").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("25-30").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("25-30").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("25-30").get("bet75%").get(1);
 
                     payoffMap.get("25-30").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("25-30").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("25-30").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("25-30").get("bet100%").get(1);
-
-                    payoffMap.get("25-30").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("25-30").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("25-30").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("25-30").get("bet150%").get(1);
-
-                    payoffMap.get("25-30").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("25-30").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("25-30").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("25-30").get("bet200%").get(1);
-
-                    payoffMap.get("25-30").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("25-30").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("25-30").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("25-30").get("raise").get(1);
@@ -796,42 +522,12 @@ public class SimulatedHand {
 
                     payoffMap.get("30-35").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("30-35").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("30-35").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("30-35").get("bet25%").get(1);
-
-                    payoffMap.get("30-35").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("30-35").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("30-35").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("30-35").get("bet50%").get(1);
-
-                    payoffMap.get("30-35").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("30-35").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("30-35").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("30-35").get("bet75%").get(1);
 
                     payoffMap.get("30-35").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("30-35").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("30-35").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("30-35").get("bet100%").get(1);
-
-                    payoffMap.get("30-35").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("30-35").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("30-35").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("30-35").get("bet150%").get(1);
-
-                    payoffMap.get("30-35").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("30-35").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("30-35").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("30-35").get("bet200%").get(1);
-
-                    payoffMap.get("30-35").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("30-35").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("30-35").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("30-35").get("raise").get(1);
@@ -858,42 +554,12 @@ public class SimulatedHand {
 
                     payoffMap.get("35-40").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("35-40").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("35-40").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("35-40").get("bet25%").get(1);
-
-                    payoffMap.get("35-40").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("35-40").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("35-40").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("35-40").get("bet50%").get(1);
-
-                    payoffMap.get("35-40").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("35-40").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("35-40").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("35-40").get("bet75%").get(1);
 
                     payoffMap.get("35-40").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("35-40").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("35-40").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("35-40").get("bet100%").get(1);
-
-                    payoffMap.get("35-40").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("35-40").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("35-40").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("35-40").get("bet150%").get(1);
-
-                    payoffMap.get("35-40").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("35-40").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("35-40").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("35-40").get("bet200%").get(1);
-
-                    payoffMap.get("35-40").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("35-40").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("35-40").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("35-40").get("raise").get(1);
@@ -920,42 +586,12 @@ public class SimulatedHand {
 
                     payoffMap.get("40-45").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("40-45").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("40-45").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("40-45").get("bet25%").get(1);
-
-                    payoffMap.get("40-45").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("40-45").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("40-45").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("40-45").get("bet50%").get(1);
-
-                    payoffMap.get("40-45").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("40-45").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("40-45").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("40-45").get("bet75%").get(1);
 
                     payoffMap.get("40-45").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("40-45").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("40-45").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("40-45").get("bet100%").get(1);
-
-                    payoffMap.get("40-45").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("40-45").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("40-45").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("40-45").get("bet150%").get(1);
-
-                    payoffMap.get("40-45").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("40-45").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("40-45").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("40-45").get("bet200%").get(1);
-
-                    payoffMap.get("40-45").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("40-45").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("40-45").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("40-45").get("raise").get(1);
@@ -982,42 +618,12 @@ public class SimulatedHand {
 
                     payoffMap.get("45-50").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("45-50").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("45-50").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("45-50").get("bet25%").get(1);
-
-                    payoffMap.get("45-50").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("45-50").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("45-50").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("45-50").get("bet50%").get(1);
-
-                    payoffMap.get("45-50").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("45-50").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("45-50").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("45-50").get("bet75%").get(1);
 
                     payoffMap.get("45-50").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("45-50").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("45-50").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("45-50").get("bet100%").get(1);
-
-                    payoffMap.get("45-50").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("45-50").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("45-50").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("45-50").get("bet150%").get(1);
-
-                    payoffMap.get("45-50").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("45-50").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("45-50").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("45-50").get("bet200%").get(1);
-
-                    payoffMap.get("45-50").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("45-50").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("45-50").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("45-50").get("raise").get(1);
@@ -1044,42 +650,12 @@ public class SimulatedHand {
 
                     payoffMap.get("50-55").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("50-55").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("50-55").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("50-55").get("bet25%").get(1);
-
-                    payoffMap.get("50-55").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("50-55").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("50-55").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("50-55").get("bet50%").get(1);
-
-                    payoffMap.get("50-55").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("50-55").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("50-55").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("50-55").get("bet75%").get(1);
 
                     payoffMap.get("50-55").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("50-55").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("50-55").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("50-55").get("bet100%").get(1);
-
-                    payoffMap.get("50-55").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("50-55").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("50-55").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("50-55").get("bet150%").get(1);
-
-                    payoffMap.get("50-55").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("50-55").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("50-55").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("50-55").get("bet200%").get(1);
-
-                    payoffMap.get("50-55").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("50-55").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("50-55").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("50-55").get("raise").get(1);
@@ -1106,42 +682,12 @@ public class SimulatedHand {
 
                     payoffMap.get("55-60").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("55-60").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("55-60").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("55-60").get("bet25%").get(1);
-
-                    payoffMap.get("55-60").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("55-60").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("55-60").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("55-60").get("bet50%").get(1);
-
-                    payoffMap.get("55-60").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("55-60").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("55-60").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("55-60").get("bet75%").get(1);
 
                     payoffMap.get("55-60").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("55-60").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("55-60").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("55-60").get("bet100%").get(1);
-
-                    payoffMap.get("55-60").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("55-60").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("55-60").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("55-60").get("bet150%").get(1);
-
-                    payoffMap.get("55-60").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("55-60").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("55-60").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("55-60").get("bet200%").get(1);
-
-                    payoffMap.get("55-60").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("55-60").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("55-60").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("55-60").get("raise").get(1);
@@ -1168,42 +714,12 @@ public class SimulatedHand {
 
                     payoffMap.get("60-65").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("60-65").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("60-65").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("60-65").get("bet25%").get(1);
-
-                    payoffMap.get("60-65").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("60-65").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("60-65").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("60-65").get("bet50%").get(1);
-
-                    payoffMap.get("60-65").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("60-65").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("60-65").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("60-65").get("bet75%").get(1);
 
                     payoffMap.get("60-65").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("60-65").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("60-65").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("60-65").get("bet100%").get(1);
-
-                    payoffMap.get("60-65").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("60-65").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("60-65").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("60-65").get("bet150%").get(1);
-
-                    payoffMap.get("60-65").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("60-65").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("60-65").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("60-65").get("bet200%").get(1);
-
-                    payoffMap.get("60-65").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("60-65").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("60-65").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("60-65").get("raise").get(1);
@@ -1230,42 +746,12 @@ public class SimulatedHand {
 
                     payoffMap.get("65-70").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("65-70").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("65-70").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("65-70").get("bet25%").get(1);
-
-                    payoffMap.get("65-70").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("65-70").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("65-70").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("65-70").get("bet50%").get(1);
-
-                    payoffMap.get("65-70").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("65-70").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("65-70").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("65-70").get("bet75%").get(1);
 
                     payoffMap.get("65-70").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("65-70").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("65-70").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("65-70").get("bet100%").get(1);
-
-                    payoffMap.get("65-70").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("65-70").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("65-70").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("65-70").get("bet150%").get(1);
-
-                    payoffMap.get("65-70").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("65-70").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("65-70").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("65-70").get("bet200%").get(1);
-
-                    payoffMap.get("65-70").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("65-70").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("65-70").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("65-70").get("raise").get(1);
@@ -1292,42 +778,12 @@ public class SimulatedHand {
 
                     payoffMap.get("70-75").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("70-75").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("70-75").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("70-75").get("bet25%").get(1);
-
-                    payoffMap.get("70-75").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("70-75").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("70-75").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("70-75").get("bet50%").get(1);
-
-                    payoffMap.get("70-75").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("70-75").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("70-75").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("70-75").get("bet75%").get(1);
 
                     payoffMap.get("70-75").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("70-75").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("70-75").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("70-75").get("bet100%").get(1);
-
-                    payoffMap.get("70-75").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("70-75").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("70-75").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("70-75").get("bet150%").get(1);
-
-                    payoffMap.get("70-75").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("70-75").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("70-75").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("70-75").get("bet200%").get(1);
-
-                    payoffMap.get("70-75").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("70-75").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("70-75").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("70-75").get("raise").get(1);
@@ -1354,42 +810,12 @@ public class SimulatedHand {
 
                     payoffMap.get("75-80").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("75-80").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("75-80").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("75-80").get("bet25%").get(1);
-
-                    payoffMap.get("75-80").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("75-80").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("75-80").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("75-80").get("bet50%").get(1);
-
-                    payoffMap.get("75-80").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("75-80").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("75-80").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("75-80").get("bet75%").get(1);
 
                     payoffMap.get("75-80").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("75-80").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("75-80").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("75-80").get("bet100%").get(1);
-
-                    payoffMap.get("75-80").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("75-80").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("75-80").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("75-80").get("bet150%").get(1);
-
-                    payoffMap.get("75-80").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("75-80").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("75-80").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("75-80").get("bet200%").get(1);
-
-                    payoffMap.get("75-80").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("75-80").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("75-80").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("75-80").get("raise").get(1);
@@ -1416,42 +842,12 @@ public class SimulatedHand {
 
                     payoffMap.get("80-85").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("80-85").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("80-85").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("80-85").get("bet25%").get(1);
-
-                    payoffMap.get("80-85").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("80-85").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("80-85").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("80-85").get("bet50%").get(1);
-
-                    payoffMap.get("80-85").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("80-85").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("80-85").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("80-85").get("bet75%").get(1);
 
                     payoffMap.get("80-85").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("80-85").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("80-85").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("80-85").get("bet100%").get(1);
-
-                    payoffMap.get("80-85").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("80-85").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("80-85").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("80-85").get("bet150%").get(1);
-
-                    payoffMap.get("80-85").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("80-85").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("80-85").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("80-85").get("bet200%").get(1);
-
-                    payoffMap.get("80-85").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("80-85").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("80-85").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("80-85").get("raise").get(1);
@@ -1478,42 +874,12 @@ public class SimulatedHand {
 
                     payoffMap.get("85-90").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("85-90").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("85-90").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("85-90").get("bet25%").get(1);
-
-                    payoffMap.get("85-90").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("85-90").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("85-90").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("85-90").get("bet50%").get(1);
-
-                    payoffMap.get("85-90").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("85-90").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("85-90").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("85-90").get("bet75%").get(1);
 
                     payoffMap.get("85-90").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("85-90").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("85-90").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("85-90").get("bet100%").get(1);
-
-                    payoffMap.get("85-90").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("85-90").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("85-90").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("85-90").get("bet150%").get(1);
-
-                    payoffMap.get("85-90").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("85-90").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("85-90").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("85-90").get("bet200%").get(1);
-
-                    payoffMap.get("85-90").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("85-90").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("85-90").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("85-90").get("raise").get(1);
@@ -1540,42 +906,12 @@ public class SimulatedHand {
 
                     payoffMap.get("90-95").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("90-95").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("90-95").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("90-95").get("bet25%").get(1);
-
-                    payoffMap.get("90-95").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("90-95").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("90-95").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("90-95").get("bet50%").get(1);
-
-                    payoffMap.get("90-95").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("90-95").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("90-95").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("90-95").get("bet75%").get(1);
 
                     payoffMap.get("90-95").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("90-95").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("90-95").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("90-95").get("bet100%").get(1);
-
-                    payoffMap.get("90-95").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("90-95").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("90-95").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("90-95").get("bet150%").get(1);
-
-                    payoffMap.get("90-95").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("90-95").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("90-95").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("90-95").get("bet200%").get(1);
-
-                    payoffMap.get("90-95").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("90-95").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("90-95").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("90-95").get("raise").get(1);
@@ -1583,7 +919,7 @@ public class SimulatedHand {
                     payoffMap.get("90-95").get("raise").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("90-95").get("raise").set(1, (oldTotalPayoff + payoffPerAction));
                 }
-            } else {
+            } else if(handStrength.equals("95-100")){
                 if(action.equals("fold")) {
                     double oldAmountOfTimes = payoffMap.get("95-100").get("fold").get(0);
                     double oldTotalPayoff = payoffMap.get("95-100").get("fold").get(1);
@@ -1602,42 +938,12 @@ public class SimulatedHand {
 
                     payoffMap.get("95-100").get("call").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("95-100").get("call").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet25%")) {
-                    double oldAmountOfTimes = payoffMap.get("95-100").get("bet25%").get(0);
-                    double oldTotalPayoff = payoffMap.get("95-100").get("bet25%").get(1);
-
-                    payoffMap.get("95-100").get("bet25%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("95-100").get("bet25%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet50%")) {
-                    double oldAmountOfTimes = payoffMap.get("95-100").get("bet50%").get(0);
-                    double oldTotalPayoff = payoffMap.get("95-100").get("bet50%").get(1);
-
-                    payoffMap.get("95-100").get("bet50%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("95-100").get("bet50%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("bet75%")) {
                     double oldAmountOfTimes = payoffMap.get("95-100").get("bet75%").get(0);
                     double oldTotalPayoff = payoffMap.get("95-100").get("bet75%").get(1);
 
                     payoffMap.get("95-100").get("bet75%").set(0, (oldAmountOfTimes + 1));
                     payoffMap.get("95-100").get("bet75%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet100%")) {
-                    double oldAmountOfTimes = payoffMap.get("95-100").get("bet100%").get(0);
-                    double oldTotalPayoff = payoffMap.get("95-100").get("bet100%").get(1);
-
-                    payoffMap.get("95-100").get("bet100%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("95-100").get("bet100%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet150%")) {
-                    double oldAmountOfTimes = payoffMap.get("95-100").get("bet150%").get(0);
-                    double oldTotalPayoff = payoffMap.get("95-100").get("bet150%").get(1);
-
-                    payoffMap.get("95-100").get("bet150%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("95-100").get("bet150%").set(1, (oldTotalPayoff + payoffPerAction));
-                } else if(action.equals("bet200%")) {
-                    double oldAmountOfTimes = payoffMap.get("95-100").get("bet200%").get(0);
-                    double oldTotalPayoff = payoffMap.get("95-100").get("bet200%").get(1);
-
-                    payoffMap.get("95-100").get("bet200%").set(0, (oldAmountOfTimes + 1));
-                    payoffMap.get("95-100").get("bet200%").set(1, (oldTotalPayoff + payoffPerAction));
                 } else if(action.equals("raise")) {
                     double oldAmountOfTimes = payoffMap.get("95-100").get("raise").get(0);
                     double oldTotalPayoff = payoffMap.get("95-100").get("raise").get(1);
@@ -2059,55 +1365,71 @@ public class SimulatedHand {
         return handStrengthString;
     }
 
+    private String getBestActionFromPayoffMap(String handStrength, List<String> eligibleActions) {
+        Map<String, Double> payoffMapToUse = new HashMap<>();
+
+        for(String action : eligibleActions) {
+            double amountOfTimes = payoffMap.get(handStrength).get(action).get(0);
+            double totalPayoff = payoffMap.get(handStrength).get(action).get(1);
+            double averagePayoff = totalPayoff / amountOfTimes;
+
+            payoffMapToUse.put(action, averagePayoff);
+        }
+        payoffMapToUse = sortByValueHighToLow(payoffMapToUse);
+        return payoffMapToUse.entrySet().iterator().next().getKey();
+    }
+
     private void setDummyAction(String bot) {
         if(bot.equals("aiBot")) {
-            if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
-                double random = Math.random();
+            if(SimulatedHand.numberOfHandsPlayed > 15000) {
+                String handStrengthString = getHandStrengthString(aiBotHandStrength);
 
-                if(ruleBotStack == 0) {
-                    if(random < 0.6) {
-                        aiBotAction = "fold";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "fold"));
+                if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
+                    if(ruleBotStack == 0) {
+                        List<String> eligibleActions = Arrays.asList("fold", "call");
+                        aiBotAction = getBestActionFromPayoffMap(handStrengthString, eligibleActions);
                     } else {
-                        aiBotAction = "call";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "call"));
+                        List<String> eligibleActions = Arrays.asList("fold", "call", "raise");
+                        aiBotAction = getBestActionFromPayoffMap(handStrengthString, eligibleActions);
                     }
                 } else {
-                    if(random < 0.45) {
-                        aiBotAction = "fold";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "fold"));
-                    } else if(random < 0.82){
-                        aiBotAction = "call";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "call"));
-                    } else {
-                        aiBotAction = "raise";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "raise"));
-                    }
+                    List<String> eligibleActions = Arrays.asList("check", "bet75%");
+                    aiBotAction = getBestActionFromPayoffMap(handStrengthString, eligibleActions);
                 }
             } else {
-                double random = Math.random();
+                if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
+                    double random = Math.random();
 
-                if(random < 0.5) {
-                    aiBotAction = "check";
-                    aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "check"));
-                } else if(random < 0.6) {
-                    aiBotAction = "bet25%";
-                    aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "bet25%"));
-                } else if(random < 0.7) {
-                    aiBotAction = "bet50%";
-                    aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "bet50%"));
-                } else if(random < 0.8) {
-                    aiBotAction = "bet75%";
-                    aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "bet75%"));
-                } else if(random < 0.87) {
-                    aiBotAction = "bet100%";
-                    aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "bet100%"));
-                } else if(random < 0.93) {
-                    aiBotAction = "bet150%";
-                    aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "bet150%"));
+                    if(ruleBotStack == 0) {
+                        if(random < 0.5) {
+                            aiBotAction = "fold";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "fold"));
+                        } else {
+                            aiBotAction = "call";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "call"));
+                        }
+                    } else {
+                        if(random < 0.333) {
+                            aiBotAction = "fold";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "fold"));
+                        } else if(random < 0.666){
+                            aiBotAction = "call";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "call"));
+                        } else {
+                            aiBotAction = "raise";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "raise"));
+                        }
+                    }
                 } else {
-                    aiBotAction = "bet200%";
-                    aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "bet200%"));
+                    double random = Math.random();
+
+                    if(random < 0.5) {
+                        aiBotAction = "check";
+                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "check"));
+                    } else {
+                        aiBotAction = "bet75%";
+                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(getHandStrengthString(aiBotHandStrength), "bet75%"));
+                    }
                 }
             }
         } else if(bot.equals("ruleBot")) {
@@ -2130,18 +1452,8 @@ public class SimulatedHand {
             } else {
                 if(ruleBotHandStrength < 0.5) {
                     ruleBotAction = "check";
-                } else if(ruleBotHandStrength < 0.6) {
-                    ruleBotAction = "bet25%";
-                } else if(ruleBotHandStrength < 0.7) {
-                    ruleBotAction = "bet50%";
-                } else if(ruleBotHandStrength < 0.8) {
-                    ruleBotAction = "bet75%";
-                } else if(ruleBotHandStrength < 0.85) {
-                    ruleBotAction = "bet100%";
-                } else if(ruleBotHandStrength < 0.93) {
-                    ruleBotAction = "bet150%";
                 } else {
-                    ruleBotAction = "bet200%";
+                    ruleBotAction = "bet75%";
                 }
             }
         }
@@ -2208,10 +1520,25 @@ public class SimulatedHand {
         }
     }
 
-
     private double calculateRaiseAmount(double ownBetSize, double facingBetSize, double potSize) {
         double initial = ownBetSize + facingBetSize + potSize;
         return 1.3 * initial;
+    }
+
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o2.getValue() ).compareTo( o1.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 
 
