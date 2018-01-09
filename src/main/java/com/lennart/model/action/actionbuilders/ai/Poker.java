@@ -77,16 +77,20 @@ public class Poker {
         storeRoutesInDb(routes);
     }
 
-    private String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, boolean position,
+    public String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, boolean position,
                              double potSize, double computerBetSize, double opponentBetSize, double effectiveStack,
-                             String boardTexture) throws Exception {
-        String route = createRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
+                             String boardTexture) {
+        try {
+            String route = createRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
 
-        Map<String, Double> routeData = retrieveRouteDataFromDb(route);
-        Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
-        Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
+            Map<String, Double> routeData = retrieveRouteDataFromDb(route);
+            Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
+            Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
 
-        return sortedEligibleActions.entrySet().iterator().next().getKey();
+            return sortedEligibleActions.entrySet().iterator().next().getKey();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private String createRoute(double handStrength, boolean strongDraw, boolean position, double potSizeBb,
