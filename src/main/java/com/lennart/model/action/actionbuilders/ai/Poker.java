@@ -460,6 +460,11 @@ public class Poker {
             routeData.put("raise_times", rs.getDouble("raise_times"));
             routeData.put("raise_payoff", rs.getDouble("raise_payoff"));
         }
+
+        rs.close();
+        st.close();
+        closeDbConnection();
+
         return routeData;
     }
 
@@ -482,16 +487,43 @@ public class Poker {
         return routesFromDb;
     }
 
-    public static void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff) {
-        //bereken de payoff per actie
+    public void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff) {
+        double payoffPerAction = totalPayoff / actionHistory.size();
 
-        //query de db naar de route
-
-        //update in de db het totaal aantal van de actie en de totale payoff van de actie
-
-
+        for (Map.Entry<Integer, List<String>> entry : actionHistory.entrySet()) {
+            String route = entry.getValue().get(0);
+            String action = entry.getValue().get(1);
+            doDbPayoffUpdate(route, action, payoffPerAction);
+        }
     }
 
+    private void doDbPayoffUpdate(String route, String action, double payoffPerAction) {
+        try {
+            String actionTimes = action + "_times";
+            String actionPayoff = action + "_payoff";
+
+            initializeDbConnection();
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM standard WHERE route = '" + route + "';");
+
+            rs.next();
+
+            int previousTimes = rs.getInt(actionTimes);
+            double previousTotalPayoff = rs.getDouble(actionPayoff);
+
+            rs.close();
+            st.close();
+
+            Statement st2 = con.createStatement();
+            st2.executeUpdate("UPDATE standard SET " + actionTimes + " = " + (previousTimes + 1) + ", " + actionPayoff + " = " + (previousTotalPayoff + payoffPerAction) + " WHERE route = '" + route + "'");
+            st2.close();
+
+            closeDbConnection();
+        } catch (Exception e) {
+            System.out.println("Exception occured in doDbPayoffUpdate()");
+        }
+    }
 
     private void initializeDbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
