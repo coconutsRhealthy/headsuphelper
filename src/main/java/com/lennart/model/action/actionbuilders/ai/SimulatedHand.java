@@ -53,7 +53,7 @@ public class SimulatedHand {
             SimulatedHand simulatedHand = new SimulatedHand(y);
             Map<String, Double> scores = simulatedHand.playHand();
 
-            simulatedHand.updatePayoffMap(scores.get("aiBot"));
+            simulatedHand.updatePayoff(scores.get("aiBot"));
 
             aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
             ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
@@ -156,8 +156,8 @@ public class SimulatedHand {
         return scoreMap;
     }
 
-    private void updatePayoffMap(double totalPayoff) {
-        //to implement
+    private void updatePayoff(double totalPayoff) {
+        Poker.updatePayoff(aiBotActionHistory, totalPayoff);
     }
 
     private void doAiBotAction() {
@@ -514,13 +514,21 @@ public class SimulatedHand {
         }
     }
 
+    private int getHighestKeyFromMap() {
+        if(aiBotActionHistory.isEmpty()) {
+            return 0;
+        } else {
+            return aiBotActionHistory.entrySet().iterator().next().getKey();
+        }
+    }
+
     private void setDummyAction(String bot) {
         if(bot.equals("aiBot")) {
             if(SimulatedHand.numberOfHandsPlayed > 15000) {
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     if(ruleBotStack == 0) {
                         List<String> eligibleActions = Arrays.asList("fold", "call");
-                        aiBotAction = new Poker().getAction(eligibleActions, 0, false, aiBotIsButton, 0, 0, 0, 0, null);
+                        aiBotAction = new Poker().getAction(eligibleActions, aiBotHandStrength, false, aiBotIsButton, pot, aiBotBetSize, ruleBotBetSize, 0, null);
                     } else {
                         List<String> eligibleActions = Arrays.asList("fold", "call", "raise");
                         aiBotAction = new Poker().getAction(eligibleActions, 0, false, aiBotIsButton, 0, 0, 0, 0, null);
@@ -530,22 +538,29 @@ public class SimulatedHand {
                     aiBotAction = new Poker().getAction(eligibleActions, 0, false, aiBotIsButton, 0, 0, 0, 0, null);
                 }
             } else {
+                String route = new Poker().getRoute(0, false, aiBotIsButton, 0, 0, 0, 0, null);
+
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     double random = Math.random();
 
                     if(ruleBotStack == 0) {
                         if(random < 0.5) {
                             aiBotAction = "fold";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "fold"));
                         } else {
                             aiBotAction = "call";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "call"));
                         }
                     } else {
                         if(random < 0.333) {
                             aiBotAction = "fold";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "fold"));
                         } else if(random < 0.666){
                             aiBotAction = "call";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "call"));
                         } else {
                             aiBotAction = "raise";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "raise"));
                         }
                     }
                 } else {
@@ -553,8 +568,10 @@ public class SimulatedHand {
 
                     if(random < 0.5) {
                         aiBotAction = "check";
+                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "check"));
                     } else {
                         aiBotAction = "bet75%";
+                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "bet75%"));
                     }
                 }
             }

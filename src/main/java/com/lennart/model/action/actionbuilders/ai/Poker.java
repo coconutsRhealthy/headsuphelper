@@ -1,7 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +80,7 @@ public class Poker {
                              double potSize, double computerBetSize, double opponentBetSize, double effectiveStack,
                              String boardTexture) {
         try {
-            String route = createRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
+            String route = getRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
 
             Map<String, Double> routeData = retrieveRouteDataFromDb(route);
             Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
@@ -93,9 +92,9 @@ public class Poker {
         }
     }
 
-    private String createRoute(double handStrength, boolean strongDraw, boolean position, double potSizeBb,
-                               double computerBetSizeBb, double opponentBetSizeBb, double effectiveStackBb,
-                               String boardTexture) {
+    public String getRoute(double handStrength, boolean strongDraw, boolean position, double potSizeBb,
+                            double computerBetSizeBb, double opponentBetSizeBb, double effectiveStackBb,
+                            String boardTexture) {
         String handStrengthString = getHandStrengthString(handStrength);
         String strongDrawString = getStrongDrawString(strongDraw);
         String positionString = getPositionString(position);
@@ -482,6 +481,17 @@ public class Poker {
 
         return routesFromDb;
     }
+
+    public static void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff) {
+        //bereken de payoff per actie
+
+        //query de db naar de route
+
+        //update in de db het totaal aantal van de actie en de totale payoff van de actie
+
+
+    }
+
 
     private void initializeDbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
