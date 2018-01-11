@@ -88,6 +88,7 @@ public class Poker {
 
             return sortedEligibleActions.entrySet().iterator().next().getKey();
         } catch (Exception e) {
+            System.out.println("error occurred in getAction()");
             return null;
         }
     }
@@ -449,8 +450,8 @@ public class Poker {
             routeData.put("bet25%_payoff", rs.getDouble("bet25%_payoff"));
             routeData.put("bet50%_times", rs.getDouble("bet50%_times"));
             routeData.put("bet50%_payoff", rs.getDouble("bet50%_payoff"));
-            routeData.put("bet75%_times", rs.getDouble("bet75%_times"));
-            routeData.put("bet75%_payoff", rs.getDouble("bet75%_payoff"));
+            routeData.put("bet75%_times", rs.getDouble("bet75pct_times"));
+            routeData.put("bet75%_payoff", rs.getDouble("bet75pct_payoff"));
             routeData.put("bet100%_times", rs.getDouble("bet100%_times"));
             routeData.put("bet100%_payoff", rs.getDouble("bet100%_payoff"));
             routeData.put("bet150%_times", rs.getDouble("bet150%_times"));
@@ -499,21 +500,25 @@ public class Poker {
 
     private void doDbPayoffUpdate(String route, String action, double payoffPerAction) {
         try {
+            if(action.contains("%")) {
+                action = removePercentageFromString(action);
+            }
+
             String actionTimes = action + "_times";
             String actionPayoff = action + "_payoff";
 
             initializeDbConnection();
 
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM standard WHERE route = '" + route + "';");
+//            Statement st = con.createStatement();
+//            ResultSet rs = st.executeQuery("SELECT * FROM standard WHERE route = '" + route + "';");
+//
+//            rs.next();
 
-            rs.next();
+            int previousTimes = 0;
+            double previousTotalPayoff = 0;
 
-            int previousTimes = rs.getInt(actionTimes);
-            double previousTotalPayoff = rs.getDouble(actionPayoff);
-
-            rs.close();
-            st.close();
+//            rs.close();
+//            st.close();
 
             Statement st2 = con.createStatement();
             st2.executeUpdate("UPDATE standard SET " + actionTimes + " = " + (previousTimes + 1) + ", " + actionPayoff + " = " + (previousTotalPayoff + payoffPerAction) + " WHERE route = '" + route + "'");
@@ -523,6 +528,11 @@ public class Poker {
         } catch (Exception e) {
             System.out.println("Exception occured in doDbPayoffUpdate()");
         }
+    }
+
+    private String removePercentageFromString(String string) {
+        String toReturn = string.replaceAll("%", "pct");
+        return toReturn;
     }
 
     private void initializeDbConnection() throws Exception {
