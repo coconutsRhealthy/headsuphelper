@@ -55,6 +55,8 @@ public class Poker {
 
     protected Connection con;
 
+    private static Map<String, Map<String, Double>> payoffMap = new HashMap<>();
+
     public static void main(String[] args) throws Exception {
         new Poker().theMethod();
     }
@@ -65,14 +67,14 @@ public class Poker {
 //        System.out.println("jaja");
 //        List<String> routesFromDb = retrieveAllRoutesFromDb();
 //
-//        List<String> routesNormal = generateTable();
+//        List<String> routesNormal = getAllRoutes();
 //
 //        System.out.println("wacht");
 //
 //        routesFromDb.removeAll(routesNormal);
 //
 //        System.out.println("wacht2");
-        List<String> routes = generateTable();
+        List<String> routes = getAllRoutes();
         storeRoutesInDb(routes);
     }
 
@@ -82,7 +84,9 @@ public class Poker {
         try {
             String route = getRoute(handStrength, strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
 
-            Map<String, Double> routeData = retrieveRouteDataFromDb(route);
+            //Map<String, Double> routeData = retrieveRouteDataFromDb(route);
+            Map<String, Double> routeData = retrieveRouteFromMemory(route);
+
             Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
             Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
 
@@ -282,12 +286,7 @@ public class Poker {
         sortedAveragePayoffMap.put("fold", (routeData.get("fold_payoff") / routeData.get("fold_times")));
         sortedAveragePayoffMap.put("check", (routeData.get("check_payoff") / routeData.get("check_times")));
         sortedAveragePayoffMap.put("call", (routeData.get("call_payoff") / routeData.get("call_times")));
-        sortedAveragePayoffMap.put("bet25%", (routeData.get("bet25%_payoff") / routeData.get("bet25%_times")));
-        sortedAveragePayoffMap.put("bet50%", (routeData.get("bet50%_payoff") / routeData.get("bet50%_times")));
-        sortedAveragePayoffMap.put("bet75%", (routeData.get("bet75%_payoff") / routeData.get("bet75%_times")));
-        sortedAveragePayoffMap.put("bet100%", (routeData.get("bet100%_payoff") / routeData.get("bet100%_times")));
-        sortedAveragePayoffMap.put("bet150%", (routeData.get("bet150%_payoff") / routeData.get("bet150%_times")));
-        sortedAveragePayoffMap.put("bet200%", (routeData.get("bet200%_payoff") / routeData.get("bet200%_times")));
+        sortedAveragePayoffMap.put("bet75%", (routeData.get("bet75pct_payoff") / routeData.get("bet75pct_times")));
         sortedAveragePayoffMap.put("raise", (routeData.get("raise_payoff") / routeData.get("raise_times")));
 
         return sortByValueHighToLow(sortedAveragePayoffMap);
@@ -307,7 +306,7 @@ public class Poker {
         return sortByValueHighToLow(sortedEligibleActions);
     }
 
-    private List<String> generateTable() {
+    private List<String> getAllRoutes() {
         List<String> handStrength = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
         List<String> position = new ArrayList<>();
@@ -469,6 +468,10 @@ public class Poker {
         return routeData;
     }
 
+    private Map<String, Double> retrieveRouteFromMemory(String route) {
+        return payoffMap.get(route);
+    }
+
     private List<String> retrieveAllRoutesFromDb() throws Exception {
         List<String> routesFromDb = new ArrayList<>();
 
@@ -494,7 +497,8 @@ public class Poker {
         for (Map.Entry<Integer, List<String>> entry : actionHistory.entrySet()) {
             String route = entry.getValue().get(0);
             String action = entry.getValue().get(1);
-            doDbPayoffUpdate(route, action, payoffPerAction);
+            //doDbPayoffUpdate(route, action, payoffPerAction);
+            doMemoryPayoffUpdate(route, action, payoffPerAction);
         }
     }
 
@@ -530,9 +534,45 @@ public class Poker {
         }
     }
 
+    private void doMemoryPayoffUpdate(String route, String action, double payoffPerAction) {
+        if(action.contains("%")) {
+            action = removePercentageFromString(action);
+        }
+
+        String actionTimes = action + "_times";
+        String actionPayoff = action + "_payoff";
+
+        double previousTimes = payoffMap.get(route).get(actionTimes);
+        double previousPayoff = payoffMap.get(route).get(actionPayoff);
+
+        payoffMap.get(route).put(actionTimes, (previousTimes + 1.0));
+        payoffMap.get(route).put(actionPayoff, (previousPayoff + payoffPerAction));
+    }
+
     private String removePercentageFromString(String string) {
         String toReturn = string.replaceAll("%", "pct");
         return toReturn;
+    }
+
+    public void initializePayoffMap() {
+        List<String> allRoutes = getAllRoutes();
+
+        for(String route : allRoutes) {
+            payoffMap.put(route, new HashMap<>());
+
+            payoffMap.get(route).put("fold_times", 0.0);
+            payoffMap.get(route).put("fold_payoff", 0.0);
+            payoffMap.get(route).put("check_times", 0.0);
+            payoffMap.get(route).put("check_payoff", 0.0);
+            payoffMap.get(route).put("call_times", 0.0);
+            payoffMap.get(route).put("call_payoff", 0.0);
+            payoffMap.get(route).put("bet75pct_times", 0.0);
+            payoffMap.get(route).put("bet75pct_payoff", 0.0);
+            payoffMap.get(route).put("raise_times", 0.0);
+            payoffMap.get(route).put("raise_payoff", 0.0);
+        }
+
+        System.out.println("hoi");
     }
 
     private void initializeDbConnection() throws Exception {
