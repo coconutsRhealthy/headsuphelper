@@ -1,5 +1,9 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.LoosePassive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightAggressive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
@@ -39,10 +43,25 @@ public class SimulatedHand {
     private double ruleBotHandStrength = -1;
 
     private boolean aiBotHasStrongDraw = false;
+    private boolean ruleBotHasStrongDraw = false;
 
     private Map<Integer, List<String>> aiBotActionHistory = new TreeMap<>(Collections.reverseOrder());
 
     private static int numberOfHandsPlayed = 0;
+
+    private static double callRaiseCount = 0;
+    private static double foldCount = 0;
+    private static double betRaiseCount = 0;
+    private static double checkCallCount = 0;
+
+
+    //Looseness stat
+    //callRaiseCount / ( foldCount + callRaiseCount)
+
+
+    //Aggressiveness stat
+    //betRaiseCount / ( checkCallCount + betRaiseCount)
+
 
     public static void main(String[] args) {
         double aiBotTotalScore = 0;
@@ -62,7 +81,10 @@ public class SimulatedHand {
             aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
             ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
 
-            System.out.println(i + "        " + aiBotTotalScore);
+            System.out.println(i + "     " + "looseness: " + (callRaiseCount / (foldCount + callRaiseCount)));
+            System.out.println(i + "     " + "aggressiveness: " + (betRaiseCount / (checkCallCount + betRaiseCount)));
+
+            //System.out.println(i + "        " + aiBotTotalScore);
         }
 
         System.out.println("aiBot total score: " + aiBotTotalScore);
@@ -582,28 +604,22 @@ public class SimulatedHand {
                 }
             }
         } else if(bot.equals("ruleBot")) {
-            if(aiBotAction.contains("bet") || aiBotAction.contains("raise")) {
-                if(aiBotStack == 0 || ((ruleBotStack + ruleBotBetSize) <= aiBotBetSize)) {
-                    if(ruleBotHandStrength < 0.5) {
-                        ruleBotAction = "fold";
-                    } else {
-                        ruleBotAction = "call";
-                    }
-                } else {
-                    if(ruleBotHandStrength > 0.5 && ruleBotHandStrength < 0.85) {
-                        ruleBotAction = "call";
-                    } else if(ruleBotHandStrength >= 0.85) {
-                        ruleBotAction = "raise";
-                    } else {
-                        ruleBotAction = "fold";
-                    }
-                }
-            } else {
-                if(ruleBotHandStrength < 0.5) {
-                    ruleBotAction = "check";
-                } else {
-                    ruleBotAction = "bet75%";
-                }
+            LoosePassive loosePassive = new LoosePassive();
+            ruleBotAction = loosePassive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
+                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind));
+
+            if(ruleBotAction.equals("fold")) {
+                SimulatedHand.foldCount++;
+            } else if(ruleBotAction.equals("check")) {
+                SimulatedHand.checkCallCount++;
+            } else if(ruleBotAction.equals("call")) {
+                SimulatedHand.checkCallCount++;
+                SimulatedHand.callRaiseCount++;
+            } else if(ruleBotAction.equals("bet75pct")) {
+                SimulatedHand.betRaiseCount++;
+            } else if(ruleBotAction.equals("raise")) {
+                SimulatedHand.betRaiseCount++;
+                SimulatedHand.callRaiseCount++;
             }
         }
     }
@@ -611,12 +627,13 @@ public class SimulatedHand {
     private void calculateHandStrengthsAndDraws() {
         BoardEvaluator boardEvaluator = new BoardEvaluator(board);
         HandEvaluator handEvaluatorForAiBot = new HandEvaluator(aiBotHolecards, boardEvaluator);
-        HandEvaluator handEvaluatorForRuleBot = new HandEvaluator(boardEvaluator);
+        HandEvaluator handEvaluatorForRuleBot = new HandEvaluator(ruleBotHolecards, boardEvaluator);
 
         aiBotHandStrength = handEvaluatorForAiBot.getHandStrength(aiBotHolecards);
         ruleBotHandStrength = handEvaluatorForRuleBot.getHandStrength(ruleBotHolecards);
 
         aiBotHasStrongDraw = hasStrongDraw(handEvaluatorForAiBot);
+        ruleBotHasStrongDraw = hasStrongDraw(handEvaluatorForRuleBot);
     }
 
     private boolean hasStrongDraw(HandEvaluator handEvaluator) {

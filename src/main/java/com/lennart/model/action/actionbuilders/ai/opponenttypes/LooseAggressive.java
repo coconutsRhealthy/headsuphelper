@@ -5,13 +5,21 @@ package com.lennart.model.action.actionbuilders.ai.opponenttypes;
  */
 public class LooseAggressive {
 
-    private String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
+    private double potSizeBb;
+    private double ruleBotStack;
+
+    public LooseAggressive(double potSizeBb, double ruleBotStack) {
+        this.potSizeBb = potSizeBb;
+        this.ruleBotStack = ruleBotStack;
+    }
+
+    public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
                             double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
-        String action = "";
+        String action;
         if(aiBotAction.contains("bet") || aiBotAction.contains("raise")) {
-            doFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb, position);
+            action = doFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb, position);
         } else {
-            doCheckBetAction(handStrength, strongDraw, position);
+            action = doCheckBetAction(handStrength, strongDraw, position);
         }
         return action;
     }
@@ -244,14 +252,26 @@ public class LooseAggressive {
                 } else if(betSizeBb < 20) {
                     double random = Math.random();
 
-                    if(random > 0.8) {
-                        action = "bet75pct";
+                    if(position) {
+                        if(random > 0.55) {
+                            action = "bet75pct";
+                        }
+                    } else {
+                        if(random > 0.8) {
+                            action = "bet75pct";
+                        }
                     }
                 } else if(betSizeBb < 30) {
                     double random = Math.random();
 
-                    if(random > 0.93) {
-                        action = "bet75pct";
+                    if(position) {
+                        if(random > 0.67) {
+                            action = "bet75pct";
+                        }
+                    } else {
+                        if(random > 0.93) {
+                            action = "bet75pct";
+                        }
                     }
                 }
             } else if(handStrength < 0.7) {
@@ -262,20 +282,38 @@ public class LooseAggressive {
                 } else if(betSizeBb < 20) {
                     double random = Math.random();
 
-                    if(random > 0.5) {
-                        action = "bet75pct";
+                    if(position) {
+                        if(random > 0.3) {
+                            action = "bet75pct";
+                        }
+                    } else {
+                        if(random > 0.5) {
+                            action = "bet75pct";
+                        }
                     }
                 } else if(betSizeBb < 30) {
                     double random = Math.random();
 
-                    if(random > 0.75) {
-                        action = "bet75pct";
+                    if(position) {
+                        if(random > 0.55) {
+                            action = "bet75pct";
+                        }
+                    } else {
+                        if(random > 0.75) {
+                            action = "bet75pct";
+                        }
                     }
                 } else {
                     double random = Math.random();
 
-                    if(random > 0.9) {
-                        action = "bet75pct";
+                    if(position) {
+                        if(random > 0.7) {
+                            action = "bet75pct";
+                        }
+                    } else {
+                        if(random > 0.9) {
+                            action = "bet75pct";
+                        }
                     }
                 }
             } else if(handStrength < 0.8) {
@@ -286,17 +324,29 @@ public class LooseAggressive {
                 } else if(betSizeBb < 40) {
                     double random = Math.random();
 
-                    if(random > 0.5) {
-                        action = "bet75pct";
+                    if(position) {
+                        if(random > 0.3) {
+                            action = "bet75pct";
+                        }
+                    } else {
+                        if(random > 0.5) {
+                            action = "bet75pct";
+                        }
                     }
                 } else {
                     double random = Math.random();
 
-                    if(random > 0.8) {
-                        action = "bet75pct";
+                    if(position) {
+                        if(random > 0.63) {
+                            action = "bet75pct";
+                        }
+                    } else {
+                        if(random > 0.8) {
+                            action = "bet75pct";
+                        }
                     }
                 }
-            } else {
+            } else if(handStrength >= 0.8) {
                 action = "bet75pct";
             }
         }
@@ -333,6 +383,12 @@ public class LooseAggressive {
     }
 
     private double getBetSizeBb() {
-        return 0;
+        double betAmount = 0.75 * potSizeBb;
+
+        if(betAmount > ruleBotStack) {
+            betAmount = ruleBotStack;
+        }
+
+        return betAmount;
     }
 }

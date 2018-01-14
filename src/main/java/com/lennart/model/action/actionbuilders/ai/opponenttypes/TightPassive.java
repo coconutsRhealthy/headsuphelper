@@ -5,13 +5,13 @@ package com.lennart.model.action.actionbuilders.ai.opponenttypes;
  */
 public class TightPassive {
 
-    private String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
+    public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
                             double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb) {
-        String action = "";
+        String action;
         if(aiBotAction.contains("bet") || aiBotAction.contains("raise")) {
-            doFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb);
+            action = doFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb);
         } else {
-            doCheckBetAction(handStrength, strongDraw);
+            action = doCheckBetAction(handStrength, strongDraw);
         }
         return action;
     }
@@ -195,7 +195,7 @@ public class TightPassive {
         if(strongDraw) {
             double random = Math.random();
 
-            if(random < 0.2) {
+            if(random < 0.05) {
                 action = "bet75pct";
             }
         }
