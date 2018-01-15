@@ -79,10 +79,10 @@ public class Poker {
     }
 
     public String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, boolean position,
-                             double potSize, double computerBetSize, double opponentBetSize, double effectiveStack,
+                             double potSizeBb, double computerBetSizeBb, double opponentBetSizeBb, double effectiveStackBb,
                              String boardTexture) {
         try {
-            String route = getRoute(strongDraw, position, potSize, computerBetSize, opponentBetSize, effectiveStack, boardTexture);
+            String route = getRoute(strongDraw, position, potSizeBb, computerBetSizeBb, opponentBetSizeBb, effectiveStackBb, boardTexture);
 
             Map<String, Double> routeData = retrieveRouteDataFromDb(route);
             //Map<String, Double> routeData = retrieveRouteFromMemory(route);
