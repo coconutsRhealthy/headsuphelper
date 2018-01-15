@@ -67,9 +67,9 @@ public class SimulatedHand {
         double aiBotTotalScore = 0;
         double ruleBotTotalScore = 0;
 
-        new Poker().initializePayoffMap();
+        //new Poker().initializePayoffMap();
 
-        for(int i = 0; i < 100_000; i++) {
+        for(int i = 0; i < 50_000; i++) {
             Random rn = new Random();
             int y = rn.nextInt(2 - 1 + 1) + 1;
 
@@ -81,10 +81,10 @@ public class SimulatedHand {
             aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
             ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
 
-            System.out.println(i + "     " + "looseness: " + (callRaiseCount / (foldCount + callRaiseCount)));
-            System.out.println(i + "     " + "aggressiveness: " + (betRaiseCount / (checkCallCount + betRaiseCount)));
+            //System.out.println(i + "     " + "looseness: " + (callRaiseCount / (foldCount + callRaiseCount)));
+            //System.out.println(i + "     " + "aggressiveness: " + (betRaiseCount / (checkCallCount + betRaiseCount)));
 
-            //System.out.println(i + "        " + aiBotTotalScore);
+            System.out.println(i + "        " + aiBotTotalScore);
         }
 
         System.out.println("aiBot total score: " + aiBotTotalScore);
@@ -566,7 +566,7 @@ public class SimulatedHand {
                     aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
                 }
             } else {
-                String route = poker.getRoute(aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                String route = poker.getRoute(aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
 
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     double random = Math.random();
@@ -574,21 +574,21 @@ public class SimulatedHand {
                     if(ruleBotStack == 0 || ((aiBotStack + aiBotBetSize) <= ruleBotBetSize)) {
                         if(random < 0.5) {
                             aiBotAction = "fold";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "fold"));
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "fold"));
                         } else {
                             aiBotAction = "call";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "call"));
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "call"));
                         }
                     } else {
                         if(random < 0.333) {
                             aiBotAction = "fold";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "fold"));
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "fold"));
                         } else if(random < 0.666){
                             aiBotAction = "call";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "call"));
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "call"));
                         } else {
                             aiBotAction = "raise";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "raise"));
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "raise"));
                         }
                     }
                 } else {
@@ -596,17 +596,17 @@ public class SimulatedHand {
 
                     if(random < 0.5) {
                         aiBotAction = "check";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "check"));
+                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "check"));
                     } else {
                         aiBotAction = "bet75%";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(route, "bet75%"));
+                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "bet75%"));
                     }
                 }
             }
         } else if(bot.equals("ruleBot")) {
-            LoosePassive loosePassive = new LoosePassive();
-            ruleBotAction = loosePassive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
-                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind));
+            TightAggressive tightAggressive = new TightAggressive(getPotSizeInBb(), (ruleBotStack / bigBlind));
+            ruleBotAction = tightAggressive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
+                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton);
 
             if(ruleBotAction.equals("fold")) {
                 SimulatedHand.foldCount++;
