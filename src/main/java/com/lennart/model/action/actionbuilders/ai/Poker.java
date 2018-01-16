@@ -83,10 +83,9 @@ public class Poker {
                              String boardTexture) {
         try {
             String route = getRoute(strongDraw, position, potSizeBb, computerBetSizeBb, opponentBetSizeBb, effectiveStackBb, boardTexture);
+            String table = getTableString(handStrength);
 
-            Map<String, Double> routeData = retrieveRouteDataFromDb(route);
-            //Map<String, Double> routeData = retrieveRouteFromMemory(route);
-
+            Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
             Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
             Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
 
@@ -109,54 +108,6 @@ public class Poker {
         String route = strongDrawString + positionString + potSizeString + computerBetSizeString + opponentBetSizeString + effectiveStackString + boardTexture;
 
         return route;
-    }
-
-    private String getHandStrengthString(double handStength) {
-        String handStrengthString = null;
-
-        if(handStength >= 0 && handStength < 0.05) {
-            handStrengthString = "Handstrength0-5";
-        } else if(handStength < 0.10) {
-            handStrengthString = "Handstrength5-10";
-        } else if(handStength < 0.15) {
-            handStrengthString = "Handstrength10-15";
-        } else if(handStength < 0.20) {
-            handStrengthString = "Handstrength15-20";
-        } else if(handStength < 0.25) {
-            handStrengthString = "Handstrength20-25";
-        } else if(handStength < 0.30) {
-            handStrengthString = "Handstrength25-30";
-        } else if(handStength < 0.35) {
-            handStrengthString = "Handstrength30-35";
-        } else if(handStength < 0.40) {
-            handStrengthString = "Handstrength35-40";
-        } else if(handStength < 0.45) {
-            handStrengthString = "Handstrength40-45";
-        } else if(handStength < 0.50) {
-            handStrengthString = "Handstrength45-50";
-        } else if(handStength < 0.55) {
-            handStrengthString = "Handstrength50-55";
-        } else if(handStength < 0.60) {
-            handStrengthString = "Handstrength55-60";
-        } else if(handStength < 0.65) {
-            handStrengthString = "Handstrength60-65";
-        } else if(handStength < 0.70) {
-            handStrengthString = "Handstrength65-70";
-        } else if(handStength < 0.75) {
-            handStrengthString = "Handstrength70-75";
-        } else if(handStength < 0.80) {
-            handStrengthString = "Handstrength75-80";
-        } else if(handStength < 0.85) {
-            handStrengthString = "Handstrength80-85";
-        } else if(handStength < 0.90) {
-            handStrengthString = "Handstrength85-90";
-        } else if(handStength < 0.95) {
-            handStrengthString = "Handstrength90-95";
-        } else if(handStength < 1.1){
-            handStrengthString = "Handstrength95-100";
-        }
-
-        return handStrengthString;
     }
 
     private String getStrongDrawString(boolean strongDraw) {
@@ -278,9 +229,8 @@ public class Poker {
         return effectiveStackBbString;
     }
 
-    private String getTableString(String handStrengthAsString) {
+    private String getTableString(double handStrength) {
         String table = "";
-        double handStrength = Double.valueOf(handStrengthAsString);
 
         if(handStrength >= 0 && handStrength < 0.05) {
             table = "ta_hs_0_5";
@@ -329,13 +279,17 @@ public class Poker {
         return table;
     }
 
+    private String getTableString(String handStrengthAsString) {
+        return getTableString(Double.parseDouble(handStrengthAsString));
+    }
+
     private Map<String, Double> getSortedAveragePayoffMapFromRouteData(Map<String, Double> routeData) {
         Map<String, Double> sortedAveragePayoffMap = new HashMap<>();
 
         sortedAveragePayoffMap.put("fold", (routeData.get("fold_payoff") / routeData.get("fold_times")));
         sortedAveragePayoffMap.put("check", (routeData.get("check_payoff") / routeData.get("check_times")));
         sortedAveragePayoffMap.put("call", (routeData.get("call_payoff") / routeData.get("call_times")));
-        sortedAveragePayoffMap.put("bet75%", (routeData.get("bet75pct_payoff") / routeData.get("bet75pct_times")));
+        sortedAveragePayoffMap.put("bet75pct", (routeData.get("bet75pct_payoff") / routeData.get("bet75pct_times")));
         sortedAveragePayoffMap.put("raise", (routeData.get("raise_payoff") / routeData.get("raise_times")));
 
         return sortByValueHighToLow(sortedAveragePayoffMap);
@@ -440,11 +394,11 @@ public class Poker {
         initializeDbConnection();
 
         List<String> databases = new ArrayList<>();
-//        databases.add("ta_hs_5_10");
-//        databases.add("ta_hs_10_15");
-//        databases.add("ta_hs_15_20");
-//        databases.add("ta_hs_20_25");
-//        databases.add("ta_hs_25_30");
+        databases.add("ta_hs_5_10");
+        databases.add("ta_hs_10_15");
+        databases.add("ta_hs_15_20");
+        databases.add("ta_hs_20_25");
+        databases.add("ta_hs_25_30");
         databases.add("ta_hs_30_35");
         databases.add("ta_hs_35_40");
         databases.add("ta_hs_40_45");
@@ -481,40 +435,46 @@ public class Poker {
         closeDbConnection();
     }
 
-    private Map<String, Double> retrieveRouteDataFromDb(String route) throws Exception {
+    private Map<String, Double> retrieveRouteDataFromDb(String route, String table) throws Exception {
         Map<String, Double> routeData = new HashMap<>();
 
-        initializeDbConnection();
+        routeData.put("fold_times", 30.0);
+        routeData.put("fold_payoff", Math.random());
+        routeData.put("check_times", 30.0);
+        routeData.put("check_payoff", Math.random());
+        routeData.put("call_times", 30.0);
+        routeData.put("call_payoff", Math.random());
+        routeData.put("bet75pct_times", 30.0);
+        routeData.put("bet75pct_payoff", Math.random());
+        routeData.put("raise_times", 30.0);
+        routeData.put("raise_payoff", Math.random());
 
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM standard WHERE route = '" + route + "';");
 
-        while(rs.next()) {
-            routeData.put("fold_times", rs.getDouble("fold_times"));
-            routeData.put("fold_payoff", rs.getDouble("fold_payoff"));
-            routeData.put("check_times", rs.getDouble("check_times"));
-            routeData.put("check_payoff", rs.getDouble("check_payoff"));
-            routeData.put("call_times", rs.getDouble("call_times"));
-            routeData.put("call_payoff", rs.getDouble("call_payoff"));
-            routeData.put("bet25%_times", rs.getDouble("bet25%_times"));
-            routeData.put("bet25%_payoff", rs.getDouble("bet25%_payoff"));
-            routeData.put("bet50%_times", rs.getDouble("bet50%_times"));
-            routeData.put("bet50%_payoff", rs.getDouble("bet50%_payoff"));
-            routeData.put("bet75%_times", rs.getDouble("bet75pct_times"));
-            routeData.put("bet75%_payoff", rs.getDouble("bet75pct_payoff"));
-            routeData.put("bet100%_times", rs.getDouble("bet100%_times"));
-            routeData.put("bet100%_payoff", rs.getDouble("bet100%_payoff"));
-            routeData.put("bet150%_times", rs.getDouble("bet150%_times"));
-            routeData.put("bet150%_payoff", rs.getDouble("bet150%_payoff"));
-            routeData.put("bet200%_times", rs.getDouble("bet200%_times"));
-            routeData.put("bet200%_payoff", rs.getDouble("bet200%_payoff"));
-            routeData.put("raise_times", rs.getDouble("raise_times"));
-            routeData.put("raise_payoff", rs.getDouble("raise_payoff"));
-        }
 
-        rs.close();
-        st.close();
-        closeDbConnection();
+
+
+
+//        initializeDbConnection();
+//
+//        Statement st = con.createStatement();
+//        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
+//
+//        while(rs.next()) {
+//            routeData.put("fold_times", rs.getDouble("fold_times"));
+//            routeData.put("fold_payoff", rs.getDouble("fold_payoff"));
+//            routeData.put("check_times", rs.getDouble("check_times"));
+//            routeData.put("check_payoff", rs.getDouble("check_payoff"));
+//            routeData.put("call_times", rs.getDouble("call_times"));
+//            routeData.put("call_payoff", rs.getDouble("call_payoff"));
+//            routeData.put("bet75pct_times", rs.getDouble("bet75pct_times"));
+//            routeData.put("bet75pct_payoff", rs.getDouble("bet75pct_payoff"));
+//            routeData.put("raise_times", rs.getDouble("raise_times"));
+//            routeData.put("raise_payoff", rs.getDouble("raise_payoff"));
+//        }
+//
+//        rs.close();
+//        st.close();
+//        closeDbConnection();
 
         return routeData;
     }
@@ -523,24 +483,6 @@ public class Poker {
         return payoffMap.get(route);
     }
 
-    private List<String> retrieveAllRoutesFromDb() throws Exception {
-        List<String> routesFromDb = new ArrayList<>();
-
-        initializeDbConnection();
-
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM standard");
-
-        while(rs.next()) {
-            routesFromDb.add(rs.getString("route"));
-        }
-
-        rs.close();
-        st.close();
-        closeDbConnection();
-
-        return routesFromDb;
-    }
 
     public void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff) {
         double payoffPerAction = totalPayoff / actionHistory.size();

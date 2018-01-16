@@ -82,7 +82,7 @@ public class ComputerGameNew implements Actionable {
 
         calculateHandStrengthsAndDraws();
 
-        if(isComputerIsButton()) {
+        if(!isComputerIsButton()) {
             doComputerAction();
 
             if(computerWrittenAction.contains("fold")) {
@@ -367,18 +367,26 @@ public class ComputerGameNew implements Actionable {
     private void postBlinds() {
         if(computerIsButton) {
             myStack = myStack - bigBlind;
-            opponentIncrementalBetSize = bigBlind;
-            opponentTotalBetSize = bigBlind;
-            computerStack = computerStack - smallBlind;
-            computerIncrementalBetSize = smallBlind;
-            computerTotalBetSize = smallBlind;
-        } else {
-            myStack = myStack - smallBlind;
-            opponentIncrementalBetSize = smallBlind;
-            opponentTotalBetSize = smallBlind;
+//            opponentIncrementalBetSize = bigBlind;
+//            opponentTotalBetSize = bigBlind;
+
+
             computerStack = computerStack - bigBlind;
-            computerIncrementalBetSize = bigBlind;
-            computerTotalBetSize = bigBlind;
+//            computerIncrementalBetSize = smallBlind;
+//            computerTotalBetSize = smallBlind;
+
+            potSize = potSize + bigBlind + bigBlind;
+        } else {
+            myStack = myStack - bigBlind;
+//            opponentIncrementalBetSize = smallBlind;
+//            opponentTotalBetSize = smallBlind;
+
+
+            computerStack = computerStack - bigBlind;
+//            computerIncrementalBetSize = bigBlind;
+//            computerTotalBetSize = bigBlind;
+
+            potSize = potSize + bigBlind + bigBlind;
         }
     }
 
@@ -587,8 +595,26 @@ public class ComputerGameNew implements Actionable {
     }
 
     private String determineWinnerAtShowdown() {
-        //to implement
-        return "";
+        if(myAction.equals("fold")) {
+            return "computer";
+        } else if(computerWrittenAction.equals("fold")) {
+            return "human";
+        } else {
+            double computerHandStrength = this.computerHandStrength;
+
+            BoardEvaluator endOfHandBoardEvaluator = new BoardEvaluator(board);
+            HandEvaluator endOfHandHandEvaluator = new HandEvaluator(endOfHandBoardEvaluator);
+
+            double humanHandstrength = endOfHandHandEvaluator.getHandStrength(myHoleCards);
+
+            if(computerHandStrength > humanHandstrength) {
+                return "computer";
+            } else if(computerHandStrength == humanHandstrength) {
+                return "draw";
+            } else {
+                return "human";
+            }
+        }
     }
 
     private void allocatePotToHandWinner() {
@@ -981,5 +1007,21 @@ public class ComputerGameNew implements Actionable {
 
     public void setOpponentBetsOrRaisesPostFlop(boolean opponentBetsOrRaisesPostFlop) {
         this.opponentBetsOrRaisesPostFlop = opponentBetsOrRaisesPostFlop;
+    }
+
+    public double getComputerHandStrength() {
+        return computerHandStrength;
+    }
+
+    public void setComputerHandStrength(double computerHandStrength) {
+        this.computerHandStrength = computerHandStrength;
+    }
+
+    public boolean isComputerHasStrongDraw() {
+        return computerHasStrongDraw;
+    }
+
+    public void setComputerHasStrongDraw(boolean computerHasStrongDraw) {
+        this.computerHasStrongDraw = computerHasStrongDraw;
     }
 }

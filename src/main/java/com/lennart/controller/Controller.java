@@ -2,6 +2,7 @@ package com.lennart.controller;
 
 import com.lennart.model.botgame.BotTable;
 import com.lennart.model.computergame.ComputerGame;
+import com.lennart.model.computergame.ComputerGameNew;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
@@ -14,23 +15,23 @@ import org.springframework.web.bind.annotation.*;
 public class Controller {
 
     @RequestMapping(value = "/startGame", method = RequestMethod.GET)
-    public @ResponseBody ComputerGame startGame() {
-        ComputerGame computerGame = new ComputerGame("initialize");
-        computerGame.setComputerAction(null);
-        return computerGame;
+    public @ResponseBody ComputerGameNew startGame() {
+        ComputerGameNew computerGameNew = new ComputerGameNew("initialize");
+        //computerGame.setComputerAction(null);
+        return computerGameNew;
     }
 
     @RequestMapping(value = "/submitMyAction", method = RequestMethod.POST)
-    public @ResponseBody ComputerGame submitMyAction(@RequestBody ComputerGame computerGame) {
+    public @ResponseBody ComputerGameNew submitMyAction(@RequestBody ComputerGameNew computerGame) {
         computerGame = computerGame.submitHumanActionAndDoComputerAction();
-        computerGame.setComputerAction(null);
+        //computerGame.setComputerAction(null);
         return computerGame;
     }
 
     @RequestMapping(value = "/proceedToNextHand", method = RequestMethod.POST)
-    public @ResponseBody ComputerGame proceedToNextHand(@RequestBody ComputerGame computerGame) {
+    public @ResponseBody ComputerGameNew proceedToNextHand(@RequestBody ComputerGameNew computerGame) {
         computerGame = computerGame.proceedToNextHand();
-        computerGame.setComputerAction(null);
+        //computerGame.setComputerAction(null);
         return computerGame;
     }
 
