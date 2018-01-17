@@ -93,7 +93,7 @@ public class ComputerGameNew implements Actionable {
     }
 
     public ComputerGameNew submitHumanActionAndDoComputerAction() {
-        calculateOpponentPreflopStats();
+        //calculateOpponentPreflopStats();
         boolean computerActionNeeded = isComputerActionNeeded();
 
         if(myAction.equals("fold")) {
@@ -499,6 +499,8 @@ public class ComputerGameNew implements Actionable {
         opponentPreflopStatsDoneForHand = false;
         previousBluffAction = false;
         drawBettingActionDone = false;
+
+        myAction = null;
     }
 
     public ComputerGameNew proceedToNextHand() {
@@ -509,7 +511,9 @@ public class ComputerGameNew implements Actionable {
         dealHoleCards();
         postBlinds();
 
-        if(isComputerIsButton()) {
+        dealFlopCards();
+
+        if(!isComputerIsButton()) {
             doComputerAction();
         }
         return this;
