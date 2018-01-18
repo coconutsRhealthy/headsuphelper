@@ -64,6 +64,9 @@ public class ComputerGameNew implements Actionable {
     private double computerHandStrength;
     private boolean computerHasStrongDraw;
 
+    private double totalHumanScore = 0;
+    private double totalBotScore = 0;
+
     public ComputerGameNew() {
         //default constructor
     }
@@ -189,15 +192,26 @@ public class ComputerGameNew implements Actionable {
         if(computerWrittenAction.contains("bet")) {
             sizing = 0.75 * potSize;
         } else if(computerWrittenAction.contains("raise")) {
-            sizing = calculateRaiseAmountNewAi(computerTotalBetSize, opponentTotalBetSize, potSize);
+            sizing = calculateRaiseAmountNewAi(computerTotalBetSize, opponentTotalBetSize, potSize, myStack, computerStack);
         }
 
         return sizing;
     }
 
-    private double calculateRaiseAmountNewAi(double computerBetSize, double facingBetSize, double potSize) {
+    private double calculateRaiseAmountNewAi(double computerBetSize, double facingBetSize, double potSize,
+                                             double humanStack, double botStack) {
         double initial = computerBetSize + facingBetSize + potSize;
-        return 1.3 * initial;
+        double raiseAmount = 1.3 * initial;
+
+        if(raiseAmount <= humanStack && raiseAmount <= botStack) {
+            return raiseAmount;
+        } else {
+            if(humanStack > botStack) {
+                return botStack;
+            } else {
+                return humanStack;
+            }
+        }
     }
 
     private void processComputerFoldAction() {
@@ -469,13 +483,14 @@ public class ComputerGameNew implements Actionable {
     }
 
     private void resetGameVariablesAfterFoldOrShowdown() {
-        if(myStack < 50) {
-            myStack = 50;
-        }
+        totalHumanScore = totalHumanScore + (myStack - 50);
+        totalBotScore = totalBotScore + (computerStack - 50);
 
-        if(computerStack < 50) {
-            computerStack = 50;
-        }
+        Precision.round(totalHumanScore, 2);
+        Precision.round(totalBotScore, 2);
+
+        myStack = 50;
+        computerStack = 50;
 
         potSize = 0;
         opponentIncrementalBetSize = 0;
@@ -599,25 +614,19 @@ public class ComputerGameNew implements Actionable {
     }
 
     private String determineWinnerAtShowdown() {
-        if(myAction.equals("fold")) {
+        double computerHandStrength = this.computerHandStrength;
+
+        BoardEvaluator endOfHandBoardEvaluator = new BoardEvaluator(board);
+        HandEvaluator endOfHandHandEvaluator = new HandEvaluator(endOfHandBoardEvaluator);
+
+        double humanHandstrength = endOfHandHandEvaluator.getHandStrength(myHoleCards);
+
+        if(computerHandStrength > humanHandstrength) {
             return "computer";
-        } else if(computerWrittenAction.equals("fold")) {
-            return "human";
+        } else if(computerHandStrength == humanHandstrength) {
+            return "draw";
         } else {
-            double computerHandStrength = this.computerHandStrength;
-
-            BoardEvaluator endOfHandBoardEvaluator = new BoardEvaluator(board);
-            HandEvaluator endOfHandHandEvaluator = new HandEvaluator(endOfHandBoardEvaluator);
-
-            double humanHandstrength = endOfHandHandEvaluator.getHandStrength(myHoleCards);
-
-            if(computerHandStrength > humanHandstrength) {
-                return "computer";
-            } else if(computerHandStrength == humanHandstrength) {
-                return "draw";
-            } else {
-                return "human";
-            }
+            return "human";
         }
     }
 
@@ -1027,5 +1036,21 @@ public class ComputerGameNew implements Actionable {
 
     public void setComputerHasStrongDraw(boolean computerHasStrongDraw) {
         this.computerHasStrongDraw = computerHasStrongDraw;
+    }
+
+    public double getTotalHumanScore() {
+        return totalHumanScore;
+    }
+
+    public void setTotalHumanScore(double totalHumanScore) {
+        this.totalHumanScore = totalHumanScore;
+    }
+
+    public double getTotalBotScore() {
+        return totalBotScore;
+    }
+
+    public void setTotalBotScore(double totalBotScore) {
+        this.totalBotScore = totalBotScore;
     }
 }

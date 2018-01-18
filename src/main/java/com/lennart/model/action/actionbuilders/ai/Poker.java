@@ -438,43 +438,39 @@ public class Poker {
     private Map<String, Double> retrieveRouteDataFromDb(String route, String table) throws Exception {
         Map<String, Double> routeData = new HashMap<>();
 
-        routeData.put("fold_times", 30.0);
-        routeData.put("fold_payoff", Math.random());
-        routeData.put("check_times", 30.0);
-        routeData.put("check_payoff", Math.random());
-        routeData.put("call_times", 30.0);
-        routeData.put("call_payoff", Math.random());
-        routeData.put("bet75pct_times", 30.0);
-        routeData.put("bet75pct_payoff", Math.random());
-        routeData.put("raise_times", 30.0);
-        routeData.put("raise_payoff", Math.random());
+//        routeData.put("fold_times", 30.0);
+//        routeData.put("fold_payoff", Math.random());
+//        routeData.put("check_times", 30.0);
+//        routeData.put("check_payoff", Math.random());
+//        routeData.put("call_times", 30.0);
+//        routeData.put("call_payoff", Math.random());
+//        routeData.put("bet75pct_times", 30.0);
+//        routeData.put("bet75pct_payoff", Math.random());
+//        routeData.put("raise_times", 30.0);
+//        routeData.put("raise_payoff", Math.random());
 
 
+        initializeDbConnection();
 
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
 
+        while(rs.next()) {
+            routeData.put("fold_times", rs.getDouble("fold_times"));
+            routeData.put("fold_payoff", rs.getDouble("fold_payoff"));
+            routeData.put("check_times", rs.getDouble("check_times"));
+            routeData.put("check_payoff", rs.getDouble("check_payoff"));
+            routeData.put("call_times", rs.getDouble("call_times"));
+            routeData.put("call_payoff", rs.getDouble("call_payoff"));
+            routeData.put("bet75pct_times", rs.getDouble("bet75pct_times"));
+            routeData.put("bet75pct_payoff", rs.getDouble("bet75pct_payoff"));
+            routeData.put("raise_times", rs.getDouble("raise_times"));
+            routeData.put("raise_payoff", rs.getDouble("raise_payoff"));
+        }
 
-
-//        initializeDbConnection();
-//
-//        Statement st = con.createStatement();
-//        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
-//
-//        while(rs.next()) {
-//            routeData.put("fold_times", rs.getDouble("fold_times"));
-//            routeData.put("fold_payoff", rs.getDouble("fold_payoff"));
-//            routeData.put("check_times", rs.getDouble("check_times"));
-//            routeData.put("check_payoff", rs.getDouble("check_payoff"));
-//            routeData.put("call_times", rs.getDouble("call_times"));
-//            routeData.put("call_payoff", rs.getDouble("call_payoff"));
-//            routeData.put("bet75pct_times", rs.getDouble("bet75pct_times"));
-//            routeData.put("bet75pct_payoff", rs.getDouble("bet75pct_payoff"));
-//            routeData.put("raise_times", rs.getDouble("raise_times"));
-//            routeData.put("raise_payoff", rs.getDouble("raise_payoff"));
-//        }
-//
-//        rs.close();
-//        st.close();
-//        closeDbConnection();
+        rs.close();
+        st.close();
+        closeDbConnection();
 
         return routeData;
     }

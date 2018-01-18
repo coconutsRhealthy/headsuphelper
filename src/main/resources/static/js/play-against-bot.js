@@ -214,6 +214,8 @@ mainApp.controller('pokerController', function($scope, $http) {
                         $scope.computerGame.computerWrittenAction.includes("fold") ||
                         $scope.computerGame.computerWrittenAction.includes("Draw")) {
                         $scope.showNextHandButton = true;
+                    } else {
+                        $scope.showNextHandButton = false;
                     }
                 } else if($scope.computerGame.myAction != null) {
                     if($scope.computerGame.myAction.includes("fold")) {
