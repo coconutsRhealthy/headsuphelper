@@ -5,6 +5,7 @@ import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
+import com.lennart.model.handevaluation.PreflopHandStength;
 import org.apache.commons.math3.util.Precision;
 
 import java.util.*;
@@ -190,7 +191,17 @@ public class ComputerGameNew implements Actionable {
         double sizing = 0;
 
         if(computerWrittenAction.contains("bet")) {
-            sizing = 0.75 * potSize;
+            double sizingInitial = 0.75 * potSize;
+
+            if(sizingInitial <= myStack && sizingInitial <= computerStack) {
+                sizing = sizingInitial;
+            } else {
+                if(myStack > computerStack) {
+                    sizing = computerStack;
+                } else {
+                    sizing = myStack;
+                }
+            }
         } else if(computerWrittenAction.contains("raise")) {
             sizing = calculateRaiseAmountNewAi(computerTotalBetSize, opponentTotalBetSize, potSize, myStack, computerStack);
         }
@@ -675,11 +686,16 @@ public class ComputerGameNew implements Actionable {
     }
 
     private void calculateHandStrengthsAndDraws() {
-        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
-        HandEvaluator handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);
+        if(board == null) {
+            computerHandStrength = new PreflopHandStength().getPreflopHandStength(computerHoleCards);
+            computerHasStrongDraw = false;
+        } else {
+            BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+            HandEvaluator handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);
 
-        computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
-        computerHasStrongDraw = hasStrongDraw(handEvaluator);
+            computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
+            computerHasStrongDraw = hasStrongDraw(handEvaluator);
+        }
     }
 
     private boolean hasStrongDraw(HandEvaluator handEvaluator) {
