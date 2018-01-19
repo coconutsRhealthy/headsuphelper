@@ -14,39 +14,71 @@ import java.util.Set;
  */
 public class PreflopHandStength {
 
+    public static void main(String[] args) {
+        PreflopHandStength preflopHandStength = new PreflopHandStength();
+
+//        System.out.println(preflopHandStength.getPocketPairCombosOfGivenRank(6).size());
+//        System.out.println(preflopHandStength.getSuitedCombosOfGivenRanks(7, 8).size());
+//        System.out.println(preflopHandStength.getOffSuitCombosOfGivenRanks(3, 8).size());
+
+
+        List<Card> test = new ArrayList<>();
+        test.add(new Card(3, 'd'));
+        test.add(new Card(3, 'c'));
+
+        double d = preflopHandStength.getPreflopHandStength(test);
+        System.out.println(d);
+    }
+
     public double getPreflopHandStength(List<Card> holeCards) {
+        double handstrength = -1;
 
-        List<Card> a = new ArrayList<>();
-        a.add(new Card(8, 'c'));
-        a.add(new Card(5, 'd'));
+        Set<Card> holeCardsAsSet = new HashSet<>();
+        holeCardsAsSet.addAll(holeCards);
 
-        List<Card> b = new ArrayList<>();
+        Map<Double, Map<Integer, Set<Card>>> allGroups = getMapWithAllPreflopHandstrengthGroups();
 
+        loop: for (Map.Entry<Double, Map<Integer, Set<Card>>> entry : allGroups.entrySet()) {
+            Map<Integer, Set<Card>> group = entry.getValue();
 
+            for (Map.Entry<Integer, Set<Card>> entry2 : group.entrySet()) {
+                if(holeCardsAsSet.equals(entry2.getValue())) {
+                    handstrength = entry.getKey();
+                    break loop;
+                }
+            }
+        }
 
-        return 0.0;
+        return handstrength;
     }
 
 
+    private Map<Double, Map<Integer, Set<Card>>> getMapWithAllPreflopHandstrengthGroups() {
+        Map<Double, Map<Integer, Set<Card>>> allGroups = new HashMap<>();
 
+        allGroups.put(0.02, get0_5_group());
+        allGroups.put(0.07, get5_10_group());
+        allGroups.put(0.12, get10_15_group());
+        allGroups.put(0.17, get15_20_group());
+        allGroups.put(0.22, get20_25_group());
+        allGroups.put(0.27, get25_30_group());
+        allGroups.put(0.32, get30_35_group());
+        allGroups.put(0.37, get35_40_group());
+        allGroups.put(0.42, get40_45_group());
+        allGroups.put(0.47, get45_50_group());
+        allGroups.put(0.52, get50_55_group());
+        allGroups.put(0.57, get55_60_group());
+        allGroups.put(0.62, get60_65_group());
+        allGroups.put(0.67, get65_70_group());
+        allGroups.put(0.72, get70_75_group());
+        allGroups.put(0.77, get75_80_group());
+        allGroups.put(0.82, get80_85_group());
+        allGroups.put(0.87, get85_90_group());
+        allGroups.put(0.92, get90_95_group());
+        allGroups.put(0.97, get95_100_group());
 
-
-
-    //1326
-        //14 groepen van 66 combos
-        //6 groepen van 67 combos
-
-
-
-    //********************************
-
-    //0-5
-        //32o
-        //42o
-        //52o
-        //62o
-        //72o
-        //82o
+        return allGroups;
+    }
 
     private Map<Integer, Set<Card>> get0_5_group() {
         Map<Integer, Set<Card>> group_0_5 = new HashMap<>();
@@ -61,13 +93,6 @@ public class PreflopHandStength {
         return group_0_5;
     }
 
-    //5-10
-        //92o
-        //43o
-        //63o
-        //73o
-        //83o
-
     private Map<Integer, Set<Card>> get5_10_group() {
         Map<Integer, Set<Card>> group_5_10 = new HashMap<>();
 
@@ -80,13 +105,6 @@ public class PreflopHandStength {
         return group_5_10;
     }
 
-    //10-15
-        //93o
-        //74o
-        //84o
-        //94o
-        //53o
-
     private Map<Integer, Set<Card>> get10_15_group() {
         Map<Integer, Set<Card>> group_10_15 = new HashMap<>();
 
@@ -98,16 +116,6 @@ public class PreflopHandStength {
 
         return group_10_15;
     }
-
-    //15-20
-        //T2o
-        //J2o
-        //T3o
-        //T4o
-        //64o
-        //32s
-        //42s
-        //72s
 
     private Map<Integer, Set<Card>> get15_20_group() {
         Map<Integer, Set<Card>> group_15_20 = new HashMap<>();
@@ -124,15 +132,6 @@ public class PreflopHandStength {
         return group_15_20;
     }
 
-    //20-25
-        //J3o
-        //85o
-        //95o
-        //T5o
-        //54o
-        //62s
-        //82s
-
     private Map<Integer, Set<Card>> get20_25_group() {
         Map<Integer, Set<Card>> group_20_25 = new HashMap<>();
 
@@ -146,16 +145,6 @@ public class PreflopHandStength {
 
         return group_20_25;
     }
-
-    //25-30
-        //Q2o
-        //J4o
-        //75o
-        //65o
-        //52s
-        //92s
-        //83s
-        //73s
 
     private Map<Integer, Set<Card>> get25_30_group() {
         Map<Integer, Set<Card>> group_25_30 = new HashMap<>();
@@ -172,16 +161,6 @@ public class PreflopHandStength {
         return group_25_30;
     }
 
-    //30-35
-        //Q3o
-        //J5o
-        //T6o
-        //96o
-        //93s
-        //63s
-        //53s
-        //43s
-
     private Map<Integer, Set<Card>> get30_35_group() {
         Map<Integer, Set<Card>> group_30_35 = new HashMap<>();
 
@@ -196,17 +175,6 @@ public class PreflopHandStength {
 
         return group_30_35;
     }
-
-    //35-40
-        //K2o
-        //Q4o
-        //J6o
-        //86o
-        //76o
-        //T2s
-        //94s
-        //84s
-        //74s
 
     private Map<Integer, Set<Card>> get35_40_group() {
         Map<Integer, Set<Card>> group_35_40 = new HashMap<>();
@@ -224,17 +192,6 @@ public class PreflopHandStength {
         return group_35_40;
     }
 
-    //40-45
-        //K3o
-        //Q5o
-        //97o
-        //22
-        //J2s
-        //T3s
-        //T4s
-        //64s
-        //54s
-
     private Map<Integer, Set<Card>> get40_45_group() {
         Map<Integer, Set<Card>> group_40_45 = new HashMap<>();
 
@@ -250,17 +207,6 @@ public class PreflopHandStength {
 
         return group_40_45;
     }
-
-    //45-50
-        //K4o
-        //Q6o
-        //T7o
-        //87o
-        //J3s
-        //T5s
-        //95s
-        //85s
-        //75s
 
     private Map<Integer, Set<Card>> get45_50_group() {
         Map<Integer, Set<Card>> group_45_50 = new HashMap<>();
@@ -278,17 +224,6 @@ public class PreflopHandStength {
         return group_45_50;
     }
 
-    //50-55
-        //K5o
-        //Q7o
-        //J7o
-        //33
-        //Q2s
-        //Q3s
-        //J4s
-        //J5s
-        //65s
-
     private Map<Integer, Set<Card>> get50_55_group() {
         Map<Integer, Set<Card>> group_50_55 = new HashMap<>();
 
@@ -304,17 +239,6 @@ public class PreflopHandStength {
 
         return group_50_55;
     }
-
-    //55-60
-        //A2o
-        //K6o
-        //T8o
-        //98o
-        //J6s
-        //T6s
-        //96s
-        //86s
-        //76s
 
     private Map<Integer, Set<Card>> get55_60_group() {
         Map<Integer, Set<Card>> group_55_60 = new HashMap<>();
@@ -332,16 +256,6 @@ public class PreflopHandStength {
         return group_55_60;
     }
 
-    //60-65
-        //A3o
-        //K7o
-        //Q8o
-        //J8o
-        //44
-        //K2s
-        //Q4s
-        //Q5s
-
     private Map<Integer, Set<Card>> get60_65_group() {
         Map<Integer, Set<Card>> group_60_65 = new HashMap<>();
 
@@ -356,18 +270,6 @@ public class PreflopHandStength {
 
         return group_60_65;
     }
-
-    //65-70
-        //A4o
-        //A6o
-        //K8o
-        //K3s
-        //K4s
-        //Q6s
-        //J7s
-        //T7s
-        //97s
-        //87s
 
     private Map<Integer, Set<Card>> get65_70_group() {
         Map<Integer, Set<Card>> group_65_70 = new HashMap<>();
@@ -386,16 +288,6 @@ public class PreflopHandStength {
         return group_65_70;
     }
 
-    //70-75
-        //A5o
-        //Q9o
-        //J9o
-        //T9o
-        //55
-        //K5s
-        //Q7s
-        //98s
-
     private Map<Integer, Set<Card>> get70_75_group() {
         Map<Integer, Set<Card>> group_70_75 = new HashMap<>();
 
@@ -410,18 +302,6 @@ public class PreflopHandStength {
 
         return group_70_75;
     }
-
-    //75-80
-        //A7o
-        //A8o
-        //K9o
-        //A2s
-        //A3s
-        //K6s
-        //K7s
-        //T8s
-        //J8s
-        //Q8s
 
     private Map<Integer, Set<Card>> get75_80_group() {
         Map<Integer, Set<Card>> group_75_80 = new HashMap<>();
@@ -439,19 +319,6 @@ public class PreflopHandStength {
 
         return group_75_80;
     }
-
-    //80-85
-        //A9o
-        //QTo
-        //JTo
-        //66
-        //A4s
-        //A5s
-        //A6s
-        //K8s
-        //T9s
-        //J9s
-        //Q9s
 
     private Map<Integer, Set<Card>> get80_85_group() {
         Map<Integer, Set<Card>> group_80_85 = new HashMap<>();
@@ -471,17 +338,6 @@ public class PreflopHandStength {
         return group_80_85;
     }
 
-    //85-90
-        //ATo
-        //KTo
-        //KJo
-        //QJo
-        //77
-        //A7s
-        //A8s
-        //K9s
-        //JTs
-
     private Map<Integer, Set<Card>> get85_90_group() {
         Map<Integer, Set<Card>> group_85_90 = new HashMap<>();
 
@@ -497,18 +353,6 @@ public class PreflopHandStength {
 
         return group_85_90;
     }
-
-    //90-95
-        //AJo
-        //AQo
-        //KQo
-        //88
-        //A9s
-        //QTs
-        //KTs
-        //ATs
-        //QJs
-        //KJs
 
     private Map<Integer, Set<Card>> get90_95_group() {
         Map<Integer, Set<Card>> group_90_95 = new HashMap<>();
@@ -527,19 +371,6 @@ public class PreflopHandStength {
         return group_90_95;
     }
 
-    //95-100
-        //AKo
-        //99
-        //TT
-        //JJ
-        //QQ
-        //KK
-        //AA
-        //AKs
-        //KQs
-        //AQs
-        //AJs
-
     private Map<Integer, Set<Card>> get95_100_group() {
         Map<Integer, Set<Card>> group_95_100 = new HashMap<>();
 
@@ -557,82 +388,6 @@ public class PreflopHandStength {
 
         return group_95_100;
     }
-
-
-
-
-
-
-    public static void main(String[] args) {
-        PreflopHandStength preflopHandStength = new PreflopHandStength();
-
-        System.out.println(preflopHandStength.getPocketPairCombosOfGivenRank(6).size());
-        System.out.println(preflopHandStength.getSuitedCombosOfGivenRanks(7, 8).size());
-        System.out.println(preflopHandStength.getOffSuitCombosOfGivenRanks(3, 8).size());
-
-    }
-
-
-
-//    private Map<Integer, List<Card>> getAllPossibleStartHandsInitialize() {
-//        Map<Integer, List<Card>> allPossibleStartHands = new HashMap<>();
-//        List<Card> completeCardDeck = getCompleteCardDeck();
-//
-//        int i = 1;
-//        for(int z = 0; z < 52; z++) {
-//            for(int q = 0; q < 52; q++) {
-//                if(!completeCardDeck.get(z).equals(completeCardDeck.get(q))) {
-//                    allPossibleStartHands.put(i, new ArrayList<>());
-//                    allPossibleStartHands.get(i).add(completeCardDeck.get(z));
-//                    allPossibleStartHands.get(i).add(completeCardDeck.get(q));
-//                    i++;
-//                }
-//            }
-//        }
-//
-//        List<List<Card>> asList = new ArrayList<>(allPossibleStartHands.values());
-//        Set<Set<Card>> asSet = new HashSet<>();
-//
-//        allPossibleStartHands.clear();
-//
-//        for(List<Card> l : asList) {
-//            Set<Card> s = new HashSet<>();
-//            s.addAll(l);
-//            asSet.add(s);
-//        }
-//
-//        for(Set<Card> startHand : asSet) {
-//            List<Card> l = new ArrayList<>();
-//            l.addAll(startHand);
-//            allPossibleStartHands.put(allPossibleStartHands.size(), l);
-//        }
-//        return allPossibleStartHands;
-//    }
-//
-//    public List<Card> getCompleteCardDeck() {
-//        List<Card> completeCardDeck = new ArrayList<>();
-//
-//        for(int i = 2; i <= 14; i++) {
-//            for(int z = 1; z <= 4; z++) {
-//                if(z == 1) {
-//                    completeCardDeck.add(new Card(i, 's'));
-//                }
-//                if(z == 2) {
-//                    completeCardDeck.add(new Card(i, 'c'));
-//                }
-//                if(z == 3) {
-//                    completeCardDeck.add(new Card(i, 'd'));
-//                }
-//                if(z == 4) {
-//                    completeCardDeck.add(new Card(i, 'h'));
-//                }
-//            }
-//        }
-//        return completeCardDeck;
-//    }
-
-
-
 
     private Map<Integer, Set<Card>> getSuitedCombosOfGivenRanks(int rankCard1, int rankCard2) {
         Map<Integer, Set<Card>> suitedCombosOfGivenRanks = new HashMap<>();
@@ -706,6 +461,4 @@ public class PreflopHandStength {
         }
         return pocketPairCombosOfGivenRanks;
     }
-
-
 }
