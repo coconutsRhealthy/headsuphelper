@@ -7,6 +7,7 @@ import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
+import com.lennart.model.handevaluation.PreflopHandStength;
 
 import java.util.*;
 
@@ -101,19 +102,23 @@ public class SimulatedHand {
 
         if(numberOfHandsPlayed % 2 == 0) {
             aiBotStack = 49.50;
-            ruleBotStack = 49.50;
+            ruleBotStack = 49.75;
+            aiBotAction = "bet";
+
+            aiBotBetSize = 0.50;
+            ruleBotBetSize = 0.25;
+
             aiBotIsButton = false;
         } else {
-            aiBotStack = 49.50;
+            aiBotStack = 49.75;
             ruleBotStack = 49.50;
+            ruleBotAction = "bet";
+
+            aiBotBetSize = 0.25;
+            ruleBotBetSize = 0.50;
+
             aiBotIsButton = true;
         }
-
-        pot = 1;
-
-        board.add(getAndRemoveRandomCardFromDeck());
-        board.add(getAndRemoveRandomCardFromDeck());
-        board.add(getAndRemoveRandomCardFromDeck());
 
         calculateHandStrengthsAndDraws();
     }
@@ -121,28 +126,57 @@ public class SimulatedHand {
     public Map<String, Double> playHand() {
         loop: while(continueHand) {
             while(!nextStreetNeedsToBeDealt && !playerIsAllIn) {
-                if(!aiBotIsButton) {
-                    doAiBotAction();
-                    if(aiBotAction.equals("fold")) {
-                        break loop;
-                    }
 
-                    if(!nextStreetNeedsToBeDealt) {
+                if(board.isEmpty()) {
+                    if(aiBotIsButton) {
+                        doAiBotAction();
+                        if(aiBotAction.equals("fold")) {
+                            break loop;
+                        }
+
+                        if(!nextStreetNeedsToBeDealt) {
+                            doRuleBotAction();
+                            if(ruleBotAction.equals("fold")) {
+                                break loop;
+                            }
+                        }
+                    } else {
                         doRuleBotAction();
                         if(ruleBotAction.equals("fold")) {
                             break loop;
                         }
+
+                        if(!nextStreetNeedsToBeDealt) {
+                            doAiBotAction();
+                            if(aiBotAction.equals("fold")) {
+                                break loop;
+                            }
+                        }
                     }
                 } else {
-                    doRuleBotAction();
-                    if(ruleBotAction.equals("fold")) {
-                        break loop;
-                    }
-
-                    if(!nextStreetNeedsToBeDealt) {
+                    if(!aiBotIsButton) {
                         doAiBotAction();
                         if(aiBotAction.equals("fold")) {
                             break loop;
+                        }
+
+                        if(!nextStreetNeedsToBeDealt) {
+                            doRuleBotAction();
+                            if(ruleBotAction.equals("fold")) {
+                                break loop;
+                            }
+                        }
+                    } else {
+                        doRuleBotAction();
+                        if(ruleBotAction.equals("fold")) {
+                            break loop;
+                        }
+
+                        if(!nextStreetNeedsToBeDealt) {
+                            doAiBotAction();
+                            if(aiBotAction.equals("fold")) {
+                                break loop;
+                            }
                         }
                     }
                 }
@@ -625,15 +659,24 @@ public class SimulatedHand {
     }
 
     private void calculateHandStrengthsAndDraws() {
-        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
-        HandEvaluator handEvaluatorForAiBot = new HandEvaluator(aiBotHolecards, boardEvaluator);
-        HandEvaluator handEvaluatorForRuleBot = new HandEvaluator(ruleBotHolecards, boardEvaluator);
+        if(board.isEmpty()) {
+            PreflopHandStength preflopHandStength = new PreflopHandStength();
+            aiBotHandStrength = preflopHandStength.getPreflopHandStength(aiBotHolecards);
+            ruleBotHandStrength = preflopHandStength.getPreflopHandStength(ruleBotHolecards);
 
-        aiBotHandStrength = handEvaluatorForAiBot.getHandStrength(aiBotHolecards);
-        ruleBotHandStrength = handEvaluatorForRuleBot.getHandStrength(ruleBotHolecards);
+            aiBotHasStrongDraw = false;
+            ruleBotHasStrongDraw = false;
+        } else {
+            BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+            HandEvaluator handEvaluatorForAiBot = new HandEvaluator(aiBotHolecards, boardEvaluator);
+            HandEvaluator handEvaluatorForRuleBot = new HandEvaluator(ruleBotHolecards, boardEvaluator);
 
-        aiBotHasStrongDraw = hasStrongDraw(handEvaluatorForAiBot);
-        ruleBotHasStrongDraw = hasStrongDraw(handEvaluatorForRuleBot);
+            aiBotHandStrength = handEvaluatorForAiBot.getHandStrength(aiBotHolecards);
+            ruleBotHandStrength = handEvaluatorForRuleBot.getHandStrength(ruleBotHolecards);
+
+            aiBotHasStrongDraw = hasStrongDraw(handEvaluatorForAiBot);
+            ruleBotHasStrongDraw = hasStrongDraw(handEvaluatorForRuleBot);
+        }
     }
 
     private boolean hasStrongDraw(HandEvaluator handEvaluator) {
@@ -678,7 +721,14 @@ public class SimulatedHand {
             ruleBotBetSize = 0;
 
             if(board.size() < 5) {
-                board.add(getAndRemoveRandomCardFromDeck());
+                if(board.isEmpty()) {
+                    board.add(getAndRemoveRandomCardFromDeck());
+                    board.add(getAndRemoveRandomCardFromDeck());
+                    board.add(getAndRemoveRandomCardFromDeck());
+                } else {
+                    board.add(getAndRemoveRandomCardFromDeck());
+                }
+
                 calculateHandStrengthsAndDraws();
             }
         }
