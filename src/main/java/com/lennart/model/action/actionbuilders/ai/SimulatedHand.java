@@ -640,7 +640,7 @@ public class SimulatedHand {
         } else if(bot.equals("ruleBot")) {
             TightAggressive tightAggressive = new TightAggressive(getPotSizeInBb(), (ruleBotStack / bigBlind));
             ruleBotAction = tightAggressive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
-                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton);
+                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton, board.isEmpty());
 
             if(ruleBotAction.equals("fold")) {
                 SimulatedHand.foldCount++;

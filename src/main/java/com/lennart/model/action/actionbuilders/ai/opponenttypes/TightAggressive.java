@@ -14,19 +14,134 @@ public class TightAggressive {
     }
 
     public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
-                            double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
+                            double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position, boolean preflop) {
         String action;
-        if(aiBotAction.contains("bet") || aiBotAction.contains("raise")) {
-            action = doFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb, position);
+
+        if(preflop) {
+            action = doPreflopAction(aiBotAction, handStrength, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb,
+                    ruleBotStackBb, position);
         } else {
-            action = doCheckBetAction(handStrength, strongDraw, position);
+            action = doPostflopAction(aiBotAction, handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb,
+                    aiBotStackBb, ruleBotStackBb, position);
         }
+
         return action;
     }
 
-    private String doFoldCallRaiseAction(double handStrength, boolean strongDraw, double aiBotBetsizeBb,
-                                         double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb,
-                                         boolean position) {
+    private String doPreflopAction(String aiBotAction, double handStrength, double aiBotBetsizeBb,
+                                   double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
+        String action = "";
+
+        if(position) {
+            if(aiBotBetsizeBb == 1) {
+                //1st to act he posts bb
+                if(handStrength > 0.10) {
+                    double random = Math.random();
+
+                    if(random > 0.05) {
+                        action = "raise";
+                    } else {
+                        action = "call";
+                    }
+                } else {
+                    action = "fold";
+                }
+            } else if(aiBotBetsizeBb < 12) {
+                //f 3bet
+                if(handStrength > 0.90) {
+                    //call of 4bet
+
+
+                } else if(handStrength > 0.6) {
+                    //call soms
+
+
+                } else {
+                    //bluff calls / raises
+                }
+
+
+            } else {
+                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb)) {
+                    //call of fold
+
+                    double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
+
+                    if(callAmountBb < 20) {
+
+                    } else if(callAmountBb < 50) {
+
+                    } else {
+
+                    }
+                } else {
+                    //call / fold of raise
+
+                    double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
+
+                    if(callAmountBb < 20) {
+
+                    } else if(callAmountBb < 50) {
+
+                    } else {
+
+                    }
+                }
+            }
+        } else {
+            if(aiBotBetsizeBb == 1) {
+                //f limp
+
+                if(handStrength > 0.80) {
+                    action = "raise";
+                } else {
+                    action = "check";
+                }
+            } else if(aiBotBetsizeBb <= 5) {
+                //f 2bet
+                if(handStrength >= 0.9) {
+                    //value 3bets
+
+
+                } else if(handStrength >= 0.5) {
+                    //calls en tricky 3bets
+
+                } else {
+                    //very occasionaly bluff 3bets
+                }
+
+
+            } else if(aiBotBetsizeBb <= 25) {
+                //f 4bet
+
+                //value shoves
+
+
+            } else {
+                //f shove
+
+            }
+        }
+
+        return action;
+    }
+
+    private String doPostflopAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
+                                    double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
+        String action;
+
+        if(aiBotAction.contains("bet") || aiBotAction.contains("raise")) {
+            action = doPostflopFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb, position);
+        } else {
+            action = doPostflopCheckBetAction(handStrength, strongDraw, position);
+        }
+
+        return action;
+    }
+
+    private String doPostflopFoldCallRaiseAction(double handStrength, boolean strongDraw, double aiBotBetsizeBb,
+                                                 double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb,
+                                                 boolean position) {
         String action = null;
         double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
@@ -236,7 +351,7 @@ public class TightAggressive {
         return action;
     }
 
-    private String doCheckBetAction(double handStrength, boolean strongDraw, boolean position) {
+    private String doPostflopCheckBetAction(double handStrength, boolean strongDraw, boolean position) {
         String action = null;
 
         if(strongDraw) {
