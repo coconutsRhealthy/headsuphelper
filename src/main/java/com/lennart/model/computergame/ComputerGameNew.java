@@ -58,11 +58,9 @@ public class ComputerGameNew {
         setBlinds();
         postBlinds();
 
-        dealFlopCards();
-
         calculateHandStrengthsAndDraws();
 
-        if(!isComputerIsButton()) {
+        if(isComputerIsButton()) {
             doComputerAction();
 
             if(computerWrittenAction.contains("fold")) {
@@ -73,7 +71,6 @@ public class ComputerGameNew {
     }
 
     public ComputerGameNew submitHumanActionAndDoComputerAction() {
-        //calculateOpponentPreflopStats();
         boolean computerActionNeeded = isComputerActionNeeded();
 
         if(myAction.equals("fold")) {
@@ -149,8 +146,14 @@ public class ComputerGameNew {
                 eligibleActions.add("bet75pct");
             }
         } else {
-            eligibleActions.add("check");
-            eligibleActions.add("bet75pct");
+            if(board == null) {
+                eligibleActions.add("fold");
+                eligibleActions.add("call");
+                eligibleActions.add("raise");
+            } else {
+                eligibleActions.add("check");
+                eligibleActions.add("bet75pct");
+            }
         }
 
         return eligibleActions;
@@ -365,26 +368,18 @@ public class ComputerGameNew {
     private void postBlinds() {
         if(computerIsButton) {
             myStack = myStack - bigBlind;
-//            opponentIncrementalBetSize = bigBlind;
-//            opponentTotalBetSize = bigBlind;
-
-
-            computerStack = computerStack - bigBlind;
-//            computerIncrementalBetSize = smallBlind;
-//            computerTotalBetSize = smallBlind;
-
-            potSize = potSize + bigBlind + bigBlind;
+            opponentIncrementalBetSize = bigBlind;
+            opponentTotalBetSize = bigBlind;
+            computerStack = computerStack - smallBlind;
+            computerIncrementalBetSize = smallBlind;
+            computerTotalBetSize = smallBlind;
         } else {
-            myStack = myStack - bigBlind;
-//            opponentIncrementalBetSize = smallBlind;
-//            opponentTotalBetSize = smallBlind;
-
-
+            myStack = myStack - smallBlind;
+            opponentIncrementalBetSize = smallBlind;
+            opponentTotalBetSize = smallBlind;
             computerStack = computerStack - bigBlind;
-//            computerIncrementalBetSize = bigBlind;
-//            computerTotalBetSize = bigBlind;
-
-            potSize = potSize + bigBlind + bigBlind;
+            computerIncrementalBetSize = bigBlind;
+            computerTotalBetSize = bigBlind;
         }
     }
 
@@ -493,9 +488,7 @@ public class ComputerGameNew {
         dealHoleCards();
         postBlinds();
 
-        dealFlopCards();
-
-        if(!isComputerIsButton()) {
+        if(isComputerIsButton()) {
             doComputerAction();
         }
         return this;
