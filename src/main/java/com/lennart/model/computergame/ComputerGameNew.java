@@ -1,6 +1,5 @@
 package com.lennart.model.computergame;
 
-import com.lennart.model.action.Actionable;
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
@@ -13,7 +12,7 @@ import java.util.*;
 /**
  * Created by lennart on 11-12-16.
  */
-public class ComputerGameNew implements Actionable {
+public class ComputerGameNew {
 
     private List<Card> deck;
     private List<Card> myHoleCards;
@@ -31,35 +30,12 @@ public class ComputerGameNew implements Actionable {
     private double computerTotalBetSize;
     private double potSize;
     private boolean computerIsButton;
-    private Set<Card> knownGameCards;
     private String myAction;
     private String mySize;
     private List<Card> board;
     private String computerWrittenAction;
     private String handWinner;
     private int numberOfHandsPlayed;
-    private boolean previousBluffAction;
-    private boolean drawBettingActionDone;
-
-    private String opponentType;
-
-    private boolean pre3betOrPostRaisedPot;
-
-    private double handsHumanOopFacingPreflop2bet;
-    private double handsHumanOopCall2bet;
-    private double handsHumanOop3bet;
-    private double opponentPreCall2betStat;
-    private double opponentPre3betStat;
-    private boolean opponentPreflopStatsDoneForHand;
-
-    private boolean bettingActionDoneByPassivePlayer;
-    private double handsPlayedAgainstOpponent;
-
-    private boolean opponentIsDecentThinking;
-
-    private String floatAction;
-    private boolean botIsPre3bettor;
-    private boolean opponentBetsOrRaisesPostFlop;
 
     ////
     private double computerHandStrength;
@@ -354,7 +330,6 @@ public class ComputerGameNew implements Actionable {
     private void dealHoleCards() {
         myHoleCards = new ArrayList<>();
         computerHoleCards = new ArrayList<>();
-        knownGameCards = new HashSet<>();
 
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
@@ -363,8 +338,6 @@ public class ComputerGameNew implements Actionable {
 
         System.out.println(computerHoleCards.get(0).getRank() + "" + computerHoleCards.get(0).getSuit() + "" +
                 computerHoleCards.get(1).getRank() + "" + computerHoleCards.get(1).getSuit());
-
-        knownGameCards.addAll(computerHoleCards);
     }
 
     private Card getAndRemoveRandomCardFromDeck() {
@@ -413,19 +386,6 @@ public class ComputerGameNew implements Actionable {
 
             potSize = potSize + bigBlind + bigBlind;
         }
-    }
-
-    @Override
-    public void removeHoleCardsFromKnownGameCards() {
-        knownGameCards.removeAll(computerHoleCards);
-    }
-
-    @Override
-    public void addHoleCardsToKnownGameCards() {
-        Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(computerHoleCards);
-
-        knownGameCards.addAll(holeCardsAsSet);
     }
 
     private boolean isComputerActionNeeded() {
@@ -519,12 +479,8 @@ public class ComputerGameNew implements Actionable {
         turnCard = null;
         riverCard = null;
         board = null;
-        knownGameCards = null;
         handWinner = null;
         computerWrittenAction = null;
-        opponentPreflopStatsDoneForHand = false;
-        previousBluffAction = false;
-        drawBettingActionDone = false;
 
         myAction = null;
     }
@@ -590,19 +546,16 @@ public class ComputerGameNew implements Actionable {
 
         board = new ArrayList<>();
         board.addAll(flopCards);
-        knownGameCards.addAll(flopCards);
     }
 
     private void dealTurnCard() {
         turnCard = getAndRemoveRandomCardFromDeck();
         board.add(turnCard);
-        knownGameCards.add(turnCard);
     }
 
     private void dealRiverCard() {
         riverCard = getAndRemoveRandomCardFromDeck();
         board.add(riverCard);
-        knownGameCards.add(riverCard);
     }
 
     private void resetAllBets() {
@@ -661,23 +614,6 @@ public class ComputerGameNew implements Actionable {
         return holeCard1Rank + holeCard1Suit + holeCard2Rank + holeCard2Suit;
     }
 
-    private void calculateOpponentPreflopStats() {
-        if(!opponentPreflopStatsDoneForHand) {
-            if(board == null && computerIsButton && computerWrittenAction.contains("raise") && opponentTotalBetSize == bigBlind) {
-                handsHumanOopFacingPreflop2bet++;
-                if(myAction.equals("call")) {
-                    handsHumanOopCall2bet++;
-                }
-                if(myAction.equals("raise")) {
-                    handsHumanOop3bet++;
-                }
-            }
-            opponentPreCall2betStat = handsHumanOopCall2bet / handsHumanOopFacingPreflop2bet;
-            opponentPre3betStat = handsHumanOop3bet / handsHumanOopFacingPreflop2bet;
-            opponentPreflopStatsDoneForHand = true;
-        }
-    }
-
     private boolean isPreflopCheck() {
         if(board == null) {
             return true;
@@ -720,7 +656,6 @@ public class ComputerGameNew implements Actionable {
         this.myHoleCards = myHoleCards;
     }
 
-    @Override
     public List<Card> getBotHoleCards() {
         List<Card> computerHoleCardsCopy = new ArrayList<>();
         computerHoleCardsCopy.addAll(computerHoleCards);
@@ -743,7 +678,6 @@ public class ComputerGameNew implements Actionable {
         this.smallBlind = smallBlind;
     }
 
-    @Override
     public double getBigBlind() {
         return bigBlind;
     }
@@ -752,7 +686,6 @@ public class ComputerGameNew implements Actionable {
         this.bigBlind = bigBlind;
     }
 
-    @Override
     public double getOpponentStack() {
         return getMyStack();
     }
@@ -765,7 +698,6 @@ public class ComputerGameNew implements Actionable {
         this.myStack = myStack;
     }
 
-    @Override
     public double getBotStack() {
         return getComputerStack();
     }
@@ -778,7 +710,6 @@ public class ComputerGameNew implements Actionable {
         this.computerStack = computerStack;
     }
 
-    @Override
     public double getOpponentTotalBetSize() {
         return opponentTotalBetSize;
     }
@@ -787,7 +718,6 @@ public class ComputerGameNew implements Actionable {
         this.opponentTotalBetSize = opponentTotalBetSize;
     }
 
-    @Override
     public double getBotTotalBetSize() {
         return getComputerTotalBetSize();
     }
@@ -800,7 +730,6 @@ public class ComputerGameNew implements Actionable {
         this.computerTotalBetSize = computerTotalBetSize;
     }
 
-    @Override
     public double getPotSize() {
         return potSize;
     }
@@ -809,18 +738,6 @@ public class ComputerGameNew implements Actionable {
         this.potSize = potSize;
     }
 
-
-    @Override
-    public Set<Card> getKnownGameCards() {
-        return knownGameCards;
-    }
-
-    @Override
-    public void setKnownGameCards(Set<Card> knownGameCards) {
-        this.knownGameCards = knownGameCards;
-    }
-
-    @Override
     public String getOpponentAction() {
         return getMyAction();
     }
@@ -841,7 +758,6 @@ public class ComputerGameNew implements Actionable {
         this.mySize = mySize;
     }
 
-    @Override
     public boolean isBotIsButton() {
         return isComputerIsButton();
     }
@@ -870,7 +786,6 @@ public class ComputerGameNew implements Actionable {
         this.computerIncrementalBetSize = computerIncrementalBetSize;
     }
 
-    @Override
     public List<Card> getFlopCards() {
         return flopCards;
     }
@@ -883,7 +798,6 @@ public class ComputerGameNew implements Actionable {
         return riverCard;
     }
 
-    @Override
     public List<Card> getBoard() {
         return board;
     }
@@ -910,132 +824,6 @@ public class ComputerGameNew implements Actionable {
 
     public void setNumberOfHandsPlayed(int numberOfHandsPlayed) {
         this.numberOfHandsPlayed = numberOfHandsPlayed;
-    }
-
-    public double getHandsHumanOopFacingPreflop2bet() {
-        return handsHumanOopFacingPreflop2bet;
-    }
-
-    public void setHandsHumanOopFacingPreflop2bet(double handsHumanOopFacingPreflop2bet) {
-        this.handsHumanOopFacingPreflop2bet = handsHumanOopFacingPreflop2bet;
-    }
-
-    public double getHandsHumanOopCall2bet() {
-        return handsHumanOopCall2bet;
-    }
-
-    public void setHandsHumanOopCall2bet(double handsHumanOopCall2bet) {
-        this.handsHumanOopCall2bet = handsHumanOopCall2bet;
-    }
-
-    public boolean isOpponentPreflopStatsDoneForHand() {
-        return opponentPreflopStatsDoneForHand;
-    }
-
-    public void setOpponentPreflopStatsDoneForHand(boolean opponentPreflopStatsDoneForHand) {
-        this.opponentPreflopStatsDoneForHand = opponentPreflopStatsDoneForHand;
-    }
-
-    public double getHandsHumanOop3bet() {
-        return handsHumanOop3bet;
-    }
-
-    public void setHandsHumanOop3bet(double handsHumanOop3bet) {
-        this.handsHumanOop3bet = handsHumanOop3bet;
-    }
-
-    @Override
-    public boolean isPreviousBluffAction() {
-        return previousBluffAction;
-    }
-
-    @Override
-    public void setPreviousBluffAction(boolean previousBluffAction) {
-        this.previousBluffAction = previousBluffAction;
-    }
-
-    @Override
-    public boolean isDrawBettingActionDone() {
-        return drawBettingActionDone;
-    }
-
-    @Override
-    public void setDrawBettingActionDone(boolean drawBettingActionDone) {
-        this.drawBettingActionDone = drawBettingActionDone;
-    }
-
-    @Override
-    public String getOpponentType() {
-        return opponentType;
-    }
-
-    public void setOpponentType(String opponentType) {
-        this.opponentType = opponentType;
-    }
-
-    @Override
-    public boolean isPre3betOrPostRaisedPot() {
-        return pre3betOrPostRaisedPot;
-    }
-
-    public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
-        this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
-    }
-
-    @Override
-    public boolean isBettingActionDoneByPassivePlayer() {
-        return bettingActionDoneByPassivePlayer;
-    }
-
-    public void setBettingActionDoneByPassivePlayer(boolean bettingActionDoneByPassivePlayer) {
-        this.bettingActionDoneByPassivePlayer = bettingActionDoneByPassivePlayer;
-    }
-
-    @Override
-    public double getHandsPlayedAgainstOpponent() {
-        return handsPlayedAgainstOpponent;
-    }
-
-    public void setHandsPlayedAgainstOpponent(double handsPlayedAgainstOpponent) {
-        this.handsPlayedAgainstOpponent = handsPlayedAgainstOpponent;
-    }
-
-    @Override
-    public boolean isOpponentIsDecentThinking() {
-        return opponentIsDecentThinking;
-    }
-
-    public void setOpponentIsDecentThinking(boolean opponentIsDecentThinking) {
-        this.opponentIsDecentThinking = opponentIsDecentThinking;
-    }
-
-    @Override
-    public String getFloatAction() {
-        return floatAction;
-    }
-
-    @Override
-    public void setFloatAction(String floatAction) {
-        this.floatAction = floatAction;
-    }
-
-    @Override
-    public boolean isBotIsPre3bettor() {
-        return botIsPre3bettor;
-    }
-
-    @Override
-    public void setBotIsPre3bettor(boolean botIsPre3bettor) {
-        this.botIsPre3bettor = botIsPre3bettor;
-    }
-
-    @Override
-    public boolean isOpponentBetsOrRaisesPostFlop() {
-        return opponentBetsOrRaisesPostFlop;
-    }
-
-    public void setOpponentBetsOrRaisesPostFlop(boolean opponentBetsOrRaisesPostFlop) {
-        this.opponentBetsOrRaisesPostFlop = opponentBetsOrRaisesPostFlop;
     }
 
     public double getComputerHandStrength() {
