@@ -18,7 +18,7 @@ public class TightAggressive {
         String action;
 
         if(preflop) {
-            action = doPreflopAction(aiBotAction, handStrength, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb,
+            action = doPreflopAction(handStrength, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb,
                     ruleBotStackBb, position);
         } else {
             action = doPostflopAction(aiBotAction, handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb,
@@ -28,13 +28,12 @@ public class TightAggressive {
         return action;
     }
 
-    private String doPreflopAction(String aiBotAction, double handStrength, double aiBotBetsizeBb,
+    private String doPreflopAction(double handStrength, double aiBotBetsizeBb,
                                    double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
-        String action = "";
+        String action;
 
         if(position) {
             if(aiBotBetsizeBb == 1) {
-                //1st to act he posts bb
                 if(handStrength > 0.10) {
                     double random = Math.random();
 
@@ -47,79 +46,253 @@ public class TightAggressive {
                     action = "fold";
                 }
             } else if(aiBotBetsizeBb < 12) {
-                //f 3bet
-                if(handStrength > 0.90) {
-                    //call of 4bet
+                if(handStrength >= 0.95) {
+                    double random = Math.random();
 
-
-                } else if(handStrength > 0.6) {
-                    //call soms
-
-
-                } else {
-                    //bluff calls / raises
-                }
-
-
-            } else {
-                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb)) {
-                    //call of fold
-
-                    double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
-
-                    if(callAmountBb < 20) {
-
-                    } else if(callAmountBb < 50) {
-
+                    if(random > 0.05) {
+                        action = "raise";
                     } else {
+                        action = "call";
+                    }
+                } else if(handStrength > 0.8) {
+                    double random = Math.random();
 
+                    if(random > 0.9) {
+                        action = "raise";
+                    } else {
+                        action = "call";
+                    }
+                } else if(handStrength > 0.59) {
+                    double random = Math.random();
+
+                    if(random > 0.3) {
+                        action = "call";
+                    } else {
+                        action = "fold";
                     }
                 } else {
-                    //call / fold of raise
+                    double random = Math.random();
 
+                    if(random > 0.95) {
+                        action = "raise";
+                    } else if(random > 0.8) {
+                        action = "call";
+                    } else {
+                        action = "fold";
+                    }
+                }
+            } else {
+                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb)) {
                     double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
                     if(callAmountBb < 20) {
-
+                        if(ruleBotBetsizeBb >= 10) {
+                            action = "call";
+                        } else {
+                            if(handStrength > 0.59) {
+                                action = "call";
+                            } else {
+                                action = "fold";
+                            }
+                        }
                     } else if(callAmountBb < 50) {
-
+                        if(ruleBotBetsizeBb >= 20) {
+                            if(handStrength >= 0.65) {
+                                action = "call";
+                            } else {
+                                action = "fold";
+                            }
+                        } else {
+                            if(handStrength >= 0.83) {
+                                action = "call";
+                            } else {
+                                action = "fold";
+                            }
+                        }
                     } else {
+                        if(handStrength >= 0.87) {
+                            action = "call";
+                        } else {
+                            action = "fold";
+                        }
+                    }
+                } else {
+                    double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
+                    if(callAmountBb < 20) {
+                        if(ruleBotBetsizeBb >= 10) {
+                            action = "call";
+                        } else {
+                            if(handStrength > 0.95) {
+                                double random = Math.random();
+
+                                if(random > 0.05) {
+                                    action = "raise";
+                                } else {
+                                    action = "call";
+                                }
+                            } else if(handStrength > 0.82) {
+                                action = "call";
+                            } else {
+                                double random = Math.random();
+
+                                if(random < 0.05) {
+                                    action = "raise";
+                                } else {
+                                    action = "fold";
+                                }
+                            }
+                        }
+                    } else if(callAmountBb < 50) {
+                        if(ruleBotBetsizeBb >= 20) {
+                            if (handStrength >= 0.95) {
+                                action = "raise";
+                            } else {
+                                if (handStrength > 0.80) {
+                                    action = "call";
+                                } else {
+                                    action = "fold";
+                                }
+                            }
+                        } else {
+                            if (handStrength >= 0.95) {
+                                action = "raise";
+                            } else {
+                                action = "fold";
+                            }
+                        }
+                    } else {
+                        if (handStrength >= 0.95) {
+                            action = "raise";
+                        } else {
+                            action = "fold";
+                        }
                     }
                 }
             }
         } else {
             if(aiBotBetsizeBb == 1) {
-                //f limp
-
                 if(handStrength > 0.80) {
                     action = "raise";
                 } else {
                     action = "check";
                 }
             } else if(aiBotBetsizeBb <= 5) {
-                //f 2bet
-                if(handStrength >= 0.9) {
-                    //value 3bets
+                if(handStrength >= 0.8) {
+                    double random = Math.random();
 
-
+                    if(random < 0.1) {
+                        action = "call";
+                    } else {
+                        action = "raise";
+                    }
                 } else if(handStrength >= 0.5) {
-                    //calls en tricky 3bets
+                    double random = Math.random();
 
+                    if(random < 0.15) {
+                        action = "raise";
+                    } else {
+                        action = "call";
+                    }
                 } else {
-                    //very occasionaly bluff 3bets
+                    double random = Math.random();
+
+                    if(random < 0.05) {
+                        action = "raise";
+                    } else {
+                        action = "fold";
+                    }
                 }
-
-
             } else if(aiBotBetsizeBb <= 25) {
-                //f 4bet
+                double callAmount = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
-                //value shoves
+                if(callAmount < ruleBotStackBb) {
+                    if(handStrength > 0.95) {
+                        double random = Math.random();
 
+                        if(random < 0.05) {
+                            action = "call";
+                        } else {
+                            action = "raise";
+                        }
+                    } else if(handStrength > 0.8) {
+                        double random = Math.random();
 
+                        if(random < 0.05) {
+                            action = "raise";
+                        } else {
+                            action = "call";
+                        }
+                    } else if(handStrength > 0.7) {
+                        double random = Math.random();
+
+                        if(random > 0.8) {
+                            action = "call";
+                        } else {
+                            action = "fold";
+                        }
+                    } else {
+                        double random = Math.random();
+
+                        if(random < 0.05) {
+                            action = "raise";
+                        } else {
+                            action = "fold";
+                        }
+                    }
+                } else {
+                    if(handStrength > 0.65) {
+                        action = "call";
+                    } else {
+                        action = "fold";
+                    }
+                }
             } else {
-                //f shove
-
+                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb)) {
+                    if(ruleBotStackBb <= 20) {
+                        if(handStrength > 0.6) {
+                            action = "call";
+                        } else {
+                            action = "fold";
+                        }
+                    } else if(ruleBotStackBb <= 40){
+                        if(handStrength > 0.7) {
+                            action = "call";
+                        } else {
+                            action = "fold";
+                        }
+                    } else {
+                        if(handStrength > 0.85) {
+                            action = "call";
+                        } else {
+                            action = "fold";
+                        }
+                    }
+                } else {
+                    if(ruleBotStackBb <= 20) {
+                        if(handStrength > 0.6) {
+                            action = "raise";
+                        } else {
+                            action = "fold";
+                        }
+                    } else if(ruleBotStackBb <= 40){
+                        if(handStrength > 0.8) {
+                            action = "raise";
+                        } else if(handStrength > 0.7) {
+                            action = "call";
+                        } else {
+                            action = "fold";
+                        }
+                    } else {
+                        if(handStrength > 0.91) {
+                            action = "raise";
+                        } else if(handStrength > 0.85) {
+                            action = "call";
+                        } else {
+                            action = "fold";
+                        }
+                    }
+                }
             }
         }
 
