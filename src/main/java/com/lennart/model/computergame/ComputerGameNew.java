@@ -1,6 +1,9 @@
 package com.lennart.model.computergame;
 
 import com.lennart.model.action.actionbuilders.ai.Poker;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightAggressive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
@@ -73,6 +76,10 @@ public class ComputerGameNew {
     public ComputerGameNew submitHumanActionAndDoComputerAction() {
         boolean computerActionNeeded = isComputerActionNeeded();
 
+        if(board == null) {
+            calculateHandStrengthsAndDraws();
+        }
+
         if(myAction.equals("fold")) {
             processHumanFoldAction();
         } else if(myAction.equals("check")) {
@@ -122,8 +129,12 @@ public class ComputerGameNew {
         double opponentBetSizeBb = opponentTotalBetSize / bigBlind;
         double effectiveStack = getEffectiveStackInBb();
 
-        String action = new Poker().getAction(eligibleActions, handStrength, strongDraw, position, potSizeInMethodBb, computerBetSizeBb,
-                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
+        String action = new TightPassive().doAction(
+                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
+                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null);
+
+//        String action = new Poker().getAction(eligibleActions, handStrength, strongDraw, position, potSizeInMethodBb, computerBetSizeBb,
+//                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
 
         return action;
     }

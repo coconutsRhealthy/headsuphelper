@@ -28,8 +28,8 @@ public class TightAggressive {
         return action;
     }
 
-    private String doPreflopAction(double handStrength, double aiBotBetsizeBb,
-                                   double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
+    private String doPreflopAction(double handStrength, double aiBotBetsizeBb, double ruleBotBetsizeBb,
+                                   double aiBotStackBb, double ruleBotStackBb, boolean position) {
         String action;
 
         if(position) {
@@ -62,7 +62,7 @@ public class TightAggressive {
                     } else {
                         action = "call";
                     }
-                } else if(handStrength > 0.59) {
+                } else if(handStrength > 0.54) {
                     double random = Math.random();
 
                     if(random > 0.3) {
@@ -157,6 +157,8 @@ public class TightAggressive {
                         } else {
                             if (handStrength >= 0.95) {
                                 action = "raise";
+                            } else if(handStrength > 0.85) {
+                                action = "call";
                             } else {
                                 action = "fold";
                             }
@@ -164,6 +166,8 @@ public class TightAggressive {
                     } else {
                         if (handStrength >= 0.95) {
                             action = "raise";
+                        } else if(handStrength > 0.88) {
+                            action = "call";
                         } else {
                             action = "fold";
                         }
@@ -181,7 +185,7 @@ public class TightAggressive {
                 if(handStrength >= 0.8) {
                     double random = Math.random();
 
-                    if(random < 0.1) {
+                    if(random < 0.13) {
                         action = "call";
                     } else {
                         action = "raise";
@@ -303,7 +307,7 @@ public class TightAggressive {
                                     double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
         String action;
 
-        if(aiBotAction.contains("bet") || aiBotAction.contains("raise")) {
+        if(aiBotAction != null && (aiBotAction.contains("bet") || aiBotAction.contains("raise"))) {
             action = doPostflopFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb, position);
         } else {
             action = doPostflopCheckBetAction(handStrength, strongDraw, position);
@@ -558,7 +562,7 @@ public class TightAggressive {
                         }
                     }
                 }
-            } else if(handStrength < 0.8) {
+            } else if(handStrength >= 0.7 && handStrength < 0.8) {
                 double betSizeBb = getBetSizeBb();
 
                 if(betSizeBb < 10) {
@@ -590,7 +594,7 @@ public class TightAggressive {
                         }
                     }
                 }
-            } else if(handStrength < 0.9) {
+            } else if(handStrength >= 0.8 && handStrength < 0.9) {
                 double betSizeBb = getBetSizeBb();
 
                 if(betSizeBb < 40) {

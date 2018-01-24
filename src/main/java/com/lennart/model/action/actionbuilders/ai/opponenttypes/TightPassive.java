@@ -179,7 +179,7 @@ public class TightPassive {
                 } else if(handStrength >= 0.5) {
                     double random = Math.random();
 
-                    if(random < 0.05) {
+                    if(random < 0.04) {
                         action = "raise";
                     } else {
                         action = "call";
@@ -290,16 +290,16 @@ public class TightPassive {
     private String doPostflopAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
                                     double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb) {
         String action;
-        if(aiBotAction.contains("bet") || aiBotAction.contains("raise")) {
-            action = doFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb);
+        if(aiBotAction != null && (aiBotAction.contains("bet") || aiBotAction.contains("raise"))) {
+            action = doPostflopFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb);
         } else {
-            action = doCheckBetAction(handStrength, strongDraw);
+            action = doPostflopCheckBetAction(handStrength, strongDraw);
         }
         return action;
     }
 
-    private String doFoldCallRaiseAction(double handStrength, boolean strongDraw, double aiBotBetsizeBb,
-                                         double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb) {
+    private String doPostflopFoldCallRaiseAction(double handStrength, boolean strongDraw, double aiBotBetsizeBb,
+                                                 double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb) {
         String action;
         double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
@@ -471,7 +471,7 @@ public class TightPassive {
         return action;
     }
 
-    private String doCheckBetAction(double handStrength, boolean strongDraw) {
+    private String doPostflopCheckBetAction(double handStrength, boolean strongDraw) {
         String action = null;
 
         if(strongDraw) {
