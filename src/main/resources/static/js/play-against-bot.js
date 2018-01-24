@@ -6,6 +6,12 @@ mainApp.controller('pokerController', function($scope, $http) {
 
     $scope.holeCard1ConvertedRank;
     $scope.holeCard2ConvertedRank;
+
+    ////
+    $scope.computerHoleCard1ConvertedRank;
+    $scope.computerHoleCard2ConvertedRank;
+    ////
+
     $scope.flopCard1ConvertedRank;
     $scope.flopCard2ConvertedRank;
     $scope.flopCard3ConvertedRank;
@@ -22,6 +28,15 @@ mainApp.controller('pokerController', function($scope, $http) {
 
     $scope.holeCard1Class;
     $scope.holeCard1SuitUniCode;
+
+    ////
+    $scope.computerHoleCard1SuitWritten;
+    $scope.computerHoleCard2SuitWritten;
+    $scope.computerHoleCard1Class;
+    $scope.computerHoleCard1SuitUniCode;
+    $scope.computerHoleCard1Class;
+    $scope.computerHoleCard1SuitUniCode;
+    ////
 
     $scope.holeCard2Class;
     $scope.holeCard2SuitUniCode;
@@ -74,6 +89,19 @@ mainApp.controller('pokerController', function($scope, $http) {
 
         setSuitWrittenAndUniCode("holeCard1SuitWritten", "holeCard1SuitUniCode", $scope.computerGame.myHoleCards[0].suit);
         setSuitWrittenAndUniCode("holeCard2SuitWritten", "holeCard2SuitUniCode", $scope.computerGame.myHoleCards[1].suit);
+
+
+        ////
+        $scope.computerHoleCard1ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.computerHoleCards[0].rank);
+        $scope.computerHoleCard2ConvertedRank = convertRankFromIntegerToRank($scope.computerGame.computerHoleCards[1].rank);
+
+        setSuitWrittenAndUniCode("computerHoleCard1SuitWritten", "computerHoleCard1SuitUniCode", $scope.computerGame.computerHoleCards[0].suit);
+        setSuitWrittenAndUniCode("computerHoleCard2SuitWritten", "computerHoleCard2SuitUniCode", $scope.computerGame.computerHoleCards[1].suit);
+
+        $scope.computerHoleCard1Class = "card rank-" + $scope.computerHoleCard1ConvertedRank + " " + $scope.computerHoleCard1SuitWritten;
+        $scope.computerHoleCard2Class = "card rank-" + $scope.computerHoleCard2ConvertedRank + " " + $scope.computerHoleCard2SuitWritten;
+        ////
+
 
         $scope.holeCard1Class = "card rank-" + $scope.holeCard1ConvertedRank + " " + $scope.holeCard1SuitWritten;
         $scope.holeCard2Class = "card rank-" + $scope.holeCard2ConvertedRank + " " + $scope.holeCard2SuitWritten;
