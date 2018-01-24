@@ -1,12 +1,17 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
+import com.lennart.model.card.Card;
+
+import java.util.List;
+
 /**
  * Created by lpo21630 on 11-1-2018.
  */
 public class TightPassive {
 
     public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
-                           double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position, boolean preflop) {
+                           double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position,
+                           boolean preflop, List<Card> board) {
         String action;
 
         if(preflop) {
@@ -14,7 +19,7 @@ public class TightPassive {
                     ruleBotStackBb, position);
         } else {
             action = doPostflopAction(aiBotAction, handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb,
-                    aiBotStackBb, ruleBotStackBb);
+                    aiBotStackBb, ruleBotStackBb, board, position);
         }
 
         return action;
@@ -288,12 +293,13 @@ public class TightPassive {
     }
 
     private String doPostflopAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
-                                    double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb) {
+                                    double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, List<Card> board,
+                                    boolean position) {
         String action;
         if(aiBotAction != null && (aiBotAction.contains("bet") || aiBotAction.contains("raise"))) {
             action = doPostflopFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb);
         } else {
-            action = doPostflopCheckBetAction(handStrength, strongDraw);
+            action = doPostflopCheckBetAction(handStrength, strongDraw, board, position);
         }
         return action;
     }
@@ -471,7 +477,7 @@ public class TightPassive {
         return action;
     }
 
-    private String doPostflopCheckBetAction(double handStrength, boolean strongDraw) {
+    private String doPostflopCheckBetAction(double handStrength, boolean strongDraw, List<Card> board, boolean position) {
         String action = null;
 
         if(strongDraw) {
@@ -510,12 +516,16 @@ public class TightPassive {
                     action ="bet75pct";
                 }
             } else {
-                double random = Math.random();
-
-                if(random < 0.75) {
-                    action = "check";
+                if(board.size() == 5 && position) {
+                    action = "bet75pct";
                 } else {
-                    action ="bet75pct";
+                    double random = Math.random();
+
+                    if(random < 0.75) {
+                        action = "check";
+                    } else {
+                        action ="bet75pct";
+                    }
                 }
             }
         }
