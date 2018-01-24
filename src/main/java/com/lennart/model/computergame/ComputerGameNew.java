@@ -136,7 +136,7 @@ public class ComputerGameNew {
 
         String action = new TightPassive().doAction(
                 myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
-                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null);
+                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null, board);
 
 //        String action = new Poker().getAction(eligibleActions, handStrength, strongDraw, position, potSizeInMethodBb, computerBetSizeBb,
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
