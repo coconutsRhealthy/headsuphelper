@@ -6,11 +6,11 @@ package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 public class LooseAggressive {
 
     private double potSizeBb;
-    private double ruleBotStack;
+    private double ruleBotStackBb;
 
-    public LooseAggressive(double potSizeBb, double ruleBotStack) {
+    public LooseAggressive(double potSizeBb, double ruleBotStackBb) {
         this.potSizeBb = potSizeBb;
-        this.ruleBotStack = ruleBotStack;
+        this.ruleBotStackBb = ruleBotStackBb;
     }
 
     public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
@@ -677,8 +677,8 @@ public class LooseAggressive {
     private double getBetSizeBb() {
         double betAmount = 0.75 * potSizeBb;
 
-        if(betAmount > ruleBotStack) {
-            betAmount = ruleBotStack;
+        if(betAmount > ruleBotStackBb) {
+            betAmount = ruleBotStackBb;
         }
 
         return betAmount;

@@ -2,6 +2,7 @@ package com.lennart.model.computergame;
 
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.LoosePassive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightAggressive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
 import com.lennart.model.boardevaluation.BoardEvaluator;
@@ -129,6 +130,10 @@ public class ComputerGameNew {
         double opponentBetSizeBb = opponentTotalBetSize / bigBlind;
         double effectiveStack = getEffectiveStackInBb();
 
+//        String action = new TightAggressive(potSizeInMethodBb, computerStack / bigBlind).doAction(
+//                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
+//                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null);
+
         String action = new TightPassive().doAction(
                 myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
                 (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null);
@@ -241,26 +246,32 @@ public class ComputerGameNew {
     }
 
     private void processComputerCallAction() {
-        if(computerStack - (opponentTotalBetSize - computerTotalBetSize) > 0) {
-            computerStack = computerStack - (opponentTotalBetSize - computerTotalBetSize);
-            computerTotalBetSize = opponentTotalBetSize;
+        if(board == null && (opponentTotalBetSize / bigBlind == 1)) {
+            //preflop limp
+            computerTotalBetSize = bigBlind;
+            computerStack = computerStack - smallBlind;
         } else {
-            computerTotalBetSize = computerStack;
-            computerStack = 0;
-        }
+            if(computerStack - (opponentTotalBetSize - computerTotalBetSize) > 0) {
+                computerStack = computerStack - (opponentTotalBetSize - computerTotalBetSize);
+                computerTotalBetSize = opponentTotalBetSize;
+            } else {
+                computerTotalBetSize = computerStack;
+                computerStack = 0;
+            }
 
-        updatePotSize("call");
-        resetAllBets();
+            updatePotSize("call");
+            resetAllBets();
 
-        if(board == null || board.size() < 5) {
-            resetActions();
-            proceedToNextStreet();
-        } else if(board.size() == 5) {
-            printWinnerAndHand();
-        }
+            if(board == null || board.size() < 5) {
+                resetActions();
+                proceedToNextStreet();
+            } else if(board.size() == 5) {
+                printWinnerAndHand();
+            }
 
-        if(board != null && board.size() != 5 && !computerIsButton) {
-            doComputerAction();
+            if(board != null && board.size() != 5 && !computerIsButton) {
+                doComputerAction();
+            }
         }
     }
 
@@ -286,7 +297,13 @@ public class ComputerGameNew {
 
     private void processHumanCheckAction() {
         if(computerIsButton) {
-            //nothing
+            if(board == null) {
+                String checkThatShouldBeTreatedAsCall = "call";
+                updatePotSize(checkThatShouldBeTreatedAsCall);
+                resetAllBets();
+                resetActions();
+                proceedToNextStreet();
+            }
         } else {
             if(board != null && board.size() == 5) {
                 resetAllBets();
@@ -402,6 +419,10 @@ public class ComputerGameNew {
         } else if(myAction.equals("check")) {
             if(!computerIsButton) {
                 if(board != null && board.size() == 5) {
+                    computerActionNeeded = false;
+                }
+            } else {
+                if(board == null) {
                     computerActionNeeded = false;
                 }
             }
@@ -571,6 +592,7 @@ public class ComputerGameNew {
 
     private void resetActions() {
         myAction = null;
+        computerWrittenAction = null;
     }
 
     private void roundToTwoDecimals() {

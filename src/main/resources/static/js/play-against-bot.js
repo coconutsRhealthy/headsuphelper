@@ -260,11 +260,23 @@ mainApp.controller('pokerController', function($scope, $http) {
             $scope.disableBetButton = false;
             $scope.disableRaiseButton = true;
         } else {
-            $scope.disableFoldButton = false;
-            $scope.disableCheckButton = true;
-            $scope.disableCallButton = false;
-            $scope.disableBetButton = true;
-            $scope.disableRaiseButton = false;
+            var computerBetSizeBb = $scope.computerGame.computerTotalBetSize / $scope.computerGame.bigBlind;
+            var opponentTotalBetSizeBb = $scope.computerGame.opponentTotalBetSize / $scope.computerGame.bigBlind;
+
+            if($scope.computerGame.board == null && computerBetSizeBb == 1 && opponentTotalBetSizeBb == 1) {
+                $scope.disableFoldButton = false;
+                $scope.disableCheckButton = false;
+                $scope.disableCallButton = true;
+                $scope.disableBetButton = true;
+                $scope.disableRaiseButton = false;
+
+            } else {
+                $scope.disableFoldButton = false;
+                $scope.disableCheckButton = true;
+                $scope.disableCallButton = false;
+                $scope.disableBetButton = true;
+                $scope.disableRaiseButton = false;
+            }
         }
     }
 });
