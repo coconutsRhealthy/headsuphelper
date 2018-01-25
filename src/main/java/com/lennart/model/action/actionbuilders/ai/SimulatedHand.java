@@ -312,73 +312,8 @@ public class SimulatedHand {
                     //check, do nothing
                 }
             }
-        } else if(aiBotAction.equals("bet25pct")) {
-            double sizeToBet = 0.25 * pot;
-
-            if(sizeToBet >= aiBotStack) {
-                aiBotBetSize = aiBotStack;
-                aiBotStack = 0;
-            } else if(sizeToBet >= ruleBotStack) {
-                aiBotBetSize = ruleBotStack;
-                aiBotStack = aiBotStack - ruleBotStack;
-            } else {
-                aiBotBetSize = sizeToBet;
-                aiBotStack = aiBotStack - aiBotBetSize;
-            }
-        } else if(aiBotAction.equals("bet50pct")) {
-            double sizeToBet = 0.50 * pot;
-
-            if(sizeToBet >= aiBotStack) {
-                aiBotBetSize = aiBotStack;
-                aiBotStack = 0;
-            } else if(sizeToBet >= ruleBotStack) {
-                aiBotBetSize = ruleBotStack;
-                aiBotStack = aiBotStack - ruleBotStack;
-            } else {
-                aiBotBetSize = sizeToBet;
-                aiBotStack = aiBotStack - aiBotBetSize;
-            }
         } else if(aiBotAction.equals("bet75pct")) {
-            double sizeToBet = 0.75 * pot;
-
-            if(sizeToBet >= aiBotStack) {
-                aiBotBetSize = aiBotStack;
-                aiBotStack = 0;
-            } else if(sizeToBet >= ruleBotStack) {
-                aiBotBetSize = ruleBotStack;
-                aiBotStack = aiBotStack - ruleBotStack;
-            } else {
-                aiBotBetSize = sizeToBet;
-                aiBotStack = aiBotStack - aiBotBetSize;
-            }
-        } else if(aiBotAction.equals("bet100pct")) {
-            double sizeToBet = 1 * pot;
-
-            if(sizeToBet >= aiBotStack) {
-                aiBotBetSize = aiBotStack;
-                aiBotStack = 0;
-            } else if(sizeToBet >= ruleBotStack) {
-                aiBotBetSize = ruleBotStack;
-                aiBotStack = aiBotStack - ruleBotStack;
-            } else {
-                aiBotBetSize = sizeToBet;
-                aiBotStack = aiBotStack - aiBotBetSize;
-            }
-        } else if(aiBotAction.equals("bet150pct")) {
-            double sizeToBet = 1.5 * pot;
-
-            if(sizeToBet >= aiBotStack) {
-                aiBotBetSize = aiBotStack;
-                aiBotStack = 0;
-            } else if(sizeToBet >= ruleBotStack) {
-                aiBotBetSize = ruleBotStack;
-                aiBotStack = aiBotStack - ruleBotStack;
-            } else {
-                aiBotBetSize = sizeToBet;
-                aiBotStack = aiBotStack - aiBotBetSize;
-            }
-        } else if(aiBotAction.equals("bet200pct")) {
-            double sizeToBet = 2 * pot;
+            double sizeToBet = new Sizing().getAiBotBetSizing();
 
             if(sizeToBet >= aiBotStack) {
                 aiBotBetSize = aiBotStack;
@@ -391,7 +326,7 @@ public class SimulatedHand {
                 aiBotStack = aiBotStack - aiBotBetSize;
             }
         } else if(aiBotAction.equals("raise")) {
-            double sizeToBet = calculateRaiseAmount(aiBotBetSize, ruleBotBetSize, pot);
+            double sizeToBet = new Sizing().getAiBotRaiseSizing();
 
             if((sizeToBet - aiBotBetSize) >= aiBotStack) {
                 aiBotBetSize = aiBotStack + aiBotBetSize;
@@ -498,73 +433,8 @@ public class SimulatedHand {
                     //check, do nothing
                 }
             }
-        } else if(ruleBotAction.equals("bet25pct")) {
-            double sizeToBet = 0.25 * pot;
-
-            if(sizeToBet >= ruleBotStack) {
-                ruleBotBetSize = ruleBotStack;
-                ruleBotStack = 0;
-            } else if(sizeToBet >= aiBotStack) {
-                ruleBotBetSize = aiBotStack;
-                ruleBotStack = ruleBotStack - aiBotStack;
-            } else {
-                ruleBotBetSize = sizeToBet;
-                ruleBotStack = ruleBotStack - ruleBotBetSize;
-            }
-        } else if(ruleBotAction.equals("bet50pct")) {
-            double sizeToBet = 0.50 * pot;
-
-            if(sizeToBet >= ruleBotStack) {
-                ruleBotBetSize = ruleBotStack;
-                ruleBotStack = 0;
-            } else if(sizeToBet >= aiBotStack) {
-                ruleBotBetSize = aiBotStack;
-                ruleBotStack = ruleBotStack - aiBotStack;
-            } else {
-                ruleBotBetSize = sizeToBet;
-                ruleBotStack = ruleBotStack - ruleBotBetSize;
-            }
         } else if(ruleBotAction.equals("bet75pct")) {
-            double sizeToBet = 0.75 * pot;
-
-            if(sizeToBet >= ruleBotStack) {
-                ruleBotBetSize = ruleBotStack;
-                ruleBotStack = 0;
-            } else if(sizeToBet >= aiBotStack) {
-                ruleBotBetSize = aiBotStack;
-                ruleBotStack = ruleBotStack - aiBotStack;
-            } else {
-                ruleBotBetSize = sizeToBet;
-                ruleBotStack = ruleBotStack - ruleBotBetSize;
-            }
-        } else if(ruleBotAction.equals("bet100pct")) {
-            double sizeToBet = 1 * pot;
-
-            if(sizeToBet >= ruleBotStack) {
-                ruleBotBetSize = ruleBotStack;
-                ruleBotStack = 0;
-            } else if(sizeToBet >= aiBotStack) {
-                ruleBotBetSize = aiBotStack;
-                ruleBotStack = ruleBotStack - aiBotStack;
-            } else {
-                ruleBotBetSize = sizeToBet;
-                ruleBotStack = ruleBotStack - ruleBotBetSize;
-            }
-        } else if(ruleBotAction.equals("bet150pct")) {
-            double sizeToBet = 1.5 * pot;
-
-            if(sizeToBet >= ruleBotStack) {
-                ruleBotBetSize = ruleBotStack;
-                ruleBotStack = 0;
-            } else if(sizeToBet >= aiBotStack) {
-                ruleBotBetSize = aiBotStack;
-                ruleBotStack = ruleBotStack - aiBotStack;
-            } else {
-                ruleBotBetSize = sizeToBet;
-                ruleBotStack = ruleBotStack - ruleBotBetSize;
-            }
-        } else if(ruleBotAction.equals("bet200pct")) {
-            double sizeToBet = 2 * pot;
+            double sizeToBet = new Sizing().getRuleBotBetSizing();
 
             if(sizeToBet >= ruleBotStack) {
                 ruleBotBetSize = ruleBotStack;
@@ -577,7 +447,7 @@ public class SimulatedHand {
                 ruleBotStack = ruleBotStack - ruleBotBetSize;
             }
         } else if(ruleBotAction.equals("raise")) {
-            double sizeToBet = calculateRaiseAmount(ruleBotBetSize, aiBotBetSize, pot);
+            double sizeToBet = new Sizing().getRuleBotRaiseSizing();
 
             if((sizeToBet - ruleBotBetSize) >= ruleBotStack) {
                 ruleBotBetSize = ruleBotStack + ruleBotBetSize;
