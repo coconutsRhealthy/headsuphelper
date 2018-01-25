@@ -295,7 +295,7 @@ public class SimulatedHand {
                 if(aiBotIsButton) {
                     nextStreetNeedsToBeDealt = true;
                 } else {
-                    if(board.isEmpty() && aiBotBetSize == 1 && ruleBotBetSize == 1) {
+                    if(board.isEmpty() && aiBotBetSize / bigBlind == 1 && ruleBotBetSize/ bigBlind == 1) {
                         //preflop check after limp...
                         pot = aiBotBetSize + ruleBotBetSize;
                         aiBotBetSize = 0;
@@ -481,7 +481,7 @@ public class SimulatedHand {
                 if(!aiBotIsButton) {
                     nextStreetNeedsToBeDealt = true;
                 } else {
-                    if(board.isEmpty() && aiBotBetSize == 1 && ruleBotBetSize == 1) {
+                    if(board.isEmpty() && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
                         //preflop check after limp...
                         pot = aiBotBetSize + ruleBotBetSize;
                         aiBotBetSize = 0;
