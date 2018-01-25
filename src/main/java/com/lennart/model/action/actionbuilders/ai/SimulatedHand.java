@@ -229,7 +229,11 @@ public class SimulatedHand {
         } else if(aiBotAction.equals("call")) {
             double callAmount = ruleBotBetSize - aiBotBetSize;
 
-            if(callAmount < aiBotStack && ruleBotStack > 0) {
+            if(callAmount == bigBlind / 2) {
+                //preflop limp
+                aiBotStack = aiBotStack - callAmount;
+                aiBotBetSize = ruleBotBetSize;
+            } else if(callAmount < aiBotStack && ruleBotStack > 0) {
                 if(board.size() < 5) {
                     pot = pot + (2 * ruleBotBetSize);
                     aiBotStack = aiBotStack - (ruleBotBetSize - aiBotBetSize);
@@ -291,7 +295,13 @@ public class SimulatedHand {
                 if(aiBotIsButton) {
                     nextStreetNeedsToBeDealt = true;
                 } else {
-                    //check, do nothing
+                    if(board.isEmpty() && aiBotBetSize == 1 && ruleBotBetSize == 1) {
+                        //preflop check after limp...
+                        pot = aiBotBetSize + ruleBotBetSize;
+                        aiBotBetSize = 0;
+                        ruleBotBetSize = 0;
+                        nextStreetNeedsToBeDealt = true;
+                    }
                 }
             } else {
                 if(aiBotIsButton) {
@@ -407,7 +417,11 @@ public class SimulatedHand {
         } else if(ruleBotAction.equals("call")) {
             double callAmount = aiBotBetSize - ruleBotBetSize;
 
-            if(callAmount < ruleBotStack && aiBotStack > 0) {
+            if(callAmount == bigBlind / 2) {
+                //preflop limp
+                ruleBotStack = ruleBotStack - callAmount;
+                ruleBotBetSize = aiBotBetSize;
+            } else if(callAmount < ruleBotStack && aiBotStack > 0) {
                 if(board.size() < 5) {
                     pot = pot + (2 * aiBotBetSize);
                     ruleBotStack = ruleBotStack - (aiBotBetSize - ruleBotBetSize);
@@ -467,7 +481,13 @@ public class SimulatedHand {
                 if(!aiBotIsButton) {
                     nextStreetNeedsToBeDealt = true;
                 } else {
-                    //check, do nothing
+                    if(board.isEmpty() && aiBotBetSize == 1 && ruleBotBetSize == 1) {
+                        //preflop check after limp...
+                        pot = aiBotBetSize + ruleBotBetSize;
+                        aiBotBetSize = 0;
+                        ruleBotBetSize = 0;
+                        nextStreetNeedsToBeDealt = true;
+                    }
                 }
             } else {
                 if(!aiBotIsButton) {
@@ -596,8 +616,13 @@ public class SimulatedHand {
                         aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
                     }
                 } else {
-                    List<String> eligibleActions = Arrays.asList("check", "bet75pct");
-                    aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                    if(board.isEmpty() && !aiBotIsButton && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
+                        List<String> eligibleActions = Arrays.asList("check", "raise");
+                        aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                    } else {
+                        List<String> eligibleActions = Arrays.asList("check", "bet75pct");
+                        aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                    }
                 }
             } else {
                 String route = poker.getRoute(aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
@@ -632,15 +657,21 @@ public class SimulatedHand {
                         aiBotAction = "check";
                         aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "check"));
                     } else {
-                        aiBotAction = "bet75pct";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "bet75pct"));
+                        //moet soms raise zijn
+                        if(board.isEmpty() && !aiBotIsButton && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
+                            aiBotAction = "raise";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "raise"));
+                        } else {
+                            aiBotAction = "bet75pct";
+                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "bet75pct"));
+                        }
                     }
                 }
             }
         } else if(bot.equals("ruleBot")) {
-            TightAggressive tightAggressive = new TightAggressive(getPotSizeInBb(), (ruleBotStack / bigBlind));
-            ruleBotAction = tightAggressive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
-                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton, board.isEmpty());
+            LoosePassive loosePassive = new LoosePassive();
+            ruleBotAction = loosePassive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
+                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton, board.isEmpty(), board);
 
             if(ruleBotAction.equals("fold")) {
                 SimulatedHand.foldCount++;
