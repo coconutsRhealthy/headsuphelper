@@ -1,6 +1,7 @@
 package com.lennart.model.computergame;
 
 import com.lennart.model.action.actionbuilders.ai.Poker;
+import com.lennart.model.action.actionbuilders.ai.Sizing;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.LoosePassive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightAggressive;
@@ -130,13 +131,13 @@ public class ComputerGameNew {
         double opponentBetSizeBb = opponentTotalBetSize / bigBlind;
         double effectiveStack = getEffectiveStackInBb();
 
-//        String action = new TightAggressive(potSizeInMethodBb, computerStack / bigBlind).doAction(
-//                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
-//                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null);
-
-        String action = new TightPassive().doAction(
+        String action = new LooseAggressive(potSizeInMethodBb, computerStack / bigBlind).doAction(
                 myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
-                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null, board);
+                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null);
+
+//        String action = new TightPassive().doAction(
+//                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
+//                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null, board);
 
 //        String action = new Poker().getAction(eligibleActions, handStrength, strongDraw, position, potSizeInMethodBb, computerBetSizeBb,
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
@@ -183,23 +184,26 @@ public class ComputerGameNew {
     }
 
     private double getComputerSizing() {
-        double sizing = 0;
+        //double sizing = new Sizing().getRuleBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
 
-        if(computerWrittenAction.contains("bet")) {
-            double sizingInitial = 0.75 * potSize;
-
-            if(sizingInitial <= myStack && sizingInitial <= computerStack) {
-                sizing = sizingInitial;
-            } else {
-                if(myStack > computerStack) {
-                    sizing = computerStack;
-                } else {
-                    sizing = myStack;
-                }
-            }
-        } else if(computerWrittenAction.contains("raise")) {
-            sizing = calculateRaiseAmountNewAi(computerTotalBetSize, opponentTotalBetSize, potSize, myStack, computerStack);
-        }
+        double sizing = new Sizing().getRuleBotSizing(computerTotalBetSize, getEffectiveStackInBb() * bigBlind, bigBlind);
+//        double sizing = 0;
+//
+//        if(computerWrittenAction.contains("bet")) {
+//            double sizingInitial = 0.75 * potSize;
+//
+//            if(sizingInitial <= myStack && sizingInitial <= computerStack) {
+//                sizing = sizingInitial;
+//            } else {
+//                if(myStack > computerStack) {
+//                    sizing = computerStack;
+//                } else {
+//                    sizing = myStack;
+//                }
+//            }
+//        } else if(computerWrittenAction.contains("raise")) {
+//            sizing = calculateRaiseAmountNewAi(computerTotalBetSize, opponentTotalBetSize, potSize, myStack, computerStack);
+//        }
 
         return sizing;
     }
@@ -282,9 +286,11 @@ public class ComputerGameNew {
     }
 
     private void processComputerRaiseAction() {
-        computerIncrementalBetSize = getComputerSizing() - computerTotalBetSize;
+        double sizingNew = getComputerSizing();
+
+        computerIncrementalBetSize = sizingNew - computerTotalBetSize;
         computerStack = computerStack - computerIncrementalBetSize;
-        computerTotalBetSize = getComputerSizing();
+        computerTotalBetSize = sizingNew;
     }
 
     private void processHumanFoldAction() {

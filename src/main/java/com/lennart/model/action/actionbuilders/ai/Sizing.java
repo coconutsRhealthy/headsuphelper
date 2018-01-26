@@ -2,45 +2,220 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.card.Card;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by lpo21630 on 25-1-2018.
  */
 public class Sizing {
 
-    public double getAiBotBetSizing() {
-        return 0;
+    public double getAiBotSizing(double facingBetSize, double myBetSize, double myStack, double facingStack,
+                                 double pot, double bigBlind, List<Card> board) {
+        if(board == null || board.isEmpty()) {
+            return getAiBotPreflopSizing(facingBetSize, myBetSize, facingStack, myStack, bigBlind);
+        } else {
+            return getAiBotPostFlopSizing(board, facingBetSize, pot, myStack, facingStack, bigBlind);
+        }
     }
 
-    public double getAiBotRaiseSizing() {
-        //preflop en postflop
 
-        return 0;
+//    public static void main(String[] args) {
+//        for(int i = 0; i < 30; i++) {
+//            System.out.println(new Sizing().getRuleBotSizing(0, 50, 0.5));
+//        }
+//    }
+
+    public double getRuleBotSizing(double ruleBotSizingThusFar, double effectiveStack, double bigBlind) {
+        List<Double> ruleBotOptions = getRuleBotOptions(effectiveStack, bigBlind);
+        double chosenOption = pickOption(ruleBotOptions);
+        double bbSizing = getSizingFromChosenOption(chosenOption);
+        return ruleBotSizingThusFar + (bbSizing * bigBlind);
     }
 
-    public double getRuleBotBetSizing() {
-        //dit moet heel variabel zijn
+    private List<Double> getRuleBotOptions(double effectiveStack, double bigBlind) {
+        double effectiveStackBb = effectiveStack / bigBlind;
 
-        return 0;
+        List<Double> options = new ArrayList<>();
+
+        if(effectiveStackBb <= 5) {
+            options.add(5.0);
+        } else if(effectiveStackBb <= 10) {
+            options.add(5.0);
+            options.add(10.0);
+        } else if(effectiveStackBb <= 15) {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+        } else if(effectiveStackBb <= 20) {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+            options.add(20.0);
+        } else if(effectiveStackBb <= 25) {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+            options.add(20.0);
+            options.add(25.0);
+        } else if(effectiveStackBb <= 40) {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+            options.add(20.0);
+            options.add(25.0);
+            options.add(40.0);
+        } else if(effectiveStackBb <= 60) {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+            options.add(20.0);
+            options.add(25.0);
+            options.add(40.0);
+            options.add(60.0);
+        } else if(effectiveStackBb <= 100) {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+            options.add(20.0);
+            options.add(25.0);
+            options.add(40.0);
+            options.add(60.0);
+            options.add(100.0);
+        } else if(effectiveStackBb <= 150) {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+            options.add(20.0);
+            options.add(25.0);
+            options.add(40.0);
+            options.add(60.0);
+            options.add(100.0);
+            options.add(150.0);
+        } else {
+            options.add(5.0);
+            options.add(10.0);
+            options.add(15.0);
+            options.add(20.0);
+            options.add(25.0);
+            options.add(40.0);
+            options.add(60.0);
+            options.add(100.0);
+            options.add(150.0);
+            options.add(effectiveStackBb);
+        }
+
+        return options;
     }
 
-    public double getRuleBotRaiseSizing() {
-        //dit moet heel variabel zijn
+    private double pickOption(List<Double> options) {
+        int size = options.size();
 
-        //preflop en postflop
+        Random rn = new Random();
+        int maximum = size - 1;
+        int minimum = 0;
+        int range = maximum - minimum + 1;
+        int randomNum = rn.nextInt(range) + minimum;
 
-        return 0;
+        return options.get(randomNum);
     }
+
+    private double getSizingFromChosenOption(double chosenOption) {
+        double bbsToBet;
+
+        if(chosenOption == 5.0) {
+            bbsToBet = pickNumberBetween(0, 5);
+        } else if(chosenOption == 10.0) {
+            bbsToBet = pickNumberBetween(5, 10);
+        } else if(chosenOption == 15.0) {
+            bbsToBet = pickNumberBetween(10, 15);
+        } else if(chosenOption == 20.0) {
+            bbsToBet = pickNumberBetween(15, 20);
+        } else if(chosenOption == 25.0) {
+            bbsToBet = pickNumberBetween(20, 25);
+        } else if(chosenOption == 40.0) {
+            bbsToBet = pickNumberBetween(25, 40);
+        } else if(chosenOption == 60.0) {
+            bbsToBet = pickNumberBetween(40, 60);
+        } else if(chosenOption == 100.0) {
+            bbsToBet = pickNumberBetween(60, 100);
+        } else if(chosenOption == 150.0) {
+            bbsToBet = pickNumberBetween(100, 150);
+        } else {
+            bbsToBet = pickNumberBetween(150, (int) chosenOption);
+        }
+
+        return bbsToBet;
+    }
+
+    private double pickNumberBetween(int downRange, int upRange) {
+        if(downRange == 0.0) {
+            downRange++;
+        }
+
+        return ThreadLocalRandom.current().nextDouble(downRange, upRange);
+    }
+
 
 
 
 
     //helper methods
 
+    //preflop
+
+    private double getRuleBotPreflopSizing() {
+
+
+
+
+        return 0;
+    }
+
+    private double getAiBotPreflopSizing(double facingBetSize, double myBetSize, double facingStack, double myStack, double bigBlind) {
+        double size;
+        double computerTotalBetSizeInBb = myBetSize / bigBlind;
+        double opponentTotalBetSizeInBb = facingBetSize / bigBlind;
+
+        double potSizePlusAllBetsInBb =  computerTotalBetSizeInBb + opponentTotalBetSizeInBb;
+
+        if(potSizePlusAllBetsInBb == 1.5) {
+            size = 2.5 * bigBlind;
+        } else if(potSizePlusAllBetsInBb == 2) {
+            size = 3.5 * bigBlind;
+        } else if(potSizePlusAllBetsInBb > 2 && potSizePlusAllBetsInBb <= 4) {
+            size = 3.2 * facingBetSize;
+        } else if(potSizePlusAllBetsInBb > 4 && potSizePlusAllBetsInBb <= 16) {
+            size = 2.25 * facingBetSize;
+        } else {
+            size = myStack + myBetSize;
+        }
+
+        if(size > (facingStack - facingBetSize)) {
+            size = facingStack + facingBetSize;
+        }
+
+        return size;
+    }
+
+
+
+
+
+
+
+
     //postflop
 
-    public double getAiBotPostFlopSizing(List<Card> board, double facingBetSize, double pot, double myStack, double facingStack, double bigBlind) {
+    private double getRuleBotPostFlopSizing() {
+
+
+        return 0;
+    }
+
+    private double getAiBotPostFlopSizing(List<Card> board, double facingBetSize, double pot, double myStack, double facingStack, double bigBlind) {
         double sizing = 0;
 
         if(board.size() == 3) {
@@ -50,6 +225,11 @@ public class Sizing {
         } else if(board.size() == 5) {
             sizing = getRiverSizing(facingBetSize, pot, myStack, facingStack);
         }
+
+        if(sizing > (facingStack - facingBetSize)) {
+            sizing = facingStack + facingBetSize;
+        }
+
         return sizing;
     }
 

@@ -42,30 +42,30 @@ public class SimulatedHandTest {
 
     private static int numberOfHandsPlayed = 0;
 
-    public static void main(String[] args) {
-        double aiBotTotalScore = 0;
-        double ruleBotTotalScore = 0;
-
-        SimulatedHandTest.initializePayoffMap();
-
-        for(int i = 0; i < 30000; i++) {
-            Random rn = new Random();
-            int y = rn.nextInt(2 - 1 + 1) + 1;
-
-            SimulatedHandTest simulatedHand = new SimulatedHandTest(y);
-            Map<String, Double> scores = simulatedHand.playHand();
-
-            simulatedHand.updatePayoffMap(scores.get("aiBot"));
-
-            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
-            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
-
-            System.out.println(i + "        " + aiBotTotalScore);
-        }
-
-        System.out.println("aiBot total score: " + aiBotTotalScore);
-        System.out.println("ruleBot total score: " + ruleBotTotalScore);
-    }
+//    public static void main(String[] args) {
+//        double aiBotTotalScore = 0;
+//        double ruleBotTotalScore = 0;
+//
+//        SimulatedHandTest.initializePayoffMap();
+//
+//        for(int i = 0; i < 30000; i++) {
+//            Random rn = new Random();
+//            int y = rn.nextInt(2 - 1 + 1) + 1;
+//
+//            SimulatedHandTest simulatedHand = new SimulatedHandTest(y);
+//            Map<String, Double> scores = simulatedHand.playHand();
+//
+//            simulatedHand.updatePayoffMap(scores.get("aiBot"));
+//
+//            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
+//            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
+//
+//            System.out.println(i + "        " + aiBotTotalScore);
+//        }
+//
+//        System.out.println("aiBot total score: " + aiBotTotalScore);
+//        System.out.println("ruleBot total score: " + ruleBotTotalScore);
+//    }
 
     private static void initializePayoffMap() {
         payoffMap.put("IP0-5", new HashMap<>());

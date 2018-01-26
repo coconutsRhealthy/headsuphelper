@@ -58,9 +58,9 @@ public class ActionBuilder {
     private double payoff9 = 0;
     private double payoff10 = 0;
 
-    public static void main(String[] args) {
-        new ActionBuilder().theMethod();
-    }
+//    public static void main(String[] args) {
+//        new ActionBuilder().theMethod();
+//    }
 
     private void theMethod() {
 

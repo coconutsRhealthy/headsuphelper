@@ -35,14 +35,14 @@ public class SimpleGame {
 
     private Map<Integer, Map<String, List<Double>>> payoffMap = initializePayoffMap();
 
-    public static void main(String[] args) {
-        SimpleGame simpleGame = new SimpleGame();
-
-        for(int i = 0; i < 50000; i++) {
-            simpleGame.playOneGame(i);
-            System.out.println(i + " - " + simpleGame.computerScore);
-        }
-    }
+//    public static void main(String[] args) {
+//        SimpleGame simpleGame = new SimpleGame();
+//
+//        for(int i = 0; i < 50000; i++) {
+//            simpleGame.playOneGame(i);
+//            System.out.println(i + " - " + simpleGame.computerScore);
+//        }
+//    }
 
     private Map<Integer, Map<String, List<Double>>> initializePayoffMap() {
         Map<Integer, Map<String, List<Double>>> payoffMap = new HashMap<>();
