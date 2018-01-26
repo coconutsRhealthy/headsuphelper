@@ -2,10 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.card.Card;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by lpo21630 on 25-1-2018.
@@ -21,157 +18,117 @@ public class Sizing {
         }
     }
 
-
-//    public static void main(String[] args) {
-//        for(int i = 0; i < 30; i++) {
-//            System.out.println(new Sizing().getRuleBotSizing(0, 50, 0.5));
-//        }
-//    }
-
-    public double getRuleBotSizing(double ruleBotSizingThusFar, double effectiveStack, double bigBlind) {
-        List<Double> ruleBotOptions = getRuleBotOptions(effectiveStack, bigBlind);
-        double chosenOption = pickOption(ruleBotOptions);
-        double bbSizing = getSizingFromChosenOption(chosenOption);
-        return ruleBotSizingThusFar + (bbSizing * bigBlind);
+    public double getRuleBotSizing(double handStrength, double facingBetSize, double myBetSize, double facingStack,
+                                   double myStack, double pot, List<Card> board) {
+        double oddsToOffer = getOddsToOffer(handStrength, board);
+        double sizing = getSizingGivenOdds(oddsToOffer, facingBetSize, myBetSize, facingStack, myStack, pot);
+        return sizing;
     }
 
-    private List<Double> getRuleBotOptions(double effectiveStack, double bigBlind) {
-        double effectiveStackBb = effectiveStack / bigBlind;
+    private double getSizingGivenOdds(double odds, double facingBetSize, double myBetSize, double facingStack,
+                                      double myStack, double pot) {
+        double size = (facingBetSize + (odds * pot) + (odds * facingBetSize)) / (1 - odds);
 
-        List<Double> options = new ArrayList<>();
+        if(myStack <= 1.2 * pot) {
+            size = myStack + myBetSize;
+        }
 
-        if(effectiveStackBb <= 5) {
-            options.add(5.0);
-        } else if(effectiveStackBb <= 10) {
-            options.add(5.0);
-            options.add(10.0);
-        } else if(effectiveStackBb <= 15) {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-        } else if(effectiveStackBb <= 20) {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-            options.add(20.0);
-        } else if(effectiveStackBb <= 25) {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-            options.add(20.0);
-            options.add(25.0);
-        } else if(effectiveStackBb <= 40) {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-            options.add(20.0);
-            options.add(25.0);
-            options.add(40.0);
-        } else if(effectiveStackBb <= 60) {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-            options.add(20.0);
-            options.add(25.0);
-            options.add(40.0);
-            options.add(60.0);
-        } else if(effectiveStackBb <= 100) {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-            options.add(20.0);
-            options.add(25.0);
-            options.add(40.0);
-            options.add(60.0);
-            options.add(100.0);
-        } else if(effectiveStackBb <= 150) {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-            options.add(20.0);
-            options.add(25.0);
-            options.add(40.0);
-            options.add(60.0);
-            options.add(100.0);
-            options.add(150.0);
+        if(myStack < facingStack) {
+            if(size > (myStack - myBetSize)) {
+                size = myStack + myBetSize;
+            }
         } else {
-            options.add(5.0);
-            options.add(10.0);
-            options.add(15.0);
-            options.add(20.0);
-            options.add(25.0);
-            options.add(40.0);
-            options.add(60.0);
-            options.add(100.0);
-            options.add(150.0);
-            options.add(effectiveStackBb);
+            if(size > (facingStack - facingBetSize)) {
+                size = facingStack + facingBetSize;
+            }
         }
 
-        return options;
+        return size;
     }
 
-    private double pickOption(List<Double> options) {
-        int size = options.size();
+    private double getOddsToOffer(double handStrength, List<Card> board) {
+        double oddsToOffer;
 
-        Random rn = new Random();
-        int maximum = size - 1;
-        int minimum = 0;
-        int range = maximum - minimum + 1;
-        int randomNum = rn.nextInt(range) + minimum;
+        if(handStrength < 0.4 || handStrength > 0.9) {
+            if(board == null || board.isEmpty()) {
+                double random = Math.random();
 
-        return options.get(randomNum);
-    }
+                if(random < 0.20) {
+                    //20%
+                    oddsToOffer = 0.34;
+                } else if(random < 0.40) {
+                    //20%
+                    oddsToOffer = 0.43;
+                } else if(random < 0.60) {
+                    //20%
+                    oddsToOffer = 0.51;
+                } else if(random < 0.80) {
+                    //20%
+                    oddsToOffer = 0.59;
+                } else {
+                    //20%
+                    oddsToOffer = 0.67;
+                }
+            } else {
+                double random = Math.random();
 
-    private double getSizingFromChosenOption(double chosenOption) {
-        double bbsToBet;
-
-        if(chosenOption == 5.0) {
-            bbsToBet = pickNumberBetween(0, 5);
-        } else if(chosenOption == 10.0) {
-            bbsToBet = pickNumberBetween(5, 10);
-        } else if(chosenOption == 15.0) {
-            bbsToBet = pickNumberBetween(10, 15);
-        } else if(chosenOption == 20.0) {
-            bbsToBet = pickNumberBetween(15, 20);
-        } else if(chosenOption == 25.0) {
-            bbsToBet = pickNumberBetween(20, 25);
-        } else if(chosenOption == 40.0) {
-            bbsToBet = pickNumberBetween(25, 40);
-        } else if(chosenOption == 60.0) {
-            bbsToBet = pickNumberBetween(40, 60);
-        } else if(chosenOption == 100.0) {
-            bbsToBet = pickNumberBetween(60, 100);
-        } else if(chosenOption == 150.0) {
-            bbsToBet = pickNumberBetween(100, 150);
+                if(random < 0.07) {
+                    //7%
+                    oddsToOffer = 0.17;
+                } else if(random < 0.21) {
+                    //14%
+                    oddsToOffer = 0.33;
+                } else if(random < 0.44) {
+                    //23%
+                    oddsToOffer = 0.43;
+                } else if(random < 0.77) {
+                    //33%
+                    oddsToOffer = 0.51;
+                } else if(random < 0.93) {
+                    //16%
+                    oddsToOffer = 0.59;
+                } else {
+                    //7%
+                    oddsToOffer = 0.67;
+                }
+            }
         } else {
-            bbsToBet = pickNumberBetween(150, (int) chosenOption);
+            if(board == null || board.isEmpty()) {
+                double random = Math.random();
+
+                if(random < 0.20) {
+                    //20%
+                    oddsToOffer = 0.34;
+                } else if(random < 0.40) {
+                    //20%
+                    oddsToOffer = 0.43;
+                } else if(random < 0.60) {
+                    //20%
+                    oddsToOffer = 0.51;
+                } else if(random < 0.80) {
+                    //20%
+                    oddsToOffer = 0.59;
+                } else {
+                    //20%
+                    oddsToOffer = 0.67;
+                }
+            } else {
+                double random = Math.random();
+
+                if(random < 0.05) {
+                    //5%
+                    oddsToOffer = 0.17;
+                } else if(random < 0.52) {
+                    //47%
+                    oddsToOffer = 0.33;
+                } else {
+                    //48%
+                    oddsToOffer = 0.43;
+                }
+            }
         }
 
-        return bbsToBet;
-    }
-
-    private double pickNumberBetween(int downRange, int upRange) {
-        if(downRange == 0.0) {
-            downRange++;
-        }
-
-        return ThreadLocalRandom.current().nextDouble(downRange, upRange);
-    }
-
-
-
-
-
-    //helper methods
-
-    //preflop
-
-    private double getRuleBotPreflopSizing() {
-
-
-
-
-        return 0;
+        return oddsToOffer;
     }
 
     private double getAiBotPreflopSizing(double facingBetSize, double myBetSize, double facingStack, double myStack, double bigBlind) {
@@ -198,21 +155,6 @@ public class Sizing {
         }
 
         return size;
-    }
-
-
-
-
-
-
-
-
-    //postflop
-
-    private double getRuleBotPostFlopSizing() {
-
-
-        return 0;
     }
 
     private double getAiBotPostFlopSizing(List<Card> board, double facingBetSize, double pot, double myStack, double facingStack, double bigBlind) {

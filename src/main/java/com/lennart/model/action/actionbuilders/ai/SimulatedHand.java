@@ -64,33 +64,33 @@ public class SimulatedHand {
     //betRaiseCount / ( checkCallCount + betRaiseCount)
 
 
-    public static void main(String[] args) {
-        double aiBotTotalScore = 0;
-        double ruleBotTotalScore = 0;
-
-        //new Poker().initializePayoffMap();
-
-        for(int i = 0; i < 1000; i++) {
-            Random rn = new Random();
-            int y = rn.nextInt(2 - 1 + 1) + 1;
-
-            SimulatedHand simulatedHand = new SimulatedHand(y);
-            Map<String, Double> scores = simulatedHand.playHand();
-
-            //simulatedHand.updatePayoff(scores.get("aiBot"));
-
-            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
-            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
-
-            //System.out.println(i + "     " + "looseness: " + (callRaiseCount / (foldCount + callRaiseCount)));
-            //System.out.println(i + "     " + "aggressiveness: " + (betRaiseCount / (checkCallCount + betRaiseCount)));
-
-            System.out.println(i + "        " + aiBotTotalScore);
-        }
-
-        System.out.println("aiBot total score: " + aiBotTotalScore);
-        System.out.println("ruleBot total score: " + ruleBotTotalScore);
-    }
+//    public static void main(String[] args) {
+//        double aiBotTotalScore = 0;
+//        double ruleBotTotalScore = 0;
+//
+//        //new Poker().initializePayoffMap();
+//
+//        for(int i = 0; i < 1000; i++) {
+//            Random rn = new Random();
+//            int y = rn.nextInt(2 - 1 + 1) + 1;
+//
+//            SimulatedHand simulatedHand = new SimulatedHand(y);
+//            Map<String, Double> scores = simulatedHand.playHand();
+//
+//            //simulatedHand.updatePayoff(scores.get("aiBot"));
+//
+//            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
+//            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
+//
+//            //System.out.println(i + "     " + "looseness: " + (callRaiseCount / (foldCount + callRaiseCount)));
+//            //System.out.println(i + "     " + "aggressiveness: " + (betRaiseCount / (checkCallCount + betRaiseCount)));
+//
+//            System.out.println(i + "        " + aiBotTotalScore);
+//        }
+//
+//        System.out.println("aiBot total score: " + aiBotTotalScore);
+//        System.out.println("ruleBot total score: " + ruleBotTotalScore);
+//    }
 
     public SimulatedHand(int numberOfHandsPlayed) {
         SimulatedHand.numberOfHandsPlayed++;
@@ -434,9 +434,9 @@ public class SimulatedHand {
                 }
             }
         } else if(ruleBotAction.equals("bet75pct")) {
-            double sizeToBet = new Sizing().getAiBotSizing(aiBotBetSize, ruleBotBetSize, ruleBotStack, aiBotStack, pot, bigBlind, board);
+            //double sizeToBet = new Sizing().getAiBotSizing(aiBotBetSize, ruleBotBetSize, ruleBotStack, aiBotStack, pot, bigBlind, board);
 
-            //double sizeToBet = new Sizing().getRuleBotSizing(ruleBotBetSize, getEffectiveStackInBb() * bigBlind, bigBlind);
+            double sizeToBet = new Sizing().getRuleBotSizing(ruleBotHandStrength, aiBotBetSize, ruleBotBetSize, aiBotStack, ruleBotStack, pot, board);
 
             if(sizeToBet >= ruleBotStack) {
                 ruleBotBetSize = ruleBotStack;
@@ -449,9 +449,9 @@ public class SimulatedHand {
                 ruleBotStack = ruleBotStack - ruleBotBetSize;
             }
         } else if(ruleBotAction.equals("raise")) {
-            //double sizeToBet = new Sizing().getRuleBotSizing(ruleBotBetSize, getEffectiveStackInBb() * bigBlind, bigBlind);
+            double sizeToBet = new Sizing().getRuleBotSizing(ruleBotHandStrength, aiBotBetSize, ruleBotBetSize, aiBotStack, ruleBotStack, pot, board);
 
-            double sizeToBet = new Sizing().getAiBotSizing(aiBotBetSize, ruleBotBetSize, ruleBotStack, aiBotStack, pot, bigBlind, board);
+            //double sizeToBet = new Sizing().getAiBotSizing(aiBotBetSize, ruleBotBetSize, ruleBotStack, aiBotStack, pot, bigBlind, board);
 
             if((sizeToBet - ruleBotBetSize) >= ruleBotStack) {
                 ruleBotBetSize = ruleBotStack + ruleBotBetSize;
@@ -484,22 +484,22 @@ public class SimulatedHand {
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     if(ruleBotStack == 0 || ((aiBotStack + aiBotBetSize) <= ruleBotBetSize)) {
                         List<String> eligibleActions = Arrays.asList("fold", "call");
-                        aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                        aiBotAction = poker.getAction(eligibleActions, aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), "BoardTextureMedium", aiBotHasStrongDraw, aiBotHandStrength);
                     } else {
                         List<String> eligibleActions = Arrays.asList("fold", "call", "raise");
-                        aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                        aiBotAction = poker.getAction(eligibleActions, aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), "BoardTextureMedium", aiBotHasStrongDraw, aiBotHandStrength);
                     }
                 } else {
                     if(board.isEmpty() && !aiBotIsButton && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
                         List<String> eligibleActions = Arrays.asList("check", "raise");
-                        aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                        aiBotAction = poker.getAction(eligibleActions, aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), "BoardTextureMedium", aiBotHasStrongDraw, aiBotHandStrength);
                     } else {
                         List<String> eligibleActions = Arrays.asList("check", "bet75pct");
-                        aiBotAction = poker.getAction(eligibleActions, aiBotHandStrength, aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                        aiBotAction = poker.getAction(eligibleActions, aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), "BoardTextureMedium", aiBotHasStrongDraw, aiBotHandStrength);
                     }
                 }
             } else {
-                String route = poker.getRoute(aiBotHasStrongDraw, aiBotIsButton, getPotSizeInBb(), getAiBotBetSizeInBb(), getRuleBotBetSizeInBb(), getEffectiveStackInBb(), "BoardTextureMedium");
+                String route = poker.getRoute(aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), "BoardTextureMedium", aiBotHasStrongDraw);
 
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     double random = Math.random();
@@ -543,6 +543,10 @@ public class SimulatedHand {
                 }
             }
         } else if(bot.equals("ruleBot")) {
+//            TightAggressive tightAggressive = new TightAggressive(pot / bigBlind, ruleBotStack / bigBlind);
+//            ruleBotAction = tightAggressive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
+//                    getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton, board.isEmpty());
+
             TightPassive tightPassive = new TightPassive();
             ruleBotAction = tightPassive.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
                     getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton, board.isEmpty(), board);
@@ -606,6 +610,11 @@ public class SimulatedHand {
 
     private double getRuleBotBetSizeInBb() {
         return ruleBotBetSize / bigBlind;
+    }
+
+    private double getFacingOdds() {
+        double facingOdds = (ruleBotBetSize - aiBotBetSize) / (pot + aiBotBetSize + ruleBotBetSize);
+        return facingOdds;
     }
 
     private void dealNextStreet() {

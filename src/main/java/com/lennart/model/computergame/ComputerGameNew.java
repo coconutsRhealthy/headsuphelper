@@ -186,7 +186,7 @@ public class ComputerGameNew {
     private double getComputerSizing() {
         //double sizing = new Sizing().getRuleBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
 
-        double sizing = new Sizing().getRuleBotSizing(computerTotalBetSize, getEffectiveStackInBb() * bigBlind, bigBlind);
+        double sizing = new Sizing().getRuleBotSizing(computerHandStrength, opponentTotalBetSize, computerTotalBetSize, myStack, computerStack, potSize, board);
 //        double sizing = 0;
 //
 //        if(computerWrittenAction.contains("bet")) {

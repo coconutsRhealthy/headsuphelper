@@ -78,11 +78,11 @@ public class Poker {
         storeRoutesInDb(routes);
     }
 
-    public String getAction(List<String> eligibleActions, double handStrength, boolean strongDraw, boolean position,
-                             double potSizeBb, double computerBetSizeBb, double opponentBetSizeBb, double effectiveStackBb,
-                             String boardTexture) {
+    public String getAction(List<String> eligibleActions, boolean position, double potSizeBb, String opponentAction,
+                            double facingOdds, double effectiveStackBb, String boardTexture, boolean strongDraw,
+                            double handStrength) {
         try {
-            String route = getRoute(strongDraw, position, potSizeBb, computerBetSizeBb, opponentBetSizeBb, effectiveStackBb, boardTexture);
+            String route = getRoute(position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, boardTexture, strongDraw);
             String table = getTableString(handStrength);
 
             Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
@@ -96,16 +96,18 @@ public class Poker {
         }
     }
 
-    public String getRoute(boolean strongDraw, boolean position, double potSizeBb, double computerBetSizeBb,
-                           double opponentBetSizeBb, double effectiveStackBb, String boardTexture) {
-        String strongDrawString = getStrongDrawString(strongDraw);
+    public String getRoute(boolean position, double potSizeBb, String opponentAction, double facingOdds,
+                           double effectiveStackBb, String boardTexture, boolean strongDraw) {
+
         String positionString = getPositionString(position);
         String potSizeString = getPotsizeString(potSizeBb);
-        String computerBetSizeString = getComputerBetSizeBbString(computerBetSizeBb);
-        String opponentBetSizeString = getOpponentBetSizeBbString(opponentBetSizeBb);
+        String opponentActionString = getOpponentActionString(opponentAction);
+        String facingOddsString = getFacingOddsString(facingOdds);
         String effectiveStackString = getEffectiveStackBbString(effectiveStackBb);
+        String boardTextureString = boardTexture;
+        String strongDrawString = getStrongDrawString(strongDraw);
 
-        String route = strongDrawString + positionString + potSizeString + computerBetSizeString + opponentBetSizeString + effectiveStackString + boardTexture;
+        String route = positionString + potSizeString + opponentActionString + facingOddsString + effectiveStackString + boardTextureString + strongDrawString;
 
         return route;
     }
@@ -153,60 +155,44 @@ public class Poker {
         return potSizeString;
     }
 
-    private String getComputerBetSizeBbString(double computerBetSizeBb) {
-        String computerBetSizeBbString;
+    private String getOpponentActionString(String action) {
+        String opponentActionString;
 
-        if(computerBetSizeBb >= 0 && computerBetSizeBb < 5) {
-            computerBetSizeBbString = "ComputerBetsize0-5bb";
-        } else if(computerBetSizeBb < 10) {
-            computerBetSizeBbString = "ComputerBetsize5-10bb";
-        } else if(computerBetSizeBb < 15) {
-            computerBetSizeBbString = "ComputerBetsize10-15bb";
-        } else if(computerBetSizeBb < 20) {
-            computerBetSizeBbString = "ComputerBetsize15-20bb";
-        } else if(computerBetSizeBb < 25) {
-            computerBetSizeBbString = "ComputerBetsize20-25bb";
-        } else if(computerBetSizeBb < 40) {
-            computerBetSizeBbString = "ComputerBetsize25-40bb";
-        } else if(computerBetSizeBb < 60) {
-            computerBetSizeBbString = "ComputerBetsize40-60bb";
-        } else if(computerBetSizeBb < 100) {
-            computerBetSizeBbString = "ComputerBetsize60-100bb";
-        } else if(computerBetSizeBb < 150) {
-            computerBetSizeBbString = "ComputerBetsize100-150bb";
+        if(action.contains("empty")) {
+            opponentActionString = "OpponentActionEmpty";
+        } else if(action.contains("check")) {
+            opponentActionString = "OpponentActionCheck";
+        } else if(action.contains("call")) {
+            opponentActionString = "OpponentActionCall";
+        } else if(action.contains("bet")) {
+            opponentActionString = "OpponentActionBet";
         } else {
-            computerBetSizeBbString = "ComputerBetsize>150bb";
+            opponentActionString = "OpponentActionRaise";
         }
 
-        return computerBetSizeBbString;
+        return opponentActionString;
     }
 
-    private String getOpponentBetSizeBbString(double opponentBetSizeBb) {
-        String computerBetSizeBbString;
+    private String getFacingOddsString(double facingOdds) {
+        String facingOddsString;
 
-        if(opponentBetSizeBb >= 0 && opponentBetSizeBb < 5) {
-            computerBetSizeBbString = "OpponentBetsize0-5bb";
-        } else if(opponentBetSizeBb < 10) {
-            computerBetSizeBbString = "OpponentBetsize5-10bb";
-        } else if(opponentBetSizeBb < 15) {
-            computerBetSizeBbString = "OpponentBetsize10-15bb";
-        } else if(opponentBetSizeBb < 20) {
-            computerBetSizeBbString = "OpponentBetsize15-20bb";
-        } else if(opponentBetSizeBb < 25) {
-            computerBetSizeBbString = "OpponentBetsize20-25bb";
-        } else if(opponentBetSizeBb < 40) {
-            computerBetSizeBbString = "OpponentBetsize25-40bb";
-        } else if(opponentBetSizeBb < 60) {
-            computerBetSizeBbString = "OpponentBetsize40-60bb";
-        } else if(opponentBetSizeBb < 100) {
-            computerBetSizeBbString = "OpponentBetsize60-100bb";
-        } else if(opponentBetSizeBb < 150) {
-            computerBetSizeBbString = "OpponentBetsize100-150bb";
+        if(facingOdds == 0.0) {
+            facingOddsString = "FacingOdds0";
+        } else if(facingOdds <= 0.17) {
+            facingOddsString = "FacingOdds0-21";
+        } else if(facingOdds <= 0.34) {
+            facingOddsString = "FacingOdds21-51";
+        } else if(facingOdds <= 0.45) {
+            facingOddsString = "FacingOdds51-81";
+        } else if(facingOdds <= 0.53) {
+            facingOddsString = "FacingOdds81-101";
+        } else if(facingOdds <= 0.61) {
+            facingOddsString = "FacingOdds101-151";
         } else {
-            computerBetSizeBbString = "OpponentBetsize>150bb";
+            facingOddsString = "FacingOdds>151";
         }
 
-        return computerBetSizeBbString;
+        return facingOddsString;
     }
 
     private String getEffectiveStackBbString(double effectiveStackBb) {
@@ -310,16 +296,13 @@ public class Poker {
     }
 
     private List<String> getAllRoutes() {
-        List<String> strongDraw = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> potSize = new ArrayList<>();
-        List<String> computerBetSize = new ArrayList<>();
-        List<String> opponentBetSize = new ArrayList<>();
+        List<String> opponentAction = new ArrayList<>();
+        List<String> facingOdds = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
         List<String> boardTexture = new ArrayList<>();
-
-        strongDraw.add("StrongDrawYes");
-        strongDraw.add("StrongDrawNo");
+        List<String> strongDraw = new ArrayList<>();
 
         position.add("PositionBTN");
         position.add("PositionBB");
@@ -335,27 +318,18 @@ public class Poker {
         potSize.add("Potsize100-150bb");
         potSize.add("Potsize>150bb");
 
-        computerBetSize.add("ComputerBetsize0-5bb");
-        computerBetSize.add("ComputerBetsize5-10bb");
-        computerBetSize.add("ComputerBetsize10-15bb");
-        computerBetSize.add("ComputerBetsize15-20bb");
-        computerBetSize.add("ComputerBetsize20-25bb");
-        computerBetSize.add("ComputerBetsize25-40bb");
-        computerBetSize.add("ComputerBetsize40-60bb");
-        computerBetSize.add("ComputerBetsize60-100bb");
-        computerBetSize.add("ComputerBetsize100-150bb");
-        computerBetSize.add("ComputerBetsize>150bb");
+        opponentAction.add("OpponentActionEmpty");
+        opponentAction.add("OpponentActionCheck");
+        opponentAction.add("OpponentActionBet");
+        opponentAction.add("OpponentActionRaise");
 
-        opponentBetSize.add("OpponentBetsize0-5bb");
-        opponentBetSize.add("OpponentBetsize5-10bb");
-        opponentBetSize.add("OpponentBetsize10-15bb");
-        opponentBetSize.add("OpponentBetsize15-20bb");
-        opponentBetSize.add("OpponentBetsize20-25bb");
-        opponentBetSize.add("OpponentBetsize25-40bb");
-        opponentBetSize.add("OpponentBetsize40-60bb");
-        opponentBetSize.add("OpponentBetsize60-100bb");
-        opponentBetSize.add("OpponentBetsize100-150bb");
-        opponentBetSize.add("OpponentBetsize>150bb");
+        facingOdds.add("FacingOdds0");
+        facingOdds.add("FacingOdds0-21");
+        facingOdds.add("FacingOdds21-51");
+        facingOdds.add("FacingOdds51-81");
+        facingOdds.add("FacingOdds81-101");
+        facingOdds.add("FacingOdds101-151");
+        facingOdds.add("FacingOdds>151");
 
         effectiveStack.add("EffectiveStack0-20bb");
         effectiveStack.add("EffectiveStack20-50bb");
@@ -368,15 +342,18 @@ public class Poker {
         boardTexture.add("BoardTextureMedium");
         boardTexture.add("BoardTextureWet");
 
+        strongDraw.add("StrongDrawYes");
+        strongDraw.add("StrongDrawNo");
+
         List<String> allRoutes = new ArrayList<>();
 
-        for(String a : strongDraw) {
-            for(String b : position) {
-                for(String c : potSize) {
-                    for(String d : computerBetSize) {
-                        for(String e : opponentBetSize) {
-                            for(String f : effectiveStack) {
-                                for(String g : boardTexture) {
+        for(String a : position) {
+            for(String b : potSize) {
+                for(String c : opponentAction) {
+                    for(String d : facingOdds) {
+                        for(String e : effectiveStack) {
+                            for(String f : boardTexture) {
+                                for(String g : strongDraw) {
                                     allRoutes.add(a + b + c + d + e + f + g);
                                 }
                             }
@@ -385,7 +362,6 @@ public class Poker {
                 }
             }
         }
-
 
         return allRoutes;
     }
