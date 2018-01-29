@@ -52,6 +52,8 @@ public class SimulatedHand {
 
     private static int numberOfHandsPlayed = 0;
 
+    private List<String> aiBotHandHistory;
+    private List<String> ruleBotHandHistory;
 
     public static void main(String[] args) {
         double aiBotTotalScore = 0;
@@ -96,6 +98,9 @@ public class SimulatedHand {
 
         ruleBot = initializeRuleBot();
 
+        aiBotHandHistory = new ArrayList<>();
+        ruleBotHandHistory = new ArrayList<>();
+
         if(numberOfHandsPlayed % 2 == 0) {
             aiBotStack = getRandomStackSizeOfAiBot();
             aiBotStackAtStartHand = aiBotStack;
@@ -109,6 +114,9 @@ public class SimulatedHand {
             ruleBotStack = ruleBotStack - 0.25;
 
             aiBotIsButton = false;
+
+            aiBotHandHistory.add("Preflop " + "posts Big Blind " + aiBotBetSize + " Stack:" + aiBotStack);
+            ruleBotHandHistory.add("Preflop " + "posts Small Blind " + ruleBotBetSize + " Stack:" + ruleBotStack);
         } else {
             aiBotStack = getRandomStackSizeOfAiBot();
             aiBotStackAtStartHand = aiBotStack;
@@ -122,6 +130,9 @@ public class SimulatedHand {
             ruleBotStack = ruleBotStack - 0.50;
 
             aiBotIsButton = true;
+
+            aiBotHandHistory.add("Preflop " + "posts Small Blind " + aiBotBetSize + " Stack:" + aiBotStack);
+            ruleBotHandHistory.add("Preflop " + "posts Big Blind " + ruleBotBetSize + " Stack:" + ruleBotStack);
         }
 
         calculateHandStrengthsAndDraws();
@@ -287,7 +298,7 @@ public class SimulatedHand {
                         nextStreetNeedsToBeDealt = true;
                         playerIsAllIn = true;
                     } else {
-                        pot = pot + (2 * ruleBotStack) + (2 * aiBotBetSize);
+                        pot = pot + (2 * ruleBotStack) + (2 * ruleBotBetSize);
                         aiBotStack = aiBotStack - (ruleBotBetSize - aiBotBetSize);
                         continueHand = false;
                         aiBotBetSize = 0;
@@ -341,6 +352,9 @@ public class SimulatedHand {
             } else if(sizeToBet >= ruleBotStack) {
                 aiBotBetSize = ruleBotStack;
                 aiBotStack = aiBotStack - ruleBotStack;
+            } else {
+                aiBotBetSize = sizeToBet;
+                aiBotStack = aiBotStack - aiBotBetSize;
             }
         } else if(aiBotAction.equals("raise")) {
             double sizeToBet = new Sizing().getAiBotSizing(ruleBotBetSize, aiBotBetSize, aiBotStack, ruleBotStack, pot, bigBlind, board);
@@ -371,6 +385,8 @@ public class SimulatedHand {
                 aiBotBetSize = aiBotNewBetSize;
             }
         }
+
+        aiBotHandHistory.add(getStreetForHistory() + " Action: " + aiBotAction + " aiBotBetsize: " + aiBotBetSize + " aiBotStack: " + aiBotStack + " potsize: " + pot);
     }
 
     private void doRuleBotAction() {
@@ -513,6 +529,8 @@ public class SimulatedHand {
                 ruleBotBetSize = ruleBotNewBetSize;
             }
         }
+
+        ruleBotHandHistory.add(getStreetForHistory() + " Action: " + ruleBotAction + " ruleBotBetsize: " + ruleBotBetSize + " ruleBotStack: " + ruleBotStack + " potsize: " + pot);
     }
 
     private int getHighestKeyFromMap() {
@@ -656,6 +674,24 @@ public class SimulatedHand {
             street = "river";
         } else {
             street = "wrong";
+        }
+
+        return street;
+    }
+
+    private String getStreetForHistory() {
+        String street;
+
+        if(board.isEmpty()) {
+            street = "Preflop";
+        } else if(board.size() == 3) {
+            street = "Flop";
+        } else if(board.size() == 4) {
+            street = "Turn";
+        } else if(board.size() == 5) {
+            street = "River";
+        } else {
+            street = "Wrong";
         }
 
         return street;

@@ -78,7 +78,8 @@ public class TightPassive extends AbstractOpponent {
                     }
                 }
             } else {
-                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb)) {
+                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb) ||
+                        aiBotBetsizeBb >= ruleBotStackBb) {
                     double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
                     if(callAmountBb < 20) {
@@ -244,7 +245,8 @@ public class TightPassive extends AbstractOpponent {
                     }
                 }
             } else {
-                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb)) {
+                if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb) ||
+                        aiBotBetsizeBb >= ruleBotStackBb) {
                     if(ruleBotStackBb <= 20) {
                         if(handStrength > 0.6) {
                             action = "call";
@@ -310,7 +312,8 @@ public class TightPassive extends AbstractOpponent {
         String action;
         double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
-        if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb)) {
+        if(aiBotStackBb == 0 || ((aiBotStackBb + aiBotBetsizeBb) <= ruleBotStackBb) ||
+                aiBotBetsizeBb >= ruleBotStackBb) {
             if(callAmountBb > 70) {
                 if(handStrength > 0.89) {
                     action = "call";
