@@ -57,7 +57,7 @@ public class SimulatedHand {
         double aiBotTotalScore = 0;
         double ruleBotTotalScore = 0;
 
-        for(int i = 0; i < 200; i++) {
+        for(int i = 0; i < 1000; i++) {
             Random rn = new Random();
             int y = rn.nextInt(2 - 1 + 1) + 1;
 
@@ -79,11 +79,7 @@ public class SimulatedHand {
                 System.out.println("wacht hier");
             }
 
-            System.out.println(i);
-            System.out.println(scores.get("aiBot"));
-            System.out.println(scores.get("ruleBot"));
-
-            //System.out.println(i + "        " + aiBotTotalScore);
+            System.out.println(i + "        " + aiBotTotalScore + "        " + ruleBotTotalScore);
         }
 
         System.out.println("aiBot total score: " + aiBotTotalScore);
@@ -224,7 +220,7 @@ public class SimulatedHand {
         double scoreBalance = (aiBotStack - aiBotStackAtStartHand) + (ruleBotStack - ruleBotStackAtStartHand);
 
         if(scoreBalance > 1 || scoreBalance < -1) {
-            System.out.println("rrrrrr");
+            System.out.println("rrrrrr" + "   " + ruleBotStack + "   " + aiBotStack);
         }
 
         return scoreMap;
@@ -236,12 +232,6 @@ public class SimulatedHand {
 
     private void doAiBotAction() {
         setDummyAction("aiBot");
-
-        if(ruleBotStack == 0) {
-            aiBotAction = "call";
-        } else {
-            aiBotAction = "raise";
-        }
 
         if(aiBotAction.equals("fold")) {
             continueHand = false;
@@ -292,7 +282,7 @@ public class SimulatedHand {
                     }
                 } else if(ruleBotStack == 0) {
                     if(board.size() < 5) {
-                        pot = pot + (2 * ruleBotStack) + (2 * aiBotBetSize);
+                        pot = pot + (2 * ruleBotBetSize);
                         aiBotStack = aiBotStack - (ruleBotBetSize - aiBotBetSize);
                         nextStreetNeedsToBeDealt = true;
                         playerIsAllIn = true;
@@ -386,12 +376,6 @@ public class SimulatedHand {
     private void doRuleBotAction() {
         setDummyAction("ruleBot");
 
-        if(ruleBotStack > 0) {
-            ruleBotAction = "raise";
-        } else {
-            ruleBotAction = "call";
-        }
-
         if(ruleBotAction.equals("fold")) {
             continueHand = false;
             allocatePotAndBetsToWinner("aiBot");
@@ -439,7 +423,7 @@ public class SimulatedHand {
                     }
                 } else if(aiBotStack == 0) {
                     if(board.size() < 5) {
-                        pot = pot + (2 * aiBotStack) + (2 * aiBotBetSize);
+                        pot = pot + (2 * aiBotBetSize);
                         ruleBotStack = ruleBotStack - (aiBotBetSize - ruleBotBetSize);
                         nextStreetNeedsToBeDealt = true;
                         playerIsAllIn = true;
@@ -680,18 +664,12 @@ public class SimulatedHand {
     private double getRandomStackSizeOfRuleBot() {
         double stackSize = ThreadLocalRandom.current().nextDouble(1.0, 75.0);
         stackSize = Precision.round(stackSize, 2);
-
-        stackSize = 16;
-
         return stackSize;
     }
 
     private double getRandomStackSizeOfAiBot() {
         double stackSize = ThreadLocalRandom.current().nextDouble(50.0, 75.0);
         stackSize = Precision.round(stackSize, 2);
-
-        stackSize = 72;
-
         return stackSize;
     }
 
