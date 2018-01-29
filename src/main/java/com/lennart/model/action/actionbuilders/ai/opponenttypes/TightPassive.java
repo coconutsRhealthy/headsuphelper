@@ -7,8 +7,9 @@ import java.util.List;
 /**
  * Created by lpo21630 on 11-1-2018.
  */
-public class TightPassive {
+public class TightPassive extends AbstractOpponent {
 
+    @Override
     public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
                            double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position,
                            boolean preflop, List<Card> board) {

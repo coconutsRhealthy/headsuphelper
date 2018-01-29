@@ -1,9 +1,13 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
+import com.lennart.model.card.Card;
+
+import java.util.List;
+
 /**
  * Created by lpo21630 on 11-1-2018.
  */
-public class LooseAggressive {
+public class LooseAggressive extends AbstractOpponent {
 
     private double potSizeBb;
     private double ruleBotStackBb;
@@ -13,8 +17,10 @@ public class LooseAggressive {
         this.ruleBotStackBb = ruleBotStackBb;
     }
 
+    @Override
     public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
-                            double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position, boolean preflop) {
+                           double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position,
+                           boolean preflop, List<Card> board) {
         String action;
 
         if(preflop) {

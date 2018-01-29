@@ -133,7 +133,7 @@ public class ComputerGameNew {
 
         String action = new LooseAggressive(potSizeInMethodBb, computerStack / bigBlind).doAction(
                 myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
-                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null);
+                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null, board);
 
 //        String action = new TightPassive().doAction(
 //                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,

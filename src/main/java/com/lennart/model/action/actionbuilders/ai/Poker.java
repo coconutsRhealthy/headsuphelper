@@ -57,9 +57,9 @@ public class Poker {
 
     private static Map<String, Map<String, Double>> payoffMap = new HashMap<>();
 
-//    public static void main(String[] args) throws Exception {
-//        new Poker().theMethod();
-//    }
+    public static void main(String[] args) throws Exception {
+        new Poker().theMethod();
+    }
 
     private void theMethod() throws Exception {
 //        Map<String, Double> eije = retrieveRouteDataFromDb("Handstrength50-55StrongDrawNoPositionBTNPotsize60-100bbComputerBetsize10-15bbOpponentBetsize10-15bbEffectiveStack75-110bbBoardTextureDry");
@@ -78,11 +78,10 @@ public class Poker {
         storeRoutesInDb(routes);
     }
 
-    public String getAction(List<String> eligibleActions, boolean position, double potSizeBb, String opponentAction,
-                            double facingOdds, double effectiveStackBb, String boardTexture, boolean strongDraw,
-                            double handStrength) {
+    public String getAction(List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                            double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength) {
         try {
-            String route = getRoute(position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, boardTexture, strongDraw);
+            String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
             String table = getTableString(handStrength);
 
             Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
@@ -96,18 +95,18 @@ public class Poker {
         }
     }
 
-    public String getRoute(boolean position, double potSizeBb, String opponentAction, double facingOdds,
-                           double effectiveStackBb, String boardTexture, boolean strongDraw) {
+    public String getRoute(String street, boolean position, double potSizeBb, String opponentAction, double facingOdds,
+                           double effectiveStackBb, boolean strongDraw) {
 
+        String streetString = getStreetString(street);
         String positionString = getPositionString(position);
         String potSizeString = getPotsizeString(potSizeBb);
         String opponentActionString = getOpponentActionString(opponentAction);
         String facingOddsString = getFacingOddsString(facingOdds);
         String effectiveStackString = getEffectiveStackBbString(effectiveStackBb);
-        String boardTextureString = boardTexture;
         String strongDrawString = getStrongDrawString(strongDraw);
 
-        String route = positionString + potSizeString + opponentActionString + facingOddsString + effectiveStackString + boardTextureString + strongDrawString;
+        String route = streetString + positionString + potSizeString + opponentActionString + facingOddsString + effectiveStackString + strongDrawString;
 
         return route;
     }
@@ -215,6 +214,20 @@ public class Poker {
         return effectiveStackBbString;
     }
 
+    private String getStreetString(String street) {
+        String streetString;
+
+        if(street.equals("preflop")) {
+            streetString = "StreetPreflop";
+        } else if(street.equals("flopOrTurn")) {
+            streetString = "StreetFlopOrTurn";
+        } else {
+            streetString = "StreetRiver";
+        }
+
+        return streetString;
+    }
+
     private String getTableString(double handStrength) {
         String table = "";
 
@@ -296,13 +309,17 @@ public class Poker {
     }
 
     private List<String> getAllRoutes() {
+        List<String> street = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> potSize = new ArrayList<>();
         List<String> opponentAction = new ArrayList<>();
         List<String> facingOdds = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
-        List<String> boardTexture = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
+
+        street.add("StreetPreflop");
+        street.add("StreetFlopOrTurn");
+        street.add("StreetRiver");
 
         position.add("PositionBTN");
         position.add("PositionBB");
@@ -320,6 +337,7 @@ public class Poker {
 
         opponentAction.add("OpponentActionEmpty");
         opponentAction.add("OpponentActionCheck");
+        opponentAction.add("OpponentActionCall");
         opponentAction.add("OpponentActionBet");
         opponentAction.add("OpponentActionRaise");
 
@@ -338,21 +356,17 @@ public class Poker {
         effectiveStack.add("EffectiveStack110-150bb");
         effectiveStack.add("EffectiveStack>150bb");
 
-        boardTexture.add("BoardTextureDry");
-        boardTexture.add("BoardTextureMedium");
-        boardTexture.add("BoardTextureWet");
-
         strongDraw.add("StrongDrawYes");
         strongDraw.add("StrongDrawNo");
 
         List<String> allRoutes = new ArrayList<>();
 
-        for(String a : position) {
-            for(String b : potSize) {
-                for(String c : opponentAction) {
-                    for(String d : facingOdds) {
-                        for(String e : effectiveStack) {
-                            for(String f : boardTexture) {
+        for(String a : street) {
+            for(String b : position) {
+                for(String c : potSize) {
+                    for(String d : opponentAction) {
+                        for(String e : facingOdds) {
+                            for(String f : effectiveStack) {
                                 for(String g : strongDraw) {
                                     allRoutes.add(a + b + c + d + e + f + g);
                                 }
@@ -370,6 +384,8 @@ public class Poker {
         initializeDbConnection();
 
         List<String> databases = new ArrayList<>();
+
+        databases.add("ta_hs_0_5");
         databases.add("ta_hs_5_10");
         databases.add("ta_hs_10_15");
         databases.add("ta_hs_15_20");
@@ -390,7 +406,6 @@ public class Poker {
         databases.add("ta_hs_90_95");
         databases.add("ta_hs_95_100");
 
-
         for(String database : databases) {
             for(String route : routes) {
                 Statement st = con.createStatement();
@@ -401,7 +416,7 @@ public class Poker {
                         TimeUnit.SECONDS.sleep(5);
                         st.executeUpdate("INSERT INTO " + database + " (route) VALUES ('" + route + "')");
                     } catch (Exception f) {
-                        System.out.println("wacht");
+                        System.out.println("wacht444");
                     }
                 }
                 st.close();
