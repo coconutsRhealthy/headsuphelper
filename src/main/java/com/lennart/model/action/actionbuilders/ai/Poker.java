@@ -1,5 +1,11 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.AbstractOpponent;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.LoosePassive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightAggressive;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
+
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -79,10 +85,10 @@ public class Poker {
     }
 
     public String getAction(List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
-                            double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength) {
+                            double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, AbstractOpponent opponent) {
         try {
             String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
-            String table = getTableString(handStrength);
+            String table = getTableString(handStrength, getOpponentTypeString(opponent));
 
             Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
             Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
@@ -228,49 +234,68 @@ public class Poker {
         return streetString;
     }
 
-    private String getTableString(double handStrength) {
+    private String getOpponentTypeString(AbstractOpponent opponent) {
+        String opponentTypeString;
+
+        if(opponent instanceof TightPassive) {
+            opponentTypeString = "tp";
+        } else if(opponent instanceof TightAggressive) {
+            opponentTypeString = "ta";
+        } else if(opponent instanceof LoosePassive) {
+            opponentTypeString = "lp";
+        } else if(opponent instanceof LooseAggressive) {
+            opponentTypeString = "la";
+        } else {
+            opponentTypeString = null;
+            System.out.println("No valid opponentType");
+        }
+
+        return opponentTypeString;
+    }
+
+    private String getTableString(double handStrength, String opponentType) {
         String table = "";
 
         if(handStrength >= 0 && handStrength < 0.05) {
-            table = "ta_hs_0_5";
+            table = opponentType + "_hs_0_5";
         } else if(handStrength < 0.10) {
-            table = "ta_hs_5_10";
+            table = opponentType + "_hs_5_10";
         } else if(handStrength < 0.15) {
-            table = "ta_hs_10_15";
+            table = opponentType + "_hs_10_15";
         } else if(handStrength < 0.20) {
-            table = "ta_hs_15_20";
+            table = opponentType + "_hs_15_20";
         } else if(handStrength < 0.25) {
-            table = "ta_hs_20_25";
+            table = opponentType + "_hs_20_25";
         } else if(handStrength < 0.30) {
-            table = "ta_hs_25_30";
+            table = opponentType + "_hs_25_30";
         } else if(handStrength < 0.35) {
-            table = "ta_hs_30_35";
+            table = opponentType + "_hs_30_35";
         } else if(handStrength < 0.40) {
-            table = "ta_hs_35_40";
+            table = opponentType + "_hs_35_40";
         } else if(handStrength < 0.45) {
-            table = "ta_hs_40_45";
+            table = opponentType + "_hs_40_45";
         } else if(handStrength < 0.50) {
-            table = "ta_hs_45_50";
+            table = opponentType + "_hs_45_50";
         } else if(handStrength < 0.55) {
-            table = "ta_hs_50_55";
+            table = opponentType + "_hs_50_55";
         } else if(handStrength < 0.60) {
-            table = "ta_hs_55_60";
+            table = opponentType + "_hs_55_60";
         } else if(handStrength < 0.65) {
-            table = "ta_hs_60_65";
+            table = opponentType + "_hs_60_65";
         } else if(handStrength < 0.70) {
-            table = "ta_hs_65_70";
+            table = opponentType + "_hs_65_70";
         } else if(handStrength < 0.75) {
-            table = "ta_hs_70_75";
+            table = opponentType + "_hs_70_75";
         } else if(handStrength < 0.80) {
-            table = "ta_hs_75_80";
+            table = opponentType + "_hs_75_80";
         } else if(handStrength < 0.85) {
-            table = "ta_hs_80_85";
+            table = opponentType + "_hs_80_85";
         } else if(handStrength < 0.90) {
-            table = "ta_hs_85_90";
+            table = opponentType + "_hs_85_90";
         } else if(handStrength < 0.95) {
-            table = "ta_hs_90_95";
+            table = opponentType + "_hs_90_95";
         } else if(handStrength <= 1) {
-            table = "ta_hs_95_100";
+            table = opponentType + "_hs_95_100";
         } else {
             System.out.println("Handstrengt is not within 0-1 range: " + handStrength);
         }
@@ -278,8 +303,8 @@ public class Poker {
         return table;
     }
 
-    private String getTableString(String handStrengthAsString) {
-        return getTableString(Double.parseDouble(handStrengthAsString));
+    private String getTableString(String handStrengthAsString, String opponentType) {
+        return getTableString(Double.parseDouble(handStrengthAsString), opponentType);
     }
 
     private Map<String, Double> getSortedAveragePayoffMapFromRouteData(Map<String, Double> routeData) {
@@ -471,15 +496,18 @@ public class Poker {
     }
 
 
-    public void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff) {
+    public void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff, AbstractOpponent opponent) {
         double payoffPerAction = totalPayoff / actionHistory.size();
 
         for (Map.Entry<Integer, List<String>> entry : actionHistory.entrySet()) {
-            String table = getTableString(entry.getValue().get(0));
+            String opponentType = getOpponentTypeString(opponent);
+            String table = getTableString(entry.getValue().get(0), opponentType);
             String route = entry.getValue().get(1);
             String action = entry.getValue().get(2);
             doDbPayoffUpdate(table, route, action, payoffPerAction);
             //doMemoryPayoffUpdate(route, action, payoffPerAction);
+
+            updateDbNumerOfHands(opponentType);
         }
     }
 
@@ -512,6 +540,20 @@ public class Poker {
             closeDbConnection();
         } catch (Exception e) {
             System.out.println("Exception occured in doDbPayoffUpdate()");
+        }
+    }
+
+    private void updateDbNumerOfHands(String opponentType) {
+        try {
+            initializeDbConnection();
+
+            Statement st = con.createStatement();
+            st.executeUpdate("UPDATE number_of_hands SET amount = amount + 1 WHERE type = '" + opponentType + "'");
+            st.close();
+
+            closeDbConnection();
+        } catch (Exception e) {
+            System.out.println("Exception occured in updateDbNumerOfHands()");
         }
     }
 

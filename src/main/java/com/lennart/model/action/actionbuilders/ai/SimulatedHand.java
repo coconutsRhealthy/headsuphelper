@@ -69,7 +69,7 @@ public class SimulatedHand {
 //            System.out.println(simulatedHand.ruleBotStack);
 //            System.out.println(simulatedHand.aiBotStack);
 
-            //simulatedHand.updatePayoff(scores.get("aiBot"));
+            simulatedHand.updatePayoff(scores.get("aiBot"));
 
 //            System.out.println(scores.get("ruleBot"));
 //            System.out.println(scores.get("aiBot"));
@@ -238,7 +238,7 @@ public class SimulatedHand {
     }
 
     private void updatePayoff(double totalPayoff) {
-        new Poker().updatePayoff(aiBotActionHistory, totalPayoff);
+        new Poker().updatePayoff(aiBotActionHistory, totalPayoff, ruleBot);
     }
 
     private void doAiBotAction() {
@@ -549,18 +549,18 @@ public class SimulatedHand {
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     if(ruleBotStack == 0 || ((aiBotStack + aiBotBetSize) <= ruleBotBetSize)) {
                         List<String> eligibleActions = Arrays.asList("fold", "call");
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength);
+                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, ruleBot);
                     } else {
                         List<String> eligibleActions = Arrays.asList("fold", "call", "raise");
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength);
+                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, ruleBot);
                     }
                 } else {
                     if(board.isEmpty() && !aiBotIsButton && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
                         List<String> eligibleActions = Arrays.asList("check", "raise");
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength);
+                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, ruleBot);
                     } else {
                         List<String> eligibleActions = Arrays.asList("check", "bet75pct");
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength);
+                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, ruleBot);
                     }
                 }
             } else {
