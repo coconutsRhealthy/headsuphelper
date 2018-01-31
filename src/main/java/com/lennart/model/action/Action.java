@@ -3,7 +3,6 @@ package com.lennart.model.action;
 import com.lennart.model.action.actionbuilders.postflop.PostFlopActionBuilder;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
-import com.lennart.model.botgame.BotHand;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
 
@@ -60,23 +59,15 @@ public class Action {
     }
 
     private void setNewWrittenAction(String action, Actionable actionable) {
-        if(actionable instanceof BotHand) {
-            if(sizing == 0) {
-                writtenAction = action;
-            } else {
-                writtenAction = action + " " + sizing;
-            }
-        } else {
-            List<Card> board = actionable.getBoard();
-            if(board == null) {
-                getWrittenActionFromAction(action, "Preflop");
-            } else if(board.size() == 3) {
-                getWrittenActionFromAction(action, "Flop");
-            } else if(board.size() == 4) {
-                getWrittenActionFromAction(action, "Turn");
-            } else if(board.size() == 5) {
-                getWrittenActionFromAction(action, "River");
-            }
+        List<Card> board = actionable.getBoard();
+        if(board == null) {
+            getWrittenActionFromAction(action, "Preflop");
+        } else if(board.size() == 3) {
+            getWrittenActionFromAction(action, "Flop");
+        } else if(board.size() == 4) {
+            getWrittenActionFromAction(action, "Turn");
+        } else if(board.size() == 5) {
+            getWrittenActionFromAction(action, "River");
         }
     }
 

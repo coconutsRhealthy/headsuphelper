@@ -63,9 +63,9 @@ public class Poker {
 
     private static Map<String, Map<String, Double>> payoffMap = new HashMap<>();
 
-    public static void main(String[] args) throws Exception {
-        new Poker().theMethod();
-    }
+//    public static void main(String[] args) throws Exception {
+//        new Poker().theMethod();
+//    }
 
     private void theMethod() throws Exception {
 //        Map<String, Double> eije = retrieveRouteDataFromDb("Handstrength50-55StrongDrawNoPositionBTNPotsize60-100bbComputerBetsize10-15bbOpponentBetsize10-15bbEffectiveStack75-110bbBoardTextureDry");
@@ -654,7 +654,7 @@ public class Poker {
 
     private void initializeDbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
-        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "");
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "Vuurwerk00");
     }
 
     private void closeDbConnection() throws SQLException {

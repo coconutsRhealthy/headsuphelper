@@ -52,41 +52,38 @@ public class SimulatedHand {
 
     private static int numberOfHandsPlayed = 0;
 
-    private List<String> aiBotHandHistory;
-    private List<String> ruleBotHandHistory;
-
-    public static void main(String[] args) {
-        double aiBotTotalScore = 0;
-        double ruleBotTotalScore = 0;
-
-        for(int i = 0; i < 1000; i++) {
-            Random rn = new Random();
-            int y = rn.nextInt(2 - 1 + 1) + 1;
-
-            SimulatedHand simulatedHand = new SimulatedHand(y);
-            Map<String, Double> scores = simulatedHand.playHand();
-
-//            System.out.println(simulatedHand.ruleBotStack);
-//            System.out.println(simulatedHand.aiBotStack);
-
-            simulatedHand.updatePayoff(scores.get("aiBot"));
-
-//            System.out.println(scores.get("ruleBot"));
-//            System.out.println(scores.get("aiBot"));
-
-            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
-            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
-
-            if(scores.get("aiBot") + scores.get("ruleBot") > 1 || scores.get("aiBot") + scores.get("ruleBot") < -1) {
-                System.out.println("wacht hier");
-            }
-
-            System.out.println(i + "        " + aiBotTotalScore + "        " + ruleBotTotalScore);
-        }
-
-        System.out.println("aiBot total score: " + aiBotTotalScore);
-        System.out.println("ruleBot total score: " + ruleBotTotalScore);
-    }
+//    public static void main(String[] args) {
+//        double aiBotTotalScore = 0;
+//        double ruleBotTotalScore = 0;
+//
+//        for(int i = 0; i < 1000; i++) {
+//            Random rn = new Random();
+//            int y = rn.nextInt(2 - 1 + 1) + 1;
+//
+//            SimulatedHand simulatedHand = new SimulatedHand(y);
+//            Map<String, Double> scores = simulatedHand.playHand();
+//
+////            System.out.println(simulatedHand.ruleBotStack);
+////            System.out.println(simulatedHand.aiBotStack);
+//
+//            simulatedHand.updatePayoff(scores.get("aiBot"));
+//
+////            System.out.println(scores.get("ruleBot"));
+////            System.out.println(scores.get("aiBot"));
+//
+//            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
+//            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
+//
+//            if(scores.get("aiBot") + scores.get("ruleBot") > 1 || scores.get("aiBot") + scores.get("ruleBot") < -1) {
+//                System.out.println("wacht hier");
+//            }
+//
+//            System.out.println(i + "        " + aiBotTotalScore + "        " + ruleBotTotalScore);
+//        }
+//
+//        System.out.println("aiBot total score: " + aiBotTotalScore);
+//        System.out.println("ruleBot total score: " + ruleBotTotalScore);
+//    }
 
     public SimulatedHand(int numberOfHandsPlayed) {
         SimulatedHand.numberOfHandsPlayed++;
@@ -97,9 +94,6 @@ public class SimulatedHand {
         ruleBotHolecards.add(getAndRemoveRandomCardFromDeck());
 
         ruleBot = initializeRuleBot();
-
-        aiBotHandHistory = new ArrayList<>();
-        ruleBotHandHistory = new ArrayList<>();
 
         if(numberOfHandsPlayed % 2 == 0) {
             aiBotStack = getRandomStackSizeOfAiBot();
@@ -114,9 +108,6 @@ public class SimulatedHand {
             ruleBotStack = ruleBotStack - 0.25;
 
             aiBotIsButton = false;
-
-            aiBotHandHistory.add("Preflop " + "posts Big Blind " + aiBotBetSize + " Stack:" + aiBotStack);
-            ruleBotHandHistory.add("Preflop " + "posts Small Blind " + ruleBotBetSize + " Stack:" + ruleBotStack);
         } else {
             aiBotStack = getRandomStackSizeOfAiBot();
             aiBotStackAtStartHand = aiBotStack;
@@ -130,9 +121,6 @@ public class SimulatedHand {
             ruleBotStack = ruleBotStack - 0.50;
 
             aiBotIsButton = true;
-
-            aiBotHandHistory.add("Preflop " + "posts Small Blind " + aiBotBetSize + " Stack:" + aiBotStack);
-            ruleBotHandHistory.add("Preflop " + "posts Big Blind " + ruleBotBetSize + " Stack:" + ruleBotStack);
         }
 
         calculateHandStrengthsAndDraws();
@@ -385,8 +373,6 @@ public class SimulatedHand {
                 aiBotBetSize = aiBotNewBetSize;
             }
         }
-
-        aiBotHandHistory.add(getStreetForHistory() + " Action: " + aiBotAction + " aiBotBetsize: " + aiBotBetSize + " aiBotStack: " + aiBotStack + " potsize: " + pot);
     }
 
     private void doRuleBotAction() {
@@ -529,8 +515,6 @@ public class SimulatedHand {
                 ruleBotBetSize = ruleBotNewBetSize;
             }
         }
-
-        ruleBotHandHistory.add(getStreetForHistory() + " Action: " + ruleBotAction + " ruleBotBetsize: " + ruleBotBetSize + " ruleBotStack: " + ruleBotStack + " potsize: " + pot);
     }
 
     private int getHighestKeyFromMap() {
