@@ -333,7 +333,7 @@ public class Poker {
         return sortByValueHighToLow(sortedEligibleActions);
     }
 
-    private List<String> getAllRoutes() {
+    public List<String> getAllRoutes() {
         List<String> street = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> potSize = new ArrayList<>();
@@ -405,31 +405,31 @@ public class Poker {
         return allRoutes;
     }
 
-    private void storeRoutesInDb(List<String> routes) throws Exception {
+    public void storeRoutesInDb(List<String> routes) throws Exception {
         initializeDbConnection();
 
         List<String> databases = new ArrayList<>();
 
-//        databases.add("ta_hs_0_5");
-//        databases.add("ta_hs_5_10");
-//        databases.add("ta_hs_10_15");
-//        databases.add("ta_hs_15_20");
-//        databases.add("ta_hs_20_25");
-//        databases.add("ta_hs_25_30");
-//        databases.add("ta_hs_30_35");
-//        databases.add("ta_hs_35_40");
-//        databases.add("ta_hs_40_45");
-//        databases.add("ta_hs_45_50");
-//        databases.add("ta_hs_50_55");
-//        databases.add("ta_hs_55_60");
-//        databases.add("ta_hs_60_65");
-//        databases.add("ta_hs_65_70");
-//        databases.add("ta_hs_70_75");
-//        databases.add("ta_hs_75_80");
-//        databases.add("ta_hs_80_85");
-//        databases.add("ta_hs_85_90");
-//        databases.add("ta_hs_90_95");
-//        databases.add("ta_hs_95_100");
+        databases.add("ta_hs_0_5");
+        databases.add("ta_hs_5_10");
+        databases.add("ta_hs_10_15");
+        databases.add("ta_hs_15_20");
+        databases.add("ta_hs_20_25");
+        databases.add("ta_hs_25_30");
+        databases.add("ta_hs_30_35");
+        databases.add("ta_hs_35_40");
+        databases.add("ta_hs_40_45");
+        databases.add("ta_hs_45_50");
+        databases.add("ta_hs_50_55");
+        databases.add("ta_hs_55_60");
+        databases.add("ta_hs_60_65");
+        databases.add("ta_hs_65_70");
+        databases.add("ta_hs_70_75");
+        databases.add("ta_hs_75_80");
+        databases.add("ta_hs_80_85");
+        databases.add("ta_hs_85_90");
+        databases.add("ta_hs_90_95");
+        databases.add("ta_hs_95_100");
 
         databases.add("la_hs_0_5");
         databases.add("la_hs_5_10");
@@ -561,17 +561,18 @@ public class Poker {
 
     public void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff, AbstractOpponent opponent) {
         double payoffPerAction = totalPayoff / actionHistory.size();
+        String opponentType = getOpponentTypeString(opponent);
 
         for (Map.Entry<Integer, List<String>> entry : actionHistory.entrySet()) {
-            String opponentType = getOpponentTypeString(opponent);
+
             String table = getTableString(entry.getValue().get(0), opponentType);
             String route = entry.getValue().get(1);
             String action = entry.getValue().get(2);
             doDbPayoffUpdate(table, route, action, payoffPerAction);
             //doMemoryPayoffUpdate(route, action, payoffPerAction);
-
-            updateDbNumerOfHands(opponentType);
         }
+
+        updateDbNumerOfHands(opponentType);
     }
 
     private void doDbPayoffUpdate(String table, String route, String action, double payoffPerAction) {
@@ -586,19 +587,8 @@ public class Poker {
             initializeDbConnection();
 
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
-
-            rs.next();
-
-            int previousTimes = rs.getInt(actionTimes);
-            double previousTotalPayoff = rs.getDouble(actionPayoff);
-
-            rs.close();
+            st.executeUpdate("UPDATE " + table + " SET " + actionTimes + " = " + actionTimes + " + 1, " + actionPayoff + " = " + actionPayoff + " + " + payoffPerAction + " WHERE route = '" + route + "'");
             st.close();
-
-            Statement st2 = con.createStatement();
-            st2.executeUpdate("UPDATE " + table + " SET " + actionTimes + " = " + (previousTimes + 1) + ", " + actionPayoff + " = " + (previousTotalPayoff + payoffPerAction) + " WHERE route = '" + route + "'");
-            st2.close();
 
             closeDbConnection();
         } catch (Exception e) {
@@ -612,6 +602,7 @@ public class Poker {
 
             Statement st = con.createStatement();
             st.executeUpdate("UPDATE number_of_hands SET amount = amount + 1 WHERE type = '" + opponentType + "'");
+            st.executeUpdate("UPDATE number_of_hands SET amount = amount + 1 WHERE type = 'total'");
             st.close();
 
             closeDbConnection();

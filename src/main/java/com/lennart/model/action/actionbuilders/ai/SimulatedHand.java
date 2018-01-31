@@ -237,7 +237,7 @@ public class SimulatedHand {
         return scoreMap;
     }
 
-    private void updatePayoff(double totalPayoff) {
+    public void updatePayoff(double totalPayoff) {
         new Poker().updatePayoff(aiBotActionHistory, totalPayoff, ruleBot);
     }
 
@@ -545,7 +545,7 @@ public class SimulatedHand {
         if(bot.equals("aiBot")) {
             Poker poker = new Poker();
 
-            if(SimulatedHand.numberOfHandsPlayed > 50_000) {
+            if(SimulatedHand.numberOfHandsPlayed > 4_050_000) {
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     if(ruleBotStack == 0 || ((aiBotStack + aiBotBetSize) <= ruleBotBetSize)) {
                         List<String> eligibleActions = Arrays.asList("fold", "call");
@@ -647,7 +647,11 @@ public class SimulatedHand {
     }
 
     private double getPotSizeInBb() {
-        return pot / bigBlind;
+        if(board.isEmpty()) {
+            return (aiBotBetSize + ruleBotBetSize) / bigBlind;
+        } else {
+            return pot / bigBlind;
+        }
     }
 
     private double getAiBotBetSizeInBb() {
