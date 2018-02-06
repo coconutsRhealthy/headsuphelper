@@ -101,6 +101,20 @@ public class Poker {
         }
     }
 
+    public String getAction(String route, String table, List<String> eligibleActions) {
+        try {
+            Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
+            Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
+            Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
+
+            String action = sortedEligibleActions.entrySet().iterator().next().getKey();
+            return action;
+        } catch (Exception e) {
+            System.out.println("error occurred in getAction(String route, String table, List<String> eligibleActions)");
+            return null;
+        }
+    }
+
     public String getRoute(String street, boolean position, double potSizeBb, String opponentAction, double facingOdds,
                            double effectiveStackBb, boolean strongDraw) {
 
@@ -253,7 +267,7 @@ public class Poker {
         return opponentTypeString;
     }
 
-    private String getTableString(double handStrength, String opponentType) {
+    public String getTableString(double handStrength, String opponentType) {
         String table = "";
 
         if(handStrength >= 0 && handStrength < 0.05) {
@@ -514,7 +528,7 @@ public class Poker {
         closeDbConnection();
     }
 
-    private Map<String, Double> retrieveRouteDataFromDb(String route, String table) throws Exception {
+    public Map<String, Double> retrieveRouteDataFromDb(String route, String table) throws Exception {
         Map<String, Double> routeData = new HashMap<>();
 
 //        routeData.put("fold_times", 30.0);

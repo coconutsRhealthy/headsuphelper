@@ -52,6 +52,8 @@ public class SimulatedHand {
 
     private static int numberOfHandsPlayed = 0;
 
+    private boolean randomContinuation = false;
+
     public static void main(String[] args) {
         double aiBotTotalScore = 0;
         double ruleBotTotalScore = 0;
@@ -604,14 +606,14 @@ public class SimulatedHand {
                 || handEvaluator.hasDrawOfType("strongGutshot");
     }
 
-    private double getEffectiveStackInBb() {
+    public double getEffectiveStackInBb() {
         if(aiBotStack > ruleBotStack) {
             return ruleBotStack / bigBlind;
         }
         return aiBotStack / bigBlind;
     }
 
-    private double getPotSizeInBb() {
+    public double getPotSizeInBb() {
         if(board.isEmpty()) {
             return (aiBotBetSize + ruleBotBetSize) / bigBlind;
         } else {
@@ -627,12 +629,12 @@ public class SimulatedHand {
         return ruleBotBetSize / bigBlind;
     }
 
-    private double getFacingOdds() {
+    public double getFacingOdds() {
         double facingOdds = (ruleBotBetSize - aiBotBetSize) / (pot + aiBotBetSize + ruleBotBetSize);
         return facingOdds;
     }
 
-    private String getStreet() {
+    public String getStreet() {
         String street;
 
         if(board.isEmpty()) {
@@ -758,5 +760,57 @@ public class SimulatedHand {
         } else {
             return "ruleBot";
         }
+    }
+
+    public boolean isRandomContinuation() {
+        return randomContinuation;
+    }
+
+    public void setRandomContinuation(boolean randomContinuation) {
+        this.randomContinuation = randomContinuation;
+    }
+
+    public boolean isAiBotIsButton() {
+        return aiBotIsButton;
+    }
+
+    public String getRuleBotAction() {
+        return ruleBotAction;
+    }
+
+    public boolean isAiBotHasStrongDraw() {
+        return aiBotHasStrongDraw;
+    }
+
+    public double getAiBotHandStrength() {
+        return aiBotHandStrength;
+    }
+
+    public double getRuleBotStack() {
+        return ruleBotStack;
+    }
+
+    public double getAiBotStack() {
+        return aiBotStack;
+    }
+
+    public double getAiBotBetSize() {
+        return aiBotBetSize;
+    }
+
+    public double getRuleBotBetSize() {
+        return ruleBotBetSize;
+    }
+
+    public List<Card> getBoard() {
+        return board;
+    }
+
+    public double getBigBlind() {
+        return bigBlind;
+    }
+
+    public AbstractOpponent getRuleBot() {
+        return ruleBot;
     }
 }
