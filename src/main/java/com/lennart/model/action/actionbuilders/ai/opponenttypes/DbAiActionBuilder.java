@@ -4,10 +4,8 @@ import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.SimulatedHand;
 import com.lennart.model.card.Card;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,43 +14,31 @@ import java.util.Map;
  */
 public class DbAiActionBuilder {
 
-    private Connection con;
+    public String doAiDbAction(SimulatedHand simulatedHand) {
+        try {
+            String action;
 
-    //actie
+            String route = getRoute(simulatedHand);
+            String table = getTable(simulatedHand);
 
-    //vul alles tot 100 qua aantal
+            Map<String, Double> routeData = getRouteData(route, table);
 
-
-
-    //als alles 100 of hoger, kies degene met beste payoff
-
-    //als een van de opties onder de 100, kies dan een optie onder de 100
-
-    //rest van de hand moet random
-
-
-
-
-    public String doAiDbAction(SimulatedHand simulatedHand) throws Exception {
-        String action;
-
-        String route = getRoute(simulatedHand);
-        String table = getTable(simulatedHand);
-
-        Map<String, Double> routeData = getRouteData(route, table);
-
-        if(!simulatedHand.isRandomContinuation()) {
-            if(allOptionsHave100(routeData)) {
-                action = doActionWithHighestPayoff(simulatedHand, route, table);
+            if(!simulatedHand.isRandomContinuation()) {
+                if(allOptionsHave100(simulatedHand, routeData)) {
+                    action = doActionWithHighestPayoff(simulatedHand, route, table);
+                } else {
+                    action = pickOptionBelow100(simulatedHand, routeData);
+                    simulatedHand.setRandomContinuation(true);
+                }
             } else {
-                action = pickOptionBelow100(routeData);
-                simulatedHand.setRandomContinuation(true);
+                action = doRandomAction(simulatedHand);
             }
-        } else {
-            action = doRandomAction(simulatedHand);
-        }
 
-        return action;
+            return action;
+        } catch (Exception e) {
+            System.out.println("Exception occurred in doAiDbAction()");
+            return null;
+        }
     }
 
     private String getRoute(SimulatedHand simulatedHand) {
@@ -71,20 +57,70 @@ public class DbAiActionBuilder {
 
     private String getTable(SimulatedHand simulatedHand) {
         double handStrength = simulatedHand.getAiBotHandStrength();
-        String tableString = new Poker().getTableString(handStrength, "");
-        return tableString;
+        AbstractOpponent opponent = simulatedHand.getRuleBot();
+        Poker poker = new Poker();
+        String opponentTypeString = poker.getOpponentTypeString(opponent);
+        return new Poker().getTableString(handStrength, opponentTypeString);
     }
 
     private Map<String, Double> getRouteData(String route, String table) throws Exception {
         return new Poker().retrieveRouteDataFromDb(route, table);
     }
 
-    private boolean allOptionsHave100(Map<String, Double> routeData) {
-        return false;
+    private boolean allOptionsHave100(SimulatedHand simulatedHand, Map<String, Double> routeData) {
+        boolean allOptionsHave100 = true;
+
+        List<String> eligibleActions = getEligibleActions(simulatedHand);
+        eligibleActions = addPartToStringInList(eligibleActions, "_times");
+        Map<String, Double> mapToUse = new HashMap<>();
+
+        for (Map.Entry<String, Double> entry : routeData.entrySet()) {
+            if(eligibleActions.contains(entry.getKey())) {
+                mapToUse.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        for (Map.Entry<String, Double> entry : mapToUse.entrySet()) {
+            if(entry.getValue() < 100) {
+                allOptionsHave100 = false;
+                break;
+            }
+        }
+
+        return allOptionsHave100;
     }
 
-    private String pickOptionBelow100(Map<String, Double> routeData) {
-        return null;
+    private String pickOptionBelow100(SimulatedHand simulatedHand, Map<String, Double> routeData) {
+        String optionBelow100 = null;
+
+        List<String> eligibleActions = getEligibleActions(simulatedHand);
+        eligibleActions = addPartToStringInList(eligibleActions, "_times");
+        Map<String, Double> mapToUse = new HashMap<>();
+
+        for (Map.Entry<String, Double> entry : routeData.entrySet()) {
+            if(eligibleActions.contains(entry.getKey())) {
+                mapToUse.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        for (Map.Entry<String, Double> entry : mapToUse.entrySet()) {
+            if(entry.getValue() < 100) {
+                optionBelow100 = entry.getKey();
+                break;
+            }
+        }
+
+        optionBelow100 = optionBelow100.replace("_times", "");
+
+        return optionBelow100;
+    }
+
+    private List<String> addPartToStringInList(List<String> list, String part) {
+        for(int i = 0; i < list.size(); i++) {
+            String appendedString = list.get(i) + part;
+            list.set(i, appendedString);
+        }
+        return list;
     }
 
     private String doRandomAction(SimulatedHand simulatedHand) {
@@ -135,8 +171,11 @@ public class DbAiActionBuilder {
     }
 
     private String doActionWithHighestPayoff(SimulatedHand simulatedHand, String route, String table) {
-        String action;
+        List<String> eligibleActions = getEligibleActions(simulatedHand);
+        return new Poker().getAction(route, table, eligibleActions);
+    }
 
+    private List<String> getEligibleActions(SimulatedHand simulatedHand) {
         double aiBotBetSize = simulatedHand.getAiBotBetSize();
         double ruleBotBetSize = simulatedHand.getRuleBotBetSize();
         List<Card> board = simulatedHand.getBoard();
@@ -159,17 +198,6 @@ public class DbAiActionBuilder {
             }
         }
 
-        action = new Poker().getAction(route, table, eligibleActions);
-        return action;
+        return eligibleActions;
     }
-
-    private void initializeDbConnection() throws Exception {
-        Class.forName("com.mysql.jdbc.Driver").newInstance();
-        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "");
-    }
-
-    private void closeDbConnection() throws SQLException {
-        con.close();
-    }
-
 }

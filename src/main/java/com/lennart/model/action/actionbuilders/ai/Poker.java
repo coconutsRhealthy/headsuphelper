@@ -248,7 +248,7 @@ public class Poker {
         return streetString;
     }
 
-    private String getOpponentTypeString(AbstractOpponent opponent) {
+    public String getOpponentTypeString(AbstractOpponent opponent) {
         String opponentTypeString;
 
         if(opponent instanceof TightPassive) {
@@ -582,11 +582,40 @@ public class Poker {
             String table = getTableString(entry.getValue().get(0), opponentType);
             String route = entry.getValue().get(1);
             String action = entry.getValue().get(2);
-            doDbPayoffUpdate(table, route, action, payoffPerAction);
+
+            if(isPayoffUpdateNeeded(table, route, action)) {
+                doDbPayoffUpdate(table, route, action, payoffPerAction);
+            }
+
             //doMemoryPayoffUpdate(route, action, payoffPerAction);
         }
 
         updateDbNumerOfHands(opponentType);
+    }
+
+    private boolean isPayoffUpdateNeeded(String table, String route, String action) {
+        try {
+            String actionTimes = action + "_times";
+
+            initializeDbConnection();
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
+
+            rs.next();
+
+            double amount = rs.getDouble(actionTimes);
+
+            rs.close();
+            st.close();
+
+            closeDbConnection();
+
+            return amount < 100;
+        } catch (Exception e) {
+            System.out.println("Exception occured in isPayoffUpdateNeeded()");
+            return false;
+        }
     }
 
     private void doDbPayoffUpdate(String table, String route, String action, double payoffPerAction) {

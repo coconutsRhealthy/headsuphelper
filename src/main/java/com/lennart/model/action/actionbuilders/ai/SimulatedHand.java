@@ -529,48 +529,10 @@ public class SimulatedHand {
                     }
                 }
             } else {
+                aiBotAction = new DbAiActionBuilder().doAiDbAction(this);
+                String actionCopy = aiBotAction;
                 String route = poker.getRoute(getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw);
-
-                if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
-                    double random = Math.random();
-
-                    if(ruleBotStack == 0 || ((aiBotStack + aiBotBetSize) <= ruleBotBetSize)) {
-                        if(random < 0.5) {
-                            aiBotAction = "fold";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "fold"));
-                        } else {
-                            aiBotAction = "call";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "call"));
-                        }
-                    } else {
-                        if(random < 0.333) {
-                            aiBotAction = "fold";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "fold"));
-                        } else if(random < 0.666){
-                            aiBotAction = "call";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "call"));
-                        } else {
-                            aiBotAction = "raise";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "raise"));
-                        }
-                    }
-                } else {
-                    double random = Math.random();
-
-                    if(random < 0.5) {
-                        aiBotAction = "check";
-                        aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "check"));
-                    } else {
-                        //moet soms raise zijn
-                        if(board.isEmpty() && !aiBotIsButton && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
-                            aiBotAction = "raise";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "raise"));
-                        } else {
-                            aiBotAction = "bet75pct";
-                            aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, "bet75pct"));
-                        }
-                    }
-                }
+                aiBotActionHistory.put(getHighestKeyFromMap() + 1, Arrays.asList(String.valueOf(aiBotHandStrength), route, actionCopy));
             }
         } else if(bot.equals("ruleBot")) {
             ruleBotAction = ruleBot.doAction(aiBotAction, ruleBotHandStrength, ruleBotHasStrongDraw, getAiBotBetSizeInBb(),
