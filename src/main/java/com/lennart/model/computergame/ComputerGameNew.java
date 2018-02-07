@@ -131,9 +131,10 @@ public class ComputerGameNew {
         double opponentBetSizeBb = opponentTotalBetSize / bigBlind;
         double effectiveStack = getEffectiveStackInBb();
 
-        String action = new LooseAggressive(potSizeInMethodBb, computerStack / bigBlind).doAction(
-                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
-                (myStack / bigBlind), (computerStack / bigBlind), computerIsButton, board == null, board);
+
+
+        String action = new Poker().getAction(eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, new TightAggressive(0, 0));
+
 
 //        String action = new TightPassive().doAction(
 //                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
@@ -143,6 +144,27 @@ public class ComputerGameNew {
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
 
         return action;
+    }
+
+    public String getStreet() {
+        String street;
+
+        if(board == null || board.isEmpty()) {
+            street = "preflop";
+        } else if(board.size() == 3 || board.size() == 4) {
+            street = "flopOrTurn";
+        } else if(board.size() == 5) {
+            street = "river";
+        } else {
+            street = "wrong";
+        }
+
+        return street;
+    }
+
+    public double getFacingOdds() {
+        double facingOdds = (opponentTotalBetSize - computerTotalBetSize) / (potSize + computerTotalBetSize + opponentTotalBetSize);
+        return facingOdds;
     }
 
     private List<String> getEligibleComputerActions() {
@@ -888,5 +910,21 @@ public class ComputerGameNew {
 
     public void setTotalBotScore(double totalBotScore) {
         this.totalBotScore = totalBotScore;
+    }
+
+    public void setFlopCards(List<Card> flopCards) {
+        this.flopCards = flopCards;
+    }
+
+    public void setTurnCard(Card turnCard) {
+        this.turnCard = turnCard;
+    }
+
+    public void setRiverCard(Card riverCard) {
+        this.riverCard = riverCard;
+    }
+
+    public void setBoard(List<Card> board) {
+        this.board = board;
     }
 }

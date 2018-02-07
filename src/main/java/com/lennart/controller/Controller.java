@@ -2,6 +2,7 @@ package com.lennart.controller;
 
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.SimulatedHand;
+import com.lennart.model.computergame.ComputerGameNew;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -22,6 +23,28 @@ public class Controller extends SpringBootServletInitializer {
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(Controller.class);
+    }
+
+    @RequestMapping(value = "/startGame", method = RequestMethod.GET)
+    public @ResponseBody
+    ComputerGameNew startGame() {
+        ComputerGameNew computerGameNew = new ComputerGameNew("initialize");
+        //computerGame.setComputerAction(null);
+        return computerGameNew;
+    }
+
+    @RequestMapping(value = "/submitMyAction", method = RequestMethod.POST)
+    public @ResponseBody ComputerGameNew submitMyAction(@RequestBody ComputerGameNew computerGame) {
+        computerGame = computerGame.submitHumanActionAndDoComputerAction();
+        //computerGame.setComputerAction(null);
+        return computerGame;
+    }
+
+    @RequestMapping(value = "/proceedToNextHand", method = RequestMethod.POST)
+    public @ResponseBody ComputerGameNew proceedToNextHand(@RequestBody ComputerGameNew computerGame) {
+        computerGame = computerGame.proceedToNextHand();
+        //computerGame.setComputerAction(null);
+        return computerGame;
     }
 
     @RequestMapping(value = "/fillDbs", method = RequestMethod.GET)
