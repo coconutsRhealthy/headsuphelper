@@ -54,23 +54,23 @@ public class SimulatedHand {
 
     private boolean randomContinuation = false;
 
-    public static void main(String[] args) {
-        double aiBotTotalScore = 0;
-        double ruleBotTotalScore = 0;
-
-        for(int i = 0; i < 20; i++) {
-            Random rn = new Random();
-            int y = rn.nextInt(2 - 1 + 1) + 1;
-
-            SimulatedHand simulatedHand = new SimulatedHand(y);
-            Map<String, Double> scores = simulatedHand.playHand();
-
-            simulatedHand.updatePayoff(scores.get("aiBot"));
-
-            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
-            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
-        }
-    }
+//    public static void main(String[] args) {
+//        double aiBotTotalScore = 0;
+//        double ruleBotTotalScore = 0;
+//
+//        for(int i = 0; i < 20; i++) {
+//            Random rn = new Random();
+//            int y = rn.nextInt(2 - 1 + 1) + 1;
+//
+//            SimulatedHand simulatedHand = new SimulatedHand(y);
+//            Map<String, Double> scores = simulatedHand.playHand();
+//
+//            simulatedHand.updatePayoff(scores.get("aiBot"));
+//
+//            aiBotTotalScore = aiBotTotalScore + scores.get("aiBot");
+//            ruleBotTotalScore = ruleBotTotalScore + scores.get("ruleBot");
+//        }
+//    }
 
     public SimulatedHand(int numberOfHandsPlayed) {
         SimulatedHand.numberOfHandsPlayed++;
