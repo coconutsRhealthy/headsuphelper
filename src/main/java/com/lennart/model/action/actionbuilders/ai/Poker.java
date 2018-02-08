@@ -101,18 +101,10 @@ public class Poker {
         }
     }
 
-    public String getAction(String route, String table, List<String> eligibleActions) {
-        try {
-            Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
-            Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
-            Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
-
-            String action = sortedEligibleActions.entrySet().iterator().next().getKey();
-            return action;
-        } catch (Exception e) {
-            System.out.println("error occurred in getAction(String route, String table, List<String> eligibleActions)");
-            return null;
-        }
+    public String getAction(Map<String, Double> routeData, List<String> eligibleActions) {
+        Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
+        Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
+        return sortedEligibleActions.entrySet().iterator().next().getKey();
     }
 
     public String getRoute(String street, boolean position, double potSizeBb, String opponentAction, double facingOdds,
@@ -582,40 +574,11 @@ public class Poker {
             String table = getTableString(entry.getValue().get(0), opponentType);
             String route = entry.getValue().get(1);
             String action = entry.getValue().get(2);
-
-            if(isPayoffUpdateNeeded(table, route, action)) {
-                doDbPayoffUpdate(table, route, action, payoffPerAction);
-            }
-
+            doDbPayoffUpdate(table, route, action, payoffPerAction);
             //doMemoryPayoffUpdate(route, action, payoffPerAction);
         }
 
         updateDbNumerOfHands(opponentType);
-    }
-
-    private boolean isPayoffUpdateNeeded(String table, String route, String action) {
-        try {
-            String actionTimes = action + "_times";
-
-            initializeDbConnection();
-
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
-
-            rs.next();
-
-            double amount = rs.getDouble(actionTimes);
-
-            rs.close();
-            st.close();
-
-            closeDbConnection();
-
-            return amount < 100;
-        } catch (Exception e) {
-            System.out.println("Exception occured in isPayoffUpdateNeeded()");
-            return false;
-        }
     }
 
     private void doDbPayoffUpdate(String table, String route, String action, double payoffPerAction) {
@@ -630,7 +593,7 @@ public class Poker {
             initializeDbConnection();
 
             Statement st = con.createStatement();
-            st.executeUpdate("UPDATE " + table + " SET " + actionTimes + " = " + actionTimes + " + 1, " + actionPayoff + " = " + actionPayoff + " + " + payoffPerAction + " WHERE route = '" + route + "'");
+            st.executeUpdate("UPDATE " + table + " SET " + actionTimes + " = " + actionTimes + " + 1, " + actionPayoff + " = " + actionPayoff + " + " + payoffPerAction + " WHERE route = '" + route + "' AND " + actionTimes + " < 100");
             st.close();
 
             closeDbConnection();

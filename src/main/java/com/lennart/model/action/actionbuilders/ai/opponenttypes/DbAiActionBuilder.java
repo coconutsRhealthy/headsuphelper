@@ -25,7 +25,7 @@ public class DbAiActionBuilder {
 
             if(!simulatedHand.isRandomContinuation()) {
                 if(allOptionsHave100(simulatedHand, routeData)) {
-                    action = doActionWithHighestPayoff(simulatedHand, route, table);
+                    action = doActionWithHighestPayoff(simulatedHand, routeData);
                 } else {
                     action = pickOptionBelow100(simulatedHand, routeData);
                     simulatedHand.setRandomContinuation(true);
@@ -170,9 +170,9 @@ public class DbAiActionBuilder {
         return randomAction;
     }
 
-    private String doActionWithHighestPayoff(SimulatedHand simulatedHand, String route, String table) {
+    private String doActionWithHighestPayoff(SimulatedHand simulatedHand, Map<String, Double> routeData) {
         List<String> eligibleActions = getEligibleActions(simulatedHand);
-        return new Poker().getAction(route, table, eligibleActions);
+        return new Poker().getAction(routeData, eligibleActions);
     }
 
     private List<String> getEligibleActions(SimulatedHand simulatedHand) {
