@@ -85,10 +85,10 @@ public class Poker {
     }
 
     public String getAction(List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
-                            double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, AbstractOpponent opponent) {
+                            double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType) {
         try {
             String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
-            String table = getTableString(handStrength, getOpponentTypeString(opponent));
+            String table = getTableString(handStrength, opponentType);
 
             Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
             Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
@@ -238,25 +238,6 @@ public class Poker {
         }
 
         return streetString;
-    }
-
-    public String getOpponentTypeString(AbstractOpponent opponent) {
-        String opponentTypeString;
-
-        if(opponent instanceof TightPassive) {
-            opponentTypeString = "tp";
-        } else if(opponent instanceof TightAggressive) {
-            opponentTypeString = "ta";
-        } else if(opponent instanceof LoosePassive) {
-            opponentTypeString = "lp";
-        } else if(opponent instanceof LooseAggressive) {
-            opponentTypeString = "la";
-        } else {
-            opponentTypeString = null;
-            System.out.println("No valid opponentType");
-        }
-
-        return opponentTypeString;
     }
 
     public String getTableString(double handStrength, String opponentType) {
@@ -565,9 +546,8 @@ public class Poker {
     }
 
 
-    public void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff, AbstractOpponent opponent) {
+    public void updatePayoff(Map<Integer, List<String>> actionHistory, double totalPayoff, String opponentType) {
         double payoffPerAction = totalPayoff / actionHistory.size();
-        String opponentType = getOpponentTypeString(opponent);
 
         for (Map.Entry<Integer, List<String>> entry : actionHistory.entrySet()) {
 

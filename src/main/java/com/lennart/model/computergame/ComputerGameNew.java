@@ -133,7 +133,7 @@ public class ComputerGameNew {
 
 
 
-        String action = new Poker().getAction(eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, new TightAggressive(0, 0));
+        String action = new Poker().getAction(eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "ta");
 
 
 //        String action = new TightPassive().doAction(

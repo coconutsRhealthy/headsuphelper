@@ -58,8 +58,7 @@ public class DbAiActionBuilder {
     private String getTable(SimulatedHand simulatedHand) {
         double handStrength = simulatedHand.getAiBotHandStrength();
         AbstractOpponent opponent = simulatedHand.getRuleBot();
-        Poker poker = new Poker();
-        String opponentTypeString = poker.getOpponentTypeString(opponent);
+        String opponentTypeString = simulatedHand.getOpponentTypeString(opponent);
         return new Poker().getTableString(handStrength, opponentTypeString);
     }
 
