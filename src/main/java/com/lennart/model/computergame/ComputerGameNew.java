@@ -125,14 +125,20 @@ public class ComputerGameNew {
         double handStrength = computerHandStrength;
         boolean strongDraw = computerHasStrongDraw;
         boolean position = computerIsButton;
-        double potSizeInMethodBb = potSize / bigBlind;
+        double potSizeInMethodBb = getAaPotSizeInBb();
         double computerBetSizeBb = computerTotalBetSize / bigBlind;
         double opponentBetSizeBb = opponentTotalBetSize / bigBlind;
         double effectiveStack = getEffectiveStackInBb();
 
 
-        String opponentType = new OpponentIdentifier().getOpponentType("izo", numberOfHandsPlayed);
-        String action = new Poker().getAction(eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType);
+        //String opponentType = new OpponentIdentifier().getOpponentType("izo", numberOfHandsPlayed);
+
+        String opponentType = "la";
+
+        setMyActionToBetIfPreflopNecessary();
+
+        //System.out.println("opponentType: " + opponentType);
+        String action = new Poker().getAction(eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board);
 
 //        String action = new TightPassive().doAction(
 //                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
@@ -142,6 +148,20 @@ public class ComputerGameNew {
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
 
         return action;
+    }
+
+    private void setMyActionToBetIfPreflopNecessary() {
+        if(board == null && myAction == null && computerTotalBetSize + opponentTotalBetSize == 0.75) {
+            myAction = "bet";
+        }
+    }
+
+    public double getAaPotSizeInBb() {
+        if(board == null || board.isEmpty()) {
+            return (computerTotalBetSize + opponentTotalBetSize) / bigBlind;
+        } else {
+            return potSize / bigBlind;
+        }
     }
 
     public String getStreet() {
@@ -207,6 +227,9 @@ public class ComputerGameNew {
         //double sizing = new Sizing().getRuleBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
 
         double sizing = new Sizing().getRuleBotSizing(computerHandStrength, opponentTotalBetSize, computerTotalBetSize, myStack, computerStack, potSize, board);
+
+        sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
+
 //        double sizing = 0;
 //
 //        if(computerWrittenAction.contains("bet")) {

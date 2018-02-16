@@ -5,6 +5,7 @@ import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.LoosePassive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightAggressive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
+import com.lennart.model.card.Card;
 
 import java.sql.*;
 import java.util.*;
@@ -85,20 +86,78 @@ public class Poker {
     }
 
     public String getAction(List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
-                            double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType) {
+                            double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                            double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board) {
         try {
             String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
+
+            //System.out.println(route);
+
             String table = getTableString(handStrength, opponentType);
 
-            Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
-            Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
-            Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
+            //System.out.println(table);
 
-            return sortedEligibleActions.entrySet().iterator().next().getKey();
+            Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
+
+            if(!routeDataIsBigEnough(routeData, eligibleActions)) {
+                System.out.println("xxxx");
+
+                return new LooseAggressive(potSizeBb, effectiveStackBb).doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board);
+                //return getRuleActionWhenDataIsLimited(eligibleActions, handStrength);
+            } else {
+                Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
+                Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
+
+                return sortedEligibleActions.entrySet().iterator().next().getKey();
+            }
         } catch (Exception e) {
             System.out.println("error occurred in getAction()");
             return null;
         }
+    }
+
+    private boolean routeDataIsBigEnough(Map<String, Double> routeData, List<String> eligibleActions) {
+        boolean routeDataIsBigEnough = false;
+
+        if(eligibleActions.contains("check")) {
+            double checkTimes = routeData.get("check_times");
+            double betTimes = routeData.get("bet75pct_times");
+
+            if(checkTimes >= 9.0 && betTimes >= 9.0) {
+                routeDataIsBigEnough = true;
+            }
+        } else {
+            double foldTimes = routeData.get("fold_times");
+            double callTimes = routeData.get("call_times");
+            double raiseTimes = routeData.get("raise_times");
+
+            if(foldTimes >= 9.0 && callTimes >= 9.0 && raiseTimes >= 9.0) {
+                routeDataIsBigEnough = true;
+            }
+        }
+
+        return routeDataIsBigEnough;
+    }
+
+    private String getRuleActionWhenDataIsLimited(List<String> eligibleActions, double handStrength) {
+        String ruleAction;
+
+        if(eligibleActions.contains("check")) {
+            if(handStrength > 0.9) {
+                ruleAction = "bet75pct";
+            } else {
+                ruleAction = "check";
+            }
+        } else {
+
+            if(handStrength > 0.9) {
+                ruleAction = "call";
+            } else {
+                ruleAction = "fold";
+            }
+        }
+
+        return ruleAction;
     }
 
     public String getAction(Map<String, Double> routeData, List<String> eligibleActions) {
@@ -169,7 +228,7 @@ public class Poker {
     private String getOpponentActionString(String action) {
         String opponentActionString;
 
-        if(action.contains("empty")) {
+        if(action == null || action.contains("empty")) {
             opponentActionString = "OpponentActionEmpty";
         } else if(action.contains("check")) {
             opponentActionString = "OpponentActionCheck";
