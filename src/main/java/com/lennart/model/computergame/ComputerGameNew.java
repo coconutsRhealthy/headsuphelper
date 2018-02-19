@@ -131,13 +131,13 @@ public class ComputerGameNew {
         double effectiveStack = getEffectiveStackInBb();
 
 
-        //String opponentType = new OpponentIdentifier().getOpponentType("izo", numberOfHandsPlayed);
+        String opponentType = new OpponentIdentifier().getOpponentType("izo", numberOfHandsPlayed);
 
-        String opponentType = "la";
+        //String opponentType = "la";
 
         setMyActionToBetIfPreflopNecessary();
 
-        //System.out.println("opponentType: " + opponentType);
+        System.out.println("opponentType: " + opponentType);
         String action = new Poker().getAction(eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board);
 
 //        String action = new TightPassive().doAction(
@@ -309,14 +309,15 @@ public class ComputerGameNew {
             updatePotSize("call");
             resetAllBets();
 
-            if(board == null || board.size() < 5) {
+            if(board != null && board.size() == 5) {
+                printWinnerAndHand();
+                return;
+            } else if(board == null || board.size() < 5) {
                 resetActions();
                 proceedToNextStreet();
-            } else if(board.size() == 5) {
-                printWinnerAndHand();
             }
 
-            if(board != null && board.size() != 5 && !computerIsButton) {
+            if(board != null && !computerIsButton) {
                 doComputerAction();
             }
         }
@@ -568,6 +569,7 @@ public class ComputerGameNew {
         getNewCardDeck();
         dealHoleCards();
         postBlinds();
+        calculateHandStrengthsAndDraws();
 
         if(isComputerIsButton()) {
             doComputerAction();
@@ -695,6 +697,33 @@ public class ComputerGameNew {
         }
         return false;
     }
+
+
+//    public static void main(String[] args) {
+//        new ComputerGameNew().theMethod();
+//    }
+//
+//    private void theMethod() {
+//        board = new ArrayList<>();
+//        board.add(new Card(6, 'd'));
+//        board.add(new Card(8, 'h'));
+//        board.add(new Card(10, 's'));
+//        board.add(new Card(10, 'd'));
+//        board.add(new Card(4, 'c'));
+//
+//        computerHoleCards = new ArrayList<>();
+//        computerHoleCards.add(new Card(3, 'd'));
+//        computerHoleCards.add(new Card(14, 'd'));
+//
+//        myHoleCards = new ArrayList<>();
+//        myHoleCards.add(new Card(14, 'c'));
+//        myHoleCards.add(new Card(7, 'h'));
+//
+//        calculateHandStrengthsAndDraws();
+//        determineWinnerAtShowdown();
+//
+//    }
+
 
     private void calculateHandStrengthsAndDraws() {
         if(board == null) {

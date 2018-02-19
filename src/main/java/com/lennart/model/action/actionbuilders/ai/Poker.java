@@ -100,9 +100,14 @@ public class Poker {
             Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
 
             if(!routeDataIsBigEnough(routeData, eligibleActions)) {
-                System.out.println("xxxx");
+                //System.out.println("xxxx");
 
-                return new LooseAggressive(potSizeBb, effectiveStackBb).doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board);
+                if(opponentType.equals("tp") || opponentType.equals("lp")) {
+                    return new TightPassive().doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board);
+                } else if(opponentType.equals("ta") || opponentType.equals("la")) {
+                    return new LooseAggressive(potSizeBb, ownStackBb).doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board);
+                }
+
                 //return getRuleActionWhenDataIsLimited(eligibleActions, handStrength);
             } else {
                 Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
@@ -114,6 +119,7 @@ public class Poker {
             System.out.println("error occurred in getAction()");
             return null;
         }
+        return null;
     }
 
     private boolean routeDataIsBigEnough(Map<String, Double> routeData, List<String> eligibleActions) {
@@ -699,7 +705,7 @@ public class Poker {
 
     private void initializeDbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
-        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "Vuurwerk00");
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "");
     }
 
     private void closeDbConnection() throws SQLException {
