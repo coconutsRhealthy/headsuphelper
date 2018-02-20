@@ -67,23 +67,6 @@ public class NetBetTableReader {
         return potSize;
     }
 
-    public static double getPotSizeCheckFromImage() {
-        double potSizeCheck;
-        String potSizeCheckAsString = readPotSize(false);
-
-        if(potSizeCheckAsString.matches(".*\\d.*")){
-            try {
-                potSizeCheck = Double.parseDouble(potSizeCheckAsString);
-            } catch(NumberFormatException e) {
-                potSizeCheck = -1;
-                System.out.println("NumberFormatException occurred in getPotSizeCheckFromImage(), set to -1");
-            }
-        } else {
-            potSizeCheck = -1;
-        }
-        return potSizeCheck;
-    }
-
     public double getOpponentStackFromImage() {
         double opponentStack;
         String opponentStackAsString = readTopPlayerStack();
@@ -159,8 +142,7 @@ public class NetBetTableReader {
         return botTotalBetSize;
     }
 
-    public double getOpponentTotalBetSizeFromImage(double opponentCurrentStack, double opponentPreviousStack,
-                                                   double opponentPreviousTotalBetSize) {
+    public double getOpponentTotalBetSizeFromImage() {
         double opponentTotalBetSize;
         String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
         if(opponentTotalBetSizeAsString.matches(".*\\d.*")){
@@ -174,52 +156,7 @@ public class NetBetTableReader {
             opponentTotalBetSize = 0;
         }
 
-        if(opponentTotalBetSize / bigBlind > 40) {
-            if(opponentTotalBetSize / bigBlind > 300) {
-                if(opponentPreviousStack != -1 && opponentPreviousTotalBetSize != -1 && opponentCurrentStack != -1) {
-                    if(((opponentPreviousStack + opponentPreviousTotalBetSize) - opponentCurrentStack) / bigBlind < 300) {
-                        opponentTotalBetSize = (opponentPreviousStack + opponentPreviousTotalBetSize) - opponentCurrentStack;
-                        System.out.println("Adjusted opponentTotalBetSize. OpponentTotalBetSize is now: " + opponentTotalBetSize);
-                    }
-                }
-            }
-        }
         return opponentTotalBetSize;
-    }
-
-    public static double getAmountToCall() {
-        double callAmount = -1;
-        String middleActionButton = readMiddleActionButton();
-        String rightActionButton = readRightActionButton();
-
-        if(middleActionButton.contains("Call") && middleActionButton.matches(".*\\d.*")) {
-            try {
-                callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(middleActionButton));
-            } catch(NumberFormatException e) {
-                callAmount = -1;
-                System.out.println("NumberFormatException occurred in getAmountToCall(), set to -1");
-            }
-        }
-
-        if(rightActionButton.contains("Call") && rightActionButton.matches(".*\\d.*")) {
-            try {
-                callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
-            } catch(NumberFormatException e) {
-                callAmount = -1;
-                System.out.println("NumberFormatException occurred in getAmountToCall(), set to -1");
-            }
-        }
-
-        if(middleActionButtonIsNotPresent() && rightActionButton.matches(".*\\d.*")) {
-            try {
-                callAmount = Double.parseDouble(ImageProcessor.removeAllNonNumericCharacters(rightActionButton));
-            } catch(NumberFormatException e) {
-                callAmount = -1;
-                System.out.println("NumberFormatException occurred in getAmountToCall(), set to -1");
-            }
-        }
-        System.out.println("Amount to call according to getAmountToCall: " + callAmount);
-        return callAmount;
     }
 
     public Map<String, String> getActionsFromLastThreeChatLines() {
@@ -337,22 +274,18 @@ public class NetBetTableReader {
             }
         }
 
-        boolean clickActionDone = false;
-
-        System.out.println("action going into clickaction: " + botAction);
-
         if(botAction == null) {
-            clickActionDone = clickCheckActionButton();
+            clickCheckActionButton();
         } else if(botAction.contains("fold")) {
-            clickActionDone = clickFoldActionButton();
+            clickFoldActionButton();
         } else if(botAction.contains("check")) {
-            clickActionDone = clickCheckActionButton();
+            clickCheckActionButton();
         } else if(botAction.contains("call")) {
-            clickActionDone = clickCallActionButton();
+            clickCallActionButton();
         } else if(botAction.contains("bet")) {
-            clickActionDone = clickBetActionButton();
+            clickBetActionButton();
         } else if(botAction.contains("raise")) {
-            clickActionDone = clickRaiseActionButton();
+            clickRaiseActionButton();
         }
 
         MouseKeyboard.moveMouseToLocation(20, 20);
@@ -368,69 +301,6 @@ public class NetBetTableReader {
         }
         //when not present, expected: -16641770
         return true;
-    }
-
-    public int getOpponentVPIPFromImage() {
-        int vpip;
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(627, 430, 29, 17);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        String vpipAsString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        if(vpipAsString.matches(".*\\d.*")) {
-            try {
-                vpip = Integer.parseInt(vpipAsString);
-            } catch(NumberFormatException e) {
-                vpip = -1;
-                System.out.println("NumberFormatException occurred in getOpponentVPIPFromImage(), set to -1");
-            }
-        } else {
-            vpip = -1;
-            System.out.println("String didn't match .*\\d.* in getOpponentVPIPFromImage(), set to -1");
-        }
-        //System.out.println("vpip: " + vpip);
-        return vpip;
-    }
-
-    public int getOpponent3betFromImage() {
-        int _3bet;
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(627, 448, 29, 17);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        String _3betAsString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        if(_3betAsString.matches(".*\\d.*")) {
-            try {
-                _3bet = Integer.parseInt(_3betAsString);
-            } catch(NumberFormatException e) {
-                _3bet = -1;
-                System.out.println("NumberFormatException occurred in getOpponent3betFromImage(), set to -1");
-            }
-        } else {
-            _3bet = -1;
-            System.out.println("String didn't match .*\\d.* in getOpponent3betFromImage(), set to -1");
-        }
-        //System.out.println("3bet stat: " + _3bet);
-        return _3bet;
-    }
-
-    public int getOpponentHandsFromImage() {
-        int opponentHands;
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(627, 468, 29, 17);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        String opponentHandsAsString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        if(opponentHandsAsString.matches(".*\\d.*")) {
-            try {
-                opponentHands = Integer.parseInt(opponentHandsAsString);
-            } catch(NumberFormatException e) {
-                opponentHands = -1;
-                System.out.println("NumberFormatException occurred in getOpponentHandsFromImage(), set to -1");
-            }
-        } else {
-            opponentHands = -1;
-            System.out.println("String didn't match .*\\d.* in getOpponentHandsFromImage(), set to -1");
-        }
-        System.out.println("opponentHands: " + opponentHands);
-        return opponentHands;
     }
 
     //helper methods
@@ -778,9 +648,5 @@ public class NetBetTableReader {
             action = "deal";
         }
         return action;
-    }
-
-    private String getCurrentTimeStamp() {
-        return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
     }
 }

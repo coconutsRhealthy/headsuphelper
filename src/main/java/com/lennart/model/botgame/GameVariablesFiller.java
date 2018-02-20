@@ -42,15 +42,13 @@ public class GameVariablesFiller {
         setBotStack();
         setOpponentStack();
         setBotTotalBetSize();
-        setOpponentTotalBetSize(opponentStack, botHand.getOpponentStack(), botHand.getOpponentTotalBetSize());
+        setOpponentTotalBetSize();
         setCorrectedPotSize();
         setBotHoleCard1(botHand.getBotHoleCard1());
         setBotHoleCard2(botHand.getBotHoleCard2());
         setBotIsButton();
         setOpponentPlayerName();
         setActionsFromLastThreeChatLines();
-
-        //setOpponentStats(botHand.getOpponentStats());
 
         setFlopCard1(botHand.getFlopCard1());
         if(flopCard1 != null) {
@@ -84,10 +82,8 @@ public class GameVariablesFiller {
         botTotalBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
     }
 
-    public void setOpponentTotalBetSize(double opponentCurrentStack, double opponentPreviousStack,
-                                        double opponentPreviousTotalBetSize) {
-        opponentTotalBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage(opponentCurrentStack, opponentPreviousStack,
-                opponentPreviousTotalBetSize);
+    public void setOpponentTotalBetSize() {
+        opponentTotalBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
     }
 
     private void setSmallBlind() {

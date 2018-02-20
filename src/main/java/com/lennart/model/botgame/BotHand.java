@@ -1,6 +1,12 @@
 package com.lennart.model.botgame;
 
+import com.lennart.model.action.actionbuilders.ai.Poker;
+import com.lennart.model.action.actionbuilders.ai.Sizing;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.handevaluation.HandEvaluator;
+import com.lennart.model.handevaluation.PreflopHandStength;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
 import java.util.*;
@@ -17,7 +23,6 @@ public class BotHand {
     private double opponentStack;
     private double botTotalBetSize;
     private double opponentTotalBetSize;
-    private double smallBlind;
     private double bigBlind;
 
     private boolean botIsButton;
@@ -39,21 +44,16 @@ public class BotHand {
 
     private List<String> botActionHistory;
 
-    private double botStackAtBeginningOfHand;
-    private double opponentStackAtBeginningOfHand;
-
-    private List<String> opponentActionHistory;
-
-    private String botAction;
+    private double botHandStrength;
+    private boolean botHasStrongDraw;
 
     public BotHand() {
         //default constructor
     }
 
-    public BotHand(BotTable botTable) {
+    public BotHand(String initialize) {
         gameVariablesFiller = new GameVariablesFiller(this);
 
-        setSmallBlind();
         setBigBlind();
         setBotStack(true);
         setOpponentStack(true);
@@ -61,19 +61,20 @@ public class BotHand {
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setOpponentPlayerName();
-        setBotIsButton(botTable);
+        setBotIsButton();
         setBotHoleCard1();
         setBotHoleCard2();
         setBotHoleCards();
         setStreetAndPreviousStreet();
         setOpponentAction();
+        calculateHandStrengthAndDraws();
     }
 
     public void updateVariables(BotTable botTable) {
         gameVariablesFiller = new GameVariablesFiller(this);
 
         if(foldOrShowdownOccured()) {
-            botTable.setBotHand(new BotHand(botTable));
+            botTable.setBotHand(new BotHand());
         }
 
         setFlopCard1IfNecessary();
@@ -89,15 +90,93 @@ public class BotHand {
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
         setOpponentAction();
+        calculateHandStrengthAndDraws();
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
     }
 
     public void getNewBotAction() {
-        //botAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
-        botAction = "";
+        List<String> eligibleActions = getEligibleActions();
+        String streetInMethod = street;
+        boolean botIsButtonInMethod = botIsButton;
+        double potSizeBb = potSize / bigBlind;
+        String opponentActionInMethod = opponentAction;
+        double facingOdds = getFacingOdds();
+        double effectiveStack = getEffectiveStackInBb();
+        boolean botHasStrongDrawInMethod = botHasStrongDraw;
+        double botHandStrengthInMethod = botHandStrength;
+        String opponentType = new OpponentIdentifier().getOpponentType(opponentPlayerName, 0);
+        double opponentBetsizeBb = opponentTotalBetSize / bigBlind;
+        double botBetsizeBb = botTotalBetSize / bigBlind;
+        double opponentStackBb = opponentStack / bigBlind;
+        double botStackBb = botStack / bigBlind;
+        boolean preflop = board.isEmpty();
+        List<Card> boardInMethod = board;
+
+        String botAction = new Poker().getAction(eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod);
+        double sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, botTotalBetSize, botStack, opponentStack, potSize, bigBlind, board);
+
         updateBotActionHistory(botAction);
-        NetBetTableReader.performActionOnSite(botAction, 0);
+        NetBetTableReader.performActionOnSite(botAction, sizing);
+    }
+
+    private List<String> getEligibleActions() {
+        List<String> eligibleActions = new ArrayList<>();
+
+        if(opponentAction != null) {
+            if(opponentAction.contains("bet") || opponentAction.contains("raise")) {
+                if(opponentStack == 0 || (botStack + botTotalBetSize) <= opponentTotalBetSize) {
+                    eligibleActions.add("fold");
+                    eligibleActions.add("call");
+                } else {
+                    eligibleActions.add("fold");
+                    eligibleActions.add("call");
+                    eligibleActions.add("raise");
+                }
+            } else {
+                eligibleActions.add("check");
+                eligibleActions.add("bet75pct");
+            }
+        } else {
+            if(board == null) {
+                eligibleActions.add("fold");
+                eligibleActions.add("call");
+                eligibleActions.add("raise");
+            } else {
+                eligibleActions.add("check");
+                eligibleActions.add("bet75pct");
+            }
+        }
+
+        return eligibleActions;
+    }
+
+    private double getFacingOdds() {
+        double facingOdds = (opponentTotalBetSize - botTotalBetSize) / (potSize + botTotalBetSize + opponentTotalBetSize);
+        return facingOdds;
+    }
+
+    private double getEffectiveStackInBb() {
+        if(botStack > opponentStack) {
+            return opponentStack / bigBlind;
+        }
+        return botStack / bigBlind;
+    }
+
+    private void calculateHandStrengthAndDraws() {
+        if(!street.equals(streetAtPreviousActionRequest)) {
+            if(board.isEmpty()) {
+                PreflopHandStength preflopHandStength = new PreflopHandStength();
+                botHandStrength = preflopHandStength.getPreflopHandStength(botHoleCards);
+                botHasStrongDraw = false;
+            } else {
+                BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+                HandEvaluator handEvaluator = new HandEvaluator(botHoleCards, boardEvaluator);
+                botHandStrength = handEvaluator.getHandStrength(botHoleCards);
+                botHasStrongDraw = handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")
+                        || handEvaluator.hasDrawOfType("strongGutshot");
+            }
+        }
     }
 
     private void updateBotActionHistory(String action) {
@@ -108,18 +187,6 @@ public class BotHand {
         botActionHistory.add(street + " " + action);
     }
 
-    private void updateOpponentActionHistory(String action) {
-        if(opponentActionHistory == null) {
-            opponentActionHistory = new ArrayList<>();
-        }
-
-        if(action == null) {
-            opponentActionHistory.add(street + " null");
-        } else {
-            opponentActionHistory.add(street + " " + action);
-        }
-    }
-
     private void setBotHoleCard1() {
         botHoleCard1 = gameVariablesFiller.getBotHoleCard1();
     }
@@ -128,9 +195,6 @@ public class BotHand {
         botHoleCard2 = gameVariablesFiller.getBotHoleCard2();
     }
 
-
-
-    //main variables
     private void setBotStack(boolean initialize) {
         botStack = gameVariablesFiller.getBotStack();
     }
@@ -175,8 +239,6 @@ public class BotHand {
                 opponentAction = null;
             }
         }
-
-        updateOpponentActionHistory(opponentAction);
     }
 
     private boolean foldOrShowdownOccured() {
@@ -192,17 +254,12 @@ public class BotHand {
         return false;
     }
 
-    private void setSmallBlind() {
-        smallBlind = gameVariablesFiller.getSmallBlind();
-    }
-
     private void setBigBlind() {
         bigBlind = gameVariablesFiller.getBigBlind();
     }
 
-    private void setBotIsButton(BotTable botTable) {
+    private void setBotIsButton() {
         botIsButton = gameVariablesFiller.isBotIsButton();
-        botTable.addBooleanToBotIsButtonHistoryPerOpponentMap(opponentPlayerName, botIsButton);
     }
 
     private void setFlopCard1IfNecessary() {
@@ -281,60 +338,12 @@ public class BotHand {
     }
 
     //default getters and setters
-    public GameVariablesFiller getGameVariablesFiller() {
-        return gameVariablesFiller;
-    }
-
-    public void setGameVariablesFiller(GameVariablesFiller gameVariablesFiller) {
-        this.gameVariablesFiller = gameVariablesFiller;
-    }
-
     public double getPotSize() {
         return potSize;
     }
 
     public void setPotSize(double potSize) {
         this.potSize = potSize;
-    }
-
-    public double getBotStack() {
-        return botStack;
-    }
-
-    public void setBotStack(double botStack) {
-        this.botStack = botStack;
-    }
-
-    public double getOpponentStack() {
-        return opponentStack;
-    }
-
-    public void setOpponentStack(double opponentStack) {
-        this.opponentStack = opponentStack;
-    }
-
-    public double getBotTotalBetSize() {
-        return botTotalBetSize;
-    }
-
-    public void setBotTotalBetSize(double botTotalBetSize) {
-        this.botTotalBetSize = botTotalBetSize;
-    }
-
-    public double getOpponentTotalBetSize() {
-        return opponentTotalBetSize;
-    }
-
-    public void setOpponentTotalBetSize(double opponentTotalBetSize) {
-        this.opponentTotalBetSize = opponentTotalBetSize;
-    }
-
-    public double getSmallBlind() {
-        return smallBlind;
-    }
-
-    public void setSmallBlind(double smallBlind) {
-        this.smallBlind = smallBlind;
     }
 
     public double getBigBlind() {
@@ -345,68 +354,24 @@ public class BotHand {
         this.bigBlind = bigBlind;
     }
 
-    public boolean isBotIsButton() {
-        return botIsButton;
-    }
-
-    public void setBotIsButton(boolean botIsButton) {
-        this.botIsButton = botIsButton;
-    }
-
-    public String getOpponentPlayerName() {
-        return opponentPlayerName;
-    }
-
-    public void setOpponentPlayerName(String opponentPlayerName) {
-        this.opponentPlayerName = opponentPlayerName;
-    }
-
-    public String getOpponentAction() {
-        return opponentAction;
-    }
-
-    public void setOpponentAction(String opponentAction) {
-        this.opponentAction = opponentAction;
-    }
-
     public Card getBotHoleCard1() {
         return botHoleCard1;
-    }
-
-    public void setBotHoleCard1(Card botHoleCard1) {
-        this.botHoleCard1 = botHoleCard1;
     }
 
     public Card getBotHoleCard2() {
         return botHoleCard2;
     }
 
-    public void setBotHoleCard2(Card botHoleCard2) {
-        this.botHoleCard2 = botHoleCard2;
-    }
-
     public Card getFlopCard1() {
         return flopCard1;
-    }
-
-    public void setFlopCard1(Card flopCard1) {
-        this.flopCard1 = flopCard1;
     }
 
     public Card getFlopCard2() {
         return flopCard2;
     }
 
-    public void setFlopCard2(Card flopCard2) {
-        this.flopCard2 = flopCard2;
-    }
-
     public Card getFlopCard3() {
         return flopCard3;
-    }
-
-    public void setFlopCard3(Card flopCard3) {
-        this.flopCard3 = flopCard3;
     }
 
     public Card getTurnCard() {
@@ -417,39 +382,7 @@ public class BotHand {
         return riverCard;
     }
 
-    public List<Card> getBotHoleCards() {
-        return botHoleCards;
-    }
-
-    public void setBotHoleCards(List<Card> botHoleCards) {
-        this.botHoleCards = botHoleCards;
-    }
-
     public List<Card> getBoard() {
         return board;
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    public String getStreetAtPreviousActionRequest() {
-        return streetAtPreviousActionRequest;
-    }
-
-    public void setStreetAtPreviousActionRequest(String streetAtPreviousActionRequest) {
-        this.streetAtPreviousActionRequest = streetAtPreviousActionRequest;
-    }
-
-    public List<String> getBotActionHistory() {
-        return botActionHistory;
-    }
-
-    public void setBotActionHistory(List<String> botActionHistory) {
-        this.botActionHistory = botActionHistory;
     }
 }
