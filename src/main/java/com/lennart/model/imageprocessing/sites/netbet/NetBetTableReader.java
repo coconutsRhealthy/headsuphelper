@@ -505,7 +505,7 @@ public class NetBetTableReader {
     }
 
     private static String readPotSize(boolean includingZoom) {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(430, 255, 167, 28);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(515, 394, 51, 20);
 
         if(includingZoom) {
             bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
