@@ -2,6 +2,7 @@ package com.lennart.controller;
 
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.SimulatedHand;
+import com.lennart.model.botgame.BotTable;
 import com.lennart.model.computergame.ComputerGameNew;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -64,6 +65,26 @@ public class Controller extends SpringBootServletInitializer {
             Map<String, Double> scores = simulatedHand.playHand();
             simulatedHand.updatePayoff(scores.get("aiBot"));
         }
+    }
+
+    //Botgame:
+    @RequestMapping(value = "/startBotTable", method = RequestMethod.GET)
+    public @ResponseBody BotTable startBotTable() {
+        BotTable botTable = new BotTable("initialize");
+        botTable.getBotHand().setGameVariablesFiller(null);
+        return botTable;
+    }
+
+    @RequestMapping(value = "/getNewBotActionInBotTable", method = RequestMethod.POST)
+    public @ResponseBody BotTable getNewBotAction(@RequestBody BotTable botTable) {
+        //botTable.getNewBotActionInBotTable();
+        botTable.getBotHand().setGameVariablesFiller(null);
+        return botTable;
+    }
+
+    @RequestMapping(value = "/runBotTableContinuously", method = RequestMethod.GET)
+    public void runBotTableContinuously() {
+        new BotTable(true);
     }
 
     public static void main(String[] args) {

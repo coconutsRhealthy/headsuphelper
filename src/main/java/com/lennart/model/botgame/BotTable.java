@@ -2,6 +2,8 @@ package com.lennart.model.botgame;
 
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -10,14 +12,15 @@ import java.util.concurrent.TimeUnit;
 public class BotTable {
 
     private BotHand botHand;
+    private Map<String, Integer> numberOfHandsPerOpponentMap = new HashMap<>();
 
     public BotTable() {
         //default constructor
     }
 
     public BotTable(String initialize) {
-        botHand = new BotHand("initialize");
-        botHand.getNewBotAction();
+        botHand = new BotHand("initialize", this);
+        botHand.getNewBotAction(this);
     }
 
     public BotTable(boolean continuously) {
@@ -25,8 +28,8 @@ public class BotTable {
 
         while(initializationNeeded) {
             if(NetBetTableReader.botIsToAct()) {
-                botHand = new BotHand("initialize");
-                botHand.getNewBotAction();
+                botHand = new BotHand("initialize", this);
+                botHand.getNewBotAction(this);
                 initializationNeeded = false;
             }
 
@@ -52,7 +55,7 @@ public class BotTable {
 
     public void getNewBotAction() {
         botHand.updateVariables(this);
-        botHand.getNewBotAction();
+        botHand.getNewBotAction(this);
         System.out.println();
     }
 
@@ -62,5 +65,17 @@ public class BotTable {
 
     public void setBotHand(BotHand botHand) {
         this.botHand = botHand;
+    }
+
+    public void updateNumberOfHandsPerOpponentMap(String opponentPlayerName) {
+        if(numberOfHandsPerOpponentMap.get(opponentPlayerName) == null) {
+            numberOfHandsPerOpponentMap.put(opponentPlayerName, 0);
+        } else {
+            numberOfHandsPerOpponentMap.put(opponentPlayerName, numberOfHandsPerOpponentMap.get(opponentPlayerName) + 1);
+        }
+    }
+
+    public Map<String, Integer> getNumberOfHandsPerOpponentMap() {
+        return numberOfHandsPerOpponentMap;
     }
 }

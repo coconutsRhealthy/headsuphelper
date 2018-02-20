@@ -51,7 +51,7 @@ public class BotHand {
         //default constructor
     }
 
-    public BotHand(String initialize) {
+    public BotHand(String initialize, BotTable botTable) {
         gameVariablesFiller = new GameVariablesFiller(this);
 
         setBigBlind();
@@ -66,7 +66,7 @@ public class BotHand {
         setBotHoleCard2();
         setBotHoleCards();
         setStreetAndPreviousStreet();
-        setOpponentAction();
+        setOpponentAction(botTable);
         calculateHandStrengthAndDraws();
     }
 
@@ -74,6 +74,7 @@ public class BotHand {
         gameVariablesFiller = new GameVariablesFiller(this);
 
         if(foldOrShowdownOccured()) {
+            botTable.updateNumberOfHandsPerOpponentMap(opponentPlayerName);
             botTable.setBotHand(new BotHand());
         }
 
@@ -89,13 +90,13 @@ public class BotHand {
         setBotTotalBetSize();
         setOpponentTotalBetSize();
         setStreetAndPreviousStreet();
-        setOpponentAction();
+        setOpponentAction(botTable);
         calculateHandStrengthAndDraws();
 
         System.out.println("opponent action: " + opponentAction + " " + opponentTotalBetSize);
     }
 
-    public void getNewBotAction() {
+    public void getNewBotAction(BotTable botTable) {
         List<String> eligibleActions = getEligibleActions();
         String streetInMethod = street;
         boolean botIsButtonInMethod = botIsButton;
@@ -105,7 +106,7 @@ public class BotHand {
         double effectiveStack = getEffectiveStackInBb();
         boolean botHasStrongDrawInMethod = botHasStrongDraw;
         double botHandStrengthInMethod = botHandStrength;
-        String opponentType = new OpponentIdentifier().getOpponentType(opponentPlayerName, 0);
+        String opponentType = new OpponentIdentifier().getOpponentType(opponentPlayerName, botTable.getNumberOfHandsPerOpponentMap().get(opponentPlayerName));
         double opponentBetsizeBb = opponentTotalBetSize / bigBlind;
         double botBetsizeBb = botTotalBetSize / bigBlind;
         double opponentStackBb = opponentStack / bigBlind;
@@ -219,7 +220,7 @@ public class BotHand {
         opponentPlayerName = gameVariablesFiller.getOpponentPlayerName();
     }
 
-    private void setOpponentAction() {
+    private void setOpponentAction(BotTable botTable) {
         Map<String, String> actionsFromLastThreeChatLines = gameVariablesFiller.getActionsFromLastThreeChatLines();
 
         if(street.equals(streetAtPreviousActionRequest)) {
@@ -239,6 +240,9 @@ public class BotHand {
                 opponentAction = null;
             }
         }
+
+        new OpponentIdentifier().updateCounts(opponentPlayerName, opponentAction,
+                botTable.getNumberOfHandsPerOpponentMap().get(opponentPlayerName));
     }
 
     private boolean foldOrShowdownOccured() {
@@ -384,5 +388,9 @@ public class BotHand {
 
     public List<Card> getBoard() {
         return board;
+    }
+
+    public void setGameVariablesFiller(GameVariablesFiller gameVariablesFiller) {
+        this.gameVariablesFiller = gameVariablesFiller;
     }
 }
