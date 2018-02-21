@@ -71,14 +71,12 @@ public class Controller extends SpringBootServletInitializer {
     @RequestMapping(value = "/startBotTable", method = RequestMethod.GET)
     public @ResponseBody BotTable startBotTable() {
         BotTable botTable = new BotTable("initialize");
-        botTable.getBotHand().setGameVariablesFiller(null);
         return botTable;
     }
 
     @RequestMapping(value = "/getNewBotActionInBotTable", method = RequestMethod.POST)
     public @ResponseBody BotTable getNewBotAction(@RequestBody BotTable botTable) {
-        //botTable.getNewBotActionInBotTable();
-        botTable.getBotHand().setGameVariablesFiller(null);
+        botTable.getNewBotActionInBotTable();
         return botTable;
     }
 

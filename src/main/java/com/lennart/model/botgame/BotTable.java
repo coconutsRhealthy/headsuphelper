@@ -42,7 +42,7 @@ public class BotTable {
 
         while(true) {
             if(NetBetTableReader.botIsToAct()) {
-                getNewBotAction();
+                getNewBotActionInBotTable();
             }
 
             try {
@@ -53,14 +53,10 @@ public class BotTable {
         }
     }
 
-    public void getNewBotAction() {
+    public void getNewBotActionInBotTable() {
         botHand.updateVariables(this);
         botHand.getNewBotAction(this);
         System.out.println();
-    }
-
-    public BotHand getBotHand() {
-        return botHand;
     }
 
     public void setBotHand(BotHand botHand) {

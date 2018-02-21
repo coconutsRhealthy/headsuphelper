@@ -1,13 +1,11 @@
 package com.lennart.model.imageprocessing.sites.netbet;
 
-import com.lennart.model.action.Action;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
 import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -157,6 +155,10 @@ public class NetBetTableReader {
         }
 
         return opponentTotalBetSize;
+    }
+
+    public String getOpponentAction() {
+        return "";
     }
 
     public Map<String, String> getActionsFromLastThreeChatLines() {
