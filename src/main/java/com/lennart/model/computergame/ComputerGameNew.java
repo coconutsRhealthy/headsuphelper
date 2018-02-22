@@ -534,8 +534,8 @@ public class ComputerGameNew {
         totalHumanScore = totalHumanScore + (myStack - 50);
         totalBotScore = totalBotScore + (computerStack - 50);
 
-        Precision.round(totalHumanScore, 2);
-        Precision.round(totalBotScore, 2);
+        totalHumanScore = Precision.round(totalHumanScore, 2);
+        totalBotScore = Precision.round(totalBotScore, 2);
 
         myStack = 50;
         computerStack = 50;

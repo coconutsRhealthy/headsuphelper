@@ -23,137 +23,35 @@ public class NetBetTableReader {
     public double getPotSizeFromImage() {
         double potSize;
         String potSizeAsString = readPotSize(true);
-        if(potSizeAsString.matches(".*\\d.*")){
-            try {
-                potSize = Double.parseDouble(potSizeAsString);
-            } catch(NumberFormatException e) {
-                potSize = -1;
-                System.out.println("NumberFormatException occurred in getPotSizeFromImage(), set to -1");
-            }
-        } else {
-            potSizeAsString = readPotSize(true);
-            if(potSizeAsString.matches(".*\\d.*")){
-                try {
-                    potSize = Double.parseDouble(potSizeAsString);
-                } catch(NumberFormatException e) {
-                    potSize = -1;
-                    System.out.println("NumberFormatException occurred in getPotSizeFromImage(), set to -1");
-                }
-            } else {
-                potSize = -1;
-                System.out.println("potSize not read well: -1");
-            }
-        }
-
-        if(potSize / bigBlind > 200) {
-            double potSizeCheck;
-            String potSizeCheckAsString = readPotSize(false);
-
-            if(potSizeCheckAsString.matches(".*\\d.*")){
-                try {
-                    potSizeCheck = Double.parseDouble(potSizeCheckAsString);
-
-                    if(potSizeCheck / bigBlind < 200) {
-                        potSize = potSizeCheck;
-                    }
-                } catch(NumberFormatException e) {
-                    potSize = -1;
-                    System.out.println("NumberFormatException occurred in getPotSizeFromImage(), set to -1");
-                }
-            }
-        }
+        potSize = Double.parseDouble(potSizeAsString);
         return potSize;
     }
 
     public double getOpponentStackFromImage() {
         double opponentStack;
         String opponentStackAsString = readTopPlayerStack();
-        if(opponentStackAsString.matches(".*\\d.*")){
-            try {
-                opponentStack = Double.parseDouble(opponentStackAsString);
-            } catch(NumberFormatException e) {
-                opponentStack = -1;
-                System.out.println("NumberFormatException occurred in getOpponentStackFromImage(), set to -1");
-            }
-        } else {
-            if(opponentStackAsString.contains("in")) {
-                //opponent is all-in
-                opponentStack = 0;
-            } else {
-                opponentStackAsString = readTopPlayerStack();
-                if(opponentStackAsString.matches(".*\\d.*")){
-                    try {
-                        opponentStack = Double.parseDouble(opponentStackAsString);
-                    } catch(NumberFormatException e) {
-                        opponentStack = -1;
-                        System.out.println("NumberFormatException occurred in getOpponentStackFromImage(), set to -1");
-                    }
-                } else {
-                    opponentStack = -1;
-                    System.out.println("opponentStack not read well: -1");
-                }
-            }
-        }
+        opponentStack = Double.parseDouble(opponentStackAsString);
         return opponentStack;
     }
 
     public double getBotStackFromImage() {
         double botStack;
         String botStackAsString = readBottomPlayerStack();
-        if(botStackAsString.matches(".*\\d.*")){
-            try {
-                botStack = Double.parseDouble(botStackAsString);
-            } catch(NumberFormatException e) {
-                botStack = -1;
-                System.out.println("NumberFormatException occurred in getBotStackFromImage(), set to -1");
-            }
-        } else {
-            botStackAsString = readBottomPlayerStack();
-            if(botStackAsString.matches(".*\\d.*")){
-                try {
-                    botStack = Double.parseDouble(botStackAsString);
-                } catch(NumberFormatException e) {
-                    botStack = -1;
-                    System.out.println("NumberFormatException occurred in getBotStackFromImage(), set to -1");
-                }
-            } else {
-                botStack = -1;
-                System.out.println("botStack not read well: -1");
-            }
-        }
+        botStack = Double.parseDouble(botStackAsString);
         return botStack;
     }
 
     public double getBotTotalBetSizeFromImage() {
         double botTotalBetSize;
         String botTotalBetSizeAsString = readBottomPlayerTotalBetSize();
-        if(botTotalBetSizeAsString.matches(".*\\d.*")){
-            try {
-                botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
-            } catch(NumberFormatException e) {
-                botTotalBetSize = -1;
-                System.out.println("NumberFormatException occurred in getBotTotalBetSizeFromImage(), set to -1");
-            }
-        } else {
-            botTotalBetSize = 0;
-        }
+        botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
         return botTotalBetSize;
     }
 
     public double getOpponentTotalBetSizeFromImage() {
         double opponentTotalBetSize;
         String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
-        if(opponentTotalBetSizeAsString.matches(".*\\d.*")){
-            try {
-                opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
-            } catch(NumberFormatException e) {
-                opponentTotalBetSize = -1;
-                System.out.println("NumberFormatException occurred in getOpponentTotalBetSizeFromImage(), set to -1");
-            }
-        } else {
-            opponentTotalBetSize = 0;
-        }
-
+        opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
         return opponentTotalBetSize;
     }
 

@@ -49,6 +49,7 @@ public class BotHand {
 
     public BotHand(String initialize, BotTable botTable) {
         readVariablesFromTable();
+        botTable.updateNumberOfHandsPerOpponentMap(opponentPlayerName);
         setStreetAndPreviousStreet();
         calculateHandStrengthAndDraws();
         updateOpponentIdentifier(botTable);
@@ -56,7 +57,6 @@ public class BotHand {
 
     public void updateVariables(BotTable botTable) {
         if(foldOrShowdownOccured()) {
-            botTable.updateNumberOfHandsPerOpponentMap(opponentPlayerName);
             botTable.setBotHand(new BotHand("initialize", botTable));
         } else {
             readVariablesFromTable();
@@ -160,7 +160,7 @@ public class BotHand {
                 eligibleActions.add("bet75pct");
             }
         } else {
-            if(board == null) {
+            if(board.isEmpty()) {
                 eligibleActions.add("fold");
                 eligibleActions.add("call");
                 eligibleActions.add("raise");
@@ -221,8 +221,13 @@ public class BotHand {
 
     private void setStreetAndPreviousStreet() {
         if(flopCard1 == null) {
-            streetAtPreviousActionRequest = "preflop";
-            street = "preflop";
+            if(streetAtPreviousActionRequest == null) {
+                streetAtPreviousActionRequest = "";
+                street = "preflop";
+            } else {
+                streetAtPreviousActionRequest = "preflop";
+                street = "preflop";
+            }
         }
         if(flopCard1 != null && turnCard == null) {
             streetAtPreviousActionRequest = street;
