@@ -22,36 +22,55 @@ public class NetBetTableReader {
 
     public double getPotSizeFromImage() {
         double potSize;
-        String potSizeAsString = readPotSize(true);
-        potSize = Double.parseDouble(potSizeAsString);
+        List<String> readValues = new ArrayList<>();
+
+        for(int i = 0; i < 5; i++) {
+            readValues.add(readPotSize(true));
+        }
+
+        potSize = getDoubleFromStringList(readValues);
         return potSize;
     }
 
     public double getOpponentStackFromImage() {
-        double opponentStack;
+        double opponentStack = 0;
         String opponentStackAsString = readTopPlayerStack();
-        opponentStack = Double.parseDouble(opponentStackAsString);
+
+        if(opponentStackAsString.matches(".*\\d.*")) {
+            opponentStack = Double.parseDouble(opponentStackAsString);
+        }
         return opponentStack;
     }
 
     public double getBotStackFromImage() {
         double botStack;
-        String botStackAsString = readBottomPlayerStack();
-        botStack = Double.parseDouble(botStackAsString);
+        List<String> readValues = new ArrayList<>();
+
+        for(int i = 0; i < 5; i++) {
+            readValues.add(readBottomPlayerStack());
+        }
+
+        botStack = getDoubleFromStringList(readValues);
         return botStack;
     }
 
     public double getBotTotalBetSizeFromImage() {
-        double botTotalBetSize;
+        double botTotalBetSize = 0;
         String botTotalBetSizeAsString = readBottomPlayerTotalBetSize();
-        botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
+
+        if(botTotalBetSizeAsString.matches(".*\\d.*")) {
+            botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
+        }
         return botTotalBetSize;
     }
 
     public double getOpponentTotalBetSizeFromImage() {
-        double opponentTotalBetSize;
+        double opponentTotalBetSize = 0;
         String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
-        opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
+
+        if(opponentTotalBetSizeAsString.matches(".*\\d.*")) {
+            opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
+        }
         return opponentTotalBetSize;
     }
 
@@ -68,6 +87,8 @@ public class NetBetTableReader {
             opponentAction = "check";
         } else if(bottomChatLine.contains("calls")) {
             opponentAction = "call";
+        } else if(bottomChatLine.contains("bets")) {
+            opponentAction = "bet75pct";
         } else if(bottomChatLine.contains("raise")) {
             opponentAction = "raise";
         }
@@ -548,5 +569,59 @@ public class NetBetTableReader {
             action = "deal";
         }
         return action;
+    }
+
+    private double getDoubleFromStringList(List<String> readValues) {
+        Map<String, Double> readDoublesMap = new HashMap<>();
+
+        for(String value : readValues) {
+            if(value.matches(".*\\d.*")) {
+                readDoublesMap.put(value, Double.parseDouble(value));
+            } else {
+                readDoublesMap.put(value, 0.0);
+            }
+        }
+
+        double toReturn = getDoubleClosestToAverage(readDoublesMap);
+        return toReturn;
+    }
+
+    private double getDoubleClosestToAverage(Map<String, Double> readDoublesMap) {
+        List<Double> mapValuesAsList = new ArrayList<>(readDoublesMap.values());
+
+        double total = 0;
+
+        for(Double d : mapValuesAsList) {
+            total = total + d;
+        }
+
+        double average = total / readDoublesMap.size();
+
+        Map<Double, Double> deviationMap = new HashMap<>();
+
+        for (Map.Entry<String, Double> entry : readDoublesMap.entrySet()) {
+            deviationMap.put(entry.getValue(), Math.abs(entry.getValue() - average));
+        }
+
+        deviationMap = sortByValueLowToHigh(deviationMap);
+
+        double toReturn = deviationMap.entrySet().iterator().next().getKey();
+        return toReturn;
+    }
+
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueLowToHigh(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o1.getValue() ).compareTo( o2.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 }
