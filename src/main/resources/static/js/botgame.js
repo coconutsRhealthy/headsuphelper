@@ -53,7 +53,7 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     $scope.getNewBotAction = function() {
-        $http.post('/getNewBotAction/', $scope.botTable).success(function(data) {
+        $http.post('/getNewBotActionInBotTable/', $scope.botTable).success(function(data) {
             setScopePropertiesCorrect(data);
         })
     }

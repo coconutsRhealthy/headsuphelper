@@ -74,4 +74,12 @@ public class BotTable {
     public Map<String, Integer> getNumberOfHandsPerOpponentMap() {
         return numberOfHandsPerOpponentMap;
     }
+
+    public BotHand getBotHand() {
+        return botHand;
+    }
+
+    public void setNumberOfHandsPerOpponentMap(Map<String, Integer> numberOfHandsPerOpponentMap) {
+        this.numberOfHandsPerOpponentMap = numberOfHandsPerOpponentMap;
+    }
 }

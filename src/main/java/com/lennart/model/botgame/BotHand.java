@@ -38,6 +38,7 @@ public class BotHand {
     private Card turnCard;
     private Card riverCard;
     private List<Card> botHoleCards;
+    private List<Card> flopCards;
     private List<Card> board;
 
     private double botHandStrength;
@@ -99,6 +100,12 @@ public class BotHand {
                 board.add(flopCard1);
                 board.add(flopCard2);
                 board.add(flopCard3);
+
+                flopCards = new ArrayList<>();
+
+                flopCards.add(flopCard1);
+                flopCards.add(flopCard2);
+                flopCards.add(flopCard3);
             }
         }
 
@@ -237,5 +244,190 @@ public class BotHand {
             streetAtPreviousActionRequest = street;
             street = "river";
         }
+    }
+
+
+    public double getBigBlind() {
+        return bigBlind;
+    }
+
+    public void setBigBlind(double bigBlind) {
+        this.bigBlind = bigBlind;
+    }
+
+    public double getPotSize() {
+        return potSize;
+    }
+
+    public void setPotSize(double potSize) {
+        this.potSize = potSize;
+    }
+
+    public double getBotStack() {
+        return botStack;
+    }
+
+    public void setBotStack(double botStack) {
+        this.botStack = botStack;
+    }
+
+    public double getOpponentStack() {
+        return opponentStack;
+    }
+
+    public void setOpponentStack(double opponentStack) {
+        this.opponentStack = opponentStack;
+    }
+
+    public double getBotTotalBetSize() {
+        return botTotalBetSize;
+    }
+
+    public void setBotTotalBetSize(double botTotalBetSize) {
+        this.botTotalBetSize = botTotalBetSize;
+    }
+
+    public double getOpponentTotalBetSize() {
+        return opponentTotalBetSize;
+    }
+
+    public void setOpponentTotalBetSize(double opponentTotalBetSize) {
+        this.opponentTotalBetSize = opponentTotalBetSize;
+    }
+
+    public boolean isBotIsButton() {
+        return botIsButton;
+    }
+
+    public void setBotIsButton(boolean botIsButton) {
+        this.botIsButton = botIsButton;
+    }
+
+    public String getOpponentPlayerName() {
+        return opponentPlayerName;
+    }
+
+    public void setOpponentPlayerName(String opponentPlayerName) {
+        this.opponentPlayerName = opponentPlayerName;
+    }
+
+    public String getOpponentAction() {
+        return opponentAction;
+    }
+
+    public void setOpponentAction(String opponentAction) {
+        this.opponentAction = opponentAction;
+    }
+
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getStreetAtPreviousActionRequest() {
+        return streetAtPreviousActionRequest;
+    }
+
+    public void setStreetAtPreviousActionRequest(String streetAtPreviousActionRequest) {
+        this.streetAtPreviousActionRequest = streetAtPreviousActionRequest;
+    }
+
+    public Card getBotHoleCard1() {
+        return botHoleCard1;
+    }
+
+    public void setBotHoleCard1(Card botHoleCard1) {
+        this.botHoleCard1 = botHoleCard1;
+    }
+
+    public Card getBotHoleCard2() {
+        return botHoleCard2;
+    }
+
+    public void setBotHoleCard2(Card botHoleCard2) {
+        this.botHoleCard2 = botHoleCard2;
+    }
+
+    public Card getFlopCard1() {
+        return flopCard1;
+    }
+
+    public void setFlopCard1(Card flopCard1) {
+        this.flopCard1 = flopCard1;
+    }
+
+    public Card getFlopCard2() {
+        return flopCard2;
+    }
+
+    public void setFlopCard2(Card flopCard2) {
+        this.flopCard2 = flopCard2;
+    }
+
+    public Card getFlopCard3() {
+        return flopCard3;
+    }
+
+    public void setFlopCard3(Card flopCard3) {
+        this.flopCard3 = flopCard3;
+    }
+
+    public Card getTurnCard() {
+        return turnCard;
+    }
+
+    public void setTurnCard(Card turnCard) {
+        this.turnCard = turnCard;
+    }
+
+    public Card getRiverCard() {
+        return riverCard;
+    }
+
+    public void setRiverCard(Card riverCard) {
+        this.riverCard = riverCard;
+    }
+
+    public List<Card> getBotHoleCards() {
+        return botHoleCards;
+    }
+
+    public void setBotHoleCards(List<Card> botHoleCards) {
+        this.botHoleCards = botHoleCards;
+    }
+
+    public List<Card> getBoard() {
+        return board;
+    }
+
+    public void setBoard(List<Card> board) {
+        this.board = board;
+    }
+
+    public double getBotHandStrength() {
+        return botHandStrength;
+    }
+
+    public void setBotHandStrength(double botHandStrength) {
+        this.botHandStrength = botHandStrength;
+    }
+
+    public boolean isBotHasStrongDraw() {
+        return botHasStrongDraw;
+    }
+
+    public void setBotHasStrongDraw(boolean botHasStrongDraw) {
+        this.botHasStrongDraw = botHasStrongDraw;
+    }
+
+    public List<Card> getFlopCards() {
+        return flopCards;
+    }
+
+    public void setFlopCards(List<Card> flopCards) {
+        this.flopCards = flopCards;
     }
 }
