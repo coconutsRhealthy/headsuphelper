@@ -12,7 +12,7 @@ public class LoosePassive extends AbstractOpponent {
     @Override
     public String doAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
                            double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position,
-                           boolean preflop, List<Card> board) {
+                           boolean preflop, List<Card> board, double facingOdds) {
         String action;
 
         if(preflop) {

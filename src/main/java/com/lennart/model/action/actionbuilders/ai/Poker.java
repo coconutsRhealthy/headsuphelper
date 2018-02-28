@@ -103,9 +103,9 @@ public class Poker {
                 //System.out.println("xxxx");
 
                 if(opponentType.equals("tp") || opponentType.equals("lp")) {
-                    return new TightPassive().doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board);
+                    return new TightPassive().doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board, facingOdds);
                 } else if(opponentType.equals("ta") || opponentType.equals("la")) {
-                    return new LooseAggressive(potSizeBb, ownStackBb).doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board);
+                    return new LooseAggressive(potSizeBb, ownStackBb).doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board, facingOdds);
                 }
 
                 //return getRuleActionWhenDataIsLimited(eligibleActions, handStrength);
