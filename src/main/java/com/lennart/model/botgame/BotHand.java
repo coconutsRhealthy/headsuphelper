@@ -207,16 +207,12 @@ public class BotHand {
     }
 
     private boolean foldOrShowdownOccured() {
-//        Map<String, String> actionsFromLastThreeChatLines = new NetBetTableReader(bigBlind).getActionsFromLastThreeChatLines();
-//
-//        for (Map.Entry<String, String> entry : actionsFromLastThreeChatLines.entrySet()) {
-//            if(entry.getValue() != null && entry.getValue().equals("deal")) {
-//                System.out.println("Fold or showdown occured: true");
-//                return true;
-//            }
-//        }
-//        System.out.println("Fold or showdown occured: false");
-        return false;
+        NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
+
+        double botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
+        double opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
+
+        return botBetSize == bigBlind / 2 || opponentBetSize == bigBlind / 2;
     }
 
     private void setStreetAndPreviousStreet() {
