@@ -20,117 +20,73 @@ public class NetBetTableReader {
         this.bigBlind = bigBlind;
     }
 
-    public static void main(String[] args) {
-        new NetBetTableReader(0.0).getPotSizeFromImage();
-    }
-
     public double getPotSizeFromImage() {
         double potSize;
-        List<String> readValues = new ArrayList<>();
+        String potSizeAsString = readPotSize(true);
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readPotSize(1, false, false));
-            readValues.add(readPotSize(1, false, true));
-            readValues.add(readPotSize(1, true, false));
-            readValues.add(readPotSize(1, true, true));
+        if(potSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            potSize = Double.parseDouble(potSizeAsString);
+        } else {
+            potSize = 0.0;
         }
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readPotSize(2, false, false));
-            readValues.add(readPotSize(2, false, true));
-            readValues.add(readPotSize(2, true, false));
-            readValues.add(readPotSize(2, true, true));
-        }
-
-        potSize = getDoubleFromStringList(readValues);
+        potSize = validateReadNumber(potSize);
         return potSize;
     }
 
     public double getOpponentStackFromImage() {
         double opponentStack;
-        List<String> readValues = new ArrayList<>();
+        String opponentStackAsString = readTopPlayerStack();
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readTopPlayerStack(1, false, false));
-            readValues.add(readTopPlayerStack(1, false, true));
-            readValues.add(readTopPlayerStack(1, true, false));
-            readValues.add(readTopPlayerStack(1, true, true));
+        if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            opponentStack = Double.parseDouble(opponentStackAsString);
+        } else {
+            opponentStack = 0.0;
         }
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readTopPlayerStack(2, false, false));
-            readValues.add(readTopPlayerStack(2, false, true));
-            readValues.add(readTopPlayerStack(2, true, false));
-            readValues.add(readTopPlayerStack(2, true, true));
-        }
-
-        opponentStack = getDoubleFromStringList(readValues);
+        opponentStack = validateReadNumber(opponentStack);
         return opponentStack;
     }
 
     public double getBotStackFromImage() {
         double botStack;
-        List<String> readValues = new ArrayList<>();
+        String botStackAsString = readBottomPlayerStack();
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readBottomPlayerStack(1, false, false));
-            readValues.add(readBottomPlayerStack(1, false, true));
-            readValues.add(readBottomPlayerStack(1, true, false));
-            readValues.add(readBottomPlayerStack(1, true, true));
+        if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            botStack = Double.parseDouble(botStackAsString);
+        } else {
+            botStack = 0.0;
         }
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readBottomPlayerStack(2, false, false));
-            readValues.add(readBottomPlayerStack(2, false, true));
-            readValues.add(readBottomPlayerStack(2, true, false));
-            readValues.add(readBottomPlayerStack(2, true, true));
-        }
-
-        botStack = getDoubleFromStringList(readValues);
+        botStack = validateReadNumber(botStack);
         return botStack;
     }
 
     public double getBotTotalBetSizeFromImage() {
         double botTotalBetSize;
-        List<String> readValues = new ArrayList<>();
+        String botTotalBetSizeAsString = readBottomPlayerTotalBetSize();
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readBottomPlayerTotalBetSize(1, false, false));
-            readValues.add(readBottomPlayerTotalBetSize(1, false, true));
-            readValues.add(readBottomPlayerTotalBetSize(1, true, false));
-            readValues.add(readBottomPlayerTotalBetSize(1, true, true));
+        if(botTotalBetSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
+        } else {
+            botTotalBetSize = 0.0;
         }
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readBottomPlayerTotalBetSize(2, false, false));
-            readValues.add(readBottomPlayerTotalBetSize(2, false, true));
-            readValues.add(readBottomPlayerTotalBetSize(2, true, false));
-            readValues.add(readBottomPlayerTotalBetSize(2, true, true));
-        }
-
-        botTotalBetSize = getDoubleFromStringList(readValues);
+        botTotalBetSize = validateReadNumber(botTotalBetSize);
         return botTotalBetSize;
     }
 
     public double getOpponentTotalBetSizeFromImage() {
         double opponentTotalBetSize;
-        List<String> readValues = new ArrayList<>();
+        String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readTopPlayerTotalBetSize(1, false, false));
-            readValues.add(readTopPlayerTotalBetSize(1, false, true));
-            readValues.add(readTopPlayerTotalBetSize(1, true, false));
-            readValues.add(readTopPlayerTotalBetSize(1, true, true));
+        if(opponentTotalBetSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
+        } else {
+            opponentTotalBetSize = 0.0;
         }
 
-        for(int i = 0; i < 3; i++) {
-            readValues.add(readTopPlayerTotalBetSize(2, false, false));
-            readValues.add(readTopPlayerTotalBetSize(2, false, true));
-            readValues.add(readTopPlayerTotalBetSize(2, true, false));
-            readValues.add(readTopPlayerTotalBetSize(2, true, true));
-        }
-
-        opponentTotalBetSize = getDoubleFromStringList(readValues);
+        opponentTotalBetSize = validateReadNumber(opponentTotalBetSize);
         return opponentTotalBetSize;
     }
 
@@ -481,104 +437,53 @@ public class NetBetTableReader {
         return getSuitFromIntRgb(suitRgb);
     }
 
-    private String readTopPlayerStack(int zoomLevel,  boolean invertedColours, boolean blackAndWhite) {
+    private String readTopPlayerStack() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(708, 205, 122, 34);
-
-        if(zoomLevel != 1) {
-            bufferedImage = ImageProcessor.zoomInImage(bufferedImage, zoomLevel);
-        }
-
-        if(invertedColours) {
-            bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        }
-
-        if(blackAndWhite) {
-            bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        }
-
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
         return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
     }
 
-    private String readBottomPlayerStack(int zoomLevel,  boolean invertedColours, boolean blackAndWhite) {
+    private String readBottomPlayerStack() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(704, 799, 126, 36);
-
-        if(zoomLevel != 1) {
-            bufferedImage = ImageProcessor.zoomInImage(bufferedImage, zoomLevel);
-        }
-
-        if(invertedColours) {
-            bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        }
-
-        if(blackAndWhite) {
-            bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        }
-
-        String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
-        return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        bottomPlayerStack = ImageProcessor.removeEmptySpacesFromString(bottomPlayerStack);
+        return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
     }
 
-    private static String readPotSize(int zoomLevel,  boolean invertedColours, boolean blackAndWhite) {
+    private static String readPotSize(boolean includingZoom) {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(709, 547, 72, 29);
 
-        if(zoomLevel != 1) {
-            bufferedImage = ImageProcessor.zoomInImage(bufferedImage, zoomLevel);
+        if(includingZoom) {
+            bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         }
 
-        if(invertedColours) {
-            bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        }
-
-        if(blackAndWhite) {
-            bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        }
-
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String potSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         potSize = ImageProcessor.removeEmptySpacesFromString(potSize);
         return ImageProcessor.removeAllNonNumericCharacters(potSize);
     }
 
-    private String readBottomPlayerTotalBetSize(int zoomLevel,  boolean invertedColours, boolean blackAndWhite) {
+    private String readBottomPlayerTotalBetSize() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(673, 626, 80, 26);
-
-        if(zoomLevel != 1) {
-            bufferedImage = ImageProcessor.zoomInImage(bufferedImage, zoomLevel);
-        }
-
-        if(invertedColours) {
-            bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        }
-
-        if(blackAndWhite) {
-            bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        }
-
-        String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
-        return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String bottomPlayerTotalBetSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        bottomPlayerTotalBetSize = ImageProcessor.removeEmptySpacesFromString(bottomPlayerTotalBetSize);
+        return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerTotalBetSize);
     }
 
-    private String readTopPlayerTotalBetSize(int zoomLevel,  boolean invertedColours, boolean blackAndWhite) {
+    private String readTopPlayerTotalBetSize() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(628, 266, 78, 24);
-
-        if(zoomLevel != 1) {
-            bufferedImage = ImageProcessor.zoomInImage(bufferedImage, zoomLevel);
-        }
-
-        if(invertedColours) {
-            bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        }
-
-        if(blackAndWhite) {
-            bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        }
-
-        String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
-        return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String topPlayerTotalBetSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        topPlayerTotalBetSize = ImageProcessor.removeEmptySpacesFromString(topPlayerTotalBetSize);
+        return ImageProcessor.removeAllNonNumericCharacters(topPlayerTotalBetSize);
     }
 
     private static String readLeftActionButton() {
@@ -661,64 +566,37 @@ public class NetBetTableReader {
         return cardRank;
     }
 
-    private double getDoubleFromStringList(List<String> readValues) {
-        Map<Integer, Double> readDoublesMap = new HashMap<>();
+    private double validateReadNumber(double value) {
+        double valueToReturn;
 
-        int counter = 0;
+        double valueInBb = value / bigBlind;
 
-        for(String value : readValues) {
-            if(value.matches(".*\\d.*")) {
-                readDoublesMap.put(counter, Double.parseDouble(value));
+        if(valueInBb < 0) {
+            valueToReturn = 0;
+        } else if(valueInBb <= 300) {
+            valueToReturn = value;
+        } else {
+            double adjustedValueInBb1 = (value / 10) / bigBlind;
+
+            if(adjustedValueInBb1 > 300) {
+                double adjustedValueInBb2 = (value / 100) / bigBlind;
+
+                if(adjustedValueInBb2 > 300) {
+                    double adjustedValueInBb3 = (value / 1000) / bigBlind;
+
+                    if(adjustedValueInBb3 > 300) {
+                        valueToReturn = 0.0;
+                    } else {
+                        valueToReturn = value / 1000;
+                    }
+                } else {
+                    valueToReturn = value / 100;
+                }
             } else {
-                readDoublesMap.put(counter, 0.0);
-            }
-            counter++;
-        }
-
-        readDoublesMap = removeOutliers(readDoublesMap);
-        Map<Double, Integer> frequencyMap = getFrequencyMap(readDoublesMap);
-        frequencyMap = sortByValueHighToLow(frequencyMap);
-
-        double toReturn = frequencyMap.entrySet().iterator().next().getKey();
-        return toReturn;
-    }
-
-    private Map<Double, Integer> getFrequencyMap(Map<Integer, Double> mapToAnalyse) {
-        Map<Double, Integer> frequencyMap = new HashMap<>();
-        List<Double> valuesAsList = new ArrayList<>(mapToAnalyse.values());
-
-        for (Map.Entry<Integer, Double> entry : mapToAnalyse.entrySet()) {
-            int frequency =  Collections.frequency(valuesAsList, entry.getValue());
-            frequencyMap.put(entry.getValue(), frequency);
-        }
-        return frequencyMap;
-    }
-
-    private Map<Integer, Double> removeOutliers(Map<Integer, Double> readDoublesMap) {
-        Map<Integer, Double> mapToReturn = new HashMap<>();
-
-        for (Map.Entry<Integer, Double> entry : readDoublesMap.entrySet()) {
-            if(entry.getValue() / bigBlind < 2000 || entry.getValue() < 0) {
-                mapToReturn.put(entry.getKey(), entry.getValue());
+                valueToReturn = value / 10;
             }
         }
 
-        return mapToReturn;
-    }
-
-    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
-        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o2.getValue() ).compareTo( o1.getValue());
-            }
-        });
-
-        Map<K, V> result = new LinkedHashMap<>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
+        return valueToReturn;
     }
 }
