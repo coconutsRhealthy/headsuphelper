@@ -515,7 +515,7 @@ public class SimulatedHand {
         if(bot.equals("aiBot")) {
             Poker poker = new Poker();
 
-            if(SimulatedHand.numberOfHandsPlayed > -1) {
+            if(SimulatedHand.numberOfHandsPlayed > 4_000_000) {
                 if(ruleBotAction.contains("bet") || ruleBotAction.contains("raise")) {
                     if(ruleBotStack == 0 || ((aiBotStack + aiBotBetSize) <= ruleBotBetSize)) {
                         List<String> eligibleActions = Arrays.asList("fold", "call");
@@ -560,15 +560,15 @@ public class SimulatedHand {
                     getRuleBotBetSizeInBb(), (aiBotStack / bigBlind), (ruleBotStack / bigBlind), !aiBotIsButton, board.isEmpty(), board, getFacingOdds());
 
 
-            if(ruleBot instanceof TightPassive) {
-                new OpponentIdentifier().updateCounts("tightPassive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
-            } else if(ruleBot instanceof LoosePassive) {
-                new OpponentIdentifier().updateCounts("loosePassive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
-            } else if(ruleBot instanceof TightAggressive) {
-                new OpponentIdentifier().updateCounts("tightAggressive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
-            } else if(ruleBot instanceof LooseAggressive) {
-                new OpponentIdentifier().updateCounts("looseAggressive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
-            }
+//            if(ruleBot instanceof TightPassive) {
+//                new OpponentIdentifier().updateCounts("tightPassive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
+//            } else if(ruleBot instanceof LoosePassive) {
+//                new OpponentIdentifier().updateCounts("loosePassive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
+//            } else if(ruleBot instanceof TightAggressive) {
+//                new OpponentIdentifier().updateCounts("tightAggressive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
+//            } else if(ruleBot instanceof LooseAggressive) {
+//                new OpponentIdentifier().updateCounts("looseAggressive", ruleBotAction, SimulatedHand.numberOfHandsPlayed);
+//            }
         }
     }
 
@@ -757,30 +757,30 @@ public class SimulatedHand {
     public static String getOpponentTypeString(AbstractOpponent opponent) {
         String opponentTypeString = null;
 
-//        if(opponent instanceof TightPassive) {
-//            opponentTypeString = "tp";
-//        } else if(opponent instanceof TightAggressive) {
-//            opponentTypeString = "ta";
-//        } else if(opponent instanceof LoosePassive) {
-//            opponentTypeString = "lp";
-//        } else if(opponent instanceof LooseAggressive) {
-//            opponentTypeString = "la";
-//        } else {
-//            opponentTypeString = null;
-//            System.out.println("No valid opponentType");
-//        }
-
-
-
         if(opponent instanceof TightPassive) {
-            opponentTypeString = new OpponentIdentifier().getOpponentType("tightPassive", numberOfHandsPlayed);
-        } else if(opponent instanceof LoosePassive) {
-            opponentTypeString = new OpponentIdentifier().getOpponentType("loosePassive", numberOfHandsPlayed);
+            opponentTypeString = "tp";
         } else if(opponent instanceof TightAggressive) {
-            opponentTypeString = new OpponentIdentifier().getOpponentType("tightAggressive", numberOfHandsPlayed);
+            opponentTypeString = "ta";
+        } else if(opponent instanceof LoosePassive) {
+            opponentTypeString = "lp";
         } else if(opponent instanceof LooseAggressive) {
-            opponentTypeString = new OpponentIdentifier().getOpponentType("looseAggressive", numberOfHandsPlayed);
+            opponentTypeString = "la";
+        } else {
+            opponentTypeString = null;
+            System.out.println("No valid opponentType");
         }
+
+
+
+//        if(opponent instanceof TightPassive) {
+//            opponentTypeString = new OpponentIdentifier().getOpponentType("tightPassive", numberOfHandsPlayed);
+//        } else if(opponent instanceof LoosePassive) {
+//            opponentTypeString = new OpponentIdentifier().getOpponentType("loosePassive", numberOfHandsPlayed);
+//        } else if(opponent instanceof TightAggressive) {
+//            opponentTypeString = new OpponentIdentifier().getOpponentType("tightAggressive", numberOfHandsPlayed);
+//        } else if(opponent instanceof LooseAggressive) {
+//            opponentTypeString = new OpponentIdentifier().getOpponentType("looseAggressive", numberOfHandsPlayed);
+//        }
 
         return opponentTypeString;
     }
