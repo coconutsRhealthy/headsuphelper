@@ -135,38 +135,35 @@ public class NetBetTableReader {
     }
 
     public String getOpponentAction() {
-        String opponentAction = null;
-
         String bottomChatLine = readBottomChatLine();
+        String opponentAction = getActionFromChatLine(bottomChatLine);
 
-        if(bottomChatLine.contains("COCONUT")) {
-            opponentAction = "empty";
-        } else if(bottomChatLine.contains("posts")) {
-            opponentAction = "bet";
-        } else if(bottomChatLine.contains("checks")) {
-            opponentAction = "check";
-        } else if(bottomChatLine.contains("calls")) {
-            opponentAction = "call";
-        } else if(bottomChatLine.contains("bets")) {
-            opponentAction = "bet75pct";
-        } else if(bottomChatLine.contains("raise")) {
-            opponentAction = "raise";
+        if(opponentAction == null) {
+            String middleChatLine = readBottomChatLine();
+            opponentAction = getActionFromChatLine(middleChatLine);
         }
 
         return opponentAction;
     }
 
-    public Map<String, String> getActionsFromLastThreeChatLines() {
-        Map<String, String> actionsFromChat = new HashMap<>();
-        String topChatLine = readTopChatLine();
-        String middleChatLine = readMiddleChatLine();
-        String bottomChatLine = readBottomChatLine();
+    private String getActionFromChatLine(String chatLine) {
+        String action = null;
 
-        actionsFromChat.put("top", getActionFromChatLine(topChatLine));
-        actionsFromChat.put("middle", getActionFromChatLine(middleChatLine));
-        actionsFromChat.put("bottom", getActionFromChatLine(bottomChatLine));
+        if(chatLine.contains("COCONUT")) {
+            action = "empty";
+        } else if(chatLine.contains("posts")) {
+            action = "bet";
+        } else if(chatLine.contains("checks")) {
+            action = "check";
+        } else if(chatLine.contains("calls")) {
+            action = "call";
+        } else if(chatLine.contains("bets")) {
+            action = "bet75pct";
+        } else if(chatLine.contains("raise")) {
+            action = "raise";
+        }
 
-        return actionsFromChat;
+        return action;
     }
 
     public boolean isBotButtonFromImage() {
@@ -372,6 +369,7 @@ public class NetBetTableReader {
     }
 
     private String readMiddleChatLine() {
+        //TODO: fix coordinates
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 873, 441, 34);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -661,25 +659,6 @@ public class NetBetTableReader {
             cardRank = 14;
         }
         return cardRank;
-    }
-
-    private String getActionFromChatLine(String chatLine) {
-        String action = null;
-
-        if(chatLine.contains("checks")) {
-            action = "check";
-        } else if(chatLine.contains("calls")) {
-            action = "call";
-        } else if(chatLine.contains("bets")) {
-            action = "bet";
-        } else if(chatLine.contains("raises")) {
-            action = "raise";
-        } else if(chatLine.contains("post")) {
-            action = "post";
-        } else if(chatLine.contains("Deal") && chatLine.contains("car")) {
-            action = "deal";
-        }
-        return action;
     }
 
     private double getDoubleFromStringList(List<String> readValues) {
