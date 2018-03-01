@@ -95,7 +95,7 @@ public class NetBetTableReader {
         String opponentAction = getActionFromChatLine(bottomChatLine);
 
         if(opponentAction == null) {
-            String middleChatLine = readBottomChatLine();
+            String middleChatLine = readMiddleChatLine();
             opponentAction = getActionFromChatLine(middleChatLine);
         }
 
@@ -200,7 +200,7 @@ public class NetBetTableReader {
     }
 
     public String getOpponentPlayerNameFromImage() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(495, 110, 117, 28);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(687, 152, 165, 39);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -209,7 +209,7 @@ public class NetBetTableReader {
         if(fullPlayerName.length() >= 4) {
             return fullPlayerName.substring(0, 4);
         }
-        return null;
+        return fullPlayerName;
     }
 
     public static void performActionOnSite(String botAction, double sizing) {
@@ -325,8 +325,7 @@ public class NetBetTableReader {
     }
 
     private String readMiddleChatLine() {
-        //TODO: fix coordinates
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 873, 441, 34);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 869, 441, 38);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -508,7 +507,7 @@ public class NetBetTableReader {
     }
 
     private boolean bottomPlayerIsButton() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(461, 506, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(640, 705, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         if(suitRgb / 1000 == -10) {
             //expected rgb: -10240
