@@ -116,7 +116,7 @@ public class Poker {
                 Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
 
                 String action = sortedEligibleActions.entrySet().iterator().next().getKey();
-                action = randomizePre3betAction(action, route);
+                action = randomizePre3betAction(action, route, handStrength, ownBetSizeBb);
                 action = randomizeBetAction(action, street, position);
                 return action;
             }
@@ -136,16 +136,10 @@ public class Poker {
             } else {
                 double random = Math.random();
 
-                if(random <= 0.5) {
+                if(random <= 0.7) {
                     actionToReturn = action;
                 } else {
-                    double random2 = Math.random();
-
-                    if(random2 <= 0.5) {
-                        actionToReturn = "check";
-                    } else {
-                        actionToReturn = "bet75pct";
-                    }
+                    actionToReturn = "check";
                 }
             }
         } else {
@@ -155,12 +149,35 @@ public class Poker {
         return actionToReturn;
     }
 
-    private String randomizePre3betAction(String action, String route) {
-        //40% van de gevallen randomize
+    private String randomizePre3betAction(String action, String route, double handStrength, double myBetSizeBb) {
+        String actionToReturn;
 
-        //daarvan de helft call ipv 3bet
+        if(route.contains("StreetPreflop") && route.contains("PositionBB")) {
+            if(myBetSizeBb == 1) {
+                if(action.equals("raise")) {
+                    double random = Math.random();
 
-        return null;
+                    if(random > 0.75) {
+                        if(handStrength < 0.35) {
+                            actionToReturn = "fold";
+                        } else {
+                            actionToReturn = "call";
+                        }
+
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
     private boolean routeDataIsBigEnough(Map<String, Double> routeData, List<String> eligibleActions) {
