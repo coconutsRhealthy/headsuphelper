@@ -47,6 +47,7 @@ public class BotHand {
     String botAction = "xx";
     double sizing = 0;
     String route = "xx";
+    String opponentType = "xx";
 
     public BotHand() {
         //default constructor
@@ -139,7 +140,7 @@ public class BotHand {
         double effectiveStack = getEffectiveStackInBb();
         boolean botHasStrongDrawInMethod = botHasStrongDraw;
         double botHandStrengthInMethod = botHandStrength;
-        String opponentType = new OpponentIdentifier().getOpponentType(opponentPlayerName, botTable.getNumberOfHandsPerOpponentMap().get(opponentPlayerName));
+        opponentType = new OpponentIdentifier().getOpponentType(opponentPlayerName, botTable.getNumberOfHandsPerOpponentMap().get(opponentPlayerName));
         double opponentBetsizeBb = opponentTotalBetSize / bigBlind;
         double botBetsizeBb = botTotalBetSize / bigBlind;
         double opponentStackBb = opponentStack / bigBlind;
@@ -457,5 +458,13 @@ public class BotHand {
 
     public void setRoute(String route) {
         this.route = route;
+    }
+
+    public String getOpponentType() {
+        return opponentType;
+    }
+
+    public void setOpponentType(String opponentType) {
+        this.opponentType = opponentType;
     }
 }
