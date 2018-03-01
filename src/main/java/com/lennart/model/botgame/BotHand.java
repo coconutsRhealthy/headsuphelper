@@ -44,6 +44,10 @@ public class BotHand {
     private double botHandStrength;
     private boolean botHasStrongDraw;
 
+    String botAction = "xx";
+    double sizing = 0;
+    String route = "xx";
+
     public BotHand() {
         //default constructor
     }
@@ -143,8 +147,8 @@ public class BotHand {
         boolean preflop = board.isEmpty();
         List<Card> boardInMethod = board;
 
-        String botAction = new Poker().getAction(eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod);
-        double sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, botTotalBetSize, botStack, opponentStack, potSize, bigBlind, board);
+        botAction = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod);
+        sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, botTotalBetSize, botStack, opponentStack, potSize, bigBlind, board);
 
         NetBetTableReader.performActionOnSite(botAction, sizing);
     }
@@ -429,5 +433,29 @@ public class BotHand {
 
     public void setFlopCards(List<Card> flopCards) {
         this.flopCards = flopCards;
+    }
+
+    public String getBotAction() {
+        return botAction;
+    }
+
+    public void setBotAction(String botAction) {
+        this.botAction = botAction;
+    }
+
+    public double getSizing() {
+        return sizing;
+    }
+
+    public void setSizing(double sizing) {
+        this.sizing = sizing;
+    }
+
+    public String getRoute() {
+        return route;
+    }
+
+    public void setRoute(String route) {
+        this.route = route;
     }
 }

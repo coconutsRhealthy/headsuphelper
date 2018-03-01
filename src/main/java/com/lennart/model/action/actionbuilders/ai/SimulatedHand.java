@@ -523,14 +523,14 @@ public class SimulatedHand {
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
                     } else {
                         List<String> eligibleActions = Arrays.asList("fold", "call", "raise");
 
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
                     }
                 } else {
                     if(board.isEmpty() && !aiBotIsButton && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
@@ -539,14 +539,14 @@ public class SimulatedHand {
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
                     } else {
                         List<String> eligibleActions = Arrays.asList("check", "bet75pct");
 
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
                     }
                 }
             } else {

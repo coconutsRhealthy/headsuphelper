@@ -138,7 +138,7 @@ public class ComputerGameNew {
         setMyActionToBetIfPreflopNecessary();
 
         System.out.println("opponentType: " + opponentType);
-        String action = new Poker().getAction(eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board);
+        String action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board);
 
 //        String action = new TightPassive().doAction(
 //                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
