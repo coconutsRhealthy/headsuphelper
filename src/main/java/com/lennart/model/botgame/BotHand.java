@@ -150,7 +150,7 @@ public class BotHand {
         botAction = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod);
         sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, botTotalBetSize, botStack, opponentStack, potSize, bigBlind, board);
 
-        NetBetTableReader.performActionOnSite(botAction, sizing);
+        //NetBetTableReader.performActionOnSite(botAction, sizing);
     }
 
     private List<String> getEligibleActions() {
