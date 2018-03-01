@@ -1,9 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.AbstractOpponent;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.LoosePassive;
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightAggressive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
 import com.lennart.model.botgame.BotHand;
 import com.lennart.model.card.Card;
@@ -118,12 +115,51 @@ public class Poker {
                 Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
                 Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
 
-                return sortedEligibleActions.entrySet().iterator().next().getKey();
+                String action = sortedEligibleActions.entrySet().iterator().next().getKey();
+                action = randomizePre3betAction(action, route);
+                action = randomizeBetAction(action, street, position);
+                return action;
             }
         } catch (Exception e) {
             System.out.println("error occurred in getAction()");
             return null;
         }
+        return null;
+    }
+
+    private String randomizeBetAction(String action, String street, boolean position) {
+        String actionToReturn;
+
+        if(action.equals("bet75pct")) {
+            if(street.equals("river") && position) {
+                actionToReturn = action;
+            } else {
+                double random = Math.random();
+
+                if(random <= 0.5) {
+                    actionToReturn = action;
+                } else {
+                    double random2 = Math.random();
+
+                    if(random2 <= 0.5) {
+                        actionToReturn = "check";
+                    } else {
+                        actionToReturn = "bet75pct";
+                    }
+                }
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String randomizePre3betAction(String action, String route) {
+        //40% van de gevallen randomize
+
+        //daarvan de helft call ipv 3bet
+
         return null;
     }
 
