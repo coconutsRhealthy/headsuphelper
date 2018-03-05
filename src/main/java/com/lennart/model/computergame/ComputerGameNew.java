@@ -66,6 +66,7 @@ public class ComputerGameNew {
             doComputerAction();
 
             if(computerWrittenAction.contains("fold")) {
+                processComputerFoldAction();
                 updatePotSize("computer fold");
                 resetAllBets();
             }
@@ -610,6 +611,7 @@ public class ComputerGameNew {
                 dealRiverCard();
             }
 
+            calculateHandStrengthsAndDraws();
             printWinnerAndHand();
         }
     }
