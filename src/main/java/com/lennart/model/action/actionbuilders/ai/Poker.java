@@ -116,8 +116,14 @@ public class Poker {
                 Map<String, Double> sortedEligibleActions = retainOnlyEligibleActions(sortedPayoffMap, eligibleActions);
 
                 String action = sortedEligibleActions.entrySet().iterator().next().getKey();
-                action = randomizePre3betAction(action, route, handStrength, ownBetSizeBb);
-                action = randomizeBetAction(action, street, position);
+
+                RuleApplier ruleApplier = new RuleApplier();
+
+                action = ruleApplier.moderateIpOpenPre(action, route, handStrength, ownBetSizeBb);
+                action = ruleApplier.randomizePre3betAction(action, route, handStrength, ownBetSizeBb);
+                action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw);
+                action = ruleApplier.moderateBluffRaises(action, handStrength, street, strongDraw, opponentBetSizeBb);
+
                 return action;
             }
         } catch (Exception e) {
@@ -127,58 +133,107 @@ public class Poker {
         return null;
     }
 
-    private String randomizeBetAction(String action, String street, boolean position) {
-        String actionToReturn;
-
-        if(action.equals("bet75pct")) {
-            if(street.equals("river") && position) {
-                actionToReturn = action;
-            } else {
-                double random = Math.random();
-
-                if(random <= 0.7) {
-                    actionToReturn = action;
-                } else {
-                    actionToReturn = "check";
-                }
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String randomizePre3betAction(String action, String route, double handStrength, double myBetSizeBb) {
-        String actionToReturn;
-
-        if(route.contains("StreetPreflop") && route.contains("PositionBB")) {
-            if(myBetSizeBb == 1) {
-                if(action.equals("raise")) {
-                    double random = Math.random();
-
-                    if(random > 0.75) {
-                        if(handStrength < 0.35) {
-                            actionToReturn = "fold";
-                        } else {
-                            actionToReturn = "call";
-                        }
-
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
+//    private String moderateBluffingAndRandomizeValue(String action, double handStrength) {
+//        String actionToReturn;
+//
+//        if(handStrength < 0.6) {
+//            if(action.equals("bet75pct")) {
+//                double random = Math.random();
+//
+//                if(random < 0.2) {
+//                    actionToReturn = action;
+//                } else {
+//                    actionToReturn = "check";
+//                }
+//            } else {
+//                actionToReturn = action;
+//            }
+//        } else if(handStrength > 0.8) {
+//            if(action.equals("bet75pct")) {
+//                double random = Math.random();
+//
+//                if(random > 0.2) {
+//                    actionToReturn = action;
+//                } else {
+//                    actionToReturn = "check";
+//                }
+//            } else {
+//                actionToReturn = action;
+//            }
+//        } else {
+//            actionToReturn = action;
+//        }
+//        return actionToReturn;
+//    }
+//
+//    private String randomizeBetAction(String action, String street, boolean position) {
+//        String actionToReturn;
+//
+//        if(action.equals("bet75pct")) {
+//            if(street.equals("river") && position) {
+//                actionToReturn = action;
+//            } else {
+//                double random = Math.random();
+//
+//                if(random <= 0.7) {
+//                    actionToReturn = action;
+//                } else {
+//                    actionToReturn = "check";
+//                }
+//            }
+//        } else {
+//            actionToReturn = action;
+//        }
+//
+//        return actionToReturn;
+//    }
+//
+//    private String randomizePre3betAction(String action, String route, double handStrength, double myBetSizeBb) {
+//        String actionToReturn;
+//
+//        if(route.contains("StreetPreflop") && route.contains("PositionBB")) {
+//            if(myBetSizeBb == 1) {
+//                if(action.equals("raise")) {
+//                    double random = Math.random();
+//
+//                    if(random > 0.20) {
+//                        if(handStrength < 0.35) {
+//                            actionToReturn = "fold";
+//                        } else {
+//                            actionToReturn = "call";
+//                        }
+//
+//                    } else {
+//                        actionToReturn = action;
+//                    }
+//                } else {
+//                    actionToReturn = action;
+//                }
+//            } else {
+//                actionToReturn = action;
+//            }
+//        } else {
+//            actionToReturn = action;
+//        }
+//
+//        return actionToReturn;
+//    }
+//
+//    private String moderateIpOpenPre(String action, String route, double handStrength, double myBetSizeBb) {
+//        String actionToReturn = action;
+//
+//        if(route.contains("StreetPreflop") && route.contains("PositionBTN")) {
+//            if(myBetSizeBb == 0.5) {
+//                if(action.equals("fold")) {
+//                    if(handStrength > 0.15) {
+//                        actionToReturn = "raise";
+//                    }
+//                }
+//            }
+//        }
+//
+//        return actionToReturn;
+//    }
 
     private boolean routeDataIsBigEnough(Map<String, Double> routeData, List<String> eligibleActions) {
         boolean routeDataIsBigEnough = false;
