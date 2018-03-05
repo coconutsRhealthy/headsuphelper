@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <title>Actionhelper HU NL</title>
+        <script src = "http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+        <script src="/js/actionhelper.js"></script>
+    </head>
+
+    <body>
+        <div ng-app = "mainApp" ng-controller = "pokerController">
+
+            <table>
+                <tr>
+                    <td>big blind</td>
+                    <td><input type="text" ng-model="gameVariables.bigBlind"></td>
+                </tr>
+                <tr>
+                    <td>opponent name</td>
+                    <td><input type="text" ng-model="gameVariables.opponentName"></td>
+                </tr>
+                <tr>
+                    <td>opponent stack</td>
+                    <td><input type="text" ng-model="gameVariables.opponentStack"></td>
+                </tr>
+                <tr>
+                    <td>opponent betsize</td>
+                    <td><input type="text" ng-model="gameVariables.opponentBetSize"></td>
+                </tr>
+                <tr>
+                    <td>board</td>
+                    <td><input type="text" ng-model="gameVariables.boardAsString"></td>
+                </tr>
+                <tr>
+                    <td>pot</td>
+                    <td><input type="text" ng-model="gameVariables.pot"></td>
+                </tr>
+                <tr>
+                    <td>computer betsize</td>
+                    <td><input type="text" ng-model="gameVariables.botBetSize"></td>
+                </tr>
+                <tr>
+                    <td>computer stack</td>
+                    <td><input type="text" ng-model="gameVariables.botStack"></td>
+                </tr>
+                <tr>
+                    <td>computer holecards</td>
+                    <td><input type="text" ng-model="gameVariables.botHoleCardsAsString"></td>
+                </tr>
+                <tr>
+                    <td>botIsButton</td>
+                    <td><input type="text" ng-model="gameVariables.botIsButton"></td>
+                </tr>
+                <tr>
+                    <td>opponent action</td>
+                    <td><input type="text" ng-model="gameVariables.opponentAction"></td>
+                </tr>
+                <tr>
+                    <td>new hand</td>
+                    <td><input type="text" ng-model="gameVariables.newHand"></td>
+                </tr>
+            </table>
+
+            <div style="margin-top: 25px;">
+                <button ng-click="fillFields()">fill fields</button>
+            </div>
+
+            <div>
+                <button ng-click="getAction()">get action</button>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <table>
+                    <tr>
+                        <td>action:</td>
+                        <td>{{actionVariables.action}}</td>
+                    </tr>
+
+                    <tr>
+                        <td>sizing:</td>
+                        <td>{{actionVariables.sizing}}</td>
+                    </tr>
+
+                    <tr>
+                        <td>opponenttype:</td>
+                        <td>{{actionVariables.opponentType}}</td>
+                    </tr>
+
+                    <tr>
+                        <td>route:</td>
+                        <td>{{actionVariables.route}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
+

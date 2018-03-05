@@ -1,5 +1,7 @@
 package com.lennart.controller;
 
+import com.lennart.model.action.actionbuilders.ai.ActionVariables;
+import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.SimulatedHand;
 import com.lennart.model.botgame.BotTable;
@@ -83,6 +85,19 @@ public class Controller extends SpringBootServletInitializer {
     @RequestMapping(value = "/runBotTableContinuously", method = RequestMethod.GET)
     public void runBotTableContinuously() {
         new BotTable(true);
+    }
+
+    //Actionhelper:
+    @RequestMapping(value = "/fillFields", method = RequestMethod.GET)
+    public @ResponseBody GameVariables fillFields() {
+        GameVariables gameVariables = new GameVariables();
+        return gameVariables;
+    }
+
+    @RequestMapping(value = "/getAction", method = RequestMethod.POST)
+    public @ResponseBody ActionVariables getAction(@RequestBody GameVariables gameVariables) {
+        ActionVariables actionVariables = gameVariables.testName();
+        return actionVariables;
     }
 
     public static void main(String[] args) {

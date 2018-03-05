@@ -15,6 +15,7 @@ import java.util.Map;
 public class OpponentIdentifier {
 
     private static Map<String, Map<Integer, Map<String, List<Double>>>> countMapForAllOpponents = new HashMap<>();
+    private static Map<String, Integer> numberOfHandsPerOpponentMap = new HashMap<>();
 
     private static final double LP_LOOSENESS = 0.777;
     private static final double LP_AGGRO = 0.164;
@@ -113,6 +114,18 @@ public class OpponentIdentifier {
         opponentTotalMap.get(numberOfHands).put("foldCount", foldCount);
         opponentTotalMap.get(numberOfHands).put("betRaiseCount", betRaiseCount);
         opponentTotalMap.get(numberOfHands).put("checkCallCount", checkCallCount);
+    }
+
+    public static void updateNumberOfHandsPerOpponentMap(String opponentPlayerName) {
+        if(numberOfHandsPerOpponentMap.get(opponentPlayerName) == null) {
+            numberOfHandsPerOpponentMap.put(opponentPlayerName, 0);
+        } else {
+            numberOfHandsPerOpponentMap.put(opponentPlayerName, numberOfHandsPerOpponentMap.get(opponentPlayerName) + 1);
+        }
+    }
+
+    public static Map<String, Integer> getNumberOfHandsPerOpponentMap() {
+        return numberOfHandsPerOpponentMap;
     }
 
     private Map<Integer, Map<String, List<Double>>> initializeOpponentMap() {

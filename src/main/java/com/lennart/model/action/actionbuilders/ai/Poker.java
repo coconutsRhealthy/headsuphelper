@@ -2,7 +2,6 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.LooseAggressive;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.TightPassive;
-import com.lennart.model.botgame.BotHand;
 import com.lennart.model.card.Card;
 
 import java.sql.*;
@@ -83,14 +82,14 @@ public class Poker {
         storeRoutesInDb(routes);
     }
 
-    public String getAction(BotHand botHand, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+    public String getAction(ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
                             double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
                             double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board) {
         try {
             String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
 
-            if(botHand != null) {
-                botHand.setRoute(route);
+            if(actionVariables != null) {
+                actionVariables.setRoute(route);
             }
 
             //System.out.println(route);
