@@ -34,16 +34,17 @@ public class GameVariables {
     private String opponentAction;
 
     public GameVariables(boolean newHand) {
-        if(newHand) {
-            OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
-            clearHoleCardsAndBoardCards();
-        }
-
         bigBlind = 0.02;
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
         opponentName = netBetTableReader.getOpponentPlayerNameFromImage();
+
+        if(newHand) {
+            OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
+            clearHoleCardsAndBoardCards();
+        }
+
         opponentStack = netBetTableReader.getOpponentStackFromImage();
         opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
         board = fillTheBoard();

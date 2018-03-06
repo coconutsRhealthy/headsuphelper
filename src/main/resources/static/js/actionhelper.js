@@ -7,7 +7,7 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.actionVariables;
 
     $scope.fillFields = function() {
-        $http.get('/fillFields/', $scope.newHand).success(function(data) {
+        $http.post('/fillFields/', $scope.newHand).success(function(data) {
             $scope.gameVariables = data;
         })
     }

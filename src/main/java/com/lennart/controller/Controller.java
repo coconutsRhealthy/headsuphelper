@@ -88,7 +88,7 @@ public class Controller extends SpringBootServletInitializer {
     }
 
     //Actionhelper:
-    @RequestMapping(value = "/fillFields", method = RequestMethod.GET)
+    @RequestMapping(value = "/fillFields", method = RequestMethod.POST)
     public @ResponseBody GameVariables fillFields(@RequestBody boolean newHand) {
         GameVariables gameVariables = new GameVariables(newHand);
         return gameVariables;
