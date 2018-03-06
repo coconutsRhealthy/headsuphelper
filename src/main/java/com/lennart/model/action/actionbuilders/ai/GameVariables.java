@@ -16,71 +16,50 @@ public class GameVariables {
     private String opponentName;
     private double opponentStack;
     private double opponentBetSize;
-    private Card flopCard1;
-    private Card flopCard2;
-    private Card flopCard3;
-    private Card turnCard;
-    private Card riverCard;
+    private static Card flopCard1;
+    private static Card flopCard2;
+    private static Card flopCard3;
+    private static Card turnCard;
+    private static Card riverCard;
     private List<Card> board = new ArrayList<>();
     private String boardAsString;
     private double pot;
     private double botBetSize;
     private double botStack;
-    private Card botHoleCard1;
-    private Card botHoleCard2;
+    private static Card botHoleCard1;
+    private static Card botHoleCard2;
     private List<Card> botHoleCards = new ArrayList<>();
     private String botHoleCardsAsString;
     private boolean botIsButton;
     private String opponentAction;
-    private boolean newHand;
 
-    public GameVariables() {
+    public GameVariables(boolean newHand) {
+        if(newHand) {
+            OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
+            clearHoleCardsAndBoardCards();
+        }
+
         bigBlind = 0.02;
 
-        //NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
+        NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
-        opponentName = "Sjaak";
-        opponentStack = 2;
-        opponentBetSize = 0.05;
+        opponentName = netBetTableReader.getOpponentPlayerNameFromImage();
+        opponentStack = netBetTableReader.getOpponentStackFromImage();
+        opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
         board = fillTheBoard();
         boardAsString = convertCardListToString(board);
-        pot = 0;
-        botBetSize = 0.02;
-        botStack = 1.97;
+        pot = netBetTableReader.getPotSizeFromImage();
+        botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
+        botStack = netBetTableReader.getBotStackFromImage();
         botHoleCards = fillBotHoleCards();
         botHoleCardsAsString = convertCardListToString(botHoleCards);
-        botIsButton = false;
+        botIsButton = netBetTableReader.isBotButtonFromImage();
         opponentAction = "toFill";
-        newHand = true;
-
-
-
-
-
-//        bigBlind = 0.02;
-//
-//        NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
-//
-//        opponentName = netBetTableReader.getOpponentPlayerNameFromImage();
-//        opponentStack = netBetTableReader.getOpponentStackFromImage();
-//        opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
-//        board = fillTheBoard();
-//        pot = netBetTableReader.getPotSizeFromImage();
-//        botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
-//        botStack = netBetTableReader.getBotStackFromImage();
-//        botHoleCards = fillBotHoleCards();
-//        botIsButton = netBetTableReader.isBotButtonFromImage();
-//        opponentAction = "toFill";
-//        newHand = false;
     }
 
     public ActionVariables testName() {
         botHoleCards = convertStringToCardList(getBotHoleCardsAsString());
         board = convertStringToCardList(getBoardAsString());
-
-        if(newHand) {
-            OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
-        }
 
         new OpponentIdentifier().updateCounts(opponentName, opponentAction,
                 OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
@@ -89,22 +68,65 @@ public class GameVariables {
     }
 
     private List<Card> fillTheBoard() {
-        List<Card> board = new ArrayList<>();
+        List<Card> boardInMethod = new ArrayList<>();
 
-//        board.add(new Card(8, 'd'));
-//        board.add(new Card(7, 's'));
-//        board.add(new Card(12, 'c'));
+        NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
-        return board;
+        if(flopCard1 == null) {
+            flopCard1 = netBetTableReader.getFlopCard1FromImage();
+
+            if(flopCard1 != null) {
+                flopCard2 = netBetTableReader.getFlopCard2FromImage();
+                flopCard3 = netBetTableReader.getFlopCard3FromImage();
+
+                boardInMethod.add(flopCard1);
+                boardInMethod.add(flopCard2);
+                boardInMethod.add(flopCard3);
+            }
+        }
+
+        if(flopCard1 != null && turnCard == null) {
+            turnCard = netBetTableReader.getTurnCardFromImage();
+
+            if(turnCard != null) {
+                boardInMethod.add(turnCard);
+            }
+        }
+
+        if(turnCard != null && riverCard == null) {
+            riverCard = netBetTableReader.getRiverCardFromImage();
+
+            if(riverCard != null) {
+                boardInMethod.add(riverCard);
+            }
+        }
+
+        return boardInMethod;
+    }
+
+    private void clearHoleCardsAndBoardCards() {
+        botHoleCard1 = null;
+        botHoleCard2 = null;
+        flopCard1 = null;
+        flopCard2 = null;
+        flopCard3 = null;
+        turnCard = null;
+        riverCard = null;
     }
 
     private List<Card> fillBotHoleCards() {
-        List<Card> holeCards = new ArrayList<>();
+        List<Card> botHoleCardsInMethod = new ArrayList<>();
 
-        holeCards.add(new Card(13, 'd'));
-        holeCards.add(new Card(5, 's'));
+        if(botHoleCard1 == null) {
+            NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
-        return holeCards;
+            botHoleCard1 = netBetTableReader.getBotHoleCard1FromImage();
+            botHoleCard2 = netBetTableReader.getBotHoleCard2FromImage();
+        }
+
+        botHoleCardsInMethod.add(botHoleCard1);
+        botHoleCardsInMethod.add(botHoleCard2);
+        return botHoleCardsInMethod;
     }
 
     private String convertCardListToString(List<Card> toConvert) {
@@ -278,14 +300,6 @@ public class GameVariables {
 
     public void setOpponentAction(String opponentAction) {
         this.opponentAction = opponentAction;
-    }
-
-    public boolean isNewHand() {
-        return newHand;
-    }
-
-    public void setNewHand(boolean newHand) {
-        this.newHand = newHand;
     }
 
     public String getBoardAsString() {

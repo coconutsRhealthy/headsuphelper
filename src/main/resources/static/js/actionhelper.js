@@ -2,11 +2,12 @@ var mainApp = angular.module("mainApp", []);
 
 mainApp.controller('pokerController', function($scope, $http) {
 
+    $scope.newHand;
     $scope.gameVariables;
     $scope.actionVariables;
 
     $scope.fillFields = function() {
-        $http.get('/fillFields/').success(function(data) {
+        $http.get('/fillFields/', $scope.newHand).success(function(data) {
             $scope.gameVariables = data;
         })
     }
