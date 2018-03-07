@@ -34,32 +34,56 @@ public class NetBetTableReader {
         return potSize;
     }
 
-    public double getOpponentStackFromImage() {
-        double opponentStack;
-        String opponentStackAsString = readTopPlayerStack();
+    public double getOpponentStackFromImage() throws Exception {
+        List<Double> foundValues = new ArrayList<>();
 
-        if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-            opponentStack = Double.parseDouble(opponentStackAsString);
-        } else {
-            opponentStack = 0.0;
+        for(int i = 0; i < 2; i++) {
+            String botStackAsString = readTopPlayerStack();
+
+            if(botStackAsString.endsWith(".")) {
+                botStackAsString.replaceAll(".", "");
+            }
+
+            if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+                double botStack = Double.parseDouble(botStackAsString);
+                botStack = validateReadNumber(botStack);
+                foundValues.add(botStack);
+            }
         }
 
-        opponentStack = validateReadNumber(opponentStack);
-        return opponentStack;
+        Collections.sort(foundValues, Collections.reverseOrder());
+
+        if(!foundValues.isEmpty()) {
+            return foundValues.get(0);
+        }
+        return -1;
     }
 
-    public double getBotStackFromImage() {
-        double botStack;
-        String botStackAsString = readBottomPlayerStack();
+    public double getBotStackFromImage() throws Exception {
+        List<Double> foundValues = new ArrayList<>();
 
-        if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-            botStack = Double.parseDouble(botStackAsString);
-        } else {
-            botStack = 0.0;
+        for(int i = 0; i < 3; i++) {
+            String botStackAsString = readBottomPlayerStack();
+
+            System.out.println(botStackAsString);
+
+            if(botStackAsString.endsWith(".")) {
+                botStackAsString.replaceAll(".", "");
+            }
+
+            if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+                double botStack = Double.parseDouble(botStackAsString);
+                botStack = validateReadNumber(botStack);
+                foundValues.add(botStack);
+            }
         }
 
-        botStack = validateReadNumber(botStack);
-        return botStack;
+        Collections.sort(foundValues, Collections.reverseOrder());
+
+        if(!foundValues.isEmpty()) {
+            return foundValues.get(0);
+        }
+        return -1;
     }
 
     public double getBotTotalBetSizeFromImage() {
@@ -447,7 +471,7 @@ public class NetBetTableReader {
 
     private String readBottomPlayerStack() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(704, 799, 126, 36);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         bottomPlayerStack = ImageProcessor.removeEmptySpacesFromString(bottomPlayerStack);

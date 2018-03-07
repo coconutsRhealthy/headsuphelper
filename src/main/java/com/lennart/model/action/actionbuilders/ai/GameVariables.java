@@ -35,31 +35,34 @@ public class GameVariables {
     private String opponentAction;
     private ActionVariables actionVariables;
 
-    public GameVariables() throws Exception {
+    public GameVariables() {
+        //default constructor
+    }
+
+    public GameVariables(String preventDefaultConst) throws Exception {
         bigBlind = 0.02;
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
+        botStack = netBetTableReader.getBotStackFromImage();
 
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(200);
         opponentName = netBetTableReader.getOpponentPlayerNameFromImage();
 
         OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
 
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(200);
         opponentStack = netBetTableReader.getOpponentStackFromImage();
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(200);
         opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(200);
         pot = netBetTableReader.getPotSizeFromImage();
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(200);
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
-        TimeUnit.MILLISECONDS.sleep(100);
-        botStack = netBetTableReader.getBotStackFromImage();
 
         fillBotHoleCards();
         botHoleCardsAsString = convertCardListToString(botHoleCards);
 
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(200);
         botIsButton = netBetTableReader.isBotButtonFromImage();
 
         opponentAction = "toFill";
@@ -67,12 +70,16 @@ public class GameVariables {
 
     public void fillFieldsSubsequent() throws Exception {
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
-
-        opponentStack = netBetTableReader.getOpponentStackFromImage();
-        opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
-        pot = netBetTableReader.getPotSizeFromImage();
-        botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
         botStack = netBetTableReader.getBotStackFromImage();
+
+        TimeUnit.MILLISECONDS.sleep(200);
+        opponentStack = netBetTableReader.getOpponentStackFromImage();
+        TimeUnit.MILLISECONDS.sleep(200);
+        opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
+        TimeUnit.MILLISECONDS.sleep(200);
+        pot = netBetTableReader.getPotSizeFromImage();
+        TimeUnit.MILLISECONDS.sleep(200);
+        botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
 
         fillTheBoard();
         boardAsString = convertCardListToString(board);
@@ -92,14 +99,17 @@ public class GameVariables {
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
         if(flopCard1 == null) {
-            TimeUnit.MILLISECONDS.sleep(200);
+            TimeUnit.MILLISECONDS.sleep(300);
             flopCard1 = netBetTableReader.getFlopCard1FromImage();
 
             if(flopCard1 != null) {
-                TimeUnit.MILLISECONDS.sleep(100);
-                flopCard2 = netBetTableReader.getFlopCard2FromImage();
-                TimeUnit.MILLISECONDS.sleep(100);
-                flopCard3 = netBetTableReader.getFlopCard3FromImage();
+                while(flopCard2 == null) {
+                    flopCard2 = netBetTableReader.getFlopCard2FromImage();
+                }
+
+                while(flopCard3 == null) {
+                    flopCard3 = netBetTableReader.getFlopCard3FromImage();
+                }
 
                 board.add(flopCard1);
                 board.add(flopCard2);
@@ -122,11 +132,13 @@ public class GameVariables {
         }
     }
 
-    private void fillBotHoleCards() {
+    private void fillBotHoleCards() throws Exception {
         if(botHoleCard1 == null) {
             NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
+            TimeUnit.MILLISECONDS.sleep(200);
             botHoleCard1 = netBetTableReader.getBotHoleCard1FromImage();
+            TimeUnit.MILLISECONDS.sleep(200);
             botHoleCard2 = netBetTableReader.getBotHoleCard2FromImage();
         }
 

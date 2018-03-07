@@ -89,7 +89,7 @@ public class Controller extends SpringBootServletInitializer {
     //Actionhelper:
     @RequestMapping(value = "/fillFieldsInitial", method = RequestMethod.GET)
     public @ResponseBody GameVariables fillFieldsInitial() throws Exception {
-        GameVariables gameVariables = new GameVariables();
+        GameVariables gameVariables = new GameVariables("preventDefaultConstructor");
         return gameVariables;
     }
 

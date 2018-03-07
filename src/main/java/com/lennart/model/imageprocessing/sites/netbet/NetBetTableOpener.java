@@ -59,7 +59,7 @@ public class NetBetTableOpener {
                 TimeUnit.SECONDS.sleep(1);
                 startNewTable(bigBlind);
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -137,7 +137,7 @@ public class NetBetTableOpener {
         MouseKeyboard.click(959, 16);
     }
 
-    private static boolean initialBotStackIsAbove100bb(double bigBlind) {
+    private static boolean initialBotStackIsAbove100bb(double bigBlind) throws Exception {
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
         return netBetTableReader.getBotStackFromImage() > 100 * bigBlind;
     }

@@ -77,8 +77,13 @@ public class BotHand {
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
-        botStack = netBetTableReader.getBotStackFromImage();
-        opponentStack = netBetTableReader.getOpponentStackFromImage();
+        try {
+            botStack = netBetTableReader.getBotStackFromImage();
+            opponentStack = netBetTableReader.getOpponentStackFromImage();
+        } catch (Exception e) {
+
+        }
+
         potSize = netBetTableReader.getPotSizeFromImage();
         botTotalBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
         opponentTotalBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();

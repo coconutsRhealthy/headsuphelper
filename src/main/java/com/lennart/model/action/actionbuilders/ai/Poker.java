@@ -821,7 +821,7 @@ public class Poker {
 
     private void initializeDbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
-        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "Vuurwerk00");
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/poker", "root", "");
     }
 
     private void closeDbConnection() throws SQLException {
