@@ -6,6 +6,7 @@ import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by LPO21630 on 5-3-2018.
@@ -33,11 +34,16 @@ public class GameVariables {
     private boolean botIsButton;
     private String opponentAction;
 
-    public GameVariables(boolean newHand) {
+    public GameVariables() {
+        //default constructor;
+    }
+
+    public GameVariables(boolean newHand) throws Exception {
         bigBlind = 0.02;
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
+        TimeUnit.MILLISECONDS.sleep(100);
         opponentName = netBetTableReader.getOpponentPlayerNameFromImage();
 
         if(newHand) {
@@ -45,22 +51,32 @@ public class GameVariables {
             clearHoleCardsAndBoardCards();
         }
 
+        TimeUnit.MILLISECONDS.sleep(100);
         opponentStack = netBetTableReader.getOpponentStackFromImage();
+        TimeUnit.MILLISECONDS.sleep(100);
         opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
-        board = fillTheBoard();
-        boardAsString = convertCardListToString(board);
+
+        if(!newHand) {
+            board = fillTheBoard();
+            boardAsString = convertCardListToString(board);
+        }
+
+        TimeUnit.MILLISECONDS.sleep(100);
         pot = netBetTableReader.getPotSizeFromImage();
+        TimeUnit.MILLISECONDS.sleep(100);
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
+        TimeUnit.MILLISECONDS.sleep(100);
         botStack = netBetTableReader.getBotStackFromImage();
         botHoleCards = fillBotHoleCards();
         botHoleCardsAsString = convertCardListToString(botHoleCards);
+        TimeUnit.MILLISECONDS.sleep(100);
         botIsButton = netBetTableReader.isBotButtonFromImage();
         opponentAction = "toFill";
     }
 
     public ActionVariables testName() {
-        botHoleCards = convertStringToCardList(getBotHoleCardsAsString());
-        board = convertStringToCardList(getBoardAsString());
+        botHoleCards = convertStringToCardList(botHoleCardsAsString);
+        board = convertStringToCardList(boardAsString);
 
         new OpponentIdentifier().updateCounts(opponentName, opponentAction,
                 OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
@@ -68,36 +84,45 @@ public class GameVariables {
         return new ActionVariables(this);
     }
 
-    private List<Card> fillTheBoard() {
+    private List<Card> fillTheBoard() throws Exception {
         List<Card> boardInMethod = new ArrayList<>();
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
         if(flopCard1 == null) {
+            TimeUnit.MILLISECONDS.sleep(200);
             flopCard1 = netBetTableReader.getFlopCard1FromImage();
 
             if(flopCard1 != null) {
+                System.out.println("c");
+                TimeUnit.MILLISECONDS.sleep(100);
                 flopCard2 = netBetTableReader.getFlopCard2FromImage();
+                TimeUnit.MILLISECONDS.sleep(100);
                 flopCard3 = netBetTableReader.getFlopCard3FromImage();
 
                 boardInMethod.add(flopCard1);
                 boardInMethod.add(flopCard2);
                 boardInMethod.add(flopCard3);
             }
-        }
-
-        if(flopCard1 != null && turnCard == null) {
+        } else if(turnCard == null) {
+            TimeUnit.MILLISECONDS.sleep(300);
             turnCard = netBetTableReader.getTurnCardFromImage();
 
             if(turnCard != null) {
+                boardInMethod.add(flopCard1);
+                boardInMethod.add(flopCard2);
+                boardInMethod.add(flopCard3);
                 boardInMethod.add(turnCard);
             }
-        }
-
-        if(turnCard != null && riverCard == null) {
+        } else if(riverCard == null) {
+            TimeUnit.MILLISECONDS.sleep(300);
             riverCard = netBetTableReader.getRiverCardFromImage();
 
             if(riverCard != null) {
+                boardInMethod.add(flopCard1);
+                boardInMethod.add(flopCard2);
+                boardInMethod.add(flopCard3);
+                boardInMethod.add(turnCard);
                 boardInMethod.add(riverCard);
             }
         }
@@ -135,9 +160,17 @@ public class GameVariables {
 
         for(Card card : toConvert) {
             if(convertedString.length() == 0) {
-                convertedString = convertedString + card.getRank() + card.getSuit();
+                if(card == null) {
+                    convertedString = convertedString + null;
+                } else {
+                    convertedString = convertedString + card.getRank() + card.getSuit();
+                }
             } else {
-                convertedString = convertedString + " " + card.getRank() + card.getSuit();
+                if(card == null) {
+                    convertedString = convertedString + " " + null;
+                } else {
+                    convertedString = convertedString + " " + card.getRank() + card.getSuit();
+                }
             }
         }
         return convertedString;
@@ -146,7 +179,7 @@ public class GameVariables {
     private List<Card> convertStringToCardList(String cardsAsString) {
         List<Card> listToReturn = new ArrayList<>();
 
-        if(cardsAsString.length() > 0) {
+        if(cardsAsString != null && cardsAsString.length() > 0) {
             String[] splitted = cardsAsString.split(" ");
 
             for(String s : splitted) {

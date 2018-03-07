@@ -84,10 +84,10 @@ public class ActionVariables {
             street = "preflop";
         }
         if(gameVariables.getFlopCard1() != null && gameVariables.getTurnCard() == null) {
-            street = "flop";
+            street = "flopOrTurn";
         }
         if(gameVariables.getTurnCard() != null && gameVariables.getRiverCard() == null) {
-            street = "turn";
+            street = "flopOrTurn";
         }
         if(gameVariables.getRiverCard() != null) {
             street = "river";
