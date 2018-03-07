@@ -96,6 +96,10 @@ public class Poker {
 
             String table = getTableString(handStrength, opponentType);
 
+            if(actionVariables != null) {
+                actionVariables.setTable(table);
+            }
+
             //System.out.println(table);
 
             Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);

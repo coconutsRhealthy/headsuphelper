@@ -1,6 +1,5 @@
 package com.lennart.controller;
 
-import com.lennart.model.action.actionbuilders.ai.ActionVariables;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.SimulatedHand;
@@ -88,16 +87,22 @@ public class Controller extends SpringBootServletInitializer {
     }
 
     //Actionhelper:
-    @RequestMapping(value = "/fillFields", method = RequestMethod.POST)
-    public @ResponseBody GameVariables fillFields(@RequestBody boolean newHand) throws Exception {
-        GameVariables gameVariables = new GameVariables(newHand);
+    @RequestMapping(value = "/fillFieldsInitial", method = RequestMethod.GET)
+    public @ResponseBody GameVariables fillFieldsInitial() throws Exception {
+        GameVariables gameVariables = new GameVariables();
+        return gameVariables;
+    }
+
+    @RequestMapping(value = "/fillFieldsSubsequent", method = RequestMethod.POST)
+    public @ResponseBody GameVariables fillFieldsSubsequent(@RequestBody GameVariables gameVariables) throws Exception {
+        gameVariables.fillFieldsSubsequent();
         return gameVariables;
     }
 
     @RequestMapping(value = "/getAction", method = RequestMethod.POST)
-    public @ResponseBody ActionVariables getAction(@RequestBody GameVariables gameVariables) {
-        ActionVariables actionVariables = gameVariables.testName();
-        return actionVariables;
+    public @ResponseBody GameVariables getAction(@RequestBody GameVariables gameVariables) {
+        gameVariables.doGetActionLogic();
+        return gameVariables;
     }
 
     public static void main(String[] args) {

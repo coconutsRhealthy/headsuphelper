@@ -7,14 +7,20 @@ mainApp.controller('pokerController', function($scope, $http) {
     $scope.actionVariables;
 
     $scope.fillFields = function() {
-        $http.post('/fillFields/', $scope.newHand).success(function(data) {
-            $scope.gameVariables = data;
-        })
+        if($scope.newHand === "true") {
+            $http.get('/fillFieldsInitial/').success(function(data) {
+                $scope.gameVariables = data;
+            })
+        } else {
+            $http.post('/fillFieldsSubsequent/', $scope.gameVariables).success(function(data) {
+                $scope.gameVariables = data;
+            })
+        }
     }
 
     $scope.getAction = function() {
         $http.post('/getAction/', $scope.gameVariables).success(function(data) {
-            $scope.actionVariables = data;
+            $scope.gameVariables = data;
         })
     }
 
@@ -29,7 +35,4 @@ mainApp.controller('pokerController', function($scope, $http) {
         $scope.riverCardSuitUniCode = null;
         $scope.riverCardClass = null;
     }
-
-
-
 });

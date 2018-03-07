@@ -17,28 +17,25 @@ public class GameVariables {
     private String opponentName;
     private double opponentStack;
     private double opponentBetSize;
-    private static Card flopCard1;
-    private static Card flopCard2;
-    private static Card flopCard3;
-    private static Card turnCard;
-    private static Card riverCard;
+    private Card flopCard1;
+    private Card flopCard2;
+    private Card flopCard3;
+    private Card turnCard;
+    private Card riverCard;
     private List<Card> board = new ArrayList<>();
     private String boardAsString;
     private double pot;
     private double botBetSize;
     private double botStack;
-    private static Card botHoleCard1;
-    private static Card botHoleCard2;
+    private Card botHoleCard1;
+    private Card botHoleCard2;
     private List<Card> botHoleCards = new ArrayList<>();
     private String botHoleCardsAsString;
     private boolean botIsButton;
     private String opponentAction;
+    private ActionVariables actionVariables;
 
-    public GameVariables() {
-        //default constructor;
-    }
-
-    public GameVariables(boolean newHand) throws Exception {
+    public GameVariables() throws Exception {
         bigBlind = 0.02;
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
@@ -46,47 +43,52 @@ public class GameVariables {
         TimeUnit.MILLISECONDS.sleep(100);
         opponentName = netBetTableReader.getOpponentPlayerNameFromImage();
 
-        if(newHand) {
-            OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
-            clearHoleCardsAndBoardCards();
-        }
+        OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
 
         TimeUnit.MILLISECONDS.sleep(100);
         opponentStack = netBetTableReader.getOpponentStackFromImage();
         TimeUnit.MILLISECONDS.sleep(100);
         opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
-
-        if(!newHand) {
-            board = fillTheBoard();
-            boardAsString = convertCardListToString(board);
-        }
-
         TimeUnit.MILLISECONDS.sleep(100);
         pot = netBetTableReader.getPotSizeFromImage();
         TimeUnit.MILLISECONDS.sleep(100);
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
         TimeUnit.MILLISECONDS.sleep(100);
         botStack = netBetTableReader.getBotStackFromImage();
-        botHoleCards = fillBotHoleCards();
+
+        fillBotHoleCards();
         botHoleCardsAsString = convertCardListToString(botHoleCards);
+
         TimeUnit.MILLISECONDS.sleep(100);
         botIsButton = netBetTableReader.isBotButtonFromImage();
+
         opponentAction = "toFill";
     }
 
-    public ActionVariables testName() {
-        botHoleCards = convertStringToCardList(botHoleCardsAsString);
-        board = convertStringToCardList(boardAsString);
+    public void fillFieldsSubsequent() throws Exception {
+        NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
+
+        opponentStack = netBetTableReader.getOpponentStackFromImage();
+        opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
+        pot = netBetTableReader.getPotSizeFromImage();
+        botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
+        botStack = netBetTableReader.getBotStackFromImage();
+
+        fillTheBoard();
+        boardAsString = convertCardListToString(board);
+    }
+
+    public void doGetActionLogic() {
+        botHoleCards = convertStringToCardList(botHoleCardsAsString, "holeCards");
+        board = convertStringToCardList(boardAsString, "board");
 
         new OpponentIdentifier().updateCounts(opponentName, opponentAction,
                 OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
 
-        return new ActionVariables(this);
+        actionVariables = new ActionVariables(this);
     }
 
-    private List<Card> fillTheBoard() throws Exception {
-        List<Card> boardInMethod = new ArrayList<>();
-
+    private void fillTheBoard() throws Exception {
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
         if(flopCard1 == null) {
@@ -94,55 +96,33 @@ public class GameVariables {
             flopCard1 = netBetTableReader.getFlopCard1FromImage();
 
             if(flopCard1 != null) {
-                System.out.println("c");
                 TimeUnit.MILLISECONDS.sleep(100);
                 flopCard2 = netBetTableReader.getFlopCard2FromImage();
                 TimeUnit.MILLISECONDS.sleep(100);
                 flopCard3 = netBetTableReader.getFlopCard3FromImage();
 
-                boardInMethod.add(flopCard1);
-                boardInMethod.add(flopCard2);
-                boardInMethod.add(flopCard3);
+                board.add(flopCard1);
+                board.add(flopCard2);
+                board.add(flopCard3);
             }
         } else if(turnCard == null) {
             TimeUnit.MILLISECONDS.sleep(300);
             turnCard = netBetTableReader.getTurnCardFromImage();
 
             if(turnCard != null) {
-                boardInMethod.add(flopCard1);
-                boardInMethod.add(flopCard2);
-                boardInMethod.add(flopCard3);
-                boardInMethod.add(turnCard);
+                board.add(turnCard);
             }
         } else if(riverCard == null) {
             TimeUnit.MILLISECONDS.sleep(300);
             riverCard = netBetTableReader.getRiverCardFromImage();
 
             if(riverCard != null) {
-                boardInMethod.add(flopCard1);
-                boardInMethod.add(flopCard2);
-                boardInMethod.add(flopCard3);
-                boardInMethod.add(turnCard);
-                boardInMethod.add(riverCard);
+                board.add(riverCard);
             }
         }
-
-        return boardInMethod;
     }
 
-    private void clearHoleCardsAndBoardCards() {
-        botHoleCard1 = null;
-        botHoleCard2 = null;
-        flopCard1 = null;
-        flopCard2 = null;
-        flopCard3 = null;
-        turnCard = null;
-        riverCard = null;
-    }
-
-    private List<Card> fillBotHoleCards() {
-        List<Card> botHoleCardsInMethod = new ArrayList<>();
-
+    private void fillBotHoleCards() {
         if(botHoleCard1 == null) {
             NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
@@ -150,9 +130,8 @@ public class GameVariables {
             botHoleCard2 = netBetTableReader.getBotHoleCard2FromImage();
         }
 
-        botHoleCardsInMethod.add(botHoleCard1);
-        botHoleCardsInMethod.add(botHoleCard2);
-        return botHoleCardsInMethod;
+        botHoleCards.add(botHoleCard1);
+        botHoleCards.add(botHoleCard2);
     }
 
     private String convertCardListToString(List<Card> toConvert) {
@@ -176,7 +155,7 @@ public class GameVariables {
         return convertedString;
     }
 
-    private List<Card> convertStringToCardList(String cardsAsString) {
+    private List<Card> convertStringToCardList(String cardsAsString, String holeCardsOrBoard) {
         List<Card> listToReturn = new ArrayList<>();
 
         if(cardsAsString != null && cardsAsString.length() > 0) {
@@ -189,7 +168,48 @@ public class GameVariables {
             }
         }
 
+        if(holeCardsOrBoard.equals("holeCards")) {
+            setHoleCardsBasedOnString(listToReturn);
+        } else if(holeCardsOrBoard.equals("board")) {
+            setBoardCardsBasedOnString(listToReturn);
+        }
+
         return listToReturn;
+    }
+
+    private void setHoleCardsBasedOnString(List<Card> list) {
+        botHoleCard1 = list.get(0);
+        botHoleCard2 = list.get(1);
+    }
+
+    private void setBoardCardsBasedOnString(List<Card> list) {
+        int size = list.size();
+
+        if(list.isEmpty()) {
+            flopCard1 = null;
+            flopCard2 = null;
+            flopCard3 = null;
+            turnCard = null;
+            riverCard = null;
+        } else if(size == 3) {
+            flopCard1 = list.get(0);
+            flopCard2 = list.get(1);
+            flopCard3 = list.get(2);
+            turnCard = null;
+            riverCard = null;
+        } else if(size == 4) {
+            flopCard1 = list.get(0);
+            flopCard2 = list.get(1);
+            flopCard3 = list.get(2);
+            turnCard = list.get(3);
+            riverCard = null;
+        } else if(size == 5) {
+            flopCard1 = list.get(0);
+            flopCard2 = list.get(1);
+            flopCard3 = list.get(2);
+            turnCard = list.get(3);
+            riverCard = list.get(4);
+        }
     }
 
     public double getBigBlind() {
@@ -350,5 +370,13 @@ public class GameVariables {
 
     public void setBotHoleCardsAsString(String botHoleCardsAsString) {
         this.botHoleCardsAsString = botHoleCardsAsString;
+    }
+
+    public ActionVariables getActionVariables() {
+        return actionVariables;
+    }
+
+    public void setActionVariables(ActionVariables actionVariables) {
+        this.actionVariables = actionVariables;
     }
 }

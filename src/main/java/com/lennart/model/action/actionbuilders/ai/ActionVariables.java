@@ -18,9 +18,14 @@ public class ActionVariables {
     private double sizing;
     private String opponentType;
     private String route;
+    private String table;
 
     private double botHandStrength;
     private boolean botHasStrongDraw;
+
+    public ActionVariables() {
+        //default constructor
+    }
 
     public ActionVariables(GameVariables gameVariables) {
         calculateHandStrengthAndDraws(gameVariables);
@@ -163,5 +168,13 @@ public class ActionVariables {
 
     public double getSizing() {
         return sizing;
+    }
+
+    public String getTable() {
+        return table;
+    }
+
+    public void setTable(String table) {
+        this.table = table;
     }
 }
