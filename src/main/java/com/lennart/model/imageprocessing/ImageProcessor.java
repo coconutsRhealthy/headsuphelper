@@ -119,7 +119,13 @@ public class ImageProcessor {
     }
 
     public static String removeAllNonNumericCharacters(String string) {
-        return string.replaceAll("[^\\d.]", "");
+        String stringToReturn = string.replaceAll("[^\\d.]", "");
+
+        if(stringToReturn.startsWith(".")) {
+            stringToReturn = "0" + stringToReturn;
+        }
+
+        return stringToReturn;
     }
 
     public static String getStringFromSavedImageWithTesseract(String pathOfImage) {

@@ -65,8 +65,6 @@ public class NetBetTableReader {
         for(int i = 0; i < 3; i++) {
             String botStackAsString = readBottomPlayerStack();
 
-            System.out.println(botStackAsString);
-
             if(botStackAsString.endsWith(".")) {
                 botStackAsString.replaceAll(".", "");
             }
@@ -379,7 +377,7 @@ public class NetBetTableReader {
     }
 
     private String readFirstFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(458, 401, 25, 26);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(462, 404, 23, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -387,7 +385,7 @@ public class NetBetTableReader {
     }
 
     private String readSecondFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(558, 401, 27, 27);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(562, 404, 23, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String secondFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -395,7 +393,7 @@ public class NetBetTableReader {
     }
 
     private String readThirdFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(658, 401, 27, 27);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(662, 404, 23, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String thirdFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -403,7 +401,7 @@ public class NetBetTableReader {
     }
 
     private String readTurnCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(758, 401, 27, 27);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(762, 404, 23, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String turnCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -411,7 +409,7 @@ public class NetBetTableReader {
     }
 
     private String readRiverCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(858, 401, 27, 27);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(862, 404, 23, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String riverCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -487,6 +485,11 @@ public class NetBetTableReader {
 
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String potSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+
+        if(potSize.contains("molt")) {
+            return "0.04";
+        }
+
         potSize = ImageProcessor.removeEmptySpacesFromString(potSize);
         return ImageProcessor.removeAllNonNumericCharacters(potSize);
     }
@@ -595,7 +598,7 @@ public class NetBetTableReader {
         double valueInBb = value / bigBlind;
 
         if(valueInBb < 0) {
-            valueToReturn = 0;
+            valueToReturn = -1;
         } else if(valueInBb <= 300) {
             valueToReturn = value;
         } else {
@@ -608,7 +611,7 @@ public class NetBetTableReader {
                     double adjustedValueInBb3 = (value / 1000) / bigBlind;
 
                     if(adjustedValueInBb3 > 300) {
-                        valueToReturn = 0.0;
+                        valueToReturn = -1;
                     } else {
                         valueToReturn = value / 1000;
                     }
