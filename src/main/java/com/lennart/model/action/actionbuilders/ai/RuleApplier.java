@@ -131,4 +131,56 @@ public class RuleApplier {
         return actionToReturn;
     }
 
+    public String moderateGutshotRaises(String action, boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double opponentBetSizeBb, boolean position, double handStrength) {
+        String actionToReturn;
+
+        if(action.equals("raise")) {
+            if(handStrength < 0.5) {
+                if(opponentBetSizeBb > 4) {
+                    if(!strongFlushDraw) {
+                        if(!strongOosd) {
+                            if(strongGutshot) {
+                                double random = Math.random();
+
+                                if(random > 0.6) {
+                                    actionToReturn = action;
+                                } else {
+                                    if(opponentBetSizeBb > 20) {
+                                        actionToReturn = "fold";
+                                    } else {
+                                        if(position) {
+                                            actionToReturn = "call";
+                                        } else {
+                                            double random2 = Math.random();
+
+                                            if(random2 > 0.7) {
+                                                actionToReturn = "call";
+                                            } else {
+                                                actionToReturn = "fold";
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                actionToReturn = "fold";
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+        
+        return actionToReturn;
+    }
+
 }

@@ -46,6 +46,10 @@ public class ComputerGameNew {
     private double totalHumanScore = 0;
     private double totalBotScore = 0;
 
+    private boolean strongFlushDraw;
+    private boolean strongOosd;
+    private boolean strongGutshot;
+
     public ComputerGameNew() {
         //default constructor
     }
@@ -139,7 +143,7 @@ public class ComputerGameNew {
         setMyActionToBetIfPreflopNecessary();
 
         System.out.println("opponentType: " + opponentType);
-        String action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board);
+        String action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot);
 
 //        String action = new TightPassive().doAction(
 //                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
@@ -741,8 +745,11 @@ public class ComputerGameNew {
     }
 
     private boolean hasStrongDraw(HandEvaluator handEvaluator) {
-        return handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")
-                || handEvaluator.hasDrawOfType("strongGutshot");
+        strongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
+        strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+        strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+
+        return strongFlushDraw || strongOosd || strongGutshot;
     }
 
     //getters and setters
@@ -978,5 +985,29 @@ public class ComputerGameNew {
 
     public void setBoard(List<Card> board) {
         this.board = board;
+    }
+
+    public boolean isStrongFlushDraw() {
+        return strongFlushDraw;
+    }
+
+    public void setStrongFlushDraw(boolean strongFlushDraw) {
+        this.strongFlushDraw = strongFlushDraw;
+    }
+
+    public boolean isStrongOosd() {
+        return strongOosd;
+    }
+
+    public void setStrongOosd(boolean strongOosd) {
+        this.strongOosd = strongOosd;
+    }
+
+    public boolean isStrongGutshot() {
+        return strongGutshot;
+    }
+
+    public void setStrongGutshot(boolean strongGutshot) {
+        this.strongGutshot = strongGutshot;
     }
 }

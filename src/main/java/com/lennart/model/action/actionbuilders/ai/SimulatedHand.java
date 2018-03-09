@@ -47,6 +47,13 @@ public class SimulatedHand {
     private boolean aiBotHasStrongDraw = false;
     private boolean ruleBotHasStrongDraw = false;
 
+    private boolean aiBotHasStrongFlushDraw;
+    private boolean ruleBotHasStrongFlushDraw;
+    private boolean aiBotHasStrongOosd;
+    private boolean ruleBotHasStrongOosd;
+    private boolean aiBotHasStrongGutshot;
+    private boolean ruleBotHasStrongGutshot;
+
     private Map<Integer, List<String>> aiBotActionHistory = new TreeMap<>(Collections.reverseOrder());
     private AbstractOpponent ruleBot;
 
@@ -523,14 +530,14 @@ public class SimulatedHand {
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board, aiBotHasStrongFlushDraw, aiBotHasStrongOosd, aiBotHasStrongGutshot);
                     } else {
                         List<String> eligibleActions = Arrays.asList("fold", "call", "raise");
 
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board, aiBotHasStrongFlushDraw, aiBotHasStrongOosd, aiBotHasStrongGutshot);
                     }
                 } else {
                     if(board.isEmpty() && !aiBotIsButton && aiBotBetSize / bigBlind == 1 && ruleBotBetSize / bigBlind == 1) {
@@ -539,14 +546,14 @@ public class SimulatedHand {
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board, aiBotHasStrongFlushDraw, aiBotHasStrongOosd, aiBotHasStrongGutshot);
                     } else {
                         List<String> eligibleActions = Arrays.asList("check", "bet75pct");
 
                         //System.out.println(getOpponentTypeString2(ruleBot));
                         //System.out.println(getOpponentTypeString(ruleBot));
 
-                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board);
+                        aiBotAction = poker.getAction(null, eligibleActions, getStreet(), aiBotIsButton, getPotSizeInBb(), ruleBotAction, getFacingOdds(), getEffectiveStackInBb(), aiBotHasStrongDraw, aiBotHandStrength, getOpponentTypeString(ruleBot), getRuleBotBetSizeInBb(), getAiBotBetSizeInBb(), ruleBotStack / bigBlind, aiBotStack / bigBlind, board.isEmpty(), board, aiBotHasStrongFlushDraw, aiBotHasStrongOosd, aiBotHasStrongGutshot);
                     }
                 }
             } else {
@@ -588,14 +595,25 @@ public class SimulatedHand {
             aiBotHandStrength = handEvaluatorForAiBot.getHandStrength(aiBotHolecards);
             ruleBotHandStrength = handEvaluatorForRuleBot.getHandStrength(ruleBotHolecards);
 
-            aiBotHasStrongDraw = hasStrongDraw(handEvaluatorForAiBot);
-            ruleBotHasStrongDraw = hasStrongDraw(handEvaluatorForRuleBot);
+            aiBotHasStrongDraw = hasStrongDraw(handEvaluatorForAiBot, "aiBot");
+            ruleBotHasStrongDraw = hasStrongDraw(handEvaluatorForRuleBot, "ruleBot");
         }
     }
 
-    private boolean hasStrongDraw(HandEvaluator handEvaluator) {
-        return handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")
-                || handEvaluator.hasDrawOfType("strongGutshot");
+    private boolean hasStrongDraw(HandEvaluator handEvaluator, String aiBotOrRuleBot) {
+        if(aiBotOrRuleBot.equals("aiBot")) {
+            aiBotHasStrongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
+            aiBotHasStrongOosd = handEvaluator.hasDrawOfType("strongOosd");
+            aiBotHasStrongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+
+            return aiBotHasStrongFlushDraw || aiBotHasStrongOosd || aiBotHasStrongGutshot;
+        } else {
+            ruleBotHasStrongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
+            ruleBotHasStrongOosd = handEvaluator.hasDrawOfType("strongOosd");
+            ruleBotHasStrongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+
+            return ruleBotHasStrongFlushDraw || ruleBotHasStrongOosd || ruleBotHasStrongGutshot;
+        }
     }
 
     public double getEffectiveStackInBb() {

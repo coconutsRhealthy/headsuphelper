@@ -23,6 +23,10 @@ public class ActionVariables {
     private double botHandStrength;
     private boolean botHasStrongDraw;
 
+    private boolean strongFlushDraw;
+    private boolean strongOosd;
+    private boolean strongGutshot;
+
     public ActionVariables() {
         //default constructor
     }
@@ -48,7 +52,7 @@ public class ActionVariables {
         boolean preflop = gameVariables.getBoard().isEmpty();
         List<Card> boardInMethod = gameVariables.getBoard();
 
-        action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod);
+        action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -64,8 +68,12 @@ public class ActionVariables {
             BoardEvaluator boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
             HandEvaluator handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
             botHandStrength = handEvaluator.getHandStrength(gameVariables.getBotHoleCards());
-            botHasStrongDraw = handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")
-                    || handEvaluator.hasDrawOfType("strongGutshot");
+
+            strongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
+            strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+            strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+
+            botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot;
         }
     }
 
@@ -176,5 +184,29 @@ public class ActionVariables {
 
     public void setTable(String table) {
         this.table = table;
+    }
+
+    public boolean isStrongFlushDraw() {
+        return strongFlushDraw;
+    }
+
+    public void setStrongFlushDraw(boolean strongFlushDraw) {
+        this.strongFlushDraw = strongFlushDraw;
+    }
+
+    public boolean isStrongOosd() {
+        return strongOosd;
+    }
+
+    public void setStrongOosd(boolean strongOosd) {
+        this.strongOosd = strongOosd;
+    }
+
+    public boolean isStrongGutshot() {
+        return strongGutshot;
+    }
+
+    public void setStrongGutshot(boolean strongGutshot) {
+        this.strongGutshot = strongGutshot;
     }
 }

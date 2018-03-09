@@ -84,7 +84,8 @@ public class Poker {
 
     public String getAction(ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
                             double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
-                            double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board) {
+                            double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                            boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot) {
         try {
             String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
 
@@ -126,6 +127,7 @@ public class Poker {
                 action = ruleApplier.randomizePre3betAction(action, route, handStrength, ownBetSizeBb);
                 action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw);
                 action = ruleApplier.moderateBluffRaises(action, handStrength, street, strongDraw, opponentBetSizeBb);
+                action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
 
                 return action;
             }
