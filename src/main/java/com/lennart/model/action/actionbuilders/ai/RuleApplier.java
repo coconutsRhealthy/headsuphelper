@@ -49,14 +49,30 @@ public class RuleApplier {
         if(action.equals("raise")) {
             if(street.equals("flopOrTurn")) {
                 if(!strongDraw) {
-                    if(handStrength < 0.5) {
-                        if(opponentBetSizeBb > 4) {
-                            actionToReturn = "fold";
+                    if(handStrength < 0.7) {
+                        if(handStrength < 0.5) {
+                            if(opponentBetSizeBb > 4) {
+                                actionToReturn = "fold";
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            if(opponentBetSizeBb < 20) {
+                                actionToReturn = "call";
+                            } else {
+                                actionToReturn = "fold";
+                            }
+                        }
+                    } else {
+                        if(opponentBetSizeBb >= 10) {
+                            if(handStrength < 0.8) {
+                                actionToReturn = "call";
+                            } else {
+                                actionToReturn = action;
+                            }
                         } else {
                             actionToReturn = action;
                         }
-                    } else {
-                        actionToReturn = action;
                     }
                 } else {
                     actionToReturn = action;
@@ -67,6 +83,15 @@ public class RuleApplier {
         } else {
             actionToReturn = action;
         }
+
+//        System.out.println("params in moderateBLUFFRaises(): ");
+//        System.out.println("action: " + action);
+//        System.out.println("handStrength: " + handStrength);
+//        System.out.println("street: " + street);
+//        System.out.println("strongDraw: " + strongDraw);
+//        System.out.println("opponentBetSizeBb: " + opponentBetSizeBb);
+//        System.out.println("ACTION TO RETURN: " + actionToReturn);
+//        System.out.println();
 
         return actionToReturn;
     }
@@ -179,8 +204,33 @@ public class RuleApplier {
         } else {
             actionToReturn = action;
         }
-        
+
+//        System.out.println("params in moderateGUTSHOTRaises(): ");
+//        System.out.println("action: " + action);
+//        System.out.println("strongFlushDraw: " + strongFlushDraw);
+//        System.out.println("strongOosd: " + strongOosd);
+//        System.out.println("strongGutshot: " + strongGutshot);
+//        System.out.println("opponentBetSizeBb: " + opponentBetSizeBb);
+//        System.out.println("position: " + position);
+//        System.out.println("handStrength: " + handStrength);
+//        System.out.println("ACTION TO RETURN: " + actionToReturn);
+//        System.out.println();
+
         return actionToReturn;
     }
+
+    public String monsterValueBetLogic() {
+        return null;
+    }
+
+    public String callWithFavorableOddsLogic() {
+        //from LooseAggressive:
+//        if(action.equals("fold") && facingOdds < 0.15) {
+//            action = "call";
+//        }
+
+        return null;
+    }
+
 
 }

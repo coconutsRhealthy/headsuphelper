@@ -108,11 +108,23 @@ public class Poker {
             if(!routeDataIsBigEnough(routeData, eligibleActions)) {
                 //System.out.println("xxxx");
 
+                String action = "";
+
                 if(opponentType.equals("tp") || opponentType.equals("lp")) {
-                    return new TightPassive().doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board, facingOdds);
+                    action = new TightPassive().doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board, facingOdds);
                 } else if(opponentType.equals("ta") || opponentType.equals("la")) {
-                    return new LooseAggressive(potSizeBb, ownStackBb).doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board, facingOdds);
+                    action = new LooseAggressive(potSizeBb, ownStackBb).doAction(opponentAction, handStrength, strongDraw, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, position, preflop, board, facingOdds);
                 }
+
+                RuleApplier ruleApplier = new RuleApplier();
+
+                action = ruleApplier.moderateIpOpenPre(action, route, handStrength, ownBetSizeBb);
+                action = ruleApplier.randomizePre3betAction(action, route, handStrength, ownBetSizeBb);
+                action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw);
+                action = ruleApplier.moderateBluffRaises(action, handStrength, street, strongDraw, opponentBetSizeBb);
+                action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
+
+                return action;
 
                 //return getRuleActionWhenDataIsLimited(eligibleActions, handStrength);
             } else {
@@ -135,7 +147,6 @@ public class Poker {
             System.out.println("error occurred in getAction()");
             return null;
         }
-        return null;
     }
 
 //    private String moderateBluffingAndRandomizeValue(String action, double handStrength) {
