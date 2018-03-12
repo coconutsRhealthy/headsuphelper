@@ -60,12 +60,12 @@ public class GameVariables {
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
 
         fillBotHoleCards();
-        botHoleCardsAsString = convertCardListToString(botHoleCards);
 
         TimeUnit.MILLISECONDS.sleep(200);
         botIsButton = netBetTableReader.isBotButtonFromImage();
 
-        opponentAction = "toFill";
+        TimeUnit.MILLISECONDS.sleep(200);
+        opponentAction = netBetTableReader.getOpponentAction();
     }
 
     public void fillFieldsSubsequent() throws Exception {
@@ -82,7 +82,9 @@ public class GameVariables {
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
 
         fillTheBoard();
-        boardAsString = convertCardListToString(board);
+
+        TimeUnit.MILLISECONDS.sleep(200);
+        opponentAction = netBetTableReader.getOpponentAction();
     }
 
     public void doGetActionLogic() {

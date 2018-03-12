@@ -115,12 +115,6 @@ public class NetBetTableReader {
     public String getOpponentAction() {
         String bottomChatLine = readBottomChatLine();
         String opponentAction = getActionFromChatLine(bottomChatLine);
-
-        if(opponentAction == null) {
-            String middleChatLine = readMiddleChatLine();
-            opponentAction = getActionFromChatLine(middleChatLine);
-        }
-
         return opponentAction;
     }
 
@@ -211,13 +205,23 @@ public class NetBetTableReader {
     }
 
     public static boolean botIsToAct() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(686, 679, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(926, 965, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         if(suitRgb / 10_000 == -1674) {
             //expected rgb: -16743748
             return true;
         }
         System.out.print(".");
+        return false;
+    }
+
+    public static boolean isNewHand() {
+        String middleChatLine = readMiddleChatLine();
+        String bottomChatLine = readBottomChatLine();
+
+        if(middleChatLine.contains("posts") || bottomChatLine.contains("posts")) {
+            return true;
+        }
         return false;
     }
 
@@ -276,67 +280,24 @@ public class NetBetTableReader {
     }
 
     //helper methods
-    private static boolean clickFoldActionButton() {
-        if(readLeftActionButton().contains("Fold")) {
-            MouseKeyboard.click(721, 685);
-            return true;
-        }
-        return false;
+    private static void clickFoldActionButton() {
+        MouseKeyboard.click(721, 685);
     }
 
-    private static boolean clickCheckActionButton() {
-        if(readMiddleActionButton().contains("Check")) {
-            MouseKeyboard.click(841, 682);
-            return true;
-        }
-        return false;
+    private static void clickCheckActionButton() {
+        MouseKeyboard.click(841, 682);
     }
 
-    private static boolean clickCallActionButton() {
-        String middleActionButton = readMiddleActionButton();
-        String rightActionButton = readRightActionButton();
-
-        if(middleActionButton.contains("Call")) {
-            MouseKeyboard.click(841, 682);
-            return true;
-        } else if(middleActionButtonIsNotPresent() && rightActionButton.contains("All")) {
-            MouseKeyboard.click(959, 687);
-            return true;
-        }
-        return false;
+    private static void clickCallActionButton() {
+        MouseKeyboard.click(841, 682);
     }
 
-    private static boolean clickBetActionButton() {
-        String middleActionButton = readMiddleActionButton();
-        String rightActionButton = readRightActionButton();
-
-        boolean clickActionDone = false;
-
-        if(rightActionButton.contains("Bet")) {
-            MouseKeyboard.click(959, 687);
-            clickActionDone = true;
-        } else if(middleActionButton.contains("Check") && rightActionButton.contains("All")) {
-            MouseKeyboard.click(959, 687);
-            clickActionDone = true;
-        }
-
-        return clickActionDone;
+    private static void clickBetActionButton() {
+        MouseKeyboard.click(959, 687);
     }
 
-    private static boolean clickRaiseActionButton() {
-        String rightActionButton = readRightActionButton();
-
-        boolean clickActionDone = false;
-
-        if(rightActionButton.contains("Raise")) {
-            MouseKeyboard.click(959, 687);
-            clickActionDone = true;
-        } else if(rightActionButton.contains("All")) {
-            MouseKeyboard.click(959, 687);
-            clickActionDone = true;
-        }
-
-        return clickActionDone;
+    private static void clickRaiseActionButton() {
+        MouseKeyboard.click(959, 687);
     }
 
     private String readTopChatLine() {
@@ -346,14 +307,14 @@ public class NetBetTableReader {
         return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
     }
 
-    private String readMiddleChatLine() {
+    private static String readMiddleChatLine() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 869, 441, 38);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
     }
 
-    public String readBottomChatLine() {
+    public static String readBottomChatLine() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 906, 441, 34);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -409,7 +370,7 @@ public class NetBetTableReader {
     }
 
     private String readRiverCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(862, 404, 23, 22);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(856, 404, 21, 21);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String riverCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
