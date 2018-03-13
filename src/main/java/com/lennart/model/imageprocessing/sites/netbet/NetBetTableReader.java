@@ -494,6 +494,11 @@ public class NetBetTableReader {
         return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
     }
 
+    public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 700, 700);
+        ImageProcessor.saveBufferedImage(bufferedImage, "D:/thePath" + numberOfActionRequests);
+    }
+
     private boolean bottomPlayerIsButton() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(640, 705, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
