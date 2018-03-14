@@ -1,7 +1,5 @@
 package com.lennart.model.action.actionbuilders.ai;
 
-import org.apache.commons.lang3.time.DateUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,44 +16,6 @@ import java.util.Map;
  */
 public class HandHistoryReader {
 
-    public static void main(String[] args) throws Exception {
-
-        List<String> total = new HandHistoryReader().readXmlFile();
-
-        List<String> lastHand = new HandHistoryReader().getLinesOfLastGame(total);
-
-        String playerName = new HandHistoryReader().getOpponentPlayerName(lastHand);
-
-        List<String> actionsOfOpponent = new HandHistoryReader().getAtionLinesOfOpponent(lastHand, playerName);
-
-        List<String> opponentActions = new HandHistoryReader().getOpponentActions(actionsOfOpponent);
-
-
-//        String x = System.getProperty("user.home");
-//
-//        System.out.println(x);
-//
-//        File xmlFile = new File("D:/data/hhs/6798668642.xml");
-//        Reader fileReader = new FileReader(xmlFile);
-//        BufferedReader bufReader = new BufferedReader(fileReader);
-//
-//        String line = bufReader.readLine();
-//
-//        List<String> xmlLines = new ArrayList<>();
-//
-//        while(line != null) {
-//            xmlLines.add(line);
-//            line = bufReader.readLine();
-//        }
-//
-//        System.out.println("wacht");
-//
-//
-//        bufReader.close();
-//        fileReader.close();
-
-    }
-
     public Map<String, List<String>> getOpponentActionsOfLastHand() throws Exception {
         Map<String, List<String>> mapToReturn = new HashMap<>();
 
@@ -70,8 +30,7 @@ public class HandHistoryReader {
     }
 
     private List<String> readXmlFile() throws Exception  {
-        //File xmlFile = new File("D:/hhs/6798668642.xml");
-        File xmlFile = getLatestFilefromDir("D:/hhs");
+        File xmlFile = getLatestFilefromDir("C:/Users/Lennart/AppData/Local/NetBet Poker/data/COCONUT555/History/Data/Tables");
 
         List<String> xmlLines;
         try (Reader fileReader = new FileReader(xmlFile)) {
@@ -125,7 +84,7 @@ public class HandHistoryReader {
         String opponentPlayerName = "";
 
         for(String line : lastHand) {
-            if(line.contains("<action player=")) {
+            if(line.contains("<action") && line.contains("player=")) {
                 if(!line.contains("COCONUT555")) {
                     String[] words = line.split(" ");
 
@@ -149,7 +108,7 @@ public class HandHistoryReader {
         List<String> actionLinesOfOpponent = new ArrayList<>();
 
         for(String line : lastHand) {
-            if(line.contains("<action player=")) {
+            if(line.contains("<action") && line.contains("player=")) {
                 if(line.contains(opponentPlayerName)) {
                     actionLinesOfOpponent.add(line);
                 }
@@ -198,7 +157,6 @@ public class HandHistoryReader {
         long lastModifiedTime = file.lastModified();
 
         Date currentDate = new java.util.Date();
-        currentDate = DateUtils.addHours(currentDate, 2);
         long currentTime = currentDate.getTime();
 
         if(currentTime - lastModifiedTime < 600_000) {

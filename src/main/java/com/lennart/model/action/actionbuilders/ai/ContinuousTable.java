@@ -28,7 +28,8 @@ public class ContinuousTable {
 
                 if(NetBetTableReader.isNewHand()) {
                     String opponentName = String.valueOf(Math.random());
-                    if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo("path")) {
+                    if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo
+                            ("C:/Users/Lennart/AppData/Local/NetBet Poker/data/COCONUT555/History/Data/Tables")) {
                         opponentName = new OpponentIdentifier().updateCountsFromHandhistoryAndGetOpponentPlayerName();
                     }
                     gameVariables = new GameVariables(opponentName);
