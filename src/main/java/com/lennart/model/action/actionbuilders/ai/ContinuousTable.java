@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
@@ -16,14 +17,21 @@ public class ContinuousTable {
     public void runTableContinously() throws Exception {
         GameVariables gameVariables = new GameVariables();
         int numberOfActionRequests = 0;
+        int milliSecondsTotal = 0;
+        int printDotTotal = 0;
 
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
+            milliSecondsTotal = milliSecondsTotal + 100;
             if(NetBetTableReader.botIsToAct()) {
                 numberOfActionRequests++;
 
                 if(NetBetTableReader.isNewHand()) {
-                    gameVariables = new GameVariables("preventDefault");
+                    String opponentName = String.valueOf(Math.random());
+                    if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo("path")) {
+                        opponentName = new OpponentIdentifier().updateCountsFromHandhistoryAndGetOpponentPlayerName();
+                    }
+                    gameVariables = new GameVariables(opponentName);
                 } else {
                     gameVariables.fillFieldsSubsequent();
                 }
@@ -44,15 +52,25 @@ public class ContinuousTable {
                 System.out.println("********************");
                 System.out.println();
 
-                TimeUnit.SECONDS.sleep(3);
+                NetBetTableReader.performActionOnSite(action, sizing);
 
-                //NetBetTableReader.performActionOnSite(action, sizing);
+                TimeUnit.MILLISECONDS.sleep(300);
             }
-            System.out.println(Math.random());
+
+            if(milliSecondsTotal == 5000) {
+                milliSecondsTotal = 0;
+                System.out.print(".");
+                printDotTotal++;
+
+                if(printDotTotal == 30) {
+                    printDotTotal = 0;
+                    System.out.println();
+                }
+            }
         }
     }
 
-    public void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
+    private void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
         NetBetTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
 
         String opponentStack = String.valueOf(gameVariables.getOpponentStack());

@@ -1,5 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
+import com.lennart.model.action.actionbuilders.ai.HandHistoryReader;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -114,6 +116,22 @@ public class OpponentIdentifier {
         opponentTotalMap.get(numberOfHands).put("foldCount", foldCount);
         opponentTotalMap.get(numberOfHands).put("betRaiseCount", betRaiseCount);
         opponentTotalMap.get(numberOfHands).put("checkCallCount", checkCallCount);
+    }
+
+    public String updateCountsFromHandhistoryAndGetOpponentPlayerName() throws Exception {
+        HandHistoryReader handHistoryReader = new HandHistoryReader();
+
+        Map<String, List<String>> actionsOfLastHandMap = handHistoryReader.getOpponentActionsOfLastHand();
+
+        String opponentName = actionsOfLastHandMap.entrySet().iterator().next().getKey();
+        List<String> opponentActions = actionsOfLastHandMap.entrySet().iterator().next().getValue();
+        int numberOfHands = OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName);
+
+        for(String action : opponentActions) {
+            updateCounts(opponentName, action, numberOfHands);
+        }
+
+        return opponentName;
     }
 
     public static void updateNumberOfHandsPerOpponentMap(String opponentPlayerName) {

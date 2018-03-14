@@ -213,7 +213,7 @@ public class NetBetTableReader {
     }
 
     public static boolean botIsToAct() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(926, 965, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(686, 679, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         if(suitRgb / 10_000 == -1674) {
             //expected rgb: -16743748
@@ -293,30 +293,57 @@ public class NetBetTableReader {
 
     //helper methods
     private static void clickFoldActionButton() {
-        MouseKeyboard.click(721, 685);
+        if(readLeftActionButton().contains("Fold")) {
+            MouseKeyboard.click(721, 685);
+        } else {
+            System.out.println("Clicking Fold button failed");
+        }
     }
 
     private static void clickCheckActionButton() {
-        MouseKeyboard.click(841, 682);
+        if(readMiddleActionButton().contains("Check")) {
+            MouseKeyboard.click(841, 682);
+        } else {
+            System.out.println("Clicking Check button failed");
+        }
     }
 
     private static void clickCallActionButton() {
-        MouseKeyboard.click(841, 682);
+        String middleActionButton = readMiddleActionButton();
+        String rightActionButton = readRightActionButton();
+
+        if(middleActionButton.contains("Call")) {
+            MouseKeyboard.click(841, 682);
+        } else if(middleActionButtonIsNotPresent() && rightActionButton.contains("All")) {
+            MouseKeyboard.click(959, 687);
+        } else {
+            System.out.println("Clicking Call button failed");
+        }
     }
 
     private static void clickBetActionButton() {
-        MouseKeyboard.click(959, 687);
+        String middleActionButton = readMiddleActionButton();
+        String rightActionButton = readRightActionButton();
+
+        if(rightActionButton.contains("Bet")) {
+            MouseKeyboard.click(959, 687);
+        } else if(middleActionButton.contains("Check") && rightActionButton.contains("All")) {
+            MouseKeyboard.click(959, 687);
+        } else {
+            System.out.println("Clicking Bet button failed");
+        }
     }
 
     private static void clickRaiseActionButton() {
-        MouseKeyboard.click(959, 687);
-    }
+        String rightActionButton = readRightActionButton();
 
-    private String readTopChatLine() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 840, 441, 34);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        if(rightActionButton.contains("Raise")) {
+            MouseKeyboard.click(959, 687);
+        } else if(rightActionButton.contains("All")) {
+            MouseKeyboard.click(959, 687);
+        } else {
+            System.out.println("Clicking Raise button failed");
+        }
     }
 
     private static String readMiddleChatLine() {
@@ -326,21 +353,13 @@ public class NetBetTableReader {
         return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
     }
 
-    public static String readBottomChatLine() {
+    private static String readBottomChatLine() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 906, 441, 34);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
     }
 
-
-
-
-
-
-
-
-    ///nieuw
     private String readFirstHoleCardRank() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(493, 478, 17, 19);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
@@ -438,123 +457,6 @@ public class NetBetTableReader {
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgb(suitRgb);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    private String readFirstHoleCardRank() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(684, 664, 26, 24);
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-//        String firstHoleCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//        return ImageProcessor.removeEmptySpacesFromString(firstHoleCardRank);
-//    }
-//
-//    private String readSecondHoleCardRank() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(774, 663, 24, 26);
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-//        String secondHoleCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//        return ImageProcessor.removeEmptySpacesFromString(secondHoleCardRank);
-//    }
-//
-//    private String readFirstFlopCardRankFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(462, 404, 23, 22);
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-//        String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//
-//        System.out.println("First flop cardrank: " + firstFlopCardRank);
-//
-//        return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
-//    }
-//
-//    private String readSecondFlopCardRankFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(562, 404, 23, 22);
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-//        String secondFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//        return ImageProcessor.removeEmptySpacesFromString(secondFlopCardRank);
-//    }
-//
-//    private String readThirdFlopCardRankFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(662, 404, 23, 22);
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-//        String thirdFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//        return ImageProcessor.removeEmptySpacesFromString(thirdFlopCardRank);
-//    }
-//
-//    private String readTurnCardRankFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(762, 404, 23, 22);
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-//        String turnCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//        return ImageProcessor.removeEmptySpacesFromString(turnCardRank);
-//    }
-//
-//    private String readRiverCardRankFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(856, 404, 21, 21);
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-//        String riverCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//        return ImageProcessor.removeEmptySpacesFromString(riverCardRank);
-//    }
-//
-//    private char readFirstHoleCardSuit() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(697, 702, 1, 1);
-//        int suitRgb = bufferedImage.getRGB(0, 0);
-//        return getSuitFromIntRgb(suitRgb);
-//    }
-//
-//    private char readSecondHoleCardSuit() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(786, 699, 1, 1);
-//        int suitRgb = bufferedImage.getRGB(0, 0);
-//        return getSuitFromIntRgb(suitRgb);
-//    }
-//
-//    private char readFirstFlopCardSuitFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(473, 437, 1, 1);
-//        int suitRgb = bufferedImage.getRGB(0, 0);
-//        return getSuitFromIntRgb(suitRgb);
-//    }
-//
-//    private char readSecondFlopCardSuitFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(572, 440, 1, 1);
-//        int suitRgb = bufferedImage.getRGB(0, 0);
-//        return getSuitFromIntRgb(suitRgb);
-//    }
-//
-//    private char readThirdFlopCardSuitFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(671, 440, 1, 1);
-//        int suitRgb = bufferedImage.getRGB(0, 0);
-//        return getSuitFromIntRgb(suitRgb);
-//    }
-//
-//    private char readTurnCardSuitFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(770, 441, 1, 1);
-//        int suitRgb = bufferedImage.getRGB(0, 0);
-//        return getSuitFromIntRgb(suitRgb);
-//    }
-//
-//    private char readRiverCardSuitFromBoard() {
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(870, 440, 1, 1);
-//        int suitRgb = bufferedImage.getRGB(0, 0);
-//        return getSuitFromIntRgb(suitRgb);
-//    }
 
     private String readTopPlayerStack() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(708, 205, 122, 34);

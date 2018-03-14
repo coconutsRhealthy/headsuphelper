@@ -1,12 +1,17 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LPO21630 on 9-3-2018.
@@ -49,6 +54,19 @@ public class HandHistoryReader {
 //        bufReader.close();
 //        fileReader.close();
 
+    }
+
+    public Map<String, List<String>> getOpponentActionsOfLastHand() throws Exception {
+        Map<String, List<String>> mapToReturn = new HashMap<>();
+
+        List<String> total = readXmlFile();
+        List<String> lastHand = getLinesOfLastGame(total);
+        String playerName = getOpponentPlayerName(lastHand);
+        List<String> actionLinesOfOpponent = getAtionLinesOfOpponent(lastHand, playerName);
+        List<String> opponentActions = getOpponentActions(actionLinesOfOpponent);
+
+        mapToReturn.put(playerName, opponentActions);
+        return mapToReturn;
     }
 
     private List<String> readXmlFile() throws Exception  {
@@ -173,5 +191,19 @@ public class HandHistoryReader {
             }
         }
         return lastModifiedFile;
+    }
+
+    public boolean lastModifiedFileIsLessThanTenMinutesAgo(String dirPath) {
+        File file = getLatestFilefromDir(dirPath);
+        long lastModifiedTime = file.lastModified();
+
+        Date currentDate = new java.util.Date();
+        currentDate = DateUtils.addHours(currentDate, 2);
+        long currentTime = currentDate.getTime();
+
+        if(currentTime - lastModifiedTime < 600_000) {
+            return true;
+        }
+        return false;
     }
 }

@@ -40,18 +40,17 @@ public class GameVariables {
         //default constructor
     }
 
-    public GameVariables(String preventDefaultConst) throws Exception {
+    public GameVariables(String opponentName) throws Exception {
+        //maak tafel groot
+        maximizeTable();
+        TimeUnit.MILLISECONDS.sleep(60);
+
         bigBlind = 0.02;
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
         botStack = netBetTableReader.getBotStackFromImage();
 
         TimeUnit.MILLISECONDS.sleep(200);
-        opponentName = netBetTableReader.getOpponentPlayerNameFromImage();
-
-        OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
-
-        TimeUnit.MILLISECONDS.sleep(200);
         opponentStack = netBetTableReader.getOpponentStackFromImage();
         TimeUnit.MILLISECONDS.sleep(200);
         opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
@@ -60,16 +59,27 @@ public class GameVariables {
         TimeUnit.MILLISECONDS.sleep(200);
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
 
-        fillBotHoleCards();
-
         TimeUnit.MILLISECONDS.sleep(200);
         botIsButton = netBetTableReader.isBotButtonFromImage();
 
         TimeUnit.MILLISECONDS.sleep(200);
         opponentAction = netBetTableReader.getOpponentAction();
+
+        //maak tafel klein
+        mediumSizeTable();
+        TimeUnit.MILLISECONDS.sleep(60);
+
+        fillBotHoleCards();
+
+        this.opponentName = opponentName;
+        OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
     }
 
     public void fillFieldsSubsequent() throws Exception {
+        //maak tafel groot
+        maximizeTable();
+        TimeUnit.MILLISECONDS.sleep(60);
+
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
         botStack = netBetTableReader.getBotStackFromImage();
 
@@ -82,10 +92,14 @@ public class GameVariables {
         TimeUnit.MILLISECONDS.sleep(200);
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
 
-        fillTheBoard();
-
         TimeUnit.MILLISECONDS.sleep(200);
         opponentAction = netBetTableReader.getOpponentAction();
+
+        //maak tafel klein
+        mediumSizeTable();
+        TimeUnit.MILLISECONDS.sleep(500);
+
+        fillTheBoard();
     }
 
     public void doGetActionLogic() {
@@ -99,15 +113,9 @@ public class GameVariables {
     }
 
     private void fillTheBoard() throws Exception {
-        TimeUnit.MILLISECONDS.sleep(60);
-        mediumSizeTable();
-        TimeUnit.MILLISECONDS.sleep(500);
-
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
         if(flopCard1 == null) {
-            TimeUnit.MILLISECONDS.sleep(300);
-
             for(int i = 0; i < 10; i++) {
                 flopCard1 = netBetTableReader.getFlopCard1FromImage();
                 if(flopCard1 != null) {
@@ -144,17 +152,9 @@ public class GameVariables {
                 board.add(riverCard);
             }
         }
-
-        TimeUnit.MILLISECONDS.sleep(60);
-        maximizeTable();
-        TimeUnit.MILLISECONDS.sleep(500);
     }
 
     private void fillBotHoleCards() throws Exception {
-        TimeUnit.MILLISECONDS.sleep(60);
-        mediumSizeTable();
-        TimeUnit.MILLISECONDS.sleep(60);
-
         if(botHoleCard1 == null) {
             NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
@@ -166,10 +166,6 @@ public class GameVariables {
 
         botHoleCards.add(botHoleCard1);
         botHoleCards.add(botHoleCard2);
-
-        TimeUnit.MILLISECONDS.sleep(60);
-        maximizeTable();
-        TimeUnit.MILLISECONDS.sleep(60);
     }
 
     private String convertCardListToString(List<Card> toConvert) {
