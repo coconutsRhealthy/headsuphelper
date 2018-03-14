@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
@@ -98,11 +99,22 @@ public class GameVariables {
     }
 
     private void fillTheBoard() throws Exception {
+        TimeUnit.MILLISECONDS.sleep(60);
+        mediumSizeTable();
+        TimeUnit.MILLISECONDS.sleep(500);
+
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
         if(flopCard1 == null) {
             TimeUnit.MILLISECONDS.sleep(300);
-            flopCard1 = netBetTableReader.getFlopCard1FromImage();
+
+            for(int i = 0; i < 10; i++) {
+                flopCard1 = netBetTableReader.getFlopCard1FromImage();
+                if(flopCard1 != null) {
+                    break;
+                }
+                TimeUnit.MILLISECONDS.sleep(50);
+            }
 
             if(flopCard1 != null) {
                 while(flopCard2 == null) {
@@ -132,9 +144,17 @@ public class GameVariables {
                 board.add(riverCard);
             }
         }
+
+        TimeUnit.MILLISECONDS.sleep(60);
+        maximizeTable();
+        TimeUnit.MILLISECONDS.sleep(500);
     }
 
     private void fillBotHoleCards() throws Exception {
+        TimeUnit.MILLISECONDS.sleep(60);
+        mediumSizeTable();
+        TimeUnit.MILLISECONDS.sleep(60);
+
         if(botHoleCard1 == null) {
             NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 
@@ -146,6 +166,10 @@ public class GameVariables {
 
         botHoleCards.add(botHoleCard1);
         botHoleCards.add(botHoleCard2);
+
+        TimeUnit.MILLISECONDS.sleep(60);
+        maximizeTable();
+        TimeUnit.MILLISECONDS.sleep(60);
     }
 
     private String convertCardListToString(List<Card> toConvert) {
@@ -224,6 +248,14 @@ public class GameVariables {
             turnCard = list.get(3);
             riverCard = list.get(4);
         }
+    }
+
+    private void maximizeTable() {
+        MouseKeyboard.click(983, 16);
+    }
+
+    private void mediumSizeTable() {
+        MouseKeyboard.click(1269, 25);
     }
 
     public double getBigBlind() {

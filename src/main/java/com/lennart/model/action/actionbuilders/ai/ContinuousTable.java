@@ -44,8 +44,11 @@ public class ContinuousTable {
                 System.out.println("********************");
                 System.out.println();
 
+                TimeUnit.SECONDS.sleep(3);
+
                 //NetBetTableReader.performActionOnSite(action, sizing);
             }
+            System.out.println(Math.random());
         }
     }
 
@@ -65,7 +68,7 @@ public class ContinuousTable {
         String suggestedAction = actionVariables.getAction();
         String sizing = String.valueOf(actionVariables.getSizing());
 
-        PrintWriter writer = new PrintWriter("D:/data/" + numberOfActionRequests + ".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("C:/Users/Lennart/Documents/develop/logging/" + numberOfActionRequests + ".txt", "UTF-8");
 
         writer.println("OpponentStack: " + opponentStack);
         writer.println("OpponentBetSize: " + opponentBetSize);
@@ -92,6 +95,8 @@ public class ContinuousTable {
         String cardListAsString = "initial";
 
         if(cardList != null && !cardList.isEmpty()) {
+            cardListAsString = "";
+
             for(Card card : cardList) {
                 cardListAsString = cardListAsString + card.getRank() + card.getSuit() + " ";
             }
