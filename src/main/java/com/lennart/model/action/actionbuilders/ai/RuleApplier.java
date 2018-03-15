@@ -42,18 +42,34 @@ public class RuleApplier {
                 actionToReturn = action;
             }
         } else {
-            if(action.equals("bet75pct")) {
-                double random = Math.random();
+            if(handStrength < 0.6) {
+                if(action.equals("bet75pct") && !strongDraw) {
+                    double random = Math.random();
 
-                if(random > 0.2) {
-                    actionToReturn = action;
-                } else {
-                    if(street.equals("river") && position) {
-                        //river ip value bet
+                    if(random < 0.45) {
                         actionToReturn = action;
                     } else {
                         actionToReturn = "check";
                     }
+                } else {
+                    actionToReturn = action;
+                }
+            } else if(handStrength > 0.8) {
+                if(action.equals("bet75pct")) {
+                    double random = Math.random();
+
+                    if(random > 0.08) {
+                        actionToReturn = action;
+                    } else {
+                        if(street.equals("river") && position) {
+                            //river ip value bet
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = "check";
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
                 }
             } else {
                 actionToReturn = action;
