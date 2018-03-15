@@ -41,7 +41,7 @@ public class RuleApplier {
             } else {
                 actionToReturn = action;
             }
-        } else {
+        } else if(opponentType.equals("tp")){
             if(handStrength < 0.6) {
                 if(action.equals("bet75pct") && !strongDraw) {
                     double random = Math.random();
@@ -58,7 +58,41 @@ public class RuleApplier {
                 if(action.equals("bet75pct")) {
                     double random = Math.random();
 
-                    if(random > 0.08) {
+                    if(random > 0.15) {
+                        actionToReturn = action;
+                    } else {
+                        if(street.equals("river") && position) {
+                            //river ip value bet
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = "check";
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            //lp
+            if(handStrength < 0.6) {
+                if(action.equals("bet75pct") && !strongDraw) {
+                    double random = Math.random();
+
+                    if(random < 0.2) {
+                        actionToReturn = action;
+                    } else {
+                        actionToReturn = "check";
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else if(handStrength > 0.8) {
+                if(action.equals("bet75pct")) {
+                    double random = Math.random();
+
+                    if(random > 0.04) {
                         actionToReturn = action;
                     } else {
                         if(street.equals("river") && position) {
