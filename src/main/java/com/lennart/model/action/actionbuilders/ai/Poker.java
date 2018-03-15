@@ -120,7 +120,7 @@ public class Poker {
 
                 action = ruleApplier.moderateIpOpenPre(action, route, handStrength, ownBetSizeBb);
                 action = ruleApplier.randomizePre3betAction(action, route, handStrength, ownBetSizeBb);
-                action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw);
+                action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw, opponentType);
                 action = ruleApplier.moderateBluffRaises(action, handStrength, street, strongDraw, opponentBetSizeBb);
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
 
@@ -137,7 +137,7 @@ public class Poker {
 
                 action = ruleApplier.moderateIpOpenPre(action, route, handStrength, ownBetSizeBb);
                 action = ruleApplier.randomizePre3betAction(action, route, handStrength, ownBetSizeBb);
-                action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw);
+                action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw, opponentType);
                 action = ruleApplier.moderateBluffRaises(action, handStrength, street, strongDraw, opponentBetSizeBb);
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
 

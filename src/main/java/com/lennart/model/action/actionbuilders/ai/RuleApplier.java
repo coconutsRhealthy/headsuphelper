@@ -5,22 +5,43 @@ package com.lennart.model.action.actionbuilders.ai;
  */
 public class RuleApplier {
 
-    public String moderateBluffingAndRandomizeValue(String action, double handStrength, String street, boolean position, boolean strongDraw) {
+    public String moderateBluffingAndRandomizeValue(String action, double handStrength, String street, boolean position, boolean strongDraw, String opponentType) {
         String actionToReturn;
 
-        if(handStrength < 0.6) {
-            if(action.equals("bet75pct") && !strongDraw) {
-                double random = Math.random();
+        if(opponentType.equals("ta") || opponentType.equals("la")) {
+            if(handStrength < 0.6) {
+                if(action.equals("bet75pct") && !strongDraw) {
+                    double random = Math.random();
 
-                if(random < 0.2) {
-                    actionToReturn = action;
+                    if(random < 0.2) {
+                        actionToReturn = action;
+                    } else {
+                        actionToReturn = "check";
+                    }
                 } else {
-                    actionToReturn = "check";
+                    actionToReturn = action;
+                }
+            } else if(handStrength > 0.8) {
+                if(action.equals("bet75pct")) {
+                    double random = Math.random();
+
+                    if(random > 0.2) {
+                        actionToReturn = action;
+                    } else {
+                        if(street.equals("river") && position) {
+                            //river ip value bet
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = "check";
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
                 }
             } else {
                 actionToReturn = action;
             }
-        } else if(handStrength > 0.8) {
+        } else {
             if(action.equals("bet75pct")) {
                 double random = Math.random();
 
@@ -37,9 +58,8 @@ public class RuleApplier {
             } else {
                 actionToReturn = action;
             }
-        } else {
-            actionToReturn = action;
         }
+
         return actionToReturn;
     }
 
