@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
@@ -13,6 +14,10 @@ import java.util.concurrent.TimeUnit;
  * Created by Lennart on 3/12/2018.
  */
 public class ContinuousTable {
+
+    public static void main(String[] args) throws Exception {
+        new ContinuousTable().runTableContinously();
+    }
 
     public void runTableContinously() throws Exception {
         GameVariables gameVariables = new GameVariables();
@@ -28,6 +33,7 @@ public class ContinuousTable {
 
                 if(NetBetTableReader.isNewHand()) {
                     String opponentName = String.valueOf(Math.random());
+
                     if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo
                             ("C:/Users/Lennart/AppData/Local/NetBet Poker/data/COCONUT555/History/Data/Tables")) {
                         opponentName = new OpponentIdentifier().updateCountsFromHandhistoryAndGetOpponentPlayerName();
@@ -46,6 +52,7 @@ public class ContinuousTable {
                 System.out.println();
                 System.out.println("********************");
                 System.out.println("Counter: " + numberOfActionRequests);
+                System.out.println("Opponent Name: " + gameVariables.getOpponentName());
                 System.out.println("Suggested action: "+ action);
                 System.out.println("Sizing: " + sizing);
                 System.out.println("Route: " + actionVariables.getRoute());
@@ -55,7 +62,9 @@ public class ContinuousTable {
 
                 NetBetTableReader.performActionOnSite(action, sizing);
 
-                TimeUnit.MILLISECONDS.sleep(300);
+                TimeUnit.MILLISECONDS.sleep(200);
+                maximizeTable();
+                TimeUnit.MILLISECONDS.sleep(100);
             }
 
             if(milliSecondsTotal == 5000) {
@@ -121,5 +130,9 @@ public class ContinuousTable {
             }
         }
         return cardListAsString;
+    }
+
+    private void maximizeTable() {
+        MouseKeyboard.click(983, 16);
     }
 }

@@ -124,6 +124,8 @@ public class OpponentIdentifier {
         Map<String, List<String>> actionsOfLastHandMap = handHistoryReader.getOpponentActionsOfLastHand();
 
         String opponentName = actionsOfLastHandMap.entrySet().iterator().next().getKey();
+        updateNumberOfHandsPerOpponentMap(opponentName);
+
         List<String> opponentActions = actionsOfLastHandMap.entrySet().iterator().next().getValue();
         int numberOfHands = OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName);
 

@@ -41,11 +41,7 @@ public class GameVariables {
     }
 
     public GameVariables(String opponentName) throws Exception {
-        //maak tafel groot
-        maximizeTable();
-        TimeUnit.MILLISECONDS.sleep(60);
-
-        bigBlind = 0.02;
+        bigBlind = 0.10;
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
         botStack = netBetTableReader.getBotStackFromImage();
@@ -72,14 +68,10 @@ public class GameVariables {
         fillBotHoleCards();
 
         this.opponentName = opponentName;
-        OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
+        //OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
     }
 
     public void fillFieldsSubsequent() throws Exception {
-        //maak tafel groot
-        maximizeTable();
-        TimeUnit.MILLISECONDS.sleep(60);
-
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
         botStack = netBetTableReader.getBotStackFromImage();
 
@@ -244,10 +236,6 @@ public class GameVariables {
             turnCard = list.get(3);
             riverCard = list.get(4);
         }
-    }
-
-    private void maximizeTable() {
-        MouseKeyboard.click(983, 16);
     }
 
     private void mediumSizeTable() {

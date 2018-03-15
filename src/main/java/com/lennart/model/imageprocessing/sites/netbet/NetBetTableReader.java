@@ -117,6 +117,9 @@ public class NetBetTableReader {
             String bottomChatLine = readBottomChatLine();
             String opponentAction = getActionFromChatLine(bottomChatLine);
 
+            System.out.println("bottomChatline raw: " + bottomChatLine);
+            System.out.println("opponentAction from bottomChatline: " + opponentAction);
+
             if(opponentAction != null) {
                 return opponentAction;
             }
@@ -125,8 +128,6 @@ public class NetBetTableReader {
     }
 
     private String getActionFromChatLine(String chatLine) {
-        System.out.println("Chatline is: " + chatLine);
-
         String action = null;
 
         if(chatLine.contains("COCONUT")) {
@@ -213,22 +214,18 @@ public class NetBetTableReader {
     }
 
     public static boolean botIsToAct() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(686, 679, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(926, 965, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         if(suitRgb / 10_000 == -1674) {
             //expected rgb: -16743748
             return true;
         }
-        System.out.print(".");
         return false;
     }
 
     public static boolean isNewHand() {
         String middleChatLine = readMiddleChatLine();
         String bottomChatLine = readBottomChatLine();
-
-        System.out.println("middle chat line: " + middleChatLine);
-        System.out.println("bottom chat line: " + bottomChatLine);
 
         if(middleChatLine.contains("posts") || bottomChatLine.contains("posts")
                 || middleChatLine.contains("blind") || bottomChatLine.contains("blind")) {

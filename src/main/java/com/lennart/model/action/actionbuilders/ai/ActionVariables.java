@@ -43,8 +43,7 @@ public class ActionVariables {
         double effectiveStack = getEffectiveStackInBb(gameVariables);
         boolean botHasStrongDrawInMethod = botHasStrongDraw;
         double botHandStrengthInMethod = botHandStrength;
-        opponentType = new OpponentIdentifier().getOpponentType(gameVariables.getOpponentName(),
-                OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(gameVariables.getOpponentName()));
+        opponentType = doOpponentTypeLogic(gameVariables.getOpponentName());
         double opponentBetsizeBb = gameVariables.getOpponentBetSize() / gameVariables.getBigBlind();
         double botBetsizeBb = gameVariables.getBotBetSize() / gameVariables.getBigBlind();
         double opponentStackBb = gameVariables.getOpponentStack() / gameVariables.getBigBlind();
@@ -128,6 +127,15 @@ public class ActionVariables {
         }
 
         return eligibleActions;
+    }
+
+    private String doOpponentTypeLogic(String opponentName) {
+        if(OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName) == null) {
+            OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
+        }
+
+        return new OpponentIdentifier().getOpponentType(opponentName,
+                OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
     }
 
     public void setAction(String action) {
