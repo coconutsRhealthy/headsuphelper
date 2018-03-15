@@ -124,6 +124,18 @@ public class NetBetTableReader {
                 return opponentAction;
             }
         }
+
+        String bottomChatLine = readBottomChatLine();
+        bottomChatLine = ImageProcessor.removeEmptySpacesFromString(bottomChatLine);
+
+        if(bottomChatLine.equals("")) {
+            //first hand of table...
+            String middleChatLine = readMiddleChatLine();
+            String opponentAction = getActionFromChatLine(middleChatLine);
+
+            System.out.println("First action of table... action read from middle chatline: " + opponentAction);
+            return opponentAction;
+        }
         return null;
     }
 
