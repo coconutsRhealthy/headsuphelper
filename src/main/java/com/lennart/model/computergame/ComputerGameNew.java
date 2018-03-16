@@ -25,6 +25,7 @@ public class ComputerGameNew {
     private double smallBlind;
     private double bigBlind;
     private double myStack;
+    private double myStackAtStartOfHand;
     private double computerStack;
     private double opponentIncrementalBetSize;
     private double opponentTotalBetSize;
@@ -60,6 +61,7 @@ public class ComputerGameNew {
         dealHoleCards();
         decideWhoIsButton();
         myStack = 50;
+        myStackAtStartOfHand = myStack;
         computerStack = 50;
         setBlinds();
         postBlinds();
@@ -307,7 +309,7 @@ public class ComputerGameNew {
                 computerStack = computerStack - (opponentTotalBetSize - computerTotalBetSize);
                 computerTotalBetSize = opponentTotalBetSize;
             } else {
-                computerTotalBetSize = computerStack;
+                computerTotalBetSize = computerStack + computerTotalBetSize;
                 computerStack = 0;
             }
 
@@ -375,7 +377,7 @@ public class ComputerGameNew {
             myStack = myStack - (computerTotalBetSize - opponentIncrementalBetSize);
             opponentTotalBetSize = computerTotalBetSize;
         } else {
-            opponentTotalBetSize = myStack;
+            opponentTotalBetSize = myStack + opponentTotalBetSize;
             myStack = 0;
         }
 
@@ -404,7 +406,7 @@ public class ComputerGameNew {
             opponentTotalBetSize = opponentIncrementalBetSize + myStack;
             myStack = 0;
         } else {
-            opponentIncrementalBetSize = opponentTotalBetSize - opponentIncrementalBetSize;
+            opponentIncrementalBetSize = opponentTotalBetSize - (myStackAtStartOfHand - myStack);
             myStack = myStack - opponentIncrementalBetSize;
         }
     }
@@ -1009,5 +1011,13 @@ public class ComputerGameNew {
 
     public void setStrongGutshot(boolean strongGutshot) {
         this.strongGutshot = strongGutshot;
+    }
+
+    public double getMyStackAtStartOfHand() {
+        return myStackAtStartOfHand;
+    }
+
+    public void setMyStackAtStartOfHand(double myStackAtStartOfHand) {
+        this.myStackAtStartOfHand = myStackAtStartOfHand;
     }
 }
