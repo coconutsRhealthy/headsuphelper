@@ -406,7 +406,12 @@ public class ComputerGameNew {
             opponentTotalBetSize = opponentIncrementalBetSize + myStack;
             myStack = 0;
         } else {
-            opponentIncrementalBetSize = opponentTotalBetSize - (myStackAtStartOfHand - myStack);
+            if(opponentIncrementalBetSize == 0) {
+                opponentIncrementalBetSize = opponentTotalBetSize;
+            } else {
+                opponentIncrementalBetSize = opponentTotalBetSize - (myStackAtStartOfHand - myStack);
+            }
+
             myStack = myStack - opponentIncrementalBetSize;
         }
     }
