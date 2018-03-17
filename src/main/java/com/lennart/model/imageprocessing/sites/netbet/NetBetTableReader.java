@@ -46,7 +46,7 @@ public class NetBetTableReader {
 
             if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
                 double opponentStack = Double.parseDouble(opponentStackAsString);
-                opponentStack = validateReadNumber(opponentStack);
+                opponentStack = validateStackSizeReadNumber(opponentStack);
                 foundValues.add(opponentStack);
             }
         }
@@ -71,7 +71,7 @@ public class NetBetTableReader {
 
             if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
                 double botStack = Double.parseDouble(botStackAsString);
-                botStack = validateReadNumber(botStack);
+                botStack = validateStackSizeReadNumber(botStack);
                 foundValues.add(botStack);
             }
         }
@@ -625,6 +625,40 @@ public class NetBetTableReader {
                     double adjustedValueInBb3 = (value / 1000) / bigBlind;
 
                     if(adjustedValueInBb3 > 300) {
+                        valueToReturn = -1;
+                    } else {
+                        valueToReturn = value / 1000;
+                    }
+                } else {
+                    valueToReturn = value / 100;
+                }
+            } else {
+                valueToReturn = value / 10;
+            }
+        }
+
+        return valueToReturn;
+    }
+
+    private double validateStackSizeReadNumber(double value) {
+        double valueToReturn;
+
+        double valueInBb = value / bigBlind;
+
+        if(valueInBb < 0) {
+            valueToReturn = -1;
+        } else if(valueInBb <= 600) {
+            valueToReturn = value;
+        } else {
+            double adjustedValueInBb1 = (value / 10) / bigBlind;
+
+            if(adjustedValueInBb1 > 600) {
+                double adjustedValueInBb2 = (value / 100) / bigBlind;
+
+                if(adjustedValueInBb2 > 600) {
+                    double adjustedValueInBb3 = (value / 1000) / bigBlind;
+
+                    if(adjustedValueInBb3 > 600) {
                         valueToReturn = -1;
                     } else {
                         valueToReturn = value / 1000;
