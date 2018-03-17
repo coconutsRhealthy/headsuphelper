@@ -38,16 +38,16 @@ public class NetBetTableReader {
         List<Double> foundValues = new ArrayList<>();
 
         for(int i = 0; i < 2; i++) {
-            String botStackAsString = readTopPlayerStack();
+            String opponentStackAsString = readTopPlayerStack();
 
-            if(botStackAsString.endsWith(".")) {
-                botStackAsString.replaceAll(".", "");
+            if(opponentStackAsString.endsWith(".")) {
+                opponentStackAsString.replaceAll(".", "");
             }
 
-            if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-                double botStack = Double.parseDouble(botStackAsString);
-                botStack = validateReadNumber(botStack);
-                foundValues.add(botStack);
+            if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+                double opponentStack = Double.parseDouble(opponentStackAsString);
+                opponentStack = validateReadNumber(opponentStack);
+                foundValues.add(opponentStack);
             }
         }
 
