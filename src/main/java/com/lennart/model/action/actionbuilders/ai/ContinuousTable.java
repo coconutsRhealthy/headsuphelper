@@ -73,6 +73,13 @@ public class ContinuousTable {
                 printDotTotal++;
 
                 if(printDotTotal == 30) {
+
+                    MouseKeyboard.moveMouseToLocation(1565, 909);
+                    TimeUnit.MILLISECONDS.sleep(300);
+                    MouseKeyboard.click(1565, 909);
+                    TimeUnit.MILLISECONDS.sleep(500);
+                    MouseKeyboard.moveMouseToLocation(20, 20);
+
                     printDotTotal = 0;
                     System.out.println();
                 }
