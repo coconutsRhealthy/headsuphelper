@@ -11,8 +11,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class NetBetTableOpener {
 
-    public static void startNewTable(double bigBlind) {
+    public static void startNewTable() {
         try {
+            TimeUnit.MILLISECONDS.sleep(60);
+            mediumSizeTable();
+            TimeUnit.MILLISECONDS.sleep(60);
+
             clickNoWhenAskedToPlayAgainAtSitOutTable();
             TimeUnit.SECONDS.sleep(1);
             bringLobbyToFront();
@@ -51,14 +55,18 @@ public class NetBetTableOpener {
             clickOpenChatBox();
             TimeUnit.SECONDS.sleep(1);
 
-            if(initialBotStackIsAbove100bb(bigBlind)) {
-                TimeUnit.SECONDS.sleep(1);
-                clickSitOutButton1();
-                TimeUnit.SECONDS.sleep(1);
-                clickSitOutButton2();
-                TimeUnit.SECONDS.sleep(1);
-                startNewTable(bigBlind);
-            }
+//            if(initialBotStackIsAbove100bb(bigBlind)) {
+//                TimeUnit.SECONDS.sleep(1);
+//                clickSitOutButton1();
+//                TimeUnit.SECONDS.sleep(1);
+//                clickSitOutButton2();
+//                TimeUnit.SECONDS.sleep(1);
+//                startNewTable(bigBlind);
+//            }
+
+            TimeUnit.MILLISECONDS.sleep(60);
+            maximizeTable();
+            TimeUnit.MILLISECONDS.sleep(60);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -156,5 +164,13 @@ public class NetBetTableOpener {
 
     private static void clickNoWhenAskedToPlayAgainAtSitOutTable() {
         MouseKeyboard.click(693, 466);
+    }
+
+    private static void mediumSizeTable() {
+        MouseKeyboard.click(1269, 25);
+    }
+
+    private static void maximizeTable() {
+        MouseKeyboard.click(983, 16);
     }
 }

@@ -3,6 +3,7 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
+import com.lennart.model.imageprocessing.sites.netbet.NetBetTableOpener;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
 import java.io.PrintWriter;
@@ -59,6 +60,11 @@ public class ContinuousTable {
                 System.out.println("Table: " + actionVariables.getTable());
                 System.out.println("********************");
                 System.out.println();
+
+                if(forceQuitIfEffectiveStackSizeAbove111bb(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+                        gameVariables.getOpponentStack() / gameVariables.getBigBlind())) {
+                    runTableContinously();
+                }
 
                 NetBetTableReader.performActionOnSite(action, sizing);
 
@@ -141,5 +147,21 @@ public class ContinuousTable {
 
     private void maximizeTable() {
         MouseKeyboard.click(983, 16);
+    }
+
+    private boolean forceQuitIfEffectiveStackSizeAbove111bb(double botStackBb, double opponentStackBb) {
+        if(botStackBb >= 111 && opponentStackBb >= 111) {
+            System.out.println("Effective stacksize became 100bb or more. Forced quit.");
+
+            try {
+                TimeUnit.SECONDS.sleep(60);
+                NetBetTableOpener.startNewTable();
+                return true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return false;
     }
 }
