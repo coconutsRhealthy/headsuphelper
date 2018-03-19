@@ -144,13 +144,13 @@ public class NetBetTableReader {
 
         if(chatLine.contains("COCONUT")) {
             action = "empty";
-        } else if(chatLine.contains("posts")) {
+        } else if(chatLine.contains("posts") || chatLine.contains("blind")) {
             action = "bet";
         } else if(chatLine.contains("checks")) {
             action = "check";
         } else if(chatLine.contains("calls")) {
             action = "call";
-        } else if(chatLine.contains("bets")) {
+        } else if(chatLine.contains("bets") || chatLine.contains("beis")) {
             action = "bet75pct";
         } else if(chatLine.contains("raise")) {
             action = "raise";

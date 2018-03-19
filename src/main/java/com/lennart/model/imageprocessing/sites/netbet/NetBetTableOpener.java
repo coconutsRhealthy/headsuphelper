@@ -13,15 +13,13 @@ public class NetBetTableOpener {
 
     public static void startNewTable() {
         try {
-            TimeUnit.MILLISECONDS.sleep(60);
-            mediumSizeTable();
-            TimeUnit.MILLISECONDS.sleep(60);
-
             clickNoWhenAskedToPlayAgainAtSitOutTable();
             TimeUnit.SECONDS.sleep(1);
-            bringLobbyToFront();
+            closeLeftTopTable();
             TimeUnit.SECONDS.sleep(1);
-            clickMinimizeLeftTopTable();
+            clickYesReceiveMoneyFromTableBack();
+            TimeUnit.SECONDS.sleep(1);
+
             TimeUnit.SECONDS.sleep(1);
             while(!tableOpenedLeftTop()) {
                 TimeUnit.SECONDS.sleep(1);
@@ -125,6 +123,10 @@ public class NetBetTableOpener {
         MouseKeyboard.click(72, 709);
     }
 
+    private static void closeLeftTopTable() {
+        MouseKeyboard.click(1006, 17);
+    }
+
     private static void closeRightTopTable() {
         MouseKeyboard.click(1660, 18);
     }
@@ -164,6 +166,10 @@ public class NetBetTableOpener {
 
     private static void clickNoWhenAskedToPlayAgainAtSitOutTable() {
         MouseKeyboard.click(693, 466);
+    }
+
+    private static void clickYesReceiveMoneyFromTableBack() {
+        MouseKeyboard.click(582, 470);
     }
 
     private static void mediumSizeTable() {
