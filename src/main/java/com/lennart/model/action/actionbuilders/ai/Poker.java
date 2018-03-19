@@ -123,6 +123,8 @@ public class Poker {
                 action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw, opponentType);
                 action = ruleApplier.moderateBluffRaises(action, handStrength, street, strongDraw, opponentBetSizeBb);
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
+                action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
+                action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
 
                 return action;
 
@@ -140,6 +142,8 @@ public class Poker {
                 action = ruleApplier.moderateBluffingAndRandomizeValue(action, handStrength, street, position, strongDraw, opponentType);
                 action = ruleApplier.moderateBluffRaises(action, handStrength, street, strongDraw, opponentBetSizeBb);
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
+                action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
+                action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
 
                 return action;
             }

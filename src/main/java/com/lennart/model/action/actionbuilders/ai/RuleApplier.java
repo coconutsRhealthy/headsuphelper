@@ -293,14 +293,31 @@ public class RuleApplier {
         return null;
     }
 
-    public String callWithFavorableOddsLogic() {
-        //from LooseAggressive:
-//        if(action.equals("fold") && facingOdds < 0.15) {
-//            action = "call";
-//        }
+    public String callWithFavorableOddsLogic(String action, double facingOdds) {
+        String actionToReturn = action;
 
-        return null;
+        if(action.equals("fold") && facingOdds < 0.15) {
+            actionToReturn = "call";
+        }
+
+        return actionToReturn;
     }
 
+    public String valueBet(String action, double handStength, String opponentType, boolean preflop) {
+        String actionToReturn = action;
 
+        if(action.equals("check") && !preflop) {
+            if(opponentType.equals("lp") || opponentType.equals("tp")) {
+                if(handStength > 0.8) {
+                    actionToReturn = "bet75pct";
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        }
+
+        return actionToReturn;
+    }
 }
