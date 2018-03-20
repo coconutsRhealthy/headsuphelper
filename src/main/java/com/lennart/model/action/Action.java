@@ -49,13 +49,13 @@ public class Action {
     }
 
     private void getAndProcessPostFlopAction(Actionable actionable) {
-        boardEvaluator = new BoardEvaluator(actionable.getBoard());
-        handEvaluator = new HandEvaluator(actionable.getBotHoleCards(), boardEvaluator);
-
-        postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, actionable);
-        action = postFlopActionBuilder.getAction();
-        setSizingIfNecessary(actionable, action);
-        setNewWrittenAction(action, actionable);
+//        boardEvaluator = new BoardEvaluator(actionable.getBoard());
+//        handEvaluator = new HandEvaluator(actionable.getBotHoleCards(), boardEvaluator);
+//
+//        postFlopActionBuilder = new PostFlopActionBuilder(boardEvaluator, handEvaluator, actionable);
+//        action = postFlopActionBuilder.getAction();
+//        setSizingIfNecessary(actionable, action);
+//        setNewWrittenAction(action, actionable);
     }
 
     private void setNewWrittenAction(String action, Actionable actionable) {
@@ -92,7 +92,7 @@ public class Action {
             }
         } else {
             if(myAction.equals("bet") || myAction.equals("raise")) {
-                sizing = postFlopActionBuilder.getSizing();
+                sizing = postFlopActionBuilder.getSizingInitial();
             }
         }
     }

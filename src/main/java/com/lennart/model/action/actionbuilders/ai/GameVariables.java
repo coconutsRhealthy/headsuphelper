@@ -36,6 +36,9 @@ public class GameVariables {
     private String opponentAction;
     private ActionVariables actionVariables;
 
+    private boolean drawBettingActionDone;
+    private boolean previousBluffAction;
+
     public GameVariables() {
         //default constructor
     }
@@ -408,5 +411,21 @@ public class GameVariables {
 
     public void setActionVariables(ActionVariables actionVariables) {
         this.actionVariables = actionVariables;
+    }
+
+    public boolean isDrawBettingActionDone() {
+        return drawBettingActionDone;
+    }
+
+    public void setDrawBettingActionDone(boolean drawBettingActionDone) {
+        this.drawBettingActionDone = drawBettingActionDone;
+    }
+
+    public boolean isPreviousBluffAction() {
+        return previousBluffAction;
+    }
+
+    public void setPreviousBluffAction(boolean previousBluffAction) {
+        this.previousBluffAction = previousBluffAction;
     }
 }

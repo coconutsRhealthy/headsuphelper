@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.action.actionbuilders.postflop.PostFlopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
@@ -27,6 +28,8 @@ public class ActionVariables {
     private boolean strongOosd;
     private boolean strongGutshot;
 
+    private HandEvaluator handEvaluator;
+
     public ActionVariables() {
         //default constructor
     }
@@ -51,10 +54,23 @@ public class ActionVariables {
         boolean preflop = gameVariables.getBoard().isEmpty();
         List<Card> boardInMethod = gameVariables.getBoard();
 
-        action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
+        if(opponentType.equals("tp") || opponentType.equals("lp")) {
+            action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
 
-        if(action.equals("bet75pct") || action.equals("raise")) {
-            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            if(action.equals("bet75pct") || action.equals("raise")) {
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            }
+        } else {
+            if(preflop) {
+
+            } else {
+                PostFlopActionBuilder postFlopActionBuilder = new PostFlopActionBuilder();
+                action = postFlopActionBuilder.getAction(botHandStrengthInMethod, opponentActionInMethod, gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBotBetSize(), gameVariables.getOpponentBetSize(), gameVariables.getPot(), gameVariables.getBigBlind(), boardInMethod, handEvaluator, gameVariables);
+
+                if(action.equals("bet75pct") || action.equals("raise")) {
+                    sizing = postFlopActionBuilder.getSizing();
+                }
+            }
         }
     }
 
@@ -65,7 +81,7 @@ public class ActionVariables {
             botHasStrongDraw = false;
         } else {
             BoardEvaluator boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
-            HandEvaluator handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
+            handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
             botHandStrength = handEvaluator.getHandStrength(gameVariables.getBotHoleCards());
 
             strongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
@@ -216,5 +232,13 @@ public class ActionVariables {
 
     public void setStrongGutshot(boolean strongGutshot) {
         this.strongGutshot = strongGutshot;
+    }
+
+    public HandEvaluator getHandEvaluator() {
+        return handEvaluator;
+    }
+
+    public void setHandEvaluator(HandEvaluator handEvaluator) {
+        this.handEvaluator = handEvaluator;
     }
 }
