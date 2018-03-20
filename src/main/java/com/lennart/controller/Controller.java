@@ -32,6 +32,7 @@ public class Controller extends SpringBootServletInitializer {
     ComputerGameNew startGame() {
         ComputerGameNew computerGameNew = new ComputerGameNew("initialize");
         //computerGame.setComputerAction(null);
+        computerGameNew.setHandEvaluator(null);
         return computerGameNew;
     }
 
@@ -39,6 +40,7 @@ public class Controller extends SpringBootServletInitializer {
     public @ResponseBody ComputerGameNew submitMyAction(@RequestBody ComputerGameNew computerGame) {
         computerGame = computerGame.submitHumanActionAndDoComputerAction();
         //computerGame.setComputerAction(null);
+        computerGame.setHandEvaluator(null);
         return computerGame;
     }
 

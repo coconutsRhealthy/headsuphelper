@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.postflop.PostFlopActionBuilder;
+import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
@@ -62,7 +63,8 @@ public class ActionVariables {
             }
         } else {
             if(preflop) {
-
+                action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBotStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton());
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             } else {
                 PostFlopActionBuilder postFlopActionBuilder = new PostFlopActionBuilder();
                 action = postFlopActionBuilder.getAction(botHandStrengthInMethod, opponentActionInMethod, gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBotBetSize(), gameVariables.getOpponentBetSize(), gameVariables.getPot(), gameVariables.getBigBlind(), boardInMethod, handEvaluator, gameVariables);

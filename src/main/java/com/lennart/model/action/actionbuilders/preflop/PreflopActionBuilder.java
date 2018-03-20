@@ -21,70 +21,71 @@ public class PreflopActionBuilder {
 
     private ActionBuilderUtil actionBuilderUtil;
 
-    public PreflopActionBuilder(Set<Card> knownGameCards) {
-        actionBuilderUtil = new ActionBuilderUtil(knownGameCards);
+    public PreflopActionBuilder() {
+        actionBuilderUtil = new ActionBuilderUtil();
     }
 
-    public String getAction(Actionable actionable) {
+    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double botStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton) {
+
         String action = null;
 
-        double bbOpponentTotalBetSize = actionable.getOpponentTotalBetSize() / actionable.getBigBlind();
+        double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
-        if(actionable.getOpponentStack() > -1 && actionable.getOpponentStack() < actionable.getBigBlind()) {
+        if(opponentStack > -1 && opponentStack < bigBlind) {
             //opponent is all in
             if(bbOpponentTotalBetSize <= 20) {
-                action = getFallInShortStack(actionable);
+                action = getFallInShortStack(botHoleCards);
             }
         }
 
         if(action == null) {
             if(bbOpponentTotalBetSize == 1) {
-                if(actionable.isBotIsButton()) {
-                    action = get05betF1bet(actionable);
+                if(botIsButton) {
+                    action = get05betF1bet(botHoleCards);
                 } else {
-                    action = get1betFcheck(actionable);
+                    action = get1betFcheck(botHoleCards);
                 }
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
-                action = get1betF2bet(actionable);
+                action = get1betF2bet(botHoleCards);
             } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
-                action = get2betF3bet(actionable);
+                action = get2betF3bet(botHoleCards);
             } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
-                action = get3betF4bet(actionable);
+                action = get3betF4bet(botHoleCards);
             } else {
-                action = get4betF5bet(actionable);
+                action = get4betF5bet(botHoleCards);
             }
 
-            if(actionable.getOpponentStack() > -1 && actionable.getOpponentStack() < actionable.getBigBlind()
+            if(opponentStack > -1 && opponentStack < bigBlind
                     && (action.equals("bet") || action.equals("raise"))) {
                 action = "call";
             }
 
-            if(actionable.getBotStack() >= 0 && actionable.getBotStack() <= 40 * actionable.getBigBlind()) {
+            if(botStack >= 0 && botStack <= 40 * bigBlind) {
                 if(action.equals("fold")) {
                     action = "call";
                 }
             }
 
-            if(actionable.getBotTotalBetSize() >= 50 * actionable.getBigBlind()) {
+            if(botBetSize >= 50 * bigBlind) {
                 if(action.equals("fold")) {
                     action = "call";
                 }
             }
         }
-        action = changeToCallWhenFavourableIpOdds(actionable, action);
+        action = changeToCallWhenFavourableIpOdds(opponentBetSize, botBetSize, botIsButton, bigBlind, action);
 
         return action;
     }
 
-    private String changeToCallWhenFavourableIpOdds(Actionable actionable, String action) {
-        double opponentTotalBetSize = actionable.getOpponentTotalBetSize();
-        double botTotalBetSize = actionable.getBotTotalBetSize();
+    private String changeToCallWhenFavourableIpOdds(double opponentBetSize, double botBetSize, boolean botIsButton, double bigBlind, String action) {
+        double opponentTotalBetSize = opponentBetSize;
+        double botTotalBetSize = botBetSize;
         double amountToCall = opponentTotalBetSize - botTotalBetSize;
         
-        if(actionable.isBotIsButton()) {
+        if(botIsButton) {
             if(action != null && action.equals("fold")) {
                 if(amountToCall / (opponentTotalBetSize + botTotalBetSize) < 0.34 && amountToCall / (opponentTotalBetSize + botTotalBetSize) > 0) {
-                    if(opponentTotalBetSize != actionable.getBigBlind()) {
+                    if(opponentTotalBetSize != bigBlind) {
                         action = "call";
                         System.out.println("changed action from fold to call preflop, because of favourable odds");
                     }
@@ -124,11 +125,9 @@ public class PreflopActionBuilder {
         return size;
     }
 
-    private String get05betF1bet(Actionable actionable) {
+    private String get05betF1bet(List<Card> botHoleCards) {
         Map<Integer, Set<Card>> comboMap100Percent;
         Map<Integer, Set<Card>> comboMap5Percent;
-
-        actionable.removeHoleCardsFromKnownGameCards();
 
         _2bet x2Bet = new _2bet(actionBuilderUtil);
 
@@ -141,7 +140,7 @@ public class PreflopActionBuilder {
         double percentageBet = 0;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+        holeCardsAsSet.addAll(botHoleCards);
 
         for (Map.Entry<Integer, Set<Card>> entry : comboMap100Percent.entrySet()) {
             if(entry.getValue().equals(holeCardsAsSet)) {
@@ -159,8 +158,6 @@ public class PreflopActionBuilder {
             }
         }
 
-        actionable.addHoleCardsToKnownGameCards();
-
         if(Math.random() <= percentageBet) {
             return "raise";
         } else {
@@ -168,9 +165,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betFcheck(Actionable actionable) {
-        actionable.removeHoleCardsFromKnownGameCards();
-
+    private String get1betFcheck(List<Card> botHoleCards) {
         _3bet x3Bet = new _3bet(actionBuilderUtil);
 
         Map<Integer, Set<Card>> x3bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
@@ -191,7 +186,7 @@ public class PreflopActionBuilder {
         double percentage2bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+        holeCardsAsSet.addAll(botHoleCards);
 
         percentage2bet = setPercentage(x3bet_comboMap95Percent, holeCardsAsSet, 0.95);
 
@@ -214,8 +209,6 @@ public class PreflopActionBuilder {
             percentage2bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
 
-        actionable.addHoleCardsToKnownGameCards();
-
         double random = Math.random();
         if(random <= 1 - percentage2bet) {
             return "check";
@@ -224,9 +217,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get2betF3bet(Actionable actionable) {
-        actionable.removeHoleCardsFromKnownGameCards();
-
+    private String get2betF3bet(List<Card> botHoleCards) {
         Call3bet call3Bet = new Call3bet(actionBuilderUtil);
         _4bet x4Bet = new _4bet(actionBuilderUtil);
 
@@ -273,7 +264,7 @@ public class PreflopActionBuilder {
         double percentage4bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+        holeCardsAsSet.addAll(botHoleCards);
 
         percentageCall3bet = setPercentage(call3bet_comboMap100Percent, holeCardsAsSet, 1);
 
@@ -331,8 +322,6 @@ public class PreflopActionBuilder {
             percentage4bet = setPercentage(x4bet_comboMap6Percent, holeCardsAsSet, 0.06);
         }
 
-        actionable.addHoleCardsToKnownGameCards();
-
         double random = Math.random();
         if(random <= 1 - percentage4bet - percentageCall3bet) {
             return "fold";
@@ -343,9 +332,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betF2bet(Actionable actionable) {
-        actionable.removeHoleCardsFromKnownGameCards();
-
+    private String get1betF2bet(List<Card> botHoleCards) {
         Call2bet call2Bet = new Call2bet(actionBuilderUtil);
         _3bet x3Bet = new _3bet(actionBuilderUtil);
 
@@ -385,7 +372,7 @@ public class PreflopActionBuilder {
         double percentage3bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+        holeCardsAsSet.addAll(botHoleCards);
 
         percentageCall2bet = setPercentage(call2bet_comboMap90Percent, holeCardsAsSet, 0.90);
 
@@ -432,8 +419,6 @@ public class PreflopActionBuilder {
             percentage3bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
 
-        actionable.addHoleCardsToKnownGameCards();
-
         double random = Math.random();
         if(random <= 1 - percentage3bet - percentageCall2bet) {
             return "fold";
@@ -444,10 +429,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get3betF4bet(Actionable actionable) {
-        actionable.setBotIsPre3bettor(false);
-        actionable.removeHoleCardsFromKnownGameCards();
-
+    private String get3betF4bet(List<Card> botHoleCards) {
         Call4bet call4Bet = new Call4bet(actionBuilderUtil);
 
         Map<Integer, Set<Card>> call4bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
@@ -455,7 +437,7 @@ public class PreflopActionBuilder {
         Map<Integer, Set<Card>> call4bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4Bet.getComboMap5Percent());
 
-        _5bet x5bet = new _5bet(actionable, actionBuilderUtil);
+        _5bet x5bet = new _5bet(actionBuilderUtil);
 
         Map<Integer, Set<Card>> x5bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x5bet.getComboMap95Percent());
@@ -466,7 +448,7 @@ public class PreflopActionBuilder {
         double percentage5bet;
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+        holeCardsAsSet.addAll(botHoleCards);
 
         percentageCall4bet = setPercentage(call4bet_comboMap100Percent, holeCardsAsSet, 1.0);
 
@@ -480,8 +462,6 @@ public class PreflopActionBuilder {
             percentage5bet = setPercentage(x5bet_comboMap50Percent, holeCardsAsSet, 0.50);
         }
 
-        actionable.addHoleCardsToKnownGameCards();
-
         double random = Math.random();
         if(random <= 1 - percentage5bet - percentageCall4bet) {
             return "fold";
@@ -492,20 +472,16 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get4betF5bet(Actionable actionable) {
-        actionable.removeHoleCardsFromKnownGameCards();
-
-        Call5bet call5Bet = new Call5bet(actionable, actionBuilderUtil);
+    private String get4betF5bet(List<Card> botHoleCards) {
+        Call5bet call5Bet = new Call5bet(actionBuilderUtil);
 
         Map<Integer, Set<Card>> call5bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call5Bet.getComboMap100Percent());
 
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+        holeCardsAsSet.addAll(botHoleCards);
 
         double percentageCall5bet = setPercentage(call5bet_comboMap100Percent, holeCardsAsSet, 1.0);
-
-        actionable.addHoleCardsToKnownGameCards();
 
         double random = Math.random();
         if(random < percentageCall5bet) {
@@ -515,10 +491,10 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String getFallInShortStack(Actionable actionable) {
+    private String getFallInShortStack(List<Card> botHoleCards) {
         Set<Set<Card>> combosToCallAllInWithVersusShortStack = new HashSet<>();
         Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(actionable.getBotHoleCards());
+        holeCardsAsSet.addAll(botHoleCards);
 
         combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(7).values());
         combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(8).values());

@@ -11,11 +11,6 @@ public class ActionBuilderUtil {
 
     private static final Map<Integer, List<Card>> allPossibleStartHandsAsList = getAllPossibleStartHandsInitialize();
     private static final Map<Integer, Set<Card>> allStartHandsAsSet = fillAllStartHands();
-    private Set<Card> knownGameCards;
-
-    public ActionBuilderUtil(Set<Card> knownGameCards) {
-        this.knownGameCards = knownGameCards;
-    }
 
     public Map<Integer, Set<Card>> getBroadWayHoleCards(double percentage) {
         Map<Integer, Set<Card>> offSuitBroadWayCards = getOffSuitHoleCards(10, 10, 1);
@@ -64,12 +59,6 @@ public class ActionBuilderUtil {
         Map<Integer, List<Card>> allPocketPairStartHands = getAllPocketPairStartHands();
         Map<Integer, Set<Card>> pocketPairs = new HashMap<>();
 
-        Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(this.knownGameCards);
-
-        Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(this.knownGameCards);
-
         List<List<Card>> asList = new ArrayList<>(allPocketPairStartHands.values());
         Set<Set<Card>> asSet = new HashSet<>();
 
@@ -81,16 +70,10 @@ public class ActionBuilderUtil {
             }
         }
         for(Set<Card> pocketPairCombo : asSet) {
-            List<Card> coboCheck = new ArrayList<>(pocketPairCombo);
-
-            if(knownGameCardsCopy.add(coboCheck.get(0)) && knownGameCardsCopy.add(coboCheck.get(1))) {
-                double randomNumber = Math.random();
-                if(randomNumber < percentage) {
-                    pocketPairs.put(pocketPairs.size(), pocketPairCombo);
-                }
+            double randomNumber = Math.random();
+            if(randomNumber < percentage) {
+                pocketPairs.put(pocketPairs.size(), pocketPairCombo);
             }
-            knownGameCardsCopy.clear();
-            knownGameCardsCopy.addAll(knownGameCards);
         }
         return pocketPairs;
     }
@@ -125,26 +108,17 @@ public class ActionBuilderUtil {
         suits.add('d');
         suits.add('h');
 
-        Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(this.knownGameCards);
-
-        Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(this.knownGameCards);
-
         for(Character suit : suits) {
             Set<Card> combo = new HashSet<>();
             Card holeCard1 = new Card(rankCard1, suit);
             Card holeCard2 = new Card(rankCard2, suit);
-            if(knownGameCardsCopy.add(holeCard1) && knownGameCardsCopy.add(holeCard2)) {
-                combo.add(holeCard1);
-                combo.add(holeCard2);
 
-                if (combo.size() == 2) {
-                    suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
-                }
+            combo.add(holeCard1);
+            combo.add(holeCard2);
+
+            if (combo.size() == 2) {
+                suitedCombosOfGivenRanks.put(suitedCombosOfGivenRanks.size(), combo);
             }
-            knownGameCardsCopy.clear();
-            knownGameCardsCopy.addAll(knownGameCards);
         }
         return suitedCombosOfGivenRanks;
     }
@@ -181,25 +155,16 @@ public class ActionBuilderUtil {
         suits.add('d');
         suits.add('h');
 
-        Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(this.knownGameCards);
-
-        Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(this.knownGameCards);
-
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
                 if(suit1 != suit2) {
                     Set<Card> combo = new HashSet<>();
                     Card holeCard1 = new Card(rankCard1, suit1);
                     Card holeCard2 = new Card(rankCard2, suit2);
-                    if(knownGameCardsCopy.add(holeCard1) && knownGameCardsCopy.add(holeCard2)) {
-                        combo.add(holeCard1);
-                        combo.add(holeCard2);
-                        offSuitCombosOfGivenRanks.put(offSuitCombosOfGivenRanks.size(), combo);
-                    }
-                    knownGameCardsCopy.clear();
-                    knownGameCardsCopy.addAll(knownGameCards);
+
+                    combo.add(holeCard1);
+                    combo.add(holeCard2);
+                    offSuitCombosOfGivenRanks.put(offSuitCombosOfGivenRanks.size(), combo);
                 }
             }
         }
@@ -241,27 +206,18 @@ public class ActionBuilderUtil {
         suits.add('d');
         suits.add('h');
 
-        Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(this.knownGameCards);
-
-        Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(this.knownGameCards);
-
         for(Character suit1 : suits) {
             for(Character suit2 : suits) {
                 if(suit1 != suit2) {
                     Set<Card> combo = new HashSet<>();
                     Card holeCard1 = new Card(rank, suit1);
                     Card holeCard2 = new Card(rank, suit2);
-                    if(knownGameCardsCopy.add(holeCard1) && knownGameCardsCopy.add(holeCard2)) {
-                        combo.add(holeCard1);
-                        combo.add(holeCard2);
-                        if (setToTestForUniqueness.add(combo)) {
-                            pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
-                        }
+
+                    combo.add(holeCard1);
+                    combo.add(holeCard2);
+                    if (setToTestForUniqueness.add(combo)) {
+                        pocketPairCombosOfGivenRanks.put(pocketPairCombosOfGivenRanks.size(), combo);
                     }
-                    knownGameCardsCopy.clear();
-                    knownGameCardsCopy.addAll(knownGameCards);
                 }
             }
         }
@@ -357,20 +313,10 @@ public class ActionBuilderUtil {
         Map<Integer, List<Card>> allPossibleStartHandsAsAlist = allPossibleStartHandsAsList;
         Map<Integer, Set<Card>> allPossibleStartHandsAsSet = new HashMap<>();
 
-        Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(this.knownGameCards);
-
-        Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(this.knownGameCards);
-
         for (Map.Entry<Integer, List<Card>> entry : allPossibleStartHandsAsAlist.entrySet()) {
-            if(knownGameCardsCopy.add(entry.getValue().get(0)) && knownGameCardsCopy.add(entry.getValue().get(1))) {
-                Set<Card> combo = new HashSet<>();
-                combo.addAll(entry.getValue());
-                allPossibleStartHandsAsSet.put(allPossibleStartHandsAsSet.size(), combo);
-            }
-            knownGameCardsCopy.clear();
-            knownGameCardsCopy.addAll(knownGameCards);
+            Set<Card> combo = new HashSet<>();
+            combo.addAll(entry.getValue());
+            allPossibleStartHandsAsSet.put(allPossibleStartHandsAsSet.size(), combo);
         }
         return allPossibleStartHandsAsSet;
     }
@@ -440,47 +386,37 @@ public class ActionBuilderUtil {
                                                                 double percentage) {
         Map<Integer, Set<Card>> suitedOrOffSuitHoleCards = new HashMap<>();
 
-        Set<Card> knownGameCards = new HashSet<>();
-        knownGameCards.addAll(this.knownGameCards);
-
-        Set<Card> knownGameCardsCopy = new HashSet<>();
-        knownGameCardsCopy.addAll(this.knownGameCards);
-
         for(Map.Entry<Integer, Set<Card>> entry : allStartHandsAsSet.entrySet()) {
             List<Card> asList = new ArrayList<>(entry.getValue());
 
-            if(knownGameCardsCopy.add(asList.get(0)) && knownGameCardsCopy.add(asList.get(1))) {
-                if(suited) {
-                    if(asList.get(0).getSuit() == asList.get(1).getSuit()) {
-                        List<Integer> comboRanks = new ArrayList<>();
-                        comboRanks.add(asList.get(0).getRank());
-                        comboRanks.add(asList.get(1).getRank());
+            if(suited) {
+                if(asList.get(0).getSuit() == asList.get(1).getSuit()) {
+                    List<Integer> comboRanks = new ArrayList<>();
+                    comboRanks.add(asList.get(0).getRank());
+                    comboRanks.add(asList.get(1).getRank());
 
-                        if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard) {
-                            double randomNumber = Math.random();
-                            if(randomNumber < percentage) {
-                                suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
-                            }
+                    if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard) {
+                        double randomNumber = Math.random();
+                        if(randomNumber < percentage) {
+                            suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
                         }
                     }
-                } else {
-                    if(asList.get(0).getSuit() != asList.get(1).getSuit()) {
-                        List<Integer> comboRanks = new ArrayList<>();
-                        comboRanks.add(asList.get(0).getRank());
-                        comboRanks.add(asList.get(1).getRank());
+                }
+            } else {
+                if(asList.get(0).getSuit() != asList.get(1).getSuit()) {
+                    List<Integer> comboRanks = new ArrayList<>();
+                    comboRanks.add(asList.get(0).getRank());
+                    comboRanks.add(asList.get(1).getRank());
 
-                        if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard
-                                && comboRanks.get(0) != comboRanks.get(1)) {
-                            double randomNumber = Math.random();
-                            if(randomNumber < percentage) {
-                                suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
-                            }
+                    if(Collections.max(comboRanks) >= rankOfHighestCard && Collections.min(comboRanks) >= rankOfLowestCard
+                            && comboRanks.get(0) != comboRanks.get(1)) {
+                        double randomNumber = Math.random();
+                        if(randomNumber < percentage) {
+                            suitedOrOffSuitHoleCards.put(suitedOrOffSuitHoleCards.size(), entry.getValue());
                         }
                     }
                 }
             }
-            knownGameCardsCopy.clear();
-            knownGameCardsCopy.addAll(knownGameCards);
         }
         return suitedOrOffSuitHoleCards;
     }
@@ -583,7 +519,7 @@ public class ActionBuilderUtil {
         Set<Card> handAsSet = new HashSet<>();
         handAsSet.addAll(hand);
 
-        ActionBuilderUtil p = new ActionBuilderUtil(knownGameCards);
+        ActionBuilderUtil p = new ActionBuilderUtil();
         Map<Integer, Set<Card>> combosAa = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(14);
         Map<Integer, Set<Card>> combosKk = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(13);
         Map<Integer, Set<Card>> combosQq = p.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(12);

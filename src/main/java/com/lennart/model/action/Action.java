@@ -42,10 +42,10 @@ public class Action {
 
     //helper methods
     private void getAndProcessPreflopAction(Actionable actionable) {
-        preflopActionBuilder = new PreflopActionBuilder(actionable.getKnownGameCards());
-        action = preflopActionBuilder.getAction(actionable);
-        setSizingIfNecessary(actionable, action);
-        setNewWrittenAction(action, actionable);
+//        preflopActionBuilder = new PreflopActionBuilder(actionable.getKnownGameCards());
+//        action = preflopActionBuilder.getAction(actionable);
+//        setSizingIfNecessary(actionable, action);
+//        setNewWrittenAction(action, actionable);
     }
 
     private void getAndProcessPostFlopAction(Actionable actionable) {

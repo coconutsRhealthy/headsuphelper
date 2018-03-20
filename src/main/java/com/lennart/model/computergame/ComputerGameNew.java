@@ -1,8 +1,11 @@
 package com.lennart.model.computergame;
 
+import com.lennart.model.action.actionbuilders.ai.GameVariable;
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.Sizing;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.*;
+import com.lennart.model.action.actionbuilders.postflop.PostFlopActionBuilder;
+import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
@@ -14,7 +17,7 @@ import java.util.*;
 /**
  * Created by lennart on 11-12-16.
  */
-public class ComputerGameNew {
+public class ComputerGameNew implements GameVariable {
 
     private List<Card> deck;
     private List<Card> myHoleCards;
@@ -51,6 +54,10 @@ public class ComputerGameNew {
     private boolean strongOosd;
     private boolean strongGutshot;
 
+    private boolean drawBettingActionDone;
+    private boolean previousBluffAction;
+    private HandEvaluator handEvaluator;
+
     public ComputerGameNew() {
         //default constructor
     }
@@ -84,9 +91,9 @@ public class ComputerGameNew {
 
         boolean computerActionNeeded = isComputerActionNeeded();
 
-        if(board == null) {
+        //if(board == null) {
             calculateHandStrengthsAndDraws();
-        }
+        //}
 
         if(myAction.equals("fold")) {
             processHumanFoldAction();
@@ -145,7 +152,16 @@ public class ComputerGameNew {
         setMyActionToBetIfPreflopNecessary();
 
         System.out.println("opponentType: " + opponentType);
-        String action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot);
+        //String action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot);
+
+        String action;
+
+        if(board == null || board.isEmpty()) {
+            action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, computerStack, bigBlind, computerHoleCards, computerIsButton);
+        } else {
+            action = new PostFlopActionBuilder().getAction(handStrength, myAction, computerStack, myStack, computerTotalBetSize, opponentTotalBetSize, potSize, bigBlind, board, handEvaluator, this);
+        }
+
 
 //        String action = new TightPassive().doAction(
 //                myAction, computerHandStrength, computerHasStrongDraw, opponentBetSizeBb, computerBetSizeBb,
@@ -233,9 +249,9 @@ public class ComputerGameNew {
     private double getComputerSizing() {
         //double sizing = new Sizing().getRuleBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
 
-        double sizing = new Sizing().getRuleBotSizing(computerHandStrength, opponentTotalBetSize, computerTotalBetSize, myStack, computerStack, potSize, board);
+        //double sizing = new Sizing().getRuleBotSizing(computerHandStrength, opponentTotalBetSize, computerTotalBetSize, myStack, computerStack, potSize, board);
 
-        sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
+        double sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
 
 //        double sizing = 0;
 //
@@ -744,7 +760,7 @@ public class ComputerGameNew {
             computerHasStrongDraw = false;
         } else {
             BoardEvaluator boardEvaluator = new BoardEvaluator(board);
-            HandEvaluator handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);
+            handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);
 
             computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
             computerHasStrongDraw = hasStrongDraw(handEvaluator);
@@ -878,6 +894,7 @@ public class ComputerGameNew {
         this.mySize = mySize;
     }
 
+    @Override
     public boolean isBotIsButton() {
         return isComputerIsButton();
     }
@@ -1024,5 +1041,33 @@ public class ComputerGameNew {
 
     public void setMyStackAtStartOfHand(double myStackAtStartOfHand) {
         this.myStackAtStartOfHand = myStackAtStartOfHand;
+    }
+
+    @Override
+    public boolean isDrawBettingActionDone() {
+        return drawBettingActionDone;
+    }
+
+    @Override
+    public void setDrawBettingActionDone(boolean drawBettingActionDone) {
+        this.drawBettingActionDone = drawBettingActionDone;
+    }
+
+    @Override
+    public boolean isPreviousBluffAction() {
+        return previousBluffAction;
+    }
+
+    @Override
+    public void setPreviousBluffAction(boolean previousBluffAction) {
+        this.previousBluffAction = previousBluffAction;
+    }
+
+    public HandEvaluator getHandEvaluator() {
+        return handEvaluator;
+    }
+
+    public void setHandEvaluator(HandEvaluator handEvaluator) {
+        this.handEvaluator = handEvaluator;
     }
 }

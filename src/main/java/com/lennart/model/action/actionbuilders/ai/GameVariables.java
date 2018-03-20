@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by LPO21630 on 5-3-2018.
  */
-public class GameVariables {
+public class GameVariables implements GameVariable {
 
     private double bigBlind;
     private String opponentName;
@@ -373,6 +373,7 @@ public class GameVariables {
         this.botHoleCards = botHoleCards;
     }
 
+    @Override
     public boolean isBotIsButton() {
         return botIsButton;
     }
@@ -413,18 +414,22 @@ public class GameVariables {
         this.actionVariables = actionVariables;
     }
 
+    @Override
     public boolean isDrawBettingActionDone() {
         return drawBettingActionDone;
     }
 
+    @Override
     public void setDrawBettingActionDone(boolean drawBettingActionDone) {
         this.drawBettingActionDone = drawBettingActionDone;
     }
 
+    @Override
     public boolean isPreviousBluffAction() {
         return previousBluffAction;
     }
 
+    @Override
     public void setPreviousBluffAction(boolean previousBluffAction) {
         this.previousBluffAction = previousBluffAction;
     }

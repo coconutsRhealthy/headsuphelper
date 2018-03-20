@@ -1,6 +1,6 @@
 package com.lennart.model.action.actionbuilders.postflop;
 
-import com.lennart.model.action.actionbuilders.ai.GameVariables;
+import com.lennart.model.action.actionbuilders.ai.GameVariable;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.card.Card;
 
@@ -20,7 +20,7 @@ public class PostFlopActionBuilder {
     private double bigBlind;
     private List<Card> board;
     private HandEvaluator handEvaluator;
-    private GameVariables gameVariables;
+    private GameVariable gameVariable;
 
     private final String FOLD = "fold";
     private final String CHECK = "check";
@@ -40,7 +40,7 @@ public class PostFlopActionBuilder {
                             double bigBlind,
                             List<Card> board,
                             HandEvaluator handEvaluator,
-                            GameVariables gameVariables) {
+                            GameVariable gameVariable) {
         this.opponentAction = opponentAction;
         this.botStack = botStack;
         this.opponentStack = opponentStack;
@@ -50,7 +50,7 @@ public class PostFlopActionBuilder {
         this.bigBlind = bigBlind;
         this.board = board;
         this.handEvaluator = handEvaluator;
-        this.gameVariables = gameVariables;
+        this.gameVariable = gameVariable;
         this.sizing = getSizingInitial();
 
         String action = null;
@@ -176,7 +176,7 @@ public class PostFlopActionBuilder {
             }
 
             if(drawBettingAction == null) {
-                gameVariables.setDrawBettingActionDone(false);
+                gameVariable.setDrawBettingActionDone(false);
             } else {
                 System.out.println("draw betting action");
             }
@@ -187,7 +187,7 @@ public class PostFlopActionBuilder {
     private String getDraw2ndBarrelAction(String bettingAction) {
         String draw2ndBarrelAction = null;
 
-        if(gameVariables.isDrawBettingActionDone()) {
+        if(gameVariable.isDrawBettingActionDone()) {
             if(bettingAction.equals(BET)) {
                 if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("strongOosd")) {
                     if(Math.random() < 0.85) {
@@ -254,7 +254,7 @@ public class PostFlopActionBuilder {
         }
 
         if(drawBettingInitializeAction != null) {
-            gameVariables.setDrawBettingActionDone(true);
+            gameVariable.setDrawBettingActionDone(true);
         }
         return drawBettingInitializeAction;
     }
@@ -310,10 +310,10 @@ public class PostFlopActionBuilder {
     private String getBluffBarrelAction(String bettingAction, double handStrength) {
         String bluffBarrelAction = null;
 
-        if(gameVariables.isPreviousBluffAction()) {
+        if(gameVariable.isPreviousBluffAction()) {
             if (bluffOddsAreOk() && handStrength < 0.62) {
                 if (bettingAction.equals(BET)) {
-                    if (gameVariables.isBotIsButton()) {
+                    if (gameVariable.isBotIsButton()) {
                         if (Math.random() <= 0.75) {
                             bluffBarrelAction = bettingAction;
                         }
@@ -327,12 +327,12 @@ public class PostFlopActionBuilder {
                         if (sizing / bigBlind < 70) {
                             if (Math.random() < 0.05) {
                                 bluffBarrelAction = bettingAction;
-                                gameVariables.setPreviousBluffAction(true);
+                                gameVariable.setPreviousBluffAction(true);
                             }
                         } else {
                             if (Math.random() < 0.02) {
                                 bluffBarrelAction = bettingAction;
-                                gameVariables.setPreviousBluffAction(true);
+                                gameVariable.setPreviousBluffAction(true);
                             }
                         }
                     }
@@ -345,8 +345,8 @@ public class PostFlopActionBuilder {
     private String getBluffAfterMissedDrawAction(String bettingAction) {
         String bluffAfterMissedDrawAction = null;
 
-        if(gameVariables.isDrawBettingActionDone() && bettingAction.equals(BET) && bluffOddsAreOk()) {
-            if(gameVariables.isBotIsButton()) {
+        if(gameVariable.isDrawBettingActionDone() && bettingAction.equals(BET) && bluffOddsAreOk()) {
+            if(gameVariable.isBotIsButton()) {
                 if(Math.random() <= 0.65) {
                     bluffAfterMissedDrawAction = bettingAction;
                 }
@@ -365,31 +365,31 @@ public class PostFlopActionBuilder {
         if(bluffOddsAreOk() && handStrength < 0.65) {
             if(bettingAction.equals(BET)) {
                 if(potSize / bigBlind < 10) {
-                    if(gameVariables.isBotIsButton()) {
+                    if(gameVariable.isBotIsButton()) {
                         if(Math.random() < 0.18) {
                             bluffInitializeAction = bettingAction;
-                            gameVariables.setPreviousBluffAction(true);
+                            gameVariable.setPreviousBluffAction(true);
                         }
                     } else {
                         if(Math.random() < 0.07) {
                             bluffInitializeAction = bettingAction;
-                            gameVariables.setPreviousBluffAction(true);
+                            gameVariable.setPreviousBluffAction(true);
                         }
                     }
                 } else if(potSize / bigBlind < 25) {
                     if(Math.random() < 0.40) {
                         bluffInitializeAction = bettingAction;
-                        gameVariables.setPreviousBluffAction(true);
+                        gameVariable.setPreviousBluffAction(true);
                     }
                 } else if(potSize / bigBlind < 50) {
                     if(Math.random() < 0.50) {
                         bluffInitializeAction = bettingAction;
-                        gameVariables.setPreviousBluffAction(true);
+                        gameVariable.setPreviousBluffAction(true);
                     }
                 } else {
                     if(Math.random() < 0.60) {
                         bluffInitializeAction = bettingAction;
-                        gameVariables.setPreviousBluffAction(true);
+                        gameVariable.setPreviousBluffAction(true);
                     }
                 }
             } else {
@@ -397,22 +397,22 @@ public class PostFlopActionBuilder {
                     if(potSize / bigBlind < 10) {
                         if(Math.random() < 0.10) {
                             bluffInitializeAction = bettingAction;
-                            gameVariables.setPreviousBluffAction(true);
+                            gameVariable.setPreviousBluffAction(true);
                         }
                     } else if(potSize / bigBlind < 25) {
                         if(Math.random() < 0.25) {
                             bluffInitializeAction = bettingAction;
-                            gameVariables.setPreviousBluffAction(true);
+                            gameVariable.setPreviousBluffAction(true);
                         }
                     } else if(potSize / bigBlind < 50) {
                         if(Math.random() < 0.30) {
                             bluffInitializeAction = bettingAction;
-                            gameVariables.setPreviousBluffAction(true);
+                            gameVariable.setPreviousBluffAction(true);
                         }
                     } else {
                         if(Math.random() < 0.35) {
                             bluffInitializeAction = bettingAction;
-                            gameVariables.setPreviousBluffAction(true);
+                            gameVariable.setPreviousBluffAction(true);
                         }
                     }
                 }
@@ -465,7 +465,7 @@ public class PostFlopActionBuilder {
 
         double amountToCall = (opponentTotalBetSize - botTotalBetSize);
         double odds = amountToCall / (potSize + opponentTotalBetSize + botTotalBetSize);
-        boolean botIsButton = gameVariables.isBotIsButton();
+        boolean botIsButton = gameVariable.isBotIsButton();
 
         if(board.size() == 3 || board.size() == 4) {
             if(amountToCall / bigBlind < 4) {
@@ -559,7 +559,7 @@ public class PostFlopActionBuilder {
             }
         } else {
             String opponentAction = this.opponentAction;
-            if(gameVariables.isBotIsButton() && (opponentAction == null || opponentAction.equals("empty"))) {
+            if(gameVariable.isBotIsButton() && (opponentAction == null || opponentAction.equals("empty"))) {
                 if(Math.random() < 0.92) {
                     return bettingAction;
                 } else {
