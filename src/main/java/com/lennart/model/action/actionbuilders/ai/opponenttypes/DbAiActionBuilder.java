@@ -46,7 +46,7 @@ public class DbAiActionBuilder {
         boolean aiBotIsButton = simulatedHand.isAiBotIsButton();
         double potSizeBb = simulatedHand.getPotSizeInBb();
         String ruleBotAction = simulatedHand.getRuleBotAction();
-        double facingOdds = simulatedHand.getFacingOdds();
+        double facingOdds = simulatedHand.getAiBotFacingOdds();
         double effectiveStackBb = simulatedHand.getEffectiveStackInBb();
         boolean aiBotHasStrongDraw = simulatedHand.isAiBotHasStrongDraw();
 
