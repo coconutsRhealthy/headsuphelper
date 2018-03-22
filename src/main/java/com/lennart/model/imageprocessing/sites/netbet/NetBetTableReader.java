@@ -152,7 +152,7 @@ public class NetBetTableReader {
             action = "call";
         } else if(chatLine.contains("bets") || chatLine.contains("beis")) {
             action = "bet75pct";
-        } else if(chatLine.contains("raise")) {
+        } else if(chatLine.contains("raise") || chatLine.contains("goes ") || chatLine.contains("laise")) {
             action = "raise";
         }
 

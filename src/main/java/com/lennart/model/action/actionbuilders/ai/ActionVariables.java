@@ -64,13 +64,19 @@ public class ActionVariables {
         } else {
             if(preflop) {
                 action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBotStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton());
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+
+                if(action.equals("raise")) {
+                    sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                }
             } else {
-                PostFlopActionBuilder postFlopActionBuilder = new PostFlopActionBuilder();
-                action = postFlopActionBuilder.getAction(botHandStrengthInMethod, opponentActionInMethod, gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBotBetSize(), gameVariables.getOpponentBetSize(), gameVariables.getPot(), gameVariables.getBigBlind(), boardInMethod, handEvaluator, gameVariables);
+                if(opponentType.contains("t")) {
+                    action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "tp", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
+                } else {
+                    action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "lp", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
+                }
 
                 if(action.equals("bet75pct") || action.equals("raise")) {
-                    sizing = postFlopActionBuilder.getSizing();
+                    sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
                 }
             }
         }

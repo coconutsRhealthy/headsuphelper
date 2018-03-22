@@ -55,25 +55,12 @@ public class PreflopActionBuilder {
                 action = get4betF5bet(botHoleCards);
             }
 
-            if(opponentStack > -1 && opponentStack < bigBlind
-                    && (action.equals("bet") || action.equals("raise"))) {
+            if(action.equals("fold") && ((opponentBetSize - botBetSize) / (opponentBetSize + botBetSize) < 0.24)) {
                 action = "call";
             }
 
-            if(botStack >= 0 && botStack <= 40 * bigBlind) {
-                if(action.equals("fold")) {
-                    action = "call";
-                }
-            }
-
-            if(botBetSize >= 50 * bigBlind) {
-                if(action.equals("fold")) {
-                    action = "call";
-                }
-            }
+            return action;
         }
-        action = changeToCallWhenFavourableIpOdds(opponentBetSize, botBetSize, botIsButton, bigBlind, action);
-
         return action;
     }
 
