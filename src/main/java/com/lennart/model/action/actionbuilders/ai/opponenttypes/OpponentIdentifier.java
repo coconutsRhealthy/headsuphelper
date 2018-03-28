@@ -19,14 +19,14 @@ public class OpponentIdentifier {
     private static Map<String, Map<Integer, Map<String, List<Double>>>> countMapForAllOpponents = new HashMap<>();
     private static Map<String, Integer> numberOfHandsPerOpponentMap = new HashMap<>();
 
-    private static final double LP_LOOSENESS = 0.777;
-    private static final double LP_AGGRO = 0.164;
-    private static final double LA_LOOSENESS = 0.794;
-    private static final double LA_AGGRO = 0.643;
-    private static final double TP_LOOSENESS = 0.650;
-    private static final double TP_AGGRO = 0.272;
-    private static final double TA_LOOSENESS = 0.675;
-    private static final double TA_AGGRO = 0.526;
+    private static final double LP_LOOSENESS_POSTFLOP = 0.71;
+    private static final double LP_AGGRO_POSTFLOP = 0.1;
+    private static final double LA_LOOSENESS_POSTFLOP = 0.71;
+    private static final double LA_AGGRO_POSTFLOP = 0.61;
+    private static final double TP_LOOSENESS_POSTFLOP = 0.47;
+    private static final double TP_AGGRO_POSTFLOP = 0.11;
+    private static final double TA_LOOSENESS_POSTFLOP = 0.53;
+    private static final double TA_AGGRO_POSTFLOP = 0.43;
 
     public String getOpponentType(String opponentNick, int numberOfHands) {
         String opponentType;
@@ -192,10 +192,10 @@ public class OpponentIdentifier {
     }
 
     private Map<String, Double> getLoosenessMatchMap(double looseness) {
-        double lpDifference = Math.abs(looseness - LP_LOOSENESS);
-        double laDifference = Math.abs(looseness - LA_LOOSENESS);
-        double tpDifference = Math.abs(looseness - TP_LOOSENESS);
-        double taDifference = Math.abs(looseness - TA_LOOSENESS);
+        double lpDifference = Math.abs(looseness - LP_LOOSENESS_POSTFLOP);
+        double laDifference = Math.abs(looseness - LA_LOOSENESS_POSTFLOP);
+        double tpDifference = Math.abs(looseness - TP_LOOSENESS_POSTFLOP);
+        double taDifference = Math.abs(looseness - TA_LOOSENESS_POSTFLOP);
 
         Map<String, Double> loosenessMatchMap = new HashMap<>();
 
@@ -208,10 +208,10 @@ public class OpponentIdentifier {
     }
 
     private Map<String, Double> getAggroMatchMap(double aggressiveness) {
-        double lpDifference = Math.abs(aggressiveness - LP_AGGRO);
-        double laDifference = Math.abs(aggressiveness - LA_AGGRO);
-        double tpDifference = Math.abs(aggressiveness - TP_AGGRO);
-        double taDifference = Math.abs(aggressiveness - TA_AGGRO);
+        double lpDifference = Math.abs(aggressiveness - LP_AGGRO_POSTFLOP);
+        double laDifference = Math.abs(aggressiveness - LA_AGGRO_POSTFLOP);
+        double tpDifference = Math.abs(aggressiveness - TP_AGGRO_POSTFLOP);
+        double taDifference = Math.abs(aggressiveness - TA_AGGRO_POSTFLOP);
 
         Map<String, Double> loosenessMatchMap = new HashMap<>();
 

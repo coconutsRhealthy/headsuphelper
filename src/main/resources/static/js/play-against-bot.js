@@ -261,6 +261,10 @@ mainApp.controller('pokerController', function($scope, $http) {
     }
 
     $scope.submitMyAction = function(action) {
+        if(action.includes("bet")) {
+            action = "bet75pct";
+        }
+
         $scope.computerGame.myAction = action;
 
         $http.post('/submitMyAction/', $scope.computerGame).success(function(data) {

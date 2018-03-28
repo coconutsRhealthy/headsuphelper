@@ -87,7 +87,9 @@ public class ComputerGameNew implements GameVariable {
     }
 
     public ComputerGameNew submitHumanActionAndDoComputerAction() {
-        new OpponentIdentifier().updateCounts("izo", myAction, numberOfHandsPlayed);
+        if(board != null && !board.isEmpty()) {
+            new OpponentIdentifier().updateCounts("izo", myAction, numberOfHandsPlayed);
+        }
 
         boolean computerActionNeeded = isComputerActionNeeded();
 
@@ -101,7 +103,7 @@ public class ComputerGameNew implements GameVariable {
             processHumanCheckAction();
         } else if(myAction.equals("call")) {
             processHumanCallAction();
-        } else if(myAction.equals("bet") || myAction.equals("raise")) {
+        } else if(myAction.contains("bet") || myAction.equals("raise")) {
             processHumanBetOrRaiseAction();
         }
 
@@ -159,7 +161,7 @@ public class ComputerGameNew implements GameVariable {
         if(board == null || board.isEmpty()) {
             action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, computerStack, bigBlind, computerHoleCards, computerIsButton);
         } else {
-            action = new PostFlopActionBuilder().getAction(handStrength, myAction, computerStack, myStack, computerTotalBetSize, opponentTotalBetSize, potSize, bigBlind, board, handEvaluator, this);
+            action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot);
         }
 
 
@@ -517,7 +519,7 @@ public class ComputerGameNew implements GameVariable {
     }
 
     private boolean isComputerActionNeededIfPlayerIsAllIn() {
-        if((myAction != null && (myAction.equals("bet") || myAction.equals("raise"))) && myStack == 0) {
+        if((myAction != null && (myAction.contains("bet") || myAction.equals("raise"))) && myStack == 0) {
             return true;
         } else {
             if(playerIsAllIn()) {

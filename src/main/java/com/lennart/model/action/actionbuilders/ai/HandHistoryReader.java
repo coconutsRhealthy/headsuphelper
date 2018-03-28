@@ -110,7 +110,9 @@ public class HandHistoryReader {
         for(String line : lastHand) {
             if(line.contains("<action") && line.contains("player=")) {
                 if(line.contains(opponentPlayerName)) {
-                    actionLinesOfOpponent.add(line);
+                    if(line.contains("type=\"Flop\"") || line.contains("type=\"Turn\"") || line.contains("type=\"River\"")) {
+                        actionLinesOfOpponent.add(line);
+                    }
                 }
             }
         }
