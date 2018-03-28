@@ -16,6 +16,23 @@ import java.util.Map;
  */
 public class HandHistoryReader {
 
+    public Map<String, List<String>> getOpponentActionsOfLastHand2() throws Exception {
+        Map<String, List<String>> mapToReturn = new HashMap<>();
+
+        List<String> total = readXmlFile();
+        List<String> lastHand = getLinesOfLastGame(total);
+        String playerName = getOpponentPlayerName(lastHand);
+
+        Map<Integer, List<String>> mapOfRounds = getLinesPerRoundOfLastGame(lastHand);
+
+        List<String> actionLinesOfOpponent = getActionLinesOfOpponent(mapOfRounds, playerName);
+
+        List<String> opponentActions = getOpponentActions2(actionLinesOfOpponent);
+
+        mapToReturn.put(playerName, opponentActions);
+        return mapToReturn;
+    }
+
     public Map<String, List<String>> getOpponentActionsOfLastHand() throws Exception {
         Map<String, List<String>> mapToReturn = new HashMap<>();
 
@@ -80,6 +97,30 @@ public class HandHistoryReader {
         return lastGame;
     }
 
+    private Map<Integer, List<String>> getLinesPerRoundOfLastGame(List<String> linesOfLastGame) {
+        Map<Integer, List<String>> linesPerRoundOfLastGame = new HashMap<>();
+
+        int counter = 0;
+        boolean roundStarted = false;
+
+        for(String line : linesOfLastGame) {
+            if(line.contains("<round")) {
+                counter++;
+                linesPerRoundOfLastGame.put(counter, new ArrayList<>());
+                roundStarted = true;
+            }
+
+            if(roundStarted) {
+                linesPerRoundOfLastGame.get(counter).add(line);
+
+                if(line.contains("/round")) {
+                    roundStarted = false;
+                }
+            }
+        }
+        return linesPerRoundOfLastGame;
+    }
+
     private String getOpponentPlayerName(List<String> lastHand) {
         String opponentPlayerName = "";
 
@@ -119,10 +160,56 @@ public class HandHistoryReader {
         return actionLinesOfOpponent;
     }
 
+    private List<String> getActionLinesOfOpponent(Map<Integer, List<String>> mapOfRounds, String opponentPlayerName) {
+        List<String> actionLinesOfOpponent = new ArrayList<>();
+
+        for (Map.Entry<Integer, List<String>> entry : mapOfRounds.entrySet()) {
+           boolean postflop = false;
+
+           for(String line : entry.getValue()) {
+               if(line.contains("type=\"Flop\"") || line.contains("type=\"Turn\"") || line.contains("type=\"River\"")) {
+                   postflop = true;
+                   break;
+               }
+           }
+
+            for(String line : entry.getValue()) {
+                if(line.contains("<action") && line.contains("player=")) {
+                    if(line.contains(opponentPlayerName)) {
+                        if(postflop) {
+                            actionLinesOfOpponent.add(line);
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionLinesOfOpponent;
+    }
+
     private List<String> getOpponentActions(List<String> actionLinesOfOpponent) {
         List<String> opponentActions = new ArrayList<>();
 
         for(String line : actionLinesOfOpponent) {
+            if(line.contains("type=\"0\"")) {
+                opponentActions.add("fold");
+            } else if(line.contains("type=\"3\"")) {
+                opponentActions.add("call");
+            } else if(line.contains("type=\"4\"")) {
+                opponentActions.add("check");
+            } else if(line.contains("type=\"5\"")) {
+                opponentActions.add("bet75pct");
+            } else if(line.contains("type=\"23\"")) {
+                opponentActions.add("raise");
+            }
+        }
+        return opponentActions;
+    }
+
+    private List<String> getOpponentActions2(List<String> actionLinesOfOpponent) {
+        List<String> opponentActions = new ArrayList<>();
+
+        for (String line : actionLinesOfOpponent) {
             if(line.contains("type=\"0\"")) {
                 opponentActions.add("fold");
             } else if(line.contains("type=\"3\"")) {
