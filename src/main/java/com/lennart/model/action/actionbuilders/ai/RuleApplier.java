@@ -1,5 +1,9 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.card.Card;
+
+import java.util.List;
+
 /**
  * Created by LennartMac on 01/03/2018.
  */
@@ -316,6 +320,49 @@ public class RuleApplier {
             } else {
                 actionToReturn = action;
             }
+        }
+
+        return actionToReturn;
+    }
+
+    public String moderateDeepPostflopValueBettingAndRaising(String action, double handStrength, boolean postFlop,
+                                                             boolean strongFlushDraw, boolean strongOosd, double facingBetSize,
+                                                             double myBetSize, double myStack, double facingStack,
+                                                             double pot, double bigBlind, List<Card> board) {
+        String actionToReturn;
+
+        if(postFlop) {
+            if(!strongFlushDraw && !strongOosd) {
+                if(handStrength > 0.5 && handStrength < 0.95) {
+                    if(action.equals("bet75pct")) {
+                        if(pot / bigBlind >= 85) {
+                            actionToReturn = "check";
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else if(action.equals("raise")) {
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                        if(sizing / bigBlind >= 64) {
+                            if(handStrength > 0.7) {
+                                actionToReturn = "call";
+                            } else {
+                                actionToReturn = "fold";
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
         }
 
         return actionToReturn;

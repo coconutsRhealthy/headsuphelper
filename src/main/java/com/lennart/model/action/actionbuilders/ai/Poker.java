@@ -85,7 +85,7 @@ public class Poker {
     public String getAction(ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
                             double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
                             double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
-                            boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot) {
+                            boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind) {
         try {
             String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
 
@@ -125,6 +125,7 @@ public class Poker {
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
                 action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
                 action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
+                action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
 
                 return action;
 
@@ -144,6 +145,7 @@ public class Poker {
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
                 action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
                 action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
+                action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
 
                 return action;
             }

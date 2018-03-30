@@ -161,7 +161,7 @@ public class ComputerGameNew implements GameVariable {
         if(board == null || board.isEmpty()) {
             action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, computerStack, bigBlind, computerHoleCards, computerIsButton);
         } else {
-            action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot);
+            action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind);
         }
 
 
