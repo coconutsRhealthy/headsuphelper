@@ -333,9 +333,11 @@ public class RuleApplier {
 
         if(postFlop) {
             if(!strongFlushDraw && !strongOosd) {
-                if(handStrength > 0.5 && handStrength < 0.95) {
+                if(handStrength > 0.63 && handStrength < 0.95) {
                     if(action.equals("bet75pct")) {
-                        if(pot / bigBlind >= 85) {
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                        if(sizing / bigBlind >= 64) {
                             actionToReturn = "check";
                         } else {
                             actionToReturn = action;
@@ -344,7 +346,7 @@ public class RuleApplier {
                         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
                         if(sizing / bigBlind >= 64) {
-                            if(handStrength > 0.7) {
+                            if(handStrength > 0.8) {
                                 actionToReturn = "call";
                             } else {
                                 actionToReturn = "fold";

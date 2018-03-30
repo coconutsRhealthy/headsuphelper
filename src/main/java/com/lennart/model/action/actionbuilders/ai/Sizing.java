@@ -147,7 +147,11 @@ public class Sizing {
         } else if(opponentTotalBetSizeInBb > 4 && opponentTotalBetSizeInBb <= 16) {
             size = 2.25 * facingBetSize;
         } else {
-            size = myStack + myBetSize;
+            if((myStack / bigBlind) + computerTotalBetSizeInBb > (5.5 * (opponentTotalBetSizeInBb + computerTotalBetSizeInBb))) {
+                size = 2.25 * facingBetSize;
+            } else {
+                size = myStack + myBetSize;
+            }
         }
 
         if(size > (facingStack - facingBetSize)) {
