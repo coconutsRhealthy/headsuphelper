@@ -337,7 +337,7 @@ public class RuleApplier {
                     if(action.equals("bet75pct")) {
                         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
-                        if(sizing / bigBlind >= 64) {
+                        if(sizing / bigBlind >= 90) {
                             actionToReturn = "check";
                         } else {
                             actionToReturn = action;
@@ -345,7 +345,7 @@ public class RuleApplier {
                     } else if(action.equals("raise")) {
                         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
-                        if(sizing / bigBlind >= 64) {
+                        if(sizing / bigBlind >= 90) {
                             if(handStrength > 0.8) {
                                 actionToReturn = "call";
                             } else {
@@ -354,6 +354,35 @@ public class RuleApplier {
                         } else {
                             actionToReturn = action;
                         }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String moderateDeepValueCalls(String action, double myBetSizeBb, double facingBetSizeBb, double effectiveStackBb, double handStrength, boolean postflop) {
+        String actionToReturn;
+        double amountToCallBb = facingBetSizeBb - myBetSizeBb;
+
+        if(amountToCallBb > effectiveStackBb) {
+            amountToCallBb = effectiveStackBb;
+        }
+
+        if(action.equals("call")) {
+            if(postflop) {
+                if(amountToCallBb > 100) {
+                    if(handStrength < 0.96) {
+                        actionToReturn = "fold";
                     } else {
                         actionToReturn = action;
                     }

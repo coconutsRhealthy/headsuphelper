@@ -31,8 +31,11 @@ public class OpponentIdentifier {
     public String getOpponentType(String opponentNick, int numberOfHands) {
         String opponentType;
 
-        if(numberOfHands < 19) {
-            opponentType = "lp";
+        System.out.println("opponentNick: " + opponentNick);
+        System.out.println("numberOfHands: " + numberOfHands);
+
+        if(numberOfHands < 14) {
+            opponentType = "tp";
         } else {
             if(countMapForAllOpponents.get(opponentNick) == null) {
                 countMapForAllOpponents.put(opponentNick, initializeOpponentMap());
@@ -59,6 +62,9 @@ public class OpponentIdentifier {
 
             double looseness = callRaiseCount / (foldCount + callRaiseCount);
             double aggressiveness = betRaiseCount / (checkCallCount + betRaiseCount);
+
+            System.out.println("Looseness: " + looseness);
+            System.out.println("Aggressiveness: " + aggressiveness);
 
             Map<String, Double> loosenessMatchMap = getLoosenessMatchMap(looseness);
             Map<String, Double> aggroMatchMap = getAggroMatchMap(aggressiveness);
@@ -121,7 +127,7 @@ public class OpponentIdentifier {
     public String updateCountsFromHandhistoryAndGetOpponentPlayerName() throws Exception {
         HandHistoryReader handHistoryReader = new HandHistoryReader();
 
-        Map<String, List<String>> actionsOfLastHandMap = handHistoryReader.getOpponentActionsOfLastHand();
+        Map<String, List<String>> actionsOfLastHandMap = handHistoryReader.getOpponentActionsOfLastHand2();
 
         String opponentName = actionsOfLastHandMap.entrySet().iterator().next().getKey();
         updateNumberOfHandsPerOpponentMap(opponentName);

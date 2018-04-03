@@ -61,10 +61,10 @@ public class ContinuousTable {
                 System.out.println("********************");
                 System.out.println();
 
-                if(forceQuitIfEffectiveStackSizeAbove111bb(gameVariables.getBotStack() / gameVariables.getBigBlind(),
-                        gameVariables.getOpponentStack() / gameVariables.getBigBlind())) {
-                    runTableContinously();
-                }
+//                if(forceQuitIfEffectiveStackSizeAbove111bb(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+//                        gameVariables.getOpponentStack() / gameVariables.getBigBlind())) {
+//                    runTableContinously();
+//                }
 
                 NetBetTableReader.performActionOnSite(action, sizing);
 

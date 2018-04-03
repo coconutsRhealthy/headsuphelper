@@ -27,7 +27,7 @@ public class HandHistoryReader {
 
         List<String> actionLinesOfOpponent = getActionLinesOfOpponent(mapOfRounds, playerName);
 
-        List<String> opponentActions = getOpponentActions2(actionLinesOfOpponent);
+        List<String> opponentActions = getOpponentActions(actionLinesOfOpponent);
 
         mapToReturn.put(playerName, opponentActions);
         return mapToReturn;
@@ -191,25 +191,6 @@ public class HandHistoryReader {
         List<String> opponentActions = new ArrayList<>();
 
         for(String line : actionLinesOfOpponent) {
-            if(line.contains("type=\"0\"")) {
-                opponentActions.add("fold");
-            } else if(line.contains("type=\"3\"")) {
-                opponentActions.add("call");
-            } else if(line.contains("type=\"4\"")) {
-                opponentActions.add("check");
-            } else if(line.contains("type=\"5\"")) {
-                opponentActions.add("bet75pct");
-            } else if(line.contains("type=\"23\"")) {
-                opponentActions.add("raise");
-            }
-        }
-        return opponentActions;
-    }
-
-    private List<String> getOpponentActions2(List<String> actionLinesOfOpponent) {
-        List<String> opponentActions = new ArrayList<>();
-
-        for (String line : actionLinesOfOpponent) {
             if(line.contains("type=\"0\"")) {
                 opponentActions.add("fold");
             } else if(line.contains("type=\"3\"")) {

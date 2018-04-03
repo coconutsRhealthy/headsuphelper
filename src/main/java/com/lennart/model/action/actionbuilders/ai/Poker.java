@@ -126,6 +126,7 @@ public class Poker {
                 action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
                 action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, effectiveStackBb, handStrength, !preflop);
 
                 return action;
 
@@ -146,6 +147,7 @@ public class Poker {
                 action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
                 action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, effectiveStackBb, handStrength, !preflop);
 
                 return action;
             }
