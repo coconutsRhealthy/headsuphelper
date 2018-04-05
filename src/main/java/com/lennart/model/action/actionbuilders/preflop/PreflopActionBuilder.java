@@ -11,6 +11,7 @@ import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip._4bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop.Call2bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop.Call4bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._3bet;
+import com.lennart.model.handevaluation.PreflopHandStength;
 
 import java.util.*;
 
@@ -25,68 +26,55 @@ public class PreflopActionBuilder {
         actionBuilderUtil = new ActionBuilderUtil();
     }
 
-    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double botStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton) {
-
-        String action = null;
-
+    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton) {
+        String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
-        if(opponentStack > -1 && opponentStack < bigBlind) {
-            //opponent is all in
-            if(bbOpponentTotalBetSize <= 20) {
-                action = getFallInShortStack(botHoleCards);
-            }
-        }
-
-        if(action == null) {
-            if(bbOpponentTotalBetSize == 1) {
-                if(botIsButton) {
-                    action = get05betF1bet(botHoleCards);
-                } else {
-                    action = get1betFcheck(botHoleCards);
-                }
-            } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
-                action = get1betF2bet(botHoleCards);
-            } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
-                action = get2betF3bet(botHoleCards);
-            } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
-                action = get3betF4bet(botHoleCards);
+        if(bbOpponentTotalBetSize == 1) {
+            if(botIsButton) {
+                action = get05betF1bet(botHoleCards);
             } else {
-                action = get4betF5bet(botHoleCards);
+                action = get1betFcheck(botHoleCards);
             }
-
-            if(action.equals("fold") && ((opponentBetSize - botBetSize) / (opponentBetSize + botBetSize) < 0.24)) {
-                action = "call";
+        } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
+            if(opponentStack == 0) {
+                action = getActionFacingAllIn(botHoleCards, 0.5);
+            } else {
+                action = get1betF2bet(botHoleCards);
             }
-
-            return action;
+        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
+            if(opponentStack == 0) {
+                action = getActionFacingAllIn(botHoleCards, 0.75);
+            } else {
+                action = get2betF3bet(botHoleCards);
+            }
+        } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
+            if(opponentStack == 0) {
+                action = getActionFacingAllIn(botHoleCards, 0.85);
+            } else {
+                action = get3betF4bet(botHoleCards);
+            }
+        } else {
+            action = get4betF5bet(botHoleCards);
         }
+
+        if(action.equals("fold") && ((opponentBetSize - botBetSize) / (opponentBetSize + botBetSize) < 0.24)) {
+            action = "call";
+        }
+
         return action;
     }
 
-    private String changeToCallWhenFavourableIpOdds(double opponentBetSize, double botBetSize, boolean botIsButton, double bigBlind, String action) {
-        double opponentTotalBetSize = opponentBetSize;
-        double botTotalBetSize = botBetSize;
-        double amountToCall = opponentTotalBetSize - botTotalBetSize;
-        
-        if(botIsButton) {
-            if(action != null && action.equals("fold")) {
-                if(amountToCall / (opponentTotalBetSize + botTotalBetSize) < 0.34 && amountToCall / (opponentTotalBetSize + botTotalBetSize) > 0) {
-                    if(opponentTotalBetSize != bigBlind) {
-                        action = "call";
-                        System.out.println("changed action from fold to call preflop, because of favourable odds");
-                    }
-                }
-            }
+    private String getActionFacingAllIn(List<Card> botHoleCards, double handStrengthLowerLimit) {
+        String actionToReturn;
+        double handStrength = new PreflopHandStength().getPreflopHandStength(botHoleCards);
+
+        if(handStrength >= handStrengthLowerLimit) {
+            actionToReturn = "call";
         } else {
-            if(action != null && action.equals("fold")) {
-                if(amountToCall / (opponentTotalBetSize + botTotalBetSize) < 0.28 && amountToCall / (opponentTotalBetSize + botTotalBetSize) > 0) {
-                    action = "call";
-                    System.out.println("changed action from fold to call preflop, because of favourable odds");
-                }
-            }
+            actionToReturn = "fold";
         }
-        return action;
+        return actionToReturn;
     }
 
     public double getSize(Actionable actionable) {
@@ -476,38 +464,6 @@ public class PreflopActionBuilder {
         } else {
             return "fold";
         }
-    }
-
-    private String getFallInShortStack(List<Card> botHoleCards) {
-        Set<Set<Card>> combosToCallAllInWithVersusShortStack = new HashSet<>();
-        Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(botHoleCards);
-
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(7).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(8).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(9).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(10).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(11).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(12).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(13).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRankIgnoreKnownGameCards(14).values());
-
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
-
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 8).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 9).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 10).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 11).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 12).values());
-        combosToCallAllInWithVersusShortStack.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanksIgnoreKnownGameCards(14, 13).values());
-
-        if(!combosToCallAllInWithVersusShortStack.add(holeCardsAsSet)) {
-            //holecards are a combo to call shortstack shove with
-            return "call";
-        }
-        return null;
     }
 
     private double setPercentage(Map<Integer, Set<Card>> comboMap, Set<Card> combo, double percentage) {
