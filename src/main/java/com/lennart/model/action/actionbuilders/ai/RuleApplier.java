@@ -358,7 +358,37 @@ public class RuleApplier {
                         actionToReturn = action;
                     }
                 } else {
-                    actionToReturn = action;
+                    if(handStrength >= 0.95) {
+                        if(action.equals("bet75pct")) {
+                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                            if(sizing / bigBlind >= 90) {
+                                if(handStrength >= 0.96) {
+                                    actionToReturn = action;
+                                } else {
+                                    actionToReturn = "check";
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else if(action.equals("raise")) {
+                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                            if(sizing / bigBlind >= 90) {
+                                if(handStrength >= 0.992) {
+                                    actionToReturn = action;
+                                } else {
+                                    actionToReturn = "call";
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
                 }
             } else {
                 actionToReturn = action;
@@ -370,12 +400,12 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String moderateDeepValueCalls(String action, double myBetSizeBb, double facingBetSizeBb, double effectiveStackBb, double handStrength, boolean postflop) {
+    public String moderateDeepValueCalls(String action, double myBetSizeBb, double facingBetSizeBb, double myStackBb, double handStrength, boolean postflop) {
         String actionToReturn;
         double amountToCallBb = facingBetSizeBb - myBetSizeBb;
 
-        if(amountToCallBb > effectiveStackBb) {
-            amountToCallBb = effectiveStackBb;
+        if(amountToCallBb > myStackBb) {
+            amountToCallBb = myStackBb;
         }
 
         if(action.equals("call")) {
