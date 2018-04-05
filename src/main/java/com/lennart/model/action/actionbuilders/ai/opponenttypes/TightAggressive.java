@@ -28,7 +28,7 @@ public class TightAggressive extends AbstractOpponent {
                     ruleBotStackBb, position);
         } else {
             action = doPostflopAction(aiBotAction, handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb,
-                    aiBotStackBb, ruleBotStackBb, position);
+                    aiBotStackBb, ruleBotStackBb, position, board);
         }
 
         return action;
@@ -310,11 +310,12 @@ public class TightAggressive extends AbstractOpponent {
     }
 
     private String doPostflopAction(String aiBotAction, double handStrength, boolean strongDraw, double aiBotBetsizeBb,
-                                    double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position) {
+                                    double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb, boolean position,
+                                    List<Card> board) {
         String action;
 
         if(aiBotAction != null && (aiBotAction.contains("bet") || aiBotAction.contains("raise"))) {
-            action = doPostflopFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb, position);
+            action = doPostflopFoldCallRaiseAction(handStrength, strongDraw, aiBotBetsizeBb, ruleBotBetsizeBb, aiBotStackBb, ruleBotStackBb, position, board);
         } else {
             action = doPostflopCheckBetAction(handStrength, strongDraw, position);
         }
@@ -324,7 +325,7 @@ public class TightAggressive extends AbstractOpponent {
 
     private String doPostflopFoldCallRaiseAction(double handStrength, boolean strongDraw, double aiBotBetsizeBb,
                                                  double ruleBotBetsizeBb, double aiBotStackBb, double ruleBotStackBb,
-                                                 boolean position) {
+                                                 boolean position, List<Card> board) {
         String action = null;
         double callAmountBb = getCallAmountBb(aiBotBetsizeBb, ruleBotBetsizeBb, ruleBotStackBb);
 
@@ -431,7 +432,7 @@ public class TightAggressive extends AbstractOpponent {
                         if(handStrength > 0.77) {
                             action = "call";
                         } else {
-                            if(position) {
+                            if(isFloatOpportunity(handStrength, position, board)) {
                                 double random = Math.random();
 
                                 if(random > 0.92) {
@@ -473,7 +474,7 @@ public class TightAggressive extends AbstractOpponent {
                         if(handStrength > 0.72) {
                             action = "call";
                         } else {
-                            if(position) {
+                            if(isFloatOpportunity(handStrength, position, board)) {
                                 double random = Math.random();
 
                                 if(random > 0.85) {
@@ -515,7 +516,7 @@ public class TightAggressive extends AbstractOpponent {
                         if(handStrength > 0.58) {
                             action = "call";
                         } else {
-                            if(position) {
+                            if(isFloatOpportunity(handStrength, position, board)) {
                                 double random = Math.random();
 
                                 if(random > 0.80) {
@@ -532,6 +533,19 @@ public class TightAggressive extends AbstractOpponent {
             }
         }
         return action;
+    }
+
+    private boolean isFloatOpportunity(double handStrength, boolean position, List<Card> board) {
+        boolean isFloatOpportunity = false;
+
+        if(board != null && board.size() != 5) {
+            if(handStrength > 0.2) {
+                if(position) {
+                    isFloatOpportunity = true;
+                }
+            }
+        }
+        return isFloatOpportunity;
     }
 
     private String doPostflopCheckBetAction(double handStrength, boolean strongDraw, boolean position) {
