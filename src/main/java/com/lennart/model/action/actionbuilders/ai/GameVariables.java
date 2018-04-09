@@ -54,9 +54,9 @@ public class GameVariables implements GameVariable {
         TimeUnit.MILLISECONDS.sleep(200);
         opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
         TimeUnit.MILLISECONDS.sleep(200);
-        pot = netBetTableReader.getPotSizeFromImage();
-        TimeUnit.MILLISECONDS.sleep(200);
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
+        TimeUnit.MILLISECONDS.sleep(200);
+        pot = netBetTableReader.getPotSizeFromImage(board.isEmpty(), opponentBetSize, botBetSize);
 
         TimeUnit.MILLISECONDS.sleep(200);
         botIsButton = netBetTableReader.isBotButtonFromImage();
@@ -83,9 +83,9 @@ public class GameVariables implements GameVariable {
         TimeUnit.MILLISECONDS.sleep(200);
         opponentBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
         TimeUnit.MILLISECONDS.sleep(200);
-        pot = netBetTableReader.getPotSizeFromImage();
-        TimeUnit.MILLISECONDS.sleep(200);
         botBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
+        TimeUnit.MILLISECONDS.sleep(200);
+        pot = netBetTableReader.getPotSizeFromImage(board.isEmpty(), opponentBetSize, botBetSize);
 
         TimeUnit.MILLISECONDS.sleep(200);
         opponentAction = netBetTableReader.getOpponentAction();

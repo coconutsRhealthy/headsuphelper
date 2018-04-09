@@ -84,7 +84,12 @@ public class BotHand {
 
         }
 
-        potSize = netBetTableReader.getPotSizeFromImage();
+        try {
+            potSize = netBetTableReader.getPotSizeFromImage(false, 0, 0);
+        } catch (Exception e) {
+
+        }
+
         botTotalBetSize = netBetTableReader.getBotTotalBetSizeFromImage();
         opponentTotalBetSize = netBetTableReader.getOpponentTotalBetSizeFromImage();
         opponentPlayerName = netBetTableReader.getOpponentPlayerNameFromImage();

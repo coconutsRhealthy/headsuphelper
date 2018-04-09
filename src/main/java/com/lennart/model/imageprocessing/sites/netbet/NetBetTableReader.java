@@ -20,7 +20,7 @@ public class NetBetTableReader {
         this.bigBlind = bigBlind;
     }
 
-    public double getPotSizeFromImage() {
+    public double getPotSizeFromImage(boolean postFlop, double opponentTotalBetSize, double botTotalBetSize) throws Exception {
         double potSize;
         String potSizeAsString = readPotSize(true);
 
@@ -31,6 +31,17 @@ public class NetBetTableReader {
         }
 
         potSize = validateReadNumber(potSize);
+
+        if(postFlop && potSize == 0) {
+            TimeUnit.MILLISECONDS.sleep(60);
+            mediumSizeTable();
+            TimeUnit.MILLISECONDS.sleep(60);
+            potSizeAsString = readPotSizeOld();
+            potSize = getCorrectValueFromReadPotSizeOld(potSizeAsString, opponentTotalBetSize, botTotalBetSize);
+            TimeUnit.MILLISECONDS.sleep(60);
+            maximizeTable();
+            TimeUnit.MILLISECONDS.sleep(60);
+        }
         return potSize;
     }
 
@@ -503,6 +514,35 @@ public class NetBetTableReader {
         return ImageProcessor.removeAllNonNumericCharacters(potSize);
     }
 
+    private static String readPotSizeOld() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(430, 255, 167, 28);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String potSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        potSize = ImageProcessor.removeEmptySpacesFromString(potSize);
+        return ImageProcessor.removeAllNonNumericCharacters(potSize);
+    }
+
+    private double getCorrectValueFromReadPotSizeOld(String potSizeAsString, double opponentTotalBetSize,
+                                                     double botTotalBetSize) {
+        double potSize;
+
+        if(potSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            potSize = Double.parseDouble(potSizeAsString);
+        } else {
+            potSize = 0.0;
+        }
+
+        potSize = validateStackSizeReadNumber(potSize);
+
+        if(potSize != 0) {
+            potSize = potSize - opponentTotalBetSize - botTotalBetSize;
+        }
+
+        return potSize;
+    }
+
     private String readBottomPlayerTotalBetSize() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(673, 626, 80, 26);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
@@ -672,5 +712,13 @@ public class NetBetTableReader {
         }
 
         return valueToReturn;
+    }
+
+    private void mediumSizeTable() {
+        MouseKeyboard.click(1269, 25);
+    }
+
+    private void maximizeTable() {
+        MouseKeyboard.click(983, 16);
     }
 }

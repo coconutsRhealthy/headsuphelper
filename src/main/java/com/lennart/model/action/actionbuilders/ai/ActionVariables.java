@@ -89,6 +89,14 @@ public class ActionVariables {
     }
 
     private double getEffectiveStackInBb(GameVariables gameVariables) {
+        if(gameVariables.getOpponentStack() == 0) {
+            if(gameVariables.getBotStack() > gameVariables.getOpponentBetSize()) {
+                return gameVariables.getOpponentBetSize() - gameVariables.getBotBetSize();
+            } else {
+                return gameVariables.getBotStack();
+            }
+        }
+
         if(gameVariables.getBotStack() > gameVariables.getOpponentStack()) {
             return gameVariables.getOpponentStack() / gameVariables.getBigBlind();
         }
