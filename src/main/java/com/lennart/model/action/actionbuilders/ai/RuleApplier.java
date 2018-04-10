@@ -428,4 +428,116 @@ public class RuleApplier {
 
         return actionToReturn;
     }
+
+    public String moderateDrawCalls(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                    double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                    double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                    boolean strongFlushDraw, boolean strongOosd, double bigBlind) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(strongDraw) {
+                String actionWhenNotStrongDraw = getActionWhenStrongDrawIsSetToFalse(actionVariables, eligibleActions,
+                        street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, handStrength,
+                        opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, bigBlind);
+
+                if(actionWhenNotStrongDraw.equals("fold") || (actionWhenNotStrongDraw.equals("raise") && handStrength < 0.6)) {
+                    if(!strongFlushDraw && !strongOosd) {
+                        if(facingOdds <= 0.17) {
+                            actionToReturn = "call";
+                        } else if(facingOdds <= 0.34) {
+                            if(board.size() == 3) {
+                                actionToReturn = "call";
+                            } else {
+                                if(position) {
+                                    actionToReturn = "call";
+                                } else {
+                                    if(opponentBetSizeBb <= 10) {
+                                        actionToReturn = "call";
+                                    } else {
+                                        actionToReturn = "fold";
+                                    }
+                                }
+                            }
+                        } else if(facingOdds <= 0.45) {
+                            if(board.size() == 3) {
+                                if(opponentBetSizeBb <= 10) {
+                                    actionToReturn = "call";
+                                } else {
+                                    actionToReturn = "fold";
+                                }
+                            } else {
+                                actionToReturn = "fold";
+                            }
+                        } else {
+                            actionToReturn = "fold";
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String moderateDrawFolds(String action, boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot,
+                                    double handStrength, double myBetSizeBb, double facingBetSizeBb, double facingOdds,
+                                    List<Card> board) {
+        String actionToReturn;
+
+        if(action.equals("fold")) {
+            if(strongGutshot) {
+                if(handStrength >= 0.7 && board.size() == 3) {
+                    if(facingOdds <= 0.5) {
+                        if(facingBetSizeBb - myBetSizeBb <= 40) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else if(strongFlushDraw || strongOosd) {
+                if(handStrength >= 0.5 && board.size() == 3) {
+                    if(facingOdds <= 0.5) {
+                        if(facingBetSizeBb - myBetSizeBb <= 40) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String getActionWhenStrongDrawIsSetToFalse(ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                                      double facingOdds, double effectiveStackBb, double handStrength, String opponentType,
+                                                      double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                                      double bigBlind) {
+        return new Poker().getAction(actionVariables, eligibleActions, street, position, potSizeBb, opponentAction,
+                facingOdds, effectiveStackBb, false, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb,
+                opponentStackBb, ownStackBb, preflop, board, false, false, false, bigBlind);
+    }
 }

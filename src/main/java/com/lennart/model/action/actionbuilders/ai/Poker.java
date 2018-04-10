@@ -125,6 +125,8 @@ public class Poker {
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
                 action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
                 action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
+                action = ruleApplier.moderateDrawFolds(action, strongFlushDraw, strongOosd, strongGutshot, handStrength, ownBetSizeBb, opponentBetSizeBb, facingOdds, board);
+                action = ruleApplier.moderateDrawCalls(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, bigBlind);
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
                 action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, ownStackBb, handStrength, !preflop);
 
@@ -146,6 +148,8 @@ public class Poker {
                 action = ruleApplier.moderateGutshotRaises(action, strongFlushDraw, strongOosd, strongGutshot, opponentBetSizeBb, position, handStrength);
                 action = ruleApplier.valueBet(action, handStrength, opponentType, preflop);
                 action = ruleApplier.callWithFavorableOddsLogic(action, facingOdds);
+                action = ruleApplier.moderateDrawFolds(action, strongFlushDraw, strongOosd, strongGutshot, handStrength, ownBetSizeBb, opponentBetSizeBb, facingOdds, board);
+                action = ruleApplier.moderateDrawCalls(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, bigBlind);
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
                 action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, ownStackBb, handStrength, !preflop);
 
