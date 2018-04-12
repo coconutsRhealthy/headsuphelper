@@ -540,4 +540,79 @@ public class RuleApplier {
                 facingOdds, effectiveStackBb, false, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb,
                 opponentStackBb, ownStackBb, preflop, board, false, false, false, bigBlind);
     }
+
+    public String doBettingAgainstTp(String action, double handStrength, double facingBetSize,
+                                        double myBetSize, double myStack, double facingStack,
+                                        double pot, double bigBlind, List<Card> board, String opponentType,
+                                        boolean strongDraw, boolean position) {
+        String actionToReturn;
+
+        if(action.equals("check")) {
+            if(opponentType.equals("tp")) {
+                if(strongDraw) {
+                    double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                    if(sizing / bigBlind < 20) {
+                        double random = Math.random();
+
+                        if(random <= 0.8) {
+                            actionToReturn = "bet";
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else if(board.size() == 3 || board.size() == 4) {
+                    if(handStrength > 0.5 && handStrength < 0.75) {
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                        if(sizing / bigBlind < 13) {
+                            double random = Math.random();
+
+                            if(random <= 0.5) {
+                                actionToReturn = "bet";
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else if(board.size() == 5) {
+                    if(handStrength < 0.4) {
+                        if(position) {
+                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                            if(sizing / bigBlind < 12) {
+                                double random = Math.random();
+
+                                if(random <= 0.4) {
+                                    actionToReturn = "bet";
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
 }
