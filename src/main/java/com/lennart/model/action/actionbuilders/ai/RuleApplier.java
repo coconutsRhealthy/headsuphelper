@@ -556,7 +556,7 @@ public class RuleApplier {
                         double random = Math.random();
 
                         if(random <= 0.8) {
-                            actionToReturn = "bet";
+                            actionToReturn = "bet75pct";
                         } else {
                             actionToReturn = action;
                         }
@@ -571,7 +571,7 @@ public class RuleApplier {
                             double random = Math.random();
 
                             if(random <= 0.5) {
-                                actionToReturn = "bet";
+                                actionToReturn = "bet75pct";
                             } else {
                                 actionToReturn = action;
                             }
@@ -590,7 +590,7 @@ public class RuleApplier {
                                 double random = Math.random();
 
                                 if(random <= 0.4) {
-                                    actionToReturn = "bet";
+                                    actionToReturn = "bet75pct";
                                 } else {
                                     actionToReturn = action;
                                 }

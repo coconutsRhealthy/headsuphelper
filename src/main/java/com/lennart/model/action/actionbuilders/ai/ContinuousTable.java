@@ -7,6 +7,7 @@ import com.lennart.model.imageprocessing.sites.netbet.NetBetTableOpener;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,12 +34,19 @@ public class ContinuousTable {
                 numberOfActionRequests++;
 
                 if(NetBetTableReader.isNewHand()) {
+                    System.out.println("is new hand");
                     String opponentName = String.valueOf(Math.random());
 
-                    if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo
-                            ("C:/Users/Lennart/AppData/Local/NetBet Poker/data/COCONUT555/History/Data/Tables")) {
-                        opponentName = new OpponentIdentifier().updateCountsFromHandhistoryAndGetOpponentPlayerName();
+                    try {
+                        if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo
+                                ("C:/Users/Lennart/AppData/Local/NetBet Poker/data/COCONUT555/History/Data/Tables")) {
+                            opponentName = new OpponentIdentifier().updateCountsFromHandhistoryAndGetOpponentPlayerName();
+                        }
+                    } catch (Exception e) {
+                        System.out.println("error in xml reader");
+                        opponentName = "asdfgghhj";
                     }
+
                     gameVariables = new GameVariables(opponentName);
                 } else {
                     gameVariables.fillFieldsSubsequent();
@@ -61,7 +69,7 @@ public class ContinuousTable {
                 System.out.println("********************");
                 System.out.println();
 
-//                if(forceQuitIfEffectiveStackSizeAbove111bb(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+//                if(forceQuitIfOpponentStackIs200bbOrMoreBiggerThanBotStack(gameVariables.getBotStack() / gameVariables.getBigBlind(),
 //                        gameVariables.getOpponentStack() / gameVariables.getBigBlind())) {
 //                    runTableContinously();
 //                }
@@ -79,6 +87,7 @@ public class ContinuousTable {
                 printDotTotal++;
 
                 if(printDotTotal == 30) {
+                    NetBetTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
 
                     MouseKeyboard.moveMouseToLocation(1565, 909);
                     TimeUnit.MILLISECONDS.sleep(300);
@@ -149,9 +158,9 @@ public class ContinuousTable {
         MouseKeyboard.click(983, 16);
     }
 
-    private boolean forceQuitIfEffectiveStackSizeAbove111bb(double botStackBb, double opponentStackBb) {
-        if(botStackBb >= 111 && opponentStackBb >= 111) {
-            System.out.println("Effective stacksize became 100bb or more. Forced quit.");
+    private boolean forceQuitIfOpponentStackIs200bbOrMoreBiggerThanBotStack(double botStackBb, double opponentStackBb) {
+        if(opponentStackBb - botStackBb > 200 && opponentStackBb != 0 && botStackBb != 0) {
+            System.out.println("Difference between opponentStack and botStack got more than 200bb. Force table quit.");
 
             try {
                 TimeUnit.SECONDS.sleep(60);

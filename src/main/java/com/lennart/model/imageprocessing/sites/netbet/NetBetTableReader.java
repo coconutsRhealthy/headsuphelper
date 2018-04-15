@@ -587,6 +587,11 @@ public class NetBetTableReader {
         ImageProcessor.saveBufferedImage(bufferedImage, "C:/Users/Lennart/Documents/develop/logging/" + numberOfActionRequests + ".png");
     }
 
+    public static void saveScreenshotOfEntireScreen(long time) throws Exception {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
+        ImageProcessor.saveBufferedImage(bufferedImage, "C:/Users/Lennart/Documents/develop/logging/" + time + ".png");
+    }
+
     private boolean bottomPlayerIsButton() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(640, 705, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
