@@ -35,7 +35,7 @@ public class ActionVariables {
         //default constructor
     }
 
-    public ActionVariables(GameVariables gameVariables) {
+    public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable) {
         calculateHandStrengthAndDraws(gameVariables);
 
         List<String> eligibleActions = getEligibleActions(gameVariables);
@@ -55,6 +55,8 @@ public class ActionVariables {
         boolean preflop = gameVariables.getBoard().isEmpty();
         List<Card> boardInMethod = gameVariables.getBoard();
 
+        setOpponentHasInitiative(opponentActionInMethod, continuousTable);
+
         if(preflop) {
             action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton());
 
@@ -62,10 +64,32 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
         } else {
-            action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind());
+            if(continuousTable != null && (continuousTable.isOpponentHasInitiative() && opponentActionInMethod.equals("empty"))) {
+                action = "check";
+            } else {
+                String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind());
 
-            if(action.equals("bet75pct") || action.equals("raise")) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                if(actionAgainstLa.equals("bet75pct")) {
+                    action = actionAgainstLa;
+                } else {
+                    action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind());
+
+                    if(action.equals("bet75pct") || action.equals("raise")) {
+                        sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                    }
+                }
+            }
+        }
+    }
+
+    private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable) {
+        if(continuousTable != null) {
+            if(opponentAction != null && !opponentAction.equals("empty")) {
+                if(opponentAction.equals("bet75pct") || opponentAction.equals("raise")) {
+                    continuousTable.setOpponentHasInitiative(true);
+                } else {
+                    continuousTable.setOpponentHasInitiative(false);
+                }
             }
         }
     }

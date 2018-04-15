@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class ContinuousTable {
 
+    private boolean opponentHasInitiative = false;
+
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
     }
@@ -52,7 +54,7 @@ public class ContinuousTable {
                     gameVariables.fillFieldsSubsequent();
                 }
 
-                ActionVariables actionVariables = new ActionVariables(gameVariables);
+                ActionVariables actionVariables = new ActionVariables(gameVariables, this);
                 String action = actionVariables.getAction();
                 double sizing = actionVariables.getSizing();
 
@@ -69,10 +71,10 @@ public class ContinuousTable {
                 System.out.println("********************");
                 System.out.println();
 
-//                if(forceQuitIfOpponentStackIs200bbOrMoreBiggerThanBotStack(gameVariables.getBotStack() / gameVariables.getBigBlind(),
-//                        gameVariables.getOpponentStack() / gameVariables.getBigBlind())) {
-//                    runTableContinously();
-//                }
+                if(forceQuitIfOpponentStackIsPlus200bbBiggerThanBotStack(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+                        gameVariables.getOpponentStack() / gameVariables.getBigBlind())) {
+                    runTableContinously();
+                }
 
                 NetBetTableReader.performActionOnSite(action, sizing);
 
@@ -158,7 +160,7 @@ public class ContinuousTable {
         MouseKeyboard.click(983, 16);
     }
 
-    private boolean forceQuitIfOpponentStackIs200bbOrMoreBiggerThanBotStack(double botStackBb, double opponentStackBb) {
+    private boolean forceQuitIfOpponentStackIsPlus200bbBiggerThanBotStack(double botStackBb, double opponentStackBb) {
         if(opponentStackBb - botStackBb > 200 && opponentStackBb != 0 && botStackBb != 0) {
             System.out.println("Difference between opponentStack and botStack got more than 200bb. Force table quit.");
 
@@ -172,5 +174,13 @@ public class ContinuousTable {
         }
 
         return false;
+    }
+
+    public boolean isOpponentHasInitiative() {
+        return opponentHasInitiative;
+    }
+
+    public void setOpponentHasInitiative(boolean opponentHasInitiative) {
+        this.opponentHasInitiative = opponentHasInitiative;
     }
 }

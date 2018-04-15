@@ -58,6 +58,8 @@ public class ComputerGameNew implements GameVariable {
     private boolean previousBluffAction;
     private HandEvaluator handEvaluator;
 
+    private boolean opponentHasInitiative;
+
     public ComputerGameNew() {
         //default constructor
     }
@@ -107,11 +109,21 @@ public class ComputerGameNew implements GameVariable {
             processHumanBetOrRaiseAction();
         }
 
+        setOpponentHasInitiativeVariable(myAction);
+
         if(computerActionNeeded && isComputerActionNeededIfPlayerIsAllIn()) {
             doComputerAction();
         }
         roundToTwoDecimals();
         return this;
+    }
+
+    private void setOpponentHasInitiativeVariable(String myAction) {
+        if(myAction != null && (myAction.equals("bet75pct") || myAction.equals("raise"))) {
+            opponentHasInitiative = true;
+        } else {
+            opponentHasInitiative = false;
+        }
     }
 
     private void doComputerAction() {
@@ -161,7 +173,17 @@ public class ComputerGameNew implements GameVariable {
         if(board == null || board.isEmpty()) {
             action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, bigBlind, computerHoleCards, computerIsButton);
         } else {
-            action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind);
+            if(opponentHasInitiative && (myAction == null || myAction.equals("empty"))) {
+                action = "check";
+            } else {
+                String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind);
+
+                if(actionAgainstLa.equals("bet75pct")) {
+                    action = actionAgainstLa;
+                } else {
+                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind);
+                }
+            }
         }
 
 

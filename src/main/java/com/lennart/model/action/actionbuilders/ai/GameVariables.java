@@ -104,7 +104,7 @@ public class GameVariables implements GameVariable {
         new OpponentIdentifier().updateCounts(opponentName, opponentAction,
                 OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
 
-        actionVariables = new ActionVariables(this);
+        actionVariables = new ActionVariables(this, null);
     }
 
     private void fillTheBoard() throws Exception {
