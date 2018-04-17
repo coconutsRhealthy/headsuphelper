@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class ContinuousTable {
 
     private boolean opponentHasInitiative = false;
+    private boolean opponentDidPreflop4betPot = false;
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -37,6 +38,7 @@ public class ContinuousTable {
 
                 if(NetBetTableReader.isNewHand()) {
                     System.out.println("is new hand");
+                    opponentDidPreflop4betPot = false;
                     String opponentName = String.valueOf(Math.random());
 
                     try {
@@ -182,5 +184,13 @@ public class ContinuousTable {
 
     public void setOpponentHasInitiative(boolean opponentHasInitiative) {
         this.opponentHasInitiative = opponentHasInitiative;
+    }
+
+    public boolean isOpponentDidPreflop4betPot() {
+        return opponentDidPreflop4betPot;
+    }
+
+    public void setOpponentDidPreflop4betPot(boolean opponentDidPreflop4betPot) {
+        this.opponentDidPreflop4betPot = opponentDidPreflop4betPot;
     }
 }

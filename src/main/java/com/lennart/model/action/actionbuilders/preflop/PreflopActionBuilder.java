@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.preflop;
 
 import com.lennart.model.action.Actionable;
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._5bet;
 import com.lennart.model.card.Card;
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
@@ -26,7 +27,7 @@ public class PreflopActionBuilder {
         actionBuilderUtil = new ActionBuilderUtil();
     }
 
-    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton) {
+    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton, ContinuousTable continuousTable, String opponentType) {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -52,7 +53,7 @@ public class PreflopActionBuilder {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.85);
             } else {
-                action = get3betF4bet(botHoleCards);
+                action = get3betF4bet(botHoleCards, continuousTable, opponentType);
             }
         } else {
             action = get4betF5bet(botHoleCards);
@@ -404,15 +405,15 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get3betF4bet(List<Card> botHoleCards) {
-        Call4bet call4Bet = new Call4bet(actionBuilderUtil);
+    private String get3betF4bet(List<Card> botHoleCards, ContinuousTable continuousTable, String opponenType) {
+        Call4bet call4Bet = new Call4bet(actionBuilderUtil, opponenType);
 
         Map<Integer, Set<Card>> call4bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4Bet.getComboMap100Percent());
         Map<Integer, Set<Card>> call4bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call4Bet.getComboMap5Percent());
 
-        _5bet x5bet = new _5bet(actionBuilderUtil);
+        _5bet x5bet = new _5bet(actionBuilderUtil, opponenType);
 
         Map<Integer, Set<Card>> x5bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (x5bet.getComboMap95Percent());
@@ -441,6 +442,11 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage5bet - percentageCall4bet) {
             return "fold";
         } else if ((random <= 1 - percentage5bet) && (random >= 1 - percentage5bet - percentageCall4bet)){
+            if(continuousTable != null) {
+                System.out.println("Opponent did preflop 4bet and bot called");
+                continuousTable.setOpponentDidPreflop4betPot(true);
+            }
+
             return "call";
         } else {
             return "raise";

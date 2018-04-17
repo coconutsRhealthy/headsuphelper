@@ -159,7 +159,7 @@ public class BotHand {
         List<Card> boardInMethod = board;
 
         //TODO: fix met specific drawtypes
-        botAction = new Poker().getAction(null, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, false, false, false, bigBlind);
+        botAction = new Poker().getAction(null, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, false, false, false, bigBlind, false);
 
         if(botAction.equals("bet75pct") || botAction.equals("raise")) {
             sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, botTotalBetSize, botStack, opponentStack, potSize, bigBlind, board);
