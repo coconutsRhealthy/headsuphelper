@@ -628,7 +628,7 @@ public class RuleApplier {
         String actionToReturn;
 
         if(opponentDidPreflop4betPot) {
-            if(!opponentType.equals("la")) {
+            if(!opponentType.equals("la") && !opponentType.equals("tp")) {
                 //play as if against tp
                 actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street, position, potSizeBb,
                         opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, "tp", opponentBetSizeBb,
