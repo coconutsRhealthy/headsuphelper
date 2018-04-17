@@ -11,11 +11,19 @@ public class Sizing {
 
     public double getAiBotSizing(double facingBetSize, double myBetSize, double myStack, double facingStack,
                                  double pot, double bigBlind, List<Card> board) {
+        double sizing;
+
         if(board == null || board.isEmpty()) {
-            return getAiBotPreflopSizing(facingBetSize, myBetSize, facingStack, myStack, bigBlind);
+            sizing = getAiBotPreflopSizing(facingBetSize, myBetSize, facingStack, myStack, bigBlind);
         } else {
-            return getAiBotPostFlopSizing(board, facingBetSize, pot, myStack, facingStack, bigBlind);
+            sizing = getAiBotPostFlopSizing(board, facingBetSize, pot, myStack, facingStack, bigBlind);
         }
+
+        if(sizing < 0) {
+            sizing = 0;
+        }
+
+        return sizing;
     }
 
     public double getRuleBotSizing(double handStrength, double facingBetSize, double myBetSize, double facingStack,
