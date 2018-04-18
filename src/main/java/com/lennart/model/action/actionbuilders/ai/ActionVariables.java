@@ -72,13 +72,18 @@ public class ActionVariables {
             } else {
                 if(eligibleActions != null && eligibleActions.contains("bet75pct")) {
                     String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot());
-                    double bigBlind = gameVariables.getBigBlind();
-                    actionAgainstLa = new RuleApplier().moderateTooThinValueBetsAgainstNotLa(actionAgainstLa, botHandStrengthInMethod, opponentType, streetInMethod, (opponentBetsizeBb * bigBlind), (botBetsizeBb * bigBlind), (botStackBb * bigBlind), (opponentStackBb * bigBlind), (potSizeBb * bigBlind), bigBlind, boardInMethod);
 
-                    if(actionAgainstLa.equals("bet75pct")) {
+                    if(opponentType.equals("la")) {
                         action = actionAgainstLa;
                     } else {
-                        action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot());
+                        double bigBlind = gameVariables.getBigBlind();
+                        actionAgainstLa = new RuleApplier().moderateTooThinValueBetsAgainstNotLa(actionAgainstLa, botHandStrengthInMethod, opponentType, streetInMethod, (opponentBetsizeBb * bigBlind), (botBetsizeBb * bigBlind), (botStackBb * bigBlind), (opponentStackBb * bigBlind), (potSizeBb * bigBlind), bigBlind, boardInMethod);
+
+                        if(actionAgainstLa.equals("bet75pct")) {
+                            action = actionAgainstLa;
+                        } else {
+                            action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot());
+                        }
                     }
                 } else {
                     action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot());

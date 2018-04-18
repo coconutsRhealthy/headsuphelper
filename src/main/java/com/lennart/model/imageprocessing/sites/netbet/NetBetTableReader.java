@@ -658,18 +658,18 @@ public class NetBetTableReader {
 
         if(valueInBb < 0) {
             valueToReturn = -1;
-        } else if(valueInBb <= 300) {
+        } else if(valueInBb <= 500) {
             valueToReturn = value;
         } else {
             double adjustedValueInBb1 = (value / 10) / bigBlind;
 
-            if(adjustedValueInBb1 > 300) {
+            if(adjustedValueInBb1 > 500) {
                 double adjustedValueInBb2 = (value / 100) / bigBlind;
 
-                if(adjustedValueInBb2 > 300) {
+                if(adjustedValueInBb2 > 500) {
                     double adjustedValueInBb3 = (value / 1000) / bigBlind;
 
-                    if(adjustedValueInBb3 > 300) {
+                    if(adjustedValueInBb3 > 500) {
                         valueToReturn = -1;
                     } else {
                         valueToReturn = value / 1000;
