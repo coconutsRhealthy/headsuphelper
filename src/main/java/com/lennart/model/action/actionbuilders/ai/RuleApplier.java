@@ -308,7 +308,7 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String valueBet(String action, double handStength, String opponentType, boolean preflop) {
+    public String valueBet(String action, double handStength, String opponentType, boolean preflop, String street, boolean position) {
         String actionToReturn = action;
 
         if(action.equals("check") && !preflop) {
@@ -321,6 +321,36 @@ public class RuleApplier {
             } else {
                 actionToReturn = action;
             }
+        }
+
+        if(action.equals("check") && !preflop && handStength >= 0.95) {
+            if(street.equals("river") && position) {
+                actionToReturn = "bet75pct";
+            } else {
+                double random = Math.random();
+
+                if(random > 0.10) {
+                    actionToReturn = "bet75pct";
+                } else {
+                    actionToReturn = action;
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    public String neverFoldTheNuts(String action, double handStrength, List<String> eligibleActions) {
+        String actionToReturn;
+
+        if(action.equals("fold") && handStrength >= 0.992) {
+            if(eligibleActions != null && eligibleActions.contains("raise")) {
+                actionToReturn = "raise";
+            } else {
+                actionToReturn = "call";
+            }
+        } else {
+            actionToReturn = action;
         }
 
         return actionToReturn;
