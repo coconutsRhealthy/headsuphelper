@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.preflop;
 
 import com.lennart.model.action.Actionable;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+import com.lennart.model.action.actionbuilders.ai.ContinuousTableable;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._5bet;
 import com.lennart.model.card.Card;
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
@@ -27,7 +28,7 @@ public class PreflopActionBuilder {
         actionBuilderUtil = new ActionBuilderUtil();
     }
 
-    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton, ContinuousTable continuousTable, String opponentType, double amountToCallBb) {
+    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable, String opponentType, double amountToCallBb) {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -41,19 +42,19 @@ public class PreflopActionBuilder {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.5);
             } else {
-                action = get1betF2bet(botHoleCards, continuousTable);
+                action = get1betF2bet(botHoleCards, continuousTableable);
             }
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.75);
             } else {
-                action = get2betF3bet(botHoleCards, continuousTable);
+                action = get2betF3bet(botHoleCards, continuousTableable);
             }
         } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.85);
             } else {
-                action = get3betF4bet(botHoleCards, continuousTable, opponentType);
+                action = get3betF4bet(botHoleCards, continuousTableable, opponentType);
             }
         } else {
             action = get4betF5bet(botHoleCards, amountToCallBb);
@@ -193,7 +194,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get2betF3bet(List<Card> botHoleCards, ContinuousTable continuousTable) {
+    private String get2betF3bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
         Call3bet call3Bet = new Call3bet(actionBuilderUtil);
         _4bet x4Bet = new _4bet(actionBuilderUtil);
 
@@ -302,15 +303,15 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage4bet - percentageCall3bet) {
             return "fold";
         } else if ((random <= 1 - percentage4bet) && (random >= 1 - percentage4bet - percentageCall3bet)){
-            continuousTable.setPre3betOrPostRaisedPot(true);
+            continuousTableable.setPre3betOrPostRaisedPot(true);
             return "call";
         } else {
-            continuousTable.setPre3betOrPostRaisedPot(true);
+            continuousTableable.setPre3betOrPostRaisedPot(true);
             return "raise";
         }
     }
 
-    private String get1betF2bet(List<Card> botHoleCards, ContinuousTable continuousTable) {
+    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
         Call2bet call2Bet = new Call2bet(actionBuilderUtil);
         _3bet x3Bet = new _3bet(actionBuilderUtil);
 
@@ -403,12 +404,12 @@ public class PreflopActionBuilder {
         } else if ((random <= 1 - percentage3bet) && (random >= 1 - percentage3bet - percentageCall2bet)){
             return "call";
         } else {
-            continuousTable.setPre3betOrPostRaisedPot(true);
+            continuousTableable.setPre3betOrPostRaisedPot(true);
             return "raise";
         }
     }
 
-    private String get3betF4bet(List<Card> botHoleCards, ContinuousTable continuousTable, String opponenType) {
+    private String get3betF4bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, String opponenType) {
         Call4bet call4Bet = new Call4bet(actionBuilderUtil, opponenType);
 
         Map<Integer, Set<Card>> call4bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
@@ -445,9 +446,9 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage5bet - percentageCall4bet) {
             return "fold";
         } else if ((random <= 1 - percentage5bet) && (random >= 1 - percentage5bet - percentageCall4bet)){
-            if(continuousTable != null) {
+            if(continuousTableable != null) {
                 System.out.println("Opponent did preflop 4bet and bot called");
-                continuousTable.setOpponentDidPreflop4betPot(true);
+                continuousTableable.setOpponentDidPreflop4betPot(true);
             }
 
             return "call";

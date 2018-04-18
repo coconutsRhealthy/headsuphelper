@@ -15,15 +15,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Lennart on 3/12/2018.
  */
-public class ContinuousTable {
+public class ContinuousTable implements ContinuousTableable {
 
     private boolean opponentHasInitiative = false;
     private boolean pre3betOrPostRaisedPot = false;
     private boolean opponentDidPreflop4betPot = false;
 
-    public static void main(String[] args) throws Exception {
-        new ContinuousTable().runTableContinously();
-    }
+//    public static void main(String[] args) throws Exception {
+//        new ContinuousTable().runTableContinously();
+//    }
 
     public void runTableContinously() throws Exception {
         GameVariables gameVariables = new GameVariables();
@@ -180,26 +180,32 @@ public class ContinuousTable {
         return false;
     }
 
+    @Override
     public boolean isOpponentHasInitiative() {
         return opponentHasInitiative;
     }
 
+    @Override
     public void setOpponentHasInitiative(boolean opponentHasInitiative) {
         this.opponentHasInitiative = opponentHasInitiative;
     }
 
+    @Override
     public boolean isOpponentDidPreflop4betPot() {
         return opponentDidPreflop4betPot;
     }
 
+    @Override
     public void setOpponentDidPreflop4betPot(boolean opponentDidPreflop4betPot) {
         this.opponentDidPreflop4betPot = opponentDidPreflop4betPot;
     }
 
+    @Override
     public boolean isPre3betOrPostRaisedPot() {
         return pre3betOrPostRaisedPot;
     }
 
+    @Override
     public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
         this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
     }

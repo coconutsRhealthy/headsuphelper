@@ -1,5 +1,6 @@
 package com.lennart.model.computergame;
 
+import com.lennart.model.action.actionbuilders.ai.ContinuousTableable;
 import com.lennart.model.action.actionbuilders.ai.GameVariable;
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.Sizing;
@@ -17,7 +18,7 @@ import java.util.*;
 /**
  * Created by lennart on 11-12-16.
  */
-public class ComputerGameNew implements GameVariable {
+public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
     private List<Card> deck;
     private List<Card> myHoleCards;
@@ -59,6 +60,8 @@ public class ComputerGameNew implements GameVariable {
     private HandEvaluator handEvaluator;
 
     private boolean opponentHasInitiative;
+    private boolean pre3betOrPostRaisedPot;
+    private boolean opponentDidPreflop4betPot;
 
     public ComputerGameNew() {
         //default constructor
@@ -91,6 +94,10 @@ public class ComputerGameNew implements GameVariable {
     public ComputerGameNew submitHumanActionAndDoComputerAction() {
         if(board != null && !board.isEmpty()) {
             new OpponentIdentifier().updateCounts("izo", myAction, numberOfHandsPlayed);
+
+            if(myAction != null && myAction.equals("raise")) {
+                pre3betOrPostRaisedPot = true;
+            }
         }
 
         boolean computerActionNeeded = isComputerActionNeeded();
@@ -172,24 +179,28 @@ public class ComputerGameNew implements GameVariable {
         String action;
 
         if(board == null || board.isEmpty()) {
-            action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, bigBlind, computerHoleCards, computerIsButton, null, opponentType, amountToCallBb);
+            action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, bigBlind, computerHoleCards, computerIsButton, this, opponentType, amountToCallBb);
         } else {
             if(opponentHasInitiative && (myAction == null || myAction.equals("empty"))) {
                 action = "check";
             } else {
                 if(eligibleActions != null && eligibleActions.contains("bet75pct")) {
-                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, false, false);
+                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
 
                     if(opponentType.equals("la")) {
                         action = actionAgainstLa;
                     } else if(actionAgainstLa.equals("bet75pct")) {
                         action = actionAgainstLa;
                     } else {
-                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, false, false);
+                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
                     }
                 } else {
-                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, false, false);
+                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
                 }
+            }
+
+            if(action.equals("raise")) {
+                pre3betOrPostRaisedPot = true;
             }
         }
 
@@ -629,6 +640,10 @@ public class ComputerGameNew implements GameVariable {
         computerWrittenAction = null;
 
         myAction = null;
+
+        opponentHasInitiative = false;
+        pre3betOrPostRaisedPot = false;
+        opponentDidPreflop4betPot = false;
     }
 
     public ComputerGameNew proceedToNextHand() {
@@ -1110,5 +1125,35 @@ public class ComputerGameNew implements GameVariable {
 
     public void setHandEvaluator(HandEvaluator handEvaluator) {
         this.handEvaluator = handEvaluator;
+    }
+
+    @Override
+    public boolean isOpponentHasInitiative() {
+        return opponentHasInitiative;
+    }
+
+    @Override
+    public void setOpponentHasInitiative(boolean opponentHasInitiative) {
+        this.opponentHasInitiative = opponentHasInitiative;
+    }
+
+    @Override
+    public boolean isPre3betOrPostRaisedPot() {
+        return pre3betOrPostRaisedPot;
+    }
+
+    @Override
+    public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
+        this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
+    }
+
+    @Override
+    public boolean isOpponentDidPreflop4betPot() {
+        return opponentDidPreflop4betPot;
+    }
+
+    @Override
+    public void setOpponentDidPreflop4betPot(boolean opponentDidPreflop4betPot) {
+        this.opponentDidPreflop4betPot = opponentDidPreflop4betPot;
     }
 }
