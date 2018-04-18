@@ -132,7 +132,7 @@ public class Poker {
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
                 action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, ownStackBb, handStrength, !preflop);
                 action = ruleApplier.playCautiouslyInOpponentPre4betPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
-                action = ruleApplier.noFlopOrTurnRaisesInPre3betOrPostRaisedPot(action, actionVariables, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
+                action = ruleApplier.noFlopOrTurnRaisesInPre3betOrPostRaisedPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
 
                 return action;
 
@@ -158,7 +158,7 @@ public class Poker {
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
                 action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, ownStackBb, handStrength, !preflop);
                 action = ruleApplier.playCautiouslyInOpponentPre4betPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
-                action = ruleApplier.noFlopOrTurnRaisesInPre3betOrPostRaisedPot(action, actionVariables, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
+                action = ruleApplier.noFlopOrTurnRaisesInPre3betOrPostRaisedPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
 
                 return action;
             }

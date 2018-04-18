@@ -646,66 +646,39 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String noFlopOrTurnRaisesInPre3betOrPostRaisedPot(String action, ActionVariables actionVariables, String street,
-                                                             boolean position, double potSizeBb, String opponentAction,
-                                                             double facingOdds, double effectiveStackBb, boolean strongDraw,
-                                                             double handStrength, String opponentType, double opponentBetSizeBb,
-                                                             double ownBetSizeBb, double opponentStackBb, double ownStackBb,
-                                                             boolean preflop, List<Card> board, boolean strongFlushDraw,
-                                                             boolean strongOosd, boolean strongGutshot, double bigBlind,
-                                                             boolean opponentDidPreflop4betPot, boolean pre3betOrPostRaisedPot) {
+    public String noFlopOrTurnRaisesInPre3betOrPostRaisedPot(String action, ActionVariables actionVariables,
+                                                             List<String> eligibleActions, String street, boolean position,
+                                                             double potSizeBb, String opponentAction, double facingOdds,
+                                                             double effectiveStackBb, boolean strongDraw, double handStrength,
+                                                             String opponentType, double opponentBetSizeBb, double ownBetSizeBb,
+                                                             double opponentStackBb, double ownStackBb, boolean preflop,
+                                                             List<Card> board, boolean strongFlushDraw, boolean strongOosd,
+                                                             boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                                             boolean pre3betOrPostRaisedPot) {
         String actionToReturn;
 
         if(pre3betOrPostRaisedPot) {
             if(action.equals("raise")) {
                 if(board != null && (board.size() == 3 || board.size() == 4)) {
-                    List<String> eligibleActionsNew = new ArrayList<>();
-                    eligibleActionsNew.add("fold");
-                    eligibleActionsNew.add("call");
+                    if(eligibleActions.contains("fold") && eligibleActions.contains("call") &&
+                            !eligibleActions.contains("raise") && opponentStackBb != 0 &&
+                            (ownStackBb + ownBetSizeBb > opponentBetSizeBb)) {
+                        //je komt hier voor de 2e keer met aangepaste eligible actions, en weer is het raise.
 
-                    actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
-                            opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb,
-                            ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
-                            bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
-
-                    if(actionToReturn.equals("raise")) {
                         //set opponentStack to 0
-                        actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                        actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street, position, potSizeBb,
                                 opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb,
                                 ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
                                 bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    public String moderateTooThinValueBetsAgainstNotLa(String action, double handStrength, String opponentType, String street,
-                                                       double facingBetSize, double myBetSize, double myStack, double facingStack,
-                                                       double pot, double bigBlind, List<Card> board) {
-        String actionToReturn;
-
-        if(action.equals("bet75pct")) {
-            if(street.equals("river")) {
-                if(opponentType.equals("tp") || opponentType.equals("ta")) {
-                    if(handStrength >= 0.5 && handStrength <= 0.77) {
-                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
-
-                        if(sizing / bigBlind > 10) {
-                            actionToReturn = "check";
-                        } else {
-                            actionToReturn = action;
-                        }
                     } else {
-                        actionToReturn = action;
+                        List<String> eligibleActionsNew = new ArrayList<>();
+                        eligibleActionsNew.add("fold");
+                        eligibleActionsNew.add("call");
+
+                        actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
                     }
                 } else {
                     actionToReturn = action;
