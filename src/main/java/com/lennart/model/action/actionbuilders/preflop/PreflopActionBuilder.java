@@ -27,7 +27,7 @@ public class PreflopActionBuilder {
         actionBuilderUtil = new ActionBuilderUtil();
     }
 
-    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton, ContinuousTable continuousTable, String opponentType) {
+    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton, ContinuousTable continuousTable, String opponentType, double amountToCallBb) {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -56,7 +56,7 @@ public class PreflopActionBuilder {
                 action = get3betF4bet(botHoleCards, continuousTable, opponentType);
             }
         } else {
-            action = get4betF5bet(botHoleCards);
+            action = get4betF5bet(botHoleCards, amountToCallBb);
         }
 
         if(action.equals("fold") && ((opponentBetSize - botBetSize) / (opponentBetSize + botBetSize) < 0.24)) {
@@ -453,8 +453,8 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get4betF5bet(List<Card> botHoleCards) {
-        Call5bet call5Bet = new Call5bet(actionBuilderUtil);
+    private String get4betF5bet(List<Card> botHoleCards, double amountToCallBb) {
+        Call5bet call5Bet = new Call5bet(actionBuilderUtil, amountToCallBb);
 
         Map<Integer, Set<Card>> call5bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
                 (call5Bet.getComboMap100Percent());

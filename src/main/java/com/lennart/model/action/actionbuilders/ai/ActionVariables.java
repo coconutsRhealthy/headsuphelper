@@ -56,9 +56,10 @@ public class ActionVariables {
         List<Card> boardInMethod = gameVariables.getBoard();
 
         setOpponentHasInitiative(opponentActionInMethod, continuousTable);
+        double amountToCallBb = getAmountToCallBb(botBetsizeBb, opponentBetsizeBb, botStackBb);
 
         if(preflop) {
-            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType);
+            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb);
 
             if(action.equals("raise")) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -177,6 +178,16 @@ public class ActionVariables {
 
         return new OpponentIdentifier().getOpponentType(opponentName,
                 OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
+    }
+
+    private double getAmountToCallBb(double botBetSizeBb, double opponentBetSizeBb, double botStackBb) {
+        double amountToCallBb = opponentBetSizeBb - botBetSizeBb;
+
+        if(amountToCallBb > botStackBb) {
+            amountToCallBb = botStackBb;
+        }
+
+        return amountToCallBb;
     }
 
     public void setAction(String action) {

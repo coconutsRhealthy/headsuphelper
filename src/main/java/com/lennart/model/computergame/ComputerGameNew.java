@@ -157,6 +157,7 @@ public class ComputerGameNew implements GameVariable {
         double computerBetSizeBb = computerTotalBetSize / bigBlind;
         double opponentBetSizeBb = opponentTotalBetSize / bigBlind;
         double effectiveStack = getEffectiveStackInBb();
+        double amountToCallBb = getAmountToCallBb(computerBetSizeBb, opponentBetSizeBb, computerStack / bigBlind);
 
 
         String opponentType = new OpponentIdentifier().getOpponentType("izo", numberOfHandsPlayed);
@@ -171,7 +172,7 @@ public class ComputerGameNew implements GameVariable {
         String action;
 
         if(board == null || board.isEmpty()) {
-            action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, bigBlind, computerHoleCards, computerIsButton, null, opponentType);
+            action = new PreflopActionBuilder().getAction(opponentTotalBetSize, computerTotalBetSize, myStack, bigBlind, computerHoleCards, computerIsButton, null, opponentType, amountToCallBb);
         } else {
             if(opponentHasInitiative && (myAction == null || myAction.equals("empty"))) {
                 action = "check";
@@ -213,6 +214,16 @@ public class ComputerGameNew implements GameVariable {
         } else {
             return potSize / bigBlind;
         }
+    }
+
+    private double getAmountToCallBb(double botBetSizeBb, double opponentBetSizeBb, double botStackBb) {
+        double amountToCallBb = opponentBetSizeBb - botBetSizeBb;
+
+        if(amountToCallBb > botStackBb) {
+            amountToCallBb = botStackBb;
+        }
+
+        return amountToCallBb;
     }
 
     public String getStreet() {
