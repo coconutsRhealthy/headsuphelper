@@ -687,4 +687,36 @@ public class RuleApplier {
 
         return actionToReturn;
     }
+
+    public String moderateTooThinValueBetsAgainstNotLa(String action, double handStrength, String opponentType, String street,
+                                                       double facingBetSize, double myBetSize, double myStack, double facingStack,
+                                                       double pot, double bigBlind, List<Card> board) {
+        String actionToReturn;
+
+        if(action.equals("bet75pct")) {
+            if(street.equals("river")) {
+                if(opponentType.equals("tp") || opponentType.equals("ta")) {
+                    if(handStrength >= 0.5 && handStrength <= 0.77) {
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                        if(sizing / bigBlind > 10) {
+                            actionToReturn = "check";
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
 }
