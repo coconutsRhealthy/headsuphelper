@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 public class ContinuousTable {
 
     private boolean opponentHasInitiative = false;
+    private boolean pre3betOrPostRaisedPot = false;
     private boolean opponentDidPreflop4betPot = false;
 
     public static void main(String[] args) throws Exception {
@@ -39,6 +40,7 @@ public class ContinuousTable {
                 if(NetBetTableReader.isNewHand()) {
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
+                    pre3betOrPostRaisedPot = false;
                     String opponentName = String.valueOf(Math.random());
 
                     try {
@@ -192,5 +194,13 @@ public class ContinuousTable {
 
     public void setOpponentDidPreflop4betPot(boolean opponentDidPreflop4betPot) {
         this.opponentDidPreflop4betPot = opponentDidPreflop4betPot;
+    }
+
+    public boolean isPre3betOrPostRaisedPot() {
+        return pre3betOrPostRaisedPot;
+    }
+
+    public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
+        this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
     }
 }

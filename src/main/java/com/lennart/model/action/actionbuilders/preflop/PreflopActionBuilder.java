@@ -41,13 +41,13 @@ public class PreflopActionBuilder {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.5);
             } else {
-                action = get1betF2bet(botHoleCards);
+                action = get1betF2bet(botHoleCards, continuousTable);
             }
         } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.75);
             } else {
-                action = get2betF3bet(botHoleCards);
+                action = get2betF3bet(botHoleCards, continuousTable);
             }
         } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
             if(opponentStack == 0) {
@@ -193,7 +193,7 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get2betF3bet(List<Card> botHoleCards) {
+    private String get2betF3bet(List<Card> botHoleCards, ContinuousTable continuousTable) {
         Call3bet call3Bet = new Call3bet(actionBuilderUtil);
         _4bet x4Bet = new _4bet(actionBuilderUtil);
 
@@ -302,13 +302,15 @@ public class PreflopActionBuilder {
         if(random <= 1 - percentage4bet - percentageCall3bet) {
             return "fold";
         } else if ((random <= 1 - percentage4bet) && (random >= 1 - percentage4bet - percentageCall3bet)){
+            continuousTable.setPre3betOrPostRaisedPot(true);
             return "call";
         } else {
+            continuousTable.setPre3betOrPostRaisedPot(true);
             return "raise";
         }
     }
 
-    private String get1betF2bet(List<Card> botHoleCards) {
+    private String get1betF2bet(List<Card> botHoleCards, ContinuousTable continuousTable) {
         Call2bet call2Bet = new Call2bet(actionBuilderUtil);
         _3bet x3Bet = new _3bet(actionBuilderUtil);
 
@@ -401,6 +403,7 @@ public class PreflopActionBuilder {
         } else if ((random <= 1 - percentage3bet) && (random >= 1 - percentage3bet - percentageCall2bet)){
             return "call";
         } else {
+            continuousTable.setPre3betOrPostRaisedPot(true);
             return "raise";
         }
     }
