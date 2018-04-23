@@ -1,7 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
-import com.lennart.model.action.actionbuilders.postflop.PostFlopActionBuilder;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
@@ -56,7 +55,7 @@ public class ActionVariables {
         List<Card> boardInMethod = gameVariables.getBoard();
 
         setOpponentHasInitiative(opponentActionInMethod, continuousTable);
-        setOpponentDidPostflopFlopOrTurnRaise(opponentActionInMethod, boardInMethod, continuousTable);
+        setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(opponentActionInMethod, boardInMethod, continuousTable, opponentBetsizeBb, potSizeBb);
         double amountToCallBb = getAmountToCallBb(botBetsizeBb, opponentBetsizeBb, botStackBb);
 
         if(preflop) {
@@ -103,7 +102,7 @@ public class ActionVariables {
                         }
                     }
 
-                    if(action.equals("toDetermine")) {
+                    if(action != null && action.equals("toDetermine")) {
                         action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot());
                     } else {
                         action = actionAgainstLa;
@@ -133,10 +132,17 @@ public class ActionVariables {
         }
     }
 
-    private void setOpponentDidPostflopFlopOrTurnRaise(String opponentAction, List<Card> board, ContinuousTable continuousTable) {
+    private void setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(String opponentAction, List<Card> board, ContinuousTable continuousTable, double opponentBetsizeBb, double potSizeBb) {
        if(continuousTable != null) {
            if(opponentAction.equals("raise")) {
                if(board != null && (board.size() == 3 || board.size() == 4)) {
+                   continuousTable.setPre3betOrPostRaisedPot(true);
+               }
+           }
+
+           //overbet check
+           if(opponentAction.equals("bet75pct")) {
+               if(opponentBetsizeBb > potSizeBb) {
                    continuousTable.setPre3betOrPostRaisedPot(true);
                }
            }
