@@ -869,6 +869,56 @@ public class BoardEvaluator {
         return cleanedSortedCombos;
     }
 
+    public static int getBoardWetnessGroup(List<Set<Card>> top5percentTurnCombos, List<Set<Card>> top5percentRiverCombos) {
+        int group = 0;
+
+        top5percentTurnCombos.retainAll(top5percentRiverCombos);
+
+        int size = top5percentTurnCombos.size();
+
+        return size;
+
+//        if(size < 22) {
+//            group = 1;
+//        } else if(size < 38) {
+//            group = 2;
+//        } else if(size < 53) {
+//            group = 3;
+//        } else {
+//            group = 4;
+//        }
+//
+//        System.out.println("Boardwetnessgroup: " + group);
+//
+//        return group;
+    }
+
+    public List<Set<Card>> getTop5percentCombos() {
+        List<Set<Card>> top5percentCombos = new ArrayList<>();
+
+        int counter = 1;
+
+        loop: for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosNew.entrySet()) {
+            if(counter < 67) {
+                List<Set<Card>> setSetAsList = new ArrayList<>();
+                setSetAsList.addAll(entry.getValue());
+
+                for(Set<Card> combo : setSetAsList) {
+                    if(counter < 67) {
+                        top5percentCombos.add(combo);
+                        counter++;
+                    } else {
+                        break loop;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+        return top5percentCombos;
+    }
+
     public StraightEvaluator getStraightEvaluator() {
         return straightEvaluator;
     }

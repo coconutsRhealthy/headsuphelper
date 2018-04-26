@@ -5,7 +5,6 @@ import com.lennart.model.action.actionbuilders.ai.GameVariable;
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.Sizing;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.*;
-import com.lennart.model.action.actionbuilders.postflop.PostFlopActionBuilder;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
@@ -54,6 +53,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     private boolean strongFlushDraw;
     private boolean strongOosd;
     private boolean strongGutshot;
+    private boolean strongOvercards;
+    private boolean strongBackdoorFd;
+    private boolean strongBackdoorSd;
 
     private boolean drawBettingActionDone;
     private boolean previousBluffAction;
@@ -62,6 +64,10 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     private boolean opponentHasInitiative;
     private boolean pre3betOrPostRaisedPot;
     private boolean opponentDidPreflop4betPot;
+
+    private List<Set<Card>> top5percentFlopCombos;
+    private List<Set<Card>> top5percentTurnCombos;
+    private List<Set<Card>> top5percentRiverCombos;
 
     public ComputerGameNew() {
         //default constructor
@@ -165,7 +171,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         double opponentBetSizeBb = opponentTotalBetSize / bigBlind;
         double effectiveStack = getEffectiveStackInBb();
         double amountToCallBb = getAmountToCallBb(computerBetSizeBb, opponentBetSizeBb, computerStack / bigBlind);
-
+        int boardWetness = getBoardWetness();
 
         String opponentType = new OpponentIdentifier().getOpponentType("izo", numberOfHandsPlayed);
 
@@ -185,17 +191,17 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                 action = "check";
             } else {
                 if(eligibleActions != null && eligibleActions.contains("bet75pct")) {
-                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
+                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
 
                     if(opponentType.equals("la")) {
                         action = actionAgainstLa;
                     } else if(actionAgainstLa.equals("bet75pct")) {
                         action = actionAgainstLa;
                     } else {
-                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
+                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
                     }
                 } else {
-                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot);
+                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
                 }
             }
 
@@ -213,6 +219,22 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
 
         return action;
+    }
+
+    private int getBoardWetness() {
+        List<Set<Card>> top5PercentTurnCombosCopy = new ArrayList<>();
+        List<Set<Card>> top5PercentRiverCombosCopy = new ArrayList<>();
+
+        if(top5percentTurnCombos != null) {
+            top5PercentTurnCombosCopy.addAll(top5percentTurnCombos);
+        }
+
+        if(top5percentRiverCombos != null) {
+            top5PercentRiverCombosCopy.addAll(top5percentRiverCombos);
+        }
+
+        int boardChangeTurn = BoardEvaluator.getBoardWetnessGroup(top5PercentTurnCombosCopy, top5PercentRiverCombosCopy);
+        return boardChangeTurn;
     }
 
     private void setMyActionToBetIfPreflopNecessary() {
@@ -644,6 +666,10 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         opponentHasInitiative = false;
         pre3betOrPostRaisedPot = false;
         opponentDidPreflop4betPot = false;
+
+        top5percentFlopCombos = null;
+        top5percentTurnCombos = null;
+        top5percentRiverCombos = null;
     }
 
     public ComputerGameNew proceedToNextHand() {
@@ -816,6 +842,15 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             computerHasStrongDraw = false;
         } else {
             BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+
+            if(board.size() == 3) {
+                top5percentFlopCombos = boardEvaluator.getTop5percentCombos();
+            } else if(board.size() == 4) {
+                top5percentTurnCombos = boardEvaluator.getTop5percentCombos();
+            } else if(board.size() == 5) {
+                top5percentRiverCombos = boardEvaluator.getTop5percentCombos();
+            }
+
             handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);
 
             computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
@@ -827,6 +862,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         strongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
         strongOosd = handEvaluator.hasDrawOfType("strongOosd");
         strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+        strongOvercards = handEvaluator.hasDrawOfType("strongOvercards");
+        strongBackdoorFd = handEvaluator.hasDrawOfType("strongBackDoorFlush");
+        strongBackdoorSd = handEvaluator.hasDrawOfType("strongBackDoorStraight");
 
         return strongFlushDraw || strongOosd || strongGutshot;
     }
@@ -1155,5 +1193,29 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     @Override
     public void setOpponentDidPreflop4betPot(boolean opponentDidPreflop4betPot) {
         this.opponentDidPreflop4betPot = opponentDidPreflop4betPot;
+    }
+
+    public List<Set<Card>> getTop5percentFlopCombos() {
+        return top5percentFlopCombos;
+    }
+
+    public void setTop5percentFlopCombos(List<Set<Card>> top5percentFlopCombos) {
+        this.top5percentFlopCombos = top5percentFlopCombos;
+    }
+
+    public List<Set<Card>> getTop5percentTurnCombos() {
+        return top5percentTurnCombos;
+    }
+
+    public void setTop5percentTurnCombos(List<Set<Card>> top5percentTurnCombos) {
+        this.top5percentTurnCombos = top5percentTurnCombos;
+    }
+
+    public List<Set<Card>> getTop5percentRiverCombos() {
+        return top5percentRiverCombos;
+    }
+
+    public void setTop5percentRiverCombos(List<Set<Card>> top5percentRiverCombos) {
+        this.top5percentRiverCombos = top5percentRiverCombos;
     }
 }
