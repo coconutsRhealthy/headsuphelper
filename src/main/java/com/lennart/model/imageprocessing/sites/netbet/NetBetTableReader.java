@@ -147,6 +147,13 @@ public class NetBetTableReader {
             System.out.println("First action of table... action read from middle chatline: " + opponentAction);
             return opponentAction;
         }
+
+        String actionToReturn = readMiddleChatLine();
+
+        if(actionToReturn != null) {
+            return getActionFromChatLine(actionToReturn);
+        }
+
         return null;
     }
 
@@ -157,9 +164,9 @@ public class NetBetTableReader {
             action = "empty";
         } else if(chatLine.contains("posts") || chatLine.contains("blind")) {
             action = "bet";
-        } else if(chatLine.contains("checks")) {
+        } else if(chatLine.contains("checks") || chatLine.contains("checls")) {
             action = "check";
-        } else if(chatLine.contains("calls") || chatLine.contains("ca lls")) {
+        } else if(chatLine.contains("calls") || chatLine.contains("ca lls") || chatLine.contains("cal ls")) {
             action = "call";
         } else if(chatLine.contains("bets") || chatLine.contains("beis") || chatLine.contains("be'ls")) {
             action = "bet75pct";
