@@ -30,12 +30,14 @@ public class ContinuousTable implements ContinuousTableable {
         int numberOfActionRequests = 0;
         int milliSecondsTotal = 0;
         int printDotTotal = 0;
+        int refreshTableTotal = 0;
 
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
             milliSecondsTotal = milliSecondsTotal + 100;
             if(NetBetTableReader.botIsToAct()) {
                 numberOfActionRequests++;
+                refreshTableTotal = 0;
 
                 if(NetBetTableReader.isNewHand()) {
                     System.out.println("is new hand");
@@ -102,6 +104,20 @@ public class ContinuousTable implements ContinuousTableable {
                     MouseKeyboard.moveMouseToLocation(20, 20);
 
                     printDotTotal = 0;
+                    refreshTableTotal++;
+
+                    if(refreshTableTotal == 24) {
+                        mediumSizeTable();
+
+                        try {
+                            refreshTableTotal = 0;
+                            TimeUnit.MILLISECONDS.sleep(150);
+                            NetBetTableOpener.startNewTable();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     System.out.println();
                 }
             }
@@ -158,6 +174,10 @@ public class ContinuousTable implements ContinuousTableable {
             }
         }
         return cardListAsString;
+    }
+
+    private void mediumSizeTable() {
+        MouseKeyboard.click(1269, 25);
     }
 
     private void maximizeTable() {
