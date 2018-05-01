@@ -791,7 +791,7 @@ public class RuleApplier {
         boolean bluffable = strongOosd || strongFd || strongOvercards || strongGutshot || strongBackdoorFd || strongBackdoorSd
                 || (handStrength > 0.5 && handStrength < 0.65);
 
-        if(bluffable || (board.size() == 5 && boardWetness < 36)) {
+        if(bluffable || (board.size() == 5 && boardWetness < 20)) {
             System.out.println("Boardwetness is in method: " + boardWetness);
 
             if(board != null) {
@@ -799,43 +799,31 @@ public class RuleApplier {
                 if(bluffOddsAreOk(opponentBetSizeBb * bigBlind, botBetSizeBb * bigBlind, botStackBb * bigBlind,
                         opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board)) {
                     if(action.equals("check")) {
-                        if(board.size() == 3) {
-                            double random = Math.random();
-
-                            if(position) {
-                                if(random > 0.1) {
-                                    actionToReturn = "bet75pct";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else {
-                                if(random > 0.57) {
-                                    actionToReturn = "bet75pct";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            }
-                        } else if(board.size() == 4) {
-                            if(position) {
-                                actionToReturn = "bet75pct";
-                            } else {
+                        if(board.size() == 3 || board.size() == 4) {
+                            if(handStrength < 0.65) {
                                 double random = Math.random();
 
-                                if(random > 0.5) {
-                                    actionToReturn = "bet75pct";
+                                if(position) {
+                                    if(random > 0.75) {
+                                        actionToReturn = "bet75pct";
+                                    } else {
+                                        actionToReturn = action;
+                                    }
                                 } else {
                                     actionToReturn = action;
                                 }
+                            } else {
+                                actionToReturn = action;
                             }
                         } else {
                             if(position) {
-                                if(boardWetness < 35) {
+                                if(boardWetness < 30) {
                                     actionToReturn = "bet75pct";
                                 } else {
                                     actionToReturn = action;
                                 }
                             } else {
-                                if(boardWetness < 20) {
+                                if(boardWetness < 15) {
                                     actionToReturn = "bet75pct";
                                 } else {
                                     actionToReturn = action;
@@ -848,13 +836,13 @@ public class RuleApplier {
                                 double random = Math.random();
 
                                 if(position) {
-                                    if(random > 0.6) {
+                                    if(random > 0.80) {
                                         actionToReturn = "raise";
                                     } else {
                                         actionToReturn = action;
                                     }
                                 } else {
-                                    if(random > 0.8) {
+                                    if(random > 0.90) {
                                         actionToReturn = "raise";
                                     } else {
                                         actionToReturn = action;
@@ -864,7 +852,7 @@ public class RuleApplier {
                                 if(boardWetness > 10 && boardWetness <= 20) {
                                     double random = Math.random();
 
-                                    if(random > 0.5) {
+                                    if(random > 0.8) {
                                         actionToReturn = "raise";
                                     } else {
                                         actionToReturn = action;
@@ -963,7 +951,7 @@ public class RuleApplier {
     private boolean bluffOddsAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
                                    double bigBlind, List<Card> board) {
         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
-        double odds = sizing / (facingBetSize + myBetSize + pot);
+        double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
         return odds > 0.41;
     }
 
@@ -973,7 +961,7 @@ public class RuleApplier {
         double facingStackAfterFloat = facingStack;
         double myStackAfterFloat = myStack - (facingBetSize - myBetSize);
         double sizingAfterFloat = new Sizing().getAiBotSizing(0, 0, myStackAfterFloat, facingStackAfterFloat, potAfterFloat, bigBlind, board);
-        double oddsOnStreetAfterFloat = sizingAfterFloat / potAfterFloat;
+        double oddsOnStreetAfterFloat = sizingAfterFloat / (potAfterFloat + sizingAfterFloat);
         return oddsOnStreetAfterFloat > 0.41;
     }
 }
