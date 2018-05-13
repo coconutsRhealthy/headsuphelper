@@ -733,136 +733,23 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String bluffMore(String action, boolean position) {
+    public String doBluff(String action, double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
+                          double bigBlind, List<Card> board, double handStrength) {
         String actionToReturn;
 
-        if(action.equals("check")) {
-            double random = Math.random();
+        double methodSizing = 0;
 
-            if(position) {
-                if(random > 0.47) {
-                    actionToReturn = "bet75pct";
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                if(random > 0.77) {
-                    actionToReturn = "bet75pct";
-                } else {
-                    actionToReturn = action;
-                }
-            }
-        } else if(action.equals("fold")) {
-            double random = Math.random();
+        if(handStrength < 0.62) {
+            if(action.equals("check")) {
+                double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                methodSizing = sizing;
 
-            if(random > 0.62) {
-                actionToReturn = "raise";
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
+                if(bluffOddsAreOk(sizing, facingBetSize, pot)) {
+                    if(sizing / bigBlind <= 11) {
+                        double random = Math.random();
 
-        return actionToReturn;
-    }
-
-    public String bluffAction(String action,
-                              boolean position,
-                              List<Card> board,
-                              boolean strongOosd,
-                              boolean strongFd,
-                              boolean strongOvercards,
-                              boolean strongGutshot,
-                              boolean strongBackdoorFd,
-                              boolean strongBackdoorSd,
-                              int boardWetness,
-                              double handStrength,
-                              double opponentBetSizeBb,
-                              double botBetSizeBb,
-                              double botStackBb,
-                              double opponentStackBb,
-                              double potSizeBb,
-                              double bigBlind) {
-        String actionToReturn;
-
-        System.out.println("Action at beginning of bluffmethod: " + action);
-
-        boolean bluffable = strongOosd || strongFd || strongOvercards || strongGutshot || strongBackdoorFd || strongBackdoorSd
-                || (handStrength > 0.5 && handStrength < 0.65);
-
-        if(bluffable || (board.size() == 5 && boardWetness < 20)) {
-            System.out.println("Boardwetness is in method: " + boardWetness);
-
-            if(board != null) {
-
-                if(bluffOddsAreOk(opponentBetSizeBb * bigBlind, botBetSizeBb * bigBlind, botStackBb * bigBlind,
-                        opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board)) {
-                    if(action.equals("check")) {
-                        if(board.size() == 3 || board.size() == 4) {
-                            if(handStrength < 0.65) {
-                                double random = Math.random();
-
-                                if(position) {
-                                    if(random > 0.75) {
-                                        actionToReturn = "bet75pct";
-                                    } else {
-                                        actionToReturn = action;
-                                    }
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            if(position) {
-                                if(boardWetness < 30) {
-                                    actionToReturn = "bet75pct";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else {
-                                if(boardWetness < 15) {
-                                    actionToReturn = "bet75pct";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            }
-                        }
-                    } else if(action.equals("fold")) {
-                        if(opponentStackBb != 0) {
-                            if(board.size() == 3 || board.size() == 4) {
-                                double random = Math.random();
-
-                                if(position) {
-                                    if(random > 0.80) {
-                                        actionToReturn = "raise";
-                                    } else {
-                                        actionToReturn = action;
-                                    }
-                                } else {
-                                    if(random > 0.90) {
-                                        actionToReturn = "raise";
-                                    } else {
-                                        actionToReturn = action;
-                                    }
-                                }
-                            } else {
-                                if(boardWetness > 10 && boardWetness <= 20) {
-                                    double random = Math.random();
-
-                                    if(random > 0.8) {
-                                        actionToReturn = "raise";
-                                    } else {
-                                        actionToReturn = action;
-                                    }
-                                } else if(boardWetness <= 10) {
-                                    actionToReturn = "raise";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            }
+                        if(random > 0.5) {
+                            actionToReturn = "bet75pct";
                         } else {
                             actionToReturn = action;
                         }
@@ -879,89 +766,17 @@ public class RuleApplier {
             actionToReturn = action;
         }
 
-        System.out.println("Action at end of bluffmethod: " + actionToReturn);
-
-        return actionToReturn;
-    }
-
-    public String floatAction(String action,
-                              boolean position,
-                              List<Card> board,
-                              double handStrength,
-                              boolean strongOosd,
-                              boolean strongFd,
-                              boolean strongOvercards,
-                              boolean strongGutshot,
-                              boolean strongBackdoorFd,
-                              boolean strongBackdoorSd,
-                              String opponentAction,
-                              double opponentBetsizeBb,
-                              double botBetSizeBb,
-                              double botStackBb,
-                              double opponentStackBb,
-                              double potSizeBb,
-                              double bigBlind) {
-        String actionToReturn;
-
-        System.out.println("Action at beginning of floatmethod: " + action);
-
-        if(action.equals("fold") && opponentAction.equals("bet75pct")) {
-            if(position) {
-                if(board != null && (board.size() == 3 || board.size() == 4)) {
-                    if(strongOosd || strongFd || strongOvercards || strongGutshot || strongBackdoorFd || strongBackdoorSd || (handStrength > 0.5 && handStrength < 0.65)) {
-                        if(board.size() == 3 || board.size() == 4) {
-                            if(oddsOfferedToOpponentAfterFloatAreOk(opponentBetsizeBb * bigBlind, botBetSizeBb * bigBlind,
-                                                                    botStackBb * bigBlind, opponentStackBb * bigBlind,
-                                                                    potSizeBb * bigBlind, bigBlind, board)) {
-                                if(opponentBetsizeBb <= 20) {
-                                    actionToReturn = "call";
-                                } else {
-                                    double random = Math.random();
-
-                                    if(random > 0.5) {
-                                        actionToReturn = "call";
-                                    } else {
-                                        actionToReturn = action;
-                                    }
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
+        if(!actionToReturn.equals(action)) {
+            System.out.println("bluff action done! " + actionToReturn);
+            System.out.println("board size: " + board.size());
+            System.out.println("sizing: " + methodSizing);
         }
 
-        System.out.println("Action at end of floatmethod: " + actionToReturn);
-
         return actionToReturn;
     }
 
-    private boolean bluffOddsAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
-                                   double bigBlind, List<Card> board) {
-        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
         double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
         return odds > 0.41;
-    }
-
-    private boolean oddsOfferedToOpponentAfterFloatAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
-                                                         double bigBlind, List<Card> board) {
-        double potAfterFloat = pot + (2 * facingBetSize);
-        double facingStackAfterFloat = facingStack;
-        double myStackAfterFloat = myStack - (facingBetSize - myBetSize);
-        double sizingAfterFloat = new Sizing().getAiBotSizing(0, 0, myStackAfterFloat, facingStackAfterFloat, potAfterFloat, bigBlind, board);
-        double oddsOnStreetAfterFloat = sizingAfterFloat / (potAfterFloat + sizingAfterFloat);
-        return oddsOnStreetAfterFloat > 0.41;
     }
 }

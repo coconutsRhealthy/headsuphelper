@@ -299,16 +299,30 @@ public class PreflopActionBuilder {
             percentage4bet = setPercentage(x4bet_comboMap6Percent, holeCardsAsSet, 0.06);
         }
 
+        String actionToReturn;
+
         double random = Math.random();
         if(random <= 1 - percentage4bet - percentageCall3bet) {
-            return "fold";
+            actionToReturn = "fold";
         } else if ((random <= 1 - percentage4bet) && (random >= 1 - percentage4bet - percentageCall3bet)){
             continuousTableable.setPre3betOrPostRaisedPot(true);
-            return "call";
+            actionToReturn = "call";
         } else {
             continuousTableable.setPre3betOrPostRaisedPot(true);
-            return "raise";
+            actionToReturn = "raise";
         }
+
+        if(holeCardsAreBluffable(botHoleCards)) {
+            random = Math.random();
+
+            if(random <= 0.50) {
+                System.out.println("Bluffcall pre3bet done");
+                continuousTableable.setPre3betOrPostRaisedPot(true);
+                actionToReturn = "call";
+            }
+        }
+
+        return actionToReturn;
     }
 
     private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
@@ -398,15 +412,29 @@ public class PreflopActionBuilder {
             percentage3bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
         }
 
+        String actionToReturn;
+
         double random = Math.random();
         if(random <= 1 - percentage3bet - percentageCall2bet) {
-            return "fold";
+            actionToReturn = "fold";
         } else if ((random <= 1 - percentage3bet) && (random >= 1 - percentage3bet - percentageCall2bet)){
-            return "call";
+            actionToReturn = "call";
         } else {
             continuousTableable.setPre3betOrPostRaisedPot(true);
-            return "raise";
+            actionToReturn = "raise";
         }
+
+        if(holeCardsAreBluffable(botHoleCards)) {
+            random = Math.random();
+
+            if(random <= 0.65) {
+                System.out.println("Bluff pre3bet done");
+                continuousTableable.setPre3betOrPostRaisedPot(true);
+                actionToReturn = "raise";
+            }
+        }
+
+        return actionToReturn;
     }
 
     private String get3betF4bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, String opponenType) {
@@ -483,6 +511,35 @@ public class PreflopActionBuilder {
             }
         }
         return 0;
+    }
+
+    private boolean holeCardsAreBluffable(List<Card> holeCards) {
+        boolean holeCardsAreBluffable = false;
+
+        if(holeCards != null && holeCards.size() == 2) {
+            //ace
+            if(holeCards.get(0).getRank() == 14 || holeCards.get(1).getRank() == 14) {
+                holeCardsAreBluffable = true;
+            }
+
+            //suited
+            if(!holeCardsAreBluffable && (holeCards.get(0).getSuit() == holeCards.get(1).getSuit())) {
+                holeCardsAreBluffable = true;
+            }
+
+            //one gapper
+            if(!holeCardsAreBluffable &&
+                    (holeCards.get(0).getRank() - holeCards.get(1).getRank() == 1 || holeCards.get(0).getRank() - holeCards.get(1).getRank() == -1)) {
+                holeCardsAreBluffable = true;
+            }
+
+            //pocket pairs
+            if(!holeCardsAreBluffable && (holeCards.get(0).getRank() == holeCards.get(1).getRank())) {
+                holeCardsAreBluffable = true;
+            }
+        }
+
+        return holeCardsAreBluffable;
     }
 
 }
