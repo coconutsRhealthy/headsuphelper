@@ -312,7 +312,7 @@ public class PreflopActionBuilder {
             actionToReturn = "raise";
         }
 
-        if(holeCardsAreBluffable(botHoleCards)) {
+        if(actionToReturn.equals("fold") && holeCardsAreBluffable(botHoleCards)) {
             random = Math.random();
 
             if(random <= 0.50) {
@@ -424,7 +424,7 @@ public class PreflopActionBuilder {
             actionToReturn = "raise";
         }
 
-        if(holeCardsAreBluffable(botHoleCards)) {
+        if(actionToReturn.equals("fold") && holeCardsAreBluffable(botHoleCards)) {
             random = Math.random();
 
             if(random <= 0.65) {
