@@ -745,7 +745,7 @@ public class RuleApplier {
                 methodSizing = sizing;
 
                 if(bluffOddsAreOk(sizing, facingBetSize, pot)) {
-                    if(sizing / bigBlind <= 11) {
+                    if(sizing / bigBlind <= 27) {
                         double random = Math.random();
 
                         if(random > 0.5) {
