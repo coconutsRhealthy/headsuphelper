@@ -739,13 +739,13 @@ public class RuleApplier {
 
         double methodSizing = 0;
 
-        if(handStrength < 0.62) {
+        //if(handStrength < 0.62) {
             if(action.equals("check")) {
                 double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
                 methodSizing = sizing;
 
                 if(bluffOddsAreOk(sizing, facingBetSize, pot)) {
-                    if(sizing / bigBlind <= 27) {
+                    if(sizing / bigBlind <= 90) {
                         double random = Math.random();
 
                         if(random > 0.5) {
@@ -762,14 +762,63 @@ public class RuleApplier {
             } else {
                 actionToReturn = action;
             }
+//        } else {
+//            actionToReturn = action;
+//        }
+
+        if(!actionToReturn.equals(action)) {
+            System.out.println("bluff action done! " + actionToReturn);
+            System.out.println("handstrength: " + handStrength);
+            System.out.println("board size: " + board.size());
+            System.out.println("sizing: " + methodSizing);
+        }
+
+        return actionToReturn;
+    }
+
+    public String doFloat(String action, boolean position, List<Card> board) {
+        String actionToReturn;
+
+        if(action.equals("fold")) {
+            if(board.size() == 3 || board.size() == 4) {
+                if(position) {
+                    double random = Math.random();
+
+                    if(random > 0.2) {
+                        actionToReturn = "call";
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    double random = Math.random();
+
+                    if(random > 1) {
+                        actionToReturn = "call";
+                    } else {
+                        actionToReturn = action;
+                    }
+                }
+            } else {
+                actionToReturn = action;
+            }
         } else {
             actionToReturn = action;
         }
 
-        if(!actionToReturn.equals(action)) {
-            System.out.println("bluff action done! " + actionToReturn);
-            System.out.println("board size: " + board.size());
-            System.out.println("sizing: " + methodSizing);
+        return actionToReturn;
+    }
+
+    public String valueCallAtRiver(String action, double handStrength) {
+        String actionToReturn;
+
+        if(action.equals("fold")) {
+            if(handStrength > 0.5) {
+                actionToReturn = "call";
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
         }
 
         return actionToReturn;

@@ -312,15 +312,15 @@ public class PreflopActionBuilder {
             actionToReturn = "raise";
         }
 
-//        if(actionToReturn.equals("fold") && holeCardsAreBluffable(botHoleCards)) {
-//            random = Math.random();
-//
-//            if(random <= 0.50) {
-//                System.out.println("Bluffcall pre3bet done");
-//                continuousTableable.setPre3betOrPostRaisedPot(true);
-//                actionToReturn = "call";
-//            }
-//        }
+        if(actionToReturn.equals("fold") && holeCardsAreBluffable(botHoleCards)) {
+            random = Math.random();
+
+            //if(random <= 0.50) {
+                System.out.println("Bluffcall pre3bet done");
+                continuousTableable.setPre3betOrPostRaisedPot(true);
+                actionToReturn = "call";
+            //}
+        }
 
         return actionToReturn;
     }
@@ -429,6 +429,7 @@ public class PreflopActionBuilder {
 
             if(random <= 0.06) {
                 System.out.println("changed call to 3bet");
+                continuousTableable.setPre3betOrPostRaisedPot(true);
                 actionToReturn = "raise";
             }
         }
@@ -436,13 +437,13 @@ public class PreflopActionBuilder {
         if(actionToReturn.equals("fold") && holeCardsAreBluffable(botHoleCards)) {
             random = Math.random();
 
-            if(random <= 0.65) {
+//            if(random <= 1) {
                 System.out.println("Bluff pre3bet done");
                 continuousTableable.setPre3betOrPostRaisedPot(true);
                 actionToReturn = "raise";
-            } else if(random <= 0.90){
-                actionToReturn = "call";
-            }
+//            } else if(random <= 0.90){
+//                actionToReturn = "call";
+//            }
         }
 
         return actionToReturn;
@@ -541,6 +542,12 @@ public class PreflopActionBuilder {
             //one gapper
             if(!holeCardsAreBluffable &&
                     (holeCards.get(0).getRank() - holeCards.get(1).getRank() == 1 || holeCards.get(0).getRank() - holeCards.get(1).getRank() == -1)) {
+                holeCardsAreBluffable = true;
+            }
+
+            //two gapper
+            if(!holeCardsAreBluffable &&
+                    (holeCards.get(0).getRank() - holeCards.get(1).getRank() == 2 || holeCards.get(0).getRank() - holeCards.get(1).getRank() == -2)) {
                 holeCardsAreBluffable = true;
             }
 
