@@ -776,27 +776,35 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String doFloat(String action, boolean position, List<Card> board) {
+    public String doFloat(String action, boolean position, List<Card> board, double opponentBetsizeBb,
+                          double botBetSizeBb, double botStackBb, double opponentStackBb,
+                          double potSizeBb, double bigBlind) {
         String actionToReturn;
 
         if(action.equals("fold")) {
             if(board.size() == 3 || board.size() == 4) {
-                if(position) {
-                    double random = Math.random();
+                if(oddsOfferedToOpponentAfterFloatAreOk(opponentBetsizeBb * bigBlind, botBetSizeBb * bigBlind,
+                        botStackBb * bigBlind, opponentStackBb * bigBlind,
+                        potSizeBb * bigBlind, bigBlind, board)) {
+                    if(position) {
+                        double random = Math.random();
 
-                    if(random > 0.2) {
-                        actionToReturn = "call";
+                        if(random > 0.2) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = action;
+                        }
                     } else {
-                        actionToReturn = action;
+                        double random = Math.random();
+
+                        if(random > 1) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = action;
+                        }
                     }
                 } else {
-                    double random = Math.random();
-
-                    if(random > 1) {
-                        actionToReturn = "call";
-                    } else {
-                        actionToReturn = action;
-                    }
+                    actionToReturn = action;
                 }
             } else {
                 actionToReturn = action;
@@ -827,5 +835,20 @@ public class RuleApplier {
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
         double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
         return odds > 0.41;
+    }
+
+    private boolean oddsOfferedToOpponentAfterFloatAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
+                                                         double bigBlind, List<Card> board) {
+        double potAfterFloat = pot + (2 * facingBetSize);
+        double facingStackAfterFloat = facingStack;
+        double myStackAfterFloat = myStack - (facingBetSize - myBetSize);
+
+        List<Card> dummyBoard = new ArrayList<>();
+        dummyBoard.addAll(board);
+        dummyBoard.add(new Card(2, 'd'));
+
+        double sizingAfterFloat = new Sizing().getAiBotSizing(0, 0, myStackAfterFloat, facingStackAfterFloat, potAfterFloat, bigBlind, dummyBoard);
+        double oddsOnStreetAfterFloat = sizingAfterFloat / (potAfterFloat + sizingAfterFloat);
+        return oddsOnStreetAfterFloat > 0.35;
     }
 }
