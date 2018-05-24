@@ -14,14 +14,14 @@ import java.util.concurrent.TimeUnit;
 public class Poker {
 
     //input
-        //hand strength (5% groups)
-        //strong draw yes / no
-        //opponent type
-        //board texture
-        //handpath
-        //opponent sizing ( < 50% pot, 50 - 100 / 100 - 150 / > 150 )
-        //stacks
-        //pot odds
+    //hand strength (5% groups)
+    //strong draw yes / no
+    //opponent type
+    //board texture
+    //handpath
+    //opponent sizing ( < 50% pot, 50 - 100 / 100 - 150 / > 150 )
+    //stacks
+    //pot odds
 
 
 
@@ -30,32 +30,32 @@ public class Poker {
 
 
     //input
-        //opponent type
-        //hand strength
-        //strong draw
-        //position
-        //potsize - different sizes
-        //your bet - different sizes
-        //opponent bet - different sizes
-        //effective stack
-        //board texture
+    //opponent type
+    //hand strength
+    //strong draw
+    //position
+    //potsize - different sizes
+    //your bet - different sizes
+    //opponent bet - different sizes
+    //effective stack
+    //board texture
 
-        //een TAG, jij hebt 82%, geen draw, IP, pot is 8, hij bet 4, eff. stack 40, droog board
+    //een TAG, jij hebt 82%, geen draw, IP, pot is 8, hij bet 4, eff. stack 40, droog board
 
     //process
 
 
     //output
-        //-fold
-        //-call
-        //check
-        //bet 0.25
-        //bet 0.5
-        //bet 0.75
-        //bet 1
-        //bet 1.5
-        //bet 2
-        //raise
+    //-fold
+    //-call
+    //check
+    //bet 0.25
+    //bet 0.5
+    //bet 0.75
+    //bet 1
+    //bet 1.5
+    //bet 2
+    //raise
 
     protected Connection con;
 
@@ -132,9 +132,7 @@ public class Poker {
                 action = ruleApplier.doBettingAgainstTp(action, handStrength, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, opponentType, strongDraw, position);
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
                 action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, ownStackBb, handStrength, !preflop);
-                action = ruleApplier.doBluff(action, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength);
-                action = ruleApplier.doFloat(action, position, board, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind);
-                //action = ruleApplier.valueCallAtRiver(action, handStrength);
+                action = ruleApplier.doBluffSmall(action, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength);
                 action = ruleApplier.playCautiouslyInOpponentPre4betPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
                 action = ruleApplier.noFlopOrTurnRaisesInPre3betOrPostRaisedPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
@@ -162,9 +160,7 @@ public class Poker {
                 action = ruleApplier.doBettingAgainstTp(action, handStrength, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, opponentType, strongDraw, position);
                 action = ruleApplier.moderateDeepPostflopValueBettingAndRaising(action, handStrength, !preflop, strongFlushDraw, strongOosd, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
                 action = ruleApplier.moderateDeepValueCalls(action, ownBetSizeBb, opponentBetSizeBb, ownStackBb, handStrength, !preflop);
-                action = ruleApplier.doBluff(action, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength);
-                action = ruleApplier.doFloat(action, position, board, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind);
-                //action = ruleApplier.valueCallAtRiver(action, handStrength);
+                action = ruleApplier.doBluffSmall(action, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength);
                 action = ruleApplier.playCautiouslyInOpponentPre4betPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
                 action = ruleApplier.noFlopOrTurnRaisesInPre3betOrPostRaisedPot(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);

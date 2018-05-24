@@ -567,9 +567,9 @@ public class RuleApplier {
     }
 
     private String getActionWhenStrongDrawIsSetToFalse(ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
-                                                      double facingOdds, double effectiveStackBb, double handStrength, String opponentType,
-                                                      double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
-                                                      double bigBlind, boolean opponentDidPreflop4betPot, boolean pre3betOrPostRaisedPot, boolean strongOvercards,
+                                                       double facingOdds, double effectiveStackBb, double handStrength, String opponentType,
+                                                       double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                                       double bigBlind, boolean opponentDidPreflop4betPot, boolean pre3betOrPostRaisedPot, boolean strongOvercards,
                                                        boolean strongBackdoorFd, boolean strongBackdoorSd, int boardWetness) {
         return new Poker().getAction(actionVariables, eligibleActions, street, position, potSizeBb, opponentAction,
                 facingOdds, effectiveStackBb, false, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb,
@@ -578,9 +578,9 @@ public class RuleApplier {
     }
 
     public String doBettingAgainstTp(String action, double handStrength, double facingBetSize,
-                                        double myBetSize, double myStack, double facingStack,
-                                        double pot, double bigBlind, List<Card> board, String opponentType,
-                                        boolean strongDraw, boolean position) {
+                                     double myBetSize, double myStack, double facingStack,
+                                     double pot, double bigBlind, List<Card> board, String opponentType,
+                                     boolean strongDraw, boolean position) {
         String actionToReturn;
 
         if(action.equals("check")) {
@@ -653,15 +653,15 @@ public class RuleApplier {
     }
 
     public String playCautiouslyInOpponentPre4betPot(String action, ActionVariables actionVariables, List<String> eligibleActions,
-                                                      String street, boolean position, double potSizeBb, String opponentAction,
-                                                      double facingOdds, double effectiveStackBb, boolean strongDraw,
-                                                      double handStrength, String opponentType, double opponentBetSizeBb,
-                                                      double ownBetSizeBb, double opponentStackBb, double ownStackBb,
-                                                      boolean preflop, List<Card> board, boolean strongFlushDraw,
-                                                      boolean strongOosd, boolean strongGutshot, double bigBlind,
-                                                      boolean opponentDidPreflop4betPot, boolean pre3betOrPostRaisedPot,
-                                                      boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
-                                                      int boardWetness) {
+                                                     String street, boolean position, double potSizeBb, String opponentAction,
+                                                     double facingOdds, double effectiveStackBb, boolean strongDraw,
+                                                     double handStrength, String opponentType, double opponentBetSizeBb,
+                                                     double ownBetSizeBb, double opponentStackBb, double ownStackBb,
+                                                     boolean preflop, List<Card> board, boolean strongFlushDraw,
+                                                     boolean strongOosd, boolean strongGutshot, double bigBlind,
+                                                     boolean opponentDidPreflop4betPot, boolean pre3betOrPostRaisedPot,
+                                                     boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                                     int boardWetness) {
         String actionToReturn;
 
         if(opponentDidPreflop4betPot) {
@@ -733,22 +733,22 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String doBluff(String action, double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
-                          double bigBlind, List<Card> board, double handStrength) {
+    public String doBluffSmall(String action, double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
+                               double bigBlind, List<Card> board, double handStrength) {
         String actionToReturn;
 
         double methodSizing = 0;
 
-        //if(handStrength < 0.62) {
+        if(handStrength < 0.62) {
             if(action.equals("check")) {
                 double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
                 methodSizing = sizing;
 
                 if(bluffOddsAreOk(sizing, facingBetSize, pot)) {
-                    if(sizing / bigBlind <= 90) {
+                    if(sizing / bigBlind <= 7) {
                         double random = Math.random();
 
-                        if(random > 0.5) {
+                        if(random > 0.43) {
                             actionToReturn = "bet75pct";
                         } else {
                             actionToReturn = action;
@@ -762,9 +762,9 @@ public class RuleApplier {
             } else {
                 actionToReturn = action;
             }
-//        } else {
-//            actionToReturn = action;
-//        }
+        } else {
+            actionToReturn = action;
+        }
 
         if(!actionToReturn.equals(action)) {
             System.out.println("bluff action done! " + actionToReturn);
@@ -776,79 +776,8 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String doFloat(String action, boolean position, List<Card> board, double opponentBetsizeBb,
-                          double botBetSizeBb, double botStackBb, double opponentStackBb,
-                          double potSizeBb, double bigBlind) {
-        String actionToReturn;
-
-        if(action.equals("fold")) {
-            if(board.size() == 3 || board.size() == 4) {
-                if(oddsOfferedToOpponentAfterFloatAreOk(opponentBetsizeBb * bigBlind, botBetSizeBb * bigBlind,
-                        botStackBb * bigBlind, opponentStackBb * bigBlind,
-                        potSizeBb * bigBlind, bigBlind, board)) {
-                    if(position) {
-                        double random = Math.random();
-
-                        if(random > 0.2) {
-                            actionToReturn = "call";
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        double random = Math.random();
-
-                        if(random > 1) {
-                            actionToReturn = "call";
-                        } else {
-                            actionToReturn = action;
-                        }
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    public String valueCallAtRiver(String action, double handStrength) {
-        String actionToReturn;
-
-        if(action.equals("fold")) {
-            if(handStrength > 0.5) {
-                actionToReturn = "call";
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
         double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
         return odds > 0.41;
-    }
-
-    private boolean oddsOfferedToOpponentAfterFloatAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack, double pot,
-                                                         double bigBlind, List<Card> board) {
-        double potAfterFloat = pot + (2 * facingBetSize);
-        double facingStackAfterFloat = facingStack;
-        double myStackAfterFloat = myStack - (facingBetSize - myBetSize);
-
-        List<Card> dummyBoard = new ArrayList<>();
-        dummyBoard.addAll(board);
-        dummyBoard.add(new Card(2, 'd'));
-
-        double sizingAfterFloat = new Sizing().getAiBotSizing(0, 0, myStackAfterFloat, facingStackAfterFloat, potAfterFloat, bigBlind, dummyBoard);
-        double oddsOnStreetAfterFloat = sizingAfterFloat / (potAfterFloat + sizingAfterFloat);
-        return oddsOnStreetAfterFloat > 0.35;
     }
 }
