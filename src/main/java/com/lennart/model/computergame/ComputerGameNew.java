@@ -4,6 +4,8 @@ import com.lennart.model.action.actionbuilders.ai.ContinuousTableable;
 import com.lennart.model.action.actionbuilders.ai.GameVariable;
 import com.lennart.model.action.actionbuilders.ai.Poker;
 import com.lennart.model.action.actionbuilders.ai.Sizing;
+import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
+import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.*;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
@@ -217,6 +219,8 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
 //        String action = new Poker().getAction(eligibleActions, handStrength, strongDraw, position, potSizeInMethodBb, computerBetSizeBb,
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
+
+        action = AdjustToFoldStats.adjustPlayToBotFoldStat(action);
 
         return action;
     }
@@ -659,6 +663,10 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         riverCard = null;
         board = null;
         handWinner = null;
+
+        //FoldStatsKeeper.updateFoldCountMap("izo", myAction);
+        FoldStatsKeeper.updateFoldCountMap("bot", computerWrittenAction);
+
         computerWrittenAction = null;
 
         myAction = null;
