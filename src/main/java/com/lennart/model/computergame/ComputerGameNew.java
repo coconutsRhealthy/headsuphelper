@@ -42,6 +42,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     private String mySize;
     private List<Card> board;
     private String computerWrittenAction;
+    private String computerWrittenActionBeforeFoldStat;
     private String handWinner;
     private int numberOfHandsPlayed;
 
@@ -219,8 +220,39 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
 //        String action = new Poker().getAction(eligibleActions, handStrength, strongDraw, position, potSizeInMethodBb, computerBetSizeBb,
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
+        computerWrittenActionBeforeFoldStat = action;
 
-        action = AdjustToFoldStats.adjustPlayToBotFoldStat(action);
+        action = AdjustToFoldStats.adjustPlayToBotFoldStatRaise(action,
+                handStrength, opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind,
+                computerStack, myStack, potSize, bigBlind, board);
+
+        if(action.equals("fold")) {
+            double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
+
+            if(botFoldStat > 0.43) {
+                double handStrengthRequiredToCall = AdjustToFoldStats.getHandStrengthRequiredToCall(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
+                action = AdjustToFoldStats.adjustPlayToBotFoldStat(action, handStrength, handStrengthRequiredToCall, computerHoleCards, board, position);
+
+                if(action.equals("call") && getStreet().equals("preflop") && opponentBetSizeBb == 1) {
+                    action = "fold";
+                }
+
+                if(action.equals("call")) {
+                    System.out.println();
+                    System.out.println("CHANGED FROM FOLD TO CALL!");
+                    System.out.println("street: " + getStreet());
+                    System.out.println();
+                }
+
+                if(action.equals("call") && getStreet().equals("preflop") && opponentBetSizeBb > 4) {
+                    pre3betOrPostRaisedPot = true;
+                }
+
+                if(action.equals("call") && getStreet().equals("preflop") && opponentBetSizeBb > 16) {
+                    opponentDidPreflop4betPot = true;
+                }
+            }
+        }
 
         return action;
     }
@@ -665,9 +697,10 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         handWinner = null;
 
         //FoldStatsKeeper.updateFoldCountMap("izo", myAction);
-        FoldStatsKeeper.updateFoldCountMap("bot", computerWrittenAction);
+        FoldStatsKeeper.updateFoldCountMapNew("bot", computerWrittenActionBeforeFoldStat);
 
         computerWrittenAction = null;
+        computerWrittenActionBeforeFoldStat = null;
 
         myAction = null;
 
@@ -1225,5 +1258,13 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
     public void setTop5percentRiverCombos(List<Set<Card>> top5percentRiverCombos) {
         this.top5percentRiverCombos = top5percentRiverCombos;
+    }
+
+    public String getComputerWrittenActionBeforeFoldStat() {
+        return computerWrittenActionBeforeFoldStat;
+    }
+
+    public void setComputerWrittenActionBeforeFoldStat(String computerWrittenActionBeforeFoldStat) {
+        this.computerWrittenActionBeforeFoldStat = computerWrittenActionBeforeFoldStat;
     }
 }

@@ -529,7 +529,7 @@ public class RuleApplier {
 
         if(action.equals("fold")) {
             if(strongGutshot) {
-                if(handStrength >= 0.7 && board.size() == 3) {
+                if(handStrength >= 0.7 && board != null && board.size() == 3) {
                     if(facingOdds <= 0.5) {
                         if(facingBetSizeBb - myBetSizeBb <= 40) {
                             actionToReturn = "call";
@@ -543,7 +543,7 @@ public class RuleApplier {
                     actionToReturn = action;
                 }
             } else if(strongFlushDraw || strongOosd) {
-                if(handStrength >= 0.5 && board.size() == 3) {
+                if(handStrength >= 0.5 && board != null && board.size() == 3) {
                     if(facingOdds <= 0.5) {
                         if(facingBetSizeBb - myBetSizeBb <= 40) {
                             actionToReturn = "call";
