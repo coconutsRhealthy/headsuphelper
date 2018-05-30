@@ -17,7 +17,7 @@ public class AdjustToFoldStats {
 
     public static String adjustPlayToBotFoldStatRaise(String action, double handStrength, double facingBetSize,
                                                       double myBetSize, double myStack, double facingStack,
-                                                      double pot, double bigBlind, List<Card> board) {
+                                                      double pot, double bigBlind, List<Card> board, boolean strongFd, boolean strongOosd, boolean strongGutshot) {
         String actionToReturn;
 
         if(action.equals("fold") || action.equals("call")) {
@@ -26,31 +26,53 @@ public class AdjustToFoldStats {
             double differenceBotFoldStatAndDefault = botFoldStat - 0.43;
 
             if(differenceBotFoldStatAndDefault > 0.07) {
-                if(raiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
-                    double x;
-
-                    if(differenceBotFoldStatAndDefault >= 0.2) {
-                        x = 1;
-                    } else {
-                        x = differenceBotFoldStatAndDefault / 0.2;
-                    }
-
-                    if(handStrength > 0.8) {
-                        double random = Math.random();
-
-                        if(random <= x) {
-                            actionToReturn = "raise";
-                        } else {
-                            actionToReturn = action;
+                if(board != null && !board.isEmpty()) {
+                    if(raiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                        if(strongGutshot) {
+                            System.out.println("strongGutshot!");
                         }
-                    } else if(handStrength < 0.5) {
-                        double random1 = Math.random();
 
-                        if(random1 <= 0.37) {
-                            double random2 = Math.random();
+                        double x;
 
-                            if(random2 <= x) {
+                        if(differenceBotFoldStatAndDefault >= 0.2) {
+                            x = 1;
+                        } else {
+                            x = differenceBotFoldStatAndDefault / 0.2;
+                        }
+
+                        if(handStrength > 0.8) {
+                            double random = Math.random();
+
+                            if(random <= x) {
                                 actionToReturn = "raise";
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else if(strongFd || strongOosd) {
+                            actionToReturn = "raise";
+                        } else if(strongGutshot) {
+                            double random = Math.random();
+
+                            if(random < 0.43) {
+                                actionToReturn = "raise";
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else if(handStrength < 0.5) {
+                            if(board.size() == 5) {
+                                double random1 = Math.random();
+
+                                if(random1 <= 0.20) {
+                                    double random2 = Math.random();
+
+                                    if(random2 <= x) {
+                                        actionToReturn = "raise";
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
                             } else {
                                 actionToReturn = action;
                             }
@@ -68,9 +90,18 @@ public class AdjustToFoldStats {
             }
 
             if(actionToReturn.equals("raise")) {
+                System.out.println();
                 System.out.println("changed fold or call to raise!");
                 System.out.println("handstrength: " + handStrength);
                 System.out.println("old action: " + action);
+
+                if(board != null) {
+                    System.out.println("board size: " + board.size());
+                }
+
+                System.out.println("strong fd: " + strongFd);
+                System.out.println("strong oosd: " + strongOosd);
+                System.out.println();
             }
 
         } else {

@@ -224,7 +224,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
         action = AdjustToFoldStats.adjustPlayToBotFoldStatRaise(action,
                 handStrength, opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind,
-                computerStack, myStack, potSize, bigBlind, board);
+                computerStack, myStack, potSize, bigBlind, board, strongFlushDraw, strongOosd, strongGutshot);
 
         if(action.equals("fold")) {
             double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
