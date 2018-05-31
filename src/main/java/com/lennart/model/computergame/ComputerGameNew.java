@@ -222,7 +222,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 //                opponentBetSizeBb, effectiveStack, "BoardTextureMedium");
         computerWrittenActionBeforeFoldStat = action;
 
-        action = AdjustToFoldStats.adjustPlayToBotFoldStatRaise(action,
+        AdjustToFoldStats adjustToFoldStats = new AdjustToFoldStats();
+
+        action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action,
                 handStrength, opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind,
                 computerStack, myStack, potSize, bigBlind, board, strongFlushDraw, strongOosd, strongGutshot);
 
@@ -230,8 +232,8 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
 
             if(botFoldStat > 0.43) {
-                double handStrengthRequiredToCall = AdjustToFoldStats.getHandStrengthRequiredToCall(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
-                action = AdjustToFoldStats.adjustPlayToBotFoldStat(action, handStrength, handStrengthRequiredToCall, computerHoleCards, board, position);
+                double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
+                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, handStrength, handStrengthRequiredToCall, computerHoleCards, board, position);
 
                 if(action.equals("call") && getStreet().equals("preflop") && opponentBetSizeBb == 1) {
                     action = "fold";

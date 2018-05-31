@@ -1,5 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
+import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
@@ -29,6 +31,8 @@ public class ActionVariables {
     private boolean strongGutshot;
 
     private HandEvaluator handEvaluator;
+
+    private String actionBeforeFoldStat;
 
     public ActionVariables() {
         //default constructor
@@ -116,6 +120,50 @@ public class ActionVariables {
 
             if(action.equals("raise")) {
                 continuousTable.setPre3betOrPostRaisedPot(true);
+            }
+        }
+
+        actionBeforeFoldStat = action;
+
+        //now follows the adjustToFoldStat logic
+        AdjustToFoldStats adjustToFoldStats = new AdjustToFoldStats();
+
+        action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action, botHandStrengthInMethod,
+                opponentBetsizeBb * gameVariables.getBigBlind(), botBetsizeBb * gameVariables.getBigBlind(),
+                botStackBb, opponentStackBb, potSizeBb * gameVariables.getBigBlind(), gameVariables.getBigBlind(),
+                boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
+
+        if(action.equals("fold")) {
+            double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
+
+            if(botFoldStat > 0.43) {
+                double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
+                        streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack,
+                        botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb,
+                        opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot,
+                        gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(),
+                        continuousTable.isPre3betOrPostRaisedPot(), false, false, false, 0);
+
+                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod);
+
+                if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb == 1) {
+                    action = "fold";
+                }
+
+                if(action.equals("call")) {
+                    System.out.println();
+                    System.out.println("CHANGED FROM FOLD TO CALL!");
+                    System.out.println("street: " + streetInMethod);
+                    System.out.println();
+                }
+
+                if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb > 4) {
+                    continuousTable.setPre3betOrPostRaisedPot(true);
+                }
+
+                if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb > 16) {
+                    continuousTable.setOpponentDidPreflop4betPot(true);
+                }
             }
         }
     }
@@ -325,5 +373,13 @@ public class ActionVariables {
 
     public void setHandEvaluator(HandEvaluator handEvaluator) {
         this.handEvaluator = handEvaluator;
+    }
+
+    public String getActionBeforeFoldStat() {
+        return actionBeforeFoldStat;
+    }
+
+    public void setActionBeforeFoldStat(String actionBeforeFoldStat) {
+        this.actionBeforeFoldStat = actionBeforeFoldStat;
     }
 }
