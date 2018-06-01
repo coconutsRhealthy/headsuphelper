@@ -131,10 +131,10 @@ public class ActionVariables {
         action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action, botHandStrengthInMethod,
                 opponentBetsizeBb * gameVariables.getBigBlind(), botBetsizeBb * gameVariables.getBigBlind(),
                 botStackBb, opponentStackBb, potSizeBb * gameVariables.getBigBlind(), gameVariables.getBigBlind(),
-                boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
+                boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getOpponentName());
 
         if(action.equals("fold")) {
-            double botFoldStat = FoldStatsKeeper.getFoldStat("bot");
+            double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + gameVariables.getOpponentName());
 
             if(botFoldStat > 0.43) {
                 double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
@@ -144,7 +144,7 @@ public class ActionVariables {
                         gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(),
                         continuousTable.isPre3betOrPostRaisedPot(), false, false, false, 0);
 
-                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod);
+                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, gameVariables.getOpponentName());
 
                 if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb == 1) {
                     action = "fold";

@@ -14,11 +14,11 @@ public class AdjustToFoldStats {
 
     public String adjustPlayToBotFoldStatRaise(String action, double handStrength, double facingBetSize,
                                                       double myBetSize, double myStack, double facingStack,
-                                                      double pot, double bigBlind, List<Card> board, boolean strongFd, boolean strongOosd, boolean strongGutshot) {
+                                                      double pot, double bigBlind, List<Card> board, boolean strongFd, boolean strongOosd, boolean strongGutshot, String opponentPlayerName) {
         String actionToReturn;
 
         if(action.equals("fold") || action.equals("call")) {
-            double botFoldStat = FoldStatsKeeper.getFoldStat("bot");
+            double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + opponentPlayerName);
 
             double differenceBotFoldStatAndDefault = botFoldStat - 0.43;
 
@@ -109,10 +109,10 @@ public class AdjustToFoldStats {
     }
 
     public String adjustPlayToBotFoldStat(String action, double handStrength, double requiredHandStrength,
-                                                 List<Card> holeCards, List<Card> board, boolean position) {
+                                                 List<Card> holeCards, List<Card> board, boolean position, String opponentPlayerName) {
         String actionToReturn;
 
-        double botFoldStat = FoldStatsKeeper.getFoldStat("bot");
+        double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + opponentPlayerName);
 
         System.out.println("botFoldStat: " + botFoldStat);
 

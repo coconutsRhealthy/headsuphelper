@@ -1,5 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -22,6 +24,21 @@ public class HandHistoryReader {
         List<String> total = readXmlFile();
         List<String> lastHand = getLinesOfLastGame(total);
         String playerName = getOpponentPlayerName(lastHand);
+
+        //logic regarding foldstats
+        if(playerDidFold(lastHand, "COCONUT555")) {
+            FoldStatsKeeper.updateFoldCountMap("bot-V-" + playerName, "fold");
+            FoldStatsKeeper.updateFoldCountMap(playerName, "nonFold");
+        } else {
+            FoldStatsKeeper.updateFoldCountMap("bot-V-" + playerName, "nonFold");
+
+            if(playerDidFold(lastHand, playerName)) {
+                FoldStatsKeeper.updateFoldCountMap(playerName, "fold");
+            } else {
+                FoldStatsKeeper.updateFoldCountMap(playerName, "nonFold");
+            }
+        }
+        //logic regarding foldstats
 
         Map<Integer, List<String>> mapOfRounds = getLinesPerRoundOfLastGame(lastHand);
 
@@ -233,5 +250,19 @@ public class HandHistoryReader {
             return true;
         }
         return false;
+    }
+
+    private boolean playerDidFold(List<String> linesOfLastHand, String playerName) {
+        boolean playerDidFold = false;
+
+        for(String line : linesOfLastHand) {
+            if(line.contains("type=\"0\"")) {
+                if(line.contains(playerName)) {
+                    playerDidFold = true;
+                }
+                break;
+            }
+        }
+        return playerDidFold;
     }
 }
