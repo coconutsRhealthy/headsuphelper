@@ -18,7 +18,7 @@ public class AdjustToFoldStats {
         String actionToReturn;
 
         if(action.equals("fold") || action.equals("call")) {
-            double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
+            double botFoldStat = FoldStatsKeeper.getFoldStat("bot");
 
             double differenceBotFoldStatAndDefault = botFoldStat - 0.43;
 
@@ -112,7 +112,7 @@ public class AdjustToFoldStats {
                                                  List<Card> holeCards, List<Card> board, boolean position) {
         String actionToReturn;
 
-        double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
+        double botFoldStat = FoldStatsKeeper.getFoldStat("bot");
 
         System.out.println("botFoldStat: " + botFoldStat);
 

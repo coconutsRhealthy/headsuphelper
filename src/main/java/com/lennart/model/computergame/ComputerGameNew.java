@@ -229,7 +229,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                 computerStack, myStack, potSize, bigBlind, board, strongFlushDraw, strongOosd, strongGutshot);
 
         if(action.equals("fold")) {
-            double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
+            double botFoldStat = FoldStatsKeeper.getFoldStat("bot");
 
             if(botFoldStat > 0.43) {
                 double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
@@ -699,7 +699,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         handWinner = null;
 
         //FoldStatsKeeper.updateFoldCountMap("izo", myAction);
-        FoldStatsKeeper.updateFoldCountMapNew("bot", computerWrittenActionBeforeFoldStat);
+        FoldStatsKeeper.updateFoldCountMap("bot", computerWrittenActionBeforeFoldStat);
 
         computerWrittenAction = null;
         computerWrittenActionBeforeFoldStat = null;

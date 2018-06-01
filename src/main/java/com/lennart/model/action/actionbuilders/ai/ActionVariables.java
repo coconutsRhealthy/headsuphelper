@@ -134,7 +134,7 @@ public class ActionVariables {
                 boardInMethod, strongFlushDraw, strongOosd, strongGutshot);
 
         if(action.equals("fold")) {
-            double botFoldStat = FoldStatsKeeper.getFoldStatNew("bot");
+            double botFoldStat = FoldStatsKeeper.getFoldStat("bot");
 
             if(botFoldStat > 0.43) {
                 double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
