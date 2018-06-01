@@ -83,7 +83,47 @@ public class AdjustToFoldStats {
                     actionToReturn = action;
                 }
             } else {
-                actionToReturn = action;
+                if(differenceBotFoldStatAndDefault > 0) {
+                    if(board != null && !board.isEmpty()) {
+                        if(raiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                            if(handStrength >= 0.95) {
+                                double random = Math.random();
+
+                                if(random > 0.5) {
+                                    actionToReturn = "raise";
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else if(strongFd || strongOosd) {
+                                double random = Math.random();
+
+                                if(random > 0.8) {
+                                    actionToReturn = "raise";
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                if(board.size() == 5) {
+                                    double random = Math.random();
+
+                                    if(random > 0.96) {
+                                        actionToReturn = "raise";
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
             }
 
             if(actionToReturn.equals("raise")) {
