@@ -208,22 +208,23 @@ public class AdjustToFoldStats {
 
         double differenceOpponentFoldStatAndDefault = opponentFoldStat - 0.43;
 
-        if(differenceOpponentFoldStatAndDefault < 0) {
+        double x;
+
+        if(differenceOpponentFoldStatAndDefault >= 0.2) {
+            x = 1;
+        } else {
+            x = differenceOpponentFoldStatAndDefault / 0.2;
+        }
+
+        if(differenceOpponentFoldStatAndDefault > 0) {
             if(board != null && !board.isEmpty()) {
                 if(action.equals("check")) {
                     if(handStrength < 0.5) {
                         if(!opponentHasInitiative) {
                             if(betOrRaiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
-                                if(differenceOpponentFoldStatAndDefault >= -0.13) {
-                                    differenceOpponentFoldStatAndDefault = differenceOpponentFoldStatAndDefault * 1.15;
-                                }
-
-                                //make differenceOpponentFoldStatAndDefault a positive number
-                                differenceOpponentFoldStatAndDefault = differenceOpponentFoldStatAndDefault * -1.0;
-
                                 double random = Math.random();
 
-                                if(random < differenceOpponentFoldStatAndDefault) {
+                                if(random <= x) {
                                     actionToReturn = "bet75pct";
                                 } else {
                                     actionToReturn = action;
