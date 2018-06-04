@@ -24,7 +24,7 @@ public class AdjustToFoldStats {
 
             if(differenceBotFoldStatAndDefault > 0.07) {
                 if(board != null && !board.isEmpty()) {
-                    if(raiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                    if(betOrRaiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
                         if(strongGutshot) {
                             System.out.println("strongGutshot!");
                         }
@@ -85,7 +85,7 @@ public class AdjustToFoldStats {
             } else {
                 if(differenceBotFoldStatAndDefault > 0) {
                     if(board != null && !board.isEmpty()) {
-                        if(raiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                        if(betOrRaiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
                             if(handStrength >= 0.95) {
                                 double random = Math.random();
 
@@ -199,6 +199,63 @@ public class AdjustToFoldStats {
         return actionToReturn;
     }
 
+    public String adjustPlayToOpponentFoldStat(String action, boolean opponentHasInitiative, double facingBetSize,
+                                          double myBetSize, double myStack, double facingStack, double pot,
+                                          double bigBlind, List<Card> board, String opponentPlayerName, double handStrength) {
+        String actionToReturn;
+
+        double opponentFoldStat = FoldStatsKeeper.getFoldStat(opponentPlayerName);
+
+        double differenceOpponentFoldStatAndDefault = opponentFoldStat - 0.43;
+
+        if(differenceOpponentFoldStatAndDefault < 0) {
+            if(board != null && !board.isEmpty()) {
+                if(action.equals("check")) {
+                    if(handStrength < 0.5) {
+                        if(!opponentHasInitiative) {
+                            if(betOrRaiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                                if(differenceOpponentFoldStatAndDefault >= -0.13) {
+                                    differenceOpponentFoldStatAndDefault = differenceOpponentFoldStatAndDefault * 1.15;
+                                }
+
+                                //make differenceOpponentFoldStatAndDefault a positive number
+                                differenceOpponentFoldStatAndDefault = differenceOpponentFoldStatAndDefault * -1.0;
+
+                                double random = Math.random();
+
+                                if(random < differenceOpponentFoldStatAndDefault) {
+                                    actionToReturn = "bet75pct";
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        if(actionToReturn.equals("bet75pct") && !action.equals("bet75pct")) {
+            System.out.println("changed check to bet!");
+            System.out.println("board size: " + board.size());
+            System.out.println("opponent fold stat: " + opponentFoldStat);
+        }
+
+        return actionToReturn;
+    }
+
     public double getHandStrengthRequiredToCall(ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
                                                  double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
                                                  double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
@@ -279,8 +336,8 @@ public class AdjustToFoldStats {
         return holeCardsAreBluffable;
     }
 
-    private boolean raiseOddsAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack,
-                                   double pot, double bigBlind, List<Card> board) {
+    private boolean betOrRaiseOddsAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack,
+                                        double pot, double bigBlind, List<Card> board) {
 
         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 

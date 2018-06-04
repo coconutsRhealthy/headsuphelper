@@ -254,6 +254,10 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                     opponentDidPreflop4betPot = true;
                 }
             }
+        } else if(action.equals("check")) {
+            action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action, opponentHasInitiative,
+                    opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind, computerStack, myStack,
+                    potSize, bigBlind, board, "izo", handStrength);
         }
 
         return action;
@@ -698,8 +702,8 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         board = null;
         handWinner = null;
 
-        //FoldStatsKeeper.updateFoldCountMap("izo", myAction);
-        FoldStatsKeeper.updateFoldCountMap("bot", computerWrittenActionBeforeFoldStat);
+        FoldStatsKeeper.updateFoldCountMap("izo", myAction);
+        FoldStatsKeeper.updateFoldCountMap("bot-V-izo", computerWrittenActionBeforeFoldStat);
 
         computerWrittenAction = null;
         computerWrittenActionBeforeFoldStat = null;
