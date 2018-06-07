@@ -165,6 +165,20 @@ public class ActionVariables {
                     continuousTable.setOpponentDidPreflop4betPot(true);
                 }
             }
+        } else if(action.equals("check")) {
+            double bigBlind = gameVariables.getBigBlind();
+
+            action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action,
+                    continuousTable.isOpponentHasInitiative(),
+                    opponentBetsizeBb * bigBlind,
+                    botBetsizeBb * bigBlind,
+                    botStackBb * bigBlind,
+                    opponentStackBb * bigBlind,
+                    potSizeBb * bigBlind,
+                    bigBlind,
+                    boardInMethod,
+                    gameVariables.getOpponentName(),
+                    botHandStrengthInMethod);
         }
     }
 
