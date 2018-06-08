@@ -14,17 +14,25 @@ public class AdjustToFoldStats {
 
     public String adjustPlayToBotFoldStatRaise(String action, double handStrength, double facingBetSize,
                                                       double myBetSize, double myStack, double facingStack,
-                                                      double pot, double bigBlind, List<Card> board, boolean strongFd, boolean strongOosd, boolean strongGutshot, String opponentPlayerName) {
+                                                      double pot, double bigBlind, List<Card> board, boolean strongFd, boolean strongOosd, boolean strongGutshot, String opponentPlayerName, String opponentAction) {
         String actionToReturn;
 
         if(action.equals("fold") || action.equals("call")) {
             double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + opponentPlayerName);
 
             double differenceBotFoldStatAndDefault = botFoldStat - 0.43;
+            boolean onlyRaiseAgainstBet = false;
 
-            if(differenceBotFoldStatAndDefault > 0.07) {
+            if(differenceBotFoldStatAndDefault < 0.10) {
+                differenceBotFoldStatAndDefault = 0.10;
+                onlyRaiseAgainstBet = true;
+            }
+
+            if(opponentAction.equals("raise") && onlyRaiseAgainstBet) {
+                actionToReturn = action;
+            } else {
                 if(board != null && !board.isEmpty()) {
-                    if(betOrRaiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                    if(betOrRaiseOddsAreOkAndSizingBelow100bb(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
                         if(strongGutshot) {
                             System.out.println("strongGutshot!");
                         }
@@ -72,48 +80,6 @@ public class AdjustToFoldStats {
                                 }
                             } else {
                                 actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                if(differenceBotFoldStatAndDefault > 0) {
-                    if(board != null && !board.isEmpty()) {
-                        if(betOrRaiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
-                            if(handStrength >= 0.95) {
-                                double random = Math.random();
-
-                                if(random > 0.5) {
-                                    actionToReturn = "raise";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else if(strongFd || strongOosd) {
-                                double random = Math.random();
-
-                                if(random > 0.8) {
-                                    actionToReturn = "raise";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else {
-                                if(board.size() == 5) {
-                                    double random = Math.random();
-
-                                    if(random > 0.96) {
-                                        actionToReturn = "raise";
-                                    } else {
-                                        actionToReturn = action;
-                                    }
-                                } else {
-                                    actionToReturn = action;
-                                }
                             }
                         } else {
                             actionToReturn = action;
@@ -221,7 +187,7 @@ public class AdjustToFoldStats {
                 if(action.equals("check")) {
                     if(handStrength < 0.5) {
                         if(!opponentHasInitiative) {
-                            if(betOrRaiseOddsAreOk(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                            if(betOrRaiseOddsAreOkAndSizingBelow100bb(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
                                 double random = Math.random();
 
                                 if(random <= x) {
@@ -337,14 +303,14 @@ public class AdjustToFoldStats {
         return holeCardsAreBluffable;
     }
 
-    private boolean betOrRaiseOddsAreOk(double facingBetSize, double myBetSize, double myStack, double facingStack,
-                                        double pot, double bigBlind, List<Card> board) {
+    private boolean betOrRaiseOddsAreOkAndSizingBelow100bb(double facingBetSize, double myBetSize, double myStack, double facingStack,
+                                                           double pot, double bigBlind, List<Card> board) {
 
         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
         double oddsForOpponent = (sizing - facingBetSize) / (sizing + facingBetSize + pot);
 
-        return oddsForOpponent > 0.39;
+        return (oddsForOpponent > 0.39) && (sizing * bigBlind < 100);
     }
 
 }
