@@ -180,6 +180,10 @@ public class ActionVariables {
                     gameVariables.getOpponentName(),
                     botHandStrengthInMethod);
         }
+
+        if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
+            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+        }
     }
 
     private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable) {
