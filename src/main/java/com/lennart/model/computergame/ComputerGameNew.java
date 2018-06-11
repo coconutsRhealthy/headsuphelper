@@ -254,10 +254,20 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                     opponentDidPreflop4betPot = true;
                 }
             }
-        } else if(action.equals("check")) {
+        }
+
+        if(action.equals("check") || action.equals("fold")) {
             action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action, opponentHasInitiative,
                     opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind, computerStack, myStack,
-                    potSize, bigBlind, board, "izo", handStrength);
+                    potSize, bigBlind, board, "izo", handStrength,
+                    strongOosd,
+                    strongFlushDraw,
+                    strongGutshot,
+                    strongOvercards,
+                    strongBackdoorSd,
+                    strongBackdoorFd,
+                    boardWetness,
+                    myAction);
         }
 
         return action;

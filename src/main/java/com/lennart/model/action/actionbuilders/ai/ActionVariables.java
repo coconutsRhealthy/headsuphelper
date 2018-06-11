@@ -29,6 +29,9 @@ public class ActionVariables {
     private boolean strongFlushDraw;
     private boolean strongOosd;
     private boolean strongGutshot;
+    private boolean strongOvercards;
+    private boolean strongBackdoorFd;
+    private boolean strongBackdoorSd;
 
     private HandEvaluator handEvaluator;
 
@@ -165,7 +168,9 @@ public class ActionVariables {
                     continuousTable.setOpponentDidPreflop4betPot(true);
                 }
             }
-        } else if(action.equals("check")) {
+        }
+
+        if(action.equals("check") || action.equals("fold")) {
             double bigBlind = gameVariables.getBigBlind();
 
             action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action,
@@ -178,7 +183,15 @@ public class ActionVariables {
                     bigBlind,
                     boardInMethod,
                     gameVariables.getOpponentName(),
-                    botHandStrengthInMethod);
+                    botHandStrengthInMethod,
+                    strongOosd,
+                    strongFlushDraw,
+                    strongGutshot,
+                    strongOvercards,
+                    strongBackdoorSd,
+                    strongBackdoorFd,
+                    40,
+                    opponentActionInMethod);
         }
 
         if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
@@ -228,6 +241,9 @@ public class ActionVariables {
             strongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
             strongOosd = handEvaluator.hasDrawOfType("strongOosd");
             strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+            strongOvercards = handEvaluator.hasDrawOfType("strongOvercards");
+            strongBackdoorFd = handEvaluator.hasDrawOfType("strongBackDoorFlush");
+            strongBackdoorSd = handEvaluator.hasDrawOfType("strongBackDoorStraight");
 
             botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot;
         }

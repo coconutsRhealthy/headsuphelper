@@ -201,57 +201,99 @@ public class AdjustToFoldStats {
 
     public String adjustPlayToOpponentFoldStat(String action, boolean opponentHasInitiative, double facingBetSize,
                                                double myBetSize, double myStack, double facingStack, double pot,
-                                               double bigBlind, List<Card> board, String opponentPlayerName, double handStrength) {
+                                               double bigBlind, List<Card> board, String opponentPlayerName, double handStrength,
+                                               boolean strongOosd, boolean strongFd, boolean strongGutshot, boolean strongOvercards,
+                                               boolean strongBackdoorSd, boolean strongBackdoorFd, int boardWetness, String opponentAction) {
         String actionToReturn;
-
+        boolean doAggroAction = false;
         double opponentFoldStat = FoldStatsKeeper.getFoldStat(opponentPlayerName);
+        System.out.println("opponentFoldStat: " + opponentFoldStat + "      " + opponentPlayerName);
+        String loggingVariable = "x";
 
-        double differenceOpponentFoldStatAndDefault = opponentFoldStat - 0.43;
+        if(board != null && !board.isEmpty()) {
+            if(opponentAction != null && !opponentAction.equals("raise")) {
+                if(opponentFoldStat > 45) {
+                    if((action.equals("check") && !opponentHasInitiative) || action.equals("fold")) {
+                        if(betOrRaiseOddsAreOkAndSizingBelow100bb(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
+                            System.out.println("Strong overcards: " + strongOvercards);
+                            System.out.println("strong backdoor sd: " + strongBackdoorSd);
+                            System.out.println("strong backdoor fd: " + strongBackdoorFd);
+                            System.out.println("strong gutshot: " + strongGutshot);
 
-        double x;
+                            if(handStrength > 0.963) {
+                                doAggroAction = true;
+                                loggingVariable = "a";
+                            }
 
-        if(differenceOpponentFoldStatAndDefault >= 0.2) {
-            x = 1;
-        } else {
-            x = differenceOpponentFoldStatAndDefault / 0.2;
+                            if(!doAggroAction && (strongFd || strongOosd || strongOvercards || strongGutshot)) {
+                                doAggroAction = true;
+                                loggingVariable = "b";
+                            }
+
+                            if(!doAggroAction && strongBackdoorFd) {
+                                double random = Math.random();
+                                double boundry = 0.85;
+                                boundry = boundry + (opponentFoldStat - 0.45);
+
+                                if(random < boundry) {
+                                    doAggroAction = true;
+                                    loggingVariable = "d";
+                                }
+                            }
+
+                            if(!doAggroAction && strongBackdoorSd) {
+                                double random = Math.random();
+                                double boundry = 0.7;
+                                boundry = boundry + (opponentFoldStat - 0.45);
+
+                                if(random < boundry) {
+                                    doAggroAction = true;
+                                    loggingVariable = "e";
+                                }
+                            }
+
+                            if(!doAggroAction && board.size() == 5) {
+                                double random = Math.random();
+                                double boundry = 0.2;
+                                boundry = boundry + (opponentFoldStat - 0.45);
+
+                                if(random < boundry) {
+                                    doAggroAction = true;
+                                    loggingVariable = "f";
+                                }
+                            }
+
+//                            if(!doAggroAction && board.size() == 5 && boardWetness < 0.2) {
+//                                double random = Math.random();
+//                                double boundry = 0.75;
+//                                boundry = boundry + (opponentFoldStat - 0.485);
+//
+//                                if(random < boundry) {
+//                                    doAggroAction = true;
+//                                    loggingVariable = "f";
+//                                }
+//                            }
+                        }
+                    }
+                }
+            }
         }
 
-        if(differenceOpponentFoldStatAndDefault > 0) {
-            if(board != null && !board.isEmpty()) {
-                if(action.equals("check")) {
-                    if(handStrength < 0.5) {
-                        if(!opponentHasInitiative) {
-                            if(betOrRaiseOddsAreOkAndSizingBelow100bb(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board)) {
-                                double random = Math.random();
-
-                                if(random <= x) {
-                                    actionToReturn = "bet75pct";
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
+        if(doAggroAction) {
+            if(action.equals("check")) {
+                actionToReturn = "bet75pct";
+                System.out.println("changed from check to bet!");
+            } else if(action.equals("fold")) {
+                actionToReturn = "raise";
+                System.out.println("changed from fold to raise!");
             } else {
                 actionToReturn = action;
+                System.out.println("should not come here in adjustPlayToOpponentFoldStat()");
             }
+
+            System.out.println("loggingVariable: " + loggingVariable);
         } else {
             actionToReturn = action;
-        }
-
-        if(actionToReturn.equals("bet75pct") && !action.equals("bet75pct")) {
-            System.out.println("changed check to bet!");
-            System.out.println("board size: " + board.size());
-            System.out.println("opponent fold stat: " + opponentFoldStat);
         }
 
         return actionToReturn;
