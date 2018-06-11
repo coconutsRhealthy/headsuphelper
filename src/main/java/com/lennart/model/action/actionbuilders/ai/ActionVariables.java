@@ -131,7 +131,7 @@ public class ActionVariables {
         action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action, botHandStrengthInMethod,
                 opponentBetsizeBb * gameVariables.getBigBlind(), botBetsizeBb * gameVariables.getBigBlind(),
                 botStackBb, opponentStackBb, potSizeBb * gameVariables.getBigBlind(), gameVariables.getBigBlind(),
-                boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getOpponentName(), opponentActionInMethod);
+                boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getOpponentName());
 
         if(action.equals("fold")) {
             double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + gameVariables.getOpponentName());
