@@ -776,6 +776,34 @@ public class RuleApplier {
         return actionToReturn;
     }
 
+    public String setDrawTypesBasedOnEquity() {
+        //dit helpt al bij je calling...
+
+        //in de moderate call method zelf moet je backdoors uitzetten als zijnde strongdraws
+
+        return null;
+    }
+
+    public String moderateRaisesBasedOnEquity() {
+        //flop en turn alleen raisen als je zelfde equity hebt als minimaal gutshot (buiten bluff backdoors)
+
+        //river alleen raisen als je hs boven 0.9 is of als het anders een fold is...
+
+        //indien je equity lager is dan vereist, dan opnieuw .getAction() aanroepen met als eligibleActions alleen fold en call
+
+        return null;
+    }
+
+    public String moderateBetBasedOnEquity() {
+        //boven 25bb alleen betten met equity gutshot of beter (buiten bluff backdoors)
+
+        //river bets boven 25bb alleen met 82%+
+
+        return null;
+    }
+
+
+
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
         double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
         return odds > 0.41;
