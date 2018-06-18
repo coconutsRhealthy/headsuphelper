@@ -76,7 +76,10 @@ public class ActionVariables {
                 System.out.println("default check, opponent has initiative");
                 action = "check";
             } else {
-                String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), false, false, false, 0);
+                //hier de equity logic
+                doEquityLogic(boardInMethod, gameVariables.getBotHoleCards());
+
+                String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, 0);
 
                 if(opponentType.equals("la")) {
                     action = actionAgainstLa;
@@ -110,7 +113,7 @@ public class ActionVariables {
                     }
 
                     if(action != null && action.equals("toDetermine")) {
-                        action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), false, false, false, 0);
+                        action = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, 0);
                     } else {
                         action = actionAgainstLa;
                     }
@@ -131,10 +134,10 @@ public class ActionVariables {
         //now follows the adjustToFoldStat logic
         AdjustToFoldStats adjustToFoldStats = new AdjustToFoldStats();
 
-        action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action, botHandStrengthInMethod,
-                opponentBetsizeBb * gameVariables.getBigBlind(), botBetsizeBb * gameVariables.getBigBlind(),
-                botStackBb, opponentStackBb, potSizeBb * gameVariables.getBigBlind(), gameVariables.getBigBlind(),
-                boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getOpponentName());
+//        action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action, botHandStrengthInMethod,
+//                opponentBetsizeBb * gameVariables.getBigBlind(), botBetsizeBb * gameVariables.getBigBlind(),
+//                botStackBb, opponentStackBb, potSizeBb * gameVariables.getBigBlind(), gameVariables.getBigBlind(),
+//                boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getOpponentName());
 
         if(action.equals("fold")) {
             double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + gameVariables.getOpponentName());
@@ -170,33 +173,33 @@ public class ActionVariables {
             }
         }
 
-        if(action.equals("check") || action.equals("fold")) {
-            double bigBlind = gameVariables.getBigBlind();
+//        if(action.equals("check") || action.equals("fold")) {
+//            double bigBlind = gameVariables.getBigBlind();
+//
+////            action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action,
+////                    continuousTable.isOpponentHasInitiative(),
+////                    opponentBetsizeBb * bigBlind,
+////                    botBetsizeBb * bigBlind,
+////                    botStackBb * bigBlind,
+////                    opponentStackBb * bigBlind,
+////                    potSizeBb * bigBlind,
+////                    bigBlind,
+////                    boardInMethod,
+////                    gameVariables.getOpponentName(),
+////                    botHandStrengthInMethod,
+////                    strongOosd,
+////                    strongFlushDraw,
+////                    strongGutshot,
+////                    strongOvercards,
+////                    strongBackdoorSd,
+////                    strongBackdoorFd,
+////                    40,
+////                    opponentActionInMethod);
+//        }
 
-            action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action,
-                    continuousTable.isOpponentHasInitiative(),
-                    opponentBetsizeBb * bigBlind,
-                    botBetsizeBb * bigBlind,
-                    botStackBb * bigBlind,
-                    opponentStackBb * bigBlind,
-                    potSizeBb * bigBlind,
-                    bigBlind,
-                    boardInMethod,
-                    gameVariables.getOpponentName(),
-                    botHandStrengthInMethod,
-                    strongOosd,
-                    strongFlushDraw,
-                    strongGutshot,
-                    strongOvercards,
-                    strongBackdoorSd,
-                    strongBackdoorFd,
-                    40,
-                    opponentActionInMethod);
-        }
-
-        if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-        }
+//        if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
+//            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+//        }
     }
 
     private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable) {
@@ -245,7 +248,7 @@ public class ActionVariables {
             strongBackdoorFd = handEvaluator.hasDrawOfType("strongBackDoorFlush");
             strongBackdoorSd = handEvaluator.hasDrawOfType("strongBackDoorStraight");
 
-            botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot;
+            botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot || strongBackdoorFd || strongBackdoorSd;
         }
     }
 
@@ -319,6 +322,45 @@ public class ActionVariables {
         }
 
         return amountToCallBb;
+    }
+
+    private void doEquityLogic(List<Card> board, List<Card> botHoleCards) {
+        if(board != null && (board.size() == 3 || board.size() == 4)) {
+            Equity equity = new Equity();
+            List<Card> botHoleCardsCopy = new ArrayList<>();
+            List<Card> boardCopy = new ArrayList<>();
+
+            botHoleCardsCopy.addAll(botHoleCards);
+            boardCopy.addAll(board);
+
+            List<Double> handStrengthAtRiverList = equity.getHandstrengthAtRiverList(boardCopy, botHoleCardsCopy, 25);
+
+            int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
+
+            if(board.size() == 3) {
+                if(numberOfScoresAbove90 >= 4) {
+                    botHasStrongDraw = true;
+                    strongGutshot = true;
+                } else if(numberOfScoresAbove90 >= 7) {
+                    botHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 8) {
+                    botHasStrongDraw = true;
+                    strongFlushDraw = true;
+                }
+            } else {
+                if(numberOfScoresAbove90 >= 2) {
+                    botHasStrongDraw = true;
+                    strongGutshot = true;
+                } else if(numberOfScoresAbove90 >= 4) {
+                    botHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 5) {
+                    botHasStrongDraw = true;
+                    strongFlushDraw = true;
+                }
+            }
+        }
     }
 
     public void setAction(String action) {

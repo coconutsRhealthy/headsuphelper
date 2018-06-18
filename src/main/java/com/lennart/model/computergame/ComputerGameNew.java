@@ -162,9 +162,6 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     }
 
     private String getComputerActionFromAiBot() {
-        //hier equity
-        doEquityLogic();
-
         List<String> eligibleActions = getEligibleComputerActions();
         double handStrength = computerHandStrength;
         boolean strongDraw = computerHasStrongDraw;
@@ -193,6 +190,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             if(opponentHasInitiative && (myAction == null || myAction.equals("empty"))) {
                 action = "check";
             } else {
+                //hier equity
+                doEquityLogic();
+
                 if(eligibleActions != null && eligibleActions.contains("bet75pct")) {
                     String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness);
 
@@ -224,9 +224,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
         AdjustToFoldStats adjustToFoldStats = new AdjustToFoldStats();
 
-        action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action,
-                handStrength, opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind,
-                computerStack, myStack, potSize, bigBlind, board, strongFlushDraw, strongOosd, strongGutshot, "izo");
+//        action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action,
+//                handStrength, opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind,
+//                computerStack, myStack, potSize, bigBlind, board, strongFlushDraw, strongOosd, strongGutshot, "izo");
 
         if(action.equals("fold")) {
             double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-izo");
@@ -256,19 +256,19 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             }
         }
 
-        if(action.equals("check") || action.equals("fold")) {
-            action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action, opponentHasInitiative,
-                    opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind, computerStack, myStack,
-                    potSize, bigBlind, board, "izo", handStrength,
-                    strongOosd,
-                    strongFlushDraw,
-                    strongGutshot,
-                    strongOvercards,
-                    strongBackdoorSd,
-                    strongBackdoorFd,
-                    boardWetness,
-                    myAction);
-        }
+//        if(action.equals("check") || action.equals("fold")) {
+//            action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action, opponentHasInitiative,
+//                    opponentBetSizeBb * bigBlind, computerBetSizeBb * bigBlind, computerStack, myStack,
+//                    potSize, bigBlind, board, "izo", handStrength,
+//                    strongOosd,
+//                    strongFlushDraw,
+//                    strongGutshot,
+//                    strongOvercards,
+//                    strongBackdoorSd,
+//                    strongBackdoorFd,
+//                    boardWetness,
+//                    myAction);
+//        }
 
         return action;
     }
@@ -923,7 +923,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         strongBackdoorFd = handEvaluator.hasDrawOfType("strongBackDoorFlush");
         strongBackdoorSd = handEvaluator.hasDrawOfType("strongBackDoorStraight");
 
-        return strongFlushDraw || strongOosd || strongGutshot;
+        return strongFlushDraw || strongOosd || strongGutshot || strongBackdoorSd || strongBackdoorFd;
     }
 
     private void doEquityLogic() {
@@ -943,7 +943,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                 if(numberOfScoresAbove90 >= 4) {
                     computerHasStrongDraw = true;
                     strongGutshot = true;
-                } else if(numberOfScoresAbove90 >=7) {
+                } else if(numberOfScoresAbove90 >= 7) {
                     computerHasStrongDraw = true;
                     strongOosd = true;
                 } else if(numberOfScoresAbove90 >= 8) {
@@ -951,9 +951,16 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                     strongFlushDraw = true;
                 }
             } else {
-                //to fill
-
-
+                if(numberOfScoresAbove90 >= 2) {
+                    computerHasStrongDraw = true;
+                    strongGutshot = true;
+                } else if(numberOfScoresAbove90 >= 4) {
+                    computerHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 5) {
+                    computerHasStrongDraw = true;
+                    strongFlushDraw = true;
+                }
             }
         }
     }

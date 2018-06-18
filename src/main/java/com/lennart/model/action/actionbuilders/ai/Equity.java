@@ -41,9 +41,9 @@ public class Equity {
 
 
 
-    public static void main(String[] args) {
-        new Equity().theMethod();
-    }
+//    public static void main(String[] args) {
+//        new Equity().theMethod();
+//    }
 
     private void theMethod2() {
         Map<String, List<Integer>> scoreMap = new HashMap<>();

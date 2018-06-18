@@ -464,8 +464,13 @@ public class RuleApplier {
                                     double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
                                     double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
                                     boolean strongFlushDraw, boolean strongOosd, double bigBlind, boolean opponentDidPreflop4betPot, boolean pre3betOrPostRaisedPot,
-                                    boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd, int boardWetness) {
+                                    boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd, int boardWetness, boolean strongGutshot) {
         String actionToReturn;
+
+        if(!strongFlushDraw && !strongOosd && !strongGutshot && strongDraw) {
+            //strongdraw because of backdoor, set to false
+            strongDraw = false;
+        }
 
         if(action.equals("call")) {
             if(strongDraw) {
