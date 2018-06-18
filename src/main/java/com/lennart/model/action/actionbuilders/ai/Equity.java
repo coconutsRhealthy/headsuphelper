@@ -89,7 +89,7 @@ public class Equity {
 
                 if(oosd) {
                     oosdCounter++;
-                    int numberOfScoresAbove95 = getNumberOfScoresAbove95(hsList);
+                    int numberOfScoresAbove95 = getNumberOfScoresAboveLimit(hsList, 0.90);
                     scoreMap.get("oosd").add(numberOfScoresAbove95);
 
                     System.out.println("oosdcounter: " + oosdCounter);
@@ -100,7 +100,7 @@ public class Equity {
 
                 if(fd) {
                     fdCounter++;
-                    int numberOfScoresAbove95 = getNumberOfScoresAbove95(hsList);
+                    int numberOfScoresAbove95 = getNumberOfScoresAboveLimit(hsList, 0.90);
                     scoreMap.get("fd").add(numberOfScoresAbove95);
 
                     System.out.println("fdcounter: " + fdCounter);
@@ -111,7 +111,7 @@ public class Equity {
 
                 if(gutshot) {
                     gutshotCounter++;
-                    int numberOfScoresAbove95 = getNumberOfScoresAbove95(hsList);
+                    int numberOfScoresAbove95 = getNumberOfScoresAboveLimit(hsList, 0.90);
                     scoreMap.get("gutshot").add(numberOfScoresAbove95);
 
                     System.out.println("gutshotCounter: " + gutshotCounter);
@@ -170,7 +170,7 @@ public class Equity {
 
             List<Double> hsList = getHandstrengthAtRiverList(board, holeCards, 25);
 
-            System.out.println("number of scores above 90: " + getNumberOfScoresAbove95(hsList));
+            System.out.println("number of scores above 90: " + getNumberOfScoresAboveLimit(hsList, 0.90));
         //}
     }
 
@@ -206,11 +206,11 @@ public class Equity {
         return hsAtRiverList;
     }
 
-    private int getNumberOfScoresAbove95(List<Double> scoreList) {
+    public int getNumberOfScoresAboveLimit(List<Double> scoreList, double limit) {
         int counter = 0;
 
         for(Double d : scoreList) {
-            if(d > 0.90) {
+            if(d > limit) {
                 counter++;
             }
         }

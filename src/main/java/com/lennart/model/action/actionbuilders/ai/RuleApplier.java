@@ -777,6 +777,8 @@ public class RuleApplier {
     }
 
     public String setDrawTypesBasedOnEquity() {
+        /////done in ComputerGameNew
+
         //dit helpt al bij je calling...
 
         //in de moderate call method zelf moet je backdoors uitzetten als zijnde strongdraws
@@ -784,25 +786,110 @@ public class RuleApplier {
         return null;
     }
 
-    public String moderateRaisesBasedOnEquity() {
-        //flop en turn alleen raisen als je zelfde equity hebt als minimaal gutshot (buiten bluff backdoors)
+    public String moderateRaisesBasedOnEquity(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position,
+                                              double potSizeBb, String opponentAction, double facingOdds, double effectiveStackBb, boolean strongDraw,
+                                              double handStrength, String opponentType, double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb,
+                                              double ownStackBb, boolean preflop, List<Card> board, boolean strongFlushDraw, boolean strongOosd,
+                                              boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot, boolean pre3betOrPostRaisedPot,
+                                              boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd, int boardWetness) {
+        String actionToReturn;
 
-        //river alleen raisen als je hs boven 0.9 is of als het anders een fold is...
+        if(action.equals("raise")) {
+            if(!preflop) {
+                if(handStrength < 0.9) {
+                    if(board.size() == 3 || board.size() == 4) {
+                        if(strongDraw || strongBackdoorFd || strongBackdoorSd) {
+                            actionToReturn = action;
+                        } else {
+                            List<String> eligibleActionsNoRaise = new ArrayList<>();
+                            eligibleActionsNoRaise.add("fold");
+                            eligibleActionsNoRaise.add("call");
 
-        //indien je equity lager is dan vereist, dan opnieuw .getAction() aanroepen met als eligibleActions alleen fold en call
+                            actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNoRaise, street,
+                                    position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw,
+                                    handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb,
+                                    ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind,
+                                    opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                    strongBackdoorSd, boardWetness);
+                        }
+                    } else {
+                        List<String> eligibleActionsNoRaise = new ArrayList<>();
+                        eligibleActionsNoRaise.add("fold");
+                        eligibleActionsNoRaise.add("call");
 
-        return null;
+                        String actionWhenRaiseNotPossible = new Poker().getAction(actionVariables, eligibleActionsNoRaise, street,
+                                position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw,
+                                handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb,
+                                ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind,
+                                opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                strongBackdoorSd, boardWetness);
+
+                        if(actionWhenRaiseNotPossible.equals("fold")) {
+                            actionToReturn = action;
+                            System.out.println("Kept river raise as raise, since else it would be a fold");
+                        } else if(actionWhenRaiseNotPossible.equals("call")) {
+                            actionToReturn = "call";
+                            System.out.println("Changed river raise to call in moderateRaisesBasedOnEquity()");
+                        } else {
+                            actionToReturn = null;
+                            System.out.println("Should not come here in moderateRaisesBasedOnEquity()!");
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
-    public String moderateBetBasedOnEquity() {
-        //boven 25bb alleen betten met equity gutshot of beter (buiten bluff backdoors)
+    public String moderateBetBasedOnEquity(String action, double handStrength, boolean preflop, boolean strongDraw,
+                                           double facingBetSize, double myBetSize, double myStack, double facingStack,
+                                           double pot, double bigBlind, List<Card> board) {
+        String actionToReturn;
 
-        //river bets boven 25bb alleen met 82%+
+        if(action.equals("bet75pct")) {
+            if(!preflop) {
+                double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                double sizingInBb = sizing / bigBlind;
 
-        return null;
+                if(board.size() == 3 || board.size() == 4) {
+                    if(sizingInBb > 25) {
+                        if(strongDraw || handStrength >= 0.82) {
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = "check";
+                            System.out.println("changed action to check in moderateBetBasedOnEquity(). Board size: " + board.size());
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    if(sizingInBb > 25) {
+                        if(handStrength >= 0.82 || handStrength < 0.56) {
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = "check";
+                            System.out.println("changed action to check in moderateBetBasedOnEquity(). Board size: " + board.size());
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
-
-
 
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
         double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);

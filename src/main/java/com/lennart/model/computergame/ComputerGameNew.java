@@ -1,9 +1,6 @@
 package com.lennart.model.computergame;
 
-import com.lennart.model.action.actionbuilders.ai.ContinuousTableable;
-import com.lennart.model.action.actionbuilders.ai.GameVariable;
-import com.lennart.model.action.actionbuilders.ai.Poker;
-import com.lennart.model.action.actionbuilders.ai.Sizing;
+import com.lennart.model.action.actionbuilders.ai.*;
 import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.*;
@@ -165,6 +162,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     }
 
     private String getComputerActionFromAiBot() {
+        //hier equity
+        doEquityLogic();
+
         List<String> eligibleActions = getEligibleComputerActions();
         double handStrength = computerHandStrength;
         boolean strongDraw = computerHasStrongDraw;
@@ -924,6 +924,38 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         strongBackdoorSd = handEvaluator.hasDrawOfType("strongBackDoorStraight");
 
         return strongFlushDraw || strongOosd || strongGutshot;
+    }
+
+    private void doEquityLogic() {
+        if(board != null && (board.size() == 3 || board.size() == 4)) {
+            Equity equity = new Equity();
+            List<Card> computerHoleCardsCopy = new ArrayList<>();
+            List<Card> boardCopy = new ArrayList<>();
+
+            computerHoleCardsCopy.addAll(computerHoleCards);
+            boardCopy.addAll(board);
+
+            List<Double> handStrengthAtRiverList = equity.getHandstrengthAtRiverList(boardCopy, computerHoleCardsCopy, 25);
+
+            int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
+
+            if(board.size() == 3) {
+                if(numberOfScoresAbove90 >= 4) {
+                    computerHasStrongDraw = true;
+                    strongGutshot = true;
+                } else if(numberOfScoresAbove90 >=7) {
+                    computerHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 8) {
+                    computerHasStrongDraw = true;
+                    strongFlushDraw = true;
+                }
+            } else {
+                //to fill
+
+
+            }
+        }
     }
 
     //getters and setters
