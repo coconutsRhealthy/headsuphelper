@@ -44,7 +44,7 @@ public class GameVariables implements GameVariable {
     }
 
     public GameVariables(String opponentName) throws Exception {
-        bigBlind = 0.10;
+        bigBlind = 0.02;
 
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
         botStack = netBetTableReader.getBotStackFromImage();

@@ -248,7 +248,7 @@ public class ActionVariables {
             strongBackdoorFd = handEvaluator.hasDrawOfType("strongBackDoorFlush");
             strongBackdoorSd = handEvaluator.hasDrawOfType("strongBackDoorStraight");
 
-            botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot || strongBackdoorFd || strongBackdoorSd;
+            botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot || strongBackdoorFd || (strongBackdoorSd && Math.random() < 0.5);
         }
     }
 

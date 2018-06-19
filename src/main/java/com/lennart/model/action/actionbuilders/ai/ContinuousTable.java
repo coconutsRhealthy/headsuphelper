@@ -21,9 +21,9 @@ public class ContinuousTable implements ContinuousTableable {
     private boolean pre3betOrPostRaisedPot = false;
     private boolean opponentDidPreflop4betPot = false;
 
-//    public static void main(String[] args) throws Exception {
-//        new ContinuousTable().runTableContinously();
-//    }
+    public static void main(String[] args) throws Exception {
+        new ContinuousTable().runTableContinously();
+    }
 
     public void runTableContinously() throws Exception {
         GameVariables gameVariables = new GameVariables();
@@ -31,6 +31,7 @@ public class ContinuousTable implements ContinuousTableable {
         int milliSecondsTotal = 0;
         int printDotTotal = 0;
         int refreshTableTotal = 0;
+        long startTimeOfSession = new Date().getTime();
 
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
@@ -40,6 +41,11 @@ public class ContinuousTable implements ContinuousTableable {
                 refreshTableTotal = 0;
 
                 if(NetBetTableReader.isNewHand()) {
+                    if(new Date().getTime() - startTimeOfSession > 50_400_000) {
+                        System.out.println("11 hours have passed since start session, quit. Current time: " + new Date().getTime());
+                        throw new RuntimeException();
+                    }
+
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
@@ -77,10 +83,10 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("********************");
                 System.out.println();
 
-                if(forceQuitIfOpponentStackIsPlus200bbBiggerThanBotStack(gameVariables.getBotStack() / gameVariables.getBigBlind(),
-                        gameVariables.getOpponentStack() / gameVariables.getBigBlind())) {
-                    runTableContinously();
-                }
+//                if(forceQuitIfOpponentStackIsPlus200bbBiggerThanBotStack(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+//                        gameVariables.getOpponentStack() / gameVariables.getBigBlind(), gameVariables.getOpponentName())) {
+//                    runTableContinously();
+//                }
 
                 NetBetTableReader.performActionOnSite(action, sizing);
 
@@ -93,6 +99,11 @@ public class ContinuousTable implements ContinuousTableable {
                 milliSecondsTotal = 0;
                 System.out.print(".");
                 printDotTotal++;
+
+                if(new Date().getTime() - startTimeOfSession > 50_400_000) {
+                    System.out.println("11 hours have passed since start session, quit. Current time: " + new Date().getTime());
+                    throw new RuntimeException();
+                }
 
                 if(printDotTotal == 30) {
                     NetBetTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
@@ -184,18 +195,30 @@ public class ContinuousTable implements ContinuousTableable {
         MouseKeyboard.click(983, 16);
     }
 
-    private boolean forceQuitIfOpponentStackIsPlus200bbBiggerThanBotStack(double botStackBb, double opponentStackBb) {
-        if(opponentStackBb - botStackBb > 200 && opponentStackBb != 0 && botStackBb != 0) {
-            System.out.println("Difference between opponentStack and botStack got more than 200bb. Force table quit.");
+    private boolean forceQuitIfOpponentStackIsPlus200bbBiggerThanBotStack(double botStackBb, double opponentStackBb, String opponentPlayerName) {
+//        if(opponentPlayerName.contains("246824")) {
+//            System.out.println("Playing against 0246824680. Force table quit.");
+//
+//            try {
+//                TimeUnit.SECONDS.sleep(60);
+//                NetBetTableOpener.startNewTable();
+//                return true;
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
-            try {
-                TimeUnit.SECONDS.sleep(60);
-                NetBetTableOpener.startNewTable();
-                return true;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        if(opponentStackBb - botStackBb > 1400 && opponentStackBb != 0 && botStackBb != 0) {
+//            System.out.println("Difference between opponentStack and botStack got more than 200bb. Force table quit.");
+//
+//            try {
+//                TimeUnit.SECONDS.sleep(60);
+//                NetBetTableOpener.startNewTable();
+//                return true;
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         return false;
     }

@@ -257,7 +257,8 @@ public class NetBetTableReader {
         String middleChatLine = readMiddleChatLine();
         String bottomChatLine = readBottomChatLine();
 
-        if(middleChatLine.contains("posts") || bottomChatLine.contains("posts")
+        if(middleChatLine.contains("posts") || bottomChatLine.contains("posts") ||
+                middleChatLine.contains("posis") || bottomChatLine.contains("posis")
                 || middleChatLine.contains("blind") || bottomChatLine.contains("blind")) {
             return true;
         }
