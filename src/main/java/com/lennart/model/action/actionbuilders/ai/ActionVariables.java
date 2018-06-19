@@ -134,11 +134,6 @@ public class ActionVariables {
         //now follows the adjustToFoldStat logic
         AdjustToFoldStats adjustToFoldStats = new AdjustToFoldStats();
 
-//        action = adjustToFoldStats.adjustPlayToBotFoldStatRaise(action, botHandStrengthInMethod,
-//                opponentBetsizeBb * gameVariables.getBigBlind(), botBetsizeBb * gameVariables.getBigBlind(),
-//                botStackBb, opponentStackBb, potSizeBb * gameVariables.getBigBlind(), gameVariables.getBigBlind(),
-//                boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getOpponentName());
-
         if(action.equals("fold")) {
             double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + gameVariables.getOpponentName());
 
@@ -172,34 +167,6 @@ public class ActionVariables {
                 }
             }
         }
-
-//        if(action.equals("check") || action.equals("fold")) {
-//            double bigBlind = gameVariables.getBigBlind();
-//
-////            action = adjustToFoldStats.adjustPlayToOpponentFoldStat(action,
-////                    continuousTable.isOpponentHasInitiative(),
-////                    opponentBetsizeBb * bigBlind,
-////                    botBetsizeBb * bigBlind,
-////                    botStackBb * bigBlind,
-////                    opponentStackBb * bigBlind,
-////                    potSizeBb * bigBlind,
-////                    bigBlind,
-////                    boardInMethod,
-////                    gameVariables.getOpponentName(),
-////                    botHandStrengthInMethod,
-////                    strongOosd,
-////                    strongFlushDraw,
-////                    strongGutshot,
-////                    strongOvercards,
-////                    strongBackdoorSd,
-////                    strongBackdoorFd,
-////                    40,
-////                    opponentActionInMethod);
-//        }
-
-//        if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-//            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-//        }
     }
 
     private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable) {
@@ -260,8 +227,15 @@ public class ActionVariables {
     }
 
     private double getFacingOdds(GameVariables gameVariables) {
-        double facingOdds = (gameVariables.getOpponentBetSize() - gameVariables.getBotBetSize())
-                / (gameVariables.getPot() + gameVariables.getBotBetSize() + gameVariables.getOpponentBetSize());
+        double opponentBetSize = gameVariables.getOpponentBetSize();
+        double botBetSize = gameVariables.getBotBetSize();
+        double botStack = gameVariables.getBotStack();
+
+        if((opponentBetSize - botBetSize) > botStack) {
+            opponentBetSize = botStack;
+        }
+
+        double facingOdds = (opponentBetSize - botBetSize) / (gameVariables.getPot() + botBetSize + opponentBetSize);
         return facingOdds;
     }
 
@@ -338,26 +312,50 @@ public class ActionVariables {
             int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
 
             if(board.size() == 3) {
-                if(numberOfScoresAbove90 >= 4) {
-                    botHasStrongDraw = true;
-                    strongGutshot = true;
-                } else if(numberOfScoresAbove90 >= 7) {
-                    botHasStrongDraw = true;
-                    strongOosd = true;
-                } else if(numberOfScoresAbove90 >= 8) {
+                if(numberOfScoresAbove90 >= 8) {
+                    if(!botHasStrongDraw) {
+                        System.out.println("equity aaa");
+                    }
+
                     botHasStrongDraw = true;
                     strongFlushDraw = true;
+                } else if(numberOfScoresAbove90 >= 7) {
+                    if(!botHasStrongDraw) {
+                        System.out.println("equity bbb");
+                    }
+
+                    botHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 4) {
+                    if(!botHasStrongDraw) {
+                        System.out.println("equity ccc");
+                    }
+
+                    botHasStrongDraw = true;
+                    strongGutshot = true;
                 }
             } else {
-                if(numberOfScoresAbove90 >= 2) {
-                    botHasStrongDraw = true;
-                    strongGutshot = true;
-                } else if(numberOfScoresAbove90 >= 4) {
-                    botHasStrongDraw = true;
-                    strongOosd = true;
-                } else if(numberOfScoresAbove90 >= 5) {
+                if(numberOfScoresAbove90 >= 5) {
+                    if(!botHasStrongDraw) {
+                        System.out.println("equity ddd");
+                    }
+
                     botHasStrongDraw = true;
                     strongFlushDraw = true;
+                } else if(numberOfScoresAbove90 >= 4) {
+                    if(!botHasStrongDraw) {
+                        System.out.println("equity eee");
+                    }
+
+                    botHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 2) {
+                    if(!botHasStrongDraw) {
+                        System.out.println("equity fff");
+                    }
+
+                    botHasStrongDraw = true;
+                    strongGutshot = true;
                 }
             }
         }

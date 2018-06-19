@@ -330,6 +330,10 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     }
 
     public double getFacingOdds() {
+        if((opponentTotalBetSize - computerTotalBetSize) > computerStack) {
+            opponentTotalBetSize = computerStack;
+        }
+
         double facingOdds = (opponentTotalBetSize - computerTotalBetSize) / (potSize + computerTotalBetSize + opponentTotalBetSize);
         return facingOdds;
     }
@@ -940,26 +944,50 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
 
             if(board.size() == 3) {
-                if(numberOfScoresAbove90 >= 4) {
-                    computerHasStrongDraw = true;
-                    strongGutshot = true;
-                } else if(numberOfScoresAbove90 >= 7) {
-                    computerHasStrongDraw = true;
-                    strongOosd = true;
-                } else if(numberOfScoresAbove90 >= 8) {
+                if(numberOfScoresAbove90 >= 8) {
+                    if(!computerHasStrongDraw) {
+                        System.out.println("equity aaa");
+                    }
+
                     computerHasStrongDraw = true;
                     strongFlushDraw = true;
+                } else if(numberOfScoresAbove90 >= 7) {
+                    if(!computerHasStrongDraw) {
+                        System.out.println("equity bbb");
+                    }
+
+                    computerHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 4) {
+                    if(!computerHasStrongDraw) {
+                        System.out.println("equity ccc");
+                    }
+
+                    computerHasStrongDraw = true;
+                    strongGutshot = true;
                 }
             } else {
-                if(numberOfScoresAbove90 >= 2) {
-                    computerHasStrongDraw = true;
-                    strongGutshot = true;
-                } else if(numberOfScoresAbove90 >= 4) {
-                    computerHasStrongDraw = true;
-                    strongOosd = true;
-                } else if(numberOfScoresAbove90 >= 5) {
+                if(numberOfScoresAbove90 >= 5) {
+                    if(!computerHasStrongDraw) {
+                        System.out.println("equity ddd");
+                    }
+
                     computerHasStrongDraw = true;
                     strongFlushDraw = true;
+                } else if(numberOfScoresAbove90 >= 4) {
+                    if(!computerHasStrongDraw) {
+                        System.out.println("equity eee");
+                    }
+
+                    computerHasStrongDraw = true;
+                    strongOosd = true;
+                } else if(numberOfScoresAbove90 >= 2) {
+                    if(!computerHasStrongDraw) {
+                        System.out.println("equity fff");
+                    }
+
+                    computerHasStrongDraw = true;
+                    strongGutshot = true;
                 }
             }
         }
