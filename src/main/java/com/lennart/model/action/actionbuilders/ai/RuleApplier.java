@@ -763,9 +763,11 @@ public class RuleApplier {
                                 eligibleActionsNoRaise.add("fold");
                                 eligibleActionsNoRaise.add("call");
 
+                                double opponentStackBbAsZero = 0;
+
                                 actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNoRaise, street,
                                         position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw,
-                                        handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb,
+                                        handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBbAsZero,
                                         ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind,
                                         opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
                                         strongBackdoorSd, boardWetness);
@@ -785,9 +787,11 @@ public class RuleApplier {
                             eligibleActionsNoRaise.add("fold");
                             eligibleActionsNoRaise.add("call");
 
+                            double opponentStackBbAsZero = 0;
+
                             String actionWhenRaiseNotPossible = new Poker().getAction(actionVariables, eligibleActionsNoRaise, street,
                                     position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw,
-                                    handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb,
+                                    handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBbAsZero,
                                     ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind,
                                     opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
                                     strongBackdoorSd, boardWetness);
