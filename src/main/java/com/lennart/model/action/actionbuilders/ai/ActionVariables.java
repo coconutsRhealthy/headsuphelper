@@ -145,7 +145,7 @@ public class ActionVariables {
                         gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(),
                         continuousTable.isPre3betOrPostRaisedPot(), false, false, false, 0);
 
-                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, gameVariables.getOpponentName());
+                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, gameVariables.getOpponentName(), botBetsizeBb, opponentBetsizeBb);
 
                 if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb == 1) {
                     action = "fold";

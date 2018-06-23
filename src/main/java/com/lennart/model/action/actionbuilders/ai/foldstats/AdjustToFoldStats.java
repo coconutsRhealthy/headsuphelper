@@ -12,7 +12,8 @@ import java.util.List;
 public class AdjustToFoldStats {
 
     public String adjustPlayToBotFoldStat(String action, double handStrength, double requiredHandStrength,
-                                          List<Card> holeCards, List<Card> board, boolean position, String opponentPlayerName) {
+                                          List<Card> holeCards, List<Card> board, boolean position, String opponentPlayerName,
+                                          double botBetsizeBb, double opponentBetsizeBb) {
         String actionToReturn;
 
         double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + opponentPlayerName);
@@ -23,34 +24,42 @@ public class AdjustToFoldStats {
 
         if(differenceBotFoldStatAndDefault > 0) {
             if(board == null || board.isEmpty()) {
-                if(holeCardsAreBluffable(holeCards) && position) {
-                    //bij 63% alles...
-                    System.out.println("differenceBotFoldStatAndDefault: " + differenceBotFoldStatAndDefault);
-                    if(differenceBotFoldStatAndDefault >= 0.2) {
-                        actionToReturn = "call";
-                    } else {
-                        double percentageToUseBluffablePreflop = differenceBotFoldStatAndDefault / 0.2;
-                        System.out.println("percentageToUseBluffablePreflop: " + percentageToUseBluffablePreflop);
-                        double random = Math.random();
-
-                        if(random <= percentageToUseBluffablePreflop) {
+                if(opponentBetsizeBb <= 16) {
+                    if(holeCardsAreBluffable(holeCards) && position) {
+                        //bij 63% alles...
+                        System.out.println("differenceBotFoldStatAndDefault: " + differenceBotFoldStatAndDefault);
+                        if(differenceBotFoldStatAndDefault >= 0.2) {
                             actionToReturn = "call";
                         } else {
-                            actionToReturn = action;
+                            double percentageToUseBluffablePreflop = differenceBotFoldStatAndDefault / 0.2;
+                            System.out.println("percentageToUseBluffablePreflop: " + percentageToUseBluffablePreflop);
+                            double random = Math.random();
+
+                            if(random <= percentageToUseBluffablePreflop) {
+                                actionToReturn = "call";
+                            } else {
+                                actionToReturn = action;
+                            }
                         }
+                    } else {
+                        actionToReturn = action;
                     }
                 } else {
                     actionToReturn = action;
                 }
             } else {
-                if(differenceBotFoldStatAndDefault <= 0.13) {
-                    differenceBotFoldStatAndDefault = differenceBotFoldStatAndDefault * 1.15;
-                }
+                if(opponentBetsizeBb - botBetsizeBb <= 100) {
+                    if(differenceBotFoldStatAndDefault <= 0.13) {
+                        differenceBotFoldStatAndDefault = differenceBotFoldStatAndDefault * 1.15;
+                    }
 
-                double acceptableHandStrengthToCall = requiredHandStrength - (differenceBotFoldStatAndDefault);
+                    double acceptableHandStrengthToCall = requiredHandStrength - (differenceBotFoldStatAndDefault);
 
-                if(handStrength >= acceptableHandStrengthToCall) {
-                    actionToReturn = "call";
+                    if(handStrength >= acceptableHandStrengthToCall) {
+                        actionToReturn = "call";
+                    } else {
+                        actionToReturn = action;
+                    }
                 } else {
                     actionToReturn = action;
                 }
