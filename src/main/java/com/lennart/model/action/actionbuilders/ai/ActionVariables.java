@@ -78,6 +78,7 @@ public class ActionVariables {
             } else {
                 //hier de equity logic
                 doEquityLogic(boardInMethod, gameVariables.getBotHoleCards());
+                botHasStrongDrawInMethod = botHasStrongDraw;
 
                 String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, 0);
 
@@ -215,7 +216,8 @@ public class ActionVariables {
             strongBackdoorFd = handEvaluator.hasDrawOfType("strongBackDoorFlush");
             strongBackdoorSd = handEvaluator.hasDrawOfType("strongBackDoorStraight");
 
-            botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot || strongBackdoorFd || (strongBackdoorSd && Math.random() < 0.5);
+            //botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot || strongBackdoorFd || (strongBackdoorSd && Math.random() < 0.5);
+            botHasStrongDraw = strongFlushDraw || strongOosd || strongGutshot || strongBackdoorFd || strongBackdoorSd;
         }
     }
 
@@ -331,8 +333,10 @@ public class ActionVariables {
                         System.out.println("equity ccc");
                     }
 
-                    botHasStrongDraw = true;
-                    strongGutshot = true;
+//                    if(Math.random() > 0.5) {
+                        botHasStrongDraw = true;
+                        strongGutshot = true;
+//                    }
                 }
             } else {
                 if(numberOfScoresAbove90 >= 5) {
@@ -349,7 +353,7 @@ public class ActionVariables {
 
                     botHasStrongDraw = true;
                     strongOosd = true;
-                } else if(numberOfScoresAbove90 >= 2) {
+                } else if(numberOfScoresAbove90 >= 3) {
                     if(!botHasStrongDraw) {
                         System.out.println("equity fff");
                     }
