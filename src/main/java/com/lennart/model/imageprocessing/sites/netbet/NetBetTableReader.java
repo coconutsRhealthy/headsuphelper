@@ -45,6 +45,19 @@ public class NetBetTableReader {
         return potSize;
     }
 
+    public double getPotSizeFromImageNewStyle(boolean postFlop, double opponentTotalBetSize, double botTotalBetSize) throws Exception {
+        double potSize;
+
+        if(!postFlop) {
+            potSize = 0;
+        } else {
+            String potSizeAsString = readPotSizeOld();
+            potSize = getCorrectValueFromReadPotSizeOld(potSizeAsString, opponentTotalBetSize, botTotalBetSize);
+        }
+
+        return potSize;
+    }
+
     public double getOpponentStackFromImage() throws Exception {
         List<Double> foundValues = new ArrayList<>();
 

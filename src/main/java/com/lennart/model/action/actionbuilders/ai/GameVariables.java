@@ -68,6 +68,16 @@ public class GameVariables implements GameVariable {
         mediumSizeTable();
         TimeUnit.MILLISECONDS.sleep(60);
 
+        double potNewStyle = netBetTableReader.getPotSizeFromImageNewStyle(!board.isEmpty(), opponentBetSize, botBetSize);
+        System.out.println();
+        System.out.println("potsize old style: " + pot);
+        System.out.println("potsize new style: " + potNewStyle);
+        System.out.println();
+
+        pot = potNewStyle;
+
+        TimeUnit.MILLISECONDS.sleep(60);
+
         fillBotHoleCards();
 
         this.opponentName = opponentName;
