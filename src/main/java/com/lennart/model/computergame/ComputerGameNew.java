@@ -192,6 +192,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             } else {
                 //hier equity
                 doEquityLogic();
+                strongDraw = computerHasStrongDraw;
 
                 if(eligibleActions != null && eligibleActions.contains("bet75pct")) {
                     String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
@@ -981,7 +982,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
                     computerHasStrongDraw = true;
                     strongOosd = true;
-                } else if(numberOfScoresAbove90 >= 2) {
+                } else if(numberOfScoresAbove90 >= 3) {
                     if(!computerHasStrongDraw) {
                         System.out.println("equity fff");
                     }
