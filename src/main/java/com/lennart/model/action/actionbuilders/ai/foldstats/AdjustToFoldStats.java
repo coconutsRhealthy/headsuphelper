@@ -76,7 +76,7 @@ public class AdjustToFoldStats {
                                                 double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
                                                 boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
                                                 boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
-                                                int boardWetness) {
+                                                int boardWetness, boolean opponentHasInitiative) {
         double downLimit = 0;
         double upLimit = 1;
         int counter = 0;
@@ -92,7 +92,7 @@ public class AdjustToFoldStats {
                     opponentAction, facingOdds, effectiveStackBb, strongDraw, numberInTheMiddle, opponentType, opponentBetSizeBb,
                     ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
                     bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
-                    strongBackdoorSd, boardWetness);
+                    strongBackdoorSd, boardWetness, opponentHasInitiative);
 
             if(action.equals("fold")) {
                 downLimit = numberInTheMiddle;
