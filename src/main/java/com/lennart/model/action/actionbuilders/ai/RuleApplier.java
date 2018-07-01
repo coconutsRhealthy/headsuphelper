@@ -916,6 +916,103 @@ public class RuleApplier {
         return actionToReturn;
     }
 
+    public String moderateBackdoorRaises(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                         double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                         double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                         boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                         boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                         int boardWetness, boolean opponentHasInitiative) {
+        String actionToReturn;
+
+        if(action.equals("raise")) {
+            if(handStrength < 0.85) {
+                if(strongDraw && !strongFlushDraw && !strongOosd && !strongGutshot && (strongBackdoorFd || strongBackdoorSd)) {
+                    if(effectiveStackBb >= 35) {
+                        if(!strongBackdoorFd && strongBackdoorSd) {
+                            double random = Math.random();
+
+                            if(position) {
+                                if(random < 0.35) {
+                                    actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
+                                            position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
+                                            handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
+                                            preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                                            pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative);
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                if(random < 0.5) {
+                                    actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
+                                            position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
+                                            handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
+                                            preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                                            pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative);
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
+                                position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
+                                handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
+                                preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                                pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative);
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String moderateBackdoorCalls(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                        double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                        double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                        boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                        boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                        int boardWetness, boolean opponentHasInitiative) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(strongDraw && !strongFlushDraw && !strongOosd && !strongGutshot && (strongBackdoorFd || strongBackdoorSd)) {
+                if(effectiveStackBb >= 50) {
+                    if(position) {
+                        actionToReturn = action;
+                    } else {
+                        actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
+                                position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
+                                handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
+                                preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                                pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative);
+                    }
+                } else {
+                    actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
+                            position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
+                            handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
+                            preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                            pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative);
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
         double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
         return odds > 0.392;
