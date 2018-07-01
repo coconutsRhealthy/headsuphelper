@@ -100,7 +100,11 @@ public class GameVariables implements GameVariable {
         System.out.println("potsize new style: " + potNewStyle);
         System.out.println();
 
-        pot = potNewStyle;
+        if(potNewStyle == 0 && pot != 0) {
+            //nothing
+        } else {
+            pot = potNewStyle;
+        }
 
         TimeUnit.MILLISECONDS.sleep(60);
 
