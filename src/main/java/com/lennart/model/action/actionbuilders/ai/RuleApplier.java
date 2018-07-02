@@ -1012,9 +1012,55 @@ public class RuleApplier {
         return actionToReturn;
     }
 
+    public String playCautiousAgainstPostflop3bet(String action, double potSizeBb, double botTotalBetsizeBb,
+                                                  double opponentTotalBetsizeBb, double handStrength, boolean strongOosd,
+                                                  boolean strongFd, double botStackBb, double opponentStackBb) {
+        String actionToReturn;
+
+        if(facingPostFlop3bet(potSizeBb, botTotalBetsizeBb, opponentTotalBetsizeBb)) {
+            if(action.equals("call")) {
+                double opponentStackPlusBetSizePlusHalfPotBb = opponentStackBb + opponentTotalBetsizeBb + (potSizeBb / 2);
+                double botStackPlusBetSizePlusHalfPotBb = botStackBb + botTotalBetsizeBb + (potSizeBb / 2);
+
+                if(opponentStackPlusBetSizePlusHalfPotBb <= 50 || botStackPlusBetSizePlusHalfPotBb <= 50) {
+                    if(handStrength >= 0.8 || strongFd || strongOosd) {
+                        actionToReturn = action;
+                    } else {
+                        actionToReturn = "fold";
+                        System.out.println("changed to fold in postflop facing 3bet pot");
+                    }
+                } else {
+                    if(handStrength >= 0.9 || strongFd || strongOosd) {
+                        actionToReturn = action;
+                    } else {
+                        actionToReturn = "fold";
+                        System.out.println("changed to fold in postflop facing 3bet pot");
+                    }
+
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
 
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
         double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
         return odds > 0.392;
+    }
+
+    private boolean facingPostFlop3bet(double potSizeBb, double botTotalBetsizeBb, double opponentTotalBetsizeBb) {
+        boolean facingPostFlop3bet = false;
+
+        if(botTotalBetsizeBb > potSizeBb && opponentTotalBetsizeBb > botTotalBetsizeBb) {
+            facingPostFlop3bet = true;
+            System.out.println("facing postflop 3bet");
+        }
+
+        return facingPostFlop3bet;
     }
 }
