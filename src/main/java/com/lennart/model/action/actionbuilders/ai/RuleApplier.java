@@ -881,7 +881,7 @@ public class RuleApplier {
                             if(bluffOddsAreOk(sizing, facingBetSize, pot)) {
                                 double random = Math.random();
 
-                                if(random < 0.5) {
+                                //if(random < 0.5) {
                                     actionToReturn = "bet75pct";
 
                                     System.out.println();
@@ -891,9 +891,9 @@ public class RuleApplier {
                                     System.out.println("holeCards: " + boardCard1.getRank() + boardCard1.getSuit() + " "
                                             + boardCard2.getRank() + boardCard2.getSuit());
                                     System.out.println();
-                                } else {
-                                    actionToReturn = action;
-                                }
+                                //} else {
+                                //    actionToReturn = action;
+                                //}
                             } else {
                                 actionToReturn = action;
                             }
