@@ -79,7 +79,7 @@ public class ContinuousTable implements ContinuousTableable {
                             System.out.println("Force quit table because opponent is player not to play against");
                             try {
                                 opponentNotToPlayCount = 0;
-                                TimeUnit.MILLISECONDS.sleep(150);
+                                TimeUnit.SECONDS.sleep(60);
                                 NetBetTableOpener.startNewTable();
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
