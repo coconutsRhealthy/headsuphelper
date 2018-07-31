@@ -847,23 +847,77 @@ public class StarsTableReader {
 
     /////
 
-    private Map<String, Double> deriveOpponentActionAndSizingFromPotTotal(double potsizeTotal, double lastBotBetSize,
-                                                                          List<Card> boardAtLastBotAction, List<Card> currentBoard, double bigBlind) {
+    private Map<String, Double> deriveOpponentActionAndSizingFromPotTotal(double potsizeTotal, double lastPotsizeTotal, double lastBotTotalBetSize,
+                                                                          List<Card> boardAtLastBotAction, List<Card> currentBoard, boolean position, double bigBlind) {
          Map<String, Double> opponentActionAndSizing = new HashMap<>();
 
         if(currentBoard.isEmpty()) {
             if(potsizeTotal / bigBlind == 1.5) {
                 //bot first to act
                 opponentActionAndSizing.put("bet", bigBlind);
+            } else if(potsizeTotal / bigBlind == 2) {
+                //opponent limped
+                opponentActionAndSizing.put("call", bigBlind);
             } else {
-                opponentActionAndSizing.put("raise", (potsizeTotal - lastBotBetSize));
+                opponentActionAndSizing.put("raise", (potsizeTotal - lastBotTotalBetSize));
             }
         } else {
             if(boardAtLastBotAction.equals(currentBoard)) {
-                
+                //opponent action is either bet or raise
 
-
+                if(lastBotTotalBetSize == 0) {
+                    opponentActionAndSizing.put("bet75pct", potsizeTotal - lastPotsizeTotal);
+                } else {
+                    opponentActionAndSizing.put("raise", (potsizeTotal - lastPotsizeTotal - lastBotTotalBetSize));
+                }
             } else {
+                if(position) {
+                    if(potsizeTotal == lastPotsizeTotal) {
+                        opponentActionAndSizing.put("check", 0.0);
+                    } else {
+                        //opponent kan gecheckt hebben of gebet...
+
+                            //
+
+
+                    }
+                } else {
+                    //het is een nieuwe straat en je zit oop... dan moet het wel een first to act moment zijn..
+                    opponentActionAndSizing.put("empty", 0.0);
+                }
+
+
+
+
+
+
+
+
+
+
+//                //first action of hero on turn or river
+//                //opp action is either check or bet
+//
+//
+//                if(potsizeTotal == lastPotsizeTotal) {
+//                    //hero is ofwel first to act ofwel opponent checked
+//                    if(position) {
+//                        opponentActionAndSizing.put("check", 0.0);
+//                    } else {
+//                        opponentActionAndSizing.put("empty", 0.0);
+//                    }
+//                } else {
+//                    if(position) {
+//
+//                    } else {
+//                        //het is een nieuwe straat en je zit oop... dan moet het wel een first to act moment zijn..
+//
+//
+//
+//
+//                    }
+//
+//                }
 
             }
         }
