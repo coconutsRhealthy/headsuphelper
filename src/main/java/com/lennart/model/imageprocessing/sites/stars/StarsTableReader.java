@@ -3,11 +3,9 @@ package com.lennart.model.imageprocessing.sites.stars;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
-import com.sun.tools.javadoc.Start;
 import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,178 +19,46 @@ public class StarsTableReader {
         this.bigBlind = bigBlind;
     }
 
-    public double getPotSizeFromImage(boolean postFlop, double opponentTotalBetSize, double botTotalBetSize) throws Exception {
-        double potSize;
-        String potSizeAsString = readPotSize(true);
+    public double getBotStackFromImage() throws Exception {
+        String botStackAsString = readLeftPlayerStack();
 
-        if(potSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-            potSize = Double.parseDouble(potSizeAsString);
+        if(botStackAsString.endsWith(".")) {
+            botStackAsString.replaceAll(".", "");
+        }
+
+        if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            return Double.parseDouble(botStackAsString);
         } else {
-            potSize = 0.0;
+            return -1;
         }
-
-        potSize = validateReadNumber(potSize);
-
-        if(postFlop && potSize == 0) {
-            TimeUnit.MILLISECONDS.sleep(60);
-            mediumSizeTable();
-            TimeUnit.MILLISECONDS.sleep(60);
-            potSizeAsString = readPotSizeOld();
-            potSize = getCorrectValueFromReadPotSizeOld(potSizeAsString, opponentTotalBetSize, botTotalBetSize);
-            TimeUnit.MILLISECONDS.sleep(60);
-            maximizeTable();
-            TimeUnit.MILLISECONDS.sleep(60);
-        }
-        return potSize;
-    }
-
-    public double getPotSizeFromImageNewStyle(boolean postFlop, double opponentTotalBetSize, double botTotalBetSize) throws Exception {
-        double potSize;
-
-        if(!postFlop) {
-            potSize = 0;
-        } else {
-            String potSizeAsString = readPotSizeOld();
-            potSize = getCorrectValueFromReadPotSizeOld(potSizeAsString, opponentTotalBetSize, botTotalBetSize);
-        }
-
-        return potSize;
     }
 
     public double getOpponentStackFromImage() throws Exception {
-        List<Double> foundValues = new ArrayList<>();
+        String opponentStackAsString = readRightPlayerStack();
 
-        for(int i = 0; i < 2; i++) {
-            String opponentStackAsString = readTopPlayerStack();
-
-            if(opponentStackAsString.endsWith(".")) {
-                opponentStackAsString.replaceAll(".", "");
-            }
-
-            if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-                double opponentStack = Double.parseDouble(opponentStackAsString);
-                opponentStack = validateStackSizeReadNumber(opponentStack);
-                foundValues.add(opponentStack);
-            }
+        if(opponentStackAsString.endsWith(".")) {
+            opponentStackAsString.replaceAll(".", "");
         }
 
-        Collections.sort(foundValues, Collections.reverseOrder());
-
-        if(!foundValues.isEmpty()) {
-            return foundValues.get(0);
-        }
-        return -1;
-    }
-
-    public double getBotStackFromImage() throws Exception {
-        List<Double> foundValues = new ArrayList<>();
-
-        for(int i = 0; i < 3; i++) {
-            String botStackAsString = readBottomPlayerStack();
-
-            if(botStackAsString.endsWith(".")) {
-                botStackAsString.replaceAll(".", "");
-            }
-
-            if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-                double botStack = Double.parseDouble(botStackAsString);
-                botStack = validateStackSizeReadNumber(botStack);
-                foundValues.add(botStack);
-            }
-        }
-
-        Collections.sort(foundValues, Collections.reverseOrder());
-
-        if(!foundValues.isEmpty()) {
-            return foundValues.get(0);
-        }
-        return -1;
-    }
-
-    public double getBotTotalBetSizeFromImage() {
-        double botTotalBetSize;
-        String botTotalBetSizeAsString = readBottomPlayerTotalBetSize();
-
-        if(botTotalBetSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-            botTotalBetSize = Double.parseDouble(botTotalBetSizeAsString);
+        if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            return Double.parseDouble(opponentStackAsString);
         } else {
-            botTotalBetSize = 0.0;
+            return -1;
         }
-
-        botTotalBetSize = validateReadNumber(botTotalBetSize);
-        return botTotalBetSize;
     }
 
-    public double getOpponentTotalBetSizeFromImage() {
-        double opponentTotalBetSize;
-        String opponentTotalBetSizeAsString = readTopPlayerTotalBetSize();
+    public double getTopPotsizeFromImage() throws Exception {
+        String topPotsize = readTopTotalPotSize();
 
-        if(opponentTotalBetSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-            opponentTotalBetSize = Double.parseDouble(opponentTotalBetSizeAsString);
+        if(topPotsize.endsWith(".")) {
+            topPotsize.replaceAll(".", "");
+        }
+
+        if(topPotsize.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            return Double.parseDouble(topPotsize);
         } else {
-            opponentTotalBetSize = 0.0;
+            return -1;
         }
-
-        opponentTotalBetSize = validateReadNumber(opponentTotalBetSize);
-        return opponentTotalBetSize;
-    }
-
-    public String getOpponentAction() {
-        for(int i = 0; i < 10; i++) {
-            String bottomChatLine = readBottomChatLine();
-            String opponentAction = getActionFromChatLine(bottomChatLine);
-
-            System.out.println("bottomChatline raw: " + bottomChatLine);
-            System.out.println("opponentAction from bottomChatline: " + opponentAction);
-
-            if(opponentAction != null) {
-                return opponentAction;
-            }
-        }
-
-        String bottomChatLine = readBottomChatLine();
-        bottomChatLine = ImageProcessor.removeEmptySpacesFromString(bottomChatLine);
-
-        if(bottomChatLine.equals("")) {
-            //first hand of table...
-            String middleChatLine = readMiddleChatLine();
-            String opponentAction = getActionFromChatLine(middleChatLine);
-
-            System.out.println("First action of table... action read from middle chatline: " + opponentAction);
-            return opponentAction;
-        }
-
-        String actionToReturn = readMiddleChatLine();
-
-        if(actionToReturn != null) {
-            return getActionFromChatLine(actionToReturn);
-        }
-
-        return null;
-    }
-
-    private String getActionFromChatLine(String chatLine) {
-        String action = null;
-
-        if(chatLine.contains("COCONUT")) {
-            action = "empty";
-        } else if(chatLine.contains("posts") || chatLine.contains("blind")) {
-            action = "bet";
-        } else if(chatLine.contains("checks") || chatLine.contains("checls")) {
-            action = "check";
-        } else if(chatLine.contains("calls") || chatLine.contains("ca lls") || chatLine.contains("cal ls")) {
-            action = "call";
-        } else if(chatLine.contains("bets") || chatLine.contains("beis") || chatLine.contains("be'ls")) {
-            action = "bet75pct";
-        } else if(chatLine.contains("raise") || chatLine.contains("goes ") || chatLine.contains("laise")) {
-            action = "raise";
-        }
-
-        return action;
-    }
-
-    public boolean isBotButtonFromImage() {
-        return bottomPlayerIsButton();
     }
 
     public Card getBotHoleCard1FromImage() {
@@ -258,6 +124,8 @@ public class StarsTableReader {
     }
 
     public static boolean botIsToAct() {
+        //to implement
+
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(926, 965, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         if(suitRgb / 10_000 == -1674) {
@@ -268,18 +136,14 @@ public class StarsTableReader {
     }
 
     public static boolean isNewHand() {
-        String middleChatLine = readMiddleChatLine();
-        String bottomChatLine = readBottomChatLine();
+        //to implement
 
-        if(middleChatLine.contains("posts") || bottomChatLine.contains("posts") ||
-                middleChatLine.contains("posis") || bottomChatLine.contains("posis")
-                || middleChatLine.contains("blind") || bottomChatLine.contains("blind")) {
-            return true;
-        }
         return false;
     }
 
     public String getOpponentPlayerNameFromImage() {
+        //to implement
+
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(687, 152, 165, 39);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -293,6 +157,8 @@ public class StarsTableReader {
     }
 
     public static void performActionOnSite(String botAction, double sizing) {
+        //to implement
+
         if(botAction != null && sizing != 0) {
             try {
                 MouseKeyboard.click(674, 647);
@@ -321,101 +187,47 @@ public class StarsTableReader {
         MouseKeyboard.moveMouseToLocation(20, 20);
     }
 
-    public static boolean middleActionButtonIsNotPresent() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(786, 712, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-
-        if(suitRgb / 1000 == -16673) {
-            //expected: -16673794
-            return false;
-        }
-        //when not present, expected: -16641770
-        return true;
-    }
-
     //helper methods
     private static void clickFoldActionButton() {
-        if(readLeftActionButton().contains("Fold")) {
-            MouseKeyboard.click(721, 685);
-        } else {
-            System.out.println("Clicking Fold button failed");
-        }
+        //to implement
+
+
     }
 
     private static void clickCheckActionButton() {
-        if(readMiddleActionButton().contains("Check")) {
-            MouseKeyboard.click(841, 682);
-        } else {
-            System.out.println("Clicking Check button failed");
-        }
+        //to implement
+
+
     }
 
     private static void clickCallActionButton() {
-        String middleActionButton = readMiddleActionButton();
-        String rightActionButton = readRightActionButton();
+        //to implement
 
-        if(middleActionButton.contains("Call")) {
-            MouseKeyboard.click(841, 682);
-        } else if(middleActionButtonIsNotPresent() && rightActionButton.contains("All")) {
-            MouseKeyboard.click(959, 687);
-        } else {
-            System.out.println("Clicking Call button failed");
-        }
+
     }
 
     private static void clickBetActionButton() {
-        String middleActionButton = readMiddleActionButton();
-        String rightActionButton = readRightActionButton();
+        //to implement
 
-        if(rightActionButton.contains("Bet")) {
-            MouseKeyboard.click(959, 687);
-        } else if(middleActionButton.contains("Check") && rightActionButton.contains("All")) {
-            MouseKeyboard.click(959, 687);
-        } else {
-            System.out.println("Clicking Bet button failed");
-        }
+
     }
 
     private static void clickRaiseActionButton() {
-        String rightActionButton = readRightActionButton();
+        //to implement
 
-        if(rightActionButton.contains("Raise")) {
-            MouseKeyboard.click(959, 687);
-        } else if(rightActionButton.contains("All")) {
-            MouseKeyboard.click(959, 687);
-        } else {
-            System.out.println("Clicking Raise button failed");
-        }
-    }
 
-    private static String readMiddleChatLine() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 869, 441, 38);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-    }
-
-    private static String readBottomChatLine() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(19, 906, 441, 34);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        return ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
     }
 
     private String readFirstHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(493, 478, 17, 19);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        String firstHoleCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(firstHoleCardRank);
+        //to implement
+
+        return null;
     }
 
     private String readSecondHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(557, 478, 17, 19);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        String secondHoleCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(secondHoleCardRank);
+        //to implement
+
+        return null;
     }
 
     private String readFirstFlopCardRankFromBoard() {
@@ -459,15 +271,15 @@ public class StarsTableReader {
     }
 
     private char readFirstHoleCardSuit() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(501, 503, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        //to implement
+
+        return 'a';
     }
 
     private char readSecondHoleCardSuit() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(566, 506, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        //to implement
+
+        return 'a';
     }
 
 
@@ -522,53 +334,7 @@ public class StarsTableReader {
         return getSuitFromIntRgb(suitRgb);
     }
 
-
-
-    //
-    public static void main(String[] args) {
-        for(int i = 0; i < 50; i++) {
-            StarsTableReader starsTableReader = new StarsTableReader(0);
-
-//            starsTableReader.readFirstFlopCardSuitFromBoard();
-//            starsTableReader.readSecondFlopCardSuitFromBoard();
-//            starsTableReader.readThirdFlopCardSuitFromBoard();
-//            starsTableReader.readTurnCardSuitFromBoard();
-//            starsTableReader.readRiverCardSuitFromBoard();
-
-
-
-            System.out.println(starsTableReader.readTopPlayerStack());
-
-
-
-
-//            System.out.print(starsTableReader.readFirstFlopCardRankFromBoard());
-//            System.out.print(starsTableReader.readFirstFlopCardSuitFromBoard() + " ");
-//
-//            System.out.print(starsTableReader.readSecondFlopCardRankFromBoard());
-//            System.out.print(starsTableReader.readSecondFlopCardSuitFromBoard() + " ");
-//
-//            System.out.print(starsTableReader.readThirdFlopCardRankFromBoard());
-//            System.out.print(starsTableReader.readThirdFlopCardSuitFromBoard() + " ");
-//
-//            System.out.print(starsTableReader.readTurnCardRankFromBoard());
-//            System.out.print(starsTableReader.readTurnCardSuitFromBoard() + " ");
-//
-//            System.out.print(starsTableReader.readRiverCardRankFromBoard());
-//            System.out.print(starsTableReader.readRiverCardSuitFromBoard() + " ");
-
-
-
-
-//            System.out.print(new StarsTableReader(0).readSecondFlopCardRankFromBoard() + " ");
-//            System.out.print(new StarsTableReader(0).readThirdFlopCardRankFromBoard() + " ");
-//            System.out.print(new StarsTableReader(0).readTurnCardRankFromBoard() + " ");
-//            System.out.print(new StarsTableReader(0).readRiverCardRankFromBoard());
-            System.out.println();
-        }
-    }
-
-    private String readTopPlayerStack() {
+    private String readRightPlayerStack() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(50, 421, 123, 21);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -577,7 +343,7 @@ public class StarsTableReader {
         return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
     }
 
-    private String readBottomPlayerStack() {
+    private String readLeftPlayerStack() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(924, 421, 123, 21);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -586,25 +352,9 @@ public class StarsTableReader {
         return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
     }
 
-    private static String readPotSize(boolean includingZoom) {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(709, 547, 72, 29);
 
-        if(includingZoom) {
-            bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        }
-
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String potSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-
-        if(potSize.contains("molt")) {
-            return "0.04";
-        }
-
-        potSize = ImageProcessor.removeEmptySpacesFromString(potSize);
-        return ImageProcessor.removeAllNonNumericCharacters(potSize);
-    }
-
-    private static String readPotSizeOld() {
+    //welke potsize methode kan weg?
+    private static String readPotSize() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(472, 407, 126, 17);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
 
@@ -612,43 +362,6 @@ public class StarsTableReader {
         String potSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         potSize = ImageProcessor.removeEmptySpacesFromString(potSize);
         return ImageProcessor.removeAllNonNumericCharacters(potSize);
-    }
-
-    private double getCorrectValueFromReadPotSizeOld(String potSizeAsString, double opponentTotalBetSize,
-                                                     double botTotalBetSize) {
-        double potSize;
-
-        if(potSizeAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-            potSize = Double.parseDouble(potSizeAsString);
-        } else {
-            potSize = 0.0;
-        }
-
-        potSize = validateStackSizeReadNumber(potSize);
-
-        if(potSize != 0) {
-            potSize = potSize - opponentTotalBetSize - botTotalBetSize;
-        }
-
-        return potSize;
-    }
-
-    private String readBottomPlayerTotalBetSize() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(673, 626, 80, 26);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String bottomPlayerTotalBetSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        bottomPlayerTotalBetSize = ImageProcessor.removeEmptySpacesFromString(bottomPlayerTotalBetSize);
-        return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerTotalBetSize);
-    }
-
-    private String readTopPlayerTotalBetSize() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(469, 61, 147, 28);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String topPlayerTotalBetSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        topPlayerTotalBetSize = ImageProcessor.removeEmptySpacesFromString(topPlayerTotalBetSize);
-        return ImageProcessor.removeAllNonNumericCharacters(topPlayerTotalBetSize);
     }
 
     private String readTopTotalPotSize() {
@@ -670,29 +383,6 @@ public class StarsTableReader {
         return ImageProcessor.removeAllNonNumericCharacters(topPlayerTotalBetSize);
     }
 
-
-
-    private static String readLeftActionButton() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(664, 662, 111, 54);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String leftActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
-    }
-
-    public static String readMiddleActionButton() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(783, 662, 111, 54);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String leftActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
-    }
-
-    public static String readRightActionButton() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(903, 662, 111, 54);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String leftActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(leftActionButton);
-    }
-
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
         ImageProcessor.saveBufferedImage(bufferedImage, "C:/Users/Lennart/Documents/develop/logging/" + numberOfActionRequests + ".png");
@@ -703,7 +393,9 @@ public class StarsTableReader {
         ImageProcessor.saveBufferedImage(bufferedImage, "C:/Users/Lennart/Documents/develop/logging/" + time + ".png");
     }
 
-    private boolean bottomPlayerIsButton() {
+    public boolean leftPlayerIsButton() {
+        //to implement
+
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(640, 705, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         if(suitRgb / 1000 == -10) {
@@ -765,166 +457,5 @@ public class StarsTableReader {
             cardRank = 14;
         }
         return cardRank;
-    }
-
-    private double validateReadNumber(double value) {
-        double valueToReturn;
-
-        double valueInBb = value / bigBlind;
-
-        if(valueInBb < 0) {
-            valueToReturn = -1;
-        } else if(valueInBb <= 500) {
-            valueToReturn = value;
-        } else {
-            double adjustedValueInBb1 = (value / 10) / bigBlind;
-
-            if(adjustedValueInBb1 > 500) {
-                double adjustedValueInBb2 = (value / 100) / bigBlind;
-
-                if(adjustedValueInBb2 > 500) {
-                    double adjustedValueInBb3 = (value / 1000) / bigBlind;
-
-                    if(adjustedValueInBb3 > 500) {
-                        valueToReturn = -1;
-                    } else {
-                        valueToReturn = value / 1000;
-                    }
-                } else {
-                    valueToReturn = value / 100;
-                }
-            } else {
-                valueToReturn = value / 10;
-            }
-        }
-
-        return valueToReturn;
-    }
-
-    private double validateStackSizeReadNumber(double value) {
-        double valueToReturn;
-
-        double valueInBb = value / bigBlind;
-
-        if(valueInBb < 0) {
-            valueToReturn = -1;
-        } else if(valueInBb <= 600) {
-            valueToReturn = value;
-        } else {
-            double adjustedValueInBb1 = (value / 10) / bigBlind;
-
-            if(adjustedValueInBb1 > 600) {
-                double adjustedValueInBb2 = (value / 100) / bigBlind;
-
-                if(adjustedValueInBb2 > 600) {
-                    double adjustedValueInBb3 = (value / 1000) / bigBlind;
-
-                    if(adjustedValueInBb3 > 600) {
-                        valueToReturn = -1;
-                    } else {
-                        valueToReturn = value / 1000;
-                    }
-                } else {
-                    valueToReturn = value / 100;
-                }
-            } else {
-                valueToReturn = value / 10;
-            }
-        }
-
-        return valueToReturn;
-    }
-
-    private void mediumSizeTable() {
-        MouseKeyboard.click(1269, 25);
-    }
-
-    private void maximizeTable() {
-        MouseKeyboard.click(983, 16);
-    }
-
-
-
-    /////
-
-    private Map<String, Double> deriveOpponentActionAndSizingFromPotTotal(double potsizeTotal, double lastPotsizeTotal, double lastBotTotalBetSize,
-                                                                          List<Card> boardAtLastBotAction, List<Card> currentBoard, boolean position, double bigBlind) {
-         Map<String, Double> opponentActionAndSizing = new HashMap<>();
-
-        if(currentBoard.isEmpty()) {
-            if(potsizeTotal / bigBlind == 1.5) {
-                //bot first to act
-                opponentActionAndSizing.put("bet", bigBlind);
-            } else if(potsizeTotal / bigBlind == 2) {
-                //opponent limped
-                opponentActionAndSizing.put("call", bigBlind);
-            } else {
-                opponentActionAndSizing.put("raise", (potsizeTotal - lastBotTotalBetSize));
-            }
-        } else {
-            if(boardAtLastBotAction.equals(currentBoard)) {
-                //opponent action is either bet or raise
-
-                if(lastBotTotalBetSize == 0) {
-                    opponentActionAndSizing.put("bet75pct", potsizeTotal - lastPotsizeTotal);
-                } else {
-                    opponentActionAndSizing.put("raise", (potsizeTotal - lastPotsizeTotal - lastBotTotalBetSize));
-                }
-            } else {
-                if(position) {
-                    if(potsizeTotal == lastPotsizeTotal) {
-                        opponentActionAndSizing.put("check", 0.0);
-                    } else {
-                        //opponent kan gecheckt hebben of gebet...
-
-                            //
-
-
-                    }
-                } else {
-                    //het is een nieuwe straat en je zit oop... dan moet het wel een first to act moment zijn..
-                    opponentActionAndSizing.put("empty", 0.0);
-                }
-
-
-
-
-
-
-
-
-
-
-//                //first action of hero on turn or river
-//                //opp action is either check or bet
-//
-//
-//                if(potsizeTotal == lastPotsizeTotal) {
-//                    //hero is ofwel first to act ofwel opponent checked
-//                    if(position) {
-//                        opponentActionAndSizing.put("check", 0.0);
-//                    } else {
-//                        opponentActionAndSizing.put("empty", 0.0);
-//                    }
-//                } else {
-//                    if(position) {
-//
-//                    } else {
-//                        //het is een nieuwe straat en je zit oop... dan moet het wel een first to act moment zijn..
-//
-//
-//
-//
-//                    }
-//
-//                }
-
-            }
-        }
-
-
-
-
-        return null;
     }
 }
