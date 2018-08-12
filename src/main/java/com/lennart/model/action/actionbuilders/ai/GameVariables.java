@@ -3,7 +3,9 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
+import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
+import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +41,55 @@ public class GameVariables implements GameVariable {
     private boolean drawBettingActionDone;
     private boolean previousBluffAction;
 
+    private List<ActionRequest> allActionRequestsOfHand;
+
     public GameVariables() {
         //default constructor
+    }
+
+    public GameVariables(boolean stars) throws Exception {
+        bigBlind = 0.50;
+
+        StarsTableReader starsTableReader = new StarsTableReader(bigBlind);
+
+        botStack = starsTableReader.getBotStackFromImage();
+        opponentStack = starsTableReader.getOpponentStackFromImage();
+        botHoleCard1 = starsTableReader.getBotHoleCard1FromImage();
+        botHoleCard2 = starsTableReader.getBotHoleCard2FromImage();
+        opponentName = starsTableReader.getOpponentPlayerNameFromImage();
+        botIsButton = starsTableReader.leftPlayerIsButton();
+        botHoleCards.add(botHoleCard1);
+        botHoleCards.add(botHoleCard2);
+
+        double topPotSize = starsTableReader.getTopPotsizeFromImage();
+        allActionRequestsOfHand = new ArrayList<>();
+        ActionRequest actionRequest = new ActionRequest(new ArrayList<>(), topPotSize, board, botIsButton, bigBlind);
+        allActionRequestsOfHand.add(actionRequest);
+
+        opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+        botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalOpponentBetSize();
+        pot = topPotSize - opponentBetSize - botBetSize;
+        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getAction();
+    }
+
+    public void fillFieldsSubsequent(boolean stars) throws Exception {
+        StarsTableReader starsTableReader = new StarsTableReader(bigBlind);
+
+        botStack = starsTableReader.getBotStackFromImage();
+        opponentStack = starsTableReader.getOpponentStackFromImage();
+        fillTheStarsBoard();
+
+        double topPotSize = starsTableReader.getTopPotsizeFromImage();
+
+        List<ActionRequest> copyOfAllActionRequests = new ArrayList<>();
+        copyOfAllActionRequests.addAll(allActionRequestsOfHand);
+        ActionRequest actionRequest = new ActionRequest(copyOfAllActionRequests, topPotSize, board, botIsButton, bigBlind);
+        allActionRequestsOfHand.add(actionRequest);
+
+        opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+        botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalOpponentBetSize();
+        pot = topPotSize - opponentBetSize - botBetSize;
+        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getAction();
     }
 
     public GameVariables(String opponentName) throws Exception {
@@ -158,6 +207,48 @@ public class GameVariables implements GameVariable {
         } else if(riverCard == null) {
             TimeUnit.MILLISECONDS.sleep(300);
             riverCard = netBetTableReader.getRiverCardFromImage();
+
+            if(riverCard != null) {
+                board.add(riverCard);
+            }
+        }
+    }
+
+    private void fillTheStarsBoard() throws Exception {
+        StarsTableReader starsTableReader = new StarsTableReader(bigBlind);
+
+        if(flopCard1 == null) {
+            for(int i = 0; i < 10; i++) {
+                flopCard1 = starsTableReader.getFlopCard1FromImage();
+                if(flopCard1 != null) {
+                    break;
+                }
+                TimeUnit.MILLISECONDS.sleep(50);
+            }
+
+            if(flopCard1 != null) {
+                while(flopCard2 == null) {
+                    flopCard2 = starsTableReader.getFlopCard2FromImage();
+                }
+
+                while(flopCard3 == null) {
+                    flopCard3 = starsTableReader.getFlopCard3FromImage();
+                }
+
+                board.add(flopCard1);
+                board.add(flopCard2);
+                board.add(flopCard3);
+            }
+        } else if(turnCard == null) {
+            TimeUnit.MILLISECONDS.sleep(300);
+            turnCard = starsTableReader.getTurnCardFromImage();
+
+            if(turnCard != null) {
+                board.add(turnCard);
+            }
+        } else if(riverCard == null) {
+            TimeUnit.MILLISECONDS.sleep(300);
+            riverCard = starsTableReader.getRiverCardFromImage();
 
             if(riverCard != null) {
                 board.add(riverCard);
