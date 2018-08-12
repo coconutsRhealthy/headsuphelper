@@ -102,7 +102,7 @@ public class Controller extends SpringBootServletInitializer {
     }
 
     @RequestMapping(value = "/getAction", method = RequestMethod.POST)
-    public @ResponseBody GameVariables getAction(@RequestBody GameVariables gameVariables) {
+    public @ResponseBody GameVariables getAction(@RequestBody GameVariables gameVariables) throws Exception {
         gameVariables.doGetActionLogic();
         return gameVariables;
     }

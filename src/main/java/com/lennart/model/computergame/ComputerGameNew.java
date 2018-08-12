@@ -234,7 +234,14 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
             if(botFoldStat > 0.43) {
                 double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
-                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, handStrength, handStrengthRequiredToCall, computerHoleCards, board, position, "izo", computerBetSizeBb, opponentBetSizeBb);
+
+                try {
+                    action = adjustToFoldStats.adjustPlayToBotFoldStat(action, handStrength, handStrengthRequiredToCall, computerHoleCards, board, position, "izo", computerBetSizeBb, opponentBetSizeBb, true);
+                } catch (Exception e) {
+                    System.out.println("Exception occorued in adjustPlayToBotFoldStat...");
+                    e.printStackTrace();
+                }
+
 
                 if(action.equals("call") && getStreet().equals("preflop") && opponentBetSizeBb == 1) {
                     action = "fold";

@@ -162,7 +162,7 @@ public class GameVariables implements GameVariable {
         fillTheBoard();
     }
 
-    public void doGetActionLogic() {
+    public void doGetActionLogic() throws Exception {
         botHoleCards = convertStringToCardList(botHoleCardsAsString, "holeCards");
         board = convertStringToCardList(boardAsString, "board");
 

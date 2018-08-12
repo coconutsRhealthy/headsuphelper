@@ -13,10 +13,16 @@ public class AdjustToFoldStats {
 
     public String adjustPlayToBotFoldStat(String action, double handStrength, double requiredHandStrength,
                                           List<Card> holeCards, List<Card> board, boolean position, String opponentPlayerName,
-                                          double botBetsizeBb, double opponentBetsizeBb) {
+                                          double botBetsizeBb, double opponentBetsizeBb, boolean computerGame) throws Exception {
         String actionToReturn;
 
-        double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + opponentPlayerName);
+        double botFoldStat;
+
+        if(computerGame) {
+            botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-" + opponentPlayerName);
+        } else {
+            botFoldStat = new FoldStatsKeeper().getFoldStatFromDb("bot-V-" + opponentPlayerName);
+        }
 
         System.out.println("botFoldStat: " + botFoldStat);
 

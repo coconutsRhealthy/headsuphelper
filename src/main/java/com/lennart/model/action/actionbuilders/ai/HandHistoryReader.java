@@ -26,16 +26,18 @@ public class HandHistoryReader {
         String playerName = getOpponentPlayerName(lastHand);
 
         //logic regarding foldstats
+        FoldStatsKeeper foldStatsKeeper = new FoldStatsKeeper();
+
         if(playerDidFold(lastHand, "COCONUT555")) {
-            FoldStatsKeeper.updateFoldCountMap("bot-V-" + playerName, "fold");
-            FoldStatsKeeper.updateFoldCountMap(playerName, "nonFold");
+            foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + playerName, "fold");
+            foldStatsKeeper.updateFoldCountMapInDb(playerName, "nonFold");
         } else {
-            FoldStatsKeeper.updateFoldCountMap("bot-V-" + playerName, "nonFold");
+            foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + playerName, "nonFold");
 
             if(playerDidFold(lastHand, playerName)) {
-                FoldStatsKeeper.updateFoldCountMap(playerName, "fold");
+                foldStatsKeeper.updateFoldCountMapInDb(playerName, "fold");
             } else {
-                FoldStatsKeeper.updateFoldCountMap(playerName, "nonFold");
+                foldStatsKeeper.updateFoldCountMapInDb(playerName, "nonFold");
             }
         }
         //logic regarding foldstats

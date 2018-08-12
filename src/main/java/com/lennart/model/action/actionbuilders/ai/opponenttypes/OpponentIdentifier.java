@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
 import com.lennart.model.action.actionbuilders.ai.HandHistoryReader;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,6 +28,8 @@ public class OpponentIdentifier {
     private static final double TP_AGGRO_POSTFLOP = 0.11;
     private static final double TA_LOOSENESS_POSTFLOP = 0.53;
     private static final double TA_AGGRO_POSTFLOP = 0.43;
+
+    private Connection con;
 
     public String getOpponentType(String opponentNick, int numberOfHands) {
         String opponentType;
@@ -70,6 +73,45 @@ public class OpponentIdentifier {
             Map<String, Double> aggroMatchMap = getAggroMatchMap(aggressiveness);
 
             opponentType = getMatch(loosenessMatchMap, aggroMatchMap);
+        }
+
+        return opponentType;
+    }
+
+    public String getOpponentTypeFromDb(String opponentNick, int numberOfHands) throws Exception {
+        String opponentType;
+
+        System.out.println("opponentNick: " + opponentNick);
+        System.out.println("numberOfHands: " + numberOfHands);
+
+        if(numberOfHands < 14) {
+            opponentType = "tp";
+        } else {
+            initializeDbConnection();
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier WHERE playerName = '" + opponentNick + "';");
+
+            if(!rs.next()) {
+                st.executeUpdate("INSERT INTO opponentidentifier (playerName) VALUES ('" + opponentNick + "')");
+                opponentType = "tp";
+            } else {
+                double callRaiseCount = rs.getDouble("callRaiseCount");
+                double foldCount = rs.getDouble("foldCount");
+                double betRaiseCount = rs.getDouble("betRaiseCount");
+                double checkCallCount = rs.getDouble("checkCallCount");
+
+                double looseness = callRaiseCount / (foldCount + callRaiseCount);
+                double aggressiveness = betRaiseCount / (checkCallCount + betRaiseCount);
+
+                System.out.println("Looseness: " + looseness);
+                System.out.println("Aggressiveness: " + aggressiveness);
+
+                Map<String, Double> loosenessMatchMap = getLoosenessMatchMap(looseness);
+                Map<String, Double> aggroMatchMap = getAggroMatchMap(aggressiveness);
+
+                opponentType = getMatch(loosenessMatchMap, aggroMatchMap);
+            }
         }
 
         return opponentType;
@@ -124,6 +166,37 @@ public class OpponentIdentifier {
         opponentTotalMap.get(numberOfHands).put("checkCallCount", checkCallCount);
     }
 
+    public void updateCountsInDb(String opponentNick, String action) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier WHERE playerName = '" + opponentNick + "';");
+
+        if(!rs.next()) {
+            st.executeUpdate("INSERT INTO opponentidentifier (playerName) VALUES ('" + opponentNick + "')");
+        }
+
+        if(action.equals("fold")) {
+            st.executeUpdate("UPDATE opponentidentifier SET foldCount = foldCount + 1 WHERE playerName = '" + opponentNick + "'");
+        } else if(action.equals("check")) {
+            st.executeUpdate("UPDATE opponentidentifier SET checkCallCount = checkCallCount + 1 WHERE playerName = '" + opponentNick + "'");
+        } else if(action.equals("call")) {
+            st.executeUpdate("UPDATE opponentidentifier SET callRaiseCount = callRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+            st.executeUpdate("UPDATE opponentidentifier SET checkCallCount = checkCallCount + 1 WHERE playerName = '" + opponentNick + "'");
+        } else if(action.equals("bet75pct")) {
+            st.executeUpdate("UPDATE opponentidentifier SET betRaiseCount = betRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+        } else if(action.equals("raise")) {
+            st.executeUpdate("UPDATE opponentidentifier SET callRaiseCount = callRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+            st.executeUpdate("UPDATE opponentidentifier SET betRaiseCount = betRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+        }
+
+        rs.close();
+        st.close();
+        closeDbConnection();
+    }
+
+    //dit haalt alle acties van de afgelopen hand uit de hand history file, en doet vervolgens in de in memory countmap de update.
+    //ook haalt het de opponent player name uit de hand history
     public String updateCountsFromHandhistoryAndGetOpponentPlayerName() throws Exception {
         HandHistoryReader handHistoryReader = new HandHistoryReader();
 
@@ -142,6 +215,21 @@ public class OpponentIdentifier {
         return opponentName;
     }
 
+    public void updateCountsFromHandhistoryAndGetOpponentPlayerNameDbLogic() throws Exception {
+        HandHistoryReader handHistoryReader = new HandHistoryReader();
+
+        Map<String, List<String>> actionsOfLastHandMap = handHistoryReader.getOpponentActionsOfLastHand2();
+
+        String opponentName = actionsOfLastHandMap.entrySet().iterator().next().getKey();
+        updateNumberOfHandsPerOpponentMapInDb(opponentName);
+
+        List<String> opponentActions = actionsOfLastHandMap.entrySet().iterator().next().getValue();
+
+        for(String action : opponentActions) {
+            updateCountsInDb(opponentName, action);
+        }
+    }
+
     public static void updateNumberOfHandsPerOpponentMap(String opponentPlayerName) {
         if(numberOfHandsPerOpponentMap.get(opponentPlayerName) == null) {
             numberOfHandsPerOpponentMap.put(opponentPlayerName, 0);
@@ -150,8 +238,42 @@ public class OpponentIdentifier {
         }
     }
 
+    public void updateNumberOfHandsPerOpponentMapInDb(String opponentPlayerName) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier WHERE playerName = '" + opponentPlayerName + "';");
+
+        if(!rs.next()) {
+            st.executeUpdate("INSERT INTO opponentidentifier (playerName) VALUES ('" + opponentPlayerName + "')");
+        } else {
+            st.executeUpdate("UPDATE opponentidentifier SET numberOfHands = numberOfHands + 1 WHERE playerName = '" + opponentPlayerName + "'");
+        }
+
+        rs.close();
+        st.close();
+        closeDbConnection();
+    }
+
     public static Map<String, Integer> getNumberOfHandsPerOpponentMap() {
         return numberOfHandsPerOpponentMap;
+    }
+
+    public int getOpponentNumberOfHandsFromDb(String opponentPlayerName) throws Exception {
+        double numberOfHands;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier WHERE playerName = '" + opponentPlayerName + "';");
+
+        if(rs.next()) {
+            numberOfHands = rs.getDouble("numberOfHands");
+        } else {
+            numberOfHands = 0.0;
+        }
+
+        return (int) numberOfHands;
     }
 
     private Map<Integer, Map<String, List<Double>>> initializeOpponentMap() {
@@ -260,5 +382,14 @@ public class OpponentIdentifier {
             result.put(entry.getKey(), entry.getValue());
         }
         return result;
+    }
+
+    private void initializeDbConnection() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker?&serverTimezone=UTC", "root", "");
+    }
+
+    private void closeDbConnection() throws SQLException {
+        con.close();
     }
 }
