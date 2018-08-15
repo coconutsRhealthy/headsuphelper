@@ -26,18 +26,16 @@ public class HandHistoryReader {
         String playerName = getOpponentPlayerName(lastHand);
 
         //logic regarding foldstats
-        FoldStatsKeeper foldStatsKeeper = new FoldStatsKeeper();
-
         if(playerDidFold(lastHand, "COCONUT555")) {
-            foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + playerName, "fold");
-            foldStatsKeeper.updateFoldCountMapInDb(playerName, "nonFold");
+            FoldStatsKeeper.updateFoldCountMap("bot-V-" + playerName, "fold");
+            FoldStatsKeeper.updateFoldCountMap(playerName, "nonFold");
         } else {
-            foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + playerName, "nonFold");
+            FoldStatsKeeper.updateFoldCountMap("bot-V-" + playerName, "nonFold");
 
             if(playerDidFold(lastHand, playerName)) {
-                foldStatsKeeper.updateFoldCountMapInDb(playerName, "fold");
+                FoldStatsKeeper.updateFoldCountMap(playerName, "fold");
             } else {
-                foldStatsKeeper.updateFoldCountMapInDb(playerName, "nonFold");
+                FoldStatsKeeper.updateFoldCountMap(playerName, "nonFold");
             }
         }
         //logic regarding foldstats
@@ -183,14 +181,14 @@ public class HandHistoryReader {
         List<String> actionLinesOfOpponent = new ArrayList<>();
 
         for (Map.Entry<Integer, List<String>> entry : mapOfRounds.entrySet()) {
-           boolean postflop = false;
+            boolean postflop = false;
 
-           for(String line : entry.getValue()) {
-               if(line.contains("type=\"Flop\"") || line.contains("type=\"Turn\"") || line.contains("type=\"River\"")) {
-                   postflop = true;
-                   break;
-               }
-           }
+            for(String line : entry.getValue()) {
+                if(line.contains("type=\"Flop\"") || line.contains("type=\"Turn\"") || line.contains("type=\"River\"")) {
+                    postflop = true;
+                    break;
+                }
+            }
 
             for(String line : entry.getValue()) {
                 if(line.contains("<action") && line.contains("player=")) {
