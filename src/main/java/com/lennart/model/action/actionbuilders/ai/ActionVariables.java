@@ -281,15 +281,6 @@ public class ActionVariables {
         return eligibleActions;
     }
 
-    private String doOpponentTypeLogic(String opponentName) {
-        if(OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName) == null) {
-            OpponentIdentifier.updateNumberOfHandsPerOpponentMap(opponentName);
-        }
-
-        return new OpponentIdentifier().getOpponentType(opponentName,
-                OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
-    }
-
     private String doOpponentTypeDbLogic(String opponentName) throws Exception {
         OpponentIdentifier opponentIdentifier = new OpponentIdentifier();
         int numberOfHands = opponentIdentifier.getOpponentNumberOfHandsFromDb(opponentName);

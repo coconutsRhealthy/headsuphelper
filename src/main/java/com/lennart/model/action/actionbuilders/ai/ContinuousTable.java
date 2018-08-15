@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -22,6 +23,7 @@ public class ContinuousTable implements ContinuousTableable {
     private boolean pre3betOrPostRaisedPot = false;
     private boolean opponentDidPreflop4betPot = false;
     private static List<String> playersNotToPlay = new ArrayList<>();
+    private static List<String> allHandsPlayedAndPlayerNames = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -33,9 +35,6 @@ public class ContinuousTable implements ContinuousTableable {
         int milliSecondsTotal = 0;
         int printDotTotal = 0;
         int refreshTableTotal = 0;
-        long startTimeOfSession = new Date().getTime();
-
-        int opponentNotToPlayCount = 0;
 
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
@@ -45,50 +44,22 @@ public class ContinuousTable implements ContinuousTableable {
                 refreshTableTotal = 0;
 
                 if(NetBetTableReader.isNewHand()) {
-                    if(new Date().getTime() - startTimeOfSession > 50_400_000) {
-                        System.out.println("11 hours have passed since start session, quit. Current time: " + new Date().getTime());
-                        throw new RuntimeException();
-                    }
-
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
-                    String opponentName = String.valueOf(Math.random());
 
-                    try {
-                        if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo
-                                ("C:/Users/Lennart/AppData/Local/NetBet Poker/data/COCONUT555/History/Data/Tables")) {
-                            opponentName = new OpponentIdentifier().updateCountsFromHandhistoryAndGetOpponentPlayerName();
-                        }
-                    } catch (Exception e) {
-                        System.out.println("error in xml reader");
-                        opponentName = "asdfgghhj";
-                    }
-
-                    gameVariables = new GameVariables(opponentName);
-
-                    if(forceQuitIfOpponentStackIs250bbOrMore(gameVariables.getOpponentStack() / gameVariables.getBigBlind(),
-                            gameVariables.getOpponentName())) {
-                        runTableContinously();
-                    }
-
-                    if(isPlayerNotToPlayAgainst(gameVariables.getOpponentName())) {
-                        opponentNotToPlayCount++;
-
-                        if(opponentNotToPlayCount == 3) {
-                            System.out.println("Force quit table because opponent is player not to play against");
-                            try {
-                                opponentNotToPlayCount = 0;
-                                TimeUnit.SECONDS.sleep(60);
-                                NetBetTableOpener.startNewTable();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            runTableContinously();
+                    if(new HandHistoryReader().lastModifiedFileIsLessThanTenMinutesAgo
+                            ("path to fill")) {
+                        if(!allHandsPlayedAndPlayerNames.isEmpty()) {
+                            String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
+                            new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand);
                         }
                     }
+
+                    gameVariables = new GameVariables(true);
+                    allHandsPlayedAndPlayerNames.add(gameVariables.getOpponentName());
                 } else {
-                    gameVariables.fillFieldsSubsequent();
+                    gameVariables.fillFieldsSubsequent(true);
                 }
 
                 ActionVariables actionVariables = new ActionVariables(gameVariables, this);
@@ -119,11 +90,6 @@ public class ContinuousTable implements ContinuousTableable {
                 milliSecondsTotal = 0;
                 System.out.print(".");
                 printDotTotal++;
-
-                if(new Date().getTime() - startTimeOfSession > 50_400_000) {
-                    System.out.println("11 hours have passed since start session, quit. Current time: " + new Date().getTime());
-                    throw new RuntimeException();
-                }
 
                 if(printDotTotal == 30) {
                     NetBetTableReader.saveScreenshotOfEntireScreen(new Date().getTime());

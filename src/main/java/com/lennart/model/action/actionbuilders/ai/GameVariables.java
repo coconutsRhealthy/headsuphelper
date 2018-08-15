@@ -162,16 +162,6 @@ public class GameVariables implements GameVariable {
         fillTheBoard();
     }
 
-    public void doGetActionLogic() throws Exception {
-        botHoleCards = convertStringToCardList(botHoleCardsAsString, "holeCards");
-        board = convertStringToCardList(boardAsString, "board");
-
-        new OpponentIdentifier().updateCounts(opponentName, opponentAction,
-                OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName));
-
-        actionVariables = new ActionVariables(this, null);
-    }
-
     private void fillTheBoard() throws Exception {
         NetBetTableReader netBetTableReader = new NetBetTableReader(bigBlind);
 

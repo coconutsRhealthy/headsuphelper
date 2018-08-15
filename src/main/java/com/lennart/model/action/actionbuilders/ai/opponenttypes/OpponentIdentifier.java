@@ -1,6 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReader;
+import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +18,6 @@ import java.util.Map;
 public class OpponentIdentifier {
 
     private static Map<String, Map<Integer, Map<String, List<Double>>>> countMapForAllOpponents = new HashMap<>();
-    private static Map<String, Integer> numberOfHandsPerOpponentMap = new HashMap<>();
 
     private static final double LP_LOOSENESS_POSTFLOP = 0.71;
     private static final double LP_AGGRO_POSTFLOP = 0.1;
@@ -166,7 +165,7 @@ public class OpponentIdentifier {
         opponentTotalMap.get(numberOfHands).put("checkCallCount", checkCallCount);
     }
 
-    public void updateCountsInDb(String opponentNick, String action) throws Exception {
+    private void updateCountsInDb(String opponentNick, String action) throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();
@@ -195,46 +194,21 @@ public class OpponentIdentifier {
         closeDbConnection();
     }
 
-    //dit haalt alle acties van de afgelopen hand uit de hand history file, en doet vervolgens in de in memory countmap de update.
-    //ook haalt het de opponent player name uit de hand history
-    public String updateCountsFromHandhistoryAndGetOpponentPlayerName() throws Exception {
-        HandHistoryReader handHistoryReader = new HandHistoryReader();
-
-        Map<String, List<String>> actionsOfLastHandMap = handHistoryReader.getOpponentActionsOfLastHand2();
-
-        String opponentName = actionsOfLastHandMap.entrySet().iterator().next().getKey();
-        updateNumberOfHandsPerOpponentMap(opponentName);
-
-        List<String> opponentActions = actionsOfLastHandMap.entrySet().iterator().next().getValue();
-        int numberOfHands = OpponentIdentifier.getNumberOfHandsPerOpponentMap().get(opponentName);
-
-        for(String action : opponentActions) {
-            updateCounts(opponentName, action, numberOfHands);
-        }
-
-        return opponentName;
-    }
-
-    public void updateCountsFromHandhistoryAndGetOpponentPlayerNameDbLogic() throws Exception {
-        HandHistoryReader handHistoryReader = new HandHistoryReader();
-
-        Map<String, List<String>> actionsOfLastHandMap = handHistoryReader.getOpponentActionsOfLastHand2();
-
-        String opponentName = actionsOfLastHandMap.entrySet().iterator().next().getKey();
-        updateNumberOfHandsPerOpponentMapInDb(opponentName);
-
-        List<String> opponentActions = actionsOfLastHandMap.entrySet().iterator().next().getValue();
+    //wat is er aan de hand hier...
+    //je gaat de acties van de afgelopen hand van je opponent aan de db toevoegen...
+    //en dit gaat ook de foldstat db updaten...
+    //alles van de afgelopen hand...
+    //maar je wil als naam eigenlijk de naam gebruiken die je in de afgelopen hand gelezen hebt via screenread...
+    //want de playername die in hh staat kan afwijken van je screen read hh...
+    //en als je in de toekomst weer een hand speelt tegen playerX dan wil je met screen read name (playerX) de data uit de db kunnen uitlezen...
+    //dus je moet hier de playername van afgelpoen hand meegeven...
+    public void updateCountsFromHandhistoryDbLogic(String opponentPlayerNameOfLastHand) throws Exception {
+        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+        List<String> opponentActions = handHistoryReaderStars.getOpponentActionsOfLastHand(opponentPlayerNameOfLastHand);
+        updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
 
         for(String action : opponentActions) {
-            updateCountsInDb(opponentName, action);
-        }
-    }
-
-    public static void updateNumberOfHandsPerOpponentMap(String opponentPlayerName) {
-        if(numberOfHandsPerOpponentMap.get(opponentPlayerName) == null) {
-            numberOfHandsPerOpponentMap.put(opponentPlayerName, 0);
-        } else {
-            numberOfHandsPerOpponentMap.put(opponentPlayerName, numberOfHandsPerOpponentMap.get(opponentPlayerName) + 1);
+            updateCountsInDb(opponentPlayerNameOfLastHand, action);
         }
     }
 
@@ -253,10 +227,6 @@ public class OpponentIdentifier {
         rs.close();
         st.close();
         closeDbConnection();
-    }
-
-    public static Map<String, Integer> getNumberOfHandsPerOpponentMap() {
-        return numberOfHandsPerOpponentMap;
     }
 
     public int getOpponentNumberOfHandsFromDb(String opponentPlayerName) throws Exception {
