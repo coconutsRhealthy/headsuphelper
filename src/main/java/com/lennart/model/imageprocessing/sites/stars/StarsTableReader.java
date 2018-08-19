@@ -142,27 +142,29 @@ public class StarsTableReader {
     }
 
     public String getOpponentPlayerNameFromImage() {
-        //to implement
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(687, 152, 165, 39);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(924, 400, 124, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         String fullPlayerName = ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
 
-        if(fullPlayerName.length() >= 4) {
-            return fullPlayerName.substring(0, 4);
+        if(fullPlayerName.endsWith("_")) {
+            fullPlayerName = fullPlayerName.substring(0, fullPlayerName.length() - 1);
         }
+
         return fullPlayerName;
     }
 
     public static void performActionOnSite(String botAction, double sizing) {
-        //to implement
-
         if(botAction != null && sizing != 0) {
             try {
-                MouseKeyboard.click(674, 647);
+                MouseKeyboard.click(901, 683);
                 TimeUnit.MILLISECONDS.sleep(150);
+                MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
+                TimeUnit.MILLISECONDS.sleep(150);
+
                 MouseKeyboard.enterText(String.valueOf(Precision.round(sizing, 2)));
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
@@ -189,45 +191,68 @@ public class StarsTableReader {
 
     //helper methods
     private static void clickFoldActionButton() {
-        //to implement
-
-
+        MouseKeyboard.click(657, 749);
     }
 
     private static void clickCheckActionButton() {
-        //to implement
-
-
+        MouseKeyboard.click(808, 749);
     }
 
     private static void clickCallActionButton() {
-        //to implement
+        MouseKeyboard.click(808, 749);
 
-
+        //or, if opponent is all in
+        MouseKeyboard.click(1000, 756);
     }
 
     private static void clickBetActionButton() {
-        //to implement
-
-
+        MouseKeyboard.click(1000, 756);
     }
 
     private static void clickRaiseActionButton() {
-        //to implement
+        MouseKeyboard.click(1000, 756);
+    }
 
+    private static String readLeftActionButton() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(579, 731, 125, 44);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
+    }
 
+    private static String readMiddleActionButton() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(765, 729, 114, 46);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        String fullPlayerName = ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
+
+        return fullPlayerName;
+    }
+
+    private static String readRightActionButton() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(941, 729, 123, 46);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
     }
 
     private String readFirstHoleCardRank() {
-        //to implement
-
-        return null;
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(74, 197, 19, 23);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
+        String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
     }
 
     private String readSecondHoleCardRank() {
-        //to implement
-
-        return null;
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(95, 203, 19, 21);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
+        String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
     }
 
     private String readFirstFlopCardRankFromBoard() {
@@ -271,66 +296,44 @@ public class StarsTableReader {
     }
 
     private char readFirstHoleCardSuit() {
-        //to implement
-
-        return 'a';
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(83, 231, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        return getSuitFromIntRgbHole(suitRgb);
     }
 
     private char readSecondHoleCardSuit() {
-        //to implement
-
-        return 'a';
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(105, 237, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+        return getSuitFromIntRgbHole(suitRgb);
     }
-
-
 
     private char readFirstFlopCardSuitFromBoard() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(378, 294, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-
-        //System.out.println("F1: " + suitRgb);
-
-        //return 'a';
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readSecondFlopCardSuitFromBoard() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(454, 294, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-
-        //System.out.println("F2: " + suitRgb);
-
-        //return 'a';
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readThirdFlopCardSuitFromBoard() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(530, 294, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-
-        //System.out.println("F3: " + suitRgb);
-
-        //return 'a';
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readTurnCardSuitFromBoard() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(606, 294, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-
-        //System.out.println("T: " + suitRgb);
-
-        //return 'a';
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readRiverCardSuitFromBoard() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(682, 294, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-
-        //System.out.println("R: " + suitRgb);
-
-        //return 'a';
         return getSuitFromIntRgb(suitRgb);
     }
 
@@ -403,6 +406,27 @@ public class StarsTableReader {
             return true;
         }
         return false;
+    }
+
+    private char getSuitFromIntRgbHole(int rgb) {
+        char suit = 'x';
+        rgb = rgb / 100_000;
+
+        //S: -4.802.890
+        //C: -2.364.451
+        //H: -4.128.753
+        //D: -16.121.711
+
+        if(rgb == -23) {
+            suit = 'c';
+        } else if(rgb == -41) {
+            suit = 'h';
+        } else if(rgb == -48) {
+            suit = 's';
+        } else if(rgb == -161) {
+            suit = 'd';
+        }
+        return suit;
     }
 
     private char getSuitFromIntRgb(int rgb) {

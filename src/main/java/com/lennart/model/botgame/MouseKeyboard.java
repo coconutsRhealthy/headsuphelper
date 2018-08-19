@@ -35,6 +35,16 @@ public class MouseKeyboard {
         }
     }
 
+    public static void pressBackSpace() {
+        try {
+            Robot bot = new Robot();
+            bot.keyPress(KeyEvent.VK_BACK_SPACE);
+            bot.keyRelease(KeyEvent.VK_BACK_SPACE);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void moveMouseToLocation(int x, int y) {
         try {
             Robot bot = new Robot();
