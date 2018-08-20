@@ -119,12 +119,11 @@ public class StarsTableReader {
     }
 
     public static boolean botIsToAct() {
-        //to implement
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(926, 965, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1048, 773, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-        if(suitRgb / 10_000 == -1674) {
-            //expected rgb: -16743748
+
+        if(suitRgb / 1_000_000 == -9) {
+            //expected rgb: -9.820.662
             return true;
         }
         return false;
@@ -231,7 +230,7 @@ public class StarsTableReader {
     }
 
     private String readFirstHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(74, 197, 19, 23);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(72, 197, 19, 21);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -388,12 +387,11 @@ public class StarsTableReader {
     }
 
     public boolean leftPlayerIsButton() {
-        //to implement
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(640, 705, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(204, 428, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-        if(suitRgb / 1000 == -10) {
-            //expected rgb: -10240
+
+        if(suitRgb / 1_000_000 == -5) {
+            //expected rgb: -5.296.598
             return true;
         }
         return false;
@@ -460,7 +458,7 @@ public class StarsTableReader {
             cardRank = 8;
         } else if(stringCardRank.contains("9")) {
             cardRank = 9;
-        } else if(stringCardRank.contains("10")) {
+        } else if(stringCardRank.contains("ll]") || stringCardRank.contains("I0") || stringCardRank.contains("IO")) {
             cardRank = 10;
         } else if(stringCardRank.contains("J")) {
             cardRank = 11;
