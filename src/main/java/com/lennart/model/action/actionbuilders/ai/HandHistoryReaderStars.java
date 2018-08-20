@@ -10,9 +10,10 @@ import java.util.*;
 
 public class HandHistoryReaderStars {
 
-    public List<String> getOpponentActionsOfLastHand(String opponentPlayerNameOfLastHand) throws Exception {
+    public List<String> getOpponentActionsOfLastHand(ContinuousTable continuousTable, String opponentPlayerNameOfLastHand) throws Exception {
         List<String> total = readTextFile();
         List<String> lastHand = getLinesOfLastGame(total);
+        continuousTable.setStarsLastHandNumber(getHandNumber(lastHand.get(0)));
 
         //logic regarding foldstats
         FoldStatsKeeper foldStatsKeeper = new FoldStatsKeeper();
@@ -30,7 +31,7 @@ public class HandHistoryReaderStars {
         return opponentActions;
     }
 
-    private List<String> readTextFile() throws Exception  {
+    public List<String> readTextFile() throws Exception  {
         File textFile = getLatestFilefromDir("/Users/lennartpopma/Downloads");
 
         List<String> textLines;
@@ -53,7 +54,7 @@ public class HandHistoryReaderStars {
         return textLines;
     }
 
-    private List<String> getLinesOfLastGame(List<String> totalXml) {
+    public List<String> getLinesOfLastGame(List<String> totalXml) {
         List<String> copyOfTotal = new ArrayList<>();
         List<String> lastGame = new ArrayList<>();
 
@@ -130,6 +131,10 @@ public class HandHistoryReaderStars {
         }
 
         return opponentActions;
+    }
+
+    public String getHandNumber(String firstLine) {
+        return firstLine.substring(firstLine.indexOf("#") + 1, firstLine.indexOf(":"));
     }
 
     private File getLatestFilefromDir(String dirPath){

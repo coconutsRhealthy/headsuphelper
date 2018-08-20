@@ -3,7 +3,7 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
-import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
+import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -20,7 +20,8 @@ public class ContinuousTable implements ContinuousTableable {
     private boolean opponentHasInitiative = false;
     private boolean pre3betOrPostRaisedPot = false;
     private boolean opponentDidPreflop4betPot = false;
-    private static List<String> allHandsPlayedAndPlayerNames = new ArrayList<>();
+    private List<String> allHandsPlayedAndPlayerNames = new ArrayList<>();
+    private String starsLastHandNumber = "0";
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -35,17 +36,17 @@ public class ContinuousTable implements ContinuousTableable {
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
             milliSecondsTotal = milliSecondsTotal + 100;
-            if(NetBetTableReader.botIsToAct()) {
+            if(StarsTableReader.botIsToAct()) {
                 numberOfActionRequests++;
 
-                if(NetBetTableReader.isNewHand()) {
+                if(isNewHand()) {
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
-                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand);
+                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(this, opponentPlayerNameOfLastHand);
                     }
 
                     gameVariables = new GameVariables(true);
@@ -71,7 +72,7 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("********************");
                 System.out.println();
 
-                NetBetTableReader.performActionOnSite(action, sizing);
+                StarsTableReader.performActionOnSite(action, sizing);
 
                 TimeUnit.MILLISECONDS.sleep(100);
             }
@@ -82,7 +83,7 @@ public class ContinuousTable implements ContinuousTableable {
                 printDotTotal++;
 
                 if(printDotTotal == 30) {
-                    NetBetTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                    StarsTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
 
                     MouseKeyboard.moveMouseToLocation(1565, 909);
                     TimeUnit.MILLISECONDS.sleep(300);
@@ -98,7 +99,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
-        NetBetTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
+        StarsTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
 
         String opponentStack = String.valueOf(gameVariables.getOpponentStack());
         String opponentBetSize = String.valueOf(gameVariables.getOpponentBetSize());
@@ -149,6 +150,14 @@ public class ContinuousTable implements ContinuousTableable {
         return cardListAsString;
     }
 
+    private boolean isNewHand() throws Exception {
+        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+        List<String> total = handHistoryReaderStars.readTextFile();
+        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total);
+        String lastHandNumber = handHistoryReaderStars.getHandNumber(lastHand.get(0));
+        return !starsLastHandNumber.equals(lastHandNumber);
+    }
+
     @Override
     public boolean isOpponentHasInitiative() {
         return opponentHasInitiative;
@@ -177,5 +186,9 @@ public class ContinuousTable implements ContinuousTableable {
     @Override
     public void setPre3betOrPostRaisedPot(boolean pre3betOrPostRaisedPot) {
         this.pre3betOrPostRaisedPot = pre3betOrPostRaisedPot;
+    }
+
+    public void setStarsLastHandNumber(String starsLastHandNumber) {
+        this.starsLastHandNumber = starsLastHandNumber;
     }
 }

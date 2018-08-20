@@ -135,12 +135,6 @@ public class StarsTableReader {
         return false;
     }
 
-    public static boolean isNewHand() {
-        //to implement
-
-        return false;
-    }
-
     public String getOpponentPlayerNameFromImage() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(924, 400, 124, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
