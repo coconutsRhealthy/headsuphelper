@@ -50,7 +50,7 @@ public class GameVariables implements GameVariable {
     public GameVariables(boolean stars) throws Exception {
         bigBlind = 0.50;
 
-        StarsTableReader starsTableReader = new StarsTableReader(bigBlind);
+        StarsTableReader starsTableReader = new StarsTableReader();
 
         botStack = starsTableReader.getBotStackFromImage();
         opponentStack = starsTableReader.getOpponentStackFromImage();
@@ -73,7 +73,7 @@ public class GameVariables implements GameVariable {
     }
 
     public void fillFieldsSubsequent(boolean stars) throws Exception {
-        StarsTableReader starsTableReader = new StarsTableReader(bigBlind);
+        StarsTableReader starsTableReader = new StarsTableReader();
 
         botStack = starsTableReader.getBotStackFromImage();
         opponentStack = starsTableReader.getOpponentStackFromImage();
@@ -205,7 +205,7 @@ public class GameVariables implements GameVariable {
     }
 
     private void fillTheStarsBoard() throws Exception {
-        StarsTableReader starsTableReader = new StarsTableReader(bigBlind);
+        StarsTableReader starsTableReader = new StarsTableReader();
 
         if(flopCard1 == null) {
             for(int i = 0; i < 10; i++) {

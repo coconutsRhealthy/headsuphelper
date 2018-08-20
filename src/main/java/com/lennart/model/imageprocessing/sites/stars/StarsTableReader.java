@@ -3,6 +3,7 @@ package com.lennart.model.imageprocessing.sites.stars;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
@@ -12,12 +13,6 @@ import java.util.concurrent.TimeUnit;
  * Created by Lennart on 3/12/2017.
  */
 public class StarsTableReader {
-
-    private double bigBlind;
-
-    public StarsTableReader(double bigBlind) {
-        this.bigBlind = bigBlind;
-    }
 
     public double getBotStackFromImage() throws Exception {
         String botStackAsString = readLeftPlayerStack();
@@ -193,10 +188,12 @@ public class StarsTableReader {
     }
 
     private static void clickCallActionButton() {
-        MouseKeyboard.click(808, 749);
-
-        //or, if opponent is all in
-        MouseKeyboard.click(1000, 756);
+        if(StringUtils.containsIgnoreCase(readMiddleActionButton(), "call")) {
+            MouseKeyboard.click(808, 749);
+        } else {
+            System.out.println("Could not read 'call' in middle action button. So click right action button to call");
+            MouseKeyboard.click(1000, 756);
+        }
     }
 
     private static void clickBetActionButton() {
