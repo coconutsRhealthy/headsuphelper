@@ -69,7 +69,7 @@ public class GameVariables implements GameVariable {
         opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
         botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalOpponentBetSize();
         pot = topPotSize - opponentBetSize - botBetSize;
-        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getAction();
+        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
     }
 
     public void fillFieldsSubsequent(boolean stars) throws Exception {
@@ -89,7 +89,7 @@ public class GameVariables implements GameVariable {
         opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
         botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalOpponentBetSize();
         pot = topPotSize - opponentBetSize - botBetSize;
-        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getAction();
+        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
     }
 
     public GameVariables(String opponentName) throws Exception {
@@ -529,5 +529,9 @@ public class GameVariables implements GameVariable {
     @Override
     public void setPreviousBluffAction(boolean previousBluffAction) {
         this.previousBluffAction = previousBluffAction;
+    }
+
+    public List<ActionRequest> getAllActionRequestsOfHand() {
+        return allActionRequestsOfHand;
     }
 }
