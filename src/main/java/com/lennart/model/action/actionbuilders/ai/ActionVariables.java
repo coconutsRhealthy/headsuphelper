@@ -8,6 +8,8 @@ import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.handevaluation.PreflopHandStength;
+import com.lennart.model.handtracker.ActionRequest;
+import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,6 +170,11 @@ public class ActionVariables {
                 }
             }
         }
+
+        PlayerActionRound botPlayerActionRound = new PlayerActionRound("bot", gameVariables.getBoard(), sizing, gameVariables.getOpponentBetSize(), "theCorrectStreet", action);
+        List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
+        ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
+        lastActionRequest.getActionsSinceLastRequest().add(botPlayerActionRound);
     }
 
     private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable) {
