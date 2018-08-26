@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class StarsTableReader {
 
     public double getBotStackFromImage() throws Exception {
-        String botStackAsString = readLeftPlayerStack();
+        String botStackAsString = readBottomPlayerStack();
 
         if(botStackAsString.endsWith(".")) {
             botStackAsString.replaceAll(".", "");
@@ -29,7 +29,7 @@ public class StarsTableReader {
     }
 
     public double getOpponentStackFromImage() throws Exception {
-        String opponentStackAsString = readRightPlayerStack();
+        String opponentStackAsString = readTopPlayerStack();
 
         if(opponentStackAsString.endsWith(".")) {
             opponentStackAsString.replaceAll(".", "");
@@ -43,7 +43,7 @@ public class StarsTableReader {
     }
 
     public double getTopPotsizeFromImage() throws Exception {
-        String topPotsize = readTopTotalPotSize();
+        String topPotsize = readTotalPotSize();
 
         if(topPotsize.endsWith(".")) {
             topPotsize.replaceAll(".", "");
@@ -327,8 +327,17 @@ public class StarsTableReader {
         return getSuitFromIntRgb(suitRgb);
     }
 
-    private String readRightPlayerStack() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(50, 421, 123, 21);
+    private String readBottomPlayerStack() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(514, 585, 107, 25);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        bottomPlayerStack = ImageProcessor.removeEmptySpacesFromString(bottomPlayerStack);
+        return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
+    }
+
+    private String readTopPlayerStack() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(468, 159, 107, 25);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -336,44 +345,14 @@ public class StarsTableReader {
         return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
     }
 
-    private String readLeftPlayerStack() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(924, 421, 123, 21);
+    private String readTotalPotSize() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(448, 243, 191, 38);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        bottomPlayerStack = ImageProcessor.removeEmptySpacesFromString(bottomPlayerStack);
-        return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
-    }
-
-
-    //welke potsize methode kan weg?
-    private static String readPotSize() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(472, 407, 126, 17);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String potSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        potSize = ImageProcessor.removeEmptySpacesFromString(potSize);
-        return ImageProcessor.removeAllNonNumericCharacters(potSize);
-    }
-
-    private String readTopTotalPotSize() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(469, 61, 147, 28);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String topPlayerTotalBetSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        topPlayerTotalBetSize = ImageProcessor.removeEmptySpacesFromString(topPlayerTotalBetSize);
-        return ImageProcessor.removeAllNonNumericCharacters(topPlayerTotalBetSize);
-    }
-
-    private String readNormalTotalPotSize() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(463, 406, 105, 18);
-        //bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 3);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String topPlayerTotalBetSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        topPlayerTotalBetSize = ImageProcessor.removeEmptySpacesFromString(topPlayerTotalBetSize);
-        return ImageProcessor.removeAllNonNumericCharacters(topPlayerTotalBetSize);
+        String totalPotSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        totalPotSize = ImageProcessor.removeEmptySpacesFromString(totalPotSize);
+        return ImageProcessor.removeAllNonNumericCharacters(totalPotSize);
     }
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
