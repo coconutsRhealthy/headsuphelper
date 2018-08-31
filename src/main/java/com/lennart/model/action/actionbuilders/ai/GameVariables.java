@@ -1,6 +1,5 @@
 package com.lennart.model.action.actionbuilders.ai;
 
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.handtracker.ActionRequest;
@@ -57,7 +56,7 @@ public class GameVariables implements GameVariable {
         botHoleCard1 = starsTableReader.getBotHoleCard1FromImage();
         botHoleCard2 = starsTableReader.getBotHoleCard2FromImage();
         opponentName = starsTableReader.getOpponentPlayerNameFromImage();
-        botIsButton = starsTableReader.leftPlayerIsButton();
+        botIsButton = starsTableReader.topPlayerIsButton();
         botHoleCards.add(botHoleCard1);
         botHoleCards.add(botHoleCard2);
 

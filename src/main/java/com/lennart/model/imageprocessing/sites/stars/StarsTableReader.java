@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class StarsTableReader {
 
     public double getBotStackFromImage() throws Exception {
-        String botStackAsString = readBottomPlayerStack();
+        String botStackAsString = readTopPlayerStack();
 
         if(botStackAsString.endsWith(".")) {
             botStackAsString.replaceAll(".", "");
@@ -29,7 +29,7 @@ public class StarsTableReader {
     }
 
     public double getOpponentStackFromImage() throws Exception {
-        String opponentStackAsString = readTopPlayerStack();
+        String opponentStackAsString = readBottomPlayerStack();
 
         if(opponentStackAsString.endsWith(".")) {
             opponentStackAsString.replaceAll(".", "");
@@ -130,7 +130,7 @@ public class StarsTableReader {
     }
 
     public String getOpponentPlayerNameFromImage() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(924, 400, 124, 22);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(512, 553, 124, 28);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -230,7 +230,7 @@ public class StarsTableReader {
     }
 
     private String readFirstHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(72, 197, 19, 21);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(479, 62, 19, 23);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -238,7 +238,7 @@ public class StarsTableReader {
     }
 
     private String readSecondHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(95, 203, 19, 21);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(547, 63, 19, 22);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -246,7 +246,7 @@ public class StarsTableReader {
     }
 
     private String readFirstFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(368, 259, 19, 23);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(361, 295, 19, 23);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -254,7 +254,7 @@ public class StarsTableReader {
     }
 
     private String readSecondFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(444, 259, 19, 23);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(437, 295, 19, 23);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String secondFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -262,7 +262,7 @@ public class StarsTableReader {
     }
 
     private String readThirdFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(520, 259, 19, 23);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(513, 295, 19, 23);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String thirdFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -270,7 +270,7 @@ public class StarsTableReader {
     }
 
     private String readTurnCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(596, 259, 19, 23);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(589, 295, 19, 23);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String turnCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -278,7 +278,7 @@ public class StarsTableReader {
     }
 
     private String readRiverCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(672, 259, 19, 23);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(665, 295, 19, 23);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String riverCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -286,43 +286,43 @@ public class StarsTableReader {
     }
 
     private char readFirstHoleCardSuit() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(83, 231, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(485, 93, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgbHole(suitRgb);
     }
 
     private char readSecondHoleCardSuit() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(105, 237, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(553, 93, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgbHole(suitRgb);
     }
 
     private char readFirstFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(378, 294, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(370, 328, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readSecondFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(454, 294, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(446, 328, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readThirdFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(530, 294, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(522, 328, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readTurnCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(606, 294, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(598, 328, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgb(suitRgb);
     }
 
     private char readRiverCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(682, 294, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(674, 328, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgb(suitRgb);
     }
@@ -365,12 +365,12 @@ public class StarsTableReader {
         ImageProcessor.saveBufferedImage(bufferedImage, "C:/Users/Lennart/Documents/develop/logging/" + time + ".png");
     }
 
-    public boolean leftPlayerIsButton() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(204, 428, 1, 1);
+    public boolean topPlayerIsButton() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(438, 223, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
 
-        if(suitRgb / 1_000_000 == -5) {
-            //expected rgb: -5.296.598
+        if(suitRgb / 1_000_000 == -1) {
+            //expected rgb: -1.114.100
             return true;
         }
         return false;
@@ -380,16 +380,16 @@ public class StarsTableReader {
         char suit = 'x';
         rgb = rgb / 100_000;
 
-        //S: -4.802.890
-        //C: -2.364.451
+        //S: -16.777.216
+        //C: -14.715.610 of -2.627.367
         //H: -4.128.753
         //D: -16.121.711
 
-        if(rgb == -23) {
+        if(rgb == -147 || rgb == -26) {
             suit = 'c';
         } else if(rgb == -41) {
             suit = 'h';
-        } else if(rgb == -48) {
+        } else if(rgb == -167) {
             suit = 's';
         } else if(rgb == -161) {
             suit = 'd';
@@ -401,16 +401,16 @@ public class StarsTableReader {
         char suit = 'x';
         rgb = rgb / 1_000_000;
 
-        //spades: -6250336
-        //clubs: -8012917
-        //hearts: -4128753
-        //diamonds: -16121712
+        //spades: -15.856.114
+        //clubs: -14.781.405
+        //hearts: -4.128.753
+        //diamonds: -16.121.711
 
-        if(rgb == -8) {
+        if(rgb == -14) {
             suit = 'c';
         } else if(rgb == -4) {
             suit = 'h';
-        } else if(rgb == -6) {
+        } else if(rgb == -15) {
             suit = 's';
         } else if(rgb == -16) {
             suit = 'd';
