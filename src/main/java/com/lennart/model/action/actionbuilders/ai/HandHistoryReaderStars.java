@@ -10,10 +10,9 @@ import java.util.*;
 
 public class HandHistoryReaderStars {
 
-    public List<String> getOpponentActionsOfLastHand(ContinuousTable continuousTable, String opponentPlayerNameOfLastHand) throws Exception {
+    public List<String> getOpponentActionsOfLastHand(String opponentPlayerNameOfLastHand) throws Exception {
         List<String> total = readTextFile();
         List<String> lastHand = getLinesOfLastGame(total);
-        continuousTable.setStarsLastHandNumber(getHandNumber(lastHand.get(0)));
 
         //logic regarding foldstats
         FoldStatsKeeper foldStatsKeeper = new FoldStatsKeeper();

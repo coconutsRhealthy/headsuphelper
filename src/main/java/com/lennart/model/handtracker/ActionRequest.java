@@ -220,9 +220,15 @@ public class ActionRequest {
                     }
                 } else {
                     if(botLastAction.equals("check")) {
-                        //opponent action has to also be 'check'
-                        PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "check");
-                        actionsSinceLastRequest.add(playerActionRound);
+                        if(board.size() == 3) {
+                            //bot checked after opponent preflop limp
+                            PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "empty");
+                            actionsSinceLastRequest.add(playerActionRound);
+                        } else {
+                            //opponent action has to also be 'check'
+                            PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "check");
+                            actionsSinceLastRequest.add(playerActionRound);
+                        }
                     } else if(botLastAction.equals("bet75pct")) {
                         //opponent action has to be 'call'
                         double previousTotalBotBetSize = botLastActionRound.getTotalBotBetSize();

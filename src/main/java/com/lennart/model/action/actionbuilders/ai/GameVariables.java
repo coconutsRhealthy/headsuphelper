@@ -3,6 +3,7 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.handtracker.ActionRequest;
+import com.lennart.model.handtracker.PlayerActionRound;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
 import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
 
@@ -62,13 +63,30 @@ public class GameVariables implements GameVariable {
 
         double topPotSize = starsTableReader.getTopPotsizeFromImage();
         allActionRequestsOfHand = new ArrayList<>();
-        ActionRequest actionRequest = new ActionRequest(new ArrayList<>(), topPotSize, board, botIsButton, bigBlind);
+
+        List<Card> boardCopy = new ArrayList<>();
+        boardCopy.addAll(board);
+        ActionRequest actionRequest = new ActionRequest(new ArrayList<>(), topPotSize, boardCopy, botIsButton, bigBlind);
         allActionRequestsOfHand.add(actionRequest);
 
-        opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
-        botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalBotBetSize();
+        PlayerActionRound opponentMostRecentActionRound = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent");
+        PlayerActionRound botMostRecentActionRound = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot");
+
+        if(opponentMostRecentActionRound != null) {
+            opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+            opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
+        } else {
+            opponentBetSize = 0;
+            opponentAction = "empty";
+        }
+
+        if(botMostRecentActionRound != null) {
+            botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalBotBetSize();
+        } else {
+            botBetSize = 0;
+        }
+
         pot = topPotSize - opponentBetSize - botBetSize;
-        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
     }
 
     public void fillFieldsSubsequent(boolean stars) throws Exception {
@@ -82,13 +100,30 @@ public class GameVariables implements GameVariable {
 
         List<ActionRequest> copyOfAllActionRequests = new ArrayList<>();
         copyOfAllActionRequests.addAll(allActionRequestsOfHand);
-        ActionRequest actionRequest = new ActionRequest(copyOfAllActionRequests, topPotSize, board, botIsButton, bigBlind);
+
+        List<Card> boardCopy = new ArrayList<>();
+        boardCopy.addAll(board);
+        ActionRequest actionRequest = new ActionRequest(copyOfAllActionRequests, topPotSize, boardCopy, botIsButton, bigBlind);
         allActionRequestsOfHand.add(actionRequest);
 
-        opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
-        botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalOpponentBetSize();
+        PlayerActionRound opponentMostRecentActionRound = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent");
+        PlayerActionRound botMostRecentActionRound = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot");
+
+        if(opponentMostRecentActionRound != null) {
+            opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+            opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
+        } else {
+            opponentBetSize = 0;
+            opponentAction = "empty";
+        }
+
+        if(botMostRecentActionRound != null) {
+            botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalBotBetSize();
+        } else {
+            botBetSize = 0;
+        }
+
         pot = topPotSize - opponentBetSize - botBetSize;
-        opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
     }
 
     public GameVariables(String opponentName) throws Exception {

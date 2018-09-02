@@ -195,9 +195,9 @@ public class OpponentIdentifier {
         closeDbConnection();
     }
 
-    public void updateCountsFromHandhistoryDbLogic(ContinuousTable continuousTable, String opponentPlayerNameOfLastHand) throws Exception {
+    public void updateCountsFromHandhistoryDbLogic(String opponentPlayerNameOfLastHand) throws Exception {
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> opponentActions = handHistoryReaderStars.getOpponentActionsOfLastHand(continuousTable ,opponentPlayerNameOfLastHand);
+        List<String> opponentActions = handHistoryReaderStars.getOpponentActionsOfLastHand(opponentPlayerNameOfLastHand);
         updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
 
         for(String action : opponentActions) {

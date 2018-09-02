@@ -179,7 +179,12 @@ public class ActionVariables {
             totalBotBetSizeForPlayerActionRound = sizing;
         }
 
-        PlayerActionRound botPlayerActionRound = new PlayerActionRound("bot", gameVariables.getBoard(), totalBotBetSizeForPlayerActionRound, gameVariables.getOpponentBetSize(), "theCorrectStreet", action);
+        List<Card> currentBoardCopy = new ArrayList<>();
+        currentBoardCopy.addAll(gameVariables.getBoard());
+        double opponentBetSizeCopy = gameVariables.getOpponentBetSize();
+        String actionCopy = action;
+
+        PlayerActionRound botPlayerActionRound = new PlayerActionRound("bot", currentBoardCopy, totalBotBetSizeForPlayerActionRound, opponentBetSizeCopy, "theCorrectStreet", actionCopy);
         List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
         ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
         lastActionRequest.getActionsSinceLastRequest().add(botPlayerActionRound);

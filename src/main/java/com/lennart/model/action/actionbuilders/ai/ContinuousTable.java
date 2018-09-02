@@ -46,7 +46,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
-                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(this, opponentPlayerNameOfLastHand);
+                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand);
                     }
 
                     gameVariables = new GameVariables(true);
@@ -151,11 +151,17 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private boolean isNewHand() throws Exception {
+        boolean isNewHand;
+
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
         List<String> total = handHistoryReaderStars.readTextFile();
         List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total);
         String lastHandNumber = handHistoryReaderStars.getHandNumber(lastHand.get(0));
-        return !starsLastHandNumber.equals(lastHandNumber);
+
+        isNewHand = !starsLastHandNumber.equals(lastHandNumber);
+        starsLastHandNumber = lastHandNumber;
+
+        return isNewHand;
     }
 
     @Override
