@@ -171,7 +171,15 @@ public class ActionVariables {
             }
         }
 
-        PlayerActionRound botPlayerActionRound = new PlayerActionRound("bot", gameVariables.getBoard(), sizing, gameVariables.getOpponentBetSize(), "theCorrectStreet", action);
+        double totalBotBetSizeForPlayerActionRound;
+
+        if(sizing == 0) {
+            totalBotBetSizeForPlayerActionRound = gameVariables.getBotBetSize();
+        } else {
+            totalBotBetSizeForPlayerActionRound = sizing;
+        }
+
+        PlayerActionRound botPlayerActionRound = new PlayerActionRound("bot", gameVariables.getBoard(), totalBotBetSizeForPlayerActionRound, gameVariables.getOpponentBetSize(), "theCorrectStreet", action);
         List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
         ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
         lastActionRequest.getActionsSinceLastRequest().add(botPlayerActionRound);

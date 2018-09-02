@@ -114,7 +114,7 @@ public class ContinuousTable implements ContinuousTableable {
         String suggestedAction = actionVariables.getAction();
         String sizing = String.valueOf(actionVariables.getSizing());
 
-        PrintWriter writer = new PrintWriter("C:/Users/Lennart/Documents/develop/logging/" + numberOfActionRequests + ".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("/Users/LennartMac/Documents/logging/" + numberOfActionRequests + ".txt", "UTF-8");
 
         writer.println("OpponentStack: " + opponentStack);
         writer.println("OpponentBetSize: " + opponentBetSize);

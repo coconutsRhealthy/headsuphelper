@@ -32,7 +32,7 @@ public class HandHistoryReaderStars {
     }
 
     public List<String> readTextFile() throws Exception  {
-        File textFile = getLatestFilefromDir("/Users/lennartpopma/Downloads");
+        File textFile = getLatestFilefromDir("/Users/LennartMac/Library/Application Support/PokerStarsEU/HandHistory/vegeta11223");
 
         List<String> textLines;
         try (Reader fileReader = new FileReader(textFile)) {
