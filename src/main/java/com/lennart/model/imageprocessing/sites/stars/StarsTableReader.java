@@ -122,8 +122,8 @@ public class StarsTableReader {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1048, 773, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
 
-        if(suitRgb / 1_000_000 == -9) {
-            //expected rgb: -9.820.662
+        if(suitRgb / 1_000_000 == -14) {
+            //expected rgb: -14.614.527
             return true;
         }
         return false;
@@ -146,7 +146,7 @@ public class StarsTableReader {
     public static void performActionOnSite(String botAction, double sizing) {
         if(botAction != null && sizing != 0) {
             try {
-                MouseKeyboard.click(901, 683);
+                MouseKeyboard.click(789, 696);
                 TimeUnit.MILLISECONDS.sleep(150);
                 MouseKeyboard.pressBackSpace();
                 MouseKeyboard.pressBackSpace();
@@ -179,28 +179,28 @@ public class StarsTableReader {
 
     //helper methods
     private static void clickFoldActionButton() {
-        MouseKeyboard.click(657, 749);
+        MouseKeyboard.click(609, 755);
     }
 
     private static void clickCheckActionButton() {
-        MouseKeyboard.click(808, 749);
+        MouseKeyboard.click(810, 748);
     }
 
     private static void clickCallActionButton() {
         if(StringUtils.containsIgnoreCase(readMiddleActionButton(), "call")) {
-            MouseKeyboard.click(808, 749);
+            MouseKeyboard.click(810, 748);
         } else {
             System.out.println("Could not read 'call' in middle action button. So click right action button to call");
-            MouseKeyboard.click(1000, 756);
+            MouseKeyboard.click(958, 754);
         }
     }
 
     private static void clickBetActionButton() {
-        MouseKeyboard.click(1000, 756);
+        MouseKeyboard.click(1008, 749);
     }
 
     private static void clickRaiseActionButton() {
-        MouseKeyboard.click(1000, 756);
+        MouseKeyboard.click(958, 754);
     }
 
     private static String readLeftActionButton() {
@@ -212,7 +212,7 @@ public class StarsTableReader {
     }
 
     private static String readMiddleActionButton() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(765, 729, 114, 46);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(727, 732, 151, 47);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -357,12 +357,12 @@ public class StarsTableReader {
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
-        ImageProcessor.saveBufferedImage(bufferedImage, "C:/Users/Lennart/Documents/develop/logging/" + numberOfActionRequests + ".png");
+        ImageProcessor.saveBufferedImage(bufferedImage, "/Users/LennartMac/Documents/logging/" + numberOfActionRequests + ".png");
     }
 
     public static void saveScreenshotOfEntireScreen(long time) throws Exception {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
-        ImageProcessor.saveBufferedImage(bufferedImage, "C:/Users/Lennart/Documents/develop/logging/" + time + ".png");
+        ImageProcessor.saveBufferedImage(bufferedImage, "/Users/LennartMac/Documents/logging/" + time + ".png");
     }
 
     public boolean topPlayerIsButton() {
