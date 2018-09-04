@@ -129,6 +129,10 @@ public class ActionRequest {
             List<Card> boardAtLastActionRequest = previousActionRequest.getBoard();
             String botLastAction = botLastActionRound.getAction();
 
+            if(board.isEmpty() && allActionRequestsOfHand.size() == 1) {
+                System.out.println("yoyo wachten!");
+            }
+
             if(board.equals(boardAtLastActionRequest)) {
                 if(botLastAction.equals("check")) {
                     double previousTotalPotSize = previousActionRequest.getTopTotalPotSize();
@@ -202,14 +206,25 @@ public class ActionRequest {
                     } else if(botLastAction.equals("raise")) {
                         //either call / check or call / bet...
 
+                        PlayerActionRound botSecondLastActionRound = getSecondMostRecentActionRoundOfPLayer(allActionsOfPreviousActionRequest, "bot");
+                        //PlayerActionRound opponentSecondLastActionRound = getSecondMostRecentActionRoundOfPLayer(allActionsOfPreviousActionRequest, "opponent");
+
+                        if(botSecondLastActionRound == null) {
+                            ActionRequest previousPreviousActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
+                            List<PlayerActionRound> allActionsOfPreviousPreviousActionRequest = previousPreviousActionRequest.getActionsSinceLastRequest();
+                            botSecondLastActionRound = getMostRecentActionRoundOfPLayer(allActionsOfPreviousPreviousActionRequest, "bot");
+                        }
+
                         double previousTotalPotSize = previousActionRequest.getTopTotalPotSize();
                         double previousTotalBotBetSize = botLastActionRound.getTotalBotBetSize();
                         double previousTotalOpponentBetSize = botLastActionRound.getTotalOpponentBetSize();
+                        double previousPreviousTotalBotBetSzie = botSecondLastActionRound.getTotalBotBetSize();
+                        double previousPreviousTotalOpponentBetSize = botSecondLastActionRound.getTotalOpponentBetSize();
 
                         PlayerActionRound playerActionRound1 = new PlayerActionRound("opponent", boardAtLastActionRequest, previousTotalBotBetSize, previousTotalOpponentBetSize, "thecorrectstreet", "call");
                         actionsSinceLastRequest.add(playerActionRound1);
 
-                        if(equalsRake(topTotalPotSize, previousTotalPotSize + (previousTotalBotBetSize - previousTotalOpponentBetSize))) {
+                        if(equalsRake(topTotalPotSize, previousTotalPotSize + (previousTotalBotBetSize - previousPreviousTotalBotBetSzie) + (previousTotalBotBetSize - previousPreviousTotalOpponentBetSize))) {
                             PlayerActionRound playerActionRound2 = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "check");
                             actionsSinceLastRequest.add(playerActionRound2);
                         } else {
@@ -228,12 +243,18 @@ public class ActionRequest {
                             //opponent action has to also be 'check'
                             PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "check");
                             actionsSinceLastRequest.add(playerActionRound);
+
+                            PlayerActionRound playerActionRound2 = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "empty");
+                            actionsSinceLastRequest.add(playerActionRound2);
                         }
                     } else if(botLastAction.equals("bet75pct")) {
                         //opponent action has to be 'call'
                         double previousTotalBotBetSize = botLastActionRound.getTotalBotBetSize();
                         PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, previousTotalBotBetSize, 0, "thecorrectstreet", "call");
                         actionsSinceLastRequest.add(playerActionRound);
+
+                        PlayerActionRound playerActionRound2 = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "empty");
+                        actionsSinceLastRequest.add(playerActionRound2);
                     } else if(botLastAction.equals("call")) {
                         //als jij oop gecallt hebt dan ben jij per definitie meteen weer aan de beurt nu
                         //no new PlayerActionRound since your last action
@@ -246,6 +267,9 @@ public class ActionRequest {
                         double previousTotalOpponentBetSize = botLastActionRound.getTotalOpponentBetSize();
                         PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, previousTotalBotBetSize, previousTotalOpponentBetSize, "thecorrectstreet", "call");
                         actionsSinceLastRequest.add(playerActionRound);
+
+                        PlayerActionRound playerActionRound2 = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "empty");
+                        actionsSinceLastRequest.add(playerActionRound2);
                     }
                 }
             }
@@ -271,15 +295,15 @@ public class ActionRequest {
     private boolean equalsRake(double actualValue, double expectedValue) {
         boolean equalsRake;
 
-        if(expectedValue - actualValue <= 2) {
-            if(actualValue >= (expectedValue * 0.97) && actualValue <= expectedValue) {
+        //if(expectedValue - actualValue <= 2) {
+            if(actualValue >= (expectedValue * 0.94) && actualValue <= expectedValue) {
                 equalsRake = true;
             } else {
                 equalsRake = false;
             }
-        } else {
-            equalsRake = false;
-        }
+//        } else {
+//            equalsRake = false;
+//        }
 
         return equalsRake;
     }
@@ -288,6 +312,23 @@ public class ActionRequest {
         for(int i = actionsSinceLastRequest.size() - 1; i >= 0; i--) {
             if(actionsSinceLastRequest.get(i).getPlayerName().equals(playerName)) {
                 return actionsSinceLastRequest.get(i);
+            }
+
+        }
+
+        return null;
+    }
+
+    public PlayerActionRound getSecondMostRecentActionRoundOfPLayer(List<PlayerActionRound> actionsSinceLastRequest, String playerName) {
+        int counter = 0;
+
+        for(int i = actionsSinceLastRequest.size() - 1; i >= 0; i--) {
+            if(actionsSinceLastRequest.get(i).getPlayerName().equals(playerName)) {
+                counter++;
+
+                if(counter == 2) {
+                    return actionsSinceLastRequest.get(i);
+                }
             }
 
         }

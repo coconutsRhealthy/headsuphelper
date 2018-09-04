@@ -56,7 +56,6 @@ public class GameVariables implements GameVariable {
         opponentStack = starsTableReader.getOpponentStackFromImage();
         botHoleCard1 = starsTableReader.getBotHoleCard1FromImage();
         botHoleCard2 = starsTableReader.getBotHoleCard2FromImage();
-        opponentName = starsTableReader.getOpponentPlayerNameFromImage();
         botIsButton = starsTableReader.topPlayerIsButton();
         botHoleCards.add(botHoleCard1);
         botHoleCards.add(botHoleCard2);
@@ -66,6 +65,11 @@ public class GameVariables implements GameVariable {
 
         List<Card> boardCopy = new ArrayList<>();
         boardCopy.addAll(board);
+
+        if(allActionRequestsOfHand.size() == 2) {
+            System.out.println("wacht");
+        }
+
         ActionRequest actionRequest = new ActionRequest(new ArrayList<>(), topPotSize, boardCopy, botIsButton, bigBlind);
         allActionRequestsOfHand.add(actionRequest);
 
@@ -87,6 +91,9 @@ public class GameVariables implements GameVariable {
         }
 
         pot = topPotSize - opponentBetSize - botBetSize;
+
+        TimeUnit.SECONDS.sleep(1);
+        opponentName = starsTableReader.getOpponentPlayerNameFromImage();
     }
 
     public void fillFieldsSubsequent(boolean stars) throws Exception {
@@ -103,6 +110,11 @@ public class GameVariables implements GameVariable {
 
         List<Card> boardCopy = new ArrayList<>();
         boardCopy.addAll(board);
+
+        if(allActionRequestsOfHand.size() == 1) {
+            System.out.println("wacht");
+        }
+
         ActionRequest actionRequest = new ActionRequest(copyOfAllActionRequests, topPotSize, boardCopy, botIsButton, bigBlind);
         allActionRequestsOfHand.add(actionRequest);
 
@@ -110,7 +122,12 @@ public class GameVariables implements GameVariable {
         PlayerActionRound botMostRecentActionRound = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot");
 
         if(opponentMostRecentActionRound != null) {
-            opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+            if(actionRequest.getActionsSinceLastRequest().indexOf(opponentMostRecentActionRound) >
+                    actionRequest.getActionsSinceLastRequest().indexOf(botMostRecentActionRound)) {
+                opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+            } else {
+                opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalOpponentBetSize();
+            }
             opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
         } else {
             opponentBetSize = 0;

@@ -136,6 +136,8 @@ public class StarsTableReader {
         String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         String fullPlayerName = ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
 
+        fullPlayerName = fullPlayerName.replaceAll("'", "");
+
         if(fullPlayerName.endsWith("_")) {
             fullPlayerName = fullPlayerName.substring(0, fullPlayerName.length() - 1);
         }
@@ -227,6 +229,10 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new StarsTableReader().readSecondHoleCardRank());
     }
 
     private String readFirstHoleCardRank() {
@@ -437,7 +443,7 @@ public class StarsTableReader {
             cardRank = 8;
         } else if(stringCardRank.contains("9")) {
             cardRank = 9;
-        } else if(stringCardRank.contains("ll]") || stringCardRank.contains("I0") || stringCardRank.contains("IO")) {
+        } else if(stringCardRank.contains("ll]") || stringCardRank.contains("I0") || stringCardRank.contains("IO") || stringCardRank.contains("ll]") || stringCardRank.contains("l0")) {
             cardRank = 10;
         } else if(stringCardRank.contains("J")) {
             cardRank = 11;
