@@ -66,10 +66,6 @@ public class GameVariables implements GameVariable {
         List<Card> boardCopy = new ArrayList<>();
         boardCopy.addAll(board);
 
-        if(allActionRequestsOfHand.size() == 2) {
-            System.out.println("wacht");
-        }
-
         ActionRequest actionRequest = new ActionRequest(new ArrayList<>(), topPotSize, boardCopy, botIsButton, bigBlind);
         allActionRequestsOfHand.add(actionRequest);
 
@@ -110,10 +106,6 @@ public class GameVariables implements GameVariable {
 
         List<Card> boardCopy = new ArrayList<>();
         boardCopy.addAll(board);
-
-        if(allActionRequestsOfHand.size() == 1) {
-            System.out.println("wacht");
-        }
 
         ActionRequest actionRequest = new ActionRequest(copyOfAllActionRequests, topPotSize, boardCopy, botIsButton, bigBlind);
         allActionRequestsOfHand.add(actionRequest);

@@ -129,10 +129,6 @@ public class ActionRequest {
             List<Card> boardAtLastActionRequest = previousActionRequest.getBoard();
             String botLastAction = botLastActionRound.getAction();
 
-            if(board.isEmpty() && allActionRequestsOfHand.size() == 1) {
-                System.out.println("yoyo wachten!");
-            }
-
             if(board.equals(boardAtLastActionRequest)) {
                 if(botLastAction.equals("check")) {
                     double previousTotalPotSize = previousActionRequest.getTopTotalPotSize();
@@ -207,7 +203,6 @@ public class ActionRequest {
                         //either call / check or call / bet...
 
                         PlayerActionRound botSecondLastActionRound = getSecondMostRecentActionRoundOfPLayer(allActionsOfPreviousActionRequest, "bot");
-                        //PlayerActionRound opponentSecondLastActionRound = getSecondMostRecentActionRoundOfPLayer(allActionsOfPreviousActionRequest, "opponent");
 
                         if(botSecondLastActionRound == null) {
                             ActionRequest previousPreviousActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
@@ -295,15 +290,11 @@ public class ActionRequest {
     private boolean equalsRake(double actualValue, double expectedValue) {
         boolean equalsRake;
 
-        //if(expectedValue - actualValue <= 2) {
-            if(actualValue >= (expectedValue * 0.94) && actualValue <= expectedValue) {
-                equalsRake = true;
-            } else {
-                equalsRake = false;
-            }
-//        } else {
-//            equalsRake = false;
-//        }
+        if(actualValue >= (expectedValue * 0.94) && actualValue <= expectedValue) {
+            equalsRake = true;
+        } else {
+            equalsRake = false;
+        }
 
         return equalsRake;
     }

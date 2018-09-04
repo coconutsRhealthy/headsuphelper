@@ -231,10 +231,6 @@ public class StarsTableReader {
         return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
     }
 
-    public static void main(String[] args) {
-        System.out.println(new StarsTableReader().readSecondHoleCardRank());
-    }
-
     private String readFirstHoleCardRank() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(479, 62, 19, 23);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
