@@ -57,6 +57,11 @@ public class ContinuousTable implements ContinuousTableable {
 
                 ActionVariables actionVariables = new ActionVariables(gameVariables, this);
                 String action = actionVariables.getAction();
+
+                if(action.equals("bet75pct") || action.equals("raise")) {
+                    opponentHasInitiative = false;
+                }
+
                 double sizing = actionVariables.getSizing();
 
                 doLogging(gameVariables, actionVariables, numberOfActionRequests);

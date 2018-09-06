@@ -425,7 +425,7 @@ public class StarsTableReader {
 
         if(stringCardRank.contains("2")) {
             cardRank = 2;
-        } else if(stringCardRank.contains("3")) {
+        } else if(stringCardRank.contains("3") && !stringCardRank.contains("3kg_\\:")) {
             cardRank = 3;
         } else if(stringCardRank.contains("4")) {
             cardRank = 4;
