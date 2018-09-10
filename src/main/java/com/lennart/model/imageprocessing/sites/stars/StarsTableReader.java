@@ -14,19 +14,62 @@ import java.util.concurrent.TimeUnit;
  */
 public class StarsTableReader {
 
-    public double getBotStackFromImage() throws Exception {
+    public double getBotStackFromImage(boolean botMadeBetOnCurrentStreet) throws Exception {
+        if(botMadeBetOnCurrentStreet) {
+            return changeSeaftsAndReadBottomPlayerStack();
+        }
+
         String botStackAsString = readTopPlayerStack();
 
         if(botStackAsString.endsWith(".")) {
             botStackAsString.replaceAll(".", "");
         }
 
+        double botStack;
+
         if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
-            return Double.parseDouble(botStackAsString);
+            botStack = Double.parseDouble(botStackAsString);
         } else {
-            return -1;
+            botStack = -1;
         }
+
+        if(botStack == -1) {
+            botStack = changeSeaftsAndReadBottomPlayerStack();
+        }
+
+        return botStack;
     }
+
+    private double changeSeaftsAndReadBottomPlayerStack() throws Exception {
+        TimeUnit.MILLISECONDS.sleep(200);
+        MouseKeyboard.rightClick(630, 583);
+        TimeUnit.MILLISECONDS.sleep(100);
+        MouseKeyboard.click(705, 744);
+        TimeUnit.MILLISECONDS.sleep(200);
+
+        String botStackAsString = readBottomPlayerStack();
+
+        if(botStackAsString.endsWith(".")) {
+            botStackAsString.replaceAll(".", "");
+        }
+
+        double botStack;
+
+        if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            botStack = Double.parseDouble(botStackAsString);
+        } else {
+            botStack = -1;
+        }
+
+        TimeUnit.MILLISECONDS.sleep(200);
+        MouseKeyboard.rightClick(444, 155);
+        TimeUnit.MILLISECONDS.sleep(100);
+        MouseKeyboard.click(506, 312);
+        TimeUnit.MILLISECONDS.sleep(100);
+
+        return botStack;
+    }
+
 
     public double getOpponentStackFromImage() throws Exception {
         String opponentStackAsString = readBottomPlayerStack();
@@ -38,6 +81,12 @@ public class StarsTableReader {
         if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
             return Double.parseDouble(opponentStackAsString);
         } else {
+            if(StringUtils.containsIgnoreCase(opponentStackAsString, "all")) {
+                return 0;
+            }
+
+            System.out.println("wrongly read opponentstack: " + opponentStackAsString);
+
             return -1;
         }
     }
@@ -156,6 +205,7 @@ public class StarsTableReader {
                 TimeUnit.MILLISECONDS.sleep(150);
 
                 MouseKeyboard.enterText(String.valueOf(Precision.round(sizing, 2)));
+
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -236,7 +286,13 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
+        //return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
+
+        String readValue = ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
+
+        System.out.println("1st holecard: " + readValue);
+
+        return readValue;
     }
 
     private String readSecondHoleCardRank() {
@@ -244,7 +300,13 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
+        //return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
+
+        String readValue = ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
+
+        System.out.println("2nd holecard: " + readValue);
+
+        return readValue;
     }
 
     private String readFirstFlopCardRankFromBoard() {
@@ -335,6 +397,13 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         bottomPlayerStack = ImageProcessor.removeEmptySpacesFromString(bottomPlayerStack);
+
+        System.out.println("read opp stack: " + bottomPlayerStack);
+
+        if(StringUtils.containsIgnoreCase("all", bottomPlayerStack)) {
+            bottomPlayerStack = "0";
+        }
+
         return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
     }
 
@@ -439,7 +508,7 @@ public class StarsTableReader {
             cardRank = 8;
         } else if(stringCardRank.contains("9")) {
             cardRank = 9;
-        } else if(stringCardRank.contains("ll]") || stringCardRank.contains("I0") || stringCardRank.contains("IO") || stringCardRank.contains("ll]") || stringCardRank.contains("l0")) {
+        } else if(stringCardRank.contains("ll]") || stringCardRank.contains("I0") || stringCardRank.contains("IO") || stringCardRank.contains("ll]") || stringCardRank.contains("l0") || stringCardRank.contains("IU")) {
             cardRank = 10;
         } else if(stringCardRank.contains("J")) {
             cardRank = 11;

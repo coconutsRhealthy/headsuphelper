@@ -20,6 +20,17 @@ public class MouseKeyboard {
         }
     }
 
+    public static void rightClick(int x, int y) {
+        try {
+            Robot bot = new Robot();
+            bot.mouseMove(x, y);
+            bot.mousePress(InputEvent.BUTTON3_MASK);
+            bot.mouseRelease(InputEvent.BUTTON3_MASK);
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void enterText(String text) {
         char[] charArray = text.toCharArray();
 

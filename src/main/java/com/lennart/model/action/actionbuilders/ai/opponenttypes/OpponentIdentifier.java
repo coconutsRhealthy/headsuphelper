@@ -93,7 +93,7 @@ public class OpponentIdentifier {
             ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier WHERE playerName = '" + opponentNick + "';");
 
             if(!rs.next()) {
-                st.executeUpdate("INSERT INTO opponentidentifier (playerName) VALUES ('" + opponentNick + "')");
+                st.executeUpdate("INSERT INTO opponentidentifier (playerName, numberOfHands) VALUES ('" + opponentNick + "', '-1')");
                 opponentType = "tp";
             } else {
                 double callRaiseCount = rs.getDouble("callRaiseCount");
@@ -198,6 +198,8 @@ public class OpponentIdentifier {
     public void updateCountsFromHandhistoryDbLogic(String opponentPlayerNameOfLastHand) throws Exception {
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
         List<String> opponentActions = handHistoryReaderStars.getOpponentActionsOfLastHand(opponentPlayerNameOfLastHand);
+
+        //hier misschien toevoegen alleen na 20 handen
         updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
 
         for(String action : opponentActions) {

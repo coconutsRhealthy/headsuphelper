@@ -173,6 +173,7 @@ public class ActionVariables {
 
         double totalBotBetSizeForPlayerActionRound;
 
+        //oftewel, gamevariables.getBotBetSize is hier 0 op de een of andere manier, terwijl het 250 zou moeten zijn...
         if(sizing == 0) {
             totalBotBetSizeForPlayerActionRound = gameVariables.getBotBetSize();
         } else {

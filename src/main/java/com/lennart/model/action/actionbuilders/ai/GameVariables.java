@@ -52,7 +52,7 @@ public class GameVariables implements GameVariable {
 
         StarsTableReader starsTableReader = new StarsTableReader();
 
-        botStack = starsTableReader.getBotStackFromImage();
+        botStack = starsTableReader.getBotStackFromImage(false);
         opponentStack = starsTableReader.getOpponentStackFromImage();
         botHoleCard1 = starsTableReader.getBotHoleCard1FromImage();
         botHoleCard2 = starsTableReader.getBotHoleCard2FromImage();
@@ -95,9 +95,14 @@ public class GameVariables implements GameVariable {
     public void fillFieldsSubsequent(boolean stars) throws Exception {
         StarsTableReader starsTableReader = new StarsTableReader();
 
-        botStack = starsTableReader.getBotStackFromImage();
         opponentStack = starsTableReader.getOpponentStackFromImage();
+
+        List<Card> oldBoard = new ArrayList<>();
+        oldBoard.addAll(board);
+
         fillTheStarsBoard();
+
+        botStack = starsTableReader.getBotStackFromImage(botMadeBetOnCurrentStreet(oldBoard));
 
         double topPotSize = starsTableReader.getTopPotsizeFromImage();
 
@@ -116,20 +121,25 @@ public class GameVariables implements GameVariable {
         if(opponentMostRecentActionRound != null) {
             if(actionRequest.getActionsSinceLastRequest().indexOf(opponentMostRecentActionRound) >
                     actionRequest.getActionsSinceLastRequest().indexOf(botMostRecentActionRound)) {
-                opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+                opponentBetSize = opponentMostRecentActionRound.getTotalOpponentBetSize();
             } else {
-                opponentBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalOpponentBetSize();
+                opponentBetSize = botMostRecentActionRound.getTotalOpponentBetSize();
             }
-            opponentAction = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "opponent").getAction();
+            opponentAction = opponentMostRecentActionRound.getAction();
         } else {
             opponentBetSize = 0;
             opponentAction = "empty";
         }
 
+        //zit de fout hier?
         if(botMostRecentActionRound != null) {
-            botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalBotBetSize();
+            botBetSize = botMostRecentActionRound.getTotalBotBetSize();
         } else {
-            botBetSize = 0;
+            if(opponentMostRecentActionRound != null) {
+                botBetSize = opponentMostRecentActionRound.getTotalBotBetSize();
+            } else {
+                botBetSize = 0;
+            }
         }
 
         pot = topPotSize - opponentBetSize - botBetSize;
@@ -287,6 +297,18 @@ public class GameVariables implements GameVariable {
                 board.add(riverCard);
             }
         }
+    }
+
+    private boolean botMadeBetOnCurrentStreet(List<Card> oldBoard) {
+        boolean botMadeBetOnCurrentStreet = false;
+
+        if(oldBoard.equals(board)) {
+            if(botBetSize != 0) {
+                botMadeBetOnCurrentStreet = true;
+            }
+        }
+
+        return botMadeBetOnCurrentStreet;
     }
 
     private void fillBotHoleCards() throws Exception {
