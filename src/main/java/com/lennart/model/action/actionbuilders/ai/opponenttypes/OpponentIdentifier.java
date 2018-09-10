@@ -198,8 +198,6 @@ public class OpponentIdentifier {
     public void updateCountsFromHandhistoryDbLogic(String opponentPlayerNameOfLastHand) throws Exception {
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
         List<String> opponentActions = handHistoryReaderStars.getOpponentActionsOfLastHand(opponentPlayerNameOfLastHand);
-
-        //hier misschien toevoegen alleen na 20 handen
         updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
 
         for(String action : opponentActions) {

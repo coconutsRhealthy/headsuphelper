@@ -81,12 +81,6 @@ public class StarsTableReader {
         if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
             return Double.parseDouble(opponentStackAsString);
         } else {
-            if(StringUtils.containsIgnoreCase(opponentStackAsString, "all")) {
-                return 0;
-            }
-
-            System.out.println("wrongly read opponentstack: " + opponentStackAsString);
-
             return -1;
         }
     }
@@ -205,7 +199,6 @@ public class StarsTableReader {
                 TimeUnit.MILLISECONDS.sleep(150);
 
                 MouseKeyboard.enterText(String.valueOf(Precision.round(sizing, 2)));
-
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -286,13 +279,7 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        //return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
-
-        String readValue = ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
-
-        System.out.println("1st holecard: " + readValue);
-
-        return readValue;
+        return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
     }
 
     private String readSecondHoleCardRank() {
@@ -300,13 +287,7 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        //return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
-
-        String readValue = ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
-
-        System.out.println("2nd holecard: " + readValue);
-
-        return readValue;
+        return ImageProcessor.removeEmptySpacesFromString(firstFlopCardRank);
     }
 
     private String readFirstFlopCardRankFromBoard() {

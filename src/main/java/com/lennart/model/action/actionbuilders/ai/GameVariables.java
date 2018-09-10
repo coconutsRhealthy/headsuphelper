@@ -131,7 +131,6 @@ public class GameVariables implements GameVariable {
             opponentAction = "empty";
         }
 
-        //zit de fout hier?
         if(botMostRecentActionRound != null) {
             botBetSize = botMostRecentActionRound.getTotalBotBetSize();
         } else {
