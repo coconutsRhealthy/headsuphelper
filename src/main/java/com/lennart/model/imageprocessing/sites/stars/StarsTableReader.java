@@ -3,7 +3,6 @@ package com.lennart.model.imageprocessing.sites.stars;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
@@ -196,6 +195,12 @@ public class StarsTableReader {
                 MouseKeyboard.pressBackSpace();
                 MouseKeyboard.pressBackSpace();
                 MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
+                MouseKeyboard.pressBackSpace();
                 TimeUnit.MILLISECONDS.sleep(150);
 
                 MouseKeyboard.enterText(String.valueOf(Precision.round(sizing, 2)));
@@ -232,7 +237,7 @@ public class StarsTableReader {
     }
 
     private static void clickCallActionButton() {
-        if(StringUtils.containsIgnoreCase(readMiddleActionButton(), "call")) {
+        if(readMiddleActionButton().toLowerCase().contains("call")) {
             MouseKeyboard.click(810, 748);
         } else {
             System.out.println("Could not read 'call' in middle action button. So click right action button to call");
@@ -381,7 +386,7 @@ public class StarsTableReader {
 
         System.out.println("read opp stack: " + bottomPlayerStack);
 
-        if(StringUtils.containsIgnoreCase("all", bottomPlayerStack)) {
+        if(bottomPlayerStack.toLowerCase().contains("all")) {
             bottomPlayerStack = "0";
         }
 
