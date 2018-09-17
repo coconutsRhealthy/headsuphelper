@@ -162,10 +162,6 @@ public class Sizing {
             }
         }
 
-//        if(size > (facingStack - facingBetSize)) {
-//            size = facingStack + facingBetSize;
-//        }
-
         return size;
     }
 
@@ -179,10 +175,6 @@ public class Sizing {
         } else if(board.size() == 5) {
             sizing = getRiverSizing(facingBetSize, pot, myStack, facingStack);
         }
-
-//        if(sizing > (facingStack - facingBetSize)) {
-//            sizing = facingStack + facingBetSize;
-//        }
 
         return sizing;
     }

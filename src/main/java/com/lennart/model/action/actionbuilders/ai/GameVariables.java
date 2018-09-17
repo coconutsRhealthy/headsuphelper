@@ -52,7 +52,7 @@ public class GameVariables implements GameVariable {
 
         StarsTableReader starsTableReader = new StarsTableReader();
 
-        botStack = starsTableReader.getBotStackFromImage(false);
+        botStack = starsTableReader.getBotStackFromImage();
         opponentStack = starsTableReader.getOpponentStackFromImage();
         botHoleCard1 = starsTableReader.getBotHoleCard1FromImage();
         botHoleCard2 = starsTableReader.getBotHoleCard2FromImage();
@@ -101,8 +101,6 @@ public class GameVariables implements GameVariable {
         oldBoard.addAll(board);
 
         fillTheStarsBoard();
-
-        //botStack = starsTableReader.getBotStackFromImage(botMadeBetOnCurrentStreet(oldBoard));
 
         double topPotSize = starsTableReader.getTopPotsizeFromImage();
 

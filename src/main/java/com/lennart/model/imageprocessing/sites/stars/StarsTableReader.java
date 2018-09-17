@@ -13,11 +13,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class StarsTableReader {
 
-    public double getBotStackFromImage(boolean botMadeBetOnCurrentStreet) throws Exception {
-        if(botMadeBetOnCurrentStreet) {
-            return changeSeaftsAndReadBottomPlayerStack();
-        }
-
+    public double getBotStackFromImage() throws Exception {
         String botStackAsString = readTopPlayerStack();
 
         if(botStackAsString.endsWith(".")) {

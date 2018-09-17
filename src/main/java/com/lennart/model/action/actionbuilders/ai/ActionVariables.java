@@ -43,35 +43,6 @@ public class ActionVariables {
         //default constructor
     }
 
-    public static void main(String[] args) {
-        List<Card> board = new ArrayList<>();
-        board.add(new Card(8, 'd'));
-        board.add(new Card(9, 's'));
-        board.add(new Card(6, 'c'));
-        board.add(new Card(2, 'd'));
-
-        System.out.println(new Sizing().getAiBotSizing(1342.0, 0, 11676, 8051, 1444, 100, board));
-
-
-//        OpponentStack: 8051.0
-//        OpponentBetSize: 1342.0
-//        Board: 2d 6d 8h 10d
-//        Potsize: 1388.0
-//        BotBetSize: 9393.0
-//        BotStack: 2311.0
-//        BotHoleCards: 12h 7d
-//        OpponentAction: bet75pct
-//
-//                ------------------------
-//
-//        Route: StreetFlopOrTurnPositionBTNPotsize10-15bbOpponentActionBetFacingOdds81-101EffectiveStack75-110bbStrongDrawYes
-//        Table: la_hs_20_25
-//        Action: raise
-//        Sizing: 9393.0
-
-
-    }
-
     public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean newHand) throws Exception {
         calculateHandStrengthAndDraws(gameVariables);
 
@@ -218,11 +189,9 @@ public class ActionVariables {
         ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
         lastActionRequest.getActionsSinceLastRequest().add(botPlayerActionRound);
 
-        //if(!newHand) {
-            double updatedBotStack = getUpdatedBotStack(actionCopy, gameVariables, totalBotBetSizeForPlayerActionRound);
-            gameVariables.setBotStack(updatedBotStack);
-            gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
-        //}
+        double updatedBotStack = getUpdatedBotStack(actionCopy, gameVariables, totalBotBetSizeForPlayerActionRound);
+        gameVariables.setBotStack(updatedBotStack);
+        gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
     }
 
     private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {
