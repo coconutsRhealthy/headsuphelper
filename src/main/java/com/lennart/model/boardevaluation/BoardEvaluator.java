@@ -870,27 +870,15 @@ public class BoardEvaluator {
     }
 
     public static int getBoardWetnessGroup(List<Set<Card>> top5percentTurnCombos, List<Set<Card>> top5percentRiverCombos) {
-        int group = 0;
+        int boardWetness = 50;
 
-        top5percentTurnCombos.retainAll(top5percentRiverCombos);
+        if(top5percentTurnCombos != null && top5percentTurnCombos.size() > 1
+                && top5percentRiverCombos != null && top5percentRiverCombos.size() > 1) {
+            top5percentTurnCombos.retainAll(top5percentRiverCombos);
+            boardWetness = top5percentTurnCombos.size();
+        }
 
-        int size = top5percentTurnCombos.size();
-
-        return size;
-
-//        if(size < 22) {
-//            group = 1;
-//        } else if(size < 38) {
-//            group = 2;
-//        } else if(size < 53) {
-//            group = 3;
-//        } else {
-//            group = 4;
-//        }
-//
-//        System.out.println("Boardwetnessgroup: " + group);
-//
-//        return group;
+        return boardWetness;
     }
 
     public List<Set<Card>> getTop5percentCombos() {

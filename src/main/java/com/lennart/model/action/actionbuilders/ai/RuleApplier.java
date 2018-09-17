@@ -866,56 +866,6 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String doRiverBigBluffing(String action, boolean opponentHasInitiative, double handStrength,
-                                      double facingBetSize, double myBetSize, double myStack, double facingStack,
-                                      double pot, double bigBlind, List<Card> board) {
-        String actionToReturn;
-
-        if(board != null && board.size() == 5) {
-            if(handStrength < 0.5) {
-                if(action.equals("check")) {
-                    if(!opponentHasInitiative) {
-                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
-
-                        if((sizing / bigBlind) >= 25 && (sizing / bigBlind <= 105)) {
-                            if(bluffOddsAreOk(sizing, facingBetSize, pot)) {
-                                double random = Math.random();
-
-                                //if(random < 0.5) {
-                                    actionToReturn = "bet75pct";
-
-                                    System.out.println();
-                                    System.out.println("did river bluff. sizing: " + sizing);
-                                    Card boardCard1 = board.get(0);
-                                    Card boardCard2 = board.get(1);
-                                    System.out.println("holeCards: " + boardCard1.getRank() + boardCard1.getSuit() + " "
-                                            + boardCard2.getRank() + boardCard2.getSuit());
-                                    System.out.println();
-                                //} else {
-                                //    actionToReturn = action;
-                                //}
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else  {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
     public String moderateBackdoorRaises(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
                                          double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
                                          double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
@@ -1048,11 +998,6 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double pot) {
-        double odds = (sizing - facingBetSize) / (facingBetSize + sizing + pot);
-        return odds > 0.392;
-    }
-
     private boolean facingPostFlop3bet(double potSizeBb, double botTotalBetsizeBb, double opponentTotalBetsizeBb) {
         boolean facingPostFlop3bet = false;
 
@@ -1062,5 +1007,83 @@ public class RuleApplier {
         }
 
         return facingPostFlop3bet;
+    }
+
+    private String doRiverBoardWetnessBluffing(String action, String opponentAction, int boardWetness, double handStrength, double facingBetSize, double myBetSize,
+                                               double myStack, double facingStack, double pot, double bigBlind, List<Card> board, boolean opponentHasInitiative) {
+        String actionToReturn;
+
+        if(action.equals("check")) {
+            if(board != null && board.size() == 5) {
+                if(!opponentHasInitiative) {
+                    if(handStrength < 0.6) {
+                        if(boardWetness < 18) {
+                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                                if(sizing / bigBlind > 5 && sizing / bigBlind <= 90) {
+                                    System.out.println("Do river bluff bet! " + sizing);
+                                    actionToReturn = "bet75pct";
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else if(action.equals("fold")) {
+            if(opponentAction.equals("bet75pct")) {
+                if(board != null && board.size() == 5) {
+                    if(boardWetness < 6) {
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                        if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                            if(sizing / bigBlind <= 90) {
+                                System.out.println("Do river bluff raise! " + sizing);
+                                actionToReturn = "raise";
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot) {
+        double sizingInMethod;
+
+        if(sizing > (facingBetSize + facingStackSize)) {
+            sizingInMethod = facingBetSize + facingStackSize;
+        } else {
+            sizingInMethod = sizing;
+        }
+
+        double odds = (sizingInMethod - facingBetSize) / (facingBetSize + sizingInMethod + pot);
+        return odds > 0.38;
     }
 }
