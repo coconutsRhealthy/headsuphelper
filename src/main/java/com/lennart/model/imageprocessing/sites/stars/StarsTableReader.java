@@ -40,11 +40,11 @@ public class StarsTableReader {
     }
 
     private double changeSeaftsAndReadBottomPlayerStack() throws Exception {
-        TimeUnit.MILLISECONDS.sleep(200);
+        TimeUnit.MILLISECONDS.sleep(400);
         MouseKeyboard.rightClick(630, 583);
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(250);
         MouseKeyboard.click(705, 744);
-        TimeUnit.MILLISECONDS.sleep(200);
+        TimeUnit.MILLISECONDS.sleep(400);
 
         String botStackAsString = readBottomPlayerStack();
 
@@ -60,11 +60,11 @@ public class StarsTableReader {
             botStack = -1;
         }
 
-        TimeUnit.MILLISECONDS.sleep(200);
+        TimeUnit.MILLISECONDS.sleep(400);
         MouseKeyboard.rightClick(444, 155);
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(250);
         MouseKeyboard.click(506, 312);
-        TimeUnit.MILLISECONDS.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(400);
 
         return botStack;
     }

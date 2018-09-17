@@ -102,7 +102,7 @@ public class GameVariables implements GameVariable {
 
         fillTheStarsBoard();
 
-        botStack = starsTableReader.getBotStackFromImage(botMadeBetOnCurrentStreet(oldBoard));
+        //botStack = starsTableReader.getBotStackFromImage(botMadeBetOnCurrentStreet(oldBoard));
 
         double topPotSize = starsTableReader.getTopPotsizeFromImage();
 

@@ -169,7 +169,7 @@ public class BoardEvaluator {
     }
 
     //helper methods
-    protected int getNumberOfSuitedCardsOnBoard(List<Card> board) {
+    public int getNumberOfSuitedCardsOnBoard(List<Card> board) {
         StringBuilder s = new StringBuilder();
         int x = 0;
         for(Card c : board) {
@@ -184,7 +184,7 @@ public class BoardEvaluator {
         return x;
     }
 
-    protected int getNumberOfPairsOnBoard(List<Card> board) {
+    public int getNumberOfPairsOnBoard(List<Card> board) {
         int numberOfPairsOnBoard = 0;
 
         if(!boardContainsTrips(board) && !boardContainsQuads(board)) {

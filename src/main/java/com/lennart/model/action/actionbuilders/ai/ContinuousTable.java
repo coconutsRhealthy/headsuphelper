@@ -39,7 +39,9 @@ public class ContinuousTable implements ContinuousTableable {
             if(StarsTableReader.botIsToAct()) {
                 numberOfActionRequests++;
 
-                if(isNewHand()) {
+                boolean isNewHand = isNewHand();
+
+                if(isNewHand) {
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
@@ -55,7 +57,7 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
-                ActionVariables actionVariables = new ActionVariables(gameVariables, this);
+                ActionVariables actionVariables = new ActionVariables(gameVariables, this, isNewHand);
                 String action = actionVariables.getAction();
 
                 if(action.equals("bet75pct") || action.equals("raise")) {

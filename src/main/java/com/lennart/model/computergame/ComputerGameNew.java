@@ -905,6 +905,61 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 //    }
 
 
+//    public static void main(String[] args) {
+//        new ComputerGameNew().theMethod();
+//    }
+
+
+
+    private void theMethod() {
+        List<Card> holeCards = new ArrayList<>();
+        List<Card> board = new ArrayList<>();
+
+        holeCards.add(new Card(12, 'h'));
+        holeCards.add(new Card(7, 'd'));
+
+        board.add(new Card(2, 'd'));
+        board.add(new Card(6, 'd'));
+        board.add(new Card(8, 'h'));
+        board.add(new Card(10, 'd'));
+
+        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+
+        HandEvaluator handEvaluator = new HandEvaluator(holeCards, boardEvaluator);
+
+        System.out.println(hasStrongDraw(handEvaluator));
+
+    }
+
+
+
+    public static void main(String[] args) {
+        new ComputerGameNew().theMethod222();
+
+    }
+
+    private void theMethod222() {
+        List<Card> holeCards = new ArrayList<>();
+
+        holeCards.add(new Card(6, 's'));
+        holeCards.add(new Card(8, 's'));
+
+
+        List<Card> board = new ArrayList<>();
+
+        board.add(new Card(9, 's'));
+        board.add(new Card(13, 'h'));
+        board.add(new Card(5, 'h'));
+        board.add(new Card(3, 'd'));
+
+        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+        HandEvaluator handEvaluator = new HandEvaluator(holeCards, boardEvaluator);
+
+        System.out.print(hasStrongDraw(handEvaluator));
+
+    }
+
+
     private void calculateHandStrengthsAndDraws() {
         if(board == null) {
             computerHandStrength = new PreflopHandStength().getPreflopHandStength(computerHoleCards);
