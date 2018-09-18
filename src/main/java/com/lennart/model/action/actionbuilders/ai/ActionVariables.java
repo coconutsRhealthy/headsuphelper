@@ -40,15 +40,12 @@ public class ActionVariables {
 
     private String actionBeforeFoldStat;
 
-    private List<Set<Card>> top5percentTurnCombos;
-    private List<Set<Card>> top5percentRiverCombos;
-
     public ActionVariables() {
         //default constructor
     }
 
     public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean newHand) throws Exception {
-        calculateHandStrengthAndDraws(gameVariables);
+        calculateHandStrengthAndDraws(gameVariables, continuousTable);
 
         List<String> eligibleActions = getEligibleActions(gameVariables);
         String streetInMethod = getStreet(gameVariables);
@@ -71,7 +68,7 @@ public class ActionVariables {
         setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(opponentActionInMethod, boardInMethod, continuousTable, opponentBetsizeBb, potSizeBb);
         double amountToCallBb = getAmountToCallBb(botBetsizeBb, opponentBetsizeBb, botStackBb);
 
-        int boardWetness = getBoardWetness();
+        int boardWetness = getBoardWetness(continuousTable);
 
         if(preflop) {
             action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb);
@@ -152,7 +149,7 @@ public class ActionVariables {
                         botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb,
                         opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot,
                         gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(),
-                        continuousTable.isPre3betOrPostRaisedPot(), false, false, false, 0, continuousTable.isOpponentHasInitiative());
+                        continuousTable.isPre3betOrPostRaisedPot(), false, false, false, boardWetness, continuousTable.isOpponentHasInitiative());
 
                 action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, gameVariables.getOpponentName(), botBetsizeBb, opponentBetsizeBb, false);
 
@@ -249,14 +246,15 @@ public class ActionVariables {
 
            //overbet check
            if(opponentAction.equals("bet75pct")) {
-               if(opponentBetsizeBb > potSizeBb) {
+               if(opponentBetsizeBb > (potSizeBb * 0.84)) {
+                   System.out.println("overbet done by opponent: " + opponentBetsizeBb + " in pot: " + potSizeBb);
                    continuousTable.setPre3betOrPostRaisedPot(true);
                }
            }
        }
     }
 
-    private void calculateHandStrengthAndDraws(GameVariables gameVariables) {
+    private void calculateHandStrengthAndDraws(GameVariables gameVariables, ContinuousTable continuousTable) {
         if(gameVariables.getBoard().isEmpty()) {
             PreflopHandStength preflopHandStength = new PreflopHandStength();
             botHandStrength = preflopHandStength.getPreflopHandStength(gameVariables.getBotHoleCards());
@@ -278,36 +276,13 @@ public class ActionVariables {
 
             List<Card> boardInMethod = gameVariables.getBoard();
 
-            //moet in continuoustable?
             if(boardInMethod.size() == 4) {
-                top5percentTurnCombos = boardEvaluator.getTop5percentCombos();
+                continuousTable.setTop5percentTurnCombos(boardEvaluator.getTop5percentCombos());
             } else if(boardInMethod.size() == 5) {
-                top5percentRiverCombos = boardEvaluator.getTop5percentCombos();
+                continuousTable.setTop5percentRiverCombos(boardEvaluator.getTop5percentCombos());
             }
         }
     }
-
-//    private void calculateHandStrengthsAndDraws() {
-//        if(board == null) {
-//            computerHandStrength = new PreflopHandStength().getPreflopHandStength(computerHoleCards);
-//            computerHasStrongDraw = false;
-//        } else {
-//            BoardEvaluator boardEvaluator = new BoardEvaluator(board);
-//
-//            if(board.size() == 3) {
-//                top5percentFlopCombos = boardEvaluator.getTop5percentCombos();
-//            } else if(board.size() == 4) {
-//                top5percentTurnCombos = boardEvaluator.getTop5percentCombos();
-//            } else if(board.size() == 5) {
-//                top5percentRiverCombos = boardEvaluator.getTop5percentCombos();
-//            }
-//
-//            handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);
-//
-//            computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
-//            computerHasStrongDraw = hasStrongDraw(handEvaluator);
-//        }
-//    }
 
     private double getEffectiveStackInBb(GameVariables gameVariables) {
         if(gameVariables.getBotStack() > gameVariables.getOpponentStack()) {
@@ -486,19 +461,22 @@ public class ActionVariables {
         return boardIsUnpaired && hasMaxTwoSuitedCards;
     }
 
-    private int getBoardWetness() {
+    private int getBoardWetness(ContinuousTable continuousTable) {
         List<Set<Card>> top5PercentTurnCombosCopy = new ArrayList<>();
         List<Set<Card>> top5PercentRiverCombosCopy = new ArrayList<>();
 
-        if(top5percentTurnCombos != null) {
-            top5PercentTurnCombosCopy.addAll(top5percentTurnCombos);
+        if(continuousTable.getTop5percentTurnCombos() != null) {
+            top5PercentTurnCombosCopy.addAll(continuousTable.getTop5percentTurnCombos());
         }
 
-        if(top5percentRiverCombos != null) {
-            top5PercentRiverCombosCopy.addAll(top5percentRiverCombos);
+        if(continuousTable.getTop5percentRiverCombos() != null) {
+            top5PercentRiverCombosCopy.addAll(continuousTable.getTop5percentRiverCombos());
         }
 
         int boardChangeTurn = BoardEvaluator.getBoardWetnessGroup(top5PercentTurnCombosCopy, top5PercentRiverCombosCopy);
+
+        System.out.println("BoardWetness: " + boardChangeTurn);
+
         return boardChangeTurn;
     }
 

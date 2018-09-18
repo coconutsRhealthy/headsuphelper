@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
@@ -22,6 +23,9 @@ public class ContinuousTable implements ContinuousTableable {
     private boolean opponentDidPreflop4betPot = false;
     private List<String> allHandsPlayedAndPlayerNames = new ArrayList<>();
     private String starsLastHandNumber = "0";
+
+    private List<Set<Card>> top5percentTurnCombos;
+    private List<Set<Card>> top5percentRiverCombos;
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -45,6 +49,8 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
+                    top5percentTurnCombos = new ArrayList<>();
+                    top5percentRiverCombos = new ArrayList<>();
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
@@ -203,5 +209,21 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setStarsLastHandNumber(String starsLastHandNumber) {
         this.starsLastHandNumber = starsLastHandNumber;
+    }
+
+    public List<Set<Card>> getTop5percentTurnCombos() {
+        return top5percentTurnCombos;
+    }
+
+    public void setTop5percentTurnCombos(List<Set<Card>> top5percentTurnCombos) {
+        this.top5percentTurnCombos = top5percentTurnCombos;
+    }
+
+    public List<Set<Card>> getTop5percentRiverCombos() {
+        return top5percentRiverCombos;
+    }
+
+    public void setTop5percentRiverCombos(List<Set<Card>> top5percentRiverCombos) {
+        this.top5percentRiverCombos = top5percentRiverCombos;
     }
 }

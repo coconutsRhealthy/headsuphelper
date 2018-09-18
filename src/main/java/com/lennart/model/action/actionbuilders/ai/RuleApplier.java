@@ -1009,7 +1009,7 @@ public class RuleApplier {
         return facingPostFlop3bet;
     }
 
-    private String doRiverBoardWetnessBluffing(String action, String opponentAction, int boardWetness, double handStrength, double facingBetSize, double myBetSize,
+    public String doRiverBoardWetnessBluffing(String action, String opponentAction, int boardWetness, double handStrength, double facingBetSize, double myBetSize,
                                                double myStack, double facingStack, double pot, double bigBlind, List<Card> board, boolean opponentHasInitiative) {
         String actionToReturn;
 
@@ -1022,7 +1022,7 @@ public class RuleApplier {
 
                             if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
                                 if(sizing / bigBlind > 5 && sizing / bigBlind <= 90) {
-                                    System.out.println("Do river bluff bet! " + sizing);
+                                    System.out.println("Do river bluff bet! " + sizing + " boardwetness: " + boardWetness);
                                     actionToReturn = "bet75pct";
                                 } else {
                                     actionToReturn = action;
