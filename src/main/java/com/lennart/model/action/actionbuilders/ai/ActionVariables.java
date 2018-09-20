@@ -64,7 +64,7 @@ public class ActionVariables {
         boolean preflop = gameVariables.getBoard().isEmpty();
         List<Card> boardInMethod = gameVariables.getBoard();
 
-        setOpponentHasInitiative(opponentActionInMethod, continuousTable);
+        setOpponentHasInitiative(opponentActionInMethod, continuousTable, gameVariables);
         setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(opponentActionInMethod, boardInMethod, continuousTable, opponentBetsizeBb, potSizeBb);
         double amountToCallBb = getAmountToCallBb(botBetsizeBb, opponentBetsizeBb, botStackBb);
 
@@ -224,13 +224,49 @@ public class ActionVariables {
         return updatedBotStack;
     }
 
-    private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable) {
+    private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable, GameVariables gameVariables) {
         if(continuousTable != null) {
-            if(opponentAction != null && !opponentAction.equals("empty")) {
-                if(opponentAction.equals("bet75pct") || opponentAction.equals("raise")) {
-                    continuousTable.setOpponentHasInitiative(true);
+            if(opponentAction != null) {
+                if(opponentAction.equals("empty")) {
+                    List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
+
+                    if(allActionRequestsOfHand.size() >= 2) {
+                        ActionRequest secondLastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
+                        PlayerActionRound opponentLastActionRound = secondLastActionRequest.getMostRecentActionRoundOfPLayer(secondLastActionRequest.getActionsSinceLastRequest(), "opponent");
+
+                        if(opponentLastActionRound != null) {
+                            String opponentSecondLastAction = opponentLastActionRound.getAction();
+
+                            if(opponentSecondLastAction.equals("bet75pct") || opponentSecondLastAction.equals("raise")) {
+                                continuousTable.setOpponentHasInitiative(true);
+                            } else {
+                                continuousTable.setOpponentHasInitiative(false);
+                            }
+                        } else {
+                            ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
+                            PlayerActionRound opponentSecondLastActionRound = lastActionRequest.getSecondMostRecentActionRoundOfPLayer(lastActionRequest.getActionsSinceLastRequest(), "opponent");
+
+                            if(opponentSecondLastActionRound != null) {
+                                String opponentSecondLastAction = opponentSecondLastActionRound.getAction();
+
+                                if(opponentSecondLastAction.equals("bet75pct") || opponentSecondLastAction.equals("raise")) {
+                                    continuousTable.setOpponentHasInitiative(true);
+                                } else {
+                                    continuousTable.setOpponentHasInitiative(false);
+                                }
+                            } else {
+                                continuousTable.setOpponentHasInitiative(false);
+                            }
+                        }
+                    } else {
+                        continuousTable.setOpponentHasInitiative(false);
+                    }
                 } else {
-                    continuousTable.setOpponentHasInitiative(false);
+                    if(opponentAction.equals("bet75pct") || opponentAction.equals("raise")) {
+                        continuousTable.setOpponentHasInitiative(true);
+                    } else {
+                        continuousTable.setOpponentHasInitiative(false);
+                    }
                 }
             }
         }

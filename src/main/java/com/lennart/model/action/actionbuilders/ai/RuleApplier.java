@@ -937,7 +937,15 @@ public class RuleApplier {
             if(strongDraw && !strongFlushDraw && !strongOosd && !strongGutshot && (strongBackdoorFd || strongBackdoorSd)) {
                 if(effectiveStackBb >= 50) {
                     if(position) {
-                        actionToReturn = action;
+                        if(opponentBetSizeBb / potSizeBb <= 0.8 && opponentBetSizeBb <= 20) {
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
+                                    position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
+                                    handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
+                                    preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                                    pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative);
+                        }
                     } else {
                         actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
                                 position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
@@ -1017,7 +1025,7 @@ public class RuleApplier {
             if(board != null && board.size() == 5) {
                 if(!opponentHasInitiative) {
                     if(handStrength < 0.6) {
-                        if(boardWetness < 18) {
+                        if(boardWetness <= 20) {
                             double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
                             if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
@@ -1045,13 +1053,19 @@ public class RuleApplier {
         } else if(action.equals("fold")) {
             if(opponentAction.equals("bet75pct")) {
                 if(board != null && board.size() == 5) {
-                    if(boardWetness < 6) {
-                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                    if(boardWetness < 15) {
+                        double random = Math.random();
 
-                        if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
-                            if(sizing / bigBlind <= 90) {
-                                System.out.println("Do river bluff raise! " + sizing);
-                                actionToReturn = "raise";
+                        if(random < 0.6) {
+                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                                if(sizing / bigBlind <= 90) {
+                                    System.out.println("Do river bluff raise! " + sizing + " boardwetness: " + boardWetness);
+                                    actionToReturn = "raise";
+                                } else {
+                                    actionToReturn = action;
+                                }
                             } else {
                                 actionToReturn = action;
                             }
