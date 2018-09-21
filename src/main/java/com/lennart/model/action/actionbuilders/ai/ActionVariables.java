@@ -229,35 +229,12 @@ public class ActionVariables {
             if(opponentAction != null) {
                 if(opponentAction.equals("empty")) {
                     List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
+                    ActionRequest secondLastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
+                    PlayerActionRound botLastActionRound = secondLastActionRequest.getMostRecentActionRoundOfPLayer(secondLastActionRequest.getActionsSinceLastRequest(), "bot");
+                    String botLastAction = botLastActionRound.getAction();
 
-                    if(allActionRequestsOfHand.size() >= 2) {
-                        ActionRequest secondLastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
-                        PlayerActionRound opponentLastActionRound = secondLastActionRequest.getMostRecentActionRoundOfPLayer(secondLastActionRequest.getActionsSinceLastRequest(), "opponent");
-
-                        if(opponentLastActionRound != null) {
-                            String opponentSecondLastAction = opponentLastActionRound.getAction();
-
-                            if(opponentSecondLastAction.equals("bet75pct") || opponentSecondLastAction.equals("raise")) {
-                                continuousTable.setOpponentHasInitiative(true);
-                            } else {
-                                continuousTable.setOpponentHasInitiative(false);
-                            }
-                        } else {
-                            ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
-                            PlayerActionRound opponentSecondLastActionRound = lastActionRequest.getSecondMostRecentActionRoundOfPLayer(lastActionRequest.getActionsSinceLastRequest(), "opponent");
-
-                            if(opponentSecondLastActionRound != null) {
-                                String opponentSecondLastAction = opponentSecondLastActionRound.getAction();
-
-                                if(opponentSecondLastAction.equals("bet75pct") || opponentSecondLastAction.equals("raise")) {
-                                    continuousTable.setOpponentHasInitiative(true);
-                                } else {
-                                    continuousTable.setOpponentHasInitiative(false);
-                                }
-                            } else {
-                                continuousTable.setOpponentHasInitiative(false);
-                            }
-                        }
+                    if(botLastAction.equals("call")) {
+                        continuousTable.setOpponentHasInitiative(true);
                     } else {
                         continuousTable.setOpponentHasInitiative(false);
                     }
