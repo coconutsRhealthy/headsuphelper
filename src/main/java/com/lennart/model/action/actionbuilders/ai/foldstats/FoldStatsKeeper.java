@@ -80,7 +80,7 @@ public class FoldStatsKeeper {
         if(rs.next()) {
             double totalUntilNow = rs.getDouble("totalHandCount");
 
-            if(totalUntilNow < 50) {
+            if(totalUntilNow < 20) {
                 foldStat = 0.43;
             } else {
                 double foldTotalUntilNow = rs.getDouble("foldCount");

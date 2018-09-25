@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.card.Card;
+import com.lennart.model.handevaluation.HandEvaluator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1078,6 +1079,93 @@ public class RuleApplier {
                             } else {
                                 actionToReturn = action;
                             }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String moderateCheckRaises(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                      double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                      double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                      boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                      boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                      int boardWetness, boolean opponentHasInitiative) {
+        String actionToReturn;
+
+        if(action.equals("raise")) {
+            if(board != null && (board.size() == 3 || board.size() == 4)) {
+                if(handStrength < 0.9) {
+                    HandEvaluator handEvaluator = actionVariables.getHandEvaluator();
+
+                    boolean strongFlushDrawInMethod = handEvaluator.hasDrawOfType("strongFlushDraw");
+                    boolean strongOosdInMethod = handEvaluator.hasDrawOfType("strongOosd");
+                    boolean strongGutshotInMethod = handEvaluator.hasDrawOfType("strongGutshot");
+                    boolean strongBackdoorFdInMethod = handEvaluator.hasDrawOfType("strongBackDoorFlush");
+                    boolean strongBackdoorSdInMethod = handEvaluator.hasDrawOfType("strongBackDoorStraight");
+
+                    if(strongFlushDrawInMethod || strongOosdInMethod || strongGutshotInMethod || strongBackdoorFdInMethod || strongBackdoorSdInMethod) {
+                        actionToReturn = action;
+                    } else {
+                        List<String> eligibleActionsNew = new ArrayList<>();
+                        eligibleActionsNew.add("fold");
+                        eligibleActionsNew.add("call");
+
+                        //set both opponentstack and effective stack to zero to force either fold or call
+                        actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                strongBackdoorSd, boardWetness, opponentHasInitiative);
+
+                        System.out.println("changed raise to either fold or call in moderateCheckRaises(). Action is now: " + actionToReturn);
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String dontCallWithAir(String action, List<Card> board, double handStrength, double facingOdds, boolean strongDraw, HandEvaluator handEvaluator) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(board != null && board.size() >= 3) {
+                if(handStrength < 0.5) {
+                    if(facingOdds >= 0.42) {
+                        boolean strongFlushDrawInMethod = handEvaluator.hasDrawOfType("strongFlushDraw");
+                        boolean strongOosdInMethod = handEvaluator.hasDrawOfType("strongOosd");
+
+                        if(strongFlushDrawInMethod || strongOosdInMethod) {
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = "fold";
+                            System.out.println("Changed action to fold in dontCallWithAir() A");
+                        }
+                    } else if(facingOdds >= 0.375) {
+                        if(!strongDraw) {
+                            actionToReturn = "fold";
+                            System.out.println("Changed action to fold in dontCallWithAir() B");
                         } else {
                             actionToReturn = action;
                         }
