@@ -513,7 +513,16 @@ public class RuleApplier {
                             actionToReturn = "fold";
                         }
                     } else {
-                        actionToReturn = action;
+                        double amountToCallBb = opponentBetSizeBb - ownBetSizeBb;
+                        if(amountToCallBb < 10 && board.size() == 3) {
+                            actionToReturn = action;
+                        } else {
+                            if(facingOdds <= 0.48) {
+                                actionToReturn = action;
+                            } else {
+                                actionToReturn = actionWhenNotStrongDraw;
+                            }
+                        }
                     }
                 } else {
                     actionToReturn = action;

@@ -48,7 +48,7 @@ public class GameVariables implements GameVariable {
     }
 
     public GameVariables(boolean stars) throws Exception {
-        bigBlind = 100;
+        bigBlind = 0.50;
 
         StarsTableReader starsTableReader = new StarsTableReader();
 
@@ -84,6 +84,12 @@ public class GameVariables implements GameVariable {
             botBetSize = actionRequest.getMostRecentActionRoundOfPLayer(actionRequest.getActionsSinceLastRequest(), "bot").getTotalBotBetSize();
         } else {
             botBetSize = 0;
+        }
+
+        if(opponentBetSize < bigBlind && opponentAction.equals("bet75pct")) {
+            System.out.println("A) reset action to check because betsize < 1bb");
+            opponentBetSize = 0;
+            opponentAction = "check";
         }
 
         pot = topPotSize - opponentBetSize - botBetSize;
@@ -137,6 +143,12 @@ public class GameVariables implements GameVariable {
             } else {
                 botBetSize = 0;
             }
+        }
+
+        if(opponentBetSize < bigBlind && opponentAction.equals("bet75pct")) {
+            System.out.println("B) reset action to check because betsize < 1bb");
+            opponentBetSize = 0;
+            opponentAction = "check";
         }
 
         pot = topPotSize - opponentBetSize - botBetSize;
