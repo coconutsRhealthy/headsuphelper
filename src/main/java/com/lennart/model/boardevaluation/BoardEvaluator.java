@@ -869,31 +869,31 @@ public class BoardEvaluator {
         return cleanedSortedCombos;
     }
 
-    public static int getBoardWetnessGroup(List<Set<Card>> top5percentTurnCombos, List<Set<Card>> top5percentRiverCombos) {
-        int boardWetness = 50;
+    public static int getBoardWetnessGroup(List<Set<Card>> top10percentPreviousStreetCombos, List<Set<Card>> top10percentCurrentStreetCombos) {
+        int boardWetness = 200;
 
-        if(top5percentTurnCombos != null && top5percentTurnCombos.size() > 1
-                && top5percentRiverCombos != null && top5percentRiverCombos.size() > 1) {
-            top5percentTurnCombos.retainAll(top5percentRiverCombos);
-            boardWetness = top5percentTurnCombos.size();
+        if(top10percentPreviousStreetCombos != null && top10percentPreviousStreetCombos.size() > 1
+                && top10percentCurrentStreetCombos != null && top10percentCurrentStreetCombos.size() > 1) {
+            top10percentPreviousStreetCombos.retainAll(top10percentCurrentStreetCombos);
+            boardWetness = top10percentPreviousStreetCombos.size();
         }
 
         return boardWetness;
     }
 
-    public List<Set<Card>> getTop5percentCombos() {
-        List<Set<Card>> top5percentCombos = new ArrayList<>();
+    public List<Set<Card>> getTop10percentCombos() {
+        List<Set<Card>> top10percentCombos = new ArrayList<>();
 
         int counter = 1;
 
         loop: for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombosNew.entrySet()) {
-            if(counter < 67) {
+            if(counter < 133) {
                 List<Set<Card>> setSetAsList = new ArrayList<>();
                 setSetAsList.addAll(entry.getValue());
 
                 for(Set<Card> combo : setSetAsList) {
-                    if(counter < 67) {
-                        top5percentCombos.add(combo);
+                    if(counter < 133) {
+                        top10percentCombos.add(combo);
                         counter++;
                     } else {
                         break loop;
@@ -904,7 +904,7 @@ public class BoardEvaluator {
             }
         }
 
-        return top5percentCombos;
+        return top10percentCombos;
     }
 
     public StraightEvaluator getStraightEvaluator() {

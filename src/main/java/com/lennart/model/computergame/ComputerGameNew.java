@@ -913,11 +913,11 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             BoardEvaluator boardEvaluator = new BoardEvaluator(board);
 
             if(board.size() == 3) {
-                top5percentFlopCombos = boardEvaluator.getTop5percentCombos();
+                top5percentFlopCombos = boardEvaluator.getTop10percentCombos();
             } else if(board.size() == 4) {
-                top5percentTurnCombos = boardEvaluator.getTop5percentCombos();
+                top5percentTurnCombos = boardEvaluator.getTop10percentCombos();
             } else if(board.size() == 5) {
-                top5percentRiverCombos = boardEvaluator.getTop5percentCombos();
+                top5percentRiverCombos = boardEvaluator.getTop10percentCombos();
             }
 
             handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);

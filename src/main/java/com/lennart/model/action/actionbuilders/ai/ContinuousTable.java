@@ -24,8 +24,9 @@ public class ContinuousTable implements ContinuousTableable {
     private List<String> allHandsPlayedAndPlayerNames = new ArrayList<>();
     private String starsLastHandNumber = "0";
 
-    private List<Set<Card>> top5percentTurnCombos;
-    private List<Set<Card>> top5percentRiverCombos;
+    private List<Set<Card>> top10percentFlopCombos;
+    private List<Set<Card>> top10percentTurnCombos;
+    private List<Set<Card>> top10percentRiverCombos;
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -49,8 +50,9 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
-                    top5percentTurnCombos = new ArrayList<>();
-                    top5percentRiverCombos = new ArrayList<>();
+                    top10percentFlopCombos = new ArrayList<>();
+                    top10percentTurnCombos = new ArrayList<>();
+                    top10percentRiverCombos = new ArrayList<>();
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
@@ -211,19 +213,27 @@ public class ContinuousTable implements ContinuousTableable {
         this.starsLastHandNumber = starsLastHandNumber;
     }
 
-    public List<Set<Card>> getTop5percentTurnCombos() {
-        return top5percentTurnCombos;
+    public List<Set<Card>> getTop10percentFlopCombos() {
+        return top10percentFlopCombos;
     }
 
-    public void setTop5percentTurnCombos(List<Set<Card>> top5percentTurnCombos) {
-        this.top5percentTurnCombos = top5percentTurnCombos;
+    public void setTop10percentFlopCombos(List<Set<Card>> top10percentFlopCombos) {
+        this.top10percentFlopCombos = top10percentFlopCombos;
     }
 
-    public List<Set<Card>> getTop5percentRiverCombos() {
-        return top5percentRiverCombos;
+    public List<Set<Card>> getTop10percentTurnCombos() {
+        return top10percentTurnCombos;
     }
 
-    public void setTop5percentRiverCombos(List<Set<Card>> top5percentRiverCombos) {
-        this.top5percentRiverCombos = top5percentRiverCombos;
+    public void setTop10percentTurnCombos(List<Set<Card>> top10percentTurnCombos) {
+        this.top10percentTurnCombos = top10percentTurnCombos;
+    }
+
+    public List<Set<Card>> getTop10percentRiverCombos() {
+        return top10percentRiverCombos;
+    }
+
+    public void setTop10percentRiverCombos(List<Set<Card>> top10percentRiverCombos) {
+        this.top10percentRiverCombos = top10percentRiverCombos;
     }
 }

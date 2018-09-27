@@ -149,6 +149,8 @@ public class Poker {
 
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
+                action = ruleApplier.changePlayToBoardWetness(action, opponentAction, board, opponentHasInitiative, boardWetness, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, strongDraw, handStrength, bigBlind, board.size() == 4);
+
                 return action;
             } else {
                 Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
@@ -186,6 +188,8 @@ public class Poker {
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, actionVariables.getHandEvaluator());
 
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
+
+                action = ruleApplier.changePlayToBoardWetness(action, opponentAction, board, opponentHasInitiative, boardWetness, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, strongDraw, handStrength, bigBlind, board.size() == 4);
 
                 return action;
             }

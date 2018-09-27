@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class GameVariables implements GameVariable {
 
-    private double bigBlind;
+    private static double bigBlind;
     private String opponentName;
     private double opponentStack;
     private double opponentBetSize;
@@ -48,7 +48,7 @@ public class GameVariables implements GameVariable {
     }
 
     public GameVariables(boolean stars) throws Exception {
-        bigBlind = 0.50;
+        //bigBlind = 100;
 
         StarsTableReader starsTableReader = new StarsTableReader();
 
@@ -57,10 +57,25 @@ public class GameVariables implements GameVariable {
         botHoleCard1 = starsTableReader.getBotHoleCard1FromImage();
         botHoleCard2 = starsTableReader.getBotHoleCard2FromImage();
         botIsButton = starsTableReader.topPlayerIsButton();
+
+        //System.out.println("bot is button: " + botIsButton);
+
         botHoleCards.add(botHoleCard1);
         botHoleCards.add(botHoleCard2);
 
         double topPotSize = starsTableReader.getTopPotsizeFromImage();
+
+        //if not position then i doesnt work
+        //bigBlind = topPotSize * (2.0 / 3.0);
+
+        if(botIsButton) {
+            bigBlind = topPotSize * (2.0 / 3.0);
+        } else {
+            if(bigBlind == 0.0) {
+                bigBlind = 20;
+            }
+        }
+
         allActionRequestsOfHand = new ArrayList<>();
 
         List<Card> boardCopy = new ArrayList<>();

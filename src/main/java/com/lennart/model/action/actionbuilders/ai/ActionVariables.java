@@ -143,6 +143,8 @@ public class ActionVariables {
         if(action.equals("fold")) {
             double botFoldStat = new FoldStatsKeeper().getFoldStatFromDb("bot-V-" + gameVariables.getOpponentName());
 
+            System.out.println("botFoldStat against " + gameVariables.getOpponentName() + ": " + botFoldStat);
+
             if(botFoldStat > 0.43) {
                 double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
                         streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack,
@@ -289,10 +291,12 @@ public class ActionVariables {
 
             List<Card> boardInMethod = gameVariables.getBoard();
 
-            if(boardInMethod.size() == 4) {
-                continuousTable.setTop5percentTurnCombos(boardEvaluator.getTop5percentCombos());
+            if(boardInMethod.size() == 3) {
+                continuousTable.setTop10percentFlopCombos(boardEvaluator.getTop10percentCombos());
+            } else if(boardInMethod.size() == 4) {
+                continuousTable.setTop10percentTurnCombos(boardEvaluator.getTop10percentCombos());
             } else if(boardInMethod.size() == 5) {
-                continuousTable.setTop5percentRiverCombos(boardEvaluator.getTop5percentCombos());
+                continuousTable.setTop10percentRiverCombos(boardEvaluator.getTop10percentCombos());
             }
         }
     }
@@ -475,22 +479,43 @@ public class ActionVariables {
     }
 
     private int getBoardWetness(ContinuousTable continuousTable) {
-        List<Set<Card>> top5PercentTurnCombosCopy = new ArrayList<>();
-        List<Set<Card>> top5PercentRiverCombosCopy = new ArrayList<>();
+        List<Set<Card>> top10PercentFlopCombosCopy = new ArrayList<>();
+        List<Set<Card>> top10PercentTurnCombosCopy = new ArrayList<>();
+        List<Set<Card>> top10PercentRiverCombosCopy = new ArrayList<>();
 
-        if(continuousTable.getTop5percentTurnCombos() != null) {
-            top5PercentTurnCombosCopy.addAll(continuousTable.getTop5percentTurnCombos());
+        if(continuousTable.getTop10percentFlopCombos() != null) {
+            top10PercentFlopCombosCopy.addAll(continuousTable.getTop10percentFlopCombos());
         }
 
-        if(continuousTable.getTop5percentRiverCombos() != null) {
-            top5PercentRiverCombosCopy.addAll(continuousTable.getTop5percentRiverCombos());
+        if(continuousTable.getTop10percentTurnCombos() != null) {
+            top10PercentTurnCombosCopy.addAll(continuousTable.getTop10percentTurnCombos());
         }
 
-        int boardChangeTurn = BoardEvaluator.getBoardWetnessGroup(top5PercentTurnCombosCopy, top5PercentRiverCombosCopy);
+        if(continuousTable.getTop10percentRiverCombos() != null) {
+            top10PercentRiverCombosCopy.addAll(continuousTable.getTop10percentRiverCombos());
+        }
 
-        System.out.println("BoardWetness: " + boardChangeTurn);
+        int boardWetnessToReturn;
+        int boardWetnessRiver = 200;
+        int boardWetnessTurn = 200;
 
-        return boardChangeTurn;
+        if(!continuousTable.getTop10percentRiverCombos().isEmpty()) {
+            boardWetnessRiver = BoardEvaluator.getBoardWetnessGroup(top10PercentTurnCombosCopy, top10PercentRiverCombosCopy);
+        }
+
+        if(!continuousTable.getTop10percentTurnCombos().isEmpty()) {
+            boardWetnessTurn = BoardEvaluator.getBoardWetnessGroup(top10PercentFlopCombosCopy, top10PercentTurnCombosCopy);
+        }
+
+        if(boardWetnessRiver < boardWetnessTurn) {
+            boardWetnessToReturn = boardWetnessRiver;
+        } else {
+            boardWetnessToReturn = boardWetnessTurn;
+        }
+
+        System.out.println("BoardWetness: " + boardWetnessToReturn);
+
+        return boardWetnessToReturn;
     }
 
     public void setAction(String action) {

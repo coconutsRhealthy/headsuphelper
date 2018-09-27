@@ -38,13 +38,13 @@ public class PreflopActionBuilder {
             } else {
                 action = get1betFcheck(botHoleCards);
             }
-        } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 4) {
+        } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.5);
             } else {
                 action = get1betF2bet(botHoleCards, continuousTableable);
             }
-        } else if(bbOpponentTotalBetSize > 4 && bbOpponentTotalBetSize <= 16) {
+        } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
             if(opponentStack == 0) {
                 action = getActionFacingAllIn(botHoleCards, 0.75);
             } else {

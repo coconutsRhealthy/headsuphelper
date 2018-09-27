@@ -1185,6 +1185,86 @@ public class RuleApplier {
         return actionToReturn;
     }
 
+    public String changePlayToBoardWetness(String action, String opponentAction, List<Card> board, boolean opponentHasInitiative,
+                                           int boardWetness, double facingBetSize, double myBetSize, double myStack, double facingStack,
+                                           double pot, boolean strongDraw, double handStrenght, double bigBlind, boolean turn) {
+        String actionToReturn;
+
+        int maxValue;
+        int ignoreValue;
+
+        if(turn) {
+            maxValue = 64;
+            ignoreValue = 52;
+        } else {
+            maxValue = 70;
+            ignoreValue = 60;
+        }
+
+
+        if(action.equals("fold") || action.equals("call") || action.equals("check")) {
+            if(!opponentAction.equals("raise")) {
+                if(board != null && (board.size() == 4 || board.size() == 5)) {
+//                    if(pot / bigBlind >= 10 || pot >= 250) {
+                        if(boardWetness < maxValue && boardWetness != ignoreValue) {
+                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                                if(action.equals("check")) {
+                                    if(!opponentHasInitiative) {
+                                        if(strongDraw || handStrenght > 0.8) {
+                                            actionToReturn = "bet75pct";
+                                        } else {
+                                            double random = Math.random();
+
+                                            if(random > 0.16) {
+                                                actionToReturn = "bet75pct";
+                                            } else {
+                                                actionToReturn = action;
+                                            }
+                                        }
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    if(strongDraw || handStrenght > 0.8) {
+                                        actionToReturn = "raise";
+                                    } else {
+                                        double random = Math.random();
+
+                                        if(random > 0.16) {
+                                            actionToReturn = "raise";
+                                        } else {
+                                            actionToReturn = action;
+                                        }
+                                    }
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+//                    } else {
+//                        actionToReturn = action;
+//                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        if(!action.equals(actionToReturn)) {
+            System.out.println("Action changed because of boardWetness to: " + actionToReturn);
+        }
+
+        return actionToReturn;
+    }
+
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot) {
         double sizingInMethod;
 
@@ -1195,6 +1275,6 @@ public class RuleApplier {
         }
 
         double odds = (sizingInMethod - facingBetSize) / (facingBetSize + sizingInMethod + pot);
-        return odds > 0.38;
+        return odds > 0.36;
     }
 }
