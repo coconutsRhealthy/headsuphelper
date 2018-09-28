@@ -1194,11 +1194,11 @@ public class RuleApplier {
         int ignoreValue;
 
         if(turn) {
-            maxValue = 64;
-            ignoreValue = 52;
+            maxValue = 80;
+            ignoreValue = 22222;
         } else {
-            maxValue = 70;
-            ignoreValue = 60;
+            maxValue = 80;
+            ignoreValue = 22222;
         }
 
 
@@ -1217,7 +1217,7 @@ public class RuleApplier {
                                         } else {
                                             double random = Math.random();
 
-                                            if(random > 0.16) {
+                                            if(random > 0.17) {
                                                 actionToReturn = "bet75pct";
                                             } else {
                                                 actionToReturn = action;
@@ -1235,7 +1235,7 @@ public class RuleApplier {
                                         if(random > 0.16) {
                                             actionToReturn = "raise";
                                         } else {
-                                            actionToReturn = action;
+                                            actionToReturn = "raise";
                                         }
                                     }
                                 }

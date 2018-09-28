@@ -84,7 +84,7 @@ public class OpponentIdentifier {
         System.out.println("opponentNick: " + opponentNick);
         System.out.println("numberOfHands: " + numberOfHands);
 
-        if(numberOfHands < 54) {
+        if(numberOfHands < 380) {
             opponentType = "tp";
         } else {
             initializeDbConnection();
