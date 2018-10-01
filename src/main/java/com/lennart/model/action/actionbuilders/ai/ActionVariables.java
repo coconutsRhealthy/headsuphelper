@@ -88,15 +88,14 @@ public class ActionVariables {
                 String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative());
 
                 if(opponentType.equals("la")) {
-                    action = actionAgainstLa;
+                    if(actionAgainstLa != null && actionAgainstLa.equals("fold") && botHandStrength > 0.7 && botHandStrength < 0.75) {
+                        opponentType = "ta";
+                        action = "toDetermine";
+                    } else {
+                        action = actionAgainstLa;
+                    }
                 } else {
-//                    if(botHandStrength > 0.7 && botHandStrength < 0.75 && action.equals("fold")) {
-//                        action = "toDetermine";
-//                        //opponentType = "ta";
-//                    }
-
                     if(streetInMethod.equals("flopOrTurn")) {
-
                         if(opponentStackBb == 0) {
                             action = "toDetermine";
                         }
@@ -106,11 +105,6 @@ public class ActionVariables {
                         }
 
                         if(actionAgainstLa.equals("call") && !botHasStrongDraw && opponentBetsizeBb > 15) {
-                            //opponentType = "la";
-                            action = "toDetermine";
-                        }
-
-                        if(actionAgainstLa.equals("fold")) {
                             action = "toDetermine";
                         }
                     }
@@ -125,7 +119,6 @@ public class ActionVariables {
                         }
 
                         if(actionAgainstLa.equals("call")) {
-                            //opponentType = "la";
                             action = "toDetermine";
                         }
                     }
