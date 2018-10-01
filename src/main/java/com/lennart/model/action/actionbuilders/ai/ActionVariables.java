@@ -90,7 +90,13 @@ public class ActionVariables {
                 if(opponentType.equals("la")) {
                     action = actionAgainstLa;
                 } else {
+//                    if(botHandStrength > 0.7 && botHandStrength < 0.75 && action.equals("fold")) {
+//                        action = "toDetermine";
+//                        //opponentType = "ta";
+//                    }
+
                     if(streetInMethod.equals("flopOrTurn")) {
+
                         if(opponentStackBb == 0) {
                             action = "toDetermine";
                         }
@@ -100,6 +106,11 @@ public class ActionVariables {
                         }
 
                         if(actionAgainstLa.equals("call") && !botHasStrongDraw && opponentBetsizeBb > 15) {
+                            //opponentType = "la";
+                            action = "toDetermine";
+                        }
+
+                        if(actionAgainstLa.equals("fold")) {
                             action = "toDetermine";
                         }
                     }
@@ -114,6 +125,7 @@ public class ActionVariables {
                         }
 
                         if(actionAgainstLa.equals("call")) {
+                            //opponentType = "la";
                             action = "toDetermine";
                         }
                     }

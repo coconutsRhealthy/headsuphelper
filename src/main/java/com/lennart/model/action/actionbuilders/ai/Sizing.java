@@ -189,8 +189,8 @@ public class Sizing {
         double opponentStack = facingStack;
         double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
-        if(botStack <= 1.2 * potSize) {
-            flopSizing = botStack;
+        if(botStack <= 1.6 * potSize) {
+            flopSizing = botStack + (0.05 * botStack);
         } else {
             if(opponentBetSize == 0) {
                 if(potSizeBb <= 8) {
@@ -223,7 +223,7 @@ public class Sizing {
             }
         }
         if(flopSizing > botStack) {
-            flopSizing = botStack;
+            flopSizing = botStack + (0.05 * botStack);
         }
 
         return flopSizing;
@@ -238,8 +238,8 @@ public class Sizing {
         double opponentStack = facingStack;
         double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
-        if(botStack <= 1.2 * potSize) {
-            turnSizing = botStack;
+        if(botStack <= 1.6 * potSize) {
+            turnSizing = botStack + (0.05 * botStack);
         } else {
             if(opponentBetSize == 0) {
                 double turnBetPercentage3bet = getTurnBetPercentage(effectiveStack, potSize, 0.75);
@@ -261,7 +261,7 @@ public class Sizing {
             }
         }
         if(turnSizing > botStack) {
-            turnSizing = botStack;
+            turnSizing = botStack + (0.05 * botStack);
         }
 
         return turnSizing;
@@ -277,8 +277,8 @@ public class Sizing {
         double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
         if(opponentBetSize == 0) {
-            if(botStack <= 1.2 * potSize) {
-                riverSizing = botStack;
+            if(botStack <= 1.6 * potSize) {
+                riverSizing = botStack + (0.05 * botStack);
             } else {
                 riverSizing = 0.75 * potSize;
             }
@@ -286,7 +286,7 @@ public class Sizing {
             riverSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, botStack, 2.33);
         }
         if(riverSizing > botStack) {
-            riverSizing = botStack;
+            riverSizing = botStack + (0.05 * botStack);
         }
 
         return riverSizing;
@@ -306,7 +306,7 @@ public class Sizing {
         double effectiveStackRemainingAfterRaise = effectiveStack - raiseAmount;
 
         if(effectiveStackRemainingAfterRaise / potSizeAfterRaiseAndCall < 0.51) {
-            raiseAmount = botStack;
+            raiseAmount = botStack + (0.05 * botStack);
         }
         return raiseAmount;
     }

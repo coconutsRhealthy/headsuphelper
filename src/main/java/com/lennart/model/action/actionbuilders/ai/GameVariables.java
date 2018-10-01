@@ -48,7 +48,7 @@ public class GameVariables implements GameVariable {
     }
 
     public GameVariables(boolean stars) throws Exception {
-        //bigBlind = 100;
+        bigBlind = 0.50;
 
         StarsTableReader starsTableReader = new StarsTableReader();
 
@@ -68,13 +68,13 @@ public class GameVariables implements GameVariable {
         //if not position then i doesnt work
         //bigBlind = topPotSize * (2.0 / 3.0);
 
-        if(botIsButton) {
-            bigBlind = topPotSize * (2.0 / 3.0);
-        } else {
-            if(bigBlind == 0.0) {
-                bigBlind = 20;
-            }
-        }
+//        if(botIsButton) {
+//            bigBlind = topPotSize * (2.0 / 3.0);
+//        } else {
+//            if(bigBlind == 0.0) {
+//                bigBlind = 20;
+//            }
+//        }
 
         allActionRequestsOfHand = new ArrayList<>();
 

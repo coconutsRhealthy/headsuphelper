@@ -1185,6 +1185,40 @@ public class RuleApplier {
         return actionToReturn;
     }
 
+
+
+//    public static void main(String[] args) {
+//        new RuleApplier().theMethod();
+//    }
+//
+//
+//    private void theMethod() {
+//
+//        double facingBetSize = 0;
+//        double myBetSize = 0;
+//        double myStack = 378.0;
+//        double facingStack = 2372.0;
+//        double pot = 250.0;
+//        double bigBlind = 20;
+//
+//        List<Card> board = new ArrayList<>();
+//        board.add(new Card(4, 's'));
+//        board.add(new Card(2, 'd'));
+//        board.add(new Card(10, 'c'));
+//
+//        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+//
+//        System.out.println(sizing);
+//
+//
+//
+//
+//    }
+
+
+
+
+
     public String changePlayToBoardWetness(String action, String opponentAction, List<Card> board, boolean opponentHasInitiative,
                                            int boardWetness, double facingBetSize, double myBetSize, double myStack, double facingStack,
                                            double pot, boolean strongDraw, double handStrenght, double bigBlind, boolean turn) {
@@ -1209,37 +1243,56 @@ public class RuleApplier {
                         if(boardWetness < maxValue && boardWetness != ignoreValue) {
                             double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
-                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
-                                if(action.equals("check")) {
-                                    if(!opponentHasInitiative) {
+                            if(action.equals("check")) {
+                                if(myStack <= 1.6 * pot) {
+                                    sizing = myStack;
+                                }
+                            }
+
+                            System.out.println("zzz1");
+
+                            if(sizing * bigBlind <= 80) {
+                                if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                                    System.out.println("zzz2");
+                                    if(action.equals("check")) {
+                                        System.out.println("zzz3");
+                                        if(!opponentHasInitiative) {
+                                            System.out.println("zzz4");
+                                            if(strongDraw || handStrenght > 0.8) {
+                                                actionToReturn = "bet75pct";
+                                            } else {
+                                                System.out.println("zzz5");
+                                                double random = Math.random();
+
+                                                if(random > 0.17) {
+                                                    actionToReturn = "bet75pct";
+                                                } else {
+                                                    System.out.println("wont be changed to bet: " + random);
+                                                    actionToReturn = action;
+                                                }
+                                            }
+                                        } else {
+                                            actionToReturn = action;
+                                        }
+                                    } else {
                                         if(strongDraw || handStrenght > 0.8) {
-                                            actionToReturn = "bet75pct";
+                                            actionToReturn = "raise";
                                         } else {
                                             double random = Math.random();
 
                                             if(random > 0.17) {
-                                                actionToReturn = "bet75pct";
+                                                actionToReturn = "raise";
                                             } else {
+                                                System.out.println("wont be changed to raise: " + random);
                                                 actionToReturn = action;
                                             }
                                         }
-                                    } else {
-                                        actionToReturn = action;
                                     }
                                 } else {
-                                    if(strongDraw || handStrenght > 0.8) {
-                                        actionToReturn = "raise";
-                                    } else {
-                                        double random = Math.random();
-
-                                        if(random > 0.16) {
-                                            actionToReturn = "raise";
-                                        } else {
-                                            actionToReturn = "raise";
-                                        }
-                                    }
+                                    actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("bluff sizing too big: " + sizing);
                                 actionToReturn = action;
                             }
                         } else {
