@@ -189,7 +189,7 @@ public class Sizing {
         double opponentStack = facingStack;
         double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
-        if(botStack <= 1.6 * potSize) {
+        if(botStack <= 1.2 * potSize) {
             flopSizing = botStack + (0.05 * botStack);
         } else {
             if(opponentBetSize == 0) {
@@ -238,7 +238,7 @@ public class Sizing {
         double opponentStack = facingStack;
         double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
-        if(botStack <= 1.6 * potSize) {
+        if(botStack <= 1.2 * potSize) {
             turnSizing = botStack + (0.05 * botStack);
         } else {
             if(opponentBetSize == 0) {
@@ -277,7 +277,7 @@ public class Sizing {
         double effectiveStack = getEffectiveStack(botStack, opponentStack);
 
         if(opponentBetSize == 0) {
-            if(botStack <= 1.6 * potSize) {
+            if(botStack <= 1.2 * potSize) {
                 riverSizing = botStack + (0.05 * botStack);
             } else {
                 riverSizing = 0.75 * potSize;

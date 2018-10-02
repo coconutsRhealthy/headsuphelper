@@ -1126,7 +1126,7 @@ public class RuleApplier {
                     if(boardWetness < maxValue) {
                         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
-                        if(sizing * bigBlind <= 80) {
+                        if(sizing / bigBlind <= 70) {
                             if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
                                 if(action.equals("check")) {
                                     if(!opponentHasInitiative) {
