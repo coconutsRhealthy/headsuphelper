@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.card.Card;
+import com.lennart.model.computergame.ComputerGameNew;
 import com.lennart.model.handevaluation.HandEvaluator;
 
 import java.util.ArrayList;
@@ -1117,7 +1118,13 @@ public class RuleApplier {
         if(action.equals("raise")) {
             if(board != null && (board.size() == 3 || board.size() == 4)) {
                 if(handStrength < 0.9) {
-                    HandEvaluator handEvaluator = actionVariables.getHandEvaluator();
+                    HandEvaluator handEvaluator;
+
+                    if(actionVariables.getHandEvaluator() != null) {
+                        handEvaluator = actionVariables.getHandEvaluator();
+                    } else {
+                        handEvaluator = ComputerGameNew.getHandEvaluator();
+                    }
 
                     boolean strongFlushDrawInMethod = handEvaluator.hasDrawOfType("strongFlushDraw");
                     boolean strongOosdInMethod = handEvaluator.hasDrawOfType("strongOosd");
@@ -1199,7 +1206,7 @@ public class RuleApplier {
         String actionToReturn;
 
         if(action.equals("fold") || action.equals("call") || action.equals("check")) {
-            if(!opponentAction.equals("raise")) {
+            if(opponentAction == null || !opponentAction.equals("raise")) {
                 if(board != null && (board.size() == 4 || board.size() == 5)) {
                     double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
                     int maxValue;

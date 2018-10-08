@@ -59,15 +59,15 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
     private boolean drawBettingActionDone;
     private boolean previousBluffAction;
-    private HandEvaluator handEvaluator;
+    private static HandEvaluator handEvaluator;
 
     private boolean opponentHasInitiative;
     private boolean pre3betOrPostRaisedPot;
     private boolean opponentDidPreflop4betPot;
 
-    private List<Set<Card>> top5percentFlopCombos;
-    private List<Set<Card>> top5percentTurnCombos;
-    private List<Set<Card>> top5percentRiverCombos;
+    private List<Set<Card>> top10percentFlopCombos;
+    private List<Set<Card>> top10percentTurnCombos;
+    private List<Set<Card>> top10percentRiverCombos;
 
     public ComputerGameNew() {
         //default constructor
@@ -282,19 +282,43 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     }
 
     private int getBoardWetness() {
-        List<Set<Card>> top5PercentTurnCombosCopy = new ArrayList<>();
-        List<Set<Card>> top5PercentRiverCombosCopy = new ArrayList<>();
+        List<Set<Card>> top10PercentFlopCombosCopy = new ArrayList<>();
+        List<Set<Card>> top10PercentTurnCombosCopy = new ArrayList<>();
+        List<Set<Card>> top10PercentRiverCombosCopy = new ArrayList<>();
 
-        if(top5percentTurnCombos != null) {
-            top5PercentTurnCombosCopy.addAll(top5percentTurnCombos);
+        if(top10percentFlopCombos != null) {
+            top10PercentFlopCombosCopy.addAll(top10percentFlopCombos);
         }
 
-        if(top5percentRiverCombos != null) {
-            top5PercentRiverCombosCopy.addAll(top5percentRiverCombos);
+        if(top10percentTurnCombos != null) {
+            top10PercentTurnCombosCopy.addAll(top10percentTurnCombos);
         }
 
-        int boardChangeTurn = BoardEvaluator.getBoardWetnessGroup(top5PercentTurnCombosCopy, top5PercentRiverCombosCopy);
-        return boardChangeTurn;
+        if(top10percentRiverCombos != null) {
+            top10PercentRiverCombosCopy.addAll(top10percentRiverCombos);
+        }
+
+        int boardWetnessToReturn;
+        int boardWetnessRiver = 200;
+        int boardWetnessTurn = 200;
+
+        if(top10percentRiverCombos != null && !top10percentRiverCombos.isEmpty()) {
+            boardWetnessRiver = BoardEvaluator.getBoardWetnessGroup(top10PercentTurnCombosCopy, top10PercentRiverCombosCopy);
+        }
+
+        if(top10percentTurnCombos != null && !top10percentTurnCombos.isEmpty()) {
+            boardWetnessTurn = BoardEvaluator.getBoardWetnessGroup(top10PercentFlopCombosCopy, top10PercentTurnCombosCopy);
+        }
+
+        if(boardWetnessRiver != 200) {
+            boardWetnessToReturn = boardWetnessRiver;
+        } else {
+            boardWetnessToReturn = boardWetnessTurn;
+        }
+
+        System.out.println("BoardWetness: " + boardWetnessToReturn);
+
+        return boardWetnessToReturn;
     }
 
     private void setMyActionToBetIfPreflopNecessary() {
@@ -736,9 +760,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         pre3betOrPostRaisedPot = false;
         opponentDidPreflop4betPot = false;
 
-        top5percentFlopCombos = null;
-        top5percentTurnCombos = null;
-        top5percentRiverCombos = null;
+        top10percentFlopCombos = null;
+        top10percentTurnCombos = null;
+        top10percentRiverCombos = null;
     }
 
     public ComputerGameNew proceedToNextHand() {
@@ -913,11 +937,11 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             BoardEvaluator boardEvaluator = new BoardEvaluator(board);
 
             if(board.size() == 3) {
-                top5percentFlopCombos = boardEvaluator.getTop10percentCombos();
+                top10percentFlopCombos = boardEvaluator.getTop10percentCombos();
             } else if(board.size() == 4) {
-                top5percentTurnCombos = boardEvaluator.getTop10percentCombos();
+                top10percentTurnCombos = boardEvaluator.getTop10percentCombos();
             } else if(board.size() == 5) {
-                top5percentRiverCombos = boardEvaluator.getTop10percentCombos();
+                top10percentRiverCombos = boardEvaluator.getTop10percentCombos();
             }
 
             handEvaluator = new HandEvaluator(computerHoleCards, boardEvaluator);
@@ -1289,12 +1313,12 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         this.previousBluffAction = previousBluffAction;
     }
 
-    public HandEvaluator getHandEvaluator() {
-        return handEvaluator;
+    public static HandEvaluator getHandEvaluator() {
+        return ComputerGameNew.handEvaluator;
     }
 
-    public void setHandEvaluator(HandEvaluator handEvaluator) {
-        this.handEvaluator = handEvaluator;
+    public static void setHandEvaluator(HandEvaluator handEvaluator) {
+        ComputerGameNew.handEvaluator = handEvaluator;
     }
 
     @Override
@@ -1327,28 +1351,28 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         this.opponentDidPreflop4betPot = opponentDidPreflop4betPot;
     }
 
-    public List<Set<Card>> getTop5percentFlopCombos() {
-        return top5percentFlopCombos;
+    public List<Set<Card>> getTop10percentFlopCombos() {
+        return top10percentFlopCombos;
     }
 
-    public void setTop5percentFlopCombos(List<Set<Card>> top5percentFlopCombos) {
-        this.top5percentFlopCombos = top5percentFlopCombos;
+    public void setTop10percentFlopCombos(List<Set<Card>> top10percentFlopCombos) {
+        this.top10percentFlopCombos = top10percentFlopCombos;
     }
 
-    public List<Set<Card>> getTop5percentTurnCombos() {
-        return top5percentTurnCombos;
+    public List<Set<Card>> getTop10percentTurnCombos() {
+        return top10percentTurnCombos;
     }
 
-    public void setTop5percentTurnCombos(List<Set<Card>> top5percentTurnCombos) {
-        this.top5percentTurnCombos = top5percentTurnCombos;
+    public void setTop10percentTurnCombos(List<Set<Card>> top10percentTurnCombos) {
+        this.top10percentTurnCombos = top10percentTurnCombos;
     }
 
-    public List<Set<Card>> getTop5percentRiverCombos() {
-        return top5percentRiverCombos;
+    public List<Set<Card>> getTop10percentRiverCombos() {
+        return top10percentRiverCombos;
     }
 
-    public void setTop5percentRiverCombos(List<Set<Card>> top5percentRiverCombos) {
-        this.top5percentRiverCombos = top5percentRiverCombos;
+    public void setTop10percentRiverCombos(List<Set<Card>> top10percentRiverCombos) {
+        this.top10percentRiverCombos = top10percentRiverCombos;
     }
 
     public String getComputerWrittenActionBeforeFoldStat() {
