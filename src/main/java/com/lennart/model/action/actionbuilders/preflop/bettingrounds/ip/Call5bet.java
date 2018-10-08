@@ -42,7 +42,7 @@ public class Call5bet {
             comboMap100Percent.put(16, p.getSuitedCombosOfGivenRanks(13, 12));
 
             comboMap100Percent.put(19, p.getOffSuitCombosOfGivenRanks(14, 10));
-        } else {
+        } else if(amountToCallBb <= 160) {
             comboMap100Percent.put(1, p.getPocketPairCombosOfGivenRank(14));
             comboMap100Percent.put(2, p.getPocketPairCombosOfGivenRank(13));
             comboMap100Percent.put(3, p.getPocketPairCombosOfGivenRank(12));
@@ -51,6 +51,11 @@ public class Call5bet {
             comboMap100Percent.put(6, p.getOffSuitCombosOfGivenRanks(14, 13));
 
             comboMap100Percent.put(7, p.getSuitedCombosOfGivenRanks(14, 12));
+        } else if(amountToCallBb <= 250) {
+            comboMap100Percent.put(1, p.getPocketPairCombosOfGivenRank(14));
+            comboMap100Percent.put(2, p.getPocketPairCombosOfGivenRank(13));
+        } else {
+            comboMap100Percent.put(1, p.getPocketPairCombosOfGivenRank(14));
         }
     }
 
