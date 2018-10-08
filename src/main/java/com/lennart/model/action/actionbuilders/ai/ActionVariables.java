@@ -44,6 +44,66 @@ public class ActionVariables {
         //default constructor
     }
 
+
+    public static void main(String[] args) throws Exception {
+        for(int i = 0; i < 10; i++) {
+            new ActionVariables().theMethod();
+        }
+    }
+
+
+    private void theMethod() throws Exception {
+        ContinuousTable continuousTable = new ContinuousTable();
+
+        continuousTable.setOpponentHasInitiative(true);
+        continuousTable.setPre3betOrPostRaisedPot(false);
+        continuousTable.setOpponentDidPreflop4betPot(false);
+
+        GameVariables gameVariables = new GameVariables();
+
+        gameVariables.setOpponentStack(1585.0);
+        gameVariables.setOpponentBetSize(1246.0);
+        gameVariables.setPot(3105.0);
+        gameVariables.setBotBetSize(0);
+        gameVariables.setBotStack(41168.5);
+        gameVariables.setBigBlind(100);
+        gameVariables.setBotIsButton(true);
+
+        gameVariables.setOpponentAction("bet75pct");
+
+        List<Card> holeCards = new ArrayList<>();
+
+        holeCards.add(new Card(6, 'h'));
+        holeCards.add(new Card(8, 'd'));
+
+        Card flopCard1 = new Card(3, 's');
+        Card flopCard2 = new Card(14, 'h');
+        Card flopCard3 = new Card(6, 'c');
+        Card turnCard = new Card(8, 'h');
+        Card riverCard = new Card(8, 'c');
+
+        gameVariables.setFlopCard1(flopCard1);
+        gameVariables.setFlopCard2(flopCard2);
+        gameVariables.setFlopCard3(flopCard3);
+        gameVariables.setTurnCard(turnCard);
+        gameVariables.setRiverCard(riverCard);
+
+        List<Card> board = new ArrayList<>();
+        board.add(flopCard1);
+        board.add(flopCard2);
+        board.add(flopCard3);
+        board.add(turnCard);
+        board.add(riverCard);
+
+        gameVariables.setBotHoleCards(holeCards);
+        gameVariables.setBoard(board);
+
+        ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
+    }
+
+
+
+
     public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean newHand) throws Exception {
         calculateHandStrengthAndDraws(gameVariables, continuousTable);
 
@@ -512,7 +572,7 @@ public class ActionVariables {
             boardWetnessTurn = BoardEvaluator.getBoardWetnessGroup(top10PercentFlopCombosCopy, top10PercentTurnCombosCopy);
         }
 
-        if(boardWetnessRiver < boardWetnessTurn) {
+        if(boardWetnessRiver != 200) {
             boardWetnessToReturn = boardWetnessRiver;
         } else {
             boardWetnessToReturn = boardWetnessTurn;

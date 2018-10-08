@@ -16,7 +16,7 @@ public class Call5bet {
     private Map<Integer, Map<Integer, Set<Card>>> comboMap100Percent = new HashMap<>();
 
     public Call5bet(ActionBuilderUtil p, double amountToCallBb) {
-        if(amountToCallBb <= 100) {
+        if(amountToCallBb <= 40) {
             comboMap100Percent.put(1, p.getPocketPairCombosOfGivenRank(14));
             comboMap100Percent.put(2, p.getPocketPairCombosOfGivenRank(13));
             comboMap100Percent.put(3, p.getPocketPairCombosOfGivenRank(12));

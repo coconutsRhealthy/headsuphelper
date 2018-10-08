@@ -38,6 +38,8 @@ public class ContinuousTable implements ContinuousTableable {
         int milliSecondsTotal = 0;
         int printDotTotal = 0;
 
+        long startTime = new Date().getTime();
+
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
             milliSecondsTotal = milliSecondsTotal + 100;
@@ -47,6 +49,13 @@ public class ContinuousTable implements ContinuousTableable {
                 boolean isNewHand = isNewHand();
 
                 if(isNewHand) {
+                    long currentTime = new Date().getTime();
+
+                    if(currentTime - startTime > 7_200_000) {
+                        System.out.println("2 hours have passed, force quit");
+                        throw  new RuntimeException();
+                    }
+
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
