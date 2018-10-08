@@ -211,12 +211,18 @@ public class ActionVariables {
             System.out.println("botFoldStat against " + gameVariables.getOpponentName() + ": " + botFoldStat);
 
             if(botFoldStat > 0.43) {
-                double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
-                        streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack,
-                        botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb,
-                        opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot,
-                        gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(),
-                        continuousTable.isPre3betOrPostRaisedPot(), false, false, false, boardWetness, continuousTable.isOpponentHasInitiative());
+                double handStrengthRequiredToCall;
+
+                if(preflop) {
+                    handStrengthRequiredToCall = -1;
+                } else {
+                    handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
+                            streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack,
+                            botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb,
+                            opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot,
+                            gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(),
+                            continuousTable.isPre3betOrPostRaisedPot(), false, false, false, boardWetness, continuousTable.isOpponentHasInitiative());
+                }
 
                 action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, gameVariables.getOpponentName(), botBetsizeBb, opponentBetsizeBb, false);
 
