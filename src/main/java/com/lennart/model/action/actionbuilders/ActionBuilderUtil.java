@@ -514,6 +514,18 @@ public class ActionBuilderUtil {
         return allPossibleStartHandsAsSetCopy;
     }
 
+    public static Map<Integer, List<Card>> getAllStartHandsAsList() {
+        Map<Integer, List<Card>> allPossibleStartHandsAsListCopy = new HashMap<>();
+
+        for (Map.Entry<Integer, Set<Card>> entry : allStartHandsAsSet.entrySet()) {
+            List<Card> comboCopy = new ArrayList<>();
+            comboCopy.addAll(entry.getValue());
+
+            allPossibleStartHandsAsListCopy.put(allPossibleStartHandsAsListCopy.size(), comboCopy);
+        }
+        return allPossibleStartHandsAsListCopy;
+    }
+
     public static boolean handIsTtPlusATsPlusOrAJoPlus(List<Card> hand, Set<Card> knownGameCards) {
         Set<Set<Card>> combosTtPlusATsPlusOrAJoPlus = new HashSet<>();
         Set<Card> handAsSet = new HashSet<>();
