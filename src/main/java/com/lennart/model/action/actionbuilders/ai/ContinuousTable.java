@@ -1,15 +1,13 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -27,6 +25,8 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Set<Card>> top10percentFlopCombos;
     private List<Set<Card>> top10percentTurnCombos;
     private List<Set<Card>> top10percentRiverCombos;
+
+    private Map<Integer, List<Card>> botRange;
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -62,6 +62,7 @@ public class ContinuousTable implements ContinuousTableable {
                     top10percentFlopCombos = new ArrayList<>();
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
+                    botRange = ActionBuilderUtil.getAllStartHandsAsList();
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
@@ -244,5 +245,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setTop10percentRiverCombos(List<Set<Card>> top10percentRiverCombos) {
         this.top10percentRiverCombos = top10percentRiverCombos;
+    }
+
+    public Map<Integer, List<Card>> getBotRange() {
+        return botRange;
+    }
+
+    public void setBotRange(Map<Integer, List<Card>> botRange) {
+        this.botRange = botRange;
     }
 }

@@ -1,11 +1,13 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.computergame.ComputerGameNew;
 import com.lennart.model.handevaluation.HandEvaluator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LennartMac on 01/03/2018.
@@ -1366,6 +1368,104 @@ public class RuleApplier {
                     ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
                     bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
                     strongBackdoorSd, boardWetness, opponentHasInitiative);
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String alwaysBetOrRaiseAboveHs80(String action, double handStrength, double sizing, double facingBetSize,
+                                             double facingStackSize, double pot) {
+        String actionToReturn;
+
+        if(action.equals("check")) {
+            if(handStrength >= 0.8) {
+                if(bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot)) {
+                    actionToReturn = "bet75pct";
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else if(action.equals("fold") || action.equals("call")) {
+            if(handStrength >= 0.8) {
+                if(bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot)) {
+                    actionToReturn = "raise";
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String balancePlayWithBotRange(String action, Map<Integer, List<Card>> botRange, ContinuousTable continuousTable,
+                                           GameVariables gameVariables, BoardEvaluator boardEvaluator,
+                                           String opponentType, double handStrength, double sizing, double facingBetSize,
+                                           double facingStackSize, double pot) throws Exception {
+        String actionToReturn;
+
+        if(handStrength < 0.55) {
+            if(action.equals("check")) {
+                if(bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot)) {
+                    Map<Integer, List<String>> hsAndActionPerCombo = new BotRange().getHsAndActionPerCombo(botRange,
+                            continuousTable, gameVariables, boardEvaluator, opponentType);
+
+                    double valueBetCombos = new BotRange().getNumberOfValueBetRaiseCombos(hsAndActionPerCombo, "bet75pct");
+
+                    //stel je krijgt 18 valuebet combos terug... dan wil je weten hoeveel combos onder de 0.55 in je range zitten
+
+                    double combosBelowLimitHs = new BotRange().getNumberOfCombosBelowHsLimit(hsAndActionPerCombo, 0.55);
+
+                    //stel je krijgt 44 combos onder 0.55 terug..
+
+                    //44 * X = 18
+                    //X = 18 / 44
+                    //X = valueBetCombos / combosBelowLimitHs
+
+                    double randomLimit = valueBetCombos / combosBelowLimitHs;
+
+                    double random = Math.random();
+
+                    if(randomLimit < random) {
+                        actionToReturn = "bet75pct";
+                        System.out.println("changed check to bet in balance play method");
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else if(action.equals("fold")) {
+                if(bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot)) {
+                    Map<Integer, List<String>> hsAndActionPerCombo = new BotRange().getHsAndActionPerCombo(botRange,
+                            continuousTable, gameVariables, boardEvaluator, opponentType);
+
+                    double valueBetCombos = new BotRange().getNumberOfValueBetRaiseCombos(hsAndActionPerCombo, "raise");
+                    double combosBelowLimitHs = new BotRange().getNumberOfCombosBelowHsLimit(hsAndActionPerCombo, 0.55);
+
+                    double randomLimit = valueBetCombos / combosBelowLimitHs;
+                    double random = Math.random();
+
+                    if(randomLimit < random) {
+                        actionToReturn = "raise";
+                        System.out.println("changed check to raise in balance play method");
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
         } else {
             actionToReturn = action;
         }
