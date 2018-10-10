@@ -1409,8 +1409,9 @@ public class RuleApplier {
     private String balancePlayWithBotRange(String action, Map<Integer, List<Card>> botRange, ContinuousTable continuousTable,
                                            GameVariables gameVariables, BoardEvaluator boardEvaluator,
                                            String opponentType, double handStrength, double sizing, double facingBetSize,
-                                           double facingStackSize, double pot) throws Exception {
-        String actionToReturn;
+                                           double facingStackSize, double pot, boolean strongFd, boolean strongOosd,
+                                           boolean strongGutshot, boolean strongBackdoorFd, boolean strongBackdoorSd) throws Exception {
+        String actionToReturn = null;
 
         if(handStrength < 0.55) {
             if(action.equals("check")) {
@@ -1420,26 +1421,70 @@ public class RuleApplier {
 
                     double valueBetCombos = new BotRange().getNumberOfValueBetRaiseCombos(hsAndActionPerCombo, "bet75pct");
 
-                    //stel je krijgt 18 valuebet combos terug... dan wil je weten hoeveel combos onder de 0.55 in je range zitten
+                    //stel je krijgt 18 valuebet combos terug... dan wil je weten hoeveel combos strong draw non backdoor zijn in je range
 
-                    double combosBelowLimitHs = new BotRange().getNumberOfCombosBelowHsLimit(hsAndActionPerCombo, 0.55);
+                    List<Double> strongDrawCombosCountList = new BotRange().getStrongDrawCombosCountList(botRange, boardEvaluator);
+                    double strongDrawsNonBackdoorCombos = new BotRange().getNumberOfStrongDrawsNonBackdoor(strongDrawCombosCountList);
 
-                    //stel je krijgt 44 combos onder 0.55 terug..
+                    //nu weet je hoeveel strong draws in je range zitten...
 
-                    //44 * X = 18
-                    //X = 18 / 44
-                    //X = valueBetCombos / combosBelowLimitHs
-
-                    double randomLimit = valueBetCombos / combosBelowLimitHs;
-
-                    double random = Math.random();
-
-                    if(randomLimit < random) {
-                        actionToReturn = "bet75pct";
-                        System.out.println("changed check to bet in balance play method");
+                    if(valueBetCombos - strongDrawsNonBackdoorCombos >= 0) {
+                        if(strongFd || strongOosd || strongGutshot) {
+                            actionToReturn = "bet75pct";
+                        }
                     } else {
-                        actionToReturn = action;
+                        if(strongFd || strongOosd || strongGutshot) {
+                            double randomLimitStrongDraws = valueBetCombos / strongDrawsNonBackdoorCombos;
+                            double randomStrongDraws = Math.random();
+
+                            if(randomStrongDraws < randomLimitStrongDraws) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("changed check to bet in balance play method 1");
+                            }
+                        }
                     }
+
+                    if(actionToReturn == null) {
+                        double strongBackdoorDrawCombos = new BotRange().getNumberOfBackdoorStrongDraws(strongDrawCombosCountList);
+
+                        if(valueBetCombos - strongBackdoorDrawCombos >= 0) {
+                            if(strongBackdoorFd || strongBackdoorSd) {
+                                actionToReturn = "bet75pct";
+                            }
+                        } else {
+                            if(strongBackdoorFd || strongBackdoorSd) {
+                                double randomLimitStrongBackdoorDraws = valueBetCombos / strongBackdoorDrawCombos;
+                                double randomBackdoorStrongDraws = Math.random();
+
+                                if(randomBackdoorStrongDraws < randomLimitStrongBackdoorDraws) {
+                                    actionToReturn = "bet75pct";
+                                    System.out.println("changed check to bet in balance play method 2");
+                                }
+                            }
+                        }
+                    }
+
+                    if(actionToReturn == null) {
+                        double combosBelowLimitHs = new BotRange().getNumberOfCombosBelowHsLimit(hsAndActionPerCombo, 0.55);
+
+                        //stel je krijgt 44 combos onder 0.55 terug..
+
+                        //44 * X = 18
+                        //X = 18 / 44
+                        //X = valueBetCombos / combosBelowLimitHs
+
+                        double randomLimit = valueBetCombos / combosBelowLimitHs;
+
+                        double random = Math.random();
+
+                        if(randomLimit < random) {
+                            actionToReturn = "bet75pct";
+                            System.out.println("changed check to bet in balance play method 3");
+                        } else {
+                            actionToReturn = action;
+                        }
+                    }
+
                 } else {
                     actionToReturn = action;
                 }

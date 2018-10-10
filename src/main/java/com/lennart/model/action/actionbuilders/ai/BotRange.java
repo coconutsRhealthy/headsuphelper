@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.handevaluation.HandEvaluator;
 
 import java.util.*;
 
@@ -84,6 +85,45 @@ public class BotRange {
         }
 
         return valueBetRaiseCombos;
+    }
+
+    public List<Double> getStrongDrawCombosCountList(Map<Integer, List<Card>> botRange, BoardEvaluator boardEvaluator) {
+        List<Double> strongDrawCombos = new ArrayList<>();
+
+        strongDrawCombos.add(0.0);
+        strongDrawCombos.add(0.0);
+
+        for (Map.Entry<Integer, List<Card>> entry : botRange.entrySet()) {
+            HandEvaluator handEvaluator = new HandEvaluator(entry.getValue(), boardEvaluator);
+
+            boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+            boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+            boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+            boolean strongBackDoorFlush = handEvaluator.hasDrawOfType("strongBackDoorFlush");
+            boolean strongBackDoorStraight = handEvaluator.hasDrawOfType("strongBackDoorStraight");
+
+            if(strongFd || strongOosd || strongGutshot) {
+                double oldValue = strongDrawCombos.get(0);
+                double newValue = oldValue + 1;
+                strongDrawCombos.set(0, newValue);
+            }
+
+            if(strongBackDoorFlush || strongBackDoorStraight) {
+                double oldValue = strongDrawCombos.get(1);
+                double newValue = oldValue + 1;
+                strongDrawCombos.set(1, newValue);
+            }
+        }
+
+        return strongDrawCombos;
+    }
+
+    public double getNumberOfStrongDrawsNonBackdoor(List<Double> strongDrawCombosCountList) {
+        return strongDrawCombosCountList.get(0);
+    }
+
+    public double getNumberOfBackdoorStrongDraws(List<Double> strongDrawCombosCountList) {
+        return strongDrawCombosCountList.get(1);
     }
 
     public double getNumberOfCombosBelowHsLimit(Map<Integer, List<String>> hsAndActionPerCombo, double limit) {
