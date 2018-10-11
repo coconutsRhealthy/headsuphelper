@@ -11,11 +11,6 @@ public class BotRange {
     public Map<Integer, List<Card>> updateBotRange(Map<Integer, List<Card>> previousBotRange, String actionDoneByBot,
                                                    ContinuousTable continuousTable, GameVariables gameVariables,
                                                    String opponentType, BoardEvaluator boardEvaluator) throws Exception {
-
-        //loop door al je combos van je previousRange heen en zie welke combos dezelfde actie doen als 'action';
-
-        //dit is je range
-
         Map<Integer, List<Card>> rangeToReturn = new HashMap<>();
 
         for (Map.Entry<Integer, List<Card>> entry : previousBotRange.entrySet()) {
