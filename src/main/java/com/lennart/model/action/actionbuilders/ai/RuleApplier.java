@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.computergame.ComputerGame;
 import com.lennart.model.computergame.ComputerGameNew;
 import com.lennart.model.handevaluation.HandEvaluator;
 
@@ -1242,7 +1243,7 @@ public class RuleApplier {
                                            String opponentType, double handStrength, double sizing, double facingBetSize,
                                            double facingStackSize, double pot, boolean strongFd, boolean strongOosd,
                                            boolean strongGutshot, boolean strongBackdoorFd, boolean strongBackdoorSd,
-                                           String opponentAction, List<Card> board) throws Exception {
+                                           String opponentAction, List<Card> board, ComputerGameNew computerGameNew) throws Exception {
         String actionToReturn = null;
 
         if(board != null && board.size() >= 3) {
@@ -1251,7 +1252,7 @@ public class RuleApplier {
                     if(bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot)) {
                         actionToReturn = balanceHelperMethod(action, botRange, continuousTable, gameVariables,
                                 boardEvaluator, opponentType, strongFd, strongOosd, strongGutshot, strongBackdoorFd,
-                                strongBackdoorSd, "bet75pct");
+                                strongBackdoorSd, "bet75pct", computerGameNew);
                     } else {
                         actionToReturn = action;
                     }
@@ -1259,7 +1260,7 @@ public class RuleApplier {
                     if(bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot)) {
                         actionToReturn = balanceHelperMethod(action, botRange, continuousTable, gameVariables,
                                 boardEvaluator, opponentType, strongFd, strongOosd, strongGutshot, strongBackdoorFd,
-                                strongBackdoorSd, "raise");
+                                strongBackdoorSd, "raise", computerGameNew);
                     } else {
                         actionToReturn = action;
                     }
@@ -1277,11 +1278,18 @@ public class RuleApplier {
     private String balanceHelperMethod(String action, Map<Integer, List<Card>> botRange, ContinuousTable continuousTable,
                                        GameVariables gameVariables, BoardEvaluator boardEvaluator, String opponentType,
                                        boolean strongFd, boolean strongOosd, boolean strongGutshot,
-                                       boolean strongBackdoorFd, boolean strongBackdoorSd, String actionToUse) throws Exception {
+                                       boolean strongBackdoorFd, boolean strongBackdoorSd, String actionToUse,
+                                       ComputerGameNew computerGameNew) throws Exception {
         String actionToReturn = null;
 
-        Map<Integer, List<String>> hsAndActionPerCombo = new BotRange().getHsAndActionPerCombo(botRange,
-                continuousTable, gameVariables, boardEvaluator, opponentType);
+        Map<Integer, List<String>> hsAndActionPerCombo;
+
+        if(continuousTable != null) {
+            hsAndActionPerCombo = new BotRange().getHsAndActionPerCombo(botRange, continuousTable, gameVariables,
+                    boardEvaluator, opponentType);
+        } else {
+            hsAndActionPerCombo = new BotRange().getHsAndActionPerComboComputerGame(botRange, computerGameNew, boardEvaluator);
+        }
 
         double valueCombos = new BotRange().getNumberOfValueBetRaiseCombos(hsAndActionPerCombo, actionToUse);
 

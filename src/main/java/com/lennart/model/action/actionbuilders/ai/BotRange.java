@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.computergame.ComputerGameNew;
 import com.lennart.model.handevaluation.HandEvaluator;
 
 import java.util.*;
@@ -37,6 +38,32 @@ public class BotRange {
         return rangeToReturn;
     }
 
+    public Map<Integer, List<Card>> updateBotRangeComputerGame(Map<Integer, List<Card>> previousBotRange, String actionDoneByBot,
+                                                   ComputerGameNew computerGameNew, BoardEvaluator boardEvaluator) {
+        Map<Integer, List<Card>> rangeToReturn = new HashMap<>();
+
+        for (Map.Entry<Integer, List<Card>> entry : previousBotRange.entrySet()) {
+            Card newBotHoleCard1 = entry.getValue().get(0);
+            Card newBotHoleCard2 = entry.getValue().get(1);
+            List<Card> newBotHoleCards = new ArrayList<>();
+            newBotHoleCards.add(newBotHoleCard1);
+            newBotHoleCards.add(newBotHoleCard2);
+
+            computerGameNew.setComputerHoleCards(newBotHoleCards);
+            computerGameNew.calculateHandStrengthsAndDraws(boardEvaluator);
+
+            String action = computerGameNew.getComputerActionFromAiBotForBotRange();
+
+            if(action.equals(actionDoneByBot)) {
+                List<Card> comboCopy = new ArrayList<>();
+                comboCopy.addAll(entry.getValue());
+                rangeToReturn.put(rangeToReturn.size(), comboCopy);
+            }
+        }
+
+        return rangeToReturn;
+    }
+
     public Map<Integer, List<String>> getHsAndActionPerCombo(Map<Integer, List<Card>> botRange, ContinuousTable continuousTable,
                                                              GameVariables gameVariables, BoardEvaluator boardEvaluator,
                                                              String opponentType) throws Exception {
@@ -59,6 +86,34 @@ public class BotRange {
 
             List<String> hsAndAction = new ArrayList<>();
             hsAndAction.add(actionOfCombo);
+            hsAndAction.add(String.valueOf(handStrength));
+
+            hsAndActionPerCombo.put(hsAndActionPerCombo.size(), hsAndAction);
+        }
+
+        return hsAndActionPerCombo;
+    }
+
+    public Map<Integer, List<String>> getHsAndActionPerComboComputerGame(Map<Integer, List<Card>> botRange,
+                                                                         ComputerGameNew computerGameNew,
+                                                                         BoardEvaluator boardEvaluator) {
+        Map<Integer, List<String>> hsAndActionPerCombo = new HashMap<>();
+
+        for (Map.Entry<Integer, List<Card>> entry : botRange.entrySet()) {
+            Card newBotHoleCard1 = entry.getValue().get(0);
+            Card newBotHoleCard2 = entry.getValue().get(1);
+            List<Card> newBotHoleCards = new ArrayList<>();
+            newBotHoleCards.add(newBotHoleCard1);
+            newBotHoleCards.add(newBotHoleCard2);
+
+            computerGameNew.setComputerHoleCards(newBotHoleCards);
+            computerGameNew.calculateHandStrengthsAndDraws(boardEvaluator);
+
+            String action = computerGameNew.getComputerActionFromAiBotForBotRange();
+            double handStrength = computerGameNew.getComputerHandStrength();
+
+            List<String> hsAndAction = new ArrayList<>();
+            hsAndAction.add(action);
             hsAndAction.add(String.valueOf(handStrength));
 
             hsAndActionPerCombo.put(hsAndActionPerCombo.size(), hsAndAction);

@@ -42,6 +42,8 @@ public class ActionVariables {
 
     private String actionBeforeFoldStat;
 
+    private BoardEvaluator boardEvaluator;
+
     public ActionVariables() {
         //default constructor
     }
@@ -275,7 +277,7 @@ public class ActionVariables {
         gameVariables.setBotStack(updatedBotStack);
         gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
 
-        Map<Integer, List<Card>> botRange = new BotRange().updateBotRange(continuousTable.getBotRange(), action, continuousTable, gameVariables, opponentType, null);
+        Map<Integer, List<Card>> botRange = new BotRange().updateBotRange(continuousTable.getBotRange(), action, continuousTable, gameVariables, opponentType, boardEvaluator);
         continuousTable.setBotRange(botRange);
     }
 
@@ -448,14 +450,16 @@ public class ActionVariables {
        }
     }
 
-    private void calculateHandStrengthAndDraws(GameVariables gameVariables, ContinuousTable continuousTable, BoardEvaluator boardEvaluator) {
+    private void calculateHandStrengthAndDraws(GameVariables gameVariables, ContinuousTable continuousTable, BoardEvaluator providedBoardEvaluator) {
         if(gameVariables.getBoard().isEmpty()) {
             PreflopHandStength preflopHandStength = new PreflopHandStength();
             botHandStrength = preflopHandStength.getPreflopHandStength(gameVariables.getBotHoleCards());
             botHasStrongDraw = false;
         } else {
-            if(boardEvaluator == null) {
+            if(providedBoardEvaluator == null) {
                 boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
+            } else {
+                boardEvaluator = providedBoardEvaluator;
             }
 
             handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
@@ -794,5 +798,13 @@ public class ActionVariables {
 
     public void setActionBeforeFoldStat(String actionBeforeFoldStat) {
         this.actionBeforeFoldStat = actionBeforeFoldStat;
+    }
+
+    public BoardEvaluator getBoardEvaluator() {
+        return boardEvaluator;
+    }
+
+    public void setBoardEvaluator(BoardEvaluator boardEvaluator) {
+        this.boardEvaluator = boardEvaluator;
     }
 }
