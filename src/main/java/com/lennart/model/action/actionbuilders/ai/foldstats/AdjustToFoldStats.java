@@ -1,10 +1,15 @@
 package com.lennart.model.action.actionbuilders.ai.foldstats;
 
 import com.lennart.model.action.actionbuilders.ai.ActionVariables;
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.action.actionbuilders.ai.Poker;
+import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
+import com.lennart.model.computergame.ComputerGameNew;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LennartMac on 24/05/2018.
@@ -82,7 +87,8 @@ public class AdjustToFoldStats {
                                                 double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
                                                 boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
                                                 boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
-                                                int boardWetness, boolean opponentHasInitiative) {
+                                                int boardWetness, boolean opponentHasInitiative, Map<Integer, List<Card>> botRange, ContinuousTable continuousTable,
+                                                GameVariables gameVariables, BoardEvaluator boardEvaluator, ComputerGameNew computerGameNew) {
         double downLimit = 0;
         double upLimit = 1;
         int counter = 0;
@@ -98,7 +104,7 @@ public class AdjustToFoldStats {
                     opponentAction, facingOdds, effectiveStackBb, strongDraw, numberInTheMiddle, opponentType, opponentBetSizeBb,
                     ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
                     bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
-                    strongBackdoorSd, boardWetness, opponentHasInitiative);
+                    strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, continuousTable, gameVariables, boardEvaluator, computerGameNew);
 
             if(action.equals("fold")) {
                 downLimit = numberInTheMiddle;

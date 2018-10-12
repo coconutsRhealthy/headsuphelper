@@ -71,7 +71,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     private List<Set<Card>> top10percentRiverCombos;
 
     private Map<Integer, List<Card>> botRange;
-    private BoardEvaluator boardEvaluator;
+    private static BoardEvaluator boardEvaluator;
 
     public ComputerGameNew() {
         //default constructor
@@ -201,17 +201,32 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                 strongDraw = computerHasStrongDraw;
 
                 if(eligibleActions != null && eligibleActions.contains("bet75pct")) {
-                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
+                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb,
+                            myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb,
+                            computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(),
+                            board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                            pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd,
+                            boardWetness, opponentHasInitiative, botRange, null, null, boardEvaluator, this);
 
                     if(opponentType.equals("la")) {
                         action = actionAgainstLa;
                     } else if(actionAgainstLa.equals("bet75pct")) {
                         action = actionAgainstLa;
                     } else {
-                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
+                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb,
+                                myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType,
+                                opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind,
+                                board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind,
+                                opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, null, null, boardEvaluator, this);
                     }
                 } else {
-                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
+                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction,
+                            getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                            computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(),
+                            board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                            pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd,
+                            boardWetness, opponentHasInitiative, botRange, null, null, boardEvaluator, this);
                 }
             }
 
@@ -239,7 +254,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             double botFoldStat = FoldStatsKeeper.getFoldStat("bot-V-izo");
 
             if(botFoldStat > 0.43) {
-                double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
+                double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, null, null, boardEvaluator, this);
 
                 try {
                     action = adjustToFoldStats.adjustPlayToBotFoldStat(action, handStrength, handStrengthRequiredToCall, computerHoleCards, board, position, "izo", computerBetSizeBb, opponentBetSizeBb, true);
@@ -290,7 +305,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         return action;
     }
 
-    public String getComputerActionFromAiBotForBotRange() {
+    public String monkeyHetComputerActionFromAiBotForBotRange() {
         List<String> eligibleActions = getEligibleComputerActions();
         double handStrength = computerHandStrength;
         boolean strongDraw = computerHasStrongDraw;
@@ -319,17 +334,34 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                 strongDraw = computerHasStrongDraw;
 
                 if(eligibleActions != null && eligibleActions.contains("bet75pct")) {
-                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
+                    String actionAgainstLa = new Poker().getAction(null, eligibleActions, getStreet(), position,
+                            potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength,
+                            "la", opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind,
+                            computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw,
+                            strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot,
+                            strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative,
+                            botRange, null, null, boardEvaluator, this);
 
                     if(opponentType.equals("la")) {
                         action = actionAgainstLa;
                     } else if(actionAgainstLa.equals("bet75pct")) {
                         action = actionAgainstLa;
                     } else {
-                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
+                        action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb,
+                                myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType,
+                                opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind,
+                                board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot,
+                                bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards,
+                                strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative,
+                                botRange, null, null, boardEvaluator, this);
                     }
                 } else {
-                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb, myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType, opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind, board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
+                    action = new Poker().getAction(null, eligibleActions, getStreet(), position, potSizeInMethodBb,
+                            myAction, getFacingOdds(), effectiveStack, strongDraw, handStrength, opponentType,
+                            opponentBetSizeBb, computerBetSizeBb, getOpponentStack() / bigBlind, computerStack / bigBlind,
+                            board == null || board.isEmpty(), board, strongFlushDraw, strongOosd, strongGutshot, bigBlind,
+                            opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                            strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, null, null, boardEvaluator, this);
                 }
             }
 
@@ -823,6 +855,8 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         top10percentFlopCombos = null;
         top10percentTurnCombos = null;
         top10percentRiverCombos = null;
+
+        botRange = ActionBuilderUtil.getAllStartHandsAsList();
     }
 
     public ComputerGameNew proceedToNextHand() {
@@ -1469,13 +1503,5 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
     public void setBotRange(Map<Integer, List<Card>> botRange) {
         this.botRange = botRange;
-    }
-
-    public BoardEvaluator getBoardEvaluator() {
-        return boardEvaluator;
-    }
-
-    public void setBoardEvaluator(BoardEvaluator boardEvaluator) {
-        this.boardEvaluator = boardEvaluator;
     }
 }

@@ -52,7 +52,7 @@ public class BotRange {
             computerGameNew.setComputerHoleCards(newBotHoleCards);
             computerGameNew.calculateHandStrengthsAndDraws(boardEvaluator);
 
-            String action = computerGameNew.getComputerActionFromAiBotForBotRange();
+            String action = computerGameNew.monkeyHetComputerActionFromAiBotForBotRange();
 
             if(action.equals(actionDoneByBot)) {
                 List<Card> comboCopy = new ArrayList<>();
@@ -109,7 +109,7 @@ public class BotRange {
             computerGameNew.setComputerHoleCards(newBotHoleCards);
             computerGameNew.calculateHandStrengthsAndDraws(boardEvaluator);
 
-            String action = computerGameNew.getComputerActionFromAiBotForBotRange();
+            String action = computerGameNew.monkeyHetComputerActionFromAiBotForBotRange();
             double handStrength = computerGameNew.getComputerHandStrength();
 
             List<String> hsAndAction = new ArrayList<>();
