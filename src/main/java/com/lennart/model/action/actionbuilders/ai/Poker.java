@@ -160,11 +160,13 @@ public class Poker {
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, handEvaluator);
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
-                //action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
-
+                action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
 
                 //deze methode slechts een keer (jouw eerste keer) aanroepen.
-                //action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                if(!computerGameNew.isBalanceRuleMethodHasBeenCalled()) {
+                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                    computerGameNew.setBalanceRuleMethodHasBeenCalled(true);
+                }
 
                 return action;
             } else {
@@ -198,8 +200,13 @@ public class Poker {
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, handEvaluator);
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
-                //action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
-                //action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
+
+                //deze methode slechts een keer (jouw eerste keer) aanroepen.
+                if(!computerGameNew.isBalanceRuleMethodHasBeenCalled()) {
+                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                    computerGameNew.setBalanceRuleMethodHasBeenCalled(true);
+                }
 
                 return action;
             }

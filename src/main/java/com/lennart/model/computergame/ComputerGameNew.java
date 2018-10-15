@@ -73,6 +73,10 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     private Map<Integer, List<Card>> botRange;
     private static BoardEvaluator boardEvaluator;
 
+    private boolean balanceRuleMethodHasBeenCalled = false;
+
+    private List<Card> computerHoleCardsCopy;
+
     public ComputerGameNew() {
         //default constructor
     }
@@ -301,14 +305,19 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
         Map<Integer, List<Card>> newBotRange = new BotRange().updateBotRangeComputerGame(this.botRange, action, this, boardEvaluator);
 
-        //vul je range aan met een beetje air, afhankelijk van 80+ combos..
+        System.out.println("botrange before air: " + newBotRange.size());
 
+        //vul je range aan met een beetje air, afhankelijk van 80+ combos..
+        if((action.equals("bet75pct") || action.equals("raise")) && board != null && board.size() >= 3) {
+            newBotRange = new BotRange().addAirToRange(newBotRange, this.botRange, boardEvaluator);
+            System.out.println("botrange after air: " + newBotRange.size());
+        }
 
         this.botRange = newBotRange;
 
-        System.out.println("botrange size: " + botRange.size());
-
         Poker.setRouteData(null);
+        computerHoleCards = new ArrayList<>();
+        computerHoleCards.addAll(computerHoleCardsCopy);
 
         return action;
     }
@@ -707,6 +716,9 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         computerHoleCards.add(getAndRemoveRandomCardFromDeck());
         computerHoleCards.add(getAndRemoveRandomCardFromDeck());
 
+        computerHoleCardsCopy = new ArrayList<>();
+        computerHoleCardsCopy.addAll(computerHoleCards);
+
         System.out.println(computerHoleCards.get(0).getRank() + "" + computerHoleCards.get(0).getSuit() + "" +
                 computerHoleCards.get(1).getRank() + "" + computerHoleCards.get(1).getSuit());
     }
@@ -865,6 +877,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         top10percentRiverCombos = null;
 
         botRange = ActionBuilderUtil.getAllStartHandsAsList();
+        balanceRuleMethodHasBeenCalled = false;
     }
 
     public ComputerGameNew proceedToNextHand() {
@@ -1511,5 +1524,21 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
     public void setBotRange(Map<Integer, List<Card>> botRange) {
         this.botRange = botRange;
+    }
+
+    public boolean isBalanceRuleMethodHasBeenCalled() {
+        return balanceRuleMethodHasBeenCalled;
+    }
+
+    public void setBalanceRuleMethodHasBeenCalled(boolean balanceRuleMethodHasBeenCalled) {
+        this.balanceRuleMethodHasBeenCalled = balanceRuleMethodHasBeenCalled;
+    }
+
+    public List<Card> getComputerHoleCardsCopy() {
+        return computerHoleCardsCopy;
+    }
+
+    public void setComputerHoleCardsCopy(List<Card> computerHoleCardsCopy) {
+        this.computerHoleCardsCopy = computerHoleCardsCopy;
     }
 }

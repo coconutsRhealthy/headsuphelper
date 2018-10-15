@@ -190,17 +190,80 @@ public class BotRange {
         return combosBelowHsLimit;
     }
 
-    public Map<Integer, List<Card>> addAirToRange(Map<Integer, List<Card>> currentRange, int numberOfValueCombos,
-                                                  Map<Integer, List<String>> hsAndActionPerCombo, String actionToSearchFor) {
+    //alleen aanroepen als je actie bet of raise is
+    public Map<Integer, List<Card>> addAirToRange(Map<Integer, List<Card>> currentRange, Map<Integer, List<Card>> previousRange,
+                                                  BoardEvaluator boardEvaluator) {
         Map<Integer, List<Card>> rangeToReturn = new HashMap<>();
-
         rangeToReturn.putAll(currentRange);
 
+        Map<String, Integer> valueAndDraws = getValuesAndDraws(currentRange, boardEvaluator);
 
-        return null;
+        int numberOfValueCombosInRange = valueAndDraws.get("value");
+        int numberOfNonValueDrawsInRange = valueAndDraws.get("draw");
+
+        int numberOfCombosToFill = numberOfValueCombosInRange - numberOfNonValueDrawsInRange;
+
+        if(numberOfCombosToFill > 0) {
+            List<List<Card>> currentRangeAsList = new ArrayList<>(currentRange.values());
+
+            for (Map.Entry<Integer, List<Card>> entry : previousRange.entrySet()) {
+                if(numberOfCombosToFill > 0) {
+                    if(!currentRangeAsList.contains(entry.getValue())) {
+                        HandEvaluator handEvaluator = new HandEvaluator(entry.getValue(), boardEvaluator);
+
+                        if(handEvaluator.getHandStrength(entry.getValue()) < 0.55) {
+                            boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                            boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                            boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                            boolean strongBackDoorFlush = handEvaluator.hasDrawOfType("strongBackDoorFlush");
+                            boolean strongBackDoorStraight = handEvaluator.hasDrawOfType("strongBackDoorStraight");
+
+                            if(!strongFd && !strongOosd && !strongGutshot && !strongBackDoorFlush && !strongBackDoorStraight) {
+                                List<Card> comboToAdd = new ArrayList<>();
+                                comboToAdd.addAll(entry.getValue());
+
+                                rangeToReturn.put(rangeToReturn.size(), comboToAdd);
+                                numberOfCombosToFill--;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return rangeToReturn;
+    }
 
 
 
+    private Map<String, Integer> getValuesAndDraws(Map<Integer, List<Card>> range, BoardEvaluator boardEvaluator) {
+        Map<String, Integer> valuesAndDraws = new HashMap<>();
 
+        valuesAndDraws.put("value", 0);
+        valuesAndDraws.put("draw", 0);
+
+        for (Map.Entry<Integer, List<Card>> entry : range.entrySet()) {
+            HandEvaluator handEvaluator = new HandEvaluator(entry.getValue(), boardEvaluator);
+
+            double handstrength = handEvaluator.getHandStrength(entry.getValue());
+
+            if(handstrength < 0.8) {
+                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                boolean strongBackDoorFlush = handEvaluator.hasDrawOfType("strongBackDoorFlush");
+                boolean strongBackDoorStraight = handEvaluator.hasDrawOfType("strongBackDoorStraight");
+
+                if(strongFd || strongOosd || strongGutshot || strongBackDoorFlush || strongBackDoorStraight) {
+                    int oldDrawValue = valuesAndDraws.get("draw");
+                    valuesAndDraws.put("draw", oldDrawValue + 1);
+                }
+            } else {
+                int oldValueValue = valuesAndDraws.get("value");
+                valuesAndDraws.put("value", oldValueValue + 1);
+            }
+        }
+
+        return valuesAndDraws;
     }
 }
