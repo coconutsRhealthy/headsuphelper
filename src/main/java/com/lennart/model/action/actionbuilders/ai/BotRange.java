@@ -189,4 +189,18 @@ public class BotRange {
 
         return combosBelowHsLimit;
     }
+
+    public Map<Integer, List<Card>> addAirToRange(Map<Integer, List<Card>> currentRange, int numberOfValueCombos,
+                                                  Map<Integer, List<String>> hsAndActionPerCombo, String actionToSearchFor) {
+        Map<Integer, List<Card>> rangeToReturn = new HashMap<>();
+
+        rangeToReturn.putAll(currentRange);
+
+
+        return null;
+
+
+
+
+    }
 }

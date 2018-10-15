@@ -64,6 +64,9 @@ public class Poker {
 
     private static Map<String, Map<String, Double>> payoffMap = new HashMap<>();
 
+
+    private static Map<String, Double> routeData = null;
+
 //    public static void main(String[] args) throws Exception {
 //        new Poker().theMethod();
 //    }
@@ -95,21 +98,23 @@ public class Poker {
         try {
             String route = getRoute(street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw);
 
-            if(actionVariables != null) {
-                actionVariables.setRoute(route);
+            if(routeData == null) {
+                if(actionVariables != null) {
+                    actionVariables.setRoute(route);
+                }
+
+                //System.out.println(route);
+
+                String table = getTableString(handStrength, opponentType);
+
+                if(actionVariables != null) {
+                    actionVariables.setTable(table);
+                }
+
+                //System.out.println(table);
+
+                routeData = retrieveRouteDataFromDb(route, table);
             }
-
-            //System.out.println(route);
-
-            String table = getTableString(handStrength, opponentType);
-
-            if(actionVariables != null) {
-                actionVariables.setTable(table);
-            }
-
-            //System.out.println(table);
-
-            Map<String, Double> routeData = retrieveRouteDataFromDb(route, table);
 
             HandEvaluator handEvaluator;
 
@@ -155,8 +160,11 @@ public class Poker {
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, handEvaluator);
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
-                action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
-                action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                //action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
+
+
+                //deze methode slechts een keer (jouw eerste keer) aanroepen.
+                //action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
 
                 return action;
             } else {
@@ -190,8 +198,8 @@ public class Poker {
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, handEvaluator);
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
-                action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
-                action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                //action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
+                //action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
 
                 return action;
             }
@@ -908,5 +916,13 @@ public class Poker {
             result.put(entry.getKey(), entry.getValue());
         }
         return result;
+    }
+
+    public static Map<String, Double> getRouteData() {
+        return routeData;
+    }
+
+    public static void setRouteData(Map<String, Double> routeData) {
+        Poker.routeData = routeData;
     }
 }

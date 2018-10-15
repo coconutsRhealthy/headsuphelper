@@ -300,7 +300,15 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 //        }
 
         Map<Integer, List<Card>> newBotRange = new BotRange().updateBotRangeComputerGame(this.botRange, action, this, boardEvaluator);
+
+        //vul je range aan met een beetje air, afhankelijk van 80+ combos..
+
+
         this.botRange = newBotRange;
+
+        System.out.println("botrange size: " + botRange.size());
+
+        Poker.setRouteData(null);
 
         return action;
     }
