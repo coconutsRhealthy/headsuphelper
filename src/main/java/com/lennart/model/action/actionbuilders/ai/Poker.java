@@ -164,8 +164,8 @@ public class Poker {
 
                 //deze methode slechts een keer (jouw eerste keer) aanroepen.
                 if(!computerGameNew.isBalanceRuleMethodHasBeenCalled()) {
-                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
                     computerGameNew.setBalanceRuleMethodHasBeenCalled(true);
+                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
                 }
 
                 return action;
@@ -204,8 +204,8 @@ public class Poker {
 
                 //deze methode slechts een keer (jouw eerste keer) aanroepen.
                 if(!computerGameNew.isBalanceRuleMethodHasBeenCalled()) {
-                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
                     computerGameNew.setBalanceRuleMethodHasBeenCalled(true);
+                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
                 }
 
                 return action;
