@@ -34,8 +34,8 @@ public class OpponentIdentifier {
     public String getOpponentType(String opponentNick, int numberOfHands) {
         String opponentType;
 
-        System.out.println("opponentNick: " + opponentNick);
-        System.out.println("numberOfHands: " + numberOfHands);
+        //System.out.println("opponentNick: " + opponentNick);
+        //System.out.println("numberOfHands: " + numberOfHands);
 
         if(numberOfHands < 14) {
             opponentType = "tp";
@@ -66,8 +66,8 @@ public class OpponentIdentifier {
             double looseness = callRaiseCount / (foldCount + callRaiseCount);
             double aggressiveness = betRaiseCount / (checkCallCount + betRaiseCount);
 
-            System.out.println("Looseness: " + looseness);
-            System.out.println("Aggressiveness: " + aggressiveness);
+            //System.out.println("Looseness: " + looseness);
+            //System.out.println("Aggressiveness: " + aggressiveness);
 
             Map<String, Double> loosenessMatchMap = getLoosenessMatchMap(looseness);
             Map<String, Double> aggroMatchMap = getAggroMatchMap(aggressiveness);
@@ -104,8 +104,8 @@ public class OpponentIdentifier {
                 double looseness = callRaiseCount / (foldCount + callRaiseCount);
                 double aggressiveness = betRaiseCount / (checkCallCount + betRaiseCount);
 
-                System.out.println("Looseness: " + looseness);
-                System.out.println("Aggressiveness: " + aggressiveness);
+                //System.out.println("Looseness: " + looseness);
+                //System.out.println("Aggressiveness: " + aggressiveness);
 
                 Map<String, Double> loosenessMatchMap = getLoosenessMatchMap(looseness);
                 Map<String, Double> aggroMatchMap = getAggroMatchMap(aggressiveness);

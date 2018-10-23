@@ -161,11 +161,12 @@ public class Poker {
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
                 action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
+                action = ruleApplier.prepareForBalanceMethod(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, continuousTable, gameVariables, boardEvaluator, computerGameNew);
 
                 //deze methode slechts een keer (jouw eerste keer) aanroepen.
                 if(!computerGameNew.isBalanceRuleMethodHasBeenCalled()) {
                     computerGameNew.setBalanceRuleMethodHasBeenCalled(true);
-                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew, position);
                 }
 
                 return action;
@@ -201,11 +202,12 @@ public class Poker {
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
                 action = ruleApplier.alwaysBetOrRaiseAboveHs80(action, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, opponentAction, board);
+                action = ruleApplier.prepareForBalanceMethod(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, continuousTable, gameVariables, boardEvaluator, computerGameNew);
 
                 //deze methode slechts een keer (jouw eerste keer) aanroepen.
                 if(!computerGameNew.isBalanceRuleMethodHasBeenCalled()) {
                     computerGameNew.setBalanceRuleMethodHasBeenCalled(true);
-                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew);
+                    action = ruleApplier.balancePlayWithBotRange(action, botRange, continuousTable, gameVariables, boardEvaluator, opponentType, handStrength, opponentBetSizeBb, ownBetSizeBb, ownStackBb, opponentStackBb, potSizeBb, bigBlind, strongFlushDraw, strongOosd, strongGutshot, strongBackdoorFd, strongBackdoorSd, opponentAction, board, computerGameNew, position);
                 }
 
                 return action;

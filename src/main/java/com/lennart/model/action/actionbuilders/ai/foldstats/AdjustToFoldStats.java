@@ -131,6 +131,9 @@ public class AdjustToFoldStats {
         System.out.println();
 
         double valueToReturn = (downLimit + upLimit) / 2;
+
+        valueToReturn = valueToReturn - 0.07;
+
         return valueToReturn;
     }
 

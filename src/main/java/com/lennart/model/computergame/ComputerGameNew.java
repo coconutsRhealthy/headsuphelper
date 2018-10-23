@@ -79,6 +79,14 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     private boolean balanceRuleMethodHasBeenCalled = false;
 
     private List<Card> computerHoleCardsCopy;
+    private double computerHandStrengthCopy;
+
+    private boolean strongFlushDrawCopy;
+    private boolean strongOosdCopy;
+    private boolean strongGutshotCopy;
+    private boolean strongOvercardsCopy;
+    private boolean strongBackdoorFdCopy;
+    private boolean strongBackdoorSdCopy;
 
     public ComputerGameNew() {
         //default constructor
@@ -171,6 +179,31 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         } else if(computerWrittenAction.contains("raise")) {
             processComputerRaiseAction();
         }
+
+        if(board != null && board.size() >= 3) {
+            if(computerWrittenAction != null) {
+                if(computerWrittenAction.equals("bet75pct")) {
+                    if(computerHandStrengthCopy >= 0.8) {
+                        System.out.println("*** value bet action done ***");
+                    } else if(strongFlushDrawCopy || strongOosdCopy || strongGutshotCopy || strongOvercardsCopy || strongBackdoorFdCopy || strongBackdoorSdCopy) {
+                        System.out.println("*** draw bet action done ***");
+                    } else if(computerHandStrengthCopy < 0.55) {
+                        System.out.println("*** bluff bet action done ***");
+                    }
+                }
+
+                if(computerWrittenAction.equals("raise")) {
+                    if(computerHandStrengthCopy >= 0.8) {
+                        System.out.println("*** value raise action done ***");
+                    } else if(strongFlushDrawCopy || strongOosdCopy || strongGutshotCopy || strongOvercardsCopy || strongBackdoorFdCopy || strongBackdoorSdCopy) {
+                        System.out.println("*** draw raise action done ***");
+                    } else if(computerHandStrengthCopy < 0.55) {
+                        System.out.println("*** bluff raise action done ***");
+                    }
+                }
+            }
+        }
+
         roundToTwoDecimals();
     }
 
@@ -334,10 +367,37 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         computerHoleCards = new ArrayList<>();
         computerHoleCards.addAll(computerHoleCardsCopy);
 
+        computerHandStrength = computerHandStrengthCopy;
+
         opponentHasInitiative = methodOpponentHasInitiative;
         pre3betOrPostRaisedPot = methodPre3betOrPostRaisedPot;
         opponentDidPreflop4betPot = methodOpponentDidPreflop4betPot;
         balanceRuleMethodHasBeenCalled = false;
+
+
+//        if(board != null && board.size() >= 3) {
+//
+//        }
+//
+//        if(action.equals("bet75pct")) {
+//            if(handStrength >= 0.8) {
+//                System.out.println("*** value bet action done ***");
+//            } else if(strongDraw || strongFlushDrawCopy || strongOosdCopy || strongGutshotCopy || strongOvercardsCopy || strongBackdoorFdCopy || strongBackdoorSdCopy) {
+//                System.out.println("*** draw bet action done ***");
+//            } else if(handStrength < 0.55) {
+//                System.out.println("*** bluff bet action done ***");
+//            }
+//        }
+//
+//        if(action.equals("raise")) {
+//            if(handStrength >= 0.8) {
+//                System.out.println("*** value raise action done ***");
+//            } else if(strongDraw || strongFlushDrawCopy || strongOosdCopy || strongGutshotCopy || strongOvercardsCopy || strongBackdoorFdCopy || strongBackdoorSdCopy) {
+//                System.out.println("*** draw raise action done ***");
+//            } else if(handStrength < 0.55) {
+//                System.out.println("*** bluff raise action done ***");
+//            }
+//        }
 
         return action;
     }
@@ -1077,6 +1137,14 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             computerHandStrength = handEvaluator.getHandStrength(computerHoleCards);
             computerHasStrongDraw = hasStrongDraw(handEvaluator);
         }
+
+        computerHandStrengthCopy = computerHandStrength;
+        strongFlushDrawCopy = strongFlushDraw;
+        strongOosdCopy = strongOosd;
+        strongGutshotCopy = strongGutshot;
+        strongOvercardsCopy = strongOvercards;
+        strongBackdoorSdCopy = strongBackdoorSd;
+        strongBackdoorFdCopy = strongBackdoorFd;
     }
 
     public void calculateHandStrengthsAndDraws(BoardEvaluator boardEvaluator) {

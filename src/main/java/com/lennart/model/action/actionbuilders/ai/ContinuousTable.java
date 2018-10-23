@@ -28,9 +28,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     private Map<Integer, List<Card>> botRange;
 
-    public static void main(String[] args) throws Exception {
-        new ContinuousTable().runTableContinously();
-    }
+//    public static void main(String[] args) throws Exception {
+//        new ContinuousTable().runTableContinously();
+//    }
 
     public void runTableContinously() throws Exception {
         GameVariables gameVariables = new GameVariables();

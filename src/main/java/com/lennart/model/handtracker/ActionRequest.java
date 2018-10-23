@@ -13,78 +13,78 @@ public class ActionRequest {
 
 
 
-    public static void main(String[] args) {
-        List<Card> board = new ArrayList<>();
-//        board.add(new Card(6, 'd'));
-//        board.add(new Card(7, 's'));
-//        board.add(new Card(12, 'c'));
-
-        List<ActionRequest> allRequests = new ArrayList<>();
-
-        ActionRequest actionRequest1 = new ActionRequest(allRequests, 0.75, board, true, 0.5);
-
-        double totalOpponentBetSize = actionRequest1.getMostRecentActionRoundOfPLayer(actionRequest1.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
-        PlayerActionRound botActionRound = new PlayerActionRound("bot", board, 1.25, totalOpponentBetSize, "preflop", "raise");
-        actionRequest1.getActionsSinceLastRequest().add(botActionRound);
-
-        allRequests.add(actionRequest1);
-
-        ActionRequest actionRequest2 = new ActionRequest(allRequests, 5.25, board, true, 0.5);
-
-        double totalOpponentBetSize2 = actionRequest2.getMostRecentActionRoundOfPLayer(actionRequest2.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
-        PlayerActionRound botActionRound2 = new PlayerActionRound("bot", board, 1.25, totalOpponentBetSize2, "preflop", "call");
-        actionRequest2.getActionsSinceLastRequest().add(botActionRound2);
-
-        allRequests.add(actionRequest2);
-
-        List<Card> board2 = new ArrayList<>();
-        board2.add(new Card(6, 'd'));
-        board2.add(new Card(7, 's'));
-        board2.add(new Card(12, 'c'));
-
-        ActionRequest actionRequest3 = new ActionRequest(allRequests, 8, board2, true, 0.5);
-
-        double totalOpponentBetSize3 = actionRequest3.getMostRecentActionRoundOfPLayer(actionRequest3.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
-        PlayerActionRound botActionRound3 = new PlayerActionRound("bot", board2, 5, totalOpponentBetSize3, "flop", "bet75pct");
-        actionRequest3.getActionsSinceLastRequest().add(botActionRound3);
-
-        allRequests.add(actionRequest3);
-
-        List<Card> board3 = new ArrayList<>();
-        board3.add(new Card(6, 'd'));
-        board3.add(new Card(7, 's'));
-        board3.add(new Card(12, 'c'));
-        board3.add(new Card(13, 'd'));
-
-        ActionRequest actionRequest4 = new ActionRequest(allRequests, 21, board3, true, 0.5);
-
-        double totalOpponentBetSize4 = actionRequest4.getMostRecentActionRoundOfPLayer(actionRequest4.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
-        PlayerActionRound botActionRound4 = new PlayerActionRound("bot", board3, 16, totalOpponentBetSize4, "turn", "raise");
-        actionRequest4.getActionsSinceLastRequest().add(botActionRound4);
-
-        allRequests.add(actionRequest4);
-
-        ActionRequest actionRequest5 = new ActionRequest(allRequests, 54, board3, true, 0.5);
-
-        double totalOpponentBetSize5 = actionRequest5.getMostRecentActionRoundOfPLayer(actionRequest5.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
-        PlayerActionRound botActionRound5 = new PlayerActionRound("bot", board3, 16, totalOpponentBetSize5, "turn", "call");
-        actionRequest5.getActionsSinceLastRequest().add(botActionRound5);
-
-        allRequests.add(actionRequest5);
-
-        List<Card> board4 = new ArrayList<>();
-        board4.add(new Card(6, 'd'));
-        board4.add(new Card(7, 's'));
-        board4.add(new Card(12, 'c'));
-        board4.add(new Card(13, 'd'));
-        board4.add(new Card(2, 'd'));
-
-        ActionRequest actionRequest6 = new ActionRequest(allRequests, 79.86, board4, true, 0.5);
-
-        System.out.println("wacht");
-
-
-    }
+//    public static void main(String[] args) {
+//        List<Card> board = new ArrayList<>();
+////        board.add(new Card(6, 'd'));
+////        board.add(new Card(7, 's'));
+////        board.add(new Card(12, 'c'));
+//
+//        List<ActionRequest> allRequests = new ArrayList<>();
+//
+//        ActionRequest actionRequest1 = new ActionRequest(allRequests, 0.75, board, true, 0.5);
+//
+//        double totalOpponentBetSize = actionRequest1.getMostRecentActionRoundOfPLayer(actionRequest1.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+//        PlayerActionRound botActionRound = new PlayerActionRound("bot", board, 1.25, totalOpponentBetSize, "preflop", "raise");
+//        actionRequest1.getActionsSinceLastRequest().add(botActionRound);
+//
+//        allRequests.add(actionRequest1);
+//
+//        ActionRequest actionRequest2 = new ActionRequest(allRequests, 5.25, board, true, 0.5);
+//
+//        double totalOpponentBetSize2 = actionRequest2.getMostRecentActionRoundOfPLayer(actionRequest2.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+//        PlayerActionRound botActionRound2 = new PlayerActionRound("bot", board, 1.25, totalOpponentBetSize2, "preflop", "call");
+//        actionRequest2.getActionsSinceLastRequest().add(botActionRound2);
+//
+//        allRequests.add(actionRequest2);
+//
+//        List<Card> board2 = new ArrayList<>();
+//        board2.add(new Card(6, 'd'));
+//        board2.add(new Card(7, 's'));
+//        board2.add(new Card(12, 'c'));
+//
+//        ActionRequest actionRequest3 = new ActionRequest(allRequests, 8, board2, true, 0.5);
+//
+//        double totalOpponentBetSize3 = actionRequest3.getMostRecentActionRoundOfPLayer(actionRequest3.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+//        PlayerActionRound botActionRound3 = new PlayerActionRound("bot", board2, 5, totalOpponentBetSize3, "flop", "bet75pct");
+//        actionRequest3.getActionsSinceLastRequest().add(botActionRound3);
+//
+//        allRequests.add(actionRequest3);
+//
+//        List<Card> board3 = new ArrayList<>();
+//        board3.add(new Card(6, 'd'));
+//        board3.add(new Card(7, 's'));
+//        board3.add(new Card(12, 'c'));
+//        board3.add(new Card(13, 'd'));
+//
+//        ActionRequest actionRequest4 = new ActionRequest(allRequests, 21, board3, true, 0.5);
+//
+//        double totalOpponentBetSize4 = actionRequest4.getMostRecentActionRoundOfPLayer(actionRequest4.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+//        PlayerActionRound botActionRound4 = new PlayerActionRound("bot", board3, 16, totalOpponentBetSize4, "turn", "raise");
+//        actionRequest4.getActionsSinceLastRequest().add(botActionRound4);
+//
+//        allRequests.add(actionRequest4);
+//
+//        ActionRequest actionRequest5 = new ActionRequest(allRequests, 54, board3, true, 0.5);
+//
+//        double totalOpponentBetSize5 = actionRequest5.getMostRecentActionRoundOfPLayer(actionRequest5.getActionsSinceLastRequest(), "opponent").getTotalOpponentBetSize();
+//        PlayerActionRound botActionRound5 = new PlayerActionRound("bot", board3, 16, totalOpponentBetSize5, "turn", "call");
+//        actionRequest5.getActionsSinceLastRequest().add(botActionRound5);
+//
+//        allRequests.add(actionRequest5);
+//
+//        List<Card> board4 = new ArrayList<>();
+//        board4.add(new Card(6, 'd'));
+//        board4.add(new Card(7, 's'));
+//        board4.add(new Card(12, 'c'));
+//        board4.add(new Card(13, 'd'));
+//        board4.add(new Card(2, 'd'));
+//
+//        ActionRequest actionRequest6 = new ActionRequest(allRequests, 79.86, board4, true, 0.5);
+//
+//        System.out.println("wacht");
+//
+//
+//    }
 
 
 

@@ -878,7 +878,7 @@ public class RuleApplier {
                                         opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
                                         strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, continuousTable, gameVariables, boardEvaluator, computerGameNew);
 
-                                System.out.println("changed raise to: " + actionToReturn + " moderateRaisesBasedOnEquity()");
+                                //System.out.println("changed raise to: " + actionToReturn + " moderateRaisesBasedOnEquity()");
                             } else {
                                 actionToReturn = action;
                             }
@@ -904,13 +904,13 @@ public class RuleApplier {
 
                             if(actionWhenRaiseNotPossible.equals("fold")) {
                                 actionToReturn = action;
-                                System.out.println("Kept river raise as raise, since else it would be a fold");
+                                //System.out.println("Kept river raise as raise, since else it would be a fold");
                             } else if(actionWhenRaiseNotPossible.equals("call")) {
                                 actionToReturn = "call";
-                                System.out.println("Changed river raise to call in moderateRaisesBasedOnEquity()");
+                                //System.out.println("Changed river raise to call in moderateRaisesBasedOnEquity()");
                             } else {
                                 actionToReturn = null;
-                                System.out.println("Should not come here in moderateRaisesBasedOnEquity()!");
+                                //System.out.println("Should not come here in moderateRaisesBasedOnEquity()!");
                             }
                         } else {
                             actionToReturn = action;
@@ -945,7 +945,7 @@ public class RuleApplier {
                             actionToReturn = action;
                         } else {
                             actionToReturn = "check";
-                            System.out.println("changed action to check in moderateBetBasedOnEquity(). Board size: " + board.size());
+                            //System.out.println("changed action to check in moderateBetBasedOnEquity(). Board size: " + board.size());
                         }
                     } else {
                         actionToReturn = action;
@@ -956,7 +956,7 @@ public class RuleApplier {
                             actionToReturn = action;
                         } else {
                             actionToReturn = "check";
-                            System.out.println("changed action to check in moderateBetBasedOnEquity(). Board size: " + board.size());
+                            //System.out.println("changed action to check in moderateBetBasedOnEquity(). Board size: " + board.size());
                         }
                     } else {
                         actionToReturn = action;
@@ -1093,14 +1093,14 @@ public class RuleApplier {
                         actionToReturn = action;
                     } else {
                         actionToReturn = "fold";
-                        System.out.println("changed to fold in postflop facing 3bet pot");
+                        //System.out.println("changed to fold in postflop facing 3bet pot");
                     }
                 } else {
                     if(handStrength >= 0.9 || strongFd || strongOosd) {
                         actionToReturn = action;
                     } else {
                         actionToReturn = "fold";
-                        System.out.println("changed to fold in postflop facing 3bet pot");
+                        //System.out.println("changed to fold in postflop facing 3bet pot");
                     }
 
                 }
@@ -1165,7 +1165,7 @@ public class RuleApplier {
                                 bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
                                 strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, continuousTable, gameVariables, boardEvaluator, computerGameNew);
 
-                        System.out.println("changed raise to either fold or call in moderateCheckRaises(). Action is now: " + actionToReturn);
+                        //System.out.println("changed raise to either fold or call in moderateCheckRaises(). Action is now: " + actionToReturn);
                     }
                 } else {
                     actionToReturn = action;
@@ -1194,12 +1194,12 @@ public class RuleApplier {
                             actionToReturn = action;
                         } else {
                             actionToReturn = "fold";
-                            System.out.println("Changed action to fold in dontCallWithAir() A");
+                            //System.out.println("Changed action to fold in dontCallWithAir() A");
                         }
                     } else if(facingOdds >= 0.375) {
                         if(!strongDraw) {
                             actionToReturn = "fold";
-                            System.out.println("Changed action to fold in dontCallWithAir() B");
+                            //System.out.println("Changed action to fold in dontCallWithAir() B");
                         } else {
                             actionToReturn = action;
                         }
@@ -1225,11 +1225,25 @@ public class RuleApplier {
         String actionToReturn;
 
         if(board != null && board.size() >= 3) {
-            if(action.equals("check")) {
-                if(handStrength >= 0.8) {
-                    double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                            ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+            double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
 
+            double limitBet;
+            double limitRaise;
+
+            if(sizing * bigBlind < 20) {
+                limitBet = 0.8;
+                limitRaise = 0.83;
+            } else if(sizing * bigBlind < 40) {
+                limitBet = 0.83;
+                limitRaise = 0.9;
+            } else {
+                limitBet = 0.88;
+                limitRaise = 0.95;
+            }
+
+            if(action.equals("check")) {
+                if(handStrength >= limitBet) {
                     if(bluffOddsAreOk(sizing, opponentBetSizeBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind)) {
                         if(Math.random() > 0.15) {
                             actionToReturn = "bet75pct";
@@ -1243,10 +1257,7 @@ public class RuleApplier {
                     actionToReturn = action;
                 }
             } else if((action.equals("fold") || action.equals("call")) && !opponentAction.equals("raise")) {
-                if(handStrength >= 0.8) {
-                    double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                            ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
-
+                if(handStrength >= limitRaise) {
                     if(bluffOddsAreOk(sizing, opponentBetSizeBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind)) {
                         if(Math.random() > 0.15) {
                             actionToReturn = "raise";
@@ -1269,17 +1280,65 @@ public class RuleApplier {
         return actionToReturn;
     }
 
+    public String prepareForBalanceMethod(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                          double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                          double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                          boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                          boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                          int boardWetness, boolean opponentHasInitiative, Map<Integer, List<Card>> botRange, ContinuousTable continuousTable,
+                                          GameVariables gameVariables, BoardEvaluator boardEvaluator, ComputerGameNew computerGameNew) {
+        String actionToReturn;
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+
+            double valueHsLimit;
+
+            if(sizing <= 4 * bigBlind) {
+                valueHsLimit = 0.55;
+            } else if(sizing <= 10 * bigBlind) {
+                valueHsLimit = 0.72;
+            } else {
+                valueHsLimit = 0.8;
+            }
+
+            if(handStrength < valueHsLimit) {
+                if(action.equals("bet75pct")) {
+                    actionToReturn = "check";
+                } else {
+                    List<String> eligibleActionsNew = new ArrayList<>();
+                    eligibleActionsNew.add("fold");
+                    eligibleActionsNew.add("call");
+
+                    //set both opponentstack and effective stack to zero to force either fold or call
+                    actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                            opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                            ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                            bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                            strongBackdoorSd, boardWetness, opponentHasInitiative, botRange, continuousTable, gameVariables, boardEvaluator, computerGameNew);
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
     public String balancePlayWithBotRange(String action, Map<Integer, List<Card>> botRange, ContinuousTable continuousTable,
                                           GameVariables gameVariables, BoardEvaluator boardEvaluator, String opponentType,
                                           double handStrength, double opponentBetSizeBb, double ownBetSizeBb, double ownStackBb,
                                           double opponentStackBb, double potSizeBb, double bigBlind, boolean strongFd,
                                           boolean strongOosd, boolean strongGutshot, boolean strongBackdoorFd,
                                           boolean strongBackdoorSd, String opponentAction, List<Card> board,
-                                          ComputerGameNew computerGameNew) throws Exception {
+                                          ComputerGameNew computerGameNew, boolean position) throws Exception {
         String actionToReturn = null;
 
         if(board != null && board.size() >= 3) {
-            if(handStrength < 0.55) {
+            if(handStrength < 0.8) {
                 if(action.equals("check")) {
                     double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
                             ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
@@ -1287,7 +1346,7 @@ public class RuleApplier {
                     if(bluffOddsAreOk(sizing, opponentBetSizeBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind)) {
                         actionToReturn = balanceHelperMethod(action, botRange, continuousTable, gameVariables,
                                 boardEvaluator, opponentType, strongFd, strongOosd, strongGutshot, strongBackdoorFd,
-                                strongBackdoorSd, "bet75pct", computerGameNew);
+                                strongBackdoorSd, "bet75pct", computerGameNew, position);
                     } else {
                         actionToReturn = action;
                     }
@@ -1298,7 +1357,7 @@ public class RuleApplier {
                     if(bluffOddsAreOk(sizing, opponentBetSizeBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind)) {
                         actionToReturn = balanceHelperMethod(action, botRange, continuousTable, gameVariables,
                                 boardEvaluator, opponentType, strongFd, strongOosd, strongGutshot, strongBackdoorFd,
-                                strongBackdoorSd, "raise", computerGameNew);
+                                strongBackdoorSd, "raise", computerGameNew, position);
                     } else {
                         actionToReturn = action;
                     }
@@ -1317,7 +1376,7 @@ public class RuleApplier {
                                        GameVariables gameVariables, BoardEvaluator boardEvaluator, String opponentType,
                                        boolean strongFd, boolean strongOosd, boolean strongGutshot,
                                        boolean strongBackdoorFd, boolean strongBackdoorSd, String actionToUse,
-                                       ComputerGameNew computerGameNew) throws Exception {
+                                       ComputerGameNew computerGameNew, boolean position) throws Exception {
         String actionToReturn = null;
 
         Map<Integer, List<String>> hsAndActionPerCombo;
@@ -1331,6 +1390,10 @@ public class RuleApplier {
 
         double valueCombos = new BotRange().getNumberOfValueBetRaiseCombos(hsAndActionPerCombo, actionToUse);
 
+        if(position) {
+            valueCombos = valueCombos * 2;
+        }
+
         List<Double> strongDrawCombosCountList = new BotRange().getStrongDrawCombosCountList(botRange, boardEvaluator);
         double strongDrawsNonBackdoorCombos = new BotRange().getNumberOfStrongDrawsNonBackdoor(strongDrawCombosCountList);
         double strongBackdoorDrawCombos = new BotRange().getNumberOfBackdoorStrongDraws(strongDrawCombosCountList);
@@ -1338,7 +1401,7 @@ public class RuleApplier {
         if(valueCombos - strongDrawsNonBackdoorCombos >= 0) {
             if(strongFd || strongOosd || strongGutshot) {
                 actionToReturn = actionToUse;
-                System.out.println("changed fold to " + actionToUse + " in balance play method 1a");
+                //System.out.println("changed fold to " + actionToUse + " in balance play method 1a");
             }
         } else {
             if(strongFd || strongOosd || strongGutshot) {
@@ -1347,7 +1410,7 @@ public class RuleApplier {
 
                 if(randomStrongDraws < randomLimitStrongDraws) {
                     actionToReturn = actionToUse;
-                    System.out.println("changed fold to " + actionToUse + " in balance play method 1b");
+                    //System.out.println("changed fold to " + actionToUse + " in balance play method 1b");
                 }
             }
         }
@@ -1356,7 +1419,7 @@ public class RuleApplier {
             if(valueCombos - strongDrawsNonBackdoorCombos - strongBackdoorDrawCombos >= 0) {
                 if(strongBackdoorFd || strongBackdoorSd) {
                     actionToReturn = actionToUse;
-                    System.out.println("changed check to " + actionToUse + " in balance play method 2a");
+                    //System.out.println("changed check to " + actionToUse + " in balance play method 2a");
                 }
             } else {
                 if(strongBackdoorFd || strongBackdoorSd) {
@@ -1366,18 +1429,18 @@ public class RuleApplier {
 
                     if(randomBackdoorStrongDraws < randomLimitStrongBackdoorDraws) {
                         actionToReturn = actionToUse;
-                        System.out.println("changed check to " + actionToUse + " in balance play method 2b");
+                        //System.out.println("changed check to " + actionToUse + " in balance play method 2b");
                     }
                 }
             }
         }
 
         if(actionToReturn == null) {
-            double combosBelowLimitHs = new BotRange().getNumberOfCombosBelowHsLimit(hsAndActionPerCombo, 0.55);
+            double combosBelowLimitHs = new BotRange().getNumberOfCombosBelowHsLimit(hsAndActionPerCombo, 0.73);
 
             if(valueCombos - strongDrawsNonBackdoorCombos - strongBackdoorDrawCombos - combosBelowLimitHs >= 0) {
                 actionToReturn = actionToUse;
-                System.out.println("changed check to " + actionToUse + " in balance play method 3a");
+                //System.out.println("changed check to " + actionToUse + " in balance play method 3a");
             } else {
                 double randomLimit = (valueCombos - strongDrawsNonBackdoorCombos - strongBackdoorDrawCombos)
                         / combosBelowLimitHs;
@@ -1385,7 +1448,7 @@ public class RuleApplier {
 
                 if(random < randomLimit) {
                     actionToReturn = actionToUse;
-                    System.out.println("changed check to " + actionToUse + " in balance play method 3b");
+                    //System.out.println("changed check to " + actionToUse + " in balance play method 3b");
                 } else {
                     actionToReturn = action;
                 }
