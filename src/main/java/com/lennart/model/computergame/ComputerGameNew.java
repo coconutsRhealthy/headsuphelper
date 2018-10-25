@@ -272,6 +272,18 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
                 }
             }
 
+            try {
+
+
+
+                action = new RuleApplier().balancePlayWithBotRange(action, botRange, null, null, boardEvaluator,
+                        opponentType, handStrength, opponentBetSizeBb, computerBetSizeBb, computerStack / bigBlind,
+                        myStack / bigBlind, potSize / bigBlind, bigBlind, strongFlushDraw, strongOosd, strongGutshot,
+                        strongBackdoorFd, strongBackdoorSd, myAction, board, this, position);
+            } catch (Exception e) {
+
+            }
+
             if(action.equals("raise")) {
                 pre3betOrPostRaisedPot = true;
             }
@@ -787,8 +799,15 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
 
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
         myHoleCards.add(getAndRemoveRandomCardFromDeck());
+
+//        myHoleCards.add(new Card(3, 's'));
+//        myHoleCards.add(new Card(3, 'd'));
+
         computerHoleCards.add(getAndRemoveRandomCardFromDeck());
         computerHoleCards.add(getAndRemoveRandomCardFromDeck());
+
+//        computerHoleCards.add(new Card(6, 'c'));
+//        computerHoleCards.add(new Card(4, 'c'));
 
         computerHoleCardsCopy = new ArrayList<>();
         computerHoleCardsCopy.addAll(computerHoleCards);
@@ -1012,17 +1031,26 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         flopCards.add(getAndRemoveRandomCardFromDeck());
         flopCards.add(getAndRemoveRandomCardFromDeck());
 
+//        flopCards.add(new Card(2, 'c'));
+//        flopCards.add(new Card(10, 'c'));
+//        flopCards.add(new Card(11, 'd'));
+
         board = new ArrayList<>();
         board.addAll(flopCards);
     }
 
     private void dealTurnCard() {
         turnCard = getAndRemoveRandomCardFromDeck();
+
+        //turnCard = new Card(5, 's');
         board.add(turnCard);
     }
 
     private void dealRiverCard() {
         riverCard = getAndRemoveRandomCardFromDeck();
+
+        //riverCard = (new Card(2, 'h'));
+
         board.add(riverCard);
     }
 

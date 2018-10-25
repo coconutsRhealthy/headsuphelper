@@ -1045,15 +1045,15 @@ public class RuleApplier {
             if(strongDraw && !strongFlushDraw && !strongOosd && !strongGutshot && (strongBackdoorFd || strongBackdoorSd)) {
                 if(effectiveStackBb >= 50) {
                     if(position) {
-                        if(opponentBetSizeBb / potSizeBb <= 0.8 && opponentBetSizeBb <= 20) {
-                            actionToReturn = action;
-                        } else {
+                        //if(opponentBetSizeBb / potSizeBb <= 0.8 && opponentBetSizeBb <= 20) {
+                        //    actionToReturn = action;
+                        //} else {
                             actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
                                     position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
                                     handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
                                     preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
                                     pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative, botRange, continuousTable, gameVariables, boardEvaluator, computerGameNew);
-                        }
+                        //}
                     } else {
                         actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
                                 position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
@@ -1408,6 +1408,8 @@ public class RuleApplier {
                 double randomLimitStrongDraws = valueCombos / strongDrawsNonBackdoorCombos;
                 double randomStrongDraws = Math.random();
 
+                randomLimitStrongDraws = randomLimitStrongDraws * 2;
+
                 if(randomStrongDraws < randomLimitStrongDraws) {
                     actionToReturn = actionToUse;
                     //System.out.println("changed fold to " + actionToUse + " in balance play method 1b");
@@ -1427,6 +1429,8 @@ public class RuleApplier {
                             / strongBackdoorDrawCombos;
                     double randomBackdoorStrongDraws = Math.random();
 
+                    randomLimitStrongBackdoorDraws = randomLimitStrongBackdoorDraws * 2;
+
                     if(randomBackdoorStrongDraws < randomLimitStrongBackdoorDraws) {
                         actionToReturn = actionToUse;
                         //System.out.println("changed check to " + actionToUse + " in balance play method 2b");
@@ -1445,6 +1449,8 @@ public class RuleApplier {
                 double randomLimit = (valueCombos - strongDrawsNonBackdoorCombos - strongBackdoorDrawCombos)
                         / combosBelowLimitHs;
                 double random = Math.random();
+
+                randomLimit = randomLimit * 2;
 
                 if(random < randomLimit) {
                     actionToReturn = actionToUse;
