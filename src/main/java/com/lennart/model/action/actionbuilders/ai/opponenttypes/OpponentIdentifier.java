@@ -85,7 +85,7 @@ public class OpponentIdentifier {
         System.out.println("numberOfHands: " + numberOfHands);
 
         if(numberOfHands < 20) {
-            opponentType = "tp";
+            opponentType = "la";
         } else {
             initializeDbConnection();
 
@@ -94,7 +94,7 @@ public class OpponentIdentifier {
 
             if(!rs.next()) {
                 st.executeUpdate("INSERT INTO opponentidentifier (playerName, numberOfHands) VALUES ('" + opponentNick + "', '-1')");
-                opponentType = "tp";
+                opponentType = "la";
             } else {
                 double callRaiseCount = rs.getDouble("callRaiseCount");
                 double foldCount = rs.getDouble("foldCount");

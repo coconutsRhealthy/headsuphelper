@@ -48,7 +48,7 @@ public class GameVariables implements GameVariable {
     }
 
     public GameVariables(boolean stars) throws Exception {
-        bigBlind = 0.50;
+        bigBlind = 100;
 
         StarsTableReader starsTableReader = new StarsTableReader();
 

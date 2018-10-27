@@ -19,8 +19,15 @@ public class HandHistoryReaderStars {
 
         if(botFolded(lastHand)) {
             foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + opponentPlayerNameOfLastHand, "fold");
+            foldStatsKeeper.updateFoldCountMapInDb(opponentPlayerNameOfLastHand, "nonFold");
         } else {
             foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + opponentPlayerNameOfLastHand, "nonFold");
+
+            if(opponentFolded(lastHand)) {
+                foldStatsKeeper.updateFoldCountMapInDb(opponentPlayerNameOfLastHand, "fold");
+            } else {
+                foldStatsKeeper.updateFoldCountMapInDb(opponentPlayerNameOfLastHand, "nonFold");
+            }
         }
         //logic regarding foldstats
 
@@ -163,5 +170,18 @@ public class HandHistoryReaderStars {
         }
 
         return botFolded;
+    }
+
+    private boolean opponentFolded(List<String> linesOfLastHand) {
+        boolean opponentFolded = false;
+
+        for(String line : linesOfLastHand) {
+            if(line.contains(": folds")) {
+                opponentFolded = true;
+                break;
+            }
+        }
+
+        return opponentFolded;
     }
 }
