@@ -1098,6 +1098,17 @@ public class RuleApplier {
                         } else {
                             actionToReturn = action;
                         }
+                    } else if(facingOdds >= 0.15) {
+                        if(!strongDraw) {
+                            if(handStrength <= 0.4) {
+                                actionToReturn = "fold";
+                                System.out.println("Changed action to fold in dontCallWithAir() C");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
                     } else {
                         actionToReturn = action;
                     }
@@ -1181,6 +1192,75 @@ public class RuleApplier {
 
         if(!action.equals(actionToReturn)) {
             System.out.println("Action changed because of boardWetness to: " + actionToReturn);
+        }
+
+        return actionToReturn;
+    }
+
+    public String adjustPlayToRangeMap(String action, double bigBlind, boolean position, double handStrength,
+                                       List<Card> board, boolean opponentHasInitiative, double facingBetSize,
+                                       double myBetSize, double myStack, double facingStack, double pot) {
+        String actionToReturn;
+
+        if(board != null && board.size() == 5) {
+            System.out.println("*a*");
+
+            if(action.equals("fold") || action.equals("check")) {
+                System.out.println("*b*");
+                if(handStrength < 0.64) {
+                    System.out.println("*c*");
+                    if(!opponentHasInitiative) {
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                        System.out.println("*d*");
+
+                        if(sizing / bigBlind <= 70) {
+                            System.out.println("*e*");
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                                System.out.println("*f*");
+                                RangeTracker rangeTracker = new RangeTracker();
+
+                                String route = rangeTracker.getRangeRoute(action, position, sizing, bigBlind);
+
+                                List<Double> currentList = ContinuousTable.getRangeMap().get(route);
+
+                                double bluffAmount = currentList.get(0);
+                                double valueAmount = currentList.get(1);
+
+                                System.out.println("current bluffAmount: " + bluffAmount);
+                                System.out.println("current valueAmount: " + valueAmount);
+
+                                double fictionalBluffAmount = bluffAmount + 1;
+
+                                double ratio = fictionalBluffAmount / valueAmount;
+
+                                if(ratio <= 0.5 && ratio != 0) {
+                                    if(action.equals("fold")) {
+                                        actionToReturn = "raise";
+                                        System.out.println("Changed to raise in adjustPlayToRangeMap() -> ratio: " + ratio);
+                                    } else {
+                                        actionToReturn = "bet75pct";
+                                        System.out.println("Changed to bet in adjustPlayToRangeMap() -> ratio: " + ratio);
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
         }
 
         return actionToReturn;

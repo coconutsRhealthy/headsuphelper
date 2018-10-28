@@ -44,6 +44,63 @@ public class ActionVariables {
         //default constructor
     }
 
+    public static void main(String[] args) throws Exception {
+        ActionVariables actionVariables = new ActionVariables();
+
+        for(int i = 0; i < 20; i++) {
+            actionVariables.testMethod();
+        }
+    }
+
+    private void testMethod() throws Exception {
+        ContinuousTable continuousTable = new ContinuousTable();
+
+        continuousTable.setOpponentHasInitiative(true);
+        continuousTable.setPre3betOrPostRaisedPot(false);
+        continuousTable.setOpponentDidPreflop4betPot(false);
+
+        GameVariables gameVariables = new GameVariables();
+
+        gameVariables.setOpponentStack(7696);
+        gameVariables.setOpponentBetSize(798);
+        gameVariables.setPot(1690);
+        gameVariables.setBotBetSize(0);
+        gameVariables.setBotStack(26055);
+        gameVariables.setBigBlind(100);
+        gameVariables.setBotIsButton(false);
+
+        gameVariables.setOpponentAction("bet75pct");
+
+        List<Card> holeCards = new ArrayList<>();
+
+        holeCards.add(new Card(6, 'c'));
+        holeCards.add(new Card(3, 'd'));
+
+        Card flopCard1 = new Card(14, 'd');
+        Card flopCard2 = new Card(8, 'd');
+        Card flopCard3 = new Card(5, 'h');
+        Card turnCard = new Card(12, 'h');
+        //Card riverCard = new Card(8, 'c');
+
+        gameVariables.setFlopCard1(flopCard1);
+        gameVariables.setFlopCard2(flopCard2);
+        gameVariables.setFlopCard3(flopCard3);
+        gameVariables.setTurnCard(turnCard);
+        //gameVariables.setRiverCard(riverCard);
+
+        List<Card> board = new ArrayList<>();
+        board.add(flopCard1);
+        board.add(flopCard2);
+        board.add(flopCard3);
+        board.add(turnCard);
+        //board.add(riverCard);
+
+        gameVariables.setBotHoleCards(holeCards);
+        gameVariables.setBoard(board);
+
+        ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
+    }
+
     public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean newHand) throws Exception {
         calculateHandStrengthAndDraws(gameVariables, continuousTable);
 
@@ -56,7 +113,10 @@ public class ActionVariables {
         double effectiveStack = getEffectiveStackInBb(gameVariables);
         boolean botHasStrongDrawInMethod = botHasStrongDraw;
         double botHandStrengthInMethod = botHandStrength;
-        opponentType = doOpponentTypeDbLogic(gameVariables.getOpponentName());
+        //opponentType = doOpponentTypeDbLogic(gameVariables.getOpponentName());
+
+        opponentType = "la";
+
         double opponentBetsizeBb = gameVariables.getOpponentBetSize() / gameVariables.getBigBlind();
         double botBetsizeBb = gameVariables.getBotBetSize() / gameVariables.getBigBlind();
         double opponentStackBb = gameVariables.getOpponentStack() / gameVariables.getBigBlind();
@@ -68,7 +128,8 @@ public class ActionVariables {
         setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(opponentActionInMethod, boardInMethod, continuousTable, opponentBetsizeBb, potSizeBb);
         double amountToCallBb = getAmountToCallBb(botBetsizeBb, opponentBetsizeBb, botStackBb);
 
-        int boardWetness = getBoardWetness(continuousTable);
+        //int boardWetness = getBoardWetness(continuousTable);
+        int boardWetness = 200;
 
         if(preflop) {
             action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb);
@@ -88,12 +149,12 @@ public class ActionVariables {
                 String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative());
 
                 if(opponentType.equals("la")) {
-                    if(actionAgainstLa != null && actionAgainstLa.equals("fold") && botHandStrength > 0.7 && botHandStrength < 0.75) {
-                        opponentType = "ta";
-                        action = "toDetermine";
-                    } else {
+//                    if(actionAgainstLa != null && actionAgainstLa.equals("fold") && botHandStrength > 0.7 && botHandStrength < 0.75) {
+//                        opponentType = "ta";
+//                        action = "toDetermine";
+//                    } else {
                         action = actionAgainstLa;
-                    }
+//                    }
                 } else {
                     if(streetInMethod.equals("flopOrTurn")) {
                         if(opponentStackBb == 0) {

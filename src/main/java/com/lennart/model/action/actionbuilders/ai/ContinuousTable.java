@@ -6,10 +6,7 @@ import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -27,6 +24,8 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Set<Card>> top10percentFlopCombos;
     private List<Set<Card>> top10percentTurnCombos;
     private List<Set<Card>> top10percentRiverCombos;
+
+    private static Map<String, List<Double>> rangeMap = RangeTracker.initializeRangeMap();
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -235,5 +234,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setTop10percentRiverCombos(List<Set<Card>> top10percentRiverCombos) {
         this.top10percentRiverCombos = top10percentRiverCombos;
+    }
+
+    public static Map<String, List<Double>> getRangeMap() {
+        return rangeMap;
+    }
+
+    public static void setRangeMap(Map<String, List<Double>> rangeMap) {
+        ContinuousTable.rangeMap = rangeMap;
     }
 }

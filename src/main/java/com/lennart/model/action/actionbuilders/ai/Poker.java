@@ -142,7 +142,9 @@ public class Poker {
                 action = ruleApplier.moderateCheckRaises(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, actionVariables.getHandEvaluator());
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
-                action = ruleApplier.changePlayToBoardWetness(action, opponentAction, board, opponentHasInitiative, boardWetness, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, strongDraw, handStrength, bigBlind);
+                //action = ruleApplier.changePlayToBoardWetness(action, opponentAction, board, opponentHasInitiative, boardWetness, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, strongDraw, handStrength, bigBlind);
+
+                //action = ruleApplier.adjustPlayToRangeMap(action, bigBlind, position, handStrength, board, opponentHasInitiative, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind);
 
                 return action;
             } else {
@@ -175,12 +177,15 @@ public class Poker {
                 action = ruleApplier.moderateCheckRaises(action, actionVariables, eligibleActions, street, position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, strongDraw, handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, opponentHasInitiative);
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, actionVariables.getHandEvaluator());
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
-                action = ruleApplier.changePlayToBoardWetness(action, opponentAction, board, opponentHasInitiative, boardWetness, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, strongDraw, handStrength, bigBlind);
+                //action = ruleApplier.changePlayToBoardWetness(action, opponentAction, board, opponentHasInitiative, boardWetness, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, strongDraw, handStrength, bigBlind);
+
+                //action = ruleApplier.adjustPlayToRangeMap(action, bigBlind, position, handStrength, board, opponentHasInitiative, opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind);
 
                 return action;
             }
         } catch (Exception e) {
             System.out.println("error occurred in getAction()");
+            e.printStackTrace();
             return null;
         }
     }
