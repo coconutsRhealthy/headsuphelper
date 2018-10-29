@@ -263,6 +263,10 @@ public class ActionVariables {
         double updatedBotStack = getUpdatedBotStack(actionCopy, gameVariables, totalBotBetSizeForPlayerActionRound);
         gameVariables.setBotStack(updatedBotStack);
         gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
+
+        if(boardInMethod != null && boardInMethod.size() >=3 && ((action.equals("bet75pct")) || action.equals("raise"))) {
+            new RangeTracker().updateRangeMapInDb(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod);
+        }
     }
 
     private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {
