@@ -19,37 +19,40 @@ public class RangeTracker {
 
     private void ffTest() {
 
-        //dry board
-        //medium board
-        //wet board
+//  *action
+//        bet
+//        raise
+//
+//  *betsize
+//        0-5bb		    0-2,5
+//        5-10bb		2,5-5
+//        10-15bb		5-7,5
+//        15-20bb		7,5-10
+//        20-30bb		10-15
+//        30-40bb 	    15-20
+//        40-60bb		20-30
+//        60-100bb	    30-50
+//        100>		    50 >
+//
+//  *drawwetness
+//        dry
+//        medium
+//        wet
+//
+//  *boatwetness
+//        dry
+//        medium
+//        wet
+//
+//  *street
+//        flop
+//        turn
+//        river
+//
+//  *position
+//        BB
+//        BTN
 
-        //dry boat
-        //medium boat
-        //wet boat
-
-        //flop
-        //turn
-        //river
-
-        //bet
-        //raise
-
-        //size 0-5bb
-        //size 5-10bb
-        //size 10-15bb
-        //size 15-20bb
-        //size 20-30bb
-        //size 30-40bb
-        //size 40-50bb
-        //size 50-100bb
-        //size 100-150bb
-        //size >150bb
-
-        //btn
-        //bb
-
-
-        //1080 routes
 
     }
 
@@ -102,13 +105,15 @@ public class RangeTracker {
         closeDbConnection();
     }
 
-    public void updateRangeMapInDb(String action, double sizing, double bigBlind, boolean position, double handStrength, List<Card> board) throws Exception {
+    public void updateRangeMapInDb(String action, double sizing, double bigBlind, boolean position, double handStrength, List<Card> board, int drawWetness, int boatWetness) throws Exception {
         String streetString = getStreetString(board);
         String actionString = getActionString(action);
         String positionString = getPositionString(position);
         String sizingString = getSizingString(sizing, bigBlind);
+        String drawWetnessString = getDrawWetnessString(streetString, drawWetness);
+        String boatWetnessString = getBoatWetnessString(streetString, boatWetness);
 
-        String route = streetString + actionString + positionString + sizingString;
+        String route = streetString + actionString + positionString + sizingString + drawWetnessString + boatWetnessString;
 
         initializeDbConnection();
 
@@ -151,6 +156,124 @@ public class RangeTracker {
         return actionString + positionString + sizingString;
     }
 
+    public double getRangeRouteBluffValueRatio(String rangeRoute, boolean bluff) {
+        double rangeRouteBluffValueRatio = -1;
+
+        try {
+            initializeDbConnection();
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM rangetracker WHERE route = '" + rangeRoute + "';");
+
+            double bluffAmount = rs.getDouble("bluff_amount");
+            double valueAmount = rs.getDouble("value_amount");
+
+            if(bluffAmount != 0 && valueAmount != 0) {
+                if(bluff) {
+                    bluffAmount = bluffAmount + 1;
+                } else {
+                    valueAmount = valueAmount + 1;
+                }
+
+                rangeRouteBluffValueRatio = bluffAmount / valueAmount;
+            }
+
+            rs.close();
+            st.close();
+            closeDbConnection();
+        } catch (Exception e) {
+            System.out.println("Error occured in getRangeRouteBluffValueRatio()");
+            e.printStackTrace();
+        }
+
+        return rangeRouteBluffValueRatio;
+    }
+
+    public String balancePlayDoBluff(String action, double bigBlind, boolean position, double handStrength,
+                              List<Card> board, boolean opponentHasInitiative, double facingBetSize,
+                              double myBetSize, double myStack, double facingStack, double pot) {
+        String actionToReturn;
+
+        if(board != null && board.size() >= 3) {
+            if(action.equals("check") || action.equals("fold")) {
+                if(action.equals("check") && opponentHasInitiative) {
+                    actionToReturn = action;
+                } else {
+                    if(handStrength < 0.64) {
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                        RangeTracker rangeTracker = new RangeTracker();
+
+                        if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                            String actionToUse;
+
+                            if(action.equals("check")) {
+                                actionToUse = "bet75pct";
+                            } else {
+                                actionToUse = "raise";
+                            }
+
+                            String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind);
+                            double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute, true);
+
+                            if(ratio >= 0) {
+                                double limit;
+
+                                if(position) {
+                                    limit = 0.41;
+                                } else {
+                                    limit = 0.33;
+                                }
+
+                                if(ratio <= limit) {
+                                    actionToReturn = actionToUse;
+                                    System.out.println("Changed acton to " + actionToUse + " in balancePlay()");
+                                    System.out.println("rangeRoute: " + rangeRoute);
+                                    System.out.println("ratio: " + ratio);
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String balancePlayPreventBluff() {
+        return null;
+    }
+
+    public String balancePlayDoValue() {
+        return null;
+    }
+
+    public String balancePlayPreventValue() {
+        return null;
+    }
+
+
+    //ook nog methode voor check of je op bepaalde spot niet teveel blufft?
+    //balancePlayPreventBluff()
+
+    //en ook nog methode voor check of je op bepaalde spot niet te weinig value bet?
+    //balancePlayDoValue
+
+    //en ook nog methode
+    //blancePlayPreventValue
+
     private String getActionString(String action) {
         String actionString;
 
@@ -178,14 +301,24 @@ public class RangeTracker {
     private String getSizingString(double sizing, double bigBlind) {
         String sizingString;
 
-        if(sizing / bigBlind <= 10) {
-            sizingString = "Sizing0-10bb";
+        if(sizing / bigBlind <= 5) {
+            sizingString = "Sizing0-5bb";
+        } else if(sizing / bigBlind <= 10) {
+            sizingString = "Sizing5-10bb";
+        } else if(sizing / bigBlind <= 15) {
+            sizingString = "Sizing10-15bb";
         } else if(sizing / bigBlind <= 20) {
-            sizingString = "Sizing10-20bb";
+            sizingString = "Sizing15-20bb";
         } else if(sizing / bigBlind <= 30) {
             sizingString = "Sizing20-30bb";
+        } else if(sizing / bigBlind <= 40) {
+            sizingString = "Sizing30-40bb";
+        } else if(sizing / bigBlind <= 60) {
+            sizingString = "Sizing40-60bb";
+        } else if(sizing / bigBlind <= 100) {
+            sizingString = "Sizing60-100bb";
         } else {
-            sizingString = "Sizing>30bb";
+            sizingString = "Sizing>100bb";
         }
 
         return sizingString;
@@ -205,11 +338,77 @@ public class RangeTracker {
         return streetString;
     }
 
+    private String getDrawWetnessString(String street, int drawWetness) {
+        String drawWetnessString;
+
+        if(street.equals("Flop")) {
+            if(drawWetness < 112) {
+                drawWetnessString = "DrawWetnessDry";
+            } else if(drawWetness < 167) {
+                drawWetnessString = "DrawWetnessMedium";
+            } else {
+                drawWetnessString = "DrawWetnessWet";
+            }
+        } else if(street.equals("Turn")) {
+            if(drawWetness < 176) {
+                drawWetnessString = "DrawWetnessDry";
+            } else if(drawWetness < 419) {
+                drawWetnessString = "DrawWetnessMedium";
+            } else {
+                drawWetnessString = "DrawWetnessWet";
+            }
+        } else {
+            if(drawWetness < 32) {
+                drawWetnessString = "DrawWetnessDry";
+            } else if(drawWetness < 73) {
+                drawWetnessString = "DrawWetnessMedium";
+            } else {
+                drawWetnessString = "DrawWetnessWet";
+            }
+        }
+
+        return drawWetnessString;
+    }
+
+    private String getBoatWetnessString(String street, int boatWetness) {
+        String boatWetnessString;
+
+        if(street.equals("Flop")) {
+            if(boatWetness < 9) {
+                boatWetnessString = "BoatWetnessDry";
+            } else if(boatWetness < 72) {
+                boatWetnessString = "BoatWetnessMedium";
+            } else {
+                boatWetnessString = "BoatWetnessWet";
+            }
+        } else if(street.equals("Turn")) {
+            if(boatWetness < 18) {
+                boatWetnessString = "BoatWetnessDry";
+            } else if(boatWetness < 180) {
+                boatWetnessString = "BoatWetnessMedium";
+            } else {
+                boatWetnessString = "BoatWetnessWet";
+            }
+        } else {
+            if(boatWetness < 27) {
+                boatWetnessString = "BoatWetnessDry";
+            } else if(boatWetness < 179) {
+                boatWetnessString = "BoatWetnessMedium";
+            } else {
+                boatWetnessString = "BoatWetnessWet";
+            }
+        }
+
+        return boatWetnessString;
+    }
+
     private static List<String> getAllRangeRoutes() {
         List<String> street = new ArrayList<>();
         List<String> action = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> sizing = new ArrayList<>();
+        List<String> drawWetnessString = new ArrayList<>();
+        List<String> boatWetnessString = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -221,10 +420,23 @@ public class RangeTracker {
         position.add("PositionBTN");
         position.add("PositionBB");
 
-        sizing.add("Sizing0-10bb");
-        sizing.add("Sizing10-20bb");
+        sizing.add("Sizing0-5bb");
+        sizing.add("Sizing5-10bb");
+        sizing.add("Sizing10-15bb");
+        sizing.add("Sizing15-20bb");
         sizing.add("Sizing20-30bb");
-        sizing.add("Sizing>30bb");
+        sizing.add("Sizing30-40bb");
+        sizing.add("Sizing40-60bb");
+        sizing.add("Sizing60-100bb");
+        sizing.add("Sizing>100bb");
+
+        drawWetnessString.add("DrawWetnessDry");
+        drawWetnessString.add("DrawWetnessMedium");
+        drawWetnessString.add("DrawWetnessWet");
+
+        boatWetnessString.add("BoatWetnessDry");
+        boatWetnessString.add("BoatWetnessMedium");
+        boatWetnessString.add("BoatWetnessWet");
 
         List<String> allRangeRoutes = new ArrayList<>();
 
@@ -232,13 +444,30 @@ public class RangeTracker {
             for(String b : action) {
                 for(String c : position) {
                     for(String d : sizing) {
-                        allRangeRoutes.add(a + b + c + d);
+                        for(String e : drawWetnessString) {
+                            for(String f : boatWetnessString) {
+                                allRangeRoutes.add(a + b + c + d + e + f);
+                            }
+                        }
                     }
                 }
             }
         }
 
         return allRangeRoutes;
+    }
+
+    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot) {
+        double sizingInMethod;
+
+        if(sizing > (facingBetSize + facingStackSize)) {
+            sizingInMethod = facingBetSize + facingStackSize;
+        } else {
+            sizingInMethod = sizing;
+        }
+
+        double odds = (sizingInMethod - facingBetSize) / (facingBetSize + sizingInMethod + pot);
+        return odds > 0.36;
     }
 
     private void initializeDbConnection() throws Exception {

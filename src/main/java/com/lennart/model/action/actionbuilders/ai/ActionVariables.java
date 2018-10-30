@@ -40,6 +40,8 @@ public class ActionVariables {
 
     private String actionBeforeFoldStat;
 
+    private BoardEvaluator boardEvaluator;
+
     public ActionVariables() {
         //default constructor
     }
@@ -264,8 +266,16 @@ public class ActionVariables {
         gameVariables.setBotStack(updatedBotStack);
         gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
 
+        double bigBlind = gameVariables.getBigBlind();
+        RangeTracker rangeTracker = new RangeTracker();
+        action = rangeTracker.balancePlayDoBluff(action, bigBlind, botIsButtonInMethod, botHandStrength, boardInMethod,
+                continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind, botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind);
+
         if(boardInMethod != null && boardInMethod.size() >=3 && ((action.equals("bet75pct")) || action.equals("raise"))) {
-            new RangeTracker().updateRangeMapInDb(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod);
+            int drawWetness = boardEvaluator.getFlushStraightWetness();
+            int boatWetness = boardEvaluator.getBoatWetness();
+
+            rangeTracker.updateRangeMapInDb(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
         }
     }
 
@@ -345,7 +355,7 @@ public class ActionVariables {
             botHandStrength = preflopHandStength.getPreflopHandStength(gameVariables.getBotHoleCards());
             botHasStrongDraw = false;
         } else {
-            BoardEvaluator boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
+            boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
             handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
             botHandStrength = handEvaluator.getHandStrength(gameVariables.getBotHoleCards());
 
@@ -682,5 +692,13 @@ public class ActionVariables {
 
     public void setActionBeforeFoldStat(String actionBeforeFoldStat) {
         this.actionBeforeFoldStat = actionBeforeFoldStat;
+    }
+
+    public BoardEvaluator getBoardEvaluator() {
+        return boardEvaluator;
+    }
+
+    public void setBoardEvaluator(BoardEvaluator boardEvaluator) {
+        this.boardEvaluator = boardEvaluator;
     }
 }
