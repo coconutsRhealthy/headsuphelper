@@ -115,10 +115,7 @@ public class ActionVariables {
         double effectiveStack = getEffectiveStackInBb(gameVariables);
         boolean botHasStrongDrawInMethod = botHasStrongDraw;
         double botHandStrengthInMethod = botHandStrength;
-        //opponentType = doOpponentTypeDbLogic(gameVariables.getOpponentName());
-
-        opponentType = "la";
-
+        opponentType = doOpponentTypeDbLogic(gameVariables.getOpponentName());
         double opponentBetsizeBb = gameVariables.getOpponentBetSize() / gameVariables.getBigBlind();
         double botBetsizeBb = gameVariables.getBotBetSize() / gameVariables.getBigBlind();
         double opponentStackBb = gameVariables.getOpponentStack() / gameVariables.getBigBlind();
@@ -244,6 +241,23 @@ public class ActionVariables {
             }
         }
 
+        double bigBlind = gameVariables.getBigBlind();
+        RangeTracker rangeTracker = new RangeTracker();
+        int drawWetness = boardEvaluator.getFlushStraightWetness();
+        int boatWetness = boardEvaluator.getBoatWetness();
+
+        action = rangeTracker.balancePlayDoBluff(action, bigBlind, botIsButtonInMethod, botHandStrength, boardInMethod,
+                continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind, botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, drawWetness, boatWetness);
+
+        action = rangeTracker.balancePlayPreventBluff(action, this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod,
+                facingOdds, effectiveStack * bigBlind, botHasStrongDraw, botHandStrength, opponentType, opponentBetsizeBb, botBetsizeBb,
+                opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, bigBlind, continuousTable.isOpponentDidPreflop4betPot(),
+                continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative(), drawWetness, boatWetness);
+
+        if(boardInMethod != null && boardInMethod.size() >=3 && ((action.equals("bet75pct")) || action.equals("raise"))) {
+            rangeTracker.updateRangeMapInDb(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
+        }
+
         double totalBotBetSizeForPlayerActionRound;
 
         if(sizing == 0) {
@@ -265,18 +279,6 @@ public class ActionVariables {
         double updatedBotStack = getUpdatedBotStack(actionCopy, gameVariables, totalBotBetSizeForPlayerActionRound);
         gameVariables.setBotStack(updatedBotStack);
         gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
-
-        double bigBlind = gameVariables.getBigBlind();
-        RangeTracker rangeTracker = new RangeTracker();
-        action = rangeTracker.balancePlayDoBluff(action, bigBlind, botIsButtonInMethod, botHandStrength, boardInMethod,
-                continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind, botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind);
-
-        if(boardInMethod != null && boardInMethod.size() >=3 && ((action.equals("bet75pct")) || action.equals("raise"))) {
-            int drawWetness = boardEvaluator.getFlushStraightWetness();
-            int boatWetness = boardEvaluator.getBoatWetness();
-
-            rangeTracker.updateRangeMapInDb(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
-        }
     }
 
     private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {

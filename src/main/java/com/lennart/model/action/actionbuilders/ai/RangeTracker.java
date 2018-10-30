@@ -148,15 +148,20 @@ public class RangeTracker {
         return rangeMap;
     }
 
-    public String getRangeRoute(String action, boolean position, double sizing, double bigBlind) {
+    public String getRangeRoute(String action, boolean position, double sizing, double bigBlind, List<Card> board, int drawWetness, int boatWetness) {
+        String streetString = getStreetString(board);
         String actionString = getActionString(action);
         String positionString = getPositionString(position);
         String sizingString = getSizingString(sizing, bigBlind);
+        String drawWetnessString = getDrawWetnessString(streetString, drawWetness);
+        String boatWetnessString = getBoatWetnessString(streetString, boatWetness);
 
-        return actionString + positionString + sizingString;
+        String route = streetString + actionString + positionString + sizingString + drawWetnessString + boatWetnessString;
+
+        return route;
     }
 
-    public double getRangeRouteBluffValueRatio(String rangeRoute, boolean bluff) {
+    public double getRangeRouteBluffValueRatio(String rangeRoute) {
         double rangeRouteBluffValueRatio = -1;
 
         try {
@@ -165,16 +170,13 @@ public class RangeTracker {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM rangetracker WHERE route = '" + rangeRoute + "';");
 
+            rs.next();
+
             double bluffAmount = rs.getDouble("bluff_amount");
             double valueAmount = rs.getDouble("value_amount");
 
             if(bluffAmount != 0 && valueAmount != 0) {
-                if(bluff) {
-                    bluffAmount = bluffAmount + 1;
-                } else {
-                    valueAmount = valueAmount + 1;
-                }
-
+                bluffAmount = bluffAmount + 1;
                 rangeRouteBluffValueRatio = bluffAmount / valueAmount;
             }
 
@@ -191,7 +193,7 @@ public class RangeTracker {
 
     public String balancePlayDoBluff(String action, double bigBlind, boolean position, double handStrength,
                               List<Card> board, boolean opponentHasInitiative, double facingBetSize,
-                              double myBetSize, double myStack, double facingStack, double pot) {
+                              double myBetSize, double myStack, double facingStack, double pot, int drawWetness, int boatWetness) {
         String actionToReturn;
 
         if(board != null && board.size() >= 3) {
@@ -212,8 +214,8 @@ public class RangeTracker {
                                 actionToUse = "raise";
                             }
 
-                            String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind);
-                            double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute, true);
+                            String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind, board, drawWetness, boatWetness);
+                            double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute);
 
                             if(ratio >= 0) {
                                 double limit;
@@ -226,7 +228,7 @@ public class RangeTracker {
 
                                 if(ratio <= limit) {
                                     actionToReturn = actionToUse;
-                                    System.out.println("Changed acton to " + actionToUse + " in balancePlay()");
+                                    System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
                                     System.out.println("rangeRoute: " + rangeRoute);
                                     System.out.println("ratio: " + ratio);
                                 } else {
@@ -252,27 +254,74 @@ public class RangeTracker {
         return actionToReturn;
     }
 
-    public String balancePlayPreventBluff() {
-        return null;
+    public String balancePlayPreventBluff(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                          double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                          double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                          boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                          boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                          int boardWetness, boolean opponentHasInitiative, int drawWetness, int boatWetness) {
+        String actionToReturn;
+
+        if(board != null && board.size() >= 3) {
+            if(action.equals("bet75pct") || action.equals("raise")) {
+                if(handStrength < 0.64) {
+                    double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                            ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+
+                    RangeTracker rangeTracker = new RangeTracker();
+                    String rangeRoute = rangeTracker.getRangeRoute(action, position, sizing, bigBlind, board, drawWetness, boatWetness);
+                    double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute);
+
+                    if(ratio >= 0) {
+                        double limit;
+
+                        if(position) {
+                            limit = 0.41;
+                        } else {
+                            limit = 0.33;
+                        }
+
+                        if(ratio >= limit) {
+                            if(action.equals("bet75pct")) {
+                                actionToReturn = "check";
+
+                                System.out.println("Changed acton to check in balancePlayPreventBluff()");
+                                System.out.println("rangeRoute: " + rangeRoute);
+                                System.out.println("ratio: " + ratio);
+                            } else {
+                                List<String> eligibleActionsNew = new ArrayList<>();
+                                eligibleActionsNew.add("fold");
+                                eligibleActionsNew.add("call");
+
+                                //set both opponentstack and effective stack to zero to force either fold or call
+                                actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                        opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                        ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                        bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                        strongBackdoorSd, boardWetness, opponentHasInitiative);
+
+                                System.out.println("Changed acton to " + actionToReturn + " balancePlayPreventBluff()");
+                                System.out.println("rangeRoute: " + rangeRoute);
+                                System.out.println("ratio: " + ratio);
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
-
-    public String balancePlayDoValue() {
-        return null;
-    }
-
-    public String balancePlayPreventValue() {
-        return null;
-    }
-
-
-    //ook nog methode voor check of je op bepaalde spot niet teveel blufft?
-    //balancePlayPreventBluff()
-
-    //en ook nog methode voor check of je op bepaalde spot niet te weinig value bet?
-    //balancePlayDoValue
-
-    //en ook nog methode
-    //blancePlayPreventValue
 
     private String getActionString(String action) {
         String actionString;
