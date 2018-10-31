@@ -175,7 +175,7 @@ public class RangeTracker {
             double bluffAmount = rs.getDouble("bluff_amount");
             double valueAmount = rs.getDouble("value_amount");
 
-            if(bluffAmount != 0 && valueAmount != 0) {
+            if(valueAmount != 0) {
                 bluffAmount = bluffAmount + 1;
                 rangeRouteBluffValueRatio = bluffAmount / valueAmount;
             }
@@ -193,7 +193,7 @@ public class RangeTracker {
 
     public String balancePlayDoBluff(String action, double bigBlind, boolean position, double handStrength,
                               List<Card> board, boolean opponentHasInitiative, double facingBetSize,
-                              double myBetSize, double myStack, double facingStack, double pot, int drawWetness, int boatWetness) {
+                              double myBetSize, double myStack, double facingStack, double pot, int drawWetness, int boatWetness, boolean pre3betOrPostRaisedPot) {
         String actionToReturn;
 
         if(board != null && board.size() >= 3) {
@@ -227,10 +227,28 @@ public class RangeTracker {
                                 }
 
                                 if(ratio <= limit) {
-                                    actionToReturn = actionToUse;
-                                    System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
-                                    System.out.println("rangeRoute: " + rangeRoute);
-                                    System.out.println("ratio: " + ratio);
+                                    if(actionToUse.equals("raise")) {
+                                        if(board.size() == 3 || board.size() == 4) {
+                                            if(pre3betOrPostRaisedPot) {
+                                                actionToReturn = action;
+                                            } else {
+                                                actionToReturn = actionToUse;
+                                                System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
+                                                System.out.println("rangeRoute: " + rangeRoute);
+                                                System.out.println("ratio: " + ratio);
+                                            }
+                                        } else {
+                                            actionToReturn = actionToUse;
+                                            System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
+                                            System.out.println("rangeRoute: " + rangeRoute);
+                                            System.out.println("ratio: " + ratio);
+                                        }
+                                    } else {
+                                        actionToReturn = actionToUse;
+                                        System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
+                                        System.out.println("rangeRoute: " + rangeRoute);
+                                        System.out.println("ratio: " + ratio);
+                                    }
                                 } else {
                                     actionToReturn = action;
                                 }
