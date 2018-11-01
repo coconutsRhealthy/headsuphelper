@@ -119,7 +119,12 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String moderateBluffRaises(String action, double handStrength, String street, boolean strongDraw, double opponentBetSizeBb) {
+    public String moderateBluffRaises(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                      double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                      double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                      boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                      boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                      int boardWetness, boolean opponentHasInitiative) {
         String actionToReturn;
 
         if(action.equals("raise")) {
@@ -128,21 +133,44 @@ public class RuleApplier {
                     if(handStrength < 0.7) {
                         if(handStrength < 0.5) {
                             if(opponentBetSizeBb > 4) {
-                                actionToReturn = "fold";
+                                List<String> eligibleActionsNew = new ArrayList<>();
+                                eligibleActionsNew.add("fold");
+                                eligibleActionsNew.add("call");
+
+                                //set both opponentstack and effective stack to zero to force either fold or call
+                                actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                        opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                        ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                        bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                        strongBackdoorSd, boardWetness, opponentHasInitiative);
                             } else {
                                 actionToReturn = action;
                             }
                         } else {
-                            if(opponentBetSizeBb < 20) {
-                                actionToReturn = "call";
-                            } else {
-                                actionToReturn = "fold";
-                            }
+                            List<String> eligibleActionsNew = new ArrayList<>();
+                            eligibleActionsNew.add("fold");
+                            eligibleActionsNew.add("call");
+
+                            //set both opponentstack and effective stack to zero to force either fold or call
+                            actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                    opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                    ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                    bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                    strongBackdoorSd, boardWetness, opponentHasInitiative);
                         }
                     } else {
                         if(opponentBetSizeBb >= 10) {
                             if(handStrength < 0.8) {
-                                actionToReturn = "call";
+                                List<String> eligibleActionsNew = new ArrayList<>();
+                                eligibleActionsNew.add("fold");
+                                eligibleActionsNew.add("call");
+
+                                //set both opponentstack and effective stack to zero to force either fold or call
+                                actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                        opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                        ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                        bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                        strongBackdoorSd, boardWetness, opponentHasInitiative);
                             } else {
                                 actionToReturn = action;
                             }
@@ -232,7 +260,12 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String moderateGutshotRaises(String action, boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double opponentBetSizeBb, boolean position, double handStrength) {
+    public String moderateGutshotRaises(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                        double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                        double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                        boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                        boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                        int boardWetness, boolean opponentHasInitiative) {
         String actionToReturn;
 
         if(action.equals("raise")) {
@@ -246,24 +279,28 @@ public class RuleApplier {
                                 if(random > 0.6) {
                                     actionToReturn = action;
                                 } else {
-                                    if(opponentBetSizeBb > 20) {
-                                        actionToReturn = "fold";
-                                    } else {
-                                        if(position) {
-                                            actionToReturn = "call";
-                                        } else {
-                                            double random2 = Math.random();
+                                    List<String> eligibleActionsNew = new ArrayList<>();
+                                    eligibleActionsNew.add("fold");
+                                    eligibleActionsNew.add("call");
 
-                                            if(random2 > 0.7) {
-                                                actionToReturn = "call";
-                                            } else {
-                                                actionToReturn = "fold";
-                                            }
-                                        }
-                                    }
+                                    //set both opponentstack and effective stack to zero to force either fold or call
+                                    actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                            opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                            ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                            bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                            strongBackdoorSd, boardWetness, opponentHasInitiative);
                                 }
                             } else {
-                                actionToReturn = "fold";
+                                List<String> eligibleActionsNew = new ArrayList<>();
+                                eligibleActionsNew.add("fold");
+                                eligibleActionsNew.add("call");
+
+                                //set both opponentstack and effective stack to zero to force either fold or call
+                                actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                        opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                        ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                        bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                        strongBackdoorSd, boardWetness, opponentHasInitiative);
                             }
                         } else {
                             actionToReturn = action;
@@ -357,17 +394,24 @@ public class RuleApplier {
         return actionToReturn;
     }
 
-    public String moderateDeepPostflopValueBettingAndRaising(String action, double handStrength, boolean postFlop,
-                                                             boolean strongFlushDraw, boolean strongOosd, double facingBetSize,
-                                                             double myBetSize, double myStack, double facingStack,
-                                                             double pot, double bigBlind, List<Card> board) {
+    public String moderateDeepPostflopValueBettingAndRaising(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                                             double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                                             double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                                             boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                                             boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                                             int boardWetness, boolean opponentHasInitiative) {
         String actionToReturn;
 
-        if(postFlop) {
+        if(board != null && board.size() >= 3) {
             if(!strongFlushDraw && !strongOosd) {
                 if(handStrength > 0.63 && handStrength < 0.95) {
                     if(action.equals("bet75pct")) {
-                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                        double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                                ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+
+                        if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
+                            sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
+                        }
 
                         if(sizing / bigBlind >= 90) {
                             actionToReturn = "check";
@@ -375,13 +419,27 @@ public class RuleApplier {
                             actionToReturn = action;
                         }
                     } else if(action.equals("raise")) {
-                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                        double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                                ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+
+                        if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
+                            sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
+                        }
 
                         if(sizing / bigBlind >= 90) {
                             if(handStrength > 0.8) {
                                 actionToReturn = "call";
                             } else {
-                                actionToReturn = "fold";
+                                List<String> eligibleActionsNew = new ArrayList<>();
+                                eligibleActionsNew.add("fold");
+                                eligibleActionsNew.add("call");
+
+                                //set both opponentstack and effective stack to zero to force either fold or call
+                                actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                        opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                        ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                        bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                        strongBackdoorSd, boardWetness, opponentHasInitiative);
                             }
                         } else {
                             actionToReturn = action;
@@ -392,7 +450,12 @@ public class RuleApplier {
                 } else {
                     if(handStrength >= 0.95) {
                         if(action.equals("bet75pct")) {
-                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                            double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+
+                            if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
+                                sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
+                            }
 
                             if(sizing / bigBlind >= 90) {
                                 if(handStrength >= 0.96) {
@@ -404,13 +467,29 @@ public class RuleApplier {
                                 actionToReturn = action;
                             }
                         } else if(action.equals("raise")) {
-                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                            double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+
+                            if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
+                                sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
+                            }
 
                             if(sizing / bigBlind >= 90) {
                                 if(handStrength >= 0.992) {
                                     actionToReturn = action;
                                 } else {
-                                    actionToReturn = "call";
+                                    //check if this is good, was first hardcoded call...
+
+                                    List<String> eligibleActionsNew = new ArrayList<>();
+                                    eligibleActionsNew.add("fold");
+                                    eligibleActionsNew.add("call");
+
+                                    //set both opponentstack and effective stack to zero to force either fold or call
+                                    actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                            opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                            ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                            bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                            strongBackdoorSd, boardWetness, opponentHasInitiative);
                                 }
                             } else {
                                 actionToReturn = action;
@@ -947,15 +1026,11 @@ public class RuleApplier {
             if(strongDraw && !strongFlushDraw && !strongOosd && !strongGutshot && (strongBackdoorFd || strongBackdoorSd)) {
                 if(effectiveStackBb >= 50) {
                     if(position) {
-                        if(opponentBetSizeBb / potSizeBb <= 0.8 && opponentBetSizeBb <= 20) {
-                            actionToReturn = action;
-                        } else {
-                            actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
-                                    position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
-                                    handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
-                                    preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
+                        actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
+                                position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
+                                handStrength, opponentType, opponentBetSizeBb, ownBetSizeBb, opponentStackBb, ownStackBb,
+                                preflop, board, strongFlushDraw, strongOosd, strongGutshot, bigBlind, opponentDidPreflop4betPot,
                                     pre3betOrPostRaisedPot, strongOvercards, false, false, boardWetness, opponentHasInitiative);
-                        }
                     } else {
                         actionToReturn = new Poker().getAction(actionVariables, eligibleActions, street,
                                 position, potSizeBb, opponentAction, facingOdds, effectiveStackBb, false,
