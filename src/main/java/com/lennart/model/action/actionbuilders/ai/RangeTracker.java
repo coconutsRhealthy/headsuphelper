@@ -290,7 +290,7 @@ public class RangeTracker {
                     String rangeRoute = rangeTracker.getRangeRoute(action, position, sizing, bigBlind, board, drawWetness, boatWetness);
                     double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute);
 
-                    if(ratio >= 0) {
+                    if(ratio >= 0 || ratio == -1) {
                         double limit;
 
                         if(position) {
@@ -299,7 +299,7 @@ public class RangeTracker {
                             limit = 0.33;
                         }
 
-                        if(ratio >= limit) {
+                        if(ratio >= limit || ratio == -1) {
                             if(action.equals("bet75pct")) {
                                 actionToReturn = "check";
 
