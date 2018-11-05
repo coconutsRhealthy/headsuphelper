@@ -25,7 +25,7 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Set<Card>> top10percentTurnCombos;
     private List<Set<Card>> top10percentRiverCombos;
 
-    private static Map<String, List<Double>> rangeMap = RangeTracker.initializeRangeMap();
+    private boolean botBluffActionDone;
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -52,6 +52,13 @@ public class ContinuousTable implements ContinuousTableable {
                     top10percentFlopCombos = new ArrayList<>();
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
+
+                    if(botBluffActionDone) {
+                        boolean bluffActionWasSuccessful = wasBluffSuccessful();
+                        String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
+                        new Bluffer().updateBluffDb(opponentPlayerNameOfLastHand, bluffActionWasSuccessful);
+                        botBluffActionDone = false;
+                    }
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
@@ -178,6 +185,24 @@ public class ContinuousTable implements ContinuousTableable {
         return isNewHand;
     }
 
+    private boolean wasBluffSuccessful() throws Exception {
+        boolean bluffSuccessful = false;
+
+        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+        List<String> total = handHistoryReaderStars.readTextFile();
+        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total);
+        Collections.reverse(lastHand);
+
+        for(String line : lastHand) {
+            if(line.contains("folds") && !line.contains("vegeta11223")) {
+                bluffSuccessful = true;
+                break;
+            }
+        }
+
+        return bluffSuccessful;
+    }
+
     @Override
     public boolean isOpponentHasInitiative() {
         return opponentHasInitiative;
@@ -236,11 +261,11 @@ public class ContinuousTable implements ContinuousTableable {
         this.top10percentRiverCombos = top10percentRiverCombos;
     }
 
-    public static Map<String, List<Double>> getRangeMap() {
-        return rangeMap;
+    public boolean isBotBluffActionDone() {
+        return botBluffActionDone;
     }
 
-    public static void setRangeMap(Map<String, List<Double>> rangeMap) {
-        ContinuousTable.rangeMap = rangeMap;
+    public void setBotBluffActionDone(boolean botBluffActionDone) {
+        this.botBluffActionDone = botBluffActionDone;
     }
 }

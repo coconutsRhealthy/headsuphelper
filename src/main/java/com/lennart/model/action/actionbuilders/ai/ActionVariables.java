@@ -259,9 +259,19 @@ public class ActionVariables {
                 rangeTracker.updateRangeMapInDb(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
             }
 
+            action = new Bluffer().doOpponentBluffSuccessAction(action, gameVariables.getOpponentName(), bigBlind,
+                    botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
+                    botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind);
+
             if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
+        }
+
+        if(boardInMethod != null && boardInMethod.size() == 5 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
+            continuousTable.setBotBluffActionDone(true);
+        } else {
+            continuousTable.setBotBluffActionDone(false);
         }
 
         double totalBotBetSizeForPlayerActionRound;
