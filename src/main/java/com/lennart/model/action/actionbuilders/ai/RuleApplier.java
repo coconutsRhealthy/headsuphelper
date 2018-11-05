@@ -649,7 +649,19 @@ public class RuleApplier {
                         actionToReturn = action;
                     }
                 } else {
-                    actionToReturn = action;
+                    if(board.size() == 3) {
+                        if(facingBetSizeBb <= 20) {
+                            if(facingOdds < 0.39) {
+                                actionToReturn = "call";
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
                 }
             } else {
                 actionToReturn = action;

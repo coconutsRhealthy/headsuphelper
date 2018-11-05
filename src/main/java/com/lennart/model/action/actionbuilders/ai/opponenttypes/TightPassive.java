@@ -375,7 +375,7 @@ public class TightPassive extends AbstractOpponent {
                         if(strongDraw) {
                             double random = Math.random();
 
-                            if(random < 0.67) {
+                            if(random < 1) {
                                 action = "call";
                             } else {
                                 action = "fold";

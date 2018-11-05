@@ -250,15 +250,19 @@ public class RangeTracker {
                                         System.out.println("ratio: " + ratio);
                                     }
                                 } else {
+                                    System.out.println("check or fold because ratio above limit. Ratio: " + ratio + " Limit: " + limit);
                                     actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("check or fold because ratio below 0");
                                 actionToReturn = action;
                             }
                         } else {
+                            System.out.println("check or fold because bluffodds not ok");
                             actionToReturn = action;
                         }
                     } else {
+                        System.out.println("check or fold with hand hs > 0.64");
                         actionToReturn = action;
                     }
                 }
@@ -323,12 +327,14 @@ public class RangeTracker {
                                 System.out.println("ratio: " + ratio);
                             }
                         } else {
+                            System.out.println("aggro action not prevented because ratio above limit or -1. Ratio: " + ratio + " limit: " + limit);
                             actionToReturn = action;
                         }
                     } else {
                         actionToReturn = action;
                     }
                 } else {
+                    System.out.println("aggro action not preventend because hs above 0.64");
                     actionToReturn = action;
                 }
             } else {
