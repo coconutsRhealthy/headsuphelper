@@ -4,9 +4,7 @@ import com.lennart.model.card.Card;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by LennartMac on 27/10/2018.
@@ -35,15 +33,40 @@ public class RangeTracker {
         closeDbConnection();
     }
 
-    public void updateRangeMapInDb(String action, double sizing, double bigBlind, boolean position, double handStrength, List<Card> board, int drawWetness, int boatWetness) throws Exception {
+    private void doDbMigration() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM rangetracker;");
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+            int bluffAmount = rs.getInt("bluff_amount");
+            int valueAmount = rs.getInt("value_amount");
+
+            int bbIndex = route.indexOf("bb");
+            String newRoute = route.substring(0, bbIndex + 2);
+
+            Statement st2 = con.createStatement();
+
+            st2.executeUpdate("UPDATE rangetracker_cons SET bluff_amount = bluff_amount + " + bluffAmount + " WHERE route = '" + newRoute + "'");
+            st2.executeUpdate("UPDATE rangetracker_cons SET value_amount = value_amount + " + valueAmount + " WHERE route = '" + newRoute + "'");
+
+            st2.close();
+        }
+
+        rs.close();
+        st.close();
+        closeDbConnection();
+    }
+
+    public void updateRangeMapInDb(String action, double sizing, double bigBlind, boolean position, double handStrength, List<Card> board) throws Exception {
         String streetString = getStreetString(board);
         String actionString = getActionString(action);
         String positionString = getPositionString(position);
         String sizingString = getSizingString(sizing, bigBlind);
-        String drawWetnessString = getDrawWetnessString(streetString, drawWetness);
-        String boatWetnessString = getBoatWetnessString(streetString, boatWetness);
 
-        String route = streetString + actionString + positionString + sizingString + drawWetnessString + boatWetnessString;
+        String route = streetString + actionString + positionString + sizingString;
 
         initializeDbConnection();
 
@@ -59,34 +82,13 @@ public class RangeTracker {
         closeDbConnection();
     }
 
-    public static Map<String, List<Double>> initializeRangeMap() {
-        Map<String, List<Double>> rangeMap = new HashMap<>();
-
-        List<String> allRangeRoutes = getAllRangeRoutes();
-
-        for(String route : allRangeRoutes) {
-            List<Double> newList = new ArrayList<>();
-            Double firstZero = 0.0;
-            Double secondZero = 0.0;
-
-            newList.add(firstZero);
-            newList.add(secondZero);
-
-            rangeMap.put(route, newList);
-        }
-
-        return rangeMap;
-    }
-
-    public String getRangeRoute(String action, boolean position, double sizing, double bigBlind, List<Card> board, int drawWetness, int boatWetness) {
+    public String getRangeRoute(String action, boolean position, double sizing, double bigBlind, List<Card> board) {
         String streetString = getStreetString(board);
         String actionString = getActionString(action);
         String positionString = getPositionString(position);
         String sizingString = getSizingString(sizing, bigBlind);
-        String drawWetnessString = getDrawWetnessString(streetString, drawWetness);
-        String boatWetnessString = getBoatWetnessString(streetString, boatWetness);
 
-        String route = streetString + actionString + positionString + sizingString + drawWetnessString + boatWetnessString;
+        String route = streetString + actionString + positionString + sizingString;
 
         return route;
     }
@@ -123,7 +125,7 @@ public class RangeTracker {
 
     public String balancePlayDoBluff(String action, double bigBlind, boolean position, double handStrength,
                               List<Card> board, boolean opponentHasInitiative, double facingBetSize,
-                              double myBetSize, double myStack, double facingStack, double pot, int drawWetness, int boatWetness, boolean pre3betOrPostRaisedPot) {
+                              double myBetSize, double myStack, double facingStack, double pot, boolean pre3betOrPostRaisedPot) {
         String actionToReturn;
 
         if(board != null && board.size() >= 3) {
@@ -144,7 +146,7 @@ public class RangeTracker {
                                 actionToUse = "raise";
                             }
 
-                            String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind, board, drawWetness, boatWetness);
+                            String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind, board);
                             double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute);
 
                             if(ratio >= 0) {
@@ -211,7 +213,7 @@ public class RangeTracker {
                                           double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
                                           boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
                                           boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
-                                          int boardWetness, boolean opponentHasInitiative, int drawWetness, int boatWetness) {
+                                          int boardWetness, boolean opponentHasInitiative) {
         String actionToReturn;
 
         if(board != null && board.size() >= 3) {
@@ -221,7 +223,7 @@ public class RangeTracker {
                             ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
 
                     RangeTracker rangeTracker = new RangeTracker();
-                    String rangeRoute = rangeTracker.getRangeRoute(action, position, sizing, bigBlind, board, drawWetness, boatWetness);
+                    String rangeRoute = rangeTracker.getRangeRoute(action, position, sizing, bigBlind, board);
                     double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute);
 
                     if(ratio >= 0 || ratio == -1) {
@@ -341,77 +343,11 @@ public class RangeTracker {
         return streetString;
     }
 
-    private String getDrawWetnessString(String street, int drawWetness) {
-        String drawWetnessString;
-
-        if(street.equals("Flop")) {
-            if(drawWetness < 112) {
-                drawWetnessString = "DrawWetnessDry";
-            } else if(drawWetness < 167) {
-                drawWetnessString = "DrawWetnessMedium";
-            } else {
-                drawWetnessString = "DrawWetnessWet";
-            }
-        } else if(street.equals("Turn")) {
-            if(drawWetness < 176) {
-                drawWetnessString = "DrawWetnessDry";
-            } else if(drawWetness < 419) {
-                drawWetnessString = "DrawWetnessMedium";
-            } else {
-                drawWetnessString = "DrawWetnessWet";
-            }
-        } else {
-            if(drawWetness < 32) {
-                drawWetnessString = "DrawWetnessDry";
-            } else if(drawWetness < 73) {
-                drawWetnessString = "DrawWetnessMedium";
-            } else {
-                drawWetnessString = "DrawWetnessWet";
-            }
-        }
-
-        return drawWetnessString;
-    }
-
-    private String getBoatWetnessString(String street, int boatWetness) {
-        String boatWetnessString;
-
-        if(street.equals("Flop")) {
-            if(boatWetness < 9) {
-                boatWetnessString = "BoatWetnessDry";
-            } else if(boatWetness < 72) {
-                boatWetnessString = "BoatWetnessMedium";
-            } else {
-                boatWetnessString = "BoatWetnessWet";
-            }
-        } else if(street.equals("Turn")) {
-            if(boatWetness < 18) {
-                boatWetnessString = "BoatWetnessDry";
-            } else if(boatWetness < 180) {
-                boatWetnessString = "BoatWetnessMedium";
-            } else {
-                boatWetnessString = "BoatWetnessWet";
-            }
-        } else {
-            if(boatWetness < 27) {
-                boatWetnessString = "BoatWetnessDry";
-            } else if(boatWetness < 179) {
-                boatWetnessString = "BoatWetnessMedium";
-            } else {
-                boatWetnessString = "BoatWetnessWet";
-            }
-        }
-
-        return boatWetnessString;
-    }
-
     private static List<String> getAllRangeRoutes() {
         List<String> street = new ArrayList<>();
         List<String> action = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> sizing = new ArrayList<>();
-        List<String> drawWetnessString = new ArrayList<>();
-        List<String> boatWetnessString = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -433,25 +369,13 @@ public class RangeTracker {
         sizing.add("Sizing60-100bb");
         sizing.add("Sizing>100bb");
 
-        drawWetnessString.add("DrawWetnessDry");
-        drawWetnessString.add("DrawWetnessMedium");
-        drawWetnessString.add("DrawWetnessWet");
-
-        boatWetnessString.add("BoatWetnessDry");
-        boatWetnessString.add("BoatWetnessMedium");
-        boatWetnessString.add("BoatWetnessWet");
-
         List<String> allRangeRoutes = new ArrayList<>();
 
         for(String a : street) {
             for(String b : action) {
                 for(String c : position) {
                     for(String d : sizing) {
-                        for(String e : drawWetnessString) {
-                            for(String f : boatWetnessString) {
-                                allRangeRoutes.add(a + b + c + d + e + f);
-                            }
-                        }
+                        allRangeRoutes.add(a + b + c + d);
                     }
                 }
             }
