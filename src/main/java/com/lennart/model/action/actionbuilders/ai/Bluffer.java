@@ -34,9 +34,10 @@ public class Bluffer {
                         if(bluffSuccessNumber == 0) {
                             actionToReturn = action;
                         } else if(bluffSuccessNumber == 1) {
-                            if(random < 0.4) {
+                            if(random < 0.40) {
                                 if(sizing <= 5) {
                                     actionToReturn = aggroActionToUse;
+                                    System.out.println("Bluff 1, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
@@ -44,9 +45,10 @@ public class Bluffer {
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 2) {
-                            if(random < 0.4) {
+                            if(random < 0.44) {
                                 if(sizing <= 10) {
                                     actionToReturn = aggroActionToUse;
+                                    System.out.println("Bluff 2, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
@@ -54,9 +56,10 @@ public class Bluffer {
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 3) {
-                            if(random < 0.4) {
+                            if(random < 0.48) {
                                 if(sizing <= 15) {
                                     actionToReturn = aggroActionToUse;
+                                    System.out.println("Bluff 3, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
@@ -64,9 +67,10 @@ public class Bluffer {
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 4) {
-                            if(random < 0.4) {
+                            if(random < 0.52) {
                                 if(sizing <= 20) {
                                     actionToReturn = aggroActionToUse;
+                                    System.out.println("Bluff 4, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
@@ -74,9 +78,10 @@ public class Bluffer {
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 5) {
-                            if(random < 0.4) {
+                            if(random < 0.56) {
                                 if(sizing <= 30) {
                                     actionToReturn = aggroActionToUse;
+                                    System.out.println("Bluff 5, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
@@ -84,9 +89,10 @@ public class Bluffer {
                                 actionToReturn = action;
                             }
                         } else {
-                            if(random < 0.4) {
+                            if(random < 0.60) {
                                 if(sizing <= 70) {
                                     actionToReturn = aggroActionToUse;
+                                    System.out.println("Bluff 6, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
