@@ -15,11 +15,15 @@ public class Bluffer {
         String actionToReturn;
 
         if(board != null && board.size() == 5) {
+            System.out.println("zzz1");
             if((action.equals("check") && !opponentHasInitiative) || action.equals("fold")) {
+                System.out.println("zzz2");
                 if(handStrength < 0.64) {
+                    System.out.println("zzz3");
                     double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
                     if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                        System.out.println("zzz4");
                         int bluffSuccessNumber = getNumberOfSuccessfulBluffs(opponentName);
                         double random = Math.random();
 
@@ -39,9 +43,11 @@ public class Bluffer {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 1, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
+                                    System.out.println("zzz5");
                                     actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("zzz6");
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 2) {
@@ -50,9 +56,11 @@ public class Bluffer {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 2, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
+                                    System.out.println("zzz7");
                                     actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("zzz8");
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 3) {
@@ -61,9 +69,11 @@ public class Bluffer {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 3, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
+                                    System.out.println("zzz9");
                                     actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("zzz10");
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 4) {
@@ -72,9 +82,11 @@ public class Bluffer {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 4, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
+                                    System.out.println("zzz11");
                                     actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("zzz12");
                                 actionToReturn = action;
                             }
                         } else if(bluffSuccessNumber == 5) {
@@ -83,9 +95,11 @@ public class Bluffer {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 5, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
+                                    System.out.println("zzz13");
                                     actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("zzz14");
                                 actionToReturn = action;
                             }
                         } else {
@@ -94,9 +108,11 @@ public class Bluffer {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 6, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
+                                    System.out.println("zzz15");
                                     actionToReturn = action;
                                 }
                             } else {
+                                System.out.println("zzz16");
                                 actionToReturn = action;
                             }
                         }
@@ -120,7 +136,7 @@ public class Bluffer {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM blufftracker WHERE playerName = '" + opponentName + "';");
+        ResultSet rs = st.executeQuery("SELECT * FROM blufftracker WHERE opponentName = '" + opponentName + "';");
 
         if(successfulBluff) {
             st.executeUpdate("UPDATE blufftracker SET bluff_success = bluff_success + 1 WHERE opponentName = '" + opponentName + "'");

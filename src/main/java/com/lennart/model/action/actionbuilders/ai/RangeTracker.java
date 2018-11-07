@@ -14,7 +14,7 @@ public class RangeTracker {
     private Connection con;
 
     public static void main(String[] args) throws Exception {
-        new RangeTracker().fillDbInitial();
+        new RangeTracker().doDbMigration();
     }
 
     private void fillDbInitial() throws Exception {
@@ -25,7 +25,7 @@ public class RangeTracker {
         for(String route : allRoutes) {
             Statement st = con.createStatement();
 
-            st.executeUpdate("INSERT INTO rangetracker (route) VALUES ('" + route + "')");
+            st.executeUpdate("INSERT INTO rangetracker_cons (route) VALUES ('" + route + "')");
 
             st.close();
         }
