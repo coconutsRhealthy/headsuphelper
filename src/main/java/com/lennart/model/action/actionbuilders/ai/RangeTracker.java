@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.card.Card;
 
 import java.sql.*;
@@ -382,6 +383,129 @@ public class RangeTracker {
         }
 
         return allRangeRoutes;
+    }
+
+    private double getLimit(String opponentName, boolean position) {
+        double limit;
+        double opponentFoldStat = FoldStatsKeeper.getFoldStat(opponentName);
+
+        if(position) {
+            if(opponentFoldStat <= 0.31) {
+                limit = 0.22;
+            } else if(opponentFoldStat < 0.55) {
+                limit = opponentFoldStat - 0.31;
+                limit = limit / 0.24;
+                limit = limit * 38;
+                limit = limit + 22;
+            } else {
+                limit = 0.60;
+            }
+        } else {
+            if(opponentFoldStat <= 0.31) {
+                limit = 0.14;
+            } else if(opponentFoldStat < 0.55) {
+                limit = opponentFoldStat - 0.31;
+                limit = limit / 0.24;
+                limit = limit * 38;
+                limit = limit + 14;
+            } else {
+                limit = 0.52;
+            }
+        }
+
+        return limit;
+    }
+
+    private void getRatio(String opponentName, double bluffAmount, double nonBluffAmount, double valueAmount, boolean position) {
+
+        double limit;
+
+        double opponentFoldStat = FoldStatsKeeper.getFoldStat(opponentName);
+
+        //laag: 0.31
+            //-> IP: 22%
+            //-> OOP: 14%
+
+        //midden: 0.43
+            //-> IP: 41%
+            //-> OOP: 33%
+
+        //hoog: 0.55
+            //-> IP: 60%
+            //-> OOP: 52%
+
+
+        if(position) {
+            if(opponentFoldStat <= 0.31) {
+                limit = 0.22;
+            } else if(opponentFoldStat < 0.55) {
+
+                //doe foldstat - 0.31
+
+                //deel uitkomst door 0.24
+
+                //doe uitkomst * 38
+
+                //tel uitkomst op bij 22
+
+                limit = opponentFoldStat - 0.31;
+                limit = limit / 0.24;
+                limit = limit * 38;
+                limit = limit + 22;
+            } else {
+                limit = 0.60;
+            }
+        } else {
+            if(opponentFoldStat <= 0.31) {
+                limit = 0.14;
+            } else if(opponentFoldStat < 0.55) {
+                limit = opponentFoldStat - 0.31;
+                limit = limit / 0.24;
+                limit = limit * 38;
+                limit = limit + 14;
+            } else {
+                limit = 0.52;
+            }
+        }
+
+
+
+
+
+
+//        if(position) {
+//            limit = 0.41;
+//        } else {
+//            limit = 0.33;
+//        }
+
+
+
+//        //stel foldstat is 0.53, das tight dus je moet meer bluffen...
+//
+//
+//        //ratio is normaalgesproken 0.41...
+//
+//        //mag maximaal naar 0.6
+//
+//
+//
+//        double bluffAmount = 41;
+//        double valueAmount = 100;
+//
+//
+//        //hoe vaak moet je extra bluffen om de ratio naar 60 / 100 te krijgen...
+//
+//        //heb je daarvoor in feite ook het aantal keren nodig dat je niet geblufft hebt?
+//
+//        double nonBluffAmount = 602;
+//
+//        //er moeten er 19 bij... dat betekent dat je 19 van de 602 keer had moeten bluffen... oftewel: 19/ 602.
+//
+//        //dus indien nonbluff, dan 0,031 keer wel bluffen
+
+
+
     }
 
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot) {

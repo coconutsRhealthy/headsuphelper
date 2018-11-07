@@ -280,6 +280,10 @@ public class ActionVariables {
                     botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
                     botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind);
 
+            //action = new Bluffer().doBluffAccordingToFoldStat
+
+            //action = new Bluffer().preventBluffAccordingToFoldStat
+
             if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
