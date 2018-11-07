@@ -248,7 +248,21 @@ public class ActionVariables {
             boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
             boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
 
-            if(!strongFd && !strongOosd && !strongGutshot) {
+            double randomLimit;
+
+            if(strongFd || strongOosd) {
+                randomLimit = 0.7;
+            } else if(strongGutshot) {
+                if(botIsButtonInMethod) {
+                    randomLimit = 0.33;
+                } else {
+                    randomLimit = 0.23;
+                }
+            } else {
+                randomLimit = 0;
+            }
+
+            if(Math.random() > randomLimit) {
                 action = rangeTracker.balancePlayDoBluff(action, bigBlind, botIsButtonInMethod, botHandStrength, boardInMethod,
                         continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind, botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
 
