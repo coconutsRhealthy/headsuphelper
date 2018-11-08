@@ -129,6 +129,7 @@ public class ActionVariables {
 
         //int boardWetness = getBoardWetness(continuousTable);
         int boardWetness = 200;
+        boolean defaultCheck = false;
 
         if(preflop) {
             action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb);
@@ -140,6 +141,7 @@ public class ActionVariables {
             if(continuousTable != null && (continuousTable.isOpponentHasInitiative() && opponentActionInMethod.equals("empty"))) {
                 System.out.println("default check, opponent has initiative");
                 action = "check";
+                defaultCheck = true;
             } else {
                 //hier de equity logic
                 doEquityLogic(boardInMethod, gameVariables.getBotHoleCards());
@@ -148,12 +150,7 @@ public class ActionVariables {
                 String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative());
 
                 if(opponentType.equals("la")) {
-//                    if(actionAgainstLa != null && actionAgainstLa.equals("fold") && botHandStrength > 0.7 && botHandStrength < 0.75) {
-//                        opponentType = "ta";
-//                        action = "toDetermine";
-//                    } else {
-                        action = actionAgainstLa;
-//                    }
+                    action = actionAgainstLa;
                 } else {
                     if(streetInMethod.equals("flopOrTurn")) {
                         if(opponentStackBb == 0) {
@@ -244,6 +241,8 @@ public class ActionVariables {
         if(boardInMethod != null && boardInMethod.size() >= 3) {
             double bigBlind = gameVariables.getBigBlind();
             RangeTracker rangeTracker = new RangeTracker();
+            int drawWetness = boardEvaluator.getFlushStraightWetness();
+            int boatWetness = boardEvaluator.getBoatWetness();
             boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
             boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
             boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
@@ -272,27 +271,25 @@ public class ActionVariables {
                         continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative());
             }
 
-            if(boardInMethod != null && boardInMethod.size() >=3 && ((action.equals("bet75pct")) || action.equals("raise"))) {
-                rangeTracker.updateRangeMapInDb(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod);
+            if(boardInMethod != null && boardInMethod.size() >=3 && !defaultCheck) {
+                rangeTracker.updateRangeMapInDbSimple(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod);
+                rangeTracker.updateRangeMapInDbExtensive(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
             }
 
-            action = new Bluffer().doOpponentBluffSuccessAction(action, gameVariables.getOpponentName(), bigBlind,
-                    botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
-                    botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind);
+            action = new FoldStatBluffAdjuster().doBluffAccordingToFoldStat(action, bigBlind, botIsButtonInMethod,
+                    botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(),
+                    opponentBetsizeBb * bigBlind, botBetsizeBb * bigBlind, botStackBb * bigBlind,
+                    opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot(),
+                    gameVariables.getOpponentName());
 
-            //action = new Bluffer().doBluffAccordingToFoldStat
-
-            //action = new Bluffer().preventBluffAccordingToFoldStat
+            action = new FoldStatBluffAdjuster().preventBluffAccordingToFoldStat(action, this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod,
+                    facingOdds, effectiveStack * bigBlind, botHasStrongDraw, botHandStrength, opponentType, opponentBetsizeBb, botBetsizeBb,
+                    opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, bigBlind, continuousTable.isOpponentDidPreflop4betPot(),
+                    continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative(), gameVariables.getOpponentName());
 
             if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
-        }
-
-        if(boardInMethod != null && boardInMethod.size() == 5 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
-            continuousTable.setBotBluffActionDone(true);
-        } else {
-            continuousTable.setBotBluffActionDone(false);
         }
 
         double totalBotBetSizeForPlayerActionRound;

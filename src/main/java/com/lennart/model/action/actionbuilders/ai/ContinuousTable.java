@@ -25,8 +25,6 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Set<Card>> top10percentTurnCombos;
     private List<Set<Card>> top10percentRiverCombos;
 
-    private boolean botBluffActionDone;
-
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
     }
@@ -37,6 +35,8 @@ public class ContinuousTable implements ContinuousTableable {
         int milliSecondsTotal = 0;
         int printDotTotal = 0;
 
+        long startTime = new Date().getTime();
+
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
             milliSecondsTotal = milliSecondsTotal + 100;
@@ -46,19 +46,19 @@ public class ContinuousTable implements ContinuousTableable {
                 boolean isNewHand = isNewHand();
 
                 if(isNewHand) {
+                    long currentTime = new Date().getTime();
+
+                    if(currentTime - startTime > 8_280_000) {
+                        System.out.println("2 hours and 23 minutes have passed, force quit");
+                        throw new RuntimeException();
+                    }
+
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
                     top10percentFlopCombos = new ArrayList<>();
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
-
-                    if(botBluffActionDone) {
-                        boolean bluffActionWasSuccessful = wasBluffSuccessful();
-                        String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
-                        new Bluffer().updateBluffDb(opponentPlayerNameOfLastHand, bluffActionWasSuccessful);
-                        botBluffActionDone = false;
-                    }
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
@@ -185,24 +185,6 @@ public class ContinuousTable implements ContinuousTableable {
         return isNewHand;
     }
 
-    private boolean wasBluffSuccessful() throws Exception {
-        boolean bluffSuccessful = false;
-
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total);
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("folds") && !line.contains("vegeta11223")) {
-                bluffSuccessful = true;
-                break;
-            }
-        }
-
-        return bluffSuccessful;
-    }
-
     @Override
     public boolean isOpponentHasInitiative() {
         return opponentHasInitiative;
@@ -259,13 +241,5 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setTop10percentRiverCombos(List<Set<Card>> top10percentRiverCombos) {
         this.top10percentRiverCombos = top10percentRiverCombos;
-    }
-
-    public boolean isBotBluffActionDone() {
-        return botBluffActionDone;
-    }
-
-    public void setBotBluffActionDone(boolean botBluffActionDone) {
-        this.botBluffActionDone = botBluffActionDone;
     }
 }
