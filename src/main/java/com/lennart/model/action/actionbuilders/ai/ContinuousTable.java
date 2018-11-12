@@ -25,6 +25,8 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Set<Card>> top10percentTurnCombos;
     private List<Set<Card>> top10percentRiverCombos;
 
+    private List<Double> allHandStrenghts = new ArrayList<>();
+
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
     }
@@ -46,10 +48,13 @@ public class ContinuousTable implements ContinuousTableable {
                 boolean isNewHand = isNewHand();
 
                 if(isNewHand) {
+                    System.out.println("^^^^a " + getNumberOfHsAbove85() + " ^^^^");
+                    System.out.println("^^^^b " + allHandStrenghts.size() + " ^^^^");
+
                     long currentTime = new Date().getTime();
 
-                    if(currentTime - startTime > 8_280_000) {
-                        System.out.println("2 hours and 23 minutes have passed, force quit");
+                    if(currentTime - startTime > 12_240_000) {
+                        System.out.println("3.4 hours have passed, force quit");
                         throw new RuntimeException();
                     }
 
@@ -92,6 +97,10 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Table: " + actionVariables.getTable());
                 System.out.println("********************");
                 System.out.println();
+
+                if(gameVariables.getBoard() != null && gameVariables.getBoard().size() >= 3) {
+                    allHandStrenghts.add(actionVariables.getBotHandStrength());
+                }
 
                 StarsTableReader.performActionOnSite(action, sizing);
 
@@ -156,6 +165,18 @@ public class ContinuousTable implements ContinuousTableable {
         writer.println("Sizing: " + sizing);
 
         writer.close();
+    }
+
+    private int getNumberOfHsAbove85() {
+        int counter = 0;
+
+        for(double d : allHandStrenghts) {
+            if(d >= 0.85) {
+                counter++;
+            }
+        }
+
+        return counter;
     }
 
     private String getCardListAsString(List<Card> cardList) {

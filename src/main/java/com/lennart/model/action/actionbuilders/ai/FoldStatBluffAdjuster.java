@@ -23,23 +23,33 @@ public class FoldStatBluffAdjuster {
                         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
                         RangeTracker rangeTracker = new RangeTracker();
 
-                        if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
-                            String actionToUse;
+                        if(sizing > (facingBetSize + facingStack)) {
+                            sizing = (facingBetSize + facingStack);
+                        }
 
-                            if(action.equals("check")) {
-                                actionToUse = "bet75pct";
-                            } else {
-                                actionToUse = "raise";
-                            }
+                        if(sizing / bigBlind <= 70) {
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                                String actionToUse;
 
-                            String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind, board);
-                            double currentRatio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute, 0);
+                                if(action.equals("check")) {
+                                    actionToUse = "bet75pct";
+                                } else {
+                                    actionToUse = "raise";
+                                }
 
-                            if(currentRatio >= 0) {
-                                double opponentFoldStat = new FoldStatsKeeper().getFoldStatFromDb(opponentName);
-                                System.out.println("opponentFoldStat-A: " + opponentFoldStat);
+                                String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind, board);
+                                double currentRatio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute, 0);
 
-                                if(opponentFoldStat != 0.43) {
+                                if(currentRatio >= 0) {
+                                    double opponentFoldStat = new FoldStatsKeeper().getFoldStatFromDb(opponentName);
+                                    System.out.println("opponentFoldStat-A: " + opponentFoldStat);
+                                    String addition = "AA";
+
+                                    if(opponentFoldStat == 0.43) {
+                                        addition = "BB";
+                                        opponentFoldStat = 0.31;
+                                    }
+
                                     double targetRatio = getTargetRatio(position, opponentFoldStat);
 
                                     double bluffAmount = rangeTracker.getBluffAmount();
@@ -63,7 +73,7 @@ public class FoldStatBluffAdjuster {
 
                                             if(random < extraBluffPercentage) {
                                                 actionToReturn = actionToUse;
-                                                System.out.println("**changed action to " + actionToUse + " in doBluffAccordingToFoldStat()");
+                                                System.out.println(addition + " **changed action to " + actionToUse + " in doBluffAccordingToFoldStat()");
                                                 System.out.println("current ratio: " + currentRatio);
                                                 System.out.println("target ratio: " + targetRatio);
                                                 System.out.println("bluffAmount: " + bluffAmount);
@@ -124,50 +134,54 @@ public class FoldStatBluffAdjuster {
                     String rangeRoute = rangeTracker.getRangeRoute(action, position, sizing, bigBlind, board);
                     double currentRatio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute, 0);
 
+                    double opponentFoldStat = new FoldStatsKeeper().getFoldStatFromDb(opponentName);
+
                     if(currentRatio >= 0 || currentRatio == -1) {
-                        double opponentFoldStat = new FoldStatsKeeper().getFoldStatFromDb(opponentName);
+
                         System.out.println("opponentFoldStat-B: " + opponentFoldStat);
+                        String addition = "AA";
 
-                        if(opponentFoldStat != 0.43) {
-                            double targetRatio = getTargetRatio(position, opponentFoldStat);
+                        if(opponentFoldStat == 0.43) {
+                            addition = "BB";
+                            opponentFoldStat = 0.31;
+                        }
 
-                            if(currentRatio >= targetRatio) {
-                                double bluffAmount = rangeTracker.getBluffAmount();
-                                double valueAmount = rangeTracker.getValueAmount();
+                        double targetRatio = getTargetRatio(position, opponentFoldStat);
 
-                                if(bluffAmount > 0 && valueAmount > 0) {
-                                    double targetBluffAmount = valueAmount * targetRatio;
-                                    double difference = bluffAmount - targetBluffAmount;
-                                    double preventBluffPercentage = difference / bluffAmount;
-                                    double random = Math.random();
+                        if(currentRatio >= targetRatio) {
+                            double bluffAmount = rangeTracker.getBluffAmount();
+                            double valueAmount = rangeTracker.getValueAmount();
 
-                                    if(random < preventBluffPercentage) {
-                                        if(action.equals("bet75pct")) {
-                                            actionToReturn = "check";
-                                            System.out.println("**changed action to check in preventBluffAccordingToFoldStat()");
-                                            System.out.println("currentRatio: " + currentRatio);
-                                            System.out.println("targetRatio: " + targetRatio);
-                                            System.out.println("bluffAmount: " + bluffAmount);
-                                            System.out.println("valueAmount: " + valueAmount);
-                                            System.out.println("targetBluffAmount: " + targetBluffAmount);
-                                            System.out.println("difference: " + difference);
-                                            System.out.println("preventBluffPercentage: " + preventBluffPercentage);
-                                        } else {
-                                            List<String> eligibleActionsNew = new ArrayList<>();
-                                            eligibleActionsNew.add("fold");
-                                            eligibleActionsNew.add("call");
+                            if(bluffAmount > 0 && valueAmount > 0) {
+                                double targetBluffAmount = valueAmount * targetRatio;
+                                double difference = bluffAmount - targetBluffAmount;
+                                double preventBluffPercentage = difference / bluffAmount;
+                                double random = Math.random();
 
-                                            //set both opponentstack and effective stack to zero to force either fold or call
-                                            actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
-                                                    opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
-                                                    ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
-                                                    bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
-                                                    strongBackdoorSd, boardWetness, opponentHasInitiative);
-
-                                            System.out.println("**changed action to " + actionToReturn + " in preventBluffAccordingToFoldStat()");
-                                        }
+                                if(random < preventBluffPercentage) {
+                                    if(action.equals("bet75pct")) {
+                                        actionToReturn = "check";
+                                        System.out.println(addition + " **changed action to check in preventBluffAccordingToFoldStat()");
+                                        System.out.println("currentRatio: " + currentRatio);
+                                        System.out.println("targetRatio: " + targetRatio);
+                                        System.out.println("bluffAmount: " + bluffAmount);
+                                        System.out.println("valueAmount: " + valueAmount);
+                                        System.out.println("targetBluffAmount: " + targetBluffAmount);
+                                        System.out.println("difference: " + difference);
+                                        System.out.println("preventBluffPercentage: " + preventBluffPercentage);
                                     } else {
-                                        actionToReturn = action;
+                                        List<String> eligibleActionsNew = new ArrayList<>();
+                                        eligibleActionsNew.add("fold");
+                                        eligibleActionsNew.add("call");
+
+                                        //set both opponentstack and effective stack to zero to force either fold or call
+                                        actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                                opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                                ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                                bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                                strongBackdoorSd, boardWetness, opponentHasInitiative);
+
+                                        System.out.println(addition + " **changed action to " + actionToReturn + " in preventBluffAccordingToFoldStat()");
                                     }
                                 } else {
                                     actionToReturn = action;
@@ -177,6 +191,56 @@ public class FoldStatBluffAdjuster {
                             }
                         } else {
                             actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String preventBigBluffsAgainstLowFoldstat(String action, ActionVariables actionVariables, List<String> eligibleActions, String street, boolean position, double potSizeBb, String opponentAction,
+                                                      double facingOdds, double effectiveStackBb, boolean strongDraw, double handStrength, String opponentType,
+                                                      double opponentBetSizeBb, double ownBetSizeBb, double opponentStackBb, double ownStackBb, boolean preflop, List<Card> board,
+                                                      boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot, double bigBlind, boolean opponentDidPreflop4betPot,
+                                                      boolean pre3betOrPostRaisedPot, boolean strongOvercards, boolean strongBackdoorFd, boolean strongBackdoorSd,
+                                                      int boardWetness, boolean opponentHasInitiative, String opponentName) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            if(handStrength < 0.64) {
+                double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
+                        ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+
+                if(sizing / bigBlind >= 17.5) {
+                    double opponentFoldStat = new FoldStatsKeeper().getFoldStatFromDb(opponentName);
+
+                    if(opponentFoldStat < 0.46) {
+                        if(action.equals("bet75pct")) {
+                            actionToReturn = "check";
+                            System.out.println("ZZZ1 sizing changed action to check in preventBigBluffsAgainstLowFoldstat()");
+                        } else {
+                            List<String> eligibleActionsNew = new ArrayList<>();
+                            eligibleActionsNew.add("fold");
+                            eligibleActionsNew.add("call");
+
+                            //set both opponentstack and effective stack to zero to force either fold or call
+                            actionToReturn = new Poker().getAction(actionVariables, eligibleActionsNew, street, position, potSizeBb,
+                                    opponentAction, facingOdds, 0, strongDraw, handStrength, opponentType, opponentBetSizeBb,
+                                    ownBetSizeBb, 0, ownStackBb, preflop, board, strongFlushDraw, strongOosd, strongGutshot,
+                                    bigBlind, opponentDidPreflop4betPot, pre3betOrPostRaisedPot, strongOvercards, strongBackdoorFd,
+                                    strongBackdoorSd, boardWetness, opponentHasInitiative);
+
+                            System.out.println("ZZZ2 sizing changed action to " + actionToReturn + " in preventBigBluffsAgainstLowFoldstat()");
                         }
                     } else {
                         actionToReturn = action;
