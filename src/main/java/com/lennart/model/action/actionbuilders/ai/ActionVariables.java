@@ -303,8 +303,6 @@ public class ActionVariables {
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
-        } else {
-            continuousTable.setBotBluffActionDone(false);
         }
 
         double totalBotBetSizeForPlayerActionRound;

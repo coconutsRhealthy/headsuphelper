@@ -55,7 +55,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     long currentTime = new Date().getTime();
 
-                    if(currentTime - startTime > 12_240_000) {
+                    if(currentTime - startTime > 14_400_000) {
                         System.out.println("3.4 hours have passed, force quit");
                         throw new RuntimeException();
                     }

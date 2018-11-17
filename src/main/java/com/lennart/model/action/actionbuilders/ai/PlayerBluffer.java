@@ -37,42 +37,42 @@ public class PlayerBluffer {
                             if(bluffSuccessNumber == 0) {
                                 actionToReturn = action;
                             } else if(bluffSuccessNumber == 1) {
-                                if(sizing <= 5) {
+                                if(sizing / bigBlind <= 5) {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 1, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
                             } else if(bluffSuccessNumber == 2) {
-                                if(sizing <= 10) {
+                                if(sizing / bigBlind <= 10) {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 2, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
                             } else if(bluffSuccessNumber == 3) {
-                                if(sizing <= 15) {
+                                if(sizing / bigBlind <= 15) {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 3, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
                             } else if(bluffSuccessNumber == 4) {
-                                if(sizing <= 20) {
+                                if(sizing / bigBlind <= 20) {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 4, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
                             } else if(bluffSuccessNumber == 5) {
-                                if(sizing <= 30) {
+                                if(sizing / bigBlind <= 30) {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 5, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
                                     actionToReturn = action;
                                 }
                             } else {
-                                if(sizing <= 70) {
+                                if(sizing / bigBlind <= 70) {
                                     actionToReturn = aggroActionToUse;
                                     System.out.println("Bluff 6, action: " + aggroActionToUse + " sizing: " + sizing + " opponentName: " + opponentName);
                                 } else {
@@ -115,13 +115,35 @@ public class PlayerBluffer {
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM blufftracker WHERE opponentName = '" + opponentName + "';");
 
+        int oldValue = -1;
+        int newValue = -1;
+
+        if(rs.next()) {
+            oldValue = rs.getInt("bluff_success");
+        }
+
         if(successfulBluff) {
             st.executeUpdate("UPDATE blufftracker SET bluff_success = bluff_success + 1 WHERE opponentName = '" + opponentName + "'");
         } else {
             st.executeUpdate("UPDATE blufftracker SET bluff_success = 0 WHERE opponentName = '" + opponentName + "'");
         }
 
+        ResultSet rs2 = st.executeQuery("SELECT * FROM blufftracker WHERE opponentName = '" + opponentName + "';");
+
+        if(rs2.next()) {
+            newValue = rs2.getInt("bluff_success");
+        }
+
+        System.out.println();
+        System.out.println("$$$$$$$$$$$");
+        System.out.println("bluff success: " + successfulBluff);
+        System.out.println("old value: " + oldValue);
+        System.out.println("new value: " + newValue);
+        System.out.println("$$$$$$$$$$$");
+        System.out.println();
+
         rs.close();
+        rs2.close();
         st.close();
         closeDbConnection();
     }
