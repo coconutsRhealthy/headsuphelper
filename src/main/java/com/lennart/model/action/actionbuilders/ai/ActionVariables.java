@@ -301,6 +301,12 @@ public class ActionVariables {
             }
         }
 
+        action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb);
+
+        if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
+            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+        }
+
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
         }
@@ -645,6 +651,34 @@ public class ActionVariables {
         System.out.println("BoardWetness: " + boardWetnessToReturn);
 
         return boardWetnessToReturn;
+    }
+
+    private String preventCallIfOpponentOrBotAlmostAllInAfterCall(String action, double opponentStackBb, double botStackBb,
+                                                                  double botTotalBetSizeBb, double potSizeBb, double amountToCallBb) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(opponentStackBb > 0) {
+                double botStackBbAfterCall = botStackBb - amountToCallBb;
+                if(botStackBbAfterCall > 0) {
+                    double potSizeBbAfterCall = potSizeBb + (2 * botTotalBetSizeBb) + (2 * amountToCallBb);
+                    if((botStackBbAfterCall / potSizeBbAfterCall <= 0.33) || (opponentStackBb / potSizeBbAfterCall <= 0.33)) {
+                        actionToReturn = "raise";
+                        System.out.println("abc-- change action to raise in preventCallIfOpponentOrBotAlmostAllInAfterCall()");
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
     public void setAction(String action) {
