@@ -6,7 +6,9 @@ import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
 
 import java.io.PrintWriter;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 
@@ -28,6 +30,10 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Double> allHandStrenghts = new ArrayList<>();
 
     private boolean botBluffActionDone;
+
+    private List<DbSave> dbSaveList = new ArrayList<>();
+
+    private Connection con;
 
     public static void main(String[] args) throws Exception {
         new ContinuousTable().runTableContinously();
@@ -66,6 +72,9 @@ public class ContinuousTable implements ContinuousTableable {
                     top10percentFlopCombos = new ArrayList<>();
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
+
+                    doDbSaveUpdate();
+                    dbSaveList = new ArrayList<>();
 
                     if(botBluffActionDone) {
                         boolean bluffActionWasSuccessful = wasBluffSuccessful();
@@ -233,6 +242,115 @@ public class ContinuousTable implements ContinuousTableable {
         return bluffSuccessful;
     }
 
+    private void doDbSaveUpdate() throws Exception {
+        for(DbSave dbSave : dbSaveList) {
+//            int entry = getHighestIntEntry("dbsave");
+//            String action = dbSave.getAction();
+//            String board = "";
+//            double sizing = dbSave.getSizing();
+//            double oppFoldStat = dbSave.getOppFoldStat();
+//            String oppType = dbSave.getOppType();
+//            int bluffSu
+
+            initializeDbConnection();
+
+            Statement st = con.createStatement();
+
+            st.executeUpdate("INSERT INTO opponentidentifier (" +
+                    "entry, " +
+                    "action, " +
+                    "board, " +
+                    "sizing, " +
+                    "opp_fold_stat, " +
+                    "bluff_success, " +
+                    "stake, " +
+                    "number_of_hands, " +
+                    "opp_looseness, " +
+                    "opp_aggressiveness, " +
+                    "handstrength, " +
+                    "opp_name, " +
+                    "date, " +
+                    "opp_type, " +
+                    "showdown, " +
+                    "won_hand) " +
+                        "VALUES ('" + "zzz" + "', '-1')");
+
+
+
+
+
+//            private String action;
+//            private List<Card> board;
+//            private double sizing;
+//            private double oppFoldStat;
+//            private String oppType;
+//            private int bluffSuccessNumber;
+//            private String stake;
+//            private double numberOfHands;
+//            private double oppLooseness;
+//            private double oppAggressiveness;
+//            private double handStrength;
+//            private String opponentName;
+//            private String date;
+//
+//            private boolean showDown;
+//            private boolean winLoss;
+
+//            if(action.equals("call")) {
+//
+//
+//
+//            }
+
+
+
+        }
+
+
+
+    }
+
+    private boolean showdownOccured() {
+        return false;
+    }
+
+    private boolean botWonHand() {
+        return false;
+    }
+
+    private int getHighestIntEntry(String database) throws Exception {
+        Statement st = con.createStatement();
+        String sql = ("SELECT * FROM " + database + " ORDER BY entry DESC;");
+        ResultSet rs = st.executeQuery(sql);
+
+        if(rs.next()) {
+            int highestIntEntry = rs.getInt("entry");
+            st.close();
+            rs.close();
+            return highestIntEntry;
+        }
+        st.close();
+        rs.close();
+        return 0;
+    }
+
+    private boolean wasValueBetOrRaiseSuccessful() {
+        return false;
+    }
+
+    private boolean wasCallSuccessful() {
+        return false;
+    }
+
+    private void initializeDbConnection() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker?&serverTimezone=UTC", "root", "");
+    }
+
+    private void closeDbConnection() throws SQLException {
+        con.close();
+    }
+
     @Override
     public boolean isOpponentHasInitiative() {
         return opponentHasInitiative;
@@ -297,5 +415,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setBotBluffActionDone(boolean botBluffActionDone) {
         this.botBluffActionDone = botBluffActionDone;
+    }
+
+    public List<DbSave> getDbSaveList() {
+        return dbSaveList;
+    }
+
+    public void setDbSaveList(List<DbSave> dbSaveList) {
+        this.dbSaveList = dbSaveList;
     }
 }

@@ -148,7 +148,7 @@ public class PlayerBluffer {
         closeDbConnection();
     }
 
-    private int getNumberOfSuccessfulBluffs(String opponentName) throws Exception {
+    public int getNumberOfSuccessfulBluffs(String opponentName) throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();

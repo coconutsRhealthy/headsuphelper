@@ -12,6 +12,7 @@ import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -301,7 +302,7 @@ public class ActionVariables {
             }
         }
 
-        action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb);
+        action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
         if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
             sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -310,6 +311,27 @@ public class ActionVariables {
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
         }
+
+        //fill dbsave
+        if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
+            DbSave dbSave = new DbSave();
+            dbSave.setAction(action);
+            dbSave.setBoard(boardInMethod);
+            dbSave.setSizing(sizing);
+            dbSave.setOppFoldStat(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+            dbSave.setOppType(opponentType);
+            dbSave.setBluffSuccessNumber(new PlayerBluffer().getNumberOfSuccessfulBluffs(gameVariables.getOpponentName()));
+            dbSave.setStake("10_000_NL_Play");
+            dbSave.setNumberOfHands(new FoldStatsKeeper().getTotalHandCountFromDb(gameVariables.getOpponentName()));
+            dbSave.setOppLooseness(new OpponentIdentifier().getOppLooseness(gameVariables.getOpponentName()));
+            dbSave.setOppAggressiveness(new OpponentIdentifier().getOppAggressiveness(gameVariables.getOpponentName()));
+            dbSave.setHandStrength(botHandStrengthInMethod);
+            dbSave.setOpponentName(gameVariables.getOpponentName());
+            dbSave.setDate(new Date().toString());
+
+            continuousTable.getDbSaveList().add(dbSave);
+        }
+        ///////
 
         double totalBotBetSizeForPlayerActionRound;
 
@@ -654,17 +676,28 @@ public class ActionVariables {
     }
 
     private String preventCallIfOpponentOrBotAlmostAllInAfterCall(String action, double opponentStackBb, double botStackBb,
-                                                                  double botTotalBetSizeBb, double potSizeBb, double amountToCallBb) {
+                                                                  double botTotalBetSizeBb, double potSizeBb, double amountToCallBb,
+                                                                  List<Card> board) {
         String actionToReturn;
 
         if(action.equals("call")) {
-            if(opponentStackBb > 0) {
-                double botStackBbAfterCall = botStackBb - amountToCallBb;
-                if(botStackBbAfterCall > 0) {
-                    double potSizeBbAfterCall = potSizeBb + (2 * botTotalBetSizeBb) + (2 * amountToCallBb);
-                    if((botStackBbAfterCall / potSizeBbAfterCall <= 0.33) || (opponentStackBb / potSizeBbAfterCall <= 0.33)) {
-                        actionToReturn = "raise";
-                        System.out.println("abc-- change action to raise in preventCallIfOpponentOrBotAlmostAllInAfterCall()");
+            if(board == null || board.size() < 5) {
+                if(opponentStackBb > 0) {
+                    System.out.println("abc-- opponentStackBb" + opponentStackBb);
+                    double botStackBbAfterCall = botStackBb - amountToCallBb;
+                    System.out.println("abc-- amountToCallBb" + amountToCallBb);
+                    System.out.println("abc-- botStackBb" + botStackBb);
+                    System.out.println("abc-- botStackBbAfterCall" + botStackBbAfterCall);
+                    if(botStackBbAfterCall > 0) {
+                        double potSizeBbAfterCall = potSizeBb + (2 * botTotalBetSizeBb) + (2 * amountToCallBb);
+                        System.out.println("abc-- potSizeBbAfterCall" + potSizeBbAfterCall);
+
+                        if((botStackBbAfterCall / potSizeBbAfterCall <= 0.33) || (opponentStackBb / potSizeBbAfterCall <= 0.33)) {
+                            actionToReturn = "raise";
+                            System.out.println("abc-- change action to raise in preventCallIfOpponentOrBotAlmostAllInAfterCall()");
+                        } else {
+                            actionToReturn = action;
+                        }
                     } else {
                         actionToReturn = action;
                     }

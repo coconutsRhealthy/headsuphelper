@@ -117,6 +117,40 @@ public class OpponentIdentifier {
         return opponentType;
     }
 
+    public double getOppLooseness(String opponentNick) throws Exception {
+        double oppLooseness = -1;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier WHERE playerName = '" + opponentNick + "';");
+
+        if(rs.next()) {
+            double callRaiseCount = rs.getDouble("callRaiseCount");
+            double foldCount = rs.getDouble("foldCount");
+            oppLooseness = callRaiseCount / (foldCount + callRaiseCount);
+        }
+
+        return oppLooseness;
+    }
+
+    public double getOppAggressiveness(String opponentNick) throws Exception {
+        double oppAggressiveness = -1;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier WHERE playerName = '" + opponentNick + "';");
+
+        if(rs.next()) {
+            double betRaiseCount = rs.getDouble("betRaiseCount");
+            double checkCallCount = rs.getDouble("checkCallCount");
+            oppAggressiveness = betRaiseCount / (checkCallCount + betRaiseCount);
+        }
+
+        return oppAggressiveness;
+    }
+
     public void updateCounts(String opponentNick, String action, int numberOfHands) {
         if(countMapForAllOpponents.get(opponentNick) == null) {
             countMapForAllOpponents.put(opponentNick, initializeOpponentMap());

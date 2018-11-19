@@ -97,6 +97,21 @@ public class FoldStatsKeeper {
         return foldStat;
     }
 
+    public double getTotalHandCountFromDb(String playerName) throws Exception {
+        double totalHandCount = -1;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM foldstats WHERE playerName = '" + playerName + "';");
+
+        if(rs.next()) {
+            totalHandCount = rs.getDouble("totalHandCount");
+        }
+
+        return totalHandCount;
+    }
+
     private void initializeDbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker?&serverTimezone=UTC", "root", "");
