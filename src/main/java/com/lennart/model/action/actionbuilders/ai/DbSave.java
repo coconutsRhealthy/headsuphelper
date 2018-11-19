@@ -23,8 +23,16 @@ public class DbSave {
     private String opponentName;
     private String date;
 
-    private boolean showDown;
-    private boolean winLoss;
+    public String getBoardAsString(List<Card> board) {
+        String boardString = "";
+
+        for(Card c : board) {
+            boardString = boardString + c.getRank();
+            boardString = boardString + c.getSuit();
+        }
+
+        return boardString;
+    }
 
     public String getAction() {
         return action;
@@ -112,22 +120,6 @@ public class DbSave {
 
     public void setHandStrength(double handStrength) {
         this.handStrength = handStrength;
-    }
-
-    public boolean isShowDown() {
-        return showDown;
-    }
-
-    public void setShowDown(boolean showDown) {
-        this.showDown = showDown;
-    }
-
-    public boolean isWinLoss() {
-        return winLoss;
-    }
-
-    public void setWinLoss(boolean winLoss) {
-        this.winLoss = winLoss;
     }
 
     public String getOpponentName() {

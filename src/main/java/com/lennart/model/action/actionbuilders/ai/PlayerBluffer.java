@@ -167,6 +167,11 @@ public class PlayerBluffer {
             bluffSuccessNumber = 1;
         }
 
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
         return bluffSuccessNumber;
     }
 
