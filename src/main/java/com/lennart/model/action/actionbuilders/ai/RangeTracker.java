@@ -189,34 +189,45 @@ public class RangeTracker {
                 } else {
                     if(handStrength < 0.64) {
                         double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
-                        RangeTracker rangeTracker = new RangeTracker();
 
-                        if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
-                            String actionToUse;
+                        if(sizing > (facingBetSize + facingStack)) {
+                            sizing = (facingBetSize + facingStack);
+                        }
 
-                            if(action.equals("check")) {
-                                actionToUse = "bet75pct";
-                            } else {
-                                actionToUse = "raise";
-                            }
+                        if(sizing / bigBlind <= 70) {
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                                String actionToUse;
 
-                            String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind, board);
-                            double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute, 1);
-
-                            if(ratio >= 0) {
-                                double limit;
-
-                                if(position) {
-                                    limit = 0.41;
+                                if(action.equals("check")) {
+                                    actionToUse = "bet75pct";
                                 } else {
-                                    limit = 0.33;
+                                    actionToUse = "raise";
                                 }
 
-                                if(ratio <= limit) {
-                                    if(actionToUse.equals("raise")) {
-                                        if(board.size() == 3 || board.size() == 4) {
-                                            if(pre3betOrPostRaisedPot) {
-                                                actionToReturn = action;
+                                RangeTracker rangeTracker = new RangeTracker();
+                                String rangeRoute = rangeTracker.getRangeRoute(actionToUse, position, sizing, bigBlind, board);
+                                double ratio = rangeTracker.getRangeRouteBluffValueRatio(rangeRoute, 1);
+
+                                if(ratio >= 0) {
+                                    double limit;
+
+                                    if(position) {
+                                        limit = 0.41;
+                                    } else {
+                                        limit = 0.33;
+                                    }
+
+                                    if(ratio <= limit) {
+                                        if(actionToUse.equals("raise")) {
+                                            if(board.size() == 3 || board.size() == 4) {
+                                                if(pre3betOrPostRaisedPot) {
+                                                    actionToReturn = action;
+                                                } else {
+                                                    actionToReturn = actionToUse;
+                                                    System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
+                                                    System.out.println("rangeRoute: " + rangeRoute);
+                                                    System.out.println("ratio: " + ratio);
+                                                }
                                             } else {
                                                 actionToReturn = actionToUse;
                                                 System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
@@ -230,21 +241,19 @@ public class RangeTracker {
                                             System.out.println("ratio: " + ratio);
                                         }
                                     } else {
-                                        actionToReturn = actionToUse;
-                                        System.out.println("Changed acton to " + actionToUse + " in balancePlayDoBluff()");
-                                        System.out.println("rangeRoute: " + rangeRoute);
-                                        System.out.println("ratio: " + ratio);
+                                        System.out.println("check or fold because ratio above limit. Ratio: " + ratio + " Limit: " + limit);
+                                        actionToReturn = action;
                                     }
                                 } else {
-                                    System.out.println("check or fold because ratio above limit. Ratio: " + ratio + " Limit: " + limit);
+                                    System.out.println("check or fold because ratio below 0");
                                     actionToReturn = action;
                                 }
                             } else {
-                                System.out.println("check or fold because ratio below 0");
+                                System.out.println("check or fold because bluffodds not ok");
                                 actionToReturn = action;
                             }
                         } else {
-                            System.out.println("check or fold because bluffodds not ok");
+                            System.out.println("check or fold because sizing too big");
                             actionToReturn = action;
                         }
                     } else {

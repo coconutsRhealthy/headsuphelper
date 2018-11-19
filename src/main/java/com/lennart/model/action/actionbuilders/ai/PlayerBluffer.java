@@ -19,6 +19,10 @@ public class PlayerBluffer {
                 if(handStrength < 0.64) {
                     double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
 
+                    if(sizing > (facingBetSize + facingStack)) {
+                        sizing = (facingBetSize + facingStack);
+                    }
+
                     if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
                         int bluffSuccessNumber = getNumberOfSuccessfulBluffs(opponentName);
 
