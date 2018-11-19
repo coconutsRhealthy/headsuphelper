@@ -10,9 +10,9 @@ import java.util.*;
 
 public class HandHistoryReaderStars {
 
-    public List<String> getOpponentActionsOfLastHand(String opponentPlayerNameOfLastHand) throws Exception {
+    public List<String> getOpponentActionsOfLastHand(String opponentPlayerNameOfLastHand, double bigBlind) throws Exception {
         List<String> total = readTextFile();
-        List<String> lastHand = getLinesOfLastGame(total);
+        List<String> lastHand = getLinesOfLastGame(total, 1, bigBlind);
 
         //logic regarding foldstats
         FoldStatsKeeper foldStatsKeeper = new FoldStatsKeeper();
@@ -60,7 +60,7 @@ public class HandHistoryReaderStars {
         return textLines;
     }
 
-    public List<String> getLinesOfLastGame(List<String> totalXml) {
+    public List<String> getLinesOfLastGame(List<String> totalXml, int handNumber, double bigBlind) {
         List<String> copyOfTotal = new ArrayList<>();
         List<String> lastGame = new ArrayList<>();
 
@@ -69,18 +69,40 @@ public class HandHistoryReaderStars {
 
         boolean firstHand = false;
 
+        int counter = 0;
+
         for(String line : copyOfTotal) {
-            if(line.contains("Seat")) {
-                firstHand = true;
+            if(line.contains("Seat 2") && line.contains("big blind")) {
+                counter++;
+
+                if(handNumber == counter) {
+                    firstHand = true;
+                }
             }
 
             if(line.contains("PokerStars")) {
-                lastGame.add(line);
-                break;
+                if(handNumber == counter) {
+                    lastGame.add(line);
+                    break;
+                }
             }
 
             if(firstHand) {
-                lastGame.add(line);
+                if(handNumber == counter) {
+                    lastGame.add(line);
+                }
+            }
+        }
+
+        String smallBlind = String.valueOf(bigBlind / 2);
+        if(smallBlind.endsWith(".0")) {
+            smallBlind = smallBlind.substring(0, smallBlind.indexOf("."));
+        }
+
+        for(String line : lastGame) {
+            if(line.contains("Uncalled bet (" + smallBlind + ") returned to vegeta11223")) {
+                lastGame = getLinesOfLastGame(totalXml, handNumber + 1, bigBlind);
+                Collections.reverse(lastGame);
             }
         }
 

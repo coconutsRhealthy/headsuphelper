@@ -36,10 +36,11 @@ public class ContinuousTable implements ContinuousTableable {
     private Connection con;
 
     public static void main(String[] args) throws Exception {
-        new ContinuousTable().runTableContinously();
+        double bigBlind = 100;
+        new ContinuousTable().runTableContinously(bigBlind);
     }
 
-    public void runTableContinously() throws Exception {
+    public void runTableContinously(double bigBlindFromMainMethod) throws Exception {
         GameVariables gameVariables = new GameVariables();
         int numberOfActionRequests = 0;
         int milliSecondsTotal = 0;
@@ -53,7 +54,7 @@ public class ContinuousTable implements ContinuousTableable {
             if(StarsTableReader.botIsToAct()) {
                 numberOfActionRequests++;
 
-                boolean isNewHand = isNewHand();
+                boolean isNewHand = isNewHand(bigBlindFromMainMethod);
 
                 if(isNewHand) {
                     System.out.println("^^^^a " + getNumberOfHsAbove85() + " ^^^^");
@@ -77,7 +78,7 @@ public class ContinuousTable implements ContinuousTableable {
                     dbSaveList = new ArrayList<>();
 
                     if(botBluffActionDone) {
-                        boolean bluffActionWasSuccessful = wasBluffSuccessful();
+                        boolean bluffActionWasSuccessful = wasBluffSuccessful(bigBlindFromMainMethod);
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
                         new PlayerBluffer().updateBluffDb(opponentPlayerNameOfLastHand, bluffActionWasSuccessful);
                         botBluffActionDone = false;
@@ -85,7 +86,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
-                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand);
+                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlindFromMainMethod);
                     }
 
                     gameVariables = new GameVariables(true);
@@ -210,12 +211,12 @@ public class ContinuousTable implements ContinuousTableable {
         return cardListAsString;
     }
 
-    private boolean isNewHand() throws Exception {
+    private boolean isNewHand(double bigBlind) throws Exception {
         boolean isNewHand;
 
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
         List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total);
+        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
         String lastHandNumber = handHistoryReaderStars.getHandNumber(lastHand.get(0));
 
         isNewHand = !starsLastHandNumber.equals(lastHandNumber);
@@ -224,12 +225,12 @@ public class ContinuousTable implements ContinuousTableable {
         return isNewHand;
     }
 
-    private boolean wasBluffSuccessful() throws Exception {
+    private boolean wasBluffSuccessful(double bigBlind) throws Exception {
         boolean bluffSuccessful = false;
 
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
         List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total);
+        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
         Collections.reverse(lastHand);
 
         for(String line : lastHand) {
