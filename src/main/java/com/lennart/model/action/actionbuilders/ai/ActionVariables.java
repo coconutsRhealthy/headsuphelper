@@ -313,23 +313,25 @@ public class ActionVariables {
         }
 
         //fill dbsave
-        if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
-            DbSave dbSave = new DbSave();
-            dbSave.setAction(action);
-            dbSave.setBoard(boardInMethod);
-            dbSave.setSizing(sizing);
-            dbSave.setOppFoldStat(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
-            dbSave.setOppType(opponentType);
-            dbSave.setBluffSuccessNumber(new PlayerBluffer().getNumberOfSuccessfulBluffs(gameVariables.getOpponentName()));
-            dbSave.setStake("10_000_NL_Play");
-            dbSave.setNumberOfHands(new FoldStatsKeeper().getTotalHandCountFromDb(gameVariables.getOpponentName()));
-            dbSave.setOppLooseness(new OpponentIdentifier().getOppLooseness(gameVariables.getOpponentName()));
-            dbSave.setOppAggressiveness(new OpponentIdentifier().getOppAggressiveness(gameVariables.getOpponentName()));
-            dbSave.setHandStrength(botHandStrengthInMethod);
-            dbSave.setOpponentName(gameVariables.getOpponentName());
-            dbSave.setDate(new Date().toString());
+        if(boardInMethod != null && boardInMethod.size() >= 3) {
+            if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
+                DbSave dbSave = new DbSave();
+                dbSave.setAction(action);
+                dbSave.setBoard(boardInMethod);
+                dbSave.setSizing(sizing);
+                dbSave.setOppFoldStat(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+                dbSave.setOppType(opponentType);
+                dbSave.setBluffSuccessNumber(new PlayerBluffer().getNumberOfSuccessfulBluffs(gameVariables.getOpponentName()));
+                dbSave.setStake("10_000_NL_Play");
+                dbSave.setNumberOfHands(new FoldStatsKeeper().getTotalHandCountFromDb(gameVariables.getOpponentName()));
+                dbSave.setOppLooseness(new OpponentIdentifier().getOppLooseness(gameVariables.getOpponentName()));
+                dbSave.setOppAggressiveness(new OpponentIdentifier().getOppAggressiveness(gameVariables.getOpponentName()));
+                dbSave.setHandStrength(botHandStrengthInMethod);
+                dbSave.setOpponentName(gameVariables.getOpponentName());
+                dbSave.setDate(new Date().toString());
 
-            continuousTable.getDbSaveList().add(dbSave);
+                continuousTable.getDbSaveList().add(dbSave);
+            }
         }
         ///////
 

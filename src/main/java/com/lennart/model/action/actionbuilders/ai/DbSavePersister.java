@@ -13,9 +13,25 @@ public class DbSavePersister {
         initializeDbConnection();
 
         for(DbSave dbSave : dbSaveList) {
+            double foldStat = dbSave.getOppFoldStat();
+            double looseness = dbSave.getOppLooseness();
+            double aggressiveness = dbSave.getOppAggressiveness();
+
+            if (Double.isNaN(foldStat)) {
+                foldStat = -1;
+            }
+
+            if (Double.isNaN(looseness)) {
+                looseness = -1;
+            }
+
+            if (Double.isNaN(aggressiveness)) {
+                aggressiveness = -1;
+            }
+
             Statement st = con.createStatement();
 
-            st.executeUpdate("INSERT INTO zzz (" +
+            st.executeUpdate("INSERT INTO dbsave (" +
                     "entry, " +
                     "action, " +
                     "board, " +
@@ -33,16 +49,16 @@ public class DbSavePersister {
                     "showdown, " +
                     "won_hand) " +
                     "VALUES ('" +
-                    getHighestIntEntry("zzz") + "', '" +
+                    getHighestIntEntry("dbsave") + "', '" +
                     dbSave.getAction() + "', '" +
                     dbSave.getBoardAsString(dbSave.getBoard()) + "', '" +
                     dbSave.getSizing() + "', '" +
-                    dbSave.getOppFoldStat() + "', '" +
+                    foldStat + "', '" +
                     dbSave.getBluffSuccessNumber() + "', '" +
                     dbSave.getStake() + "', '" +
                     dbSave.getNumberOfHands() + "', '" +
-                    dbSave.getOppLooseness() + "', '" +
-                    dbSave.getOppAggressiveness() + "', '" +
+                    looseness + "', '" +
+                    aggressiveness + "', '" +
                     dbSave.getHandStrength() + "', '" +
                     dbSave.getOpponentName() + "', '" +
                     dbSave.getDate() + "', '" +
