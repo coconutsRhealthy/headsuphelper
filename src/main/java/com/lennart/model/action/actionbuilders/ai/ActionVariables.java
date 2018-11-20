@@ -1,5 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveBluff;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveCall;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveValue;
 import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
@@ -12,7 +15,6 @@ import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -315,22 +317,69 @@ public class ActionVariables {
         //fill dbsave
         if(boardInMethod != null && boardInMethod.size() >= 3) {
             if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
-                DbSave dbSave = new DbSave();
-                dbSave.setAction(action);
-                dbSave.setBoard(boardInMethod);
-                dbSave.setSizing(sizing);
-                dbSave.setOppFoldStat(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
-                dbSave.setOppType(opponentType);
-                dbSave.setBluffSuccessNumber(new PlayerBluffer().getNumberOfSuccessfulBluffs(gameVariables.getOpponentName()));
-                dbSave.setStake("10_000_NL_Play");
-                dbSave.setNumberOfHands(new FoldStatsKeeper().getTotalHandCountFromDb(gameVariables.getOpponentName()));
-                dbSave.setOppLooseness(new OpponentIdentifier().getOppLooseness(gameVariables.getOpponentName()));
-                dbSave.setOppAggressiveness(new OpponentIdentifier().getOppAggressiveness(gameVariables.getOpponentName()));
-                dbSave.setHandStrength(botHandStrengthInMethod);
-                dbSave.setOpponentName(gameVariables.getOpponentName());
-                dbSave.setDate(new Date().toString());
+                if((action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.7) {
+                    DbSaveBluff dbSaveBluff = new DbSaveBluff();
 
-                continuousTable.getDbSaveList().add(dbSave);
+                    String sizingGroup = dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind());
+                    String street = dbSaveBluff.getStreetViaLogic(boardInMethod);
+                    String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+                    String position = dbSaveBluff.getPositionLogic(botIsButtonInMethod);
+                    String bluffAction = dbSaveBluff.getBluffActionLogic(action);
+                    String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+
+                    dbSaveBluff.setSizingGroup(sizingGroup);
+                    dbSaveBluff.setStreet(street);
+                    dbSaveBluff.setFoldStatGroup(foldStatGroup);
+                    dbSaveBluff.setPosition(position);
+                    dbSaveBluff.setBluffAction(bluffAction);
+                    dbSaveBluff.setStrongDraw(strongDraw);
+
+                    continuousTable.getDbSaveList().add(dbSaveBluff);
+                }
+
+                if(action.equals("call")) {
+                    DbSaveCall dbSaveCall = new DbSaveCall();
+
+                    String amountToCallGroup = dbSaveCall.getAmountToCallViaLogic(amountToCallBb);
+                    String street = dbSaveCall.getStreetViaLogic(boardInMethod);
+                    String oppAggroGroup = dbSaveCall.getOppAggroGroupViaLogic(gameVariables.getOpponentName());
+                    String postion = dbSaveCall.getPositionLogic(botIsButtonInMethod);
+                    String facingAction = dbSaveCall.getFacingActionViaLogic(opponentActionInMethod);
+                    String handStrength = dbSaveCall.getHandStrengthLogic(botHandStrength);
+                    String strongDraw = dbSaveCall.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+
+                    dbSaveCall.setAmountToCallGroup(amountToCallGroup);
+                    dbSaveCall.setStreet(street);
+                    dbSaveCall.setOppAggroGroup(oppAggroGroup);
+                    dbSaveCall.setPosition(postion);
+                    dbSaveCall.setFacingAction(facingAction);
+                    dbSaveCall.setHandStrength(handStrength);
+                    dbSaveCall.setStrongDraw(strongDraw);
+
+                    continuousTable.getDbSaveList().add(dbSaveCall);
+                }
+
+                if((action.equals("bet75pct") || action.equals("raise")) && botHandStrength >= 0.7) {
+                    DbSaveValue dbSaveValue = new DbSaveValue();
+
+                    String sizingGroup = dbSaveValue.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind());
+                    String street = dbSaveValue.getStreetViaLogic(boardInMethod);
+                    String oppLoosenessGroup = dbSaveValue.getOppLoosenessGroupViaLogic(gameVariables.getOpponentName());
+                    String postion = dbSaveValue.getPositionLogic(botIsButtonInMethod);
+                    String valueAction = dbSaveValue.getValueActionLogic(action);
+                    String handStrength = dbSaveValue.getHandStrengthLogic(botHandStrength);
+                    String strongDraw = dbSaveValue.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+
+                    dbSaveValue.setSizingGroup(sizingGroup);
+                    dbSaveValue.setStreet(street);
+                    dbSaveValue.setOppLoosenessGroup(oppLoosenessGroup);
+                    dbSaveValue.setPosition(postion);
+                    dbSaveValue.setValueAction(valueAction);
+                    dbSaveValue.setHandStrength(handStrength);
+                    dbSaveValue.setStrongDraw(strongDraw);
+
+                    continuousTable.getDbSaveList().add(dbSaveValue);
+                }
             }
         }
         ///////

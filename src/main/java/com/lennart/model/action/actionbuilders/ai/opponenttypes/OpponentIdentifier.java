@@ -1,6 +1,5 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
-import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
 
 import java.sql.*;
