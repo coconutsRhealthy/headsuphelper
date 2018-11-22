@@ -325,14 +325,14 @@ public class ActionVariables {
                     String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
                     String position = dbSaveBluff.getPositionLogic(botIsButtonInMethod);
                     String bluffAction = dbSaveBluff.getBluffActionLogic(action);
-                    String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+                    String effectiveStackString = dbSaveBluff.getEffectiveStackLogic(botStackBb, opponentStackBb);
 
                     dbSaveBluff.setSizingGroup(sizingGroup);
                     dbSaveBluff.setStreet(street);
                     dbSaveBluff.setFoldStatGroup(foldStatGroup);
                     dbSaveBluff.setPosition(position);
                     dbSaveBluff.setBluffAction(bluffAction);
-                    dbSaveBluff.setStrongDraw(strongDraw);
+                    dbSaveBluff.setEffectiveStack(effectiveStackString);
 
                     continuousTable.getDbSaveList().add(dbSaveBluff);
                 }
@@ -347,6 +347,7 @@ public class ActionVariables {
                     String facingAction = dbSaveCall.getFacingActionViaLogic(opponentActionInMethod);
                     String handStrength = dbSaveCall.getHandStrengthLogic(botHandStrength);
                     String strongDraw = dbSaveCall.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+                    String effectiveStackString = dbSaveCall.getEffectiveStackLogic(botStackBb, opponentStackBb);
 
                     dbSaveCall.setAmountToCallGroup(amountToCallGroup);
                     dbSaveCall.setStreet(street);
@@ -355,6 +356,7 @@ public class ActionVariables {
                     dbSaveCall.setFacingAction(facingAction);
                     dbSaveCall.setHandStrength(handStrength);
                     dbSaveCall.setStrongDraw(strongDraw);
+                    dbSaveCall.setEffectiveStack(effectiveStackString);
 
                     continuousTable.getDbSaveList().add(dbSaveCall);
                 }
@@ -369,6 +371,7 @@ public class ActionVariables {
                     String valueAction = dbSaveValue.getValueActionLogic(action);
                     String handStrength = dbSaveValue.getHandStrengthLogic(botHandStrength);
                     String strongDraw = dbSaveValue.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+                    String effectiveStackString = dbSaveValue.getEffectiveStackLogic(botStackBb, opponentStackBb);
 
                     dbSaveValue.setSizingGroup(sizingGroup);
                     dbSaveValue.setStreet(street);
@@ -377,6 +380,7 @@ public class ActionVariables {
                     dbSaveValue.setValueAction(valueAction);
                     dbSaveValue.setHandStrength(handStrength);
                     dbSaveValue.setStrongDraw(strongDraw);
+                    dbSaveValue.setEffectiveStack(effectiveStackString);
 
                     continuousTable.getDbSaveList().add(dbSaveValue);
                 }

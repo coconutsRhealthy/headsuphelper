@@ -8,17 +8,19 @@ public class DbSaveBluff extends DbSave {
     private String foldStatGroup;
     private String position;
     private String bluffAction;
-    private String strongDraw;
+    private String effectiveStack;
 
     public String getFoldStatGroupLogic(double foldStat) {
         String foldStatGroup;
 
-        if(foldStat < 0.43) {
-            foldStatGroup = "Foldstat_below_0.43";
+        if(foldStat < 0.26) {
+            foldStatGroup = "Foldstat_0_33_";
+        } else if(foldStat <= 0.4) {
+            foldStatGroup = "Foldstat_33_66_";
         } else if(foldStat == 0.43) {
-            foldStatGroup = "Foldstat_exactly_0.43";
+            foldStatGroup = "Foldstat_unknown";
         } else {
-            foldStatGroup = "Foldstat_up_0.43";
+            foldStatGroup = "Foldstat_66_100_";
         }
 
         return foldStatGroup;
@@ -76,11 +78,11 @@ public class DbSaveBluff extends DbSave {
         this.bluffAction = bluffAction;
     }
 
-    public String getStrongDraw() {
-        return strongDraw;
+    public String getEffectiveStack() {
+        return effectiveStack;
     }
 
-    public void setStrongDraw(String strongDraw) {
-        this.strongDraw = strongDraw;
+    public void setEffectiveStack(String effectiveStack) {
+        this.effectiveStack = effectiveStack;
     }
 }

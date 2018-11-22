@@ -11,6 +11,7 @@ public class DbSaveCall extends DbSave {
     private String facingAction;
     private String handStrength;
     private String strongDraw;
+    private String effectiveStack;
 
     public String getAmountToCallViaLogic(double amountToCallBb) {
         String sizingGroup;
@@ -43,12 +44,12 @@ public class DbSaveCall extends DbSave {
         } else {
             double oppAggressiveness = opponentIdentifier.getOppAggressiveness(opponentName);
 
-            if(oppAggressiveness <= 0.28) {
-                oppAggroGroup = "Aggro_passive";
-            } else if(oppAggressiveness <= 0.41) {
-                oppAggroGroup = "Aggro_medium";
+            if(oppAggressiveness <= 0.1875) {
+                oppAggroGroup = "Aggro_0_33_";
+            } else if(oppAggressiveness <= 0.32) {
+                oppAggroGroup = "Aggro_33_66_";
             } else {
-                oppAggroGroup = "Aggro_aggro";
+                oppAggroGroup = "Aggro_66_100_";
             }
         }
 
@@ -143,5 +144,13 @@ public class DbSaveCall extends DbSave {
 
     public void setStrongDraw(String strongDraw) {
         this.strongDraw = strongDraw;
+    }
+
+    public String getEffectiveStack() {
+        return effectiveStack;
+    }
+
+    public void setEffectiveStack(String effectiveStack) {
+        this.effectiveStack = effectiveStack;
     }
 }

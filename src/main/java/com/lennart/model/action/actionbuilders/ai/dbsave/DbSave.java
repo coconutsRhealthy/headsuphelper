@@ -71,4 +71,27 @@ public class DbSave {
 
         return strongDraw;
     }
+
+    public String getEffectiveStackLogic(double botStackBb, double opponentStackBb) {
+        String effectiveStackBbString;
+        double effectiveStackBb;
+
+        if(botStackBb > opponentStackBb) {
+            effectiveStackBb = opponentStackBb;
+        } else {
+            effectiveStackBb = botStackBb;
+        }
+
+        if(effectiveStackBb <= 35) {
+            effectiveStackBbString = "EffStack_0_35_";
+        } else if(effectiveStackBb <= 70) {
+            effectiveStackBbString = "EffStack_35_70_";
+        } else if(effectiveStackBb <= 120) {
+            effectiveStackBbString = "EffStack_70_120_";
+        } else {
+            effectiveStackBbString = "EffStack_120_up_";
+        }
+
+        return effectiveStackBbString;
+    }
 }

@@ -70,7 +70,7 @@ public class DbSavePersister {
         List<String> position = new ArrayList<>();
         List<String> sizingGroup = new ArrayList<>();
         List<String> foldStatGroup = new ArrayList<>();
-        List<String> strongDraw = new ArrayList<>();
+        List<String> effectiveStack = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -89,12 +89,15 @@ public class DbSavePersister {
         sizingGroup.add("Sizing_20-30bb");
         sizingGroup.add("Sizing_30bb_up");
 
-        foldStatGroup.add("Foldstat_below_0.43");
-        foldStatGroup.add("Foldstat_exactly_0.43");
-        foldStatGroup.add("Foldstat_up_0.43");
+        foldStatGroup.add("Foldstat_0_33_");
+        foldStatGroup.add("Foldstat_33_66_");
+        foldStatGroup.add("Foldstat_66_100_");
+        foldStatGroup.add("Foldstat_unknown");
 
-        strongDraw.add("StrongDrawTrue");
-        strongDraw.add("StrongDrawFalse");
+        effectiveStack.add("EffStack_0_35_");
+        effectiveStack.add("EffStack_35_70_");
+        effectiveStack.add("EffStack_70_120_");
+        effectiveStack.add("EffStack_120_up_");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -103,7 +106,7 @@ public class DbSavePersister {
                 for(String c : position) {
                     for(String d : sizingGroup) {
                         for(String e : foldStatGroup) {
-                            for(String f : strongDraw) {
+                            for(String f : effectiveStack) {
                                 allRoutes.add(a + b + c + d + e + f);
                             }
                         }
@@ -123,6 +126,7 @@ public class DbSavePersister {
         List<String> oppAggroGroup = new ArrayList<>();
         List<String> handStrength = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
+        List<String> effectiveStack = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -141,10 +145,10 @@ public class DbSavePersister {
         amountToCallGroup.add("Atc_20-30bb");
         amountToCallGroup.add("Atc_30bb_up");
 
+        oppAggroGroup.add("Aggro_0_33_");
+        oppAggroGroup.add("Aggro_33_66_");
+        oppAggroGroup.add("Aggro_66_100_");
         oppAggroGroup.add("Aggro_unknown");
-        oppAggroGroup.add("Aggro_passive");
-        oppAggroGroup.add("Aggro_medium");
-        oppAggroGroup.add("Aggro_aggro");
 
         handStrength.add("HS_0_30_");
         handStrength.add("HS_30_50_");
@@ -157,6 +161,11 @@ public class DbSavePersister {
         strongDraw.add("StrongDrawTrue");
         strongDraw.add("StrongDrawFalse");
 
+        effectiveStack.add("EffStack_0_35_");
+        effectiveStack.add("EffStack_35_70_");
+        effectiveStack.add("EffStack_70_120_");
+        effectiveStack.add("EffStack_120_up_");
+
         List<String> allRoutes = new ArrayList<>();
 
         for(String a : street) {
@@ -166,7 +175,9 @@ public class DbSavePersister {
                         for(String e : oppAggroGroup) {
                             for(String f : handStrength) {
                                 for(String g : strongDraw) {
-                                    allRoutes.add(a + b + c + d + e + f + g);
+                                    for(String h : effectiveStack) {
+                                        allRoutes.add(a + b + c + d + e + f + g + h);
+                                    }
                                 }
                             }
                         }
@@ -186,6 +197,7 @@ public class DbSavePersister {
         List<String> oppLooseness = new ArrayList<>();
         List<String> handStrength = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
+        List<String> effectiveStack = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -204,10 +216,10 @@ public class DbSavePersister {
         sizing.add("Sizing_20-30bb");
         sizing.add("Sizing_30bb_up");
 
+        oppLooseness.add("Looseness_0_33_");
+        oppLooseness.add("Looseness_33_66_");
+        oppLooseness.add("Looseness_66_100_");
         oppLooseness.add("Looseness_unknown");
-        oppLooseness.add("Looseness_tight");
-        oppLooseness.add("Looseness_medium");
-        oppLooseness.add("Looseness_loose");
 
         handStrength.add("HS_-1_");
         handStrength.add("HS_70_75_");
@@ -220,6 +232,11 @@ public class DbSavePersister {
         strongDraw.add("StrongDrawTrue");
         strongDraw.add("StrongDrawFalse");
 
+        effectiveStack.add("EffStack_0_35_");
+        effectiveStack.add("EffStack_35_70_");
+        effectiveStack.add("EffStack_70_120_");
+        effectiveStack.add("EffStack_120_up_");
+
         List<String> allRoutes = new ArrayList<>();
 
         for(String a : street) {
@@ -229,7 +246,9 @@ public class DbSavePersister {
                         for(String e : oppLooseness) {
                             for(String f : handStrength) {
                                 for(String g : strongDraw) {
-                                    allRoutes.add(a + b + c + d + e + f + g);
+                                    for(String h : effectiveStack) {
+                                        allRoutes.add(a + b + c + d + e + f + g + h);
+                                    }
                                 }
                             }
                         }
@@ -253,7 +272,7 @@ public class DbSavePersister {
                 DbSaveBluff dbSaveBluff = (DbSaveBluff) dbSave;
 
                 String route = dbSaveBluff.getStreet() + dbSaveBluff.getBluffAction() + dbSaveBluff.getPosition() +
-                        dbSaveBluff.getSizingGroup() + dbSaveBluff.getFoldStatGroup() + dbSaveBluff.getStrongDraw();
+                        dbSaveBluff.getSizingGroup() + dbSaveBluff.getFoldStatGroup() + dbSaveBluff.getEffectiveStack();
 
                 if(bluffWasSuccessfull(biglind)) {
                     st.executeUpdate("UPDATE dbstats_bluff SET success = success + 1 WHERE route = '" + route + "'");
@@ -265,9 +284,9 @@ public class DbSavePersister {
 
                 String route = dbSaveCall.getStreet() + dbSaveCall.getFacingAction() + dbSaveCall.getPosition() +
                         dbSaveCall.getAmountToCallGroup() + dbSaveCall.getOppAggroGroup() + dbSaveCall.getHandStrength() +
-                        dbSaveCall.getStrongDraw();
+                        dbSaveCall.getStrongDraw() + dbSaveCall.getEffectiveStack();
 
-                if(bluffWasSuccessfull(biglind)) {
+                if(callWasSuccessfull(biglind)) {
                     st.executeUpdate("UPDATE dbstats_call SET success = success + 1 WHERE route = '" + route + "'");
                 }
 
@@ -277,9 +296,9 @@ public class DbSavePersister {
 
                 String route = dbSaveValue.getStreet() + dbSaveValue.getValueAction() + dbSaveValue.getPosition() +
                         dbSaveValue.getSizingGroup() + dbSaveValue.getOppLoosenessGroup() + dbSaveValue.getHandStrength() +
-                        dbSaveValue.getStrongDraw();
+                        dbSaveValue.getStrongDraw() + dbSaveValue.getEffectiveStack();
 
-                if(bluffWasSuccessfull(biglind)) {
+                if(valueActionWasSuccessfull(biglind)) {
                     st.executeUpdate("UPDATE dbstats_value SET success = success + 1 WHERE route = '" + route + "'");
                 }
 

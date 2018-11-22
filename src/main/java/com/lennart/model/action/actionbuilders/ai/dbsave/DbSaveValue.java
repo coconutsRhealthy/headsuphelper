@@ -11,6 +11,7 @@ public class DbSaveValue extends DbSave {
     private String valueAction;
     private String handStrength;
     private String strongDraw;
+    private String effectiveStack;
 
     public String getOppLoosenessGroupViaLogic(String opponentName) throws Exception {
         String oppLoosenessGroup;
@@ -23,12 +24,12 @@ public class DbSaveValue extends DbSave {
         } else {
             double oppAggressiveness = opponentIdentifier.getOppAggressiveness(opponentName);
 
-            if(oppAggressiveness <= 0.45) {
-                oppLoosenessGroup = "Looseness_tight";
-            } else if(oppAggressiveness <= 0.64) {
-                oppLoosenessGroup = "Looseness_medium";
+            if(oppAggressiveness <= 0.5) {
+                oppLoosenessGroup = "Looseness_0_33_";
+            } else if(oppAggressiveness < 0.66) {
+                oppLoosenessGroup = "Looseness_33_66_";
             } else {
-                oppLoosenessGroup = "Looseness_loose";
+                oppLoosenessGroup = "Looseness_66_100_";
             }
         }
 
@@ -123,5 +124,13 @@ public class DbSaveValue extends DbSave {
 
     public void setStrongDraw(String strongDraw) {
         this.strongDraw = strongDraw;
+    }
+
+    public String getEffectiveStack() {
+        return effectiveStack;
+    }
+
+    public void setEffectiveStack(String effectiveStack) {
+        this.effectiveStack = effectiveStack;
     }
 }
