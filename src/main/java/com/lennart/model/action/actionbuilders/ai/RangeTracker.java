@@ -406,7 +406,7 @@ public class RangeTracker {
         return streetString;
     }
 
-    private String getDrawWetnessString(String street, int drawWetness) {
+    public String getDrawWetnessString(String street, int drawWetness) {
         String drawWetnessString;
 
         if(street.equals("Flop")) {
@@ -438,7 +438,7 @@ public class RangeTracker {
         return drawWetnessString;
     }
 
-    private String getBoatWetnessString(String street, int boatWetness) {
+    public String getBoatWetnessString(String street, int boatWetness) {
         String boatWetnessString;
 
         if(street.equals("Flop")) {

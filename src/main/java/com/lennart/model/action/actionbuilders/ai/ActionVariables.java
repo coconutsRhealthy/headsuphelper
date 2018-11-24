@@ -317,6 +317,9 @@ public class ActionVariables {
         //fill dbsave
         if(boardInMethod != null && boardInMethod.size() >= 3) {
             if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
+                int drawWetness = boardEvaluator.getFlushStraightWetness();
+                int boatWetness = boardEvaluator.getBoatWetness();
+
                 if((action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.7) {
                     DbSaveBluff dbSaveBluff = new DbSaveBluff();
 
@@ -326,6 +329,10 @@ public class ActionVariables {
                     String position = dbSaveBluff.getPositionLogic(botIsButtonInMethod);
                     String bluffAction = dbSaveBluff.getBluffActionLogic(action);
                     String effectiveStackString = dbSaveBluff.getEffectiveStackLogic(botStackBb, opponentStackBb);
+                    String handStrength = dbSaveBluff.getHandStrengthLogic(botHandStrength);
+                    String drawWetnessString = dbSaveBluff.getDrawWetnessLogic(boardInMethod, drawWetness);
+                    String boatWetnessString = dbSaveBluff.getBoatWetnessLogic(boardInMethod, boatWetness);
+                    String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
 
                     dbSaveBluff.setSizingGroup(sizingGroup);
                     dbSaveBluff.setStreet(street);
@@ -333,6 +340,10 @@ public class ActionVariables {
                     dbSaveBluff.setPosition(position);
                     dbSaveBluff.setBluffAction(bluffAction);
                     dbSaveBluff.setEffectiveStack(effectiveStackString);
+                    dbSaveBluff.setHandStrength(handStrength);
+                    dbSaveBluff.setDrawWetness(drawWetnessString);
+                    dbSaveBluff.setBoatWetness(boatWetnessString);
+                    dbSaveBluff.setStrongDraw(strongDraw);
 
                     continuousTable.getDbSaveList().add(dbSaveBluff);
                 }
@@ -348,6 +359,8 @@ public class ActionVariables {
                     String handStrength = dbSaveCall.getHandStrengthLogic(botHandStrength);
                     String strongDraw = dbSaveCall.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
                     String effectiveStackString = dbSaveCall.getEffectiveStackLogic(botStackBb, opponentStackBb);
+                    String drawWetnessString = dbSaveCall.getDrawWetnessLogic(boardInMethod, drawWetness);
+                    String boatWetnessString = dbSaveCall.getBoatWetnessLogic(boardInMethod, boatWetness);
 
                     dbSaveCall.setAmountToCallGroup(amountToCallGroup);
                     dbSaveCall.setStreet(street);
@@ -357,6 +370,8 @@ public class ActionVariables {
                     dbSaveCall.setHandStrength(handStrength);
                     dbSaveCall.setStrongDraw(strongDraw);
                     dbSaveCall.setEffectiveStack(effectiveStackString);
+                    dbSaveCall.setDrawWetness(drawWetnessString);
+                    dbSaveCall.setBoatWetness(boatWetnessString);
 
                     continuousTable.getDbSaveList().add(dbSaveCall);
                 }
@@ -372,6 +387,8 @@ public class ActionVariables {
                     String handStrength = dbSaveValue.getHandStrengthLogic(botHandStrength);
                     String strongDraw = dbSaveValue.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
                     String effectiveStackString = dbSaveValue.getEffectiveStackLogic(botStackBb, opponentStackBb);
+                    String drawWetnessString = dbSaveValue.getDrawWetnessLogic(boardInMethod, drawWetness);
+                    String boatWetnessString = dbSaveValue.getBoatWetnessLogic(boardInMethod, boatWetness);
 
                     dbSaveValue.setSizingGroup(sizingGroup);
                     dbSaveValue.setStreet(street);
@@ -381,6 +398,8 @@ public class ActionVariables {
                     dbSaveValue.setHandStrength(handStrength);
                     dbSaveValue.setStrongDraw(strongDraw);
                     dbSaveValue.setEffectiveStack(effectiveStackString);
+                    dbSaveValue.setDrawWetness(drawWetnessString);
+                    dbSaveValue.setBoatWetness(boatWetnessString);
 
                     continuousTable.getDbSaveList().add(dbSaveValue);
                 }

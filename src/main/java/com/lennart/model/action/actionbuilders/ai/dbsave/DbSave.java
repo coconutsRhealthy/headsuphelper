@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
+import com.lennart.model.action.actionbuilders.ai.RangeTracker;
 import com.lennart.model.card.Card;
 
 import java.util.List;
@@ -93,5 +94,41 @@ public class DbSave {
         }
 
         return effectiveStackBbString;
+    }
+
+    public String getDrawWetnessLogic(List<Card> board, int drawWetnes) {
+        String street = getStreet(board);
+
+        if(street.equals("unknown")) {
+            return street;
+        } else {
+            return new RangeTracker().getDrawWetnessString(street, drawWetnes);
+        }
+    }
+
+    public String getBoatWetnessLogic(List<Card> board, int boatWetness) {
+        String street = getStreet(board);
+
+        if(street.equals("unknown")) {
+            return street;
+        } else {
+            return new RangeTracker().getBoatWetnessString(street, boatWetness);
+        }
+    }
+
+    private String getStreet(List<Card> board) {
+        String street = "unknown";
+
+        if(board != null) {
+            if(board.size() == 3) {
+                street = "Flop";
+            } else if(board.size() == 4) {
+                street = "Turn";
+            } else if(board.size() == 5) {
+                street = "River";
+            }
+        }
+
+        return street;
     }
 }

@@ -12,6 +12,8 @@ public class DbSaveValue extends DbSave {
     private String handStrength;
     private String strongDraw;
     private String effectiveStack;
+    private String drawWetness;
+    private String boatWetness;
 
     public String getOppLoosenessGroupViaLogic(String opponentName) throws Exception {
         String oppLoosenessGroup;
@@ -132,5 +134,21 @@ public class DbSaveValue extends DbSave {
 
     public void setEffectiveStack(String effectiveStack) {
         this.effectiveStack = effectiveStack;
+    }
+
+    public String getDrawWetness() {
+        return drawWetness;
+    }
+
+    public void setDrawWetness(String drawWetness) {
+        this.drawWetness = drawWetness;
+    }
+
+    public String getBoatWetness() {
+        return boatWetness;
+    }
+
+    public void setBoatWetness(String boatWetness) {
+        this.boatWetness = boatWetness;
     }
 }

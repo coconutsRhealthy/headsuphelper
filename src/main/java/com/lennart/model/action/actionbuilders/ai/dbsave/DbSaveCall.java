@@ -13,6 +13,9 @@ public class DbSaveCall extends DbSave {
     private String strongDraw;
     private String effectiveStack;
 
+    private String drawWetness;
+    private String boatWetness;
+
     public String getAmountToCallViaLogic(double amountToCallBb) {
         String sizingGroup;
 
@@ -152,5 +155,21 @@ public class DbSaveCall extends DbSave {
 
     public void setEffectiveStack(String effectiveStack) {
         this.effectiveStack = effectiveStack;
+    }
+
+    public String getDrawWetness() {
+        return drawWetness;
+    }
+
+    public void setDrawWetness(String drawWetness) {
+        this.drawWetness = drawWetness;
+    }
+
+    public String getBoatWetness() {
+        return boatWetness;
+    }
+
+    public void setBoatWetness(String boatWetness) {
+        this.boatWetness = boatWetness;
     }
 }
