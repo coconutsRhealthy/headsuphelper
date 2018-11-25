@@ -201,9 +201,9 @@ public class DbSavePersister {
         drawWetness.add("DrawWetnessMedium");
         drawWetness.add("DrawWetnessWet");
 
-//        boatWetness.add("BoatWetnessDry");
-//        boatWetness.add("BoatWetnessMedium");
-//        boatWetness.add("BoatWetnessWet");
+        boatWetness.add("BoatWetnessDry");
+        boatWetness.add("BoatWetnessMedium");
+        boatWetness.add("BoatWetnessWet");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -216,9 +216,9 @@ public class DbSavePersister {
                                 for(String g : strongDraw) {
                                     for(String h : effectiveStack) {
                                         for(String i : drawWetness) {
-                                            //for(String j : boatWetness) {
-                                                allRoutes.add(a + b + c + d + e + f + g + h + i);
-                                            //}
+                                            for(String j : boatWetness) {
+                                                allRoutes.add(a + b + c + d + e + f + g + h + i + j);
+                                            }
                                         }
                                     }
                                 }
@@ -386,65 +386,7 @@ public class DbSavePersister {
         for(String line : lastHand) {
             if(line.contains("vegeta11223 collected")) {
                 botWonHand = true;
-            }
-
-
-        }
-
-        return botWonHand;
-    }
-
-    private boolean bluffWasSuccessfull(double bigBlind) throws Exception {
-        boolean bluffSuccessful = false;
-
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("folds") && !line.contains("vegeta11223")) {
-                bluffSuccessful = true;
                 break;
-            }
-        }
-
-        return bluffSuccessful;
-    }
-
-    private boolean callWasSuccessfull(double bigBlind) throws Exception {
-        boolean botWonHand = false;
-        boolean showdownOccured = false;
-
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("vegeta11223 collected")) {
-                botWonHand = true;
-            }
-
-            if(line.contains("*** SHOW DOWN ***")) {
-                showdownOccured = true;
-            }
-        }
-
-        return botWonHand && showdownOccured;
-    }
-
-    private boolean valueActionWasSuccessfull(double bigBlind) throws Exception {
-        boolean botWonHand = false;
-
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("vegeta11223 collected")) {
-                botWonHand = true;
             }
         }
 
