@@ -106,7 +106,7 @@ public class ActionVariables {
         ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
     }
 
-    public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean newHand) throws Exception {
+    public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean realGame) throws Exception {
         calculateHandStrengthAndDraws(gameVariables, continuousTable);
 
         List<String> eligibleActions = getEligibleActions(gameVariables);
@@ -126,7 +126,10 @@ public class ActionVariables {
         boolean preflop = gameVariables.getBoard().isEmpty();
         List<Card> boardInMethod = gameVariables.getBoard();
 
-        setOpponentHasInitiative(opponentActionInMethod, continuousTable, gameVariables);
+        if(realGame) {
+            setOpponentHasInitiative(opponentActionInMethod, continuousTable, gameVariables);
+        }
+
         setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(opponentActionInMethod, boardInMethod, continuousTable, opponentBetsizeBb, potSizeBb);
         double amountToCallBb = getAmountToCallBb(botBetsizeBb, opponentBetsizeBb, botStackBb);
 
@@ -274,9 +277,11 @@ public class ActionVariables {
                         continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative());
             }
 
-            if(boardInMethod != null && boardInMethod.size() >=3 && !defaultCheck) {
-                rangeTracker.updateRangeMapInDbSimple(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod);
-                rangeTracker.updateRangeMapInDbExtensive(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
+            if(realGame) {
+                if(boardInMethod != null && boardInMethod.size() >=3 && !defaultCheck) {
+                    rangeTracker.updateRangeMapInDbSimple(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod);
+                    rangeTracker.updateRangeMapInDbExtensive(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
+                }
             }
 
             action = new FoldStatBluffAdjuster().doBluffAccordingToFoldStat(action, bigBlind, botIsButtonInMethod,
@@ -314,120 +319,124 @@ public class ActionVariables {
             continuousTable.setBotBluffActionDone(true);
         }
 
-        //fill dbsave
-        if(boardInMethod != null && boardInMethod.size() >= 3) {
-            if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
-                int drawWetness = boardEvaluator.getFlushStraightWetness();
-                int boatWetness = boardEvaluator.getBoatWetness();
+        if(realGame) {
+            //fill dbsave
+            if(boardInMethod != null && boardInMethod.size() >= 3) {
+                if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
+                    int drawWetness = boardEvaluator.getFlushStraightWetness();
+                    int boatWetness = boardEvaluator.getBoatWetness();
 
-                if((action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.7) {
-                    DbSaveBluff dbSaveBluff = new DbSaveBluff();
+                    if((action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.7) {
+                        DbSaveBluff dbSaveBluff = new DbSaveBluff();
 
-                    String sizingGroup = dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind());
-                    String street = dbSaveBluff.getStreetViaLogic(boardInMethod);
-                    String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
-                    String position = dbSaveBluff.getPositionLogic(botIsButtonInMethod);
-                    String bluffAction = dbSaveBluff.getBluffActionLogic(action);
-                    String effectiveStackString = dbSaveBluff.getEffectiveStackLogic(botStackBb, opponentStackBb);
-                    String handStrength = dbSaveBluff.getHandStrengthLogic(botHandStrength);
-                    String drawWetnessString = dbSaveBluff.getDrawWetnessLogic(boardInMethod, drawWetness);
-                    String boatWetnessString = dbSaveBluff.getBoatWetnessLogic(boardInMethod, boatWetness);
-                    String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+                        String sizingGroup = dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind());
+                        String street = dbSaveBluff.getStreetViaLogic(boardInMethod);
+                        String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+                        String position = dbSaveBluff.getPositionLogic(botIsButtonInMethod);
+                        String bluffAction = dbSaveBluff.getBluffActionLogic(action);
+                        String effectiveStackString = dbSaveBluff.getEffectiveStackLogic(botStackBb, opponentStackBb);
+                        String handStrength = dbSaveBluff.getHandStrengthLogic(botHandStrength);
+                        String drawWetnessString = dbSaveBluff.getDrawWetnessLogic(boardInMethod, drawWetness);
+                        String boatWetnessString = dbSaveBluff.getBoatWetnessLogic(boardInMethod, boatWetness);
+                        String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
 
-                    dbSaveBluff.setSizingGroup(sizingGroup);
-                    dbSaveBluff.setStreet(street);
-                    dbSaveBluff.setFoldStatGroup(foldStatGroup);
-                    dbSaveBluff.setPosition(position);
-                    dbSaveBluff.setBluffAction(bluffAction);
-                    dbSaveBluff.setEffectiveStack(effectiveStackString);
-                    dbSaveBluff.setHandStrength(handStrength);
-                    dbSaveBluff.setDrawWetness(drawWetnessString);
-                    dbSaveBluff.setBoatWetness(boatWetnessString);
-                    dbSaveBluff.setStrongDraw(strongDraw);
+                        dbSaveBluff.setSizingGroup(sizingGroup);
+                        dbSaveBluff.setStreet(street);
+                        dbSaveBluff.setFoldStatGroup(foldStatGroup);
+                        dbSaveBluff.setPosition(position);
+                        dbSaveBluff.setBluffAction(bluffAction);
+                        dbSaveBluff.setEffectiveStack(effectiveStackString);
+                        dbSaveBluff.setHandStrength(handStrength);
+                        dbSaveBluff.setDrawWetness(drawWetnessString);
+                        dbSaveBluff.setBoatWetness(boatWetnessString);
+                        dbSaveBluff.setStrongDraw(strongDraw);
 
-                    continuousTable.getDbSaveList().add(dbSaveBluff);
-                }
+                        continuousTable.getDbSaveList().add(dbSaveBluff);
+                    }
 
-                if(action.equals("call")) {
-                    DbSaveCall dbSaveCall = new DbSaveCall();
+                    if(action.equals("call")) {
+                        DbSaveCall dbSaveCall = new DbSaveCall();
 
-                    String amountToCallGroup = dbSaveCall.getAmountToCallViaLogic(amountToCallBb);
-                    String street = dbSaveCall.getStreetViaLogic(boardInMethod);
-                    String oppAggroGroup = dbSaveCall.getOppAggroGroupViaLogic(gameVariables.getOpponentName());
-                    String postion = dbSaveCall.getPositionLogic(botIsButtonInMethod);
-                    String facingAction = dbSaveCall.getFacingActionViaLogic(opponentActionInMethod);
-                    String handStrength = dbSaveCall.getHandStrengthLogic(botHandStrength);
-                    String strongDraw = dbSaveCall.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
-                    String effectiveStackString = dbSaveCall.getEffectiveStackLogic(botStackBb, opponentStackBb);
-                    String drawWetnessString = dbSaveCall.getDrawWetnessLogic(boardInMethod, drawWetness);
-                    String boatWetnessString = dbSaveCall.getBoatWetnessLogic(boardInMethod, boatWetness);
+                        String amountToCallGroup = dbSaveCall.getAmountToCallViaLogic(amountToCallBb);
+                        String street = dbSaveCall.getStreetViaLogic(boardInMethod);
+                        String oppAggroGroup = dbSaveCall.getOppAggroGroupViaLogic(gameVariables.getOpponentName());
+                        String postion = dbSaveCall.getPositionLogic(botIsButtonInMethod);
+                        String facingAction = dbSaveCall.getFacingActionViaLogic(opponentActionInMethod);
+                        String handStrength = dbSaveCall.getHandStrengthLogic(botHandStrength);
+                        String strongDraw = dbSaveCall.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+                        String effectiveStackString = dbSaveCall.getEffectiveStackLogic(botStackBb, opponentStackBb);
+                        String drawWetnessString = dbSaveCall.getDrawWetnessLogic(boardInMethod, drawWetness);
+                        String boatWetnessString = dbSaveCall.getBoatWetnessLogic(boardInMethod, boatWetness);
 
-                    dbSaveCall.setAmountToCallGroup(amountToCallGroup);
-                    dbSaveCall.setStreet(street);
-                    dbSaveCall.setOppAggroGroup(oppAggroGroup);
-                    dbSaveCall.setPosition(postion);
-                    dbSaveCall.setFacingAction(facingAction);
-                    dbSaveCall.setHandStrength(handStrength);
-                    dbSaveCall.setStrongDraw(strongDraw);
-                    dbSaveCall.setEffectiveStack(effectiveStackString);
-                    dbSaveCall.setDrawWetness(drawWetnessString);
-                    dbSaveCall.setBoatWetness(boatWetnessString);
+                        dbSaveCall.setAmountToCallGroup(amountToCallGroup);
+                        dbSaveCall.setStreet(street);
+                        dbSaveCall.setOppAggroGroup(oppAggroGroup);
+                        dbSaveCall.setPosition(postion);
+                        dbSaveCall.setFacingAction(facingAction);
+                        dbSaveCall.setHandStrength(handStrength);
+                        dbSaveCall.setStrongDraw(strongDraw);
+                        dbSaveCall.setEffectiveStack(effectiveStackString);
+                        dbSaveCall.setDrawWetness(drawWetnessString);
+                        dbSaveCall.setBoatWetness(boatWetnessString);
 
-                    continuousTable.getDbSaveList().add(dbSaveCall);
-                }
+                        continuousTable.getDbSaveList().add(dbSaveCall);
+                    }
 
-                if((action.equals("bet75pct") || action.equals("raise")) && botHandStrength >= 0.7) {
-                    DbSaveValue dbSaveValue = new DbSaveValue();
+                    if((action.equals("bet75pct") || action.equals("raise")) && botHandStrength >= 0.7) {
+                        DbSaveValue dbSaveValue = new DbSaveValue();
 
-                    String sizingGroup = dbSaveValue.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind());
-                    String street = dbSaveValue.getStreetViaLogic(boardInMethod);
-                    String oppLoosenessGroup = dbSaveValue.getOppLoosenessGroupViaLogic(gameVariables.getOpponentName());
-                    String postion = dbSaveValue.getPositionLogic(botIsButtonInMethod);
-                    String valueAction = dbSaveValue.getValueActionLogic(action);
-                    String handStrength = dbSaveValue.getHandStrengthLogic(botHandStrength);
-                    String strongDraw = dbSaveValue.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
-                    String effectiveStackString = dbSaveValue.getEffectiveStackLogic(botStackBb, opponentStackBb);
-                    String drawWetnessString = dbSaveValue.getDrawWetnessLogic(boardInMethod, drawWetness);
-                    String boatWetnessString = dbSaveValue.getBoatWetnessLogic(boardInMethod, boatWetness);
+                        String sizingGroup = dbSaveValue.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind());
+                        String street = dbSaveValue.getStreetViaLogic(boardInMethod);
+                        String oppLoosenessGroup = dbSaveValue.getOppLoosenessGroupViaLogic(gameVariables.getOpponentName());
+                        String postion = dbSaveValue.getPositionLogic(botIsButtonInMethod);
+                        String valueAction = dbSaveValue.getValueActionLogic(action);
+                        String handStrength = dbSaveValue.getHandStrengthLogic(botHandStrength);
+                        String strongDraw = dbSaveValue.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+                        String effectiveStackString = dbSaveValue.getEffectiveStackLogic(botStackBb, opponentStackBb);
+                        String drawWetnessString = dbSaveValue.getDrawWetnessLogic(boardInMethod, drawWetness);
+                        String boatWetnessString = dbSaveValue.getBoatWetnessLogic(boardInMethod, boatWetness);
 
-                    dbSaveValue.setSizingGroup(sizingGroup);
-                    dbSaveValue.setStreet(street);
-                    dbSaveValue.setOppLoosenessGroup(oppLoosenessGroup);
-                    dbSaveValue.setPosition(postion);
-                    dbSaveValue.setValueAction(valueAction);
-                    dbSaveValue.setHandStrength(handStrength);
-                    dbSaveValue.setStrongDraw(strongDraw);
-                    dbSaveValue.setEffectiveStack(effectiveStackString);
-                    dbSaveValue.setDrawWetness(drawWetnessString);
-                    dbSaveValue.setBoatWetness(boatWetnessString);
+                        dbSaveValue.setSizingGroup(sizingGroup);
+                        dbSaveValue.setStreet(street);
+                        dbSaveValue.setOppLoosenessGroup(oppLoosenessGroup);
+                        dbSaveValue.setPosition(postion);
+                        dbSaveValue.setValueAction(valueAction);
+                        dbSaveValue.setHandStrength(handStrength);
+                        dbSaveValue.setStrongDraw(strongDraw);
+                        dbSaveValue.setEffectiveStack(effectiveStackString);
+                        dbSaveValue.setDrawWetness(drawWetnessString);
+                        dbSaveValue.setBoatWetness(boatWetnessString);
 
-                    continuousTable.getDbSaveList().add(dbSaveValue);
+                        continuousTable.getDbSaveList().add(dbSaveValue);
+                    }
                 }
             }
-        }
-        ///////
-
-        double totalBotBetSizeForPlayerActionRound;
-
-        if(sizing == 0) {
-            totalBotBetSizeForPlayerActionRound = gameVariables.getBotBetSize();
-        } else {
-            totalBotBetSizeForPlayerActionRound = sizing;
+            ///////
         }
 
-        List<Card> currentBoardCopy = new ArrayList<>();
-        currentBoardCopy.addAll(gameVariables.getBoard());
-        double opponentBetSizeCopy = gameVariables.getOpponentBetSize();
-        String actionCopy = action;
+        if(realGame) {
+            double totalBotBetSizeForPlayerActionRound;
 
-        PlayerActionRound botPlayerActionRound = new PlayerActionRound("bot", currentBoardCopy, totalBotBetSizeForPlayerActionRound, opponentBetSizeCopy, "theCorrectStreet", actionCopy);
-        List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
-        ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
-        lastActionRequest.getActionsSinceLastRequest().add(botPlayerActionRound);
+            if(sizing == 0) {
+                totalBotBetSizeForPlayerActionRound = gameVariables.getBotBetSize();
+            } else {
+                totalBotBetSizeForPlayerActionRound = sizing;
+            }
 
-        double updatedBotStack = getUpdatedBotStack(actionCopy, gameVariables, totalBotBetSizeForPlayerActionRound);
-        gameVariables.setBotStack(updatedBotStack);
-        gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
+            List<Card> currentBoardCopy = new ArrayList<>();
+            currentBoardCopy.addAll(gameVariables.getBoard());
+            double opponentBetSizeCopy = gameVariables.getOpponentBetSize();
+            String actionCopy = action;
+
+            PlayerActionRound botPlayerActionRound = new PlayerActionRound("bot", currentBoardCopy, totalBotBetSizeForPlayerActionRound, opponentBetSizeCopy, "theCorrectStreet", actionCopy);
+            List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
+            ActionRequest lastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 1);
+            lastActionRequest.getActionsSinceLastRequest().add(botPlayerActionRound);
+
+            double updatedBotStack = getUpdatedBotStack(actionCopy, gameVariables, totalBotBetSizeForPlayerActionRound);
+            gameVariables.setBotStack(updatedBotStack);
+            gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
+        }
     }
 
     private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {

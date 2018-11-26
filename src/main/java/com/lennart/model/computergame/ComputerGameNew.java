@@ -140,7 +140,8 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     }
 
     private void doComputerAction() {
-        computerWrittenAction = getComputerActionFromAiBot();
+        //computerWrittenAction = getComputerActionFromAiBot();
+        computerWrittenAction = getComputerActionFromAiBotNew();
 
         if(computerWrittenAction.contains("fold")) {
             processComputerFoldAction();
@@ -159,6 +160,78 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             processComputerRaiseAction();
         }
         roundToTwoDecimals();
+    }
+
+    private String getComputerActionFromAiBotNew() {
+        String actionToReturn = "none";
+        setMyActionToBetIfPreflopNecessary();
+
+        try {
+            ContinuousTable continuousTable = new ContinuousTable();
+
+            continuousTable.setOpponentHasInitiative(opponentHasInitiative);
+            continuousTable.setPre3betOrPostRaisedPot(pre3betOrPostRaisedPot);
+            continuousTable.setOpponentDidPreflop4betPot(opponentDidPreflop4betPot);
+
+            GameVariables gameVariables = new GameVariables();
+
+            gameVariables.setOpponentName("izo");
+            gameVariables.setOpponentStack(myStack);
+            gameVariables.setOpponentBetSize(opponentTotalBetSize);
+            gameVariables.setPot(potSize);
+            gameVariables.setBotBetSize(computerTotalBetSize);
+            gameVariables.setBotStack(computerStack);
+            gameVariables.setBigBlind(0.50);
+            gameVariables.setBotIsButton(computerIsButton);
+
+            if(myAction == null) {
+                myAction = "empty";
+            }
+
+            gameVariables.setOpponentAction(myAction);
+
+            List<Card> holeCards = new ArrayList<>();
+
+            holeCards.add(computerHoleCards.get(0));
+            holeCards.add(computerHoleCards.get(1));
+
+            List<Card> board = new ArrayList<>();
+
+            if(flopCards != null) {
+                gameVariables.setFlopCard1(flopCards.get(0));
+                gameVariables.setFlopCard2(flopCards.get(1));
+                gameVariables.setFlopCard3(flopCards.get(2));
+
+                board.add(flopCards.get(0));
+                board.add(flopCards.get(1));
+                board.add(flopCards.get(2));
+            }
+
+            if(turnCard != null) {
+                gameVariables.setTurnCard(turnCard);
+                board.add(turnCard);
+            }
+
+            if(riverCard != null) {
+                gameVariables.setRiverCard(riverCard);
+                board.add(riverCard);
+            }
+
+            gameVariables.setBotHoleCards(holeCards);
+            gameVariables.setBoard(board);
+
+            ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
+
+            actionToReturn = actionVariables.getAction();
+
+            opponentHasInitiative = continuousTable.isOpponentHasInitiative();
+            pre3betOrPostRaisedPot = continuousTable.isPre3betOrPostRaisedPot();
+            opponentDidPreflop4betPot = continuousTable.isOpponentDidPreflop4betPot();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return actionToReturn;
     }
 
     private String getComputerActionFromAiBot() {

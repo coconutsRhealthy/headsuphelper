@@ -94,7 +94,7 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
-                ActionVariables actionVariables = new ActionVariables(gameVariables, this, isNewHand);
+                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
                 String action = actionVariables.getAction();
 
                 if(action.equals("bet75pct") || action.equals("raise")) {
