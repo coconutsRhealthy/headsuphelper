@@ -260,8 +260,10 @@ public class OpponentIdentifier {
         }
         //logic regarding foldstats
 
-        for(String action : postflopOpponentActions) {
-            updateCountsInDb(opponentPlayerNameOfLastHand, action);
+        if(postflopOpponentActions != null && !postflopOpponentActions.isEmpty()) {
+            for(String action : postflopOpponentActions) {
+                updateCountsInDb(opponentPlayerNameOfLastHand, action);
+            }
         }
     }
 
