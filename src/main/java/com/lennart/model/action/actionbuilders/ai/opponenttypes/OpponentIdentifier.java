@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
 import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
+import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -234,6 +235,32 @@ public class OpponentIdentifier {
         updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
 
         for(String action : opponentActions) {
+            updateCountsInDb(opponentPlayerNameOfLastHand, action);
+        }
+    }
+
+    public void updateCountsFromComputerGameLogic(List<String> postflopOpponentActions, String opponentPlayerNameOfLastHand,
+                                                  boolean computerFolded, boolean humanFolded) throws Exception {
+        updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
+
+        //logic regarding foldstats
+        FoldStatsKeeper foldStatsKeeper = new FoldStatsKeeper();
+
+        if(computerFolded) {
+            foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + opponentPlayerNameOfLastHand, "fold");
+            foldStatsKeeper.updateFoldCountMapInDb(opponentPlayerNameOfLastHand, "nonFold");
+        } else {
+            foldStatsKeeper.updateFoldCountMapInDb("bot-V-" + opponentPlayerNameOfLastHand, "nonFold");
+
+            if(humanFolded) {
+                foldStatsKeeper.updateFoldCountMapInDb(opponentPlayerNameOfLastHand, "fold");
+            } else {
+                foldStatsKeeper.updateFoldCountMapInDb(opponentPlayerNameOfLastHand, "nonFold");
+            }
+        }
+        //logic regarding foldstats
+
+        for(String action : postflopOpponentActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action);
         }
     }
