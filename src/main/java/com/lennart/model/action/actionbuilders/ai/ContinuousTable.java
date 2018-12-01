@@ -59,12 +59,16 @@ public class ContinuousTable implements ContinuousTableable {
                 boolean isNewHand = isNewHand(bigBlind);
 
                 if(isNewHand) {
-                    System.out.println("^^^^a " + getNumberOfHsAbove85() + " ^^^^");
-                    System.out.println("^^^^b " + allHandStrenghts.size() + " ^^^^");
+                    int numberOfHsAbove85 = getNumberOfHsAbove85();
+                    int allHs = allHandStrenghts.size();
+
+                    System.out.println("^^^^a " + numberOfHsAbove85 + " ^^^^");
+                    System.out.println("^^^^b " + allHs + " ^^^^");
+                    System.out.println("^ratio: " + (double) numberOfHsAbove85 / (double) allHs + " ^^^^");
 
                     long currentTime = new Date().getTime();
 
-                    if(currentTime - startTime > 14_400_000) {
+                    if(currentTime - startTime > 13_920_000) {
                         System.out.println("3.4 hours have passed, force quit");
                         throw new RuntimeException();
                     }
