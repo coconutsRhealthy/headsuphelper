@@ -64,6 +64,39 @@ public class DbSavePersister {
         closeDbConnection();
     }
 
+    private List<String> getAllBluffRoutesCopmact() {
+        List<String> street = new ArrayList<>();
+        List<String> bluffAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> sizingGroup = new ArrayList<>();
+        List<String> foldStatGroup = new ArrayList<>();
+        List<String> strongDraw = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        bluffAction.add("Bet");
+        bluffAction.add("Raise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        sizingGroup.add("Sizing_0-10bb");
+        sizingGroup.add("Sizing_10-20bb");
+        sizingGroup.add("Sizing_20bb_up");
+
+        foldStatGroup.add("Foldstat_0_33_");
+        foldStatGroup.add("Foldstat_33_66_");
+        foldStatGroup.add("Foldstat_66_100_");
+        foldStatGroup.add("Foldstat_unknown");
+
+        strongDraw.add("StrongDrawTrue");
+        strongDraw.add("StrongDrawFalse");
+
+        return null;
+    }
+
     private List<String> getAllBluffRoutes() {
         List<String> street = new ArrayList<>();
         List<String> bluffAction = new ArrayList<>();
