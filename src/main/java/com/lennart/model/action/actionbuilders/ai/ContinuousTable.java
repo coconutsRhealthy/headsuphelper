@@ -34,12 +34,15 @@ public class ContinuousTable implements ContinuousTableable {
 
     private List<DbSave> dbSaveList = new ArrayList<>();
 
+    private double bigBlind;
+
     public static void main(String[] args) throws Exception {
-        double bigBlind = 100;
-        new ContinuousTable().runTableContinously(bigBlind);
+        ContinuousTable continuousTable = new ContinuousTable();
+        continuousTable.setBigBlind(100);
+        continuousTable.runTableContinously();
     }
 
-    public void runTableContinously(double bigBlindFromMainMethod) throws Exception {
+    public void runTableContinously() throws Exception {
         GameVariables gameVariables = new GameVariables();
         int numberOfActionRequests = 0;
         int milliSecondsTotal = 0;
@@ -53,7 +56,7 @@ public class ContinuousTable implements ContinuousTableable {
             if(StarsTableReader.botIsToAct()) {
                 numberOfActionRequests++;
 
-                boolean isNewHand = isNewHand(bigBlindFromMainMethod);
+                boolean isNewHand = isNewHand(bigBlind);
 
                 if(isNewHand) {
                     System.out.println("^^^^a " + getNumberOfHsAbove85() + " ^^^^");
@@ -73,11 +76,11 @@ public class ContinuousTable implements ContinuousTableable {
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
 
-                    new DbSavePersister().doDbSaveUpdate(this, bigBlindFromMainMethod);
+                    new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                     dbSaveList = new ArrayList<>();
 
                     if(botBluffActionDone) {
-                        boolean bluffActionWasSuccessful = wasBluffSuccessful(bigBlindFromMainMethod);
+                        boolean bluffActionWasSuccessful = wasBluffSuccessful(bigBlind);
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
                         new PlayerBluffer().updateBluffDb(opponentPlayerNameOfLastHand, bluffActionWasSuccessful);
                         botBluffActionDone = false;
@@ -85,10 +88,12 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
-                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlindFromMainMethod);
+                        new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlind);
                     }
 
-                    gameVariables = new GameVariables(true);
+                    gameVariables = new GameVariables(bigBlind, false);
+                    bigBlind = gameVariables.getBigBlind();
+
                     allHandsPlayedAndPlayerNames.add(gameVariables.getOpponentName());
                 } else {
                     gameVariables.fillFieldsSubsequent(true);
@@ -314,5 +319,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setDbSaveList(List<DbSave> dbSaveList) {
         this.dbSaveList = dbSaveList;
+    }
+
+    public double getBigBlind() {
+        return bigBlind;
+    }
+
+    public void setBigBlind(double bigBlind) {
+        this.bigBlind = bigBlind;
     }
 }
