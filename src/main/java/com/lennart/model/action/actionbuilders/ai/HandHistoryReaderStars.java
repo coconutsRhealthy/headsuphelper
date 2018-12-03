@@ -72,7 +72,7 @@ public class HandHistoryReaderStars {
         int counter = 0;
 
         for(String line : copyOfTotal) {
-            if(line.contains("Seat 2") && line.contains("big blind")) {
+            if(line.contains("Seat 2") && (line.contains("big blind") || line.contains("(button)"))) {
                 counter++;
 
                 if(handNumber == counter) {
