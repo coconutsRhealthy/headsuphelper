@@ -361,6 +361,24 @@ public class DbSavePersister {
 
         Statement st = con.createStatement();
 
+        String bluffTable;
+        String callTable;
+        String valueTable;
+
+        if(continuousTable.getGame().equals("playMoney")) {
+            bluffTable = "dbstats_bluff";
+            callTable = "dbstats_call";
+            valueTable = "dbstats_value";
+        } else if (continuousTable.getGame().equals("sng")) {
+            bluffTable = "dbstats_bluff_sng";
+            callTable = "dbstats_call_sng";
+            valueTable = "dbstats_value_sng";
+        } else {
+            bluffTable = "dbstats_bluff_50nl";
+            callTable = "dbstats_call_50nl";
+            valueTable = "dbstats_value_50nl";
+        }
+
         for(DbSave dbSave : dbSaveList) {
             if(dbSave instanceof DbSaveBluff) {
                 DbSaveBluff dbSaveBluff = (DbSaveBluff) dbSave;
@@ -371,10 +389,10 @@ public class DbSavePersister {
                         + dbSaveBluff.getStrongDraw();
 
                 if(actionWasSuccessfull(biglind)) {
-                    st.executeUpdate("UPDATE dbstats_bluff SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + bluffTable + " SET success = success + 1 WHERE route = '" + route + "'");
                 }
 
-                st.executeUpdate("UPDATE dbstats_bluff SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + bluffTable + " SET total = total + 1 WHERE route = '" + route + "'");
             } else if(dbSave instanceof DbSaveCall) {
                 DbSaveCall dbSaveCall = (DbSaveCall) dbSave;
 
@@ -384,10 +402,10 @@ public class DbSavePersister {
                         dbSaveCall.getBoatWetness();
 
                 if(actionWasSuccessfull(biglind)) {
-                    st.executeUpdate("UPDATE dbstats_call SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + callTable + " SET success = success + 1 WHERE route = '" + route + "'");
                 }
 
-                st.executeUpdate("UPDATE dbstats_call SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + callTable + " SET total = total + 1 WHERE route = '" + route + "'");
             } else if(dbSave instanceof DbSaveValue) {
                 DbSaveValue dbSaveValue = (DbSaveValue) dbSave;
 
@@ -397,10 +415,10 @@ public class DbSavePersister {
                         dbSaveValue.getBoatWetness();
 
                 if(actionWasSuccessfull(biglind)) {
-                    st.executeUpdate("UPDATE dbstats_value SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + valueTable + " SET success = success + 1 WHERE route = '" + route + "'");
                 }
 
-                st.executeUpdate("UPDATE dbstats_value SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + valueTable + " SET total = total + 1 WHERE route = '" + route + "'");
             }
         }
 

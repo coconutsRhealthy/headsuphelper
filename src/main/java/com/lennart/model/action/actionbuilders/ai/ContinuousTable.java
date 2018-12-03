@@ -36,9 +36,12 @@ public class ContinuousTable implements ContinuousTableable {
 
     private double bigBlind;
 
+    private String game;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
+        continuousTable.setGame("sng");
         continuousTable.runTableContinously();
     }
 
@@ -95,7 +98,7 @@ public class ContinuousTable implements ContinuousTableable {
                         new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlind);
                     }
 
-                    gameVariables = new GameVariables(bigBlind, false);
+                    gameVariables = new GameVariables(bigBlind, game.equals("sng"));
                     bigBlind = gameVariables.getBigBlind();
 
                     allHandsPlayedAndPlayerNames.add(gameVariables.getOpponentName());
@@ -331,5 +334,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setBigBlind(double bigBlind) {
         this.bigBlind = bigBlind;
+    }
+
+    public String getGame() {
+        return game;
+    }
+
+    public void setGame(String game) {
+        this.game = game;
     }
 }
