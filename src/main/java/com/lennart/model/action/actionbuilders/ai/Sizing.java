@@ -23,8 +23,6 @@ public class Sizing {
             sizing = 0;
         }
 
-        sizing = shoveIfPotCommitted(sizing, facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind);
-
         return sizing;
     }
 
@@ -344,42 +342,5 @@ public class Sizing {
         } else {
             return turnBetPercentage;
         }
-    }
-
-    private double shoveIfPotCommitted(double sizing, double facingBetSize, double myBetSize, double myStack, double facingStack,
-                                      double pot, double bigBlind) {
-        double sizingToReturn = sizing;
-
-        double myStackAfterSizingAction = myStack - (sizing - myBetSize);
-        double opponentStackAfterSizingAction = facingStack - (sizing - facingBetSize);
-
-        double potAfterSizing;
-
-        if(sizing < facingStack + facingBetSize) {
-            potAfterSizing = pot + (2 * sizing);
-        } else {
-            potAfterSizing = pot + (2 * facingStack) + (2 * facingBetSize);
-        }
-
-        double myStackToPot = myStackAfterSizingAction / potAfterSizing;
-        double opponentStackToPot = opponentStackAfterSizingAction / potAfterSizing;
-
-        if(myStackToPot < 0.45 || opponentStackToPot < 0.45) {
-            System.out.println("Shove, because myStackToPot or opponentStackToPot too low after action");
-            System.out.println("myStackToPot: " + myStackToPot);
-            System.out.println("opponentStackToPot: " + opponentStackToPot);
-
-            sizingToReturn = myBetSize + myStack + 0.05 * myStack;
-        }
-
-        if(myStackAfterSizingAction / bigBlind <= 4 || opponentStackAfterSizingAction / bigBlind <= 4) {
-            System.out.println("Shove, because myStackToPot or opponentStackToPot below 5 bb after action");
-            System.out.println("myStackAfterSizingAction: " + myStackAfterSizingAction);
-            System.out.println("opponentStackAfterSizingAction: " + opponentStackAfterSizingAction);
-
-            sizingToReturn = myBetSize + myStack + 0.05 * myStack;
-        }
-
-        return sizingToReturn;
     }
 }
