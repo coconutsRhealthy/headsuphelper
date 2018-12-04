@@ -167,6 +167,30 @@ public class StarsTableReader {
         return false;
     }
 
+    public static boolean sngIsFinished() {
+        return false;
+    }
+
+    public void closeSngTable() {
+
+    }
+
+    public void registerNewSng() {
+
+    }
+
+    public boolean newSngTableIsOpened() {
+        return false;
+    }
+
+    public void maximizeNewSngTable() {
+
+    }
+
+    public void closeRedundantSngPopupScreen() {
+
+    }
+
     public String getOpponentPlayerNameFromImage() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(512, 553, 124, 28);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);

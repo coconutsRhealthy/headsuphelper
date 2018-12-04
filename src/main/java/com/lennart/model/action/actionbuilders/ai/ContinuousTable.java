@@ -56,6 +56,11 @@ public class ContinuousTable implements ContinuousTableable {
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
             milliSecondsTotal = milliSecondsTotal + 100;
+
+            if(game.equals("sng")) {
+                doSngContinuousLogic();
+            }
+
             if(StarsTableReader.botIsToAct()) {
                 numberOfActionRequests++;
 
@@ -252,6 +257,39 @@ public class ContinuousTable implements ContinuousTableable {
         }
 
         return bluffSuccessful;
+    }
+
+    private void doSngContinuousLogic() throws Exception {
+        if(StarsTableReader.sngIsFinished()) {
+            System.out.println("SNG is finished, staring new game");
+
+            StarsTableReader starsTableReader = new StarsTableReader();
+
+            TimeUnit.MILLISECONDS.sleep(100);
+            starsTableReader.closeSngTable();
+            TimeUnit.MILLISECONDS.sleep(100);
+            starsTableReader.registerNewSng();
+
+            boolean newTableNotYetOpened = true;
+            while(newTableNotYetOpened) {
+                System.out.println(",");
+                TimeUnit.SECONDS.sleep(1);
+
+                TimeUnit.MILLISECONDS.sleep(100);
+                if(starsTableReader.newSngTableIsOpened()) {
+                    newTableNotYetOpened = false;
+                    System.out.println("New sng table is opened");
+                } else {
+                    newTableNotYetOpened = true;
+                }
+            }
+
+            TimeUnit.MILLISECONDS.sleep(100);
+            starsTableReader.closeRedundantSngPopupScreen();
+            TimeUnit.MILLISECONDS.sleep(100);
+            starsTableReader.maximizeNewSngTable();
+            bigBlind = 20;
+        }
     }
 
     @Override
