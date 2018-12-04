@@ -366,9 +366,9 @@ public class DbSavePersister {
         String valueTable;
 
         if(continuousTable.getGame().equals("playMoney")) {
-            bluffTable = "dbstats_bluff";
-            callTable = "dbstats_call";
-            valueTable = "dbstats_value";
+            bluffTable = "dbstats_bluff_play";
+            callTable = "dbstats_call_play";
+            valueTable = "dbstats_value_play";
         } else if (continuousTable.getGame().equals("sng")) {
             bluffTable = "dbstats_bluff_sng";
             callTable = "dbstats_call_sng";
