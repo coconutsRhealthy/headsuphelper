@@ -36,7 +36,7 @@ public class MachineLearning {
             if(handStrength < 0.7) {
                 if(bluffOddsAreOk(0, 0, 0, 0)) {
                     List<Double> bluffBetData = getDataFromDb(dbTable, route);
-                    actionToReturn = getActionFromData(bluffBetData, action, "bet75pct");
+                    changeToBetOrKeepCheckGivenData(bluffBetData);
                 } else {
                     actionToReturn = action;
                 }
@@ -44,7 +44,7 @@ public class MachineLearning {
                 if(board != null && board.size() == 5) {
                     if(position) {
                         List<Double> valueBetData = getDataFromDb(dbTable, route);
-                        actionToReturn = getActionFromData(valueBetData, action, "bet75pct");
+                        changeToBetOrKeepCheckGivenData(valueBetData);
                     } else {
                         actionToReturn = action;
                     }
@@ -102,7 +102,7 @@ public class MachineLearning {
         //verander naar ofwel fold of raise...
     }
 
-    private String getActionFromData(List<Double> data, String currentAction, String actionInConsideration) {
+    private String changeToBetOrKeepCheckGivenData(List<Double> data) {
         String actionToReturn;
 
         double successNumber = data.get(0);
@@ -111,21 +111,19 @@ public class MachineLearning {
         if(totalNumber >= 20) {
             double successRatio = successNumber / totalNumber;
 
-            if(actionInConsideration.equals("bet75pct") || actionInConsideration.equals("raise")) {
-                if(successRatio >= 0.55) {
-                    //if(currentAction.equals("call") || currentAction.equals("bet75pct") || currentAction.equals("raise"))
+            if(successRatio >= 0.55) {
+                double random = Math.random();
 
-                    actionToReturn = actionInConsideration;
+                if(random < 0.75) {
+                    actionToReturn = "bet75pct";
                 } else {
-                    actionToReturn = currentAction;
+                    actionToReturn = "check";
                 }
-            } else if(currentAction.equals("bet75pct") || currentAction.equals("raise")) {
-                if(successRatio < 0.5)
-
+            } else {
+                actionToReturn = "check";
             }
-
         } else {
-            actionToReturn = currentAction;
+            actionToReturn = "check";
         }
 
         return actionToReturn;
