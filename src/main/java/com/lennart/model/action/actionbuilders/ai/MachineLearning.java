@@ -13,29 +13,29 @@ public class MachineLearning {
     private String adjustActionToDbSaveData(String action) {
         String actionToReturn = "";
 
-//        if(action.equals("fold")) {
-//            actionToReturn = adjustFoldAction();
-//        } else if(action.equals("call")) {
-//            actionToReturn = adjustCallAction();
-//        } else if(action.equals("check")) {
-//            actionToReturn = adjustCheckAction();
-//        } else if(action.equals("bet75pct")) {
-//            actionToReturn = adjustBetAction();
-//        } else if(action.equals("raise")) {
-//            actionToReturn = adjustRaiseAction();
-//        }
+        if(action.equals("fold")) {
+            actionToReturn = adjustFoldAction();
+        } else if(action.equals("call")) {
+            actionToReturn = adjustCallAction();
+        } else if(action.equals("check")) {
+            actionToReturn = adjustCheckAction();
+        } else if(action.equals("bet75pct")) {
+            actionToReturn = adjustBetAction();
+        } else if(action.equals("raise")) {
+            actionToReturn = adjustRaiseAction();
+        }
 
         return actionToReturn;
     }
 
     private String adjustCheckAction(String action, double handStrength, String route, boolean opponentHasInitiative,
-                                     List<Card> board, boolean position) throws Exception {
+                                     List<Card> board, boolean position, String dbTable) throws Exception {
         String actionToReturn;
 
         if(!opponentHasInitiative) {
             if(handStrength < 0.7) {
                 if(bluffOddsAreOk(0, 0, 0, 0)) {
-                    List<Double> bluffBetData = getDataFromDb("dbstats_bluff", route);
+                    List<Double> bluffBetData = getDataFromDb(dbTable, route);
                     actionToReturn = getActionFromData(bluffBetData, action, "bet75pct");
                 } else {
                     actionToReturn = action;
@@ -43,7 +43,7 @@ public class MachineLearning {
             } else {
                 if(board != null && board.size() == 5) {
                     if(position) {
-                        List<Double> valueBetData = getDataFromDb("dbstats_value", route);
+                        List<Double> valueBetData = getDataFromDb(dbTable, route);
                         actionToReturn = getActionFromData(valueBetData, action, "bet75pct");
                     } else {
                         actionToReturn = action;
@@ -58,38 +58,49 @@ public class MachineLearning {
 
         return actionToReturn;
     }
-//
-//    private String adjustFoldAction() {
-//
-//    }
-//
-//    private String adjustBetAction() {
-//
-//    }
-//
-//    private String adjustBluffBetAction() {
-//
-//    }
-//
-//    private String adjustValueBetAction() {
-//
-//    }
-//
-//    private String adjustRaiseAction() {
-//
-//    }
-//
-//    private String adjustBluffRaiseAction() {
-//
-//    }
-//
-//    private String adjustValueRaiseAction() {
-//
-//    }
-//
-//    private String adjustCallAction() {
-//
-//    }
+
+    private String adjustFoldAction(String route) {
+        String actionToReturn;
+
+        //check hier het succes van call en het succes van raise in deze spots...
+
+        //change naar degene met hoogste success ratio...
+
+
+
+
+
+
+    }
+
+    private String adjustBetAction(String route, String dbTable) throws Exception {
+        String actionToReturn;
+
+        List<Double> betData = getDataFromDb(dbTable, route);
+        double ratio = betData.get(0) / betData.get(1);
+
+        if(ratio < 0.55) {
+            double random = Math.random();
+
+            if(random < 0.75) {
+                actionToReturn = "check";
+            } else {
+                actionToReturn = "bet75pct";
+            }
+        } else {
+            actionToReturn = "bet75pct";
+        }
+
+        return actionToReturn;
+    }
+
+    private String adjustRaiseAction() {
+        //verander naar ofwel call of fold...
+    }
+
+    private String adjustCallAction() {
+        //verander naar ofwel fold of raise...
+    }
 
     private String getActionFromData(List<Double> data, String currentAction, String actionInConsideration) {
         String actionToReturn;
@@ -100,11 +111,19 @@ public class MachineLearning {
         if(totalNumber >= 20) {
             double successRatio = successNumber / totalNumber;
 
-            if(successRatio >= 0.55) {
-                actionToReturn = actionInConsideration;
-            } else {
-                actionToReturn = currentAction;
+            if(actionInConsideration.equals("bet75pct") || actionInConsideration.equals("raise")) {
+                if(successRatio >= 0.55) {
+                    //if(currentAction.equals("call") || currentAction.equals("bet75pct") || currentAction.equals("raise"))
+
+                    actionToReturn = actionInConsideration;
+                } else {
+                    actionToReturn = currentAction;
+                }
+            } else if(currentAction.equals("bet75pct") || currentAction.equals("raise")) {
+                if(successRatio < 0.5)
+
             }
+
         } else {
             actionToReturn = currentAction;
         }
@@ -125,7 +144,8 @@ public class MachineLearning {
         double successNumber = rs.getDouble("success");
         double totalNumber = rs.getDouble("total");
 
-        //valuesToReturn.add(successNumber, totalNumber);
+        valuesToReturn.add(successNumber);
+        valuesToReturn.add(totalNumber);
 
         rs.close();
         st.close();
