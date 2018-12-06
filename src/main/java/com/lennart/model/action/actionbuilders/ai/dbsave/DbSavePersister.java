@@ -13,18 +13,71 @@ public class DbSavePersister {
     private Connection con;
 
     public static void main(String[] args) throws Exception {
-        new DbSavePersister().getAllCallRoutes();
+        new DbSavePersister().testMethod();
+    }
+
+//    total: 876.0
+//    success: 555.0
+
+//    total: 1471.0
+//    success: 827.0
+
+    private void testMethod() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_play_compact;");
+
+        double totalTotal = 0;
+        double successTotal = 0;
+
+        int counter = 0;
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+
+            if(!route.contains("Sizing_0-10bb")) {
+                double total = rs.getDouble("total");
+
+                if(total >= 4) {
+                    double success = rs.getDouble("success");
+
+                    totalTotal = totalTotal + total;
+                    successTotal = successTotal + success;
+
+                    if(success / total > 0.5) {
+                        System.out.println(route);
+                    }
+
+//                    double ratio = success / total;
+//
+//                    if(ratio < 0.55) {
+//                        System.out.println(route);
+//                    }
+                }
+
+            }
+        }
+
+        //System.out.println(counter);
+        System.out.println("total: " + totalTotal);
+        System.out.println("success: " + successTotal);
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
     }
 
     private void initializeBluffDb() throws Exception {
-        List<String> allRoutes = getAllBluffRoutes();
+        List<String> allRoutes = getAllBluffRoutesCopmact();
 
         initializeDbConnection();
 
         for(String route : allRoutes) {
             Statement st = con.createStatement();
 
-            st.executeUpdate("INSERT INTO dbstats_bluff (route) VALUES ('" + route + "')");
+            st.executeUpdate("INSERT INTO dbstats_bluff_play_compact (route) VALUES ('" + route + "')");
 
             st.close();
         }
@@ -64,6 +117,119 @@ public class DbSavePersister {
         closeDbConnection();
     }
 
+    private void migrateExtensiveBluffDbToCompact() throws Exception {
+        String streetToUse = "";
+        String bluffActionToUse = "";
+        String positionToUse = "";
+        String sizingGroupToUse = "";
+        String foldStatGroupToUse = "";
+        String strongDrawToUse = "";
+
+        List<String> street = new ArrayList<>();
+        List<String> bluffAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> foldStatGroup = new ArrayList<>();
+        List<String> strongDraw = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        bluffAction.add("Bet");
+        bluffAction.add("Raise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        foldStatGroup.add("Foldstat_0_33_");
+        foldStatGroup.add("Foldstat_33_66_");
+        foldStatGroup.add("Foldstat_66_100_");
+        foldStatGroup.add("Foldstat_unknown");
+
+        strongDraw.add("StrongDrawTrue");
+        strongDraw.add("StrongDrawFalse");
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_play;");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+            double total = rs.getDouble("total");
+            double success = rs.getDouble("success");
+
+            for(String s : street) {
+                if(route.contains(s)) {
+                    streetToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : bluffAction) {
+                if(route.contains(s)) {
+                    bluffActionToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : position) {
+                if(route.contains(s)) {
+                    positionToUse = s;
+                    break;
+                }
+            }
+
+            if(route.contains("Sizing_0-5bb") || route.contains("Sizing_5-10bb")) {
+                sizingGroupToUse = "Sizing_0-10bb";
+            } else if(route.contains("Sizing_10-15bb") || route.contains("Sizing_15-20bb")) {
+                sizingGroupToUse = "Sizing_10-20bb";
+            } else {
+                sizingGroupToUse = "Sizing_20bb_up";
+            }
+
+            for(String s : foldStatGroup) {
+                if(route.contains(s)) {
+                    foldStatGroupToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : strongDraw) {
+                if(route.contains(s)) {
+                    strongDrawToUse = s;
+                    break;
+                }
+            }
+
+            String compactRoute = streetToUse + bluffActionToUse + positionToUse + sizingGroupToUse + foldStatGroupToUse +
+                    strongDrawToUse;
+
+            Statement st2 = con.createStatement();
+
+            st2.executeUpdate("UPDATE dbstats_bluff_play_compact SET total = total + " + total + " WHERE route = '" + compactRoute + "'");
+            st2.executeUpdate("UPDATE dbstats_bluff_play_compact SET success = success + " + success + " WHERE route = '" + compactRoute + "'");
+
+            st2.close();
+
+            counter++;
+
+            if(counter == 100) {
+                System.out.println();
+                counter = 0;
+            } else {
+                System.out.print(".");
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
     private List<String> getAllBluffRoutesCopmact() {
         List<String> street = new ArrayList<>();
         List<String> bluffAction = new ArrayList<>();
@@ -94,7 +260,25 @@ public class DbSavePersister {
         strongDraw.add("StrongDrawTrue");
         strongDraw.add("StrongDrawFalse");
 
-        return null;
+        List<String> allRoutes = new ArrayList<>();
+
+        for(String a : street) {
+            for(String b : bluffAction) {
+                for(String c : position) {
+                    for(String d : sizingGroup) {
+                        for(String e : foldStatGroup) {
+                            for(String f : strongDraw) {
+                                allRoutes.add(a + b + c + d + e + f);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(allRoutes.size());
+
+        return allRoutes;
     }
 
     private List<String> getAllBluffRoutes() {
