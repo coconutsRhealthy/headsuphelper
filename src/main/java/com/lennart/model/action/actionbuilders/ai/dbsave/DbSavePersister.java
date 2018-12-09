@@ -340,6 +340,7 @@ public class DbSavePersister {
         List<String> facingAction = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> oppAggroGroup = new ArrayList<>();
+        List<String> handStrength = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
 
         street.add("Flop");
@@ -356,6 +357,14 @@ public class DbSavePersister {
         oppAggroGroup.add("Aggro_33_66_");
         oppAggroGroup.add("Aggro_66_100_");
         oppAggroGroup.add("Aggro_unknown");
+
+        handStrength.add("HS_0_30_");
+        handStrength.add("HS_30_50_");
+        handStrength.add("HS_50_60_");
+        handStrength.add("HS_60_70_");
+        handStrength.add("HS_70_80_");
+        handStrength.add("HS_80_90_");
+        handStrength.add("HS_90_100_");
 
         strongDraw.add("StrongDrawTrue");
         strongDraw.add("StrongDrawFalse");
@@ -408,18 +417,11 @@ public class DbSavePersister {
                 }
             }
 
-            if(route.contains("HS_0_30_")) {
-                handStrengthToUse = "HS_0_30_";
-            } else if(route.contains("HS_30_50_")) {
-                handStrengthToUse = "HS_30_50_";
-            } else if(route.contains("HS_50_60_") || route.contains("HS_60_70_")) {
-                handStrengthToUse = "HS_50_70_";
-            } else if(route.contains("HS_70_80_")) {
-                handStrengthToUse = "HS_70_80_";
-            } else if(route.contains("HS_80_90_")) {
-                handStrengthToUse = "HS_80_90_";
-            } else if(route.contains("HS_90_100_")) {
-                handStrengthToUse = "HS_90_100_";
+            for(String s : handStrength) {
+                if(route.contains(s)) {
+                    handStrengthToUse = s;
+                    break;
+                }
             }
 
             for(String s : strongDraw) {
@@ -619,7 +621,8 @@ public class DbSavePersister {
 
         handStrength.add("HS_0_30_");
         handStrength.add("HS_30_50_");
-        handStrength.add("HS_50_70_");
+        handStrength.add("HS_50_60_");
+        handStrength.add("HS_60_70_");
         handStrength.add("HS_70_80_");
         handStrength.add("HS_80_90_");
         handStrength.add("HS_90_100_");
@@ -875,7 +878,7 @@ public class DbSavePersister {
         return allRoutes;
     }
 
-    public void doDbSaveUpdate(ContinuousTable continuousTable, double biglind) throws Exception {
+    public void doDbSaveUpdate(ContinuousTable continuousTable, double bigBlind) throws Exception {
         List<DbSave> dbSaveList = continuousTable.getDbSaveList();
 
         initializeDbConnection();
@@ -883,21 +886,33 @@ public class DbSavePersister {
         Statement st = con.createStatement();
 
         String bluffTable;
+        String bluffTableCompact;
         String callTable;
+        String callTableCompact;
         String valueTable;
+        String valueTableCompact;
 
         if(continuousTable.getGame().equals("playMoney")) {
             bluffTable = "dbstats_bluff_play";
+            bluffTableCompact = "dbstats_bluff_play_compact";
             callTable = "dbstats_call_play";
+            callTableCompact = "dbstats_call_play_compact";
             valueTable = "dbstats_value_play";
+            valueTableCompact = "dbstats_value_play_compact";
         } else if (continuousTable.getGame().equals("sng")) {
             bluffTable = "dbstats_bluff_sng";
+            bluffTableCompact = "dbstats_bluff_sng_compact";
             callTable = "dbstats_call_sng";
+            callTableCompact = "dbstats_call_sng_compact";
             valueTable = "dbstats_value_sng";
+            valueTableCompact = "dbstats_value_sng_compact";
         } else {
             bluffTable = "dbstats_bluff_50nl";
+            bluffTableCompact = "dbstats_bluff_50nl_compact";
             callTable = "dbstats_call_50nl";
+            callTableCompact = "dbstats_call_50nl_compact";
             valueTable = "dbstats_value_50nl";
+            valueTableCompact = "dbstats_value_50nl_compact";
         }
 
         for(DbSave dbSave : dbSaveList) {
@@ -909,8 +924,13 @@ public class DbSavePersister {
                         + dbSaveBluff.getHandStrength() + dbSaveBluff.getDrawWetness() + dbSaveBluff.getBoatWetness()
                         + dbSaveBluff.getStrongDraw();
 
-                if(actionWasSuccessfull(biglind)) {
+                String routeCompact = dbSaveBluff.getStreet() + dbSaveBluff.getBluffAction() + dbSaveBluff.getPosition() +
+                        convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroup()) +
+                        dbSaveBluff.getFoldStatGroup() + dbSaveBluff.getStrongDraw();
+
+                if(actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + bluffTable + " SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + bluffTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
 
                 st.executeUpdate("UPDATE " + bluffTable + " SET total = total + 1 WHERE route = '" + route + "'");
@@ -922,8 +942,13 @@ public class DbSavePersister {
                         dbSaveCall.getStrongDraw() + dbSaveCall.getEffectiveStack() + dbSaveCall.getDrawWetness() +
                         dbSaveCall.getBoatWetness();
 
-                if(actionWasSuccessfull(biglind)) {
+                String routeCompact = dbSaveCall.getStreet() + dbSaveCall.getFacingAction() + dbSaveCall.getPosition() +
+                        convertCallAtcToCompact(dbSaveCall.getAmountToCallGroup()) + dbSaveCall.getOppAggroGroup() +
+                        dbSaveCall.getHandStrength() + dbSaveCall.getStrongDraw();
+
+                if(actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + callTable + " SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + callTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
 
                 st.executeUpdate("UPDATE " + callTable + " SET total = total + 1 WHERE route = '" + route + "'");
@@ -935,8 +960,13 @@ public class DbSavePersister {
                         dbSaveValue.getStrongDraw() + dbSaveValue.getEffectiveStack() + dbSaveValue.getDrawWetness() +
                         dbSaveValue.getBoatWetness();
 
-                if(actionWasSuccessfull(biglind)) {
+                String routeCompact = dbSaveValue.getStreet() + dbSaveValue.getValueAction() + dbSaveValue.getPosition() +
+                        convertBluffOrValueSizingToCompact(dbSaveValue.getSizingGroup()) + dbSaveValue.getOppLoosenessGroup() +
+                        dbSaveValue.getHandStrength();
+
+                if(actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + valueTable + " SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + valueTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
 
                 st.executeUpdate("UPDATE " + valueTable + " SET total = total + 1 WHERE route = '" + route + "'");
@@ -945,6 +975,34 @@ public class DbSavePersister {
 
         st.close();
         closeDbConnection();
+    }
+
+    private String convertBluffOrValueSizingToCompact(String sizing) {
+        String compactSizing;
+
+        if(sizing.equals("Sizing_0-5bb") || sizing.equals("Sizing_5-10bb")) {
+            compactSizing = "Sizing_0-10bb";
+        } else if(sizing.equals("Sizing_10-15bb") || sizing.equals("Sizing_15-20bb")) {
+            compactSizing = "Sizing_10-20bb";
+        } else {
+            compactSizing = "Sizing_20bb_up";
+        }
+
+        return compactSizing;
+    }
+
+    private String convertCallAtcToCompact(String sizing) {
+        String compactSizing;
+
+        if(sizing.equals("Atc_0-5bb") || sizing.equals("Atc_5-10bb")) {
+            compactSizing = "Atc_0-10bb";
+        } else if(sizing.equals("Atc_10-15bb") || sizing.equals("Atc_15-20bb")) {
+            compactSizing = "Atc_10-20bb";
+        } else {
+            compactSizing = "Atc_20bb_up";
+        }
+
+        return compactSizing;
     }
 
     private boolean actionWasSuccessfull(double bigBlind) throws Exception {
