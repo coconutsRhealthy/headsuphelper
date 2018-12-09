@@ -24,11 +24,11 @@ public class DbSaveValue extends DbSave {
         if(numberOfHands < 20) {
             oppLoosenessGroup = "Looseness_unknown";
         } else {
-            double oppAggressiveness = opponentIdentifier.getOppAggressiveness(opponentName);
+            double oppLooseness = opponentIdentifier.getOppLooseness(opponentName);
 
-            if(oppAggressiveness <= 0.5) {
+            if(oppLooseness <= 0.5) {
                 oppLoosenessGroup = "Looseness_0_33_";
-            } else if(oppAggressiveness < 0.66) {
+            } else if(oppLooseness < 0.66) {
                 oppLoosenessGroup = "Looseness_33_66_";
             } else {
                 oppLoosenessGroup = "Looseness_66_100_";
