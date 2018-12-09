@@ -16,17 +16,11 @@ public class DbSavePersister {
         new DbSavePersister().testMethod();
     }
 
-//    total: 876.0
-//    success: 555.0
-
-//    total: 1471.0
-//    success: 827.0
-
     private void testMethod() throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_play_compact;");
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_play;");
 
         double totalTotal = 0;
         double successTotal = 0;
@@ -36,32 +30,18 @@ public class DbSavePersister {
         while(rs.next()) {
             String route = rs.getString("route");
 
-            if(!route.contains("Sizing_0-10bb")) {
+            if(route.contains("Foldstat_66_100_")) {
                 double total = rs.getDouble("total");
+                double success = rs.getDouble("success");
 
-                if(total >= 4) {
-                    double success = rs.getDouble("success");
-
-                    totalTotal = totalTotal + total;
-                    successTotal = successTotal + success;
-
-                    if(success / total > 0.5) {
-                        System.out.println(route);
-                    }
-
-//                    double ratio = success / total;
-//
-//                    if(ratio < 0.55) {
-//                        System.out.println(route);
-//                    }
-                }
-
+                totalTotal = totalTotal + total;
+                successTotal = successTotal + success;
             }
         }
 
         //System.out.println(counter);
-        System.out.println("total: " + totalTotal);
         System.out.println("success: " + successTotal);
+        System.out.println("total: " + totalTotal);
 
         rs.close();
         st.close();
@@ -70,7 +50,7 @@ public class DbSavePersister {
     }
 
     private void initializeBluffDb() throws Exception {
-        List<String> allRoutes = getAllBluffRoutesCopmact();
+        List<String> allRoutes = getAllBluffRoutesCompact();
 
         initializeDbConnection();
 
@@ -230,7 +210,252 @@ public class DbSavePersister {
         closeDbConnection();
     }
 
-    private List<String> getAllBluffRoutesCopmact() {
+    private void migrateExtensiveValueDbToCompact() throws Exception {
+        String streetToUse = "";
+        String valueActionToUse = "";
+        String positionToUse = "";
+        String sizingGroupToUse = "";
+        String oppLoosenessGroupToUse = "";
+        String handStrengthToUse = "";
+
+        List<String> street = new ArrayList<>();
+        List<String> valueAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> oppLoosenessGroup = new ArrayList<>();
+        List<String> handStrength = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        valueAction.add("Bet");
+        valueAction.add("Raise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        oppLoosenessGroup.add("Looseness_0_33_");
+        oppLoosenessGroup.add("Looseness_33_66_");
+        oppLoosenessGroup.add("Looseness_66_100_");
+        oppLoosenessGroup.add("Looseness_unknown");
+
+        handStrength.add("HS_70_75_");
+        handStrength.add("HS_75_80_");
+        handStrength.add("HS_80_85_");
+        handStrength.add("HS_85_90_");
+        handStrength.add("HS_90_95_");
+        handStrength.add("HS_95_100_");
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_value_play;");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+            double total = rs.getDouble("total");
+            double success = rs.getDouble("success");
+
+            for(String s : street) {
+                if(route.contains(s)) {
+                    streetToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : valueAction) {
+                if(route.contains(s)) {
+                    valueActionToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : position) {
+                if(route.contains(s)) {
+                    positionToUse = s;
+                    break;
+                }
+            }
+
+            if(route.contains("Sizing_0-5bb") || route.contains("Sizing_5-10bb")) {
+                sizingGroupToUse = "Sizing_0-10bb";
+            } else if(route.contains("Sizing_10-15bb") || route.contains("Sizing_15-20bb")) {
+                sizingGroupToUse = "Sizing_10-20bb";
+            } else {
+                sizingGroupToUse = "Sizing_20bb_up";
+            }
+
+            for(String s : oppLoosenessGroup) {
+                if(route.contains(s)) {
+                    oppLoosenessGroupToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : handStrength) {
+                if(route.contains(s)) {
+                    handStrengthToUse = s;
+                    break;
+                }
+            }
+
+            String compactRoute = streetToUse + valueActionToUse + positionToUse + sizingGroupToUse + oppLoosenessGroupToUse +
+                    handStrengthToUse;
+
+            Statement st2 = con.createStatement();
+
+            st2.executeUpdate("UPDATE dbstats_value_play_compact SET total = total + " + total + " WHERE route = '" + compactRoute + "'");
+            st2.executeUpdate("UPDATE dbstats_value_play_compact SET success = success + " + success + " WHERE route = '" + compactRoute + "'");
+
+            st2.close();
+
+            counter++;
+
+            if(counter == 100) {
+                System.out.println();
+                counter = 0;
+            } else {
+                System.out.print(".");
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private void migrateExtensiveCallDbToCompact() throws Exception {
+        String streetToUse = "";
+        String facingActionToUse = "";
+        String positionToUse = "";
+        String amountToCallGroupToUse = "";
+        String oppAggroGroupToUse = "";
+        String handStrengthToUse = "";
+        String strongDrawToUse = "";
+
+        List<String> street = new ArrayList<>();
+        List<String> facingAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> oppAggroGroup = new ArrayList<>();
+        List<String> strongDraw = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        facingAction.add("FacingBet");
+        facingAction.add("FacingRaise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        oppAggroGroup.add("Aggro_0_33_");
+        oppAggroGroup.add("Aggro_33_66_");
+        oppAggroGroup.add("Aggro_66_100_");
+        oppAggroGroup.add("Aggro_unknown");
+
+        strongDraw.add("StrongDrawTrue");
+        strongDraw.add("StrongDrawFalse");
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_call_play;");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+            double total = rs.getDouble("total");
+            double success = rs.getDouble("success");
+
+            for(String s : street) {
+                if(route.contains(s)) {
+                    streetToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : facingAction) {
+                if(route.contains(s)) {
+                    facingActionToUse = s;
+                    break;
+                }
+            }
+
+            for(String s : position) {
+                if(route.contains(s)) {
+                    positionToUse = s;
+                    break;
+                }
+            }
+
+            if(route.contains("Atc_0-5bb") || route.contains("Atc_5-10bb")) {
+                amountToCallGroupToUse = "Atc_0-10bb";
+            } else if(route.contains("Atc_10-15bb") || route.contains("Atc_15-20bb")) {
+                amountToCallGroupToUse = "Atc_10-20bb";
+            } else {
+                amountToCallGroupToUse = "Atc_20bb_up";
+            }
+
+            for(String s : oppAggroGroup) {
+                if(route.contains(s)) {
+                    oppAggroGroupToUse = s;
+                    break;
+                }
+            }
+
+            if(route.contains("HS_0_30_")) {
+                handStrengthToUse = "HS_0_30_";
+            } else if(route.contains("HS_30_50_")) {
+                handStrengthToUse = "HS_30_50_";
+            } else if(route.contains("HS_50_60_") || route.contains("HS_60_70_")) {
+                handStrengthToUse = "HS_50_70_";
+            } else if(route.contains("HS_70_80_")) {
+                handStrengthToUse = "HS_70_80_";
+            } else if(route.contains("HS_80_90_")) {
+                handStrengthToUse = "HS_80_90_";
+            } else if(route.contains("HS_90_100_")) {
+                handStrengthToUse = "HS_90_100_";
+            }
+
+            for(String s : strongDraw) {
+                if(route.contains(s)) {
+                    strongDrawToUse = s;
+                    break;
+                }
+            }
+
+            String compactRoute = streetToUse + facingActionToUse + positionToUse + amountToCallGroupToUse + oppAggroGroupToUse +
+                    handStrengthToUse + strongDrawToUse;
+
+            Statement st2 = con.createStatement();
+
+            st2.executeUpdate("UPDATE dbstats_call_play_compact SET total = total + " + total + " WHERE route = '" + compactRoute + "'");
+            st2.executeUpdate("UPDATE dbstats_call_play_compact SET success = success + " + success + " WHERE route = '" + compactRoute + "'");
+
+            st2.close();
+
+            counter++;
+
+            if(counter == 100) {
+                System.out.println();
+                counter = 0;
+            } else {
+                System.out.print(".");
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private List<String> getAllBluffRoutesCompact() {
         List<String> street = new ArrayList<>();
         List<String> bluffAction = new ArrayList<>();
         List<String> position = new ArrayList<>();
@@ -364,6 +589,65 @@ public class DbSavePersister {
         return allRoutes;
     }
 
+    private List<String> getAllCallRoutesCompact() {
+        List<String> street = new ArrayList<>();
+        List<String> facingAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> amountToCallGroup = new ArrayList<>();
+        List<String> oppAggroGroup = new ArrayList<>();
+        List<String> handStrength = new ArrayList<>();
+        List<String> strongDraw = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        facingAction.add("FacingBet");
+        facingAction.add("FacingRaise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        amountToCallGroup.add("Atc_0-10bb");
+        amountToCallGroup.add("Atc_10-20bb");
+        amountToCallGroup.add("Atc_20bb_up");
+
+        oppAggroGroup.add("Aggro_0_33_");
+        oppAggroGroup.add("Aggro_33_66_");
+        oppAggroGroup.add("Aggro_66_100_");
+        oppAggroGroup.add("Aggro_unknown");
+
+        handStrength.add("HS_0_30_");
+        handStrength.add("HS_30_50_");
+        handStrength.add("HS_50_70_");
+        handStrength.add("HS_70_80_");
+        handStrength.add("HS_80_90_");
+        handStrength.add("HS_90_100_");
+
+        strongDraw.add("StrongDrawTrue");
+        strongDraw.add("StrongDrawFalse");
+
+        List<String> allRoutes = new ArrayList<>();
+
+        for(String a : street) {
+            for(String b : facingAction) {
+                for(String c : position) {
+                    for(String d : amountToCallGroup) {
+                        for(String e : oppAggroGroup) {
+                            for(String f : handStrength) {
+                                for(String g : strongDraw) {
+                                    allRoutes.add(a + b + c + d + e + f + g);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return allRoutes;
+    }
+
     private List<String> getAllCallRoutes() {
         List<String> street = new ArrayList<>();
         List<String> facingAction = new ArrayList<>();
@@ -447,6 +731,59 @@ public class DbSavePersister {
         }
 
         System.out.println(allRoutes.size());
+
+        return allRoutes;
+    }
+
+    private List<String> getAllValueRoutesCompact() {
+        List<String> street = new ArrayList<>();
+        List<String> valueAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> sizing = new ArrayList<>();
+        List<String> oppLooseness = new ArrayList<>();
+        List<String> handStrength = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        valueAction.add("Bet");
+        valueAction.add("Raise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        sizing.add("Sizing_0-10bb");
+        sizing.add("Sizing_10-20bb");
+        sizing.add("Sizing_20bb_up");
+
+        oppLooseness.add("Looseness_0_33_");
+        oppLooseness.add("Looseness_33_66_");
+        oppLooseness.add("Looseness_66_100_");
+        oppLooseness.add("Looseness_unknown");
+
+        handStrength.add("HS_70_75_");
+        handStrength.add("HS_75_80_");
+        handStrength.add("HS_80_85_");
+        handStrength.add("HS_85_90_");
+        handStrength.add("HS_90_95_");
+        handStrength.add("HS_95_100_");
+
+        List<String> allRoutes = new ArrayList<>();
+
+        for(String a : street) {
+            for(String b : valueAction) {
+                for(String c : position) {
+                    for(String d : sizing) {
+                        for(String e : oppLooseness) {
+                            for(String f : handStrength) {
+                                allRoutes.add(a + b + c + d + e + f);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         return allRoutes;
     }
