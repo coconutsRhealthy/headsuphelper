@@ -934,6 +934,7 @@ public class DbSavePersister {
                 }
 
                 st.executeUpdate("UPDATE " + bluffTable + " SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + bluffTableCompact + " SET total = total + 1 WHERE route = '" + routeCompact + "'");
             } else if(dbSave instanceof DbSaveCall) {
                 DbSaveCall dbSaveCall = (DbSaveCall) dbSave;
 
@@ -952,6 +953,7 @@ public class DbSavePersister {
                 }
 
                 st.executeUpdate("UPDATE " + callTable + " SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + callTableCompact + " SET total = total + 1 WHERE route = '" + routeCompact + "'");
             } else if(dbSave instanceof DbSaveValue) {
                 DbSaveValue dbSaveValue = (DbSaveValue) dbSave;
 
@@ -970,6 +972,7 @@ public class DbSavePersister {
                 }
 
                 st.executeUpdate("UPDATE " + valueTable + " SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + valueTableCompact + " SET total = total + 1 WHERE route = '" + routeCompact + "'");
             }
         }
 
