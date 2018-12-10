@@ -69,6 +69,22 @@
 //    private String adjustFoldAction(ActionVariables actionVariables, GameVariables gameVariables, String dbTable) {
 //        String actionToReturn;
 //
+//        //wat wil je hier... ofwel callen ofwel raisen... indien goed..
+//
+//
+//        if(actionVariables.getBotHandStrength() < 0.7) {
+//
+//
+//
+//        } else {
+//
+//
+//
+//        }
+//
+//
+//
+//
 //
 //
 //
@@ -90,20 +106,26 @@
 //
 //        String route;
 //
-//        if(actionVariables.getBotHandStrength() < 0.75) {
+//        if(actionVariables.getBotHandStrength() < 0.7) {
 //            route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
 //        } else {
 //            route = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
 //        }
 //
 //        List<Double> betData = getDataFromDb(dbTable, route);
-//        double ratio = betData.get(0) / betData.get(1);
 //
-//        if(ratio < 0.55) {
-//            double random = Math.random();
+//        if(betData.get(1) >= 20) {
+//            double ratio = betData.get(0) / betData.get(1);
 //
-//            if(random < 0.75) {
-//                actionToReturn = "check";
+//            if(ratio < 0.55) {
+//                double random = Math.random();
+//
+//                if(random < 0.75) {
+//                    System.out.println("Machinelearning A) Changed bet to check");
+//                    actionToReturn = "check";
+//                } else {
+//                    actionToReturn = "bet75pct";
+//                }
 //            } else {
 //                actionToReturn = "bet75pct";
 //            }
@@ -114,8 +136,20 @@
 //        return actionToReturn;
 //    }
 //
-//    private String adjustRaiseAction() {
-//        //verander naar ofwel call of fold...
+//    private String adjustRaiseAction(ActionVariables actionVariables, GameVariables gameVariables, String dbTable) throws Exception {
+//        String actionToReturn;
+//
+//        if(actionVariables.getBotHandStrength() < 0.7) {
+//            String bluffRaiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+//            List<Double> bluffRaiseData = getDataFromDb(dbTable, bluffRaiseRoute);
+//            actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(bluffRaiseData, actionVariables, gameVariables, dbTable);
+//        } else {
+//            String valueRaiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+//            List<Double> valueRaiseData = getDataFromDb(dbTable, valueRaiseRoute);
+//            actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(valueRaiseData, actionVariables, gameVariables, dbTable);
+//        }
+//
+//        return actionToReturn;
 //    }
 //
 //    private String adjustCallAction() {
@@ -144,6 +178,51 @@
 //            }
 //        } else {
 //            actionToReturn = "check";
+//        }
+//
+//        return actionToReturn;
+//    }
+//
+//    private String changeToFoldOrCallOrKeepRaiseGivenData(List<Double> raiseData, ActionVariables actionVariables,
+//                                                          GameVariables gameVariables, String dbTable) throws Exception {
+//        String actionToReturn = null;
+//
+//        if(raiseData.get(1) >= 20) {
+//            double raiseRatio = raiseData.get(0) / raiseData.get(1);
+//
+//            if(raiseRatio > 0.55) {
+//                actionToReturn = "raise";
+//            } else {
+//                double random = Math.random();
+//
+//                if(random < 0.75) {
+//                    //keep actionToReturn to null so that raise will be changed
+//                } else {
+//                    actionToReturn = "raise";
+//                }
+//            }
+//        } else {
+//            actionToReturn = "raise";
+//        }
+//
+//        if(actionToReturn == null) {
+//            String callRoute = calculateCallRoute(actionVariables, gameVariables);
+//            List<Double> callData = getDataFromDb(dbTable, callRoute);
+//
+//            if (callData.get(1) >= 20) {
+//                double callSuccessRatio = callData.get(0) / callData.get(1);
+//                double facingOdds = actionVariables.getFacingOdds(gameVariables);
+//
+//                if (callSuccessRatio > facingOdds) {
+//                    actionToReturn = "call";
+//                }
+//            }
+//        }
+//
+//        if(actionToReturn == null) {
+//            //roep new Poker() aan met eligibleactions fold en call...
+//
+//            actionToReturn = "fold";
 //        }
 //
 //        return actionToReturn;

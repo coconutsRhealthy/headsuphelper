@@ -564,7 +564,7 @@ public class ActionVariables {
         return gameVariables.getBotStack() / gameVariables.getBigBlind();
     }
 
-    private double getFacingOdds(GameVariables gameVariables) {
+    public double getFacingOdds(GameVariables gameVariables) {
         double opponentBetSize = gameVariables.getOpponentBetSize();
         double botBetSize = gameVariables.getBotBetSize();
         double botStack = gameVariables.getBotStack();
