@@ -980,7 +980,7 @@ public class DbSavePersister {
         closeDbConnection();
     }
 
-    private String convertBluffOrValueSizingToCompact(String sizing) {
+    public String convertBluffOrValueSizingToCompact(String sizing) {
         String compactSizing;
 
         if(sizing.equals("Sizing_0-5bb") || sizing.equals("Sizing_5-10bb")) {
@@ -994,7 +994,7 @@ public class DbSavePersister {
         return compactSizing;
     }
 
-    private String convertCallAtcToCompact(String sizing) {
+    public String convertCallAtcToCompact(String sizing) {
         String compactSizing;
 
         if(sizing.equals("Atc_0-5bb") || sizing.equals("Atc_5-10bb")) {

@@ -133,7 +133,6 @@ public class ActionVariables {
         setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(opponentActionInMethod, boardInMethod, continuousTable, opponentBetsizeBb, potSizeBb);
         double amountToCallBb = getAmountToCallBb(botBetsizeBb, opponentBetsizeBb, botStackBb);
 
-        //int boardWetness = getBoardWetness(continuousTable);
         int boardWetness = 200;
         boolean defaultCheck = false;
 
@@ -309,20 +308,8 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
 
-//
-//            //hier de machine learning logica
-//            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-//            action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables);
-//
-//
-//
-//            //
-
-
-
-
-
-
+            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable);
         }
 
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
@@ -577,7 +564,7 @@ public class ActionVariables {
         return facingOdds;
     }
 
-    private String getStreet(GameVariables gameVariables) {
+    public String getStreet(GameVariables gameVariables) {
         String street = "";
 
         if(gameVariables.getFlopCard1() == null) {
@@ -891,6 +878,30 @@ public class ActionVariables {
 
     public void setStrongGutshot(boolean strongGutshot) {
         this.strongGutshot = strongGutshot;
+    }
+
+    public boolean isStrongOvercards() {
+        return strongOvercards;
+    }
+
+    public void setStrongOvercards(boolean strongOvercards) {
+        this.strongOvercards = strongOvercards;
+    }
+
+    public boolean isStrongBackdoorFd() {
+        return strongBackdoorFd;
+    }
+
+    public void setStrongBackdoorFd(boolean strongBackdoorFd) {
+        this.strongBackdoorFd = strongBackdoorFd;
+    }
+
+    public boolean isStrongBackdoorSd() {
+        return strongBackdoorSd;
+    }
+
+    public void setStrongBackdoorSd(boolean strongBackdoorSd) {
+        this.strongBackdoorSd = strongBackdoorSd;
     }
 
     public HandEvaluator getHandEvaluator() {
