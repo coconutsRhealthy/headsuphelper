@@ -308,8 +308,15 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
 
+
+            String actionBeforeMachineLearning = action;
+
             sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable);
+
+            if(!actionBeforeMachineLearning.equals(action)) {
+                System.out.println("---Action changed in Machinelearning from: " + actionBeforeMachineLearning + " to: " + action);
+            }
         }
 
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);

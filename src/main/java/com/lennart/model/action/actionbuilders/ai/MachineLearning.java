@@ -43,8 +43,9 @@ public class MachineLearning {
             if(actionVariables.getBotHandStrength() < 0.7) {
                 if(bluffOddsAreOk(actionVariables.getSizing(), gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
                     String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+                    System.out.println("##Route: " + route);
                     List<Double> bluffBetData = getDataFromDb(route, "bet75pct", actionVariables.getBotHandStrength());
-                    actionToReturn = changeToBetOrKeepCheckGivenData(bluffBetData);
+                    actionToReturn = changeToBetOrKeepCheckGivenData(bluffBetData, route);
                 } else {
                     actionToReturn = actionVariables.getAction();
                 }
@@ -52,8 +53,9 @@ public class MachineLearning {
                 if(gameVariables.getBoard() != null && gameVariables.getBoard().size() == 5) {
                     if(gameVariables.isBotIsButton()) {
                         String route = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+                        System.out.println("##Route: " + route);
                         List<Double> valueBetData = getDataFromDb(route, "bet75pct", actionVariables.getBotHandStrength());
-                        actionToReturn = changeToBetOrKeepCheckGivenData(valueBetData);
+                        actionToReturn = changeToBetOrKeepCheckGivenData(valueBetData, route);
                     } else {
                         actionToReturn = actionVariables.getAction();
                     }
@@ -71,21 +73,32 @@ public class MachineLearning {
     private String adjustFoldAction(ActionVariables actionVariables, GameVariables gameVariables) throws Exception {
         String actionToReturn = null;
 
-        String raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
-        List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
+        if(bluffOddsAreOk(actionVariables.getSizing(), gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
+            String raiseRoute;
 
-        if(raiseData.get(1) >= 20) {
-            double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
+            if(actionVariables.getBotHandStrength() < 0.7) {
+                raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+            } else {
+                raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+            }
 
-            if(raiseSuccessRatio > 0.51) {
-                actionToReturn = "raise";
-                System.out.println("Machinelearning I) Changed fold to raise");
+            System.out.println("##Route: " + raiseRoute);
+            List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
 
+            if(raiseData.get(1) >= 20) {
+                double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
+
+                if(raiseSuccessRatio > 0.51) {
+                    actionToReturn = "raise";
+                    System.out.println("Machinelearning I) Changed fold to raise");
+                    System.out.println("Route: " + raiseRoute);
+                }
             }
         }
 
         if(actionToReturn == null) {
             String callRoute = calculateCallRoute(actionVariables, gameVariables);
+            System.out.println("##Route: " + callRoute);
             List<Double> callData = getDataFromDb(callRoute, "call", actionVariables.getBotHandStrength());
 
             if(callData.get(1) >= 20) {
@@ -95,6 +108,7 @@ public class MachineLearning {
                 if(callSuccessRatio > facingOdds) {
                     actionToReturn = "call";
                     System.out.println("Machinelearning J) Changed fold to call");
+                    System.out.println("Route: " + callRoute);
                 }
             }
         }
@@ -113,8 +127,10 @@ public class MachineLearning {
 
         if(actionVariables.getBotHandStrength() < 0.7) {
             route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+            System.out.println("##Route: " + route);
         } else {
             route = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+            System.out.println("##Route: " + route);
         }
 
         List<Double> betData = getDataFromDb(route, "bet75pct", actionVariables.getBotHandStrength());
@@ -127,6 +143,7 @@ public class MachineLearning {
 
                 if(random < 0.75) {
                     System.out.println("Machinelearning A) Changed bet to check");
+                    System.out.println("Route: " + route);
                     actionToReturn = "check";
                 } else {
                     actionToReturn = "bet75pct";
@@ -147,11 +164,13 @@ public class MachineLearning {
 
         if(actionVariables.getBotHandStrength() < 0.7) {
             String bluffRaiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+            System.out.println("##Route: " + bluffRaiseRoute);
             List<Double> bluffRaiseData = getDataFromDb(bluffRaiseRoute, "raise", actionVariables.getBotHandStrength());
             actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(bluffRaiseData, actionVariables, gameVariables,
                     continuousTable);
         } else {
             String valueRaiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+            System.out.println("##Route: " + valueRaiseRoute);
             List<Double> valueRaiseData = getDataFromDb(valueRaiseRoute, "raise", actionVariables.getBotHandStrength());
             actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(valueRaiseData, actionVariables, gameVariables,
                     continuousTable);
@@ -164,13 +183,14 @@ public class MachineLearning {
         String actionToReturn;
 
         String callRoute = calculateCallRoute(actionVariables, gameVariables);
+        System.out.println("##Route: " + callRoute);
         List<Double> callData = getDataFromDb(callRoute, "call", actionVariables.getBotHandStrength());
         actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables);
 
         return actionToReturn;
     }
 
-    private String changeToBetOrKeepCheckGivenData(List<Double> data) {
+    private String changeToBetOrKeepCheckGivenData(List<Double> data, String route) {
         String actionToReturn;
 
         double successNumber = data.get(0);
@@ -180,8 +200,20 @@ public class MachineLearning {
             double successRatio = successNumber / totalNumber;
 
             if(successRatio > 0.51) {
-                actionToReturn = "bet75pct";
-                System.out.println("Machinelearning H) Changed check to bet");
+                if(route.contains("Sizing_0-10bb")) {
+                    if(Math.random() < 0.7) {
+                        actionToReturn = "bet75pct";
+                        System.out.println("Machinelearning H1) Changed check to bet");
+                        System.out.println("Route: " + route);
+                    } else {
+                        actionToReturn = "check";
+                        System.out.println("MachineLearning zzz");
+                    }
+                } else {
+                    actionToReturn = "bet75pct";
+                    System.out.println("Machinelearning H2) Changed check to bet");
+                    System.out.println("Route: " + route);
+                }
             } else {
                 actionToReturn = "check";
             }
@@ -216,6 +248,7 @@ public class MachineLearning {
 
         if(actionToReturn == null) {
             String callRoute = calculateCallRoute(actionVariables, gameVariables);
+            System.out.println("##Route: " + callRoute);
             List<Double> callData = getDataFromDb(callRoute, "call", actionVariables.getBotHandStrength());
 
             if(callData.get(1) >= 20) {
@@ -225,6 +258,7 @@ public class MachineLearning {
                 if (callSuccessRatio > facingOdds) {
                     actionToReturn = "call";
                     System.out.println("Machinelearning B) Changed raise to call");
+                    System.out.println("Route: " + callRoute);
                 }
             }
         }
@@ -268,15 +302,28 @@ public class MachineLearning {
         }
 
         if(actionToReturn == null) {
-            String raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
-            List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
+            if(actionVariables.getBotHandStrength() >= 0.7 ||
+                bluffOddsAreOk(actionVariables.getSizing(), gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
 
-            if(raiseData.get(1) >= 20) {
-                double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
+                String raiseRoute;
 
-                if(raiseSuccessRatio > 0.51) {
-                    actionToReturn = "raise";
-                    System.out.println("Machinelearning F) Changed call to raise");
+                if(actionVariables.getBotHandStrength() >= 0.7) {
+                    raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+                } else {
+                    raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+                }
+
+                System.out.println("##Route: " + raiseRoute);
+                List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
+
+                if (raiseData.get(1) >= 20) {
+                    double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
+
+                    if (raiseSuccessRatio > 0.51) {
+                        actionToReturn = "raise";
+                        System.out.println("Machinelearning F) Changed call to raise");
+                        System.out.println("Route: " + raiseRoute);
+                    }
                 }
             }
         }
