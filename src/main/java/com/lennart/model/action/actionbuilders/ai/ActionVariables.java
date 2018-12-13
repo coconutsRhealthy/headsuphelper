@@ -325,10 +325,10 @@ public class ActionVariables {
             sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
         }
 
-        if(effectiveStack <= 10) {
+        if((botStackBb + botBetsizeBb <= 10) || (opponentStackBb + opponentBetsizeBb <= 10)) {
             ShortStackPlayAdjuster shortStackPlayAdjuster = new ShortStackPlayAdjuster();
             action = shortStackPlayAdjuster.adjustAction(action, gameVariables, this);
-            sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, effectiveStack, botBetsizeBb * gameVariables.getBigBlind(), opponentBetsizeBb * gameVariables.getBigBlind());
+            sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, botStackBb, botBetsizeBb);
         }
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {

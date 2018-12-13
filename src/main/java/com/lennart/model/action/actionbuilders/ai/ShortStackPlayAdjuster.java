@@ -19,11 +19,11 @@ public class ShortStackPlayAdjuster {
         return actionToReturn;
     }
 
-    public double adjustSizing(String action, double currentSizing, double effectiveStack, double botTotalBetsize, double opponentTotalBetsize) {
+    public double adjustSizing(String action, double currentSizing, double botStack, double botTotalBetsize) {
         double sizingToReturn = currentSizing;
 
         if(action.equals("bet75pct") || action.equals("raise")) {
-            sizingToReturn = effectiveStack + botTotalBetsize + opponentTotalBetsize;
+            sizingToReturn = (botStack + botTotalBetsize) * 1.2;
         }
 
         return sizingToReturn;
