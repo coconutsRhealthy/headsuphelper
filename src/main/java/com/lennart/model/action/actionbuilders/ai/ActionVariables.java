@@ -303,32 +303,32 @@ public class ActionVariables {
                     botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
                     botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
 
-
-            if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-            }
-
-
+            //machine learning
             String actionBeforeMachineLearning = action;
 
-            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-            action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable);
+            double sizingForMachineLearning = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable, sizingForMachineLearning);
 
             if(!actionBeforeMachineLearning.equals(action)) {
                 System.out.println("---Action changed in Machinelearning from: " + actionBeforeMachineLearning + " to: " + action);
+            }
+            //machine learning
+
+            if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
         }
 
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
+        if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
+            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+        }
+
         if(effectiveStack <= 10) {
             ShortStackPlayAdjuster shortStackPlayAdjuster = new ShortStackPlayAdjuster();
             action = shortStackPlayAdjuster.adjustAction(action, gameVariables, this);
             sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, effectiveStack, botBetsizeBb * gameVariables.getBigBlind(), opponentBetsizeBb * gameVariables.getBigBlind());
-        }
-
-        if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
         }
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {

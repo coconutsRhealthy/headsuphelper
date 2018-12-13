@@ -15,34 +15,34 @@ public class MachineLearning {
     private Connection con;
 
     public String adjustActionToDbSaveData(ActionVariables actionVariables, GameVariables gameVariables,
-                                           ContinuousTable continuousTable) throws Exception {
+                                           ContinuousTable continuousTable, double sizing) throws Exception {
         String actionToReturn = "";
 
         String currentAction = actionVariables.getAction();
 
         if(currentAction.equals("fold")) {
-            actionToReturn = adjustFoldAction(actionVariables, gameVariables);
+            actionToReturn = adjustFoldAction(actionVariables, gameVariables, sizing);
         } else if(currentAction.equals("call")) {
-            actionToReturn = adjustCallAction(actionVariables, gameVariables);
+            actionToReturn = adjustCallAction(actionVariables, gameVariables, sizing);
         } else if(currentAction.equals("check")) {
-            actionToReturn = adjustCheckAction(actionVariables, gameVariables, continuousTable.isOpponentHasInitiative());
+            actionToReturn = adjustCheckAction(actionVariables, gameVariables, continuousTable.isOpponentHasInitiative(), sizing);
         } else if(currentAction.equals("bet75pct")) {
-            actionToReturn = adjustBetAction(actionVariables, gameVariables);
+            actionToReturn = adjustBetAction(actionVariables, gameVariables, sizing);
         } else if(currentAction.equals("raise")) {
-            actionToReturn = adjustRaiseAction(actionVariables, gameVariables, continuousTable);
+            actionToReturn = adjustRaiseAction(actionVariables, gameVariables, continuousTable, sizing);
         }
 
         return actionToReturn;
     }
 
     private String adjustCheckAction(ActionVariables actionVariables, GameVariables gameVariables,
-                                     boolean opponentHasInitiative) throws Exception {
+                                     boolean opponentHasInitiative, double sizing) throws Exception {
         String actionToReturn;
 
         if(!opponentHasInitiative) {
             if(actionVariables.getBotHandStrength() < 0.7) {
-                if(bluffOddsAreOk(actionVariables.getSizing(), gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
-                    String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+                if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
+                    String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                     System.out.println("##Route: " + route);
                     List<Double> bluffBetData = getDataFromDb(route, "bet75pct", actionVariables.getBotHandStrength());
                     actionToReturn = changeToBetOrKeepCheckGivenData(bluffBetData, route);
@@ -52,7 +52,7 @@ public class MachineLearning {
             } else {
                 if(gameVariables.getBoard() != null && gameVariables.getBoard().size() == 5) {
                     if(gameVariables.isBotIsButton()) {
-                        String route = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+                        String route = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                         System.out.println("##Route: " + route);
                         List<Double> valueBetData = getDataFromDb(route, "bet75pct", actionVariables.getBotHandStrength());
                         actionToReturn = changeToBetOrKeepCheckGivenData(valueBetData, route);
@@ -70,16 +70,16 @@ public class MachineLearning {
         return actionToReturn;
     }
 
-    private String adjustFoldAction(ActionVariables actionVariables, GameVariables gameVariables) throws Exception {
+    private String adjustFoldAction(ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
         String actionToReturn = null;
 
-        if(bluffOddsAreOk(actionVariables.getSizing(), gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
+        if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
             String raiseRoute;
 
             if(actionVariables.getBotHandStrength() < 0.7) {
-                raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+                raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
             } else {
-                raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+                raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
             }
 
             System.out.println("##Route: " + raiseRoute);
@@ -120,16 +120,16 @@ public class MachineLearning {
         return actionToReturn;
     }
 
-    private String adjustBetAction(ActionVariables actionVariables, GameVariables gameVariables) throws Exception {
+    private String adjustBetAction(ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
         String actionToReturn;
 
         String route;
 
         if(actionVariables.getBotHandStrength() < 0.7) {
-            route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+            route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
             System.out.println("##Route: " + route);
         } else {
-            route = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct");
+            route = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
             System.out.println("##Route: " + route);
         }
 
@@ -159,17 +159,17 @@ public class MachineLearning {
     }
 
     private String adjustRaiseAction(ActionVariables actionVariables, GameVariables gameVariables,
-                                     ContinuousTable continuousTable) throws Exception {
+                                     ContinuousTable continuousTable, double sizing) throws Exception {
         String actionToReturn;
 
         if(actionVariables.getBotHandStrength() < 0.7) {
-            String bluffRaiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+            String bluffRaiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
             System.out.println("##Route: " + bluffRaiseRoute);
             List<Double> bluffRaiseData = getDataFromDb(bluffRaiseRoute, "raise", actionVariables.getBotHandStrength());
             actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(bluffRaiseData, actionVariables, gameVariables,
                     continuousTable);
         } else {
-            String valueRaiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+            String valueRaiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
             System.out.println("##Route: " + valueRaiseRoute);
             List<Double> valueRaiseData = getDataFromDb(valueRaiseRoute, "raise", actionVariables.getBotHandStrength());
             actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(valueRaiseData, actionVariables, gameVariables,
@@ -179,13 +179,13 @@ public class MachineLearning {
         return actionToReturn;
     }
 
-    private String adjustCallAction(ActionVariables actionVariables, GameVariables gameVariables) throws Exception {
+    private String adjustCallAction(ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
         String actionToReturn;
 
         String callRoute = calculateCallRoute(actionVariables, gameVariables);
         System.out.println("##Route: " + callRoute);
         List<Double> callData = getDataFromDb(callRoute, "call", actionVariables.getBotHandStrength());
-        actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables);
+        actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables, sizing);
 
         return actionToReturn;
     }
@@ -279,7 +279,7 @@ public class MachineLearning {
     }
 
     private String changeToFoldOrRaiseOrKeepCallGivenData(List<Double> callData, ActionVariables actionVariables,
-                                                          GameVariables gameVariables) throws Exception {
+                                                          GameVariables gameVariables, double sizing) throws Exception {
         String actionToReturn = null;
 
         if(callData.get(1) >= 20) {
@@ -303,14 +303,14 @@ public class MachineLearning {
 
         if(actionToReturn == null) {
             if(actionVariables.getBotHandStrength() >= 0.7 ||
-                bluffOddsAreOk(actionVariables.getSizing(), gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
+                bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
 
                 String raiseRoute;
 
                 if(actionVariables.getBotHandStrength() >= 0.7) {
-                    raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+                    raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 } else {
-                    raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise");
+                    raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 }
 
                 System.out.println("##Route: " + raiseRoute);
@@ -402,7 +402,7 @@ public class MachineLearning {
         return valuesToReturn;
     }
 
-    private String calculateBluffBetOrRaiseRoute(ActionVariables actionVariables, GameVariables gameVariables, String actionToConsider) throws Exception {
+    private String calculateBluffBetOrRaiseRoute(ActionVariables actionVariables, GameVariables gameVariables, String actionToConsider, double sizing) throws Exception {
         if(actionToConsider.equals("bet75pct")) {
             actionToConsider = "Bet";
         } else {
@@ -414,7 +414,7 @@ public class MachineLearning {
         String street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
         String bluffAction = actionToConsider;
         String position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
-        String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(actionVariables.getSizing() / gameVariables.getBigBlind()));
+        String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
         String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
         String strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
 
@@ -423,7 +423,7 @@ public class MachineLearning {
         return route;
     }
 
-    private String calculateValueBetOrRaiseRoute(ActionVariables actionVariables, GameVariables gameVariables, String actionToConsider) throws Exception {
+    private String calculateValueBetOrRaiseRoute(ActionVariables actionVariables, GameVariables gameVariables, String actionToConsider, double sizing) throws Exception {
         if(actionToConsider.equals("bet75pct")) {
             actionToConsider = "Bet";
         } else {
@@ -435,7 +435,7 @@ public class MachineLearning {
         String street = dbSaveValue.getStreetViaLogic(gameVariables.getBoard());
         String valueAction = actionToConsider;
         String postion = dbSaveValue.getPositionLogic(gameVariables.isBotIsButton());
-        String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveValue.getSizingGroupViaLogic(actionVariables.getSizing() / gameVariables.getBigBlind()));
+        String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveValue.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
         String oppLoosenessGroup = dbSaveValue.getOppLoosenessGroupViaLogic(gameVariables.getOpponentName());
         String handStrength = dbSaveValue.getHandStrengthLogic(actionVariables.getBotHandStrength());
 
