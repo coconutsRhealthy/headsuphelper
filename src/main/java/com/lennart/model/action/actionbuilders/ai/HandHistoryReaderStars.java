@@ -110,6 +110,44 @@ public class HandHistoryReaderStars {
         return lastGame;
     }
 
+    public List<String> getLinesOfLastGameNonRecursive(List<String> totalXml, int handNumber) {
+        List<String> copyOfTotal = new ArrayList<>();
+        List<String> lastGame = new ArrayList<>();
+
+        copyOfTotal.addAll(totalXml);
+        Collections.reverse(copyOfTotal);
+
+        boolean firstHand = false;
+
+        int counter = 0;
+
+        for(String line : copyOfTotal) {
+            if(line.contains("Seat 2") && (line.contains("big blind") || line.contains("(button)"))) {
+                counter++;
+
+                if(handNumber == counter) {
+                    firstHand = true;
+                }
+            }
+
+            if(line.contains("PokerStars")) {
+                if(handNumber == counter) {
+                    lastGame.add(line);
+                    break;
+                }
+            }
+
+            if(firstHand) {
+                if(handNumber == counter) {
+                    lastGame.add(line);
+                }
+            }
+        }
+
+        Collections.reverse(lastGame);
+        return lastGame;
+    }
+
     private List<String> getLinesOfHandFromFlopUntilRiver(List<String> lastGame) {
         List<String> flopUntilRiverLines = new ArrayList<>();
 
