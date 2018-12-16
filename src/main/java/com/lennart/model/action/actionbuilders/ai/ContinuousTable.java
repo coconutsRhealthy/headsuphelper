@@ -64,7 +64,7 @@ public class ContinuousTable implements ContinuousTableable {
             if(StarsTableReader.botIsToAct()) {
                 numberOfActionRequests++;
 
-                boolean isNewHand = isNewHand(bigBlind, game.equals("sng"));
+                boolean isNewHand = isNewHand(bigBlind);
 
                 if(isNewHand) {
                     int numberOfHsAbove85 = getNumberOfHsAbove85();
@@ -227,20 +227,12 @@ public class ContinuousTable implements ContinuousTableable {
         return cardListAsString;
     }
 
-    private boolean isNewHand(double bigBlind, boolean sng) throws Exception {
+    private boolean isNewHand(double bigBlind) throws Exception {
         boolean isNewHand;
 
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
         List<String> total = handHistoryReaderStars.readTextFile();
-
-        List<String> lastHand;
-
-        if(sng) {
-            lastHand = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total, 1);
-        } else {
-            lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
-        }
-
+        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
         String lastHandNumber = handHistoryReaderStars.getHandNumber(lastHand.get(0));
 
         isNewHand = !starsLastHandNumber.equals(lastHandNumber);
