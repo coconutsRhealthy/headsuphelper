@@ -432,6 +432,40 @@ public class StarsTableReader {
         return ImageProcessor.removeAllNonNumericCharacters(totalPotSize);
     }
 
+    public double readBigBlindFromSngScreen() {
+        double bigBlind;
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(361, 25, 199, 19);
+
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+
+        String bigBlindString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+
+        System.out.println(bigBlindString);
+
+        bigBlindString = bigBlindString.substring(bigBlindString.indexOf("Blinds"));
+        bigBlindString = bigBlindString.replace("Blinds ", "");
+
+        int x = bigBlindString.indexOf("- T");
+
+        bigBlindString = bigBlindString.substring(0, x);
+        bigBlindString = bigBlindString.replaceAll("\\s+","");
+
+        if(bigBlindString.charAt(2) != '0') {
+            bigBlindString = bigBlindString.substring(0, 2);
+        } else {
+            if(bigBlindString.charAt(3) == '0') {
+                bigBlindString = bigBlindString.substring(0, 4);
+            } else {
+                bigBlindString = bigBlindString.substring(0, 3);
+            }
+        }
+
+        bigBlind = Double.valueOf(bigBlindString);
+        return bigBlind * 2;
+    }
+
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
         ImageProcessor.saveBufferedImage(bufferedImage, "/Users/LennartMac/Documents/logging/" + numberOfActionRequests + ".png");

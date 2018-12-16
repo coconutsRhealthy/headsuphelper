@@ -26,6 +26,8 @@ public class ShortStackPlayAdjuster {
             sizingToReturn = (botStack + botTotalBetsize) * 1.2;
         }
 
+        System.out.println("adjusted shortstack sizing: " + sizingToReturn);
+
         return sizingToReturn;
     }
 
