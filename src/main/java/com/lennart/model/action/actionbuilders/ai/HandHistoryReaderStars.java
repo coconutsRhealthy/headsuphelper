@@ -141,10 +141,17 @@ public class HandHistoryReaderStars {
     public double getBigBlindFromLastHandHh(List<String> lastHand) {
         double bigBlind = -1;
 
+        String bigBlindLineIdentifier = "posts big blind ";
+
         for(String line : lastHand) {
-            if(line.contains("posts big blind")) {
-                String bigBlindString = line.substring(line.indexOf("posts big blind"));
-                bigBlindString = bigBlindString.replace("posts big blind", "");
+            if(line.contains(bigBlindLineIdentifier)) {
+                String bigBlindString = line.substring(line.indexOf(bigBlindLineIdentifier));
+                bigBlindString = bigBlindString.replace(bigBlindLineIdentifier, "");
+
+                if(bigBlindString.contains(" ")) {
+                    bigBlindString = bigBlindString.substring(0, bigBlindString.indexOf(" "));
+                }
+
                 bigBlindString = bigBlindString.replaceAll("\\s+","");
 
                 bigBlind = Double.valueOf(bigBlindString);
