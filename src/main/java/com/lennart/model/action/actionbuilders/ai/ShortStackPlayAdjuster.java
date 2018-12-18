@@ -19,11 +19,11 @@ public class ShortStackPlayAdjuster {
         return actionToReturn;
     }
 
-    public double adjustSizing(String action, double currentSizing, double botStack, double botTotalBetsize) {
+    public double adjustSizing(String action, double currentSizing, double bigBlind) {
         double sizingToReturn = currentSizing;
 
         if(action.equals("bet75pct") || action.equals("raise")) {
-            sizingToReturn = (botStack + botTotalBetsize) * 1.2;
+            sizingToReturn = 5000 * bigBlind;
         }
 
         System.out.println("adjusted shortstack sizing: " + sizingToReturn);
