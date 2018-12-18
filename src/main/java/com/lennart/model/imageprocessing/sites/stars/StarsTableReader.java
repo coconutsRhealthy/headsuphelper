@@ -168,27 +168,45 @@ public class StarsTableReader {
     }
 
     public static boolean sngIsFinished() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        if(pixelRgb / 100 == -15790) {
+            //expected rgb: -1.579.033
+
+            System.out.println("sng is finished");
+            return true;
+        }
         return false;
     }
 
-    public void closeSngTable() {
-
+    public void closeRematchScreen() {
+        System.out.println("closing rematch screen");
+        MouseKeyboard.click(480, 637);
     }
 
     public void registerNewSng() {
-
+        System.out.println("registering new sng");
+        MouseKeyboard.click(782, 603);
     }
 
     public boolean newSngTableIsOpened() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(197, 489, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        System.out.println(pixelRgb);
+
+        if(pixelRgb / 1000 == -15832) {
+            //expected rgb: -15.832.802
+            System.out.println("new sng table is opened a");
+            return true;
+        }
         return false;
     }
 
     public void maximizeNewSngTable() {
-
-    }
-
-    public void closeRedundantSngPopupScreen() {
-
+        System.out.println("maximizing sng table");
+        MouseKeyboard.click(55, 240);
     }
 
     public String getOpponentPlayerNameFromImage() {
