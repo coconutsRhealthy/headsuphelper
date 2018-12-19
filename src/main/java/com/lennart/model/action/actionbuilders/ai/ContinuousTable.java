@@ -244,7 +244,15 @@ public class ContinuousTable implements ContinuousTableable {
         System.out.println("Bb from HH: " + bigBlindInMethod);
 
         List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlindInMethod);
-        String lastHandNumber = handHistoryReaderStars.getHandNumber(lastHand.get(0));
+
+        String lastHandNumber;
+
+        if(!lastHand.isEmpty()) {
+            lastHandNumber = handHistoryReaderStars.getHandNumber(lastHand.get(0));
+        } else {
+            System.out.println("lasthand was empty in isNewHand()");
+            lastHandNumber = "-2";
+        }
 
         isNewHand = !starsLastHandNumber.equals(lastHandNumber);
         starsLastHandNumber = lastHandNumber;

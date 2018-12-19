@@ -168,6 +168,8 @@ public class StarsTableReader {
     }
 
     public static boolean sngIsFinished() {
+        boolean sngIsFinished = false;
+
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
@@ -175,9 +177,22 @@ public class StarsTableReader {
             //expected rgb: -1.579.033
 
             System.out.println("sng is finished");
-            return true;
+            sngIsFinished = true;
         }
-        return false;
+
+        if(!sngIsFinished) {
+            BufferedImage bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(74, 167, 1, 1);
+            int pixelRgb2 = bufferedImage2.getRGB(0, 0);
+
+            if(pixelRgb2 / 100 == -31580) {
+                //expected rgb: -3.158.065
+
+                System.out.println("sng is finished");
+                sngIsFinished = true;
+            }
+        }
+
+        return sngIsFinished;
     }
 
     public void closeRematchScreen() {
