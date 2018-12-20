@@ -200,9 +200,22 @@ public class StarsTableReader {
         MouseKeyboard.click(480, 637);
     }
 
-    public void registerNewSng() {
+    public void registerNewSng() throws Exception {
         System.out.println("registering new sng");
         MouseKeyboard.click(782, 603);
+
+        TimeUnit.MILLISECONDS.sleep(950);
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(441, 426, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        if(pixelRgb / 100 == -13158 ) {
+            System.out.println("registration was already closed. Click OK and call method again");
+            MouseKeyboard.click(782, 603);
+
+            TimeUnit.MILLISECONDS.sleep(200);
+            registerNewSng();
+        }
     }
 
     public boolean newSngTableIsOpened() {
