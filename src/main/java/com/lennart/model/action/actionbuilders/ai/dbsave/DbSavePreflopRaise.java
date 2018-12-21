@@ -1,6 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
-public class DbSavePreflopRaise {
+public class DbSavePreflopRaise extends DbSave {
 
     private String handStrength;
     private String position;
@@ -38,18 +38,6 @@ public class DbSavePreflopRaise {
         return handStrengthString;
     }
 
-    public String getPositionLogic(boolean position) {
-        String positionString;
-
-        if(position) {
-            positionString = "Ip";
-        } else {
-            positionString = "Oop";
-        }
-
-        return positionString;
-    }
-
     public String getSizingLogic(double sizingBb) {
         String sizingString;
 
@@ -82,6 +70,7 @@ public class DbSavePreflopRaise {
         return foldStatGroup;
     }
 
+    @Override
     public String getEffectiveStackLogic(double botStackBb, double opponentStackBb) {
         String effectiveStackBbString;
         double effectiveStackBb;
@@ -107,5 +96,45 @@ public class DbSavePreflopRaise {
         }
 
         return effectiveStackBbString;
+    }
+
+    public String getHandStrength() {
+        return handStrength;
+    }
+
+    public void setHandStrength(String handStrength) {
+        this.handStrength = handStrength;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public String getSizing() {
+        return sizing;
+    }
+
+    public void setSizing(String sizing) {
+        this.sizing = sizing;
+    }
+
+    public String getFoldStatGroup() {
+        return foldStatGroup;
+    }
+
+    public void setFoldStatGroup(String foldStatGroup) {
+        this.foldStatGroup = foldStatGroup;
+    }
+
+    public String getEffectiveStack() {
+        return effectiveStack;
+    }
+
+    public void setEffectiveStack(String effectiveStack) {
+        this.effectiveStack = effectiveStack;
     }
 }

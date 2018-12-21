@@ -1008,7 +1008,7 @@ public class DbSavePersister {
         return compactSizing;
     }
 
-    private boolean actionWasSuccessfull(double bigBlind) throws Exception {
+    public boolean actionWasSuccessfull(double bigBlind) throws Exception {
         boolean botWonHand = false;
 
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();

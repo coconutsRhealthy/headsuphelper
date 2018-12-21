@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
@@ -95,6 +96,7 @@ public class ContinuousTable implements ContinuousTableable {
                     top10percentRiverCombos = new ArrayList<>();
 
                     new DbSavePersister().doDbSaveUpdate(this, bigBlind);
+                    new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     dbSaveList = new ArrayList<>();
 
                     if(botBluffActionDone) {

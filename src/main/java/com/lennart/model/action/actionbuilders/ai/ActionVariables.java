@@ -1,8 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveBluff;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveCall;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveValue;
+import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
@@ -338,6 +336,7 @@ public class ActionVariables {
         if(realGame) {
             //fill dbsave
             if(boardInMethod != null && boardInMethod.size() >= 3) {
+                //postflop
                 if(action.equals("call") || action.equals("bet75pct") || action.equals("raise")) {
                     int drawWetness = boardEvaluator.getFlushStraightWetness();
                     int boatWetness = boardEvaluator.getBoatWetness();
@@ -425,6 +424,41 @@ public class ActionVariables {
 
                         continuousTable.getDbSaveList().add(dbSaveValue);
                     }
+                }
+            } else {
+                //preflop
+                if(action.equals("raise")) {
+                    DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
+
+                    String handStrength = dbSavePreflopRaise.getHandStrengthLogic(botHandStrength);
+                    String postion = dbSavePreflopRaise.getPositionLogic(botIsButtonInMethod);
+                    String sizingGroup = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
+                    String foldStatGroup = dbSavePreflopRaise.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+                    String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(botStackBb, opponentStackBb);
+
+                    dbSavePreflopRaise.setHandStrength(handStrength);
+                    dbSavePreflopRaise.setPosition(postion);
+                    dbSavePreflopRaise.setSizing(sizingGroup);
+                    dbSavePreflopRaise.setFoldStatGroup(foldStatGroup);
+                    dbSavePreflopRaise.setEffectiveStack(effectiveStackString);
+
+                    continuousTable.getDbSaveList().add(dbSavePreflopRaise);
+                } else if(action.equals("call")) {
+                    DbSavePreflopCall dbSavePreflopCall = new DbSavePreflopCall();
+
+                    String handStrength = dbSavePreflopCall.getHandStrengthLogic(botHandStrength);
+                    String postion = dbSavePreflopCall.getPositionLogic(botIsButtonInMethod);
+                    String amountToCallGroup = dbSavePreflopCall.getAmountToCallViaLogic(amountToCallBb);
+                    String foldStatGroup = dbSavePreflopCall.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+                    String effectiveStackString = dbSavePreflopCall.getEffectiveStackLogic(botStackBb, opponentStackBb);
+
+                    dbSavePreflopCall.setHandStrenght(handStrength);
+                    dbSavePreflopCall.setPosition(postion);
+                    dbSavePreflopCall.setAmountToCallBb(amountToCallGroup);
+                    dbSavePreflopCall.setFoldStatGroup(foldStatGroup);
+                    dbSavePreflopCall.setEffectiveStack(effectiveStackString);
+
+                    continuousTable.getDbSaveList().add(dbSavePreflopCall);
                 }
             }
             ///////
