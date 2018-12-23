@@ -197,7 +197,15 @@ public class StarsTableReader {
 
     public void closeRematchScreen() {
         System.out.println("closing rematch screen");
-        MouseKeyboard.click(480, 637);
+        MouseKeyboard.click(483, 648);
+
+        //playMoney
+        //MouseKeyboard.click(480, 637);
+    }
+
+    public void clickTopSngInList() {
+        System.out.println("clicking top sng in list");
+        MouseKeyboard.click(206, 278);
     }
 
     public void registerNewSng() throws Exception {
@@ -211,7 +219,7 @@ public class StarsTableReader {
 
         if(pixelRgb / 100 == -13158 ) {
             System.out.println("registration was already closed. Click OK and call method again");
-            MouseKeyboard.click(782, 603);
+            MouseKeyboard.click(489, 449);
 
             TimeUnit.MILLISECONDS.sleep(200);
             registerNewSng();
@@ -497,6 +505,7 @@ public class StarsTableReader {
 
         bigBlindString = bigBlindString.substring(0, x);
         bigBlindString = bigBlindString.replaceAll("\\s+","");
+        bigBlindString = bigBlindString.replaceAll("\\$", "");
 
         if(bigBlindString.charAt(2) != '0') {
             bigBlindString = bigBlindString.substring(0, 2);

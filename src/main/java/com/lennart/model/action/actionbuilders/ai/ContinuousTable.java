@@ -297,6 +297,8 @@ public class ContinuousTable implements ContinuousTableable {
 
             TimeUnit.MILLISECONDS.sleep(100);
             starsTableReader.closeRematchScreen();
+            TimeUnit.MILLISECONDS.sleep(500);
+            starsTableReader.clickTopSngInList();
             TimeUnit.MILLISECONDS.sleep(100);
             starsTableReader.registerNewSng();
 

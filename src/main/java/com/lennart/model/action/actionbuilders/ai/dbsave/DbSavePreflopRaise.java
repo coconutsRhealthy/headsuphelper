@@ -82,9 +82,9 @@ public class DbSavePreflopRaise extends DbSave {
         }
 
         if(effectiveStackBb <= 10) {
-            effectiveStackBbString = "EffStack_0_10bb";
+            effectiveStackBbString = "Effstack_0-10bb";
         } else if(effectiveStackBb <= 30) {
-            effectiveStackBbString = "EffStack_10_30bb";
+            effectiveStackBbString = "Effstack_10-30bb";
         } else if(effectiveStackBb <= 50) {
             effectiveStackBbString = "Effstack_30-50bb";
         } else if(effectiveStackBb <= 75) {
