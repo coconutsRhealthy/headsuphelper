@@ -381,15 +381,37 @@ public class MachineLearning {
 
         initializeDbConnection();
 
-        String database = getTable(actionToConsider, handStrength);
+        String database = getTable(actionToConsider, handStrength, "sng");
 
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM " + database + " WHERE route = '" + route + "';");
 
         rs.next();
 
-        double successNumber = rs.getDouble("success");
-        double totalNumber = rs.getDouble("total");
+        double successNumber;
+        double totalNumber;
+
+        if(rs.getDouble("total") < 20) {
+            System.out.println("playmoney machine learning data used");
+
+            database = getTable(actionToConsider, handStrength, "play");
+
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM " + database + " WHERE route = '" + route + "';");
+
+            rs2.next();
+
+            successNumber = rs2.getDouble("success");
+            totalNumber = rs2.getDouble("total");
+
+            rs2.close();
+            st2.close();
+        } else {
+            System.out.println("sng machine learning data used");
+
+            successNumber = rs.getDouble("success");
+            totalNumber = rs.getDouble("total");
+        }
 
         valuesToReturn.add(successNumber);
         valuesToReturn.add(totalNumber);
@@ -481,16 +503,16 @@ public class MachineLearning {
         return odds > 0.36;
     }
 
-    private String getTable(String actionToConsider, double handStrength) {
+    private String getTable(String actionToConsider, double handStrength, String gameType) {
         String table;
 
         if(actionToConsider.equals("call")) {
-            table = "dbstats_call_play_compact";
+            table = "dbstats_call_" + gameType + "_compact";
         } else {
             if(handStrength < 0.7) {
-                table = "dbstats_bluff_play_compact";
+                table = "dbstats_bluff_" + gameType + "_compact";
             } else {
-                table = "dbstats_value_play_compact";
+                table = "dbstats_value_" + gameType + "_compact";
             }
         }
 
