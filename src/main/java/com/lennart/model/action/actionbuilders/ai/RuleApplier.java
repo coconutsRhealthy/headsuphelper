@@ -1240,72 +1240,66 @@ public class RuleApplier {
     }
 
     public String callTighterOnFlopAndturn(String action, List<Card> board, double handStrength, HandEvaluator handEvaluator,
-                                           String opponentAction, double facingOdds, double opponentBetSizeBb, double botStackBb,
-                                           double opponentStackBb, double botBetSizeBb) {
+                                           String opponentAction, double facingOdds, double opponentBetSizeBb) {
         String actionToRetun;
 
         if(action.equals("call")) {
             if(board != null && (board.size() == 3 || board.size() == 4)) {
                 if(handStrength < 0.8) {
-                    if((botStackBb + botBetSizeBb) >= 20 && (opponentStackBb + opponentBetSizeBb) >= 20) {
-                        if(opponentAction.equals("bet75pct")) {
-                            if(opponentBetSizeBb >= 4 && opponentBetSizeBb < 10) {
-                                if(facingOdds >= 0.36) {
-                                    boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
-                                    boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                    if(opponentAction.equals("bet75pct")) {
+                        if(opponentBetSizeBb >= 4 && opponentBetSizeBb < 10) {
+                            if(facingOdds >= 0.36) {
+                                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
 
-                                    if(!strongFd && !strongOosd) {
-                                        System.out.println("(((a1)))");
-                                        actionToRetun = "fold";
-                                    } else {
-                                        System.out.println("(((a2)))");
-                                        actionToRetun = action;
-                                    }
+                                if(!strongFd && !strongOosd) {
+                                    System.out.println("(((a1)))");
+                                    actionToRetun = "fold";
                                 } else {
-                                    System.out.println("(((a3)))");
-                                    actionToRetun = action;
-                                }
-                            } else if(opponentBetSizeBb >= 10) {
-                                if(facingOdds > 0.29) {
-                                    boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
-                                    boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
-
-                                    if(!strongFd && !strongOosd) {
-                                        System.out.println("(((a4)))");
-                                        actionToRetun = "fold";
-                                    } else {
-                                        System.out.println("(((a5)))");
-                                        actionToRetun = action;
-                                    }
-                                } else {
-                                    System.out.println("(((a6)))");
+                                    System.out.println("(((a2)))");
                                     actionToRetun = action;
                                 }
                             } else {
-                                System.out.println("(((a7)))");
+                                System.out.println("(((a3)))");
+                                actionToRetun = action;
+                            }
+                        } else if(opponentBetSizeBb >= 10) {
+                            if(facingOdds > 0.29) {
+                                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+
+                                if(!strongFd && !strongOosd) {
+                                    System.out.println("(((a4)))");
+                                    actionToRetun = "fold";
+                                } else {
+                                    System.out.println("(((a5)))");
+                                    actionToRetun = action;
+                                }
+                            } else {
+                                System.out.println("(((a6)))");
                                 actionToRetun = action;
                             }
                         } else {
-                            //facing raise
-                            boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
-                            boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
-
-                            if(!strongFd && !strongOosd) {
-                                if(facingOdds > 0.2) {
-                                    System.out.println("(((a8)))");
-                                    actionToRetun = "fold";
-                                } else {
-                                    System.out.println("(((a9)))");
-                                    actionToRetun = action;
-                                }
-                            } else {
-                                System.out.println("(((a10)))");
-                                actionToRetun = action;
-                            }
+                            System.out.println("(((a7)))");
+                            actionToRetun = action;
                         }
                     } else {
-                        actionToRetun = action;
-                        System.out.println("shortstacked, ignore callTighterOnFlopAndturn(), keep call");
+                        //facing raise
+                        boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                        boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+
+                        if(!strongFd && !strongOosd) {
+                            if(facingOdds > 0.2) {
+                                System.out.println("(((a8)))");
+                                actionToRetun = "fold";
+                            } else {
+                                System.out.println("(((a9)))");
+                                actionToRetun = action;
+                            }
+                        } else {
+                            System.out.println("(((a10)))");
+                            actionToRetun = action;
+                        }
                     }
                 } else {
                     actionToRetun = action;
