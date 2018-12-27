@@ -324,9 +324,31 @@ public class ActionVariables {
         }
 
         if((botStackBb <= 10) || (opponentStackBb + opponentBetsizeBb <= 10)) {
-            ShortStackPlayAdjuster shortStackPlayAdjuster = new ShortStackPlayAdjuster();
-            action = shortStackPlayAdjuster.adjustAction(action, gameVariables, this);
-            sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, gameVariables.getBigBlind());
+            double bigBlind = gameVariables.getBigBlind();
+
+            double botStack = botStackBb * bigBlind;
+            double oppStack = opponentStackBb * bigBlind;
+            double botBetSize = botBetsizeBb * bigBlind;
+            double oppBetSize = opponentBetsizeBb * bigBlind;
+            double potSize = potSizeBb * bigBlind;
+            double total = botStack + oppStack + botBetSize + oppBetSize + potSize;
+
+            System.out.println("Shortstack play");
+            System.out.println("botstack: " + botStack);
+            System.out.println("oppstack: " + oppStack);
+            System.out.println("botbetsize: " + botBetSize);
+            System.out.println("oppbetsize: " + oppBetSize);
+            System.out.println("potsize: " + potSize);
+            System.out.println("total: " + total);
+
+            //sng specific
+            if(total > 2500 && total < 3500) {
+                ShortStackPlayAdjuster shortStackPlayAdjuster = new ShortStackPlayAdjuster();
+                action = shortStackPlayAdjuster.adjustAction(action, gameVariables, this);
+                sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, gameVariables.getBigBlind());
+            } else {
+                System.out.println("No shortstack play, total is wrong");
+            }
         }
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
