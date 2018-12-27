@@ -460,6 +460,11 @@ public class StarsTableReader {
 
         System.out.println("read opp stack: " + bottomPlayerStack);
 
+        if(bottomPlayerStack.contains("?")) {
+            bottomPlayerStack = bottomPlayerStack.replace("?", "7");
+            System.out.println("opp stack contains '?', new value: " + bottomPlayerStack);
+        }
+
         if(bottomPlayerStack.toLowerCase().contains("all")) {
             bottomPlayerStack = "0";
         }
@@ -473,6 +478,14 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
+
+        System.out.println("read botstack: " + topPlayerStack);
+
+        if(topPlayerStack.contains("?")) {
+            topPlayerStack = topPlayerStack.replace("?", "7");
+            System.out.println("botstack contains '?', new value: " + topPlayerStack);
+        }
+
         return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
     }
 
