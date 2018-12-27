@@ -144,7 +144,7 @@ public class Poker {
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, actionVariables.getHandEvaluator());
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
-                action = ruleApplier.callTighterOnFlopAndturn(action, board, handStrength, actionVariables.getHandEvaluator(), opponentAction, facingOdds, opponentBetSizeBb);
+                action = ruleApplier.callTighterOnFlopAndturn(action, board, handStrength, actionVariables.getHandEvaluator(), opponentAction, facingOdds, opponentBetSizeBb, ownStackBb, opponentStackBb, ownBetSizeBb);
 
                 return action;
             } else {
@@ -179,7 +179,7 @@ public class Poker {
                 action = ruleApplier.dontCallWithAir(action, board, handStrength, facingOdds, strongDraw, actionVariables.getHandEvaluator());
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
-                action = ruleApplier.callTighterOnFlopAndturn(action, board, handStrength, actionVariables.getHandEvaluator(), opponentAction, facingOdds, opponentBetSizeBb);
+                action = ruleApplier.callTighterOnFlopAndturn(action, board, handStrength, actionVariables.getHandEvaluator(), opponentAction, facingOdds, opponentBetSizeBb, ownStackBb, opponentStackBb, ownBetSizeBb);
 
                 return action;
             }
