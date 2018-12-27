@@ -5,6 +5,7 @@ import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveValue;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
+import com.lennart.model.card.Card;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,6 +32,9 @@ public class MachineLearning {
         } else if(currentAction.equals("raise")) {
             actionToReturn = adjustRaiseAction(actionVariables, gameVariables, continuousTable, sizing);
         }
+
+        actionToReturn = doPilotBluffingOrRaising(actionToReturn, actionVariables, gameVariables,
+                continuousTable.isOpponentHasInitiative(), sizing, continuousTable.isPre3betOrPostRaisedPot());
 
         return actionToReturn;
     }
@@ -392,8 +396,6 @@ public class MachineLearning {
         double totalNumber;
 
         if(rs.getDouble("total") < 20) {
-            System.out.println("playmoney machine learning data used");
-
             database = getTable(actionToConsider, handStrength, "play");
 
             Statement st2 = con.createStatement();
@@ -404,10 +406,14 @@ public class MachineLearning {
             successNumber = rs2.getDouble("success");
             totalNumber = rs2.getDouble("total");
 
+            if(totalNumber >= 20) {
+                System.out.println("playmoney machine learning data used for route: " + route);
+            }
+
             rs2.close();
             st2.close();
         } else {
-            System.out.println("sng machine learning data used");
+            System.out.println("sng machine learning data used for route: " + route);
 
             successNumber = rs.getDouble("success");
             totalNumber = rs.getDouble("total");
@@ -517,6 +523,138 @@ public class MachineLearning {
         }
 
         return table;
+    }
+
+    private String doPilotBluffingOrRaising(String currentAction, ActionVariables actionVariables, GameVariables gameVariables,
+                                            boolean opponentHasInitiative, double sizing, boolean pre3BetOrPostRaisedPot) throws Exception {
+        String actionToReturn;
+
+        if(currentAction.equals("check")) {
+            if(actionVariables.getBotHandStrength() < 0.7) {
+                if(!opponentHasInitiative) {
+                    if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
+                        String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+
+                        List<String> pilotRoutes = getPilotRoutes();
+
+                        if(pilotRoutes.contains(route)) {
+                            double random = Math.random();
+
+                            if(random < 0.75) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("Pilot bluffbet done");
+                                System.out.println("Route: " + route);
+                            } else {
+                                actionToReturn = currentAction;
+                                System.out.println("Pilot zzz, route: " + route);
+                            }
+                        } else {
+                            actionToReturn = currentAction;
+                        }
+                    } else {
+                        actionToReturn = currentAction;
+                    }
+                } else {
+                    actionToReturn = currentAction;
+                }
+            } else {
+                actionToReturn = currentAction;
+            }
+        } else if(currentAction.equals("fold") || currentAction.equals("call")) {
+            if(actionVariables.getBotHandStrength() < 0.7) {
+                if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot())) {
+                    String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+
+                    List<String> pilotRoutes = getPilotRoutes();
+
+                    if(pilotRoutes.contains(route)) {
+                        double random = Math.random();
+
+                        if(random < 0.75) {
+                            List<Card> board = gameVariables.getBoard();
+
+                            if(board != null && (board.size() == 3 || board.size() == 4)) {
+                                if(!pre3BetOrPostRaisedPot) {
+                                    actionToReturn = "raise";
+                                    System.out.println("Pilot bluffraise done");
+                                    System.out.println("Route: " + route);
+                                } else {
+                                    actionToReturn = currentAction;
+                                }
+                            } else {
+                                actionToReturn = "raise";
+                                System.out.println("Pilot bluffraise done");
+                                System.out.println("Route: " + route);
+                            }
+                        } else {
+                            actionToReturn = currentAction;
+                            System.out.println("Pilot zzz, route: " + route);
+                        }
+                    } else {
+                        actionToReturn = currentAction;
+                    }
+                } else {
+                    actionToReturn = currentAction;
+                }
+            } else {
+                actionToReturn = currentAction;
+            }
+        } else {
+            actionToReturn = currentAction;
+        }
+
+        return actionToReturn;
+    }
+
+    private List<String> getPilotRoutes() {
+        List<String> pilotRoutes = new ArrayList<>();
+
+        pilotRoutes.add("FlopBetIpSizing_0-10bbFoldstat_0_33_StrongDrawFalse");
+        pilotRoutes.add("FlopBetIpSizing_0-10bbFoldstat_66_100_StrongDrawTrue");
+        pilotRoutes.add("FlopBetOopSizing_0-10bbFoldstat_66_100_StrongDrawTrue");
+        pilotRoutes.add("FlopBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotRoutes.add("FlopRaiseOopSizing_0-10bbFoldstat_33_66_StrongDrawFalse");
+        pilotRoutes.add("FlopRaiseOopSizing_0-10bbFoldstat_66_100_StrongDrawFalse");
+        pilotRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_unknownStrongDrawFalse");
+        pilotRoutes.add("TurnBetIpSizing_0-10bbFoldstat_unknownStrongDrawTrue");
+        pilotRoutes.add("TurnRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotRoutes.add("RiverBetOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
+
+        return pilotRoutes;
+    }
+
+    public static void main(String[] args) throws Exception {
+        new MachineLearning().doPilotRouteAnalysis();
+    }
+
+    private void doPilotRouteAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_sng_compact;");
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+            double success = rs.getDouble("success");
+            double total = rs.getDouble("total");
+            double ratio = success / total;
+
+            if(route.contains("Bet")) {
+                if(total >= 9 && total < 20 && ratio >= 0.57) {
+                    System.out.println(route + "    " + success + "   " + total + "   " + ratio);
+                }
+            } else if(route.contains("Raise")) {
+                if(total >= 3 && total < 20 && ratio >= 0.66) {
+                    System.out.println(route + "    " + success + "   " + total + "   " + ratio);
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
     }
 
     private void initializeDbConnection() throws Exception {
