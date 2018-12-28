@@ -162,7 +162,29 @@ public class Sizing {
             }
         }
 
+        size = adjustSizingToPotCommit(size, myStack, facingStack, facingBetSize, bigBlind);
+
         return size;
+    }
+
+    private double adjustSizingToPotCommit(double currentSizing, double myStack, double facingStack, double facingBetSize,
+                                           double bigBlind) {
+        double sizingToReturn = currentSizing;
+
+        double potAfterCall = currentSizing * 2;
+        double myStackAfterCall = myStack - currentSizing;
+        double facingStackAfterCall = facingStack - (currentSizing - facingBetSize);
+        double myStackToPotAfterCall = myStackAfterCall / potAfterCall;
+        double facingStackToPotAfterCall = facingStackAfterCall / potAfterCall;
+
+        if(myStackToPotAfterCall < 0.75 || facingStackToPotAfterCall < 0.75) {
+            sizingToReturn = 5000 * bigBlind;
+            System.out.println("Adjusted preflop sizing because of pot commitance");
+            System.out.println("myStackToPotAfterCall: " + myStackToPotAfterCall);
+            System.out.println("facingStackToPotAfterCall: " + facingStackToPotAfterCall);
+        }
+
+        return sizingToReturn;
     }
 
     private double getAiBotPostFlopSizing(List<Card> board, double facingBetSize, double pot, double myStack, double facingStack, double bigBlind) {
@@ -171,9 +193,9 @@ public class Sizing {
         if(board.size() == 3) {
             sizing = getFlopSizing(facingBetSize, pot, myStack, facingStack, bigBlind);
         } else if(board.size() == 4) {
-            sizing = getTurnSizing(facingBetSize, pot, myStack, facingStack);
+            sizing = getTurnSizing(facingBetSize, pot, myStack, facingStack, bigBlind);
         } else if(board.size() == 5) {
-            sizing = getRiverSizing(facingBetSize, pot, myStack, facingStack);
+            sizing = getRiverSizing(facingBetSize, pot, myStack, facingStack, bigBlind);
         }
 
         return sizing;
@@ -219,17 +241,18 @@ public class Sizing {
                     flopSizing = flopBetPercentage * potSize;
                 }
             } else {
-                flopSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, botStack, 2.33);
+                flopSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, 2.33, bigBlind);
             }
         }
+
         if(flopSizing > botStack) {
-            flopSizing = botStack + (0.05 * botStack);
+            flopSizing = 5000 * bigBlind;
         }
 
         return flopSizing;
     }
 
-    private double getTurnSizing(double facingBetSize, double pot, double myStack, double facingStack) {
+    private double getTurnSizing(double facingBetSize, double pot, double myStack, double facingStack, double bigBlind) {
         double turnSizing;
 
         double opponentBetSize = facingBetSize;
@@ -257,17 +280,18 @@ public class Sizing {
                     turnSizing = 0.2 * potSize;
                 }
             } else {
-                turnSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, botStack, 2.33);
+                turnSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, 2.33, bigBlind);
             }
         }
+
         if(turnSizing > botStack) {
-            turnSizing = botStack + (0.05 * botStack);
+            turnSizing = 5000 * bigBlind;
         }
 
         return turnSizing;
     }
 
-    private double getRiverSizing(double facingBetSize, double pot, double myStack, double facingStack) {
+    private double getRiverSizing(double facingBetSize, double pot, double myStack, double facingStack, double bigBlind) {
         double riverSizing;
 
         double opponentBetSize = facingBetSize;
@@ -283,10 +307,11 @@ public class Sizing {
                 riverSizing = 0.75 * potSize;
             }
         } else {
-            riverSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, botStack, 2.33);
+            riverSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, 2.33, bigBlind);
         }
+
         if(riverSizing > botStack) {
-            riverSizing = botStack + (0.05 * botStack);
+            riverSizing = 5000 * bigBlind;
         }
 
         return riverSizing;
@@ -300,13 +325,13 @@ public class Sizing {
         }
     }
 
-    private double calculateRaiseAmount(double facingBetSize, double potSize, double effectiveStack, double botStack, double odds) {
+    private double calculateRaiseAmount(double facingBetSize, double potSize, double effectiveStack, double odds, double bigBlind) {
         double raiseAmount = (potSize / (odds - 1)) + (((odds + 1) * facingBetSize) / (odds - 1));
         double potSizeAfterRaiseAndCall = potSize + raiseAmount + raiseAmount;
         double effectiveStackRemainingAfterRaise = effectiveStack - raiseAmount;
 
         if(effectiveStackRemainingAfterRaise / potSizeAfterRaiseAndCall < 0.51) {
-            raiseAmount = botStack + (0.05 * botStack);
+            raiseAmount = 5000 * bigBlind;
         }
         return raiseAmount;
     }
