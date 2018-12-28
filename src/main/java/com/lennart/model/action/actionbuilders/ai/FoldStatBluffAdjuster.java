@@ -28,7 +28,7 @@ public class FoldStatBluffAdjuster {
                         }
 
                         if(sizing / bigBlind <= 70) {
-                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot)) {
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot, myStack, board)) {
                                 String actionToUse;
 
                                 if(action.equals("check")) {
@@ -288,7 +288,9 @@ public class FoldStatBluffAdjuster {
         return targetRatio;
     }
 
-    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot) {
+    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
+                                   double ownStackSize, List<Card> board) {
+        boolean bluffOddsAreOk = false;
         double sizingInMethod;
 
         if(sizing > (facingBetSize + facingStackSize)) {
@@ -298,6 +300,24 @@ public class FoldStatBluffAdjuster {
         }
 
         double odds = (sizingInMethod - facingBetSize) / (facingBetSize + sizingInMethod + pot);
-        return odds > 0.36;
+
+        if(board != null) {
+            if(board.size() == 3 || board.size() == 4) {
+                double ownStackAfterBluff = ownStackSize - sizing;
+                double facingStackAfterBluff = facingStackSize - (sizing - facingBetSize);
+
+                if(ownStackAfterBluff > 0 && facingStackAfterBluff > 0) {
+                    bluffOddsAreOk = odds > 0.2;
+                } else {
+                    bluffOddsAreOk = odds > 0.36;
+                }
+            } else {
+                bluffOddsAreOk = odds > 0.36;
+            }
+        } else {
+            bluffOddsAreOk = odds > 0.36;
+        }
+
+        return bluffOddsAreOk;
     }
 }
