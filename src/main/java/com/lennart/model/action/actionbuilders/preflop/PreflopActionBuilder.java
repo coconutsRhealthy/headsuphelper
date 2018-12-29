@@ -28,36 +28,46 @@ public class PreflopActionBuilder {
         actionBuilderUtil = new ActionBuilderUtil();
     }
 
-    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind, List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable, String opponentType, double amountToCallBb) {
+    public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind,
+                            List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable,
+                            String opponentType, double amountToCallBb) {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
-        if(bbOpponentTotalBetSize == 1) {
-            if(botIsButton) {
-                action = get05betF1bet(botHoleCards);
-            } else {
-                action = get1betFcheck(botHoleCards);
-            }
-        } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
-            if(opponentStack == 0) {
+        boolean effectiveAllIn = opponentBetSize >= ((botBetSize + (amountToCallBb * bigBlind)) * 1.1);
+
+        if(effectiveAllIn) {
+            System.out.println("Effective preflop allin is true!");
+        }
+
+        if(opponentStack <= 0 || effectiveAllIn) {
+            if(amountToCallBb <= 4) {
                 action = getActionFacingAllIn(botHoleCards, 0.5);
-            } else {
-                action = get1betF2bet(botHoleCards, continuousTableable);
-            }
-        } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
-            if(opponentStack == 0) {
+            } else if(amountToCallBb <= 16) {
                 action = getActionFacingAllIn(botHoleCards, 0.75);
-            } else {
-                action = get2betF3bet(botHoleCards, continuousTableable);
-            }
-        } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
-            if(opponentStack == 0) {
+            } else if(amountToCallBb <= 25) {
+                action = getActionFacingAllIn(botHoleCards, 0.80);
+            } else if(amountToCallBb <= 40) {
                 action = getActionFacingAllIn(botHoleCards, 0.85);
             } else {
-                action = get3betF4bet(botHoleCards, continuousTableable, opponentType);
+                action = get4betF5bet(botHoleCards, amountToCallBb);
             }
         } else {
-            action = get4betF5bet(botHoleCards, amountToCallBb);
+            if(bbOpponentTotalBetSize == 1) {
+                if(botIsButton) {
+                    action = get05betF1bet(botHoleCards);
+                } else {
+                    action = get1betFcheck(botHoleCards);
+                }
+            } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
+                action = get1betF2bet(botHoleCards, continuousTableable);
+            } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
+                action = get2betF3bet(botHoleCards, continuousTableable);
+            } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
+                action = get3betF4bet(botHoleCards, continuousTableable, opponentType);
+            } else {
+                action = get4betF5bet(botHoleCards, amountToCallBb);
+            }
         }
 
         if(action.equals("fold") && ((opponentBetSize - botBetSize) / (opponentBetSize + botBetSize) < 0.24)) {
