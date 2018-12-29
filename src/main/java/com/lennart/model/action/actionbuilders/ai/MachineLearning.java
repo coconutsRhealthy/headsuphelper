@@ -22,9 +22,9 @@ public class MachineLearning {
         String currentAction = actionVariables.getAction();
 
         if(currentAction.equals("fold")) {
-            actionToReturn = adjustFoldAction(actionVariables, gameVariables, sizing);
+            actionToReturn = adjustFoldAction(actionVariables, gameVariables, sizing, continuousTable.isPre3betOrPostRaisedPot());
         } else if(currentAction.equals("call")) {
-            actionToReturn = adjustCallAction(actionVariables, gameVariables, sizing);
+            actionToReturn = adjustCallAction(actionVariables, gameVariables, sizing, continuousTable.isPre3betOrPostRaisedPot());
         } else if(currentAction.equals("check")) {
             actionToReturn = adjustCheckAction(actionVariables, gameVariables, continuousTable.isOpponentHasInitiative(), sizing);
         } else if(currentAction.equals("bet75pct")) {
@@ -75,29 +75,32 @@ public class MachineLearning {
         return actionToReturn;
     }
 
-    private String adjustFoldAction(ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
+    private String adjustFoldAction(ActionVariables actionVariables, GameVariables gameVariables, double sizing,
+                                    boolean pre3BetOrPostRaisedPot) throws Exception {
         String actionToReturn = null;
 
-        if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
-                gameVariables.getBotStack(), gameVariables.getBoard())) {
-            String raiseRoute;
+        if(raiseIsEligible(gameVariables.getBoard(), pre3BetOrPostRaisedPot)) {
+            if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
+                    gameVariables.getBotStack(), gameVariables.getBoard())) {
+                String raiseRoute;
 
-            if(actionVariables.getBotHandStrength() < 0.7) {
-                raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
-            } else {
-                raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
-            }
+                if(actionVariables.getBotHandStrength() < 0.7) {
+                    raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                } else {
+                    raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                }
 
-            System.out.println("##Route: " + raiseRoute);
-            List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
+                System.out.println("##Route: " + raiseRoute);
+                List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
 
-            if(raiseData.get(1) >= 20) {
-                double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
+                if(raiseData.get(1) >= 20) {
+                    double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
 
-                if(raiseSuccessRatio > 0.51) {
-                    actionToReturn = "raise";
-                    System.out.println("Machinelearning I) Changed fold to raise");
-                    System.out.println("Route: " + raiseRoute);
+                    if(raiseSuccessRatio >= 0.57) {
+                        actionToReturn = "raise";
+                        System.out.println("Machinelearning I) Changed fold to raise");
+                        System.out.println("Route: " + raiseRoute);
+                    }
                 }
             }
         }
@@ -161,11 +164,20 @@ public class MachineLearning {
             if(effectiveStackAfterCall / potAfterCall >= 0.6) {
                 double random = Math.random();
 
-                if(random >= 0.9) {
-                    System.out.println("DO freaky call machine learning flop or turn");
-                    actionToReturn = "call";
+                if(gameVariables.isBotIsButton()) {
+                    if(random >= 0.84) {
+                        System.out.println("DO IP freaky call machine learning flop or turn");
+                        actionToReturn = "call";
+                    } else {
+                        System.out.println("ZZZ IP freaky call machine learning flop or turn");
+                    }
                 } else {
-                    System.out.println("ZZZ freaky call machine learning flop or turn");
+                    if(random >= 0.9) {
+                        System.out.println("DO OOP freaky call machine learning flop or turn");
+                        actionToReturn = "call";
+                    } else {
+                        System.out.println("ZZZ OOP freaky call machine learning flop or turn");
+                    }
                 }
             }
         }
@@ -249,13 +261,14 @@ public class MachineLearning {
         return actionToReturn;
     }
 
-    private String adjustCallAction(ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
+    private String adjustCallAction(ActionVariables actionVariables, GameVariables gameVariables, double sizing,
+                                    boolean pre3BetOrPostRaisedPot) throws Exception {
         String actionToReturn;
 
         String callRoute = calculateCallRoute(actionVariables, gameVariables);
         System.out.println("##Route: " + callRoute);
         List<Double> callData = getDataFromDb(callRoute, "call", actionVariables.getBotHandStrength());
-        actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables, sizing);
+        actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables, sizing, pre3BetOrPostRaisedPot);
 
         return actionToReturn;
     }
@@ -349,7 +362,8 @@ public class MachineLearning {
     }
 
     private String changeToFoldOrRaiseOrKeepCallGivenData(List<Double> callData, ActionVariables actionVariables,
-                                                          GameVariables gameVariables, double sizing) throws Exception {
+                                                          GameVariables gameVariables, double sizing,
+                                                          boolean pre3BetOrPostRaisedPot) throws Exception {
         String actionToReturn = null;
 
         if(callData.get(1) >= 20) {
@@ -372,28 +386,30 @@ public class MachineLearning {
         }
 
         if(actionToReturn == null) {
-            if(actionVariables.getBotHandStrength() >= 0.7 ||
-                bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(),
-                        gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
+            if(raiseIsEligible(gameVariables.getBoard(), pre3BetOrPostRaisedPot)) {
+                if(actionVariables.getBotHandStrength() >= 0.7 ||
+                        bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(),
+                                gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
 
-                String raiseRoute;
+                    String raiseRoute;
 
-                if(actionVariables.getBotHandStrength() >= 0.7) {
-                    raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
-                } else {
-                    raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
-                }
+                    if(actionVariables.getBotHandStrength() >= 0.7) {
+                        raiseRoute = calculateValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                    } else {
+                        raiseRoute = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                    }
 
-                System.out.println("##Route: " + raiseRoute);
-                List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
+                    System.out.println("##Route: " + raiseRoute);
+                    List<Double> raiseData = getDataFromDb(raiseRoute, "raise", actionVariables.getBotHandStrength());
 
-                if (raiseData.get(1) >= 20) {
-                    double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
+                    if (raiseData.get(1) >= 20) {
+                        double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
 
-                    if (raiseSuccessRatio > 0.51) {
-                        actionToReturn = "raise";
-                        System.out.println("Machinelearning F) Changed call to raise");
-                        System.out.println("Route: " + raiseRoute);
+                        if (raiseSuccessRatio > 0.57) {
+                            actionToReturn = "raise";
+                            System.out.println("Machinelearning F) Changed call to raise");
+                            System.out.println("Route: " + raiseRoute);
+                        }
                     }
                 }
             }
@@ -662,18 +678,12 @@ public class MachineLearning {
                         if(random < 0.75) {
                             List<Card> board = gameVariables.getBoard();
 
-                            if(board != null && (board.size() == 3 || board.size() == 4)) {
-                                if(!pre3BetOrPostRaisedPot) {
-                                    actionToReturn = "raise";
-                                    System.out.println("Pilot bluffraise done");
-                                    System.out.println("Route: " + route);
-                                } else {
-                                    actionToReturn = currentAction;
-                                }
-                            } else {
+                            if(raiseIsEligible(board, pre3BetOrPostRaisedPot)) {
                                 actionToReturn = "raise";
                                 System.out.println("Pilot bluffraise done");
                                 System.out.println("Route: " + route);
+                            } else {
+                                actionToReturn = currentAction;
                             }
                         } else {
                             actionToReturn = currentAction;
@@ -699,16 +709,16 @@ public class MachineLearning {
         List<String> pilotRoutes = new ArrayList<>();
 
         pilotRoutes.add("FlopBetIpSizing_0-10bbFoldstat_0_33_StrongDrawFalse");
-        pilotRoutes.add("FlopBetIpSizing_0-10bbFoldstat_66_100_StrongDrawTrue");
         pilotRoutes.add("FlopBetOopSizing_0-10bbFoldstat_66_100_StrongDrawTrue");
         pilotRoutes.add("FlopBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
-        pilotRoutes.add("FlopRaiseOopSizing_0-10bbFoldstat_33_66_StrongDrawFalse");
-        pilotRoutes.add("FlopRaiseOopSizing_0-10bbFoldstat_66_100_StrongDrawFalse");
+        pilotRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
+        pilotRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_unknownStrongDrawFalse");
         pilotRoutes.add("TurnBetIpSizing_0-10bbFoldstat_unknownStrongDrawTrue");
         pilotRoutes.add("TurnRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotRoutes.add("RiverBetOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
+        pilotRoutes.add("RiverRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
 
         return pilotRoutes;
     }
@@ -744,6 +754,20 @@ public class MachineLearning {
         st.close();
 
         closeDbConnection();
+    }
+
+    private boolean raiseIsEligible(List<Card> board, boolean pre3BetOrPostRaisedPot) {
+        boolean raiseIsEligible = true;
+
+        if(board != null) {
+            if(board.size() == 3 || board.size() == 4) {
+                if(pre3BetOrPostRaisedPot) {
+                    raiseIsEligible = false;
+                }
+            }
+        }
+
+        return raiseIsEligible;
     }
 
     private void initializeDbConnection() throws Exception {
