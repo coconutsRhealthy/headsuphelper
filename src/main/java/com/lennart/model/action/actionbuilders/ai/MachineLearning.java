@@ -36,6 +36,8 @@ public class MachineLearning {
         actionToReturn = doPilotBluffingOrRaising(actionToReturn, actionVariables, gameVariables,
                 continuousTable.isOpponentHasInitiative(), sizing, continuousTable.isPre3betOrPostRaisedPot());
 
+        actionToReturn = doPilotFloating(actionToReturn, actionVariables, gameVariables);
+
         return actionToReturn;
     }
 
@@ -612,6 +614,28 @@ public class MachineLearning {
         return bluffOddsAreOk;
     }
 
+    private boolean floatOddsAreOk(GameVariables gameVariables) {
+        double currentBotBetsize = gameVariables.getBotBetSize();
+        double currentOppBetsize = gameVariables.getOpponentBetSize();
+        double currentBotStack = gameVariables.getBotStack();
+        double currentOppStack = gameVariables.getOpponentStack();
+        double currentPot = gameVariables.getPot();
+
+        double potAfterFloat = currentPot + (2 * currentOppBetsize);
+        double botStackAfterFloat = currentBotStack - (currentOppBetsize - currentBotBetsize);
+        double oppStackAfterFloat = currentOppStack;
+
+        double effectiveStackAfterFloat;
+
+        if(botStackAfterFloat > oppStackAfterFloat) {
+            effectiveStackAfterFloat = oppStackAfterFloat;
+        } else {
+            effectiveStackAfterFloat = botStackAfterFloat;
+        }
+
+        return effectiveStackAfterFloat / potAfterFloat > 0.55;
+    }
+
     private String getTable(String actionToConsider, double handStrength, String gameType) {
         String table;
 
@@ -639,7 +663,7 @@ public class MachineLearning {
                             gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
                         String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
 
-                        List<String> pilotRoutes = getPilotRoutes();
+                        List<String> pilotRoutes = getPilotBluffRaiseRoutes();
 
                         if(pilotRoutes.contains(route)) {
                             double random = Math.random();
@@ -670,7 +694,7 @@ public class MachineLearning {
                         gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
                     String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
 
-                    List<String> pilotRoutes = getPilotRoutes();
+                    List<String> pilotRoutes = getPilotBluffRaiseRoutes();
 
                     if(pilotRoutes.contains(route)) {
                         double random = Math.random();
@@ -705,29 +729,125 @@ public class MachineLearning {
         return actionToReturn;
     }
 
-    private List<String> getPilotRoutes() {
-        List<String> pilotRoutes = new ArrayList<>();
+    private String doPilotFloating(String currentAction, ActionVariables actionVariables, GameVariables gameVariables) throws Exception {
+        String actionToReturn;
 
-        pilotRoutes.add("FlopBetIpSizing_0-10bbFoldstat_0_33_StrongDrawFalse");
-        pilotRoutes.add("FlopBetOopSizing_0-10bbFoldstat_66_100_StrongDrawTrue");
-        pilotRoutes.add("FlopBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
-        pilotRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
-        pilotRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
-        pilotRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_unknownStrongDrawFalse");
-        pilotRoutes.add("TurnBetIpSizing_0-10bbFoldstat_unknownStrongDrawTrue");
-        pilotRoutes.add("TurnRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
-        pilotRoutes.add("RiverBetOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
-        pilotRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
-        pilotRoutes.add("RiverRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
+        if(currentAction.equals("fold")) {
+            if(actionVariables.getBotHandStrength() < 0.7) {
+                List<Card> board = gameVariables.getBoard();
 
-        return pilotRoutes;
+                if(board != null && (board.size() == 3 || board.size() == 4)) {
+                    double facingOdds = actionVariables.getFacingOdds(gameVariables);
+
+                    if(facingOdds <= 0.5) {
+                        if(floatOddsAreOk(gameVariables)) {
+                            String route = calculateCallRoute(actionVariables, gameVariables);
+
+                            List<String> floatPilotRoutes = getPilotFloatRoutes();
+
+                            if(floatPilotRoutes.contains(route)) {
+                                actionToReturn = "call";
+                                System.out.println("Pilot float done");
+                                System.out.println("Route: " + route);
+                            } else {
+                                actionToReturn = currentAction;
+                            }
+                        } else {
+                            actionToReturn = currentAction;
+                            System.out.println("float odds not ok");
+                        }
+                    } else {
+                        actionToReturn = currentAction;
+                    }
+                } else {
+                    actionToReturn = currentAction;
+                }
+            } else {
+                actionToReturn = currentAction;
+            }
+        } else {
+            actionToReturn = currentAction;
+        }
+
+        return actionToReturn;
+    }
+
+    private List<String> getPilotBluffRaiseRoutes() {
+        List<String> pilotBluffRaiseRoutes = new ArrayList<>();
+
+        pilotBluffRaiseRoutes.add("FlopBetIpSizing_0-10bbFoldstat_0_33_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopBetOopSizing_0-10bbFoldstat_66_100_StrongDrawTrue");
+        pilotBluffRaiseRoutes.add("FlopBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("TurnBetIpSizing_0-10bbFoldstat_unknownStrongDrawTrue");
+        pilotBluffRaiseRoutes.add("TurnRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverBetIpSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverBetOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
+
+        return pilotBluffRaiseRoutes;
+    }
+
+    private List<String> getPilotFloatRoutes() {
+        List<String> pilotFloatRoutes = new ArrayList<>();
+
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_unknownHS_30_50_StrongDrawTrue");
+        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_30_50_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_unknownHS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
+        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
+        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawFalse");
+        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_unknownHS_0_30_StrongDrawTrue");
+        pilotFloatRoutes.add("TurnFacingBetOopAtc_0-10bbAggro_66_100_HS_50_60_StrongDrawFalse");
+
+        return pilotFloatRoutes;
     }
 
     public static void main(String[] args) throws Exception {
-        new MachineLearning().doPilotRouteAnalysis();
+        new MachineLearning().doPilotBluffRaiseRouteAnalysis();
     }
 
-    private void doPilotRouteAnalysis() throws Exception {
+    private void doPilotFloatRouteAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_call_sng_compact;");
+
+        double successTotal = 0;
+        double totalTotal = 0;
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+
+            if(!route.contains("HS_70_80_") && !route.contains("HS_80_90_") && !route.contains("HS_90_100_")) {
+                if(route.contains("Flop") || route.contains("Turn")) {
+                    double success = rs.getDouble("success");
+                    double total = rs.getDouble("total");
+                    double ratio = success / total;
+
+                    if(ratio >= 0.5 && total >= 3) {
+                        System.out.println(route + "      " + success + "       " + total);
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private void doPilotBluffRaiseRouteAnalysis() throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();
