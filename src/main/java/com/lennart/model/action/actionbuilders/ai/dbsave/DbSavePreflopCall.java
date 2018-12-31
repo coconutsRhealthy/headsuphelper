@@ -2,41 +2,11 @@ package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 public class DbSavePreflopCall extends DbSave {
 
-    private String handStrenght;
+    private String combo;
     private String position;
     private String amountToCallBb;
-    private String foldStatGroup;
+    private String oppAggroGroup;
     private String effectiveStack;
-
-    public String getHandStrengthLogic(double handStrength) {
-        String handStrengthString;
-
-        if(handStrength < 0.2) {
-            handStrengthString = "HS_0_20_";
-        } else if(handStrength <= 0.35) {
-            handStrengthString = "HS_20_35_";
-        } else if(handStrength <= 0.5) {
-            handStrengthString = "HS_35_50_";
-        } else if(handStrength <= 0.6) {
-            handStrengthString = "HS_50_60_";
-        } else if(handStrength <= 0.7) {
-            handStrengthString = "HS_60_70_";
-        } else if(handStrength <= 0.75) {
-            handStrengthString = "HS_70_75_";
-        } else if(handStrength <= 0.80) {
-            handStrengthString = "HS_75_80_";
-        } else if(handStrength <= 0.85) {
-            handStrengthString = "HS_80_85_";
-        } else if(handStrength <= 0.90) {
-            handStrengthString = "HS_85_90_";
-        } else if(handStrength <= 0.95) {
-            handStrengthString = "HS_90_95_";
-        } else {
-            handStrengthString = "HS_95_100_";
-        }
-
-        return handStrengthString;
-    }
 
     public String getAmountToCallViaLogic(double amountToCallBb) {
         String sizingGroup;
@@ -52,22 +22,6 @@ public class DbSavePreflopCall extends DbSave {
         }
 
         return sizingGroup;
-    }
-
-    public String getFoldStatGroupLogic(double foldStat) {
-        String foldStatGroup;
-
-        if(foldStat < 0.26) {
-            foldStatGroup = "Foldstat_0_33_";
-        } else if(foldStat <= 0.4) {
-            foldStatGroup = "Foldstat_33_66_";
-        } else if(foldStat == 0.43) {
-            foldStatGroup = "Foldstat_unknown";
-        } else {
-            foldStatGroup = "Foldstat_66_100_";
-        }
-
-        return foldStatGroup;
     }
 
     @Override
@@ -98,12 +52,12 @@ public class DbSavePreflopCall extends DbSave {
         return effectiveStackBbString;
     }
 
-    public String getHandStrenght() {
-        return handStrenght;
+    public String getCombo() {
+        return combo;
     }
 
-    public void setHandStrenght(String handStrenght) {
-        this.handStrenght = handStrenght;
+    public void setCombo(String combo) {
+        this.combo = combo;
     }
 
     public String getPosition() {
@@ -122,12 +76,12 @@ public class DbSavePreflopCall extends DbSave {
         this.amountToCallBb = amountToCallBb;
     }
 
-    public String getFoldStatGroup() {
-        return foldStatGroup;
+    public String getOppAggroGroup() {
+        return oppAggroGroup;
     }
 
-    public void setFoldStatGroup(String foldStatGroup) {
-        this.foldStatGroup = foldStatGroup;
+    public void setOppAggroGroup(String oppAggroGroup) {
+        this.oppAggroGroup = oppAggroGroup;
     }
 
     public String getEffectiveStack() {

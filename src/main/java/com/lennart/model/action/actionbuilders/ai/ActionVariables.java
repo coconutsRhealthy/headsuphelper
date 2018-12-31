@@ -452,13 +452,13 @@ public class ActionVariables {
                 if(action.equals("raise")) {
                     DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
 
-                    String handStrength = dbSavePreflopRaise.getHandStrengthLogic(botHandStrength);
+                    String combo = dbSavePreflopRaise.getComboLogic(gameVariables.getBotHoleCards());
                     String postion = dbSavePreflopRaise.getPositionLogic(botIsButtonInMethod);
                     String sizingGroup = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
                     String foldStatGroup = dbSavePreflopRaise.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
                     String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(botStackBb, opponentStackBb);
 
-                    dbSavePreflopRaise.setHandStrength(handStrength);
+                    dbSavePreflopRaise.setCombo(combo);
                     dbSavePreflopRaise.setPosition(postion);
                     dbSavePreflopRaise.setSizing(sizingGroup);
                     dbSavePreflopRaise.setFoldStatGroup(foldStatGroup);
@@ -468,16 +468,16 @@ public class ActionVariables {
                 } else if(action.equals("call")) {
                     DbSavePreflopCall dbSavePreflopCall = new DbSavePreflopCall();
 
-                    String handStrength = dbSavePreflopCall.getHandStrengthLogic(botHandStrength);
+                    String combo = dbSavePreflopCall.getComboLogic(gameVariables.getBotHoleCards());
                     String postion = dbSavePreflopCall.getPositionLogic(botIsButtonInMethod);
                     String amountToCallGroup = dbSavePreflopCall.getAmountToCallViaLogic(amountToCallBb);
-                    String foldStatGroup = dbSavePreflopCall.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+                    String oppAggroGroup = dbSavePreflopCall.getOppAggroGroupViaLogic(gameVariables.getOpponentName());
                     String effectiveStackString = dbSavePreflopCall.getEffectiveStackLogic(botStackBb, opponentStackBb);
 
-                    dbSavePreflopCall.setHandStrenght(handStrength);
+                    dbSavePreflopCall.setCombo(combo);
                     dbSavePreflopCall.setPosition(postion);
                     dbSavePreflopCall.setAmountToCallBb(amountToCallGroup);
-                    dbSavePreflopCall.setFoldStatGroup(foldStatGroup);
+                    dbSavePreflopCall.setOppAggroGroup(oppAggroGroup);
                     dbSavePreflopCall.setEffectiveStack(effectiveStackString);
 
                     continuousTable.getDbSaveList().add(dbSavePreflopCall);

@@ -1,8 +1,10 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.action.actionbuilders.ai.RangeTracker;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.card.Card;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DbSave {
@@ -130,5 +132,75 @@ public class DbSave {
         }
 
         return street;
+    }
+
+    public String getOppAggroGroupViaLogic(String opponentName) throws Exception {
+        String oppAggroGroup;
+
+        OpponentIdentifier opponentIdentifier = new OpponentIdentifier();
+        int numberOfHands = opponentIdentifier.getOpponentNumberOfHandsFromDb(opponentName);
+
+        if(numberOfHands < 20) {
+            oppAggroGroup = "Aggro_unknown";
+        } else {
+            double oppAggressiveness = opponentIdentifier.getOppAggressiveness(opponentName);
+
+            if(oppAggressiveness <= 0.1875) {
+                oppAggroGroup = "Aggro_0_33_";
+            } else if(oppAggressiveness <= 0.32) {
+                oppAggroGroup = "Aggro_33_66_";
+            } else {
+                oppAggroGroup = "Aggro_66_100_";
+            }
+        }
+
+        return oppAggroGroup;
+    }
+
+    public String getComboLogic(List<Card> holeCards) {
+        String comboString = "";
+
+        int rankCard1 = holeCards.get(0).getRank();
+        int rankCard2 = holeCards.get(1).getRank();
+
+        List<Card> holeCardsCopy = new ArrayList<>();
+
+        if(rankCard1 < rankCard2) {
+            holeCardsCopy.add(holeCards.get(1));
+            holeCardsCopy.add(holeCards.get(0));
+        } else {
+            holeCardsCopy.addAll(holeCards);
+        }
+
+        for(Card card : holeCardsCopy) {
+            int rank = card.getRank();
+
+            switch(rank) {
+                case 14:
+                    comboString = comboString + "A";
+                break;
+                case 13:
+                    comboString = comboString + "K";
+                break;
+                case 12:
+                    comboString = comboString + "Q";
+                break;
+                case 11:
+                    comboString = comboString + "J";
+                break;
+                default:
+                    comboString = comboString + String.valueOf(rank);
+            }
+        }
+
+        if(comboString.charAt(0) != comboString.charAt(1)) {
+            if(holeCardsCopy.get(0).getSuit() == holeCardsCopy.get(1).getSuit()) {
+                comboString = comboString + "s";
+            } else {
+                comboString = comboString + "o";
+            }
+        }
+
+        return comboString;
     }
 }

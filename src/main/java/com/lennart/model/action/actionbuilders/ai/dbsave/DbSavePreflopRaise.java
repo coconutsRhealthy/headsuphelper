@@ -2,41 +2,11 @@ package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 public class DbSavePreflopRaise extends DbSave {
 
-    private String handStrength;
+    private String combo;
     private String position;
     private String sizing;
     private String foldStatGroup;
     private String effectiveStack;
-
-    public String getHandStrengthLogic(double handStrength) {
-        String handStrengthString;
-
-        if(handStrength < 0.2) {
-            handStrengthString = "HS_0_20_";
-        } else if(handStrength <= 0.35) {
-            handStrengthString = "HS_20_35_";
-        } else if(handStrength <= 0.5) {
-            handStrengthString = "HS_35_50_";
-        } else if(handStrength <= 0.6) {
-            handStrengthString = "HS_50_60_";
-        } else if(handStrength <= 0.7) {
-            handStrengthString = "HS_60_70_";
-        } else if(handStrength <= 0.75) {
-            handStrengthString = "HS_70_75_";
-        } else if(handStrength <= 0.80) {
-            handStrengthString = "HS_75_80_";
-        } else if(handStrength <= 0.85) {
-            handStrengthString = "HS_80_85_";
-        } else if(handStrength <= 0.90) {
-            handStrengthString = "HS_85_90_";
-        } else if(handStrength <= 0.95) {
-            handStrengthString = "HS_90_95_";
-        } else {
-            handStrengthString = "HS_95_100_";
-        }
-
-        return handStrengthString;
-    }
 
     public String getSizingLogic(double sizingBb) {
         String sizingString;
@@ -98,12 +68,12 @@ public class DbSavePreflopRaise extends DbSave {
         return effectiveStackBbString;
     }
 
-    public String getHandStrength() {
-        return handStrength;
+    public String getCombo() {
+        return combo;
     }
 
-    public void setHandStrength(String handStrength) {
-        this.handStrength = handStrength;
+    public void setCombo(String combo) {
+        this.combo = combo;
     }
 
     public String getPosition() {

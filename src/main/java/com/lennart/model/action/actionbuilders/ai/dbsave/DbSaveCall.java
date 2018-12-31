@@ -1,6 +1,5 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 
 public class DbSaveCall extends DbSave {
 
@@ -34,29 +33,6 @@ public class DbSaveCall extends DbSave {
         }
 
         return sizingGroup;
-    }
-
-    public String getOppAggroGroupViaLogic(String opponentName) throws Exception {
-        String oppAggroGroup;
-
-        OpponentIdentifier opponentIdentifier = new OpponentIdentifier();
-        int numberOfHands = opponentIdentifier.getOpponentNumberOfHandsFromDb(opponentName);
-
-        if(numberOfHands < 20) {
-            oppAggroGroup = "Aggro_unknown";
-        } else {
-            double oppAggressiveness = opponentIdentifier.getOppAggressiveness(opponentName);
-
-            if(oppAggressiveness <= 0.1875) {
-                oppAggroGroup = "Aggro_0_33_";
-            } else if(oppAggressiveness <= 0.32) {
-                oppAggroGroup = "Aggro_33_66_";
-            } else {
-                oppAggroGroup = "Aggro_66_100_";
-            }
-        }
-
-        return oppAggroGroup;
     }
 
     public String getFacingActionViaLogic(String opponentAction) {

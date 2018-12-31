@@ -38,7 +38,7 @@ public class DbSavePersisterPreflop {
             if(dbSave instanceof DbSavePreflopRaise) {
                 DbSavePreflopRaise dbSavePreflopRaise = (DbSavePreflopRaise) dbSave;
 
-                String route = dbSavePreflopRaise.getHandStrength() + dbSavePreflopRaise.getPosition() +
+                String route = dbSavePreflopRaise.getCombo() + dbSavePreflopRaise.getPosition() +
                         dbSavePreflopRaise.getSizing() + dbSavePreflopRaise.getFoldStatGroup() +
                         dbSavePreflopRaise.getEffectiveStack();
 
@@ -50,8 +50,8 @@ public class DbSavePersisterPreflop {
             } else if(dbSave instanceof DbSavePreflopCall) {
                 DbSavePreflopCall dbSavePreflopCall = (DbSavePreflopCall) dbSave;
 
-                String route = dbSavePreflopCall.getHandStrenght() + dbSavePreflopCall.getPosition() +
-                        dbSavePreflopCall.getAmountToCallBb() + dbSavePreflopCall.getFoldStatGroup() +
+                String route = dbSavePreflopCall.getCombo() + dbSavePreflopCall.getPosition() +
+                        dbSavePreflopCall.getAmountToCallBb() + dbSavePreflopCall.getOppAggroGroup() +
                         dbSavePreflopCall.getEffectiveStack();
 
                 if(new DbSavePersister().actionWasSuccessfull(bigBlind)) {
@@ -103,23 +103,13 @@ public class DbSavePersisterPreflop {
     }
 
     private List<String> getAllPfRaiseRoutes() {
-        List<String> handStrength = new ArrayList<>();
+        List<String> holeCards;
         List<String> position = new ArrayList<>();
         List<String> sizing = new ArrayList<>();
         List<String> foldStatGroup = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
 
-        handStrength.add("HS_0_20_");
-        handStrength.add("HS_20_35_");
-        handStrength.add("HS_35_50_");
-        handStrength.add("HS_50_60_");
-        handStrength.add("HS_60_70_");
-        handStrength.add("HS_70_75_");
-        handStrength.add("HS_75_80_");
-        handStrength.add("HS_80_85_");
-        handStrength.add("HS_85_90_");
-        handStrength.add("HS_90_95_");
-        handStrength.add("HS_95_100_");
+        holeCards = getAllHoleCardCombos();
 
         position.add("Ip");
         position.add("Oop");
@@ -143,7 +133,7 @@ public class DbSavePersisterPreflop {
 
         List<String> allRoutes = new ArrayList<>();
 
-        for(String a : handStrength) {
+        for(String a : holeCards) {
             for(String b : position) {
                 for(String c : sizing) {
                     for(String d : foldStatGroup) {
@@ -161,23 +151,13 @@ public class DbSavePersisterPreflop {
     }
 
     private List<String> getAllPfCallRoutes() {
-        List<String> handStrength = new ArrayList<>();
+        List<String> holeCards;
         List<String> position = new ArrayList<>();
         List<String> amountToCall = new ArrayList<>();
-        List<String> foldStatGroup = new ArrayList<>();
+        List<String> oppAggroGroup = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
 
-        handStrength.add("HS_0_20_");
-        handStrength.add("HS_20_35_");
-        handStrength.add("HS_35_50_");
-        handStrength.add("HS_50_60_");
-        handStrength.add("HS_60_70_");
-        handStrength.add("HS_70_75_");
-        handStrength.add("HS_75_80_");
-        handStrength.add("HS_80_85_");
-        handStrength.add("HS_85_90_");
-        handStrength.add("HS_90_95_");
-        handStrength.add("HS_95_100_");
+        holeCards = getAllHoleCardCombos();
 
         position.add("Ip");
         position.add("Oop");
@@ -187,10 +167,10 @@ public class DbSavePersisterPreflop {
         amountToCall.add("Atc_13-26bb");
         amountToCall.add("Atc_26bb_up");
 
-        foldStatGroup.add("Foldstat_unknown");
-        foldStatGroup.add("Foldstat_0_33_");
-        foldStatGroup.add("Foldstat_33_66_");
-        foldStatGroup.add("Foldstat_66_100_");
+        oppAggroGroup.add("Aggro_0_33_");
+        oppAggroGroup.add("Aggro_33_66_");
+        oppAggroGroup.add("Aggro_66_100_");
+        oppAggroGroup.add("Aggro_unknown");
 
         effectiveStack.add("Effstack_0-10bb");
         effectiveStack.add("Effstack_10-30bb");
@@ -201,10 +181,10 @@ public class DbSavePersisterPreflop {
 
         List<String> allRoutes = new ArrayList<>();
 
-        for(String a : handStrength) {
+        for(String a : holeCards) {
             for(String b : position) {
                 for(String c : amountToCall) {
-                    for(String d : foldStatGroup) {
+                    for(String d : oppAggroGroup) {
                         for(String e : effectiveStack) {
                             allRoutes.add(a + b + c + d + e);
                         }
@@ -216,6 +196,43 @@ public class DbSavePersisterPreflop {
         System.out.println(allRoutes.size());
 
         return allRoutes;
+    }
+
+    private List<String> getAllHoleCardCombos() {
+        List<String> allHoleCardCombos = new ArrayList<>();
+
+        List<String> values = new ArrayList<>();
+
+        values.add("A");
+        values.add("K");
+        values.add("Q");
+        values.add("J");
+        values.add("T");
+        values.add("9");
+        values.add("8");
+        values.add("7");
+        values.add("6");
+        values.add("5");
+        values.add("4");
+        values.add("3");
+        values.add("2");
+
+        for(int i = 0; i < values.size(); i++) {
+            List<String> subList = values.subList(i, values.size());
+
+            for(String s : subList) {
+                String value = values.get(i);
+
+                if(!value.equals(s)) {
+                    allHoleCardCombos.add(value + s + "o");
+                    allHoleCardCombos.add(value + s + "s");
+                } else {
+                    allHoleCardCombos.add(value + s);
+                }
+            }
+        }
+
+        return allHoleCardCombos;
     }
 
     private void initializeDbConnection() throws Exception {
