@@ -775,17 +775,19 @@ public class MachineLearning {
     private List<String> getPilotBluffRaiseRoutes() {
         List<String> pilotBluffRaiseRoutes = new ArrayList<>();
 
-        pilotBluffRaiseRoutes.add("FlopBetIpSizing_0-10bbFoldstat_0_33_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("FlopBetOopSizing_0-10bbFoldstat_66_100_StrongDrawTrue");
         pilotBluffRaiseRoutes.add("FlopBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_0-10bbFoldstat_33_66_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("TurnBetIpSizing_0-10bbFoldstat_unknownStrongDrawTrue");
         pilotBluffRaiseRoutes.add("TurnRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverBetIpSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverBetOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
 
         return pilotBluffRaiseRoutes;
     }
@@ -796,34 +798,39 @@ public class MachineLearning {
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
-        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_unknownHS_30_50_StrongDrawTrue");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_unknownHS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
-        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_unknownHS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
-        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_unknownHS_0_30_StrongDrawTrue");
-        pilotFloatRoutes.add("TurnFacingBetOopAtc_0-10bbAggro_66_100_HS_50_60_StrongDrawFalse");
 
         return pilotFloatRoutes;
     }
 
     public static void main(String[] args) throws Exception {
-        new MachineLearning().doPilotBluffRaiseRouteAnalysis();
+        List<String> pilotBluffRaiseRoutes = new ArrayList<>();
+
+        pilotBluffRaiseRoutes.add("zzz");
+        pilotBluffRaiseRoutes.add("zzz");
+        pilotBluffRaiseRoutes.add("zzz");
+
+        new MachineLearning().doPilotBluffRaiseRouteAnalysis(pilotBluffRaiseRoutes);
     }
 
-    private void doPilotFloatRouteAnalysis() throws Exception {
+    private void doPilotFloatRouteAnalysis(List<String> oldFloatPilotRoutes) throws Exception {
+        List<String> newFloatPilotRoutes = new ArrayList<>();
+
         initializeDbConnection();
 
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM dbstats_call_sng_compact;");
 
-        double successTotal = 0;
-        double totalTotal = 0;
+        System.out.println("**** Routes ****");
+        System.out.println();
 
         while(rs.next()) {
             String route = rs.getString("route");
@@ -835,6 +842,7 @@ public class MachineLearning {
                     double ratio = success / total;
 
                     if(ratio >= 0.5 && total >= 3) {
+                        newFloatPilotRoutes.add(route);
                         System.out.println(route + "      " + success + "       " + total);
                     }
                 }
@@ -845,13 +853,40 @@ public class MachineLearning {
         st.close();
 
         closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println("**** New Routes ****");
+        System.out.println();
+
+        for(String newRoute : newFloatPilotRoutes) {
+            if(!oldFloatPilotRoutes.contains(newRoute)) {
+                System.out.println(newRoute);
+            }
+        }
+
+        System.out.println();
+        System.out.println();
+        System.out.println("**** Routes removed ****");
+        System.out.println();
+
+        for(String oldRoute : oldFloatPilotRoutes) {
+            if(!newFloatPilotRoutes.contains(oldRoute)) {
+                System.out.println(oldRoute);
+            }
+        }
     }
 
-    private void doPilotBluffRaiseRouteAnalysis() throws Exception {
+    private void doPilotBluffRaiseRouteAnalysis(List<String> oldBluffPilotRoutes) throws Exception {
+        List<String> newBluffPilotRoutes = new ArrayList<>();
+
         initializeDbConnection();
 
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_sng_compact;");
+
+        System.out.println("**** Routes ****");
+        System.out.println();
 
         while(rs.next()) {
             String route = rs.getString("route");
@@ -861,10 +896,12 @@ public class MachineLearning {
 
             if(route.contains("Bet")) {
                 if(total >= 9 && total < 20 && ratio >= 0.57) {
+                    newBluffPilotRoutes.add(route);
                     System.out.println(route + "    " + success + "   " + total + "   " + ratio);
                 }
             } else if(route.contains("Raise")) {
                 if(total >= 3 && total < 20 && ratio >= 0.66) {
+                    newBluffPilotRoutes.add(route);
                     System.out.println(route + "    " + success + "   " + total + "   " + ratio);
                 }
             }
@@ -874,6 +911,28 @@ public class MachineLearning {
         st.close();
 
         closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println("**** New Routes ****");
+        System.out.println();
+
+        for(String newRoute : newBluffPilotRoutes) {
+            if(!oldBluffPilotRoutes.contains(newRoute)) {
+                System.out.println(newRoute);
+            }
+        }
+
+        System.out.println();
+        System.out.println();
+        System.out.println("**** Routes removed ****");
+        System.out.println();
+
+        for(String oldRoute : oldBluffPilotRoutes) {
+            if(!newBluffPilotRoutes.contains(oldRoute)) {
+                System.out.println(oldRoute);
+            }
+        }
     }
 
     private boolean raiseIsEligible(List<Card> board, boolean pre3BetOrPostRaisedPot) {
