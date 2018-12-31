@@ -37,7 +37,7 @@ public class PreflopHandStength {
     }
 
 
-    private Map<Double, List<Set<Card>>> getMapWithAllPreflopHandstrengthGroups() {
+    public Map<Double, List<Set<Card>>> getMapWithAllPreflopHandstrengthGroups() {
         Map<Double, List<Set<Card>>> allGroups = new HashMap<>();
 
         allGroups.put(0.02, get0_5_group());
