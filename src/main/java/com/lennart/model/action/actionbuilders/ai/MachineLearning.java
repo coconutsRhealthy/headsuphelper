@@ -787,6 +787,7 @@ public class MachineLearning {
         pilotBluffRaiseRoutes.add("RiverBetIpSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverBetOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
 
         return pilotBluffRaiseRoutes;
@@ -800,13 +801,14 @@ public class MachineLearning {
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_unknownHS_30_50_StrongDrawTrue");
-        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_unknownHS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_33_66_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
-        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_unknownHS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_unknownHS_0_30_StrongDrawTrue");
+        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_33_66_HS_50_60_StrongDrawFalse");
 
         return pilotFloatRoutes;
     }
@@ -852,8 +854,6 @@ public class MachineLearning {
         rs.close();
         st.close();
 
-        closeDbConnection();
-
         System.out.println();
         System.out.println();
         System.out.println("**** New Routes ****");
@@ -872,9 +872,22 @@ public class MachineLearning {
 
         for(String oldRoute : oldFloatPilotRoutes) {
             if(!newFloatPilotRoutes.contains(oldRoute)) {
-                System.out.println(oldRoute);
+                Statement st2 = con.createStatement();
+                ResultSet rs2 = st2.executeQuery("SELECT * FROM dbstats_call_sng_compact WHERE route = '" + oldRoute + "';");
+
+                rs2.next();
+
+                double success = rs2.getDouble("success");
+                double total = rs2.getDouble("total");
+
+                System.out.println(oldRoute + "      " + success + "     " + total);
+
+                rs2.close();
+                st2.close();
             }
         }
+
+        closeDbConnection();
     }
 
     private void doPilotBluffRaiseRouteAnalysis(List<String> oldBluffPilotRoutes) throws Exception {
@@ -910,8 +923,6 @@ public class MachineLearning {
         rs.close();
         st.close();
 
-        closeDbConnection();
-
         System.out.println();
         System.out.println();
         System.out.println("**** New Routes ****");
@@ -930,9 +941,22 @@ public class MachineLearning {
 
         for(String oldRoute : oldBluffPilotRoutes) {
             if(!newBluffPilotRoutes.contains(oldRoute)) {
-                System.out.println(oldRoute);
+                Statement st2 = con.createStatement();
+                ResultSet rs2 = st2.executeQuery("SELECT * FROM dbstats_bluff_sng_compact WHERE route = '" + oldRoute + "';");
+
+                rs2.next();
+
+                double success = rs2.getDouble("success");
+                double total = rs2.getDouble("total");
+
+                System.out.println(oldRoute + "      " + success + "     " + total);
+
+                rs2.close();
+                st2.close();
             }
         }
+
+        closeDbConnection();
     }
 
     private boolean raiseIsEligible(List<Card> board, boolean pre3BetOrPostRaisedPot) {
