@@ -847,7 +847,7 @@ public class ActionVariables {
                         double potSizeBbAfterCall = potSizeBb + (2 * botTotalBetSizeBb) + (2 * amountToCallBb);
                         System.out.println("abc-- potSizeBbAfterCall" + potSizeBbAfterCall);
 
-                        if((botStackBbAfterCall / potSizeBbAfterCall <= 0.33) || (opponentStackBb / potSizeBbAfterCall <= 0.33)) {
+                        if((botStackBbAfterCall / potSizeBbAfterCall < 0.5) || (opponentStackBb / potSizeBbAfterCall < 0.5)) {
                             actionToReturn = "raise";
                             System.out.println("abc-- change action to raise in preventCallIfOpponentOrBotAlmostAllInAfterCall()");
                         } else {
