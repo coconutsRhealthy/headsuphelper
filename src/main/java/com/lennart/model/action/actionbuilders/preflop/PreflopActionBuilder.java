@@ -369,13 +369,17 @@ public class PreflopActionBuilder {
     }
 
     private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
+        List<Card> botHoleCardsReverseOrder = new ArrayList<>();
+        botHoleCardsReverseOrder.add(botHoleCards.get(1));
+        botHoleCardsReverseOrder.add(botHoleCards.get(0));
+
         List<List<Card>> pre3betPoule = getPre3betPoule();
         List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule);
 
-        if(pre3betPoule.contains(botHoleCards)) {
+        if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
             continuousTableable.setPre3betOrPostRaisedPot(true);
             return "raise";
-        } else if(preCall2betPoule.contains(botHoleCards)) {
+        } else if(preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
             return "call";
         } else {
             return "fold";
