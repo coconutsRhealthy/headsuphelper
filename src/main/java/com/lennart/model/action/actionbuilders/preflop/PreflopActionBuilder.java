@@ -5,10 +5,8 @@ import com.lennart.model.action.actionbuilders.ai.ContinuousTableable;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._5bet;
 import com.lennart.model.card.Card;
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
-import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip.Call3bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip.Call5bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip._2bet;
-import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip._4bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop.Call4bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._3bet;
 import com.lennart.model.handevaluation.PreflopHandStength;
@@ -122,6 +120,62 @@ public class PreflopActionBuilder {
         }
 
         return preCall2betPoule;
+    }
+
+    private List<List<Card>> getPre4betPoule() {
+        List<Set<Card>> pre4betPouleAsSets = new ArrayList<>();
+
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(14).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 13).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 12).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 13).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(13).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 12).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(12).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(11).values());
+
+        if(Math.random() < 0.5) {
+            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(10).values());
+        }
+
+        if(Math.random() < 0.5) {
+            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(9).values());
+        }
+
+        if(Math.random() < 0.5) {
+            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(8).values());
+        }
+
+        List<List<Card>> pre4betpoule = new ArrayList<>();
+
+        for(Set<Card> set : pre4betPouleAsSets) {
+            List<Card> setAsList = new ArrayList<>();
+            setAsList.addAll(set);
+            pre4betpoule.add(setAsList);
+        }
+
+        return pre4betpoule;
+    }
+
+    private List<List<Card>> getPreCall3betPoule(List<List<Card>> pre4betPoule) {
+        List<List<Card>> preCall3betPoule = new ArrayList<>();
+
+        Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
+
+        for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
+            if(entry.getKey() > 0.60) {
+                for(Set<Card> combo : entry.getValue()) {
+                    List<Card> comboAsList = new ArrayList<>();
+                    comboAsList.addAll(combo);
+
+                    if(!pre4betPoule.contains(comboAsList)) {
+                        preCall3betPoule.add(comboAsList);
+                    }
+                }
+            }
+        }
+
+        return preCall3betPoule;
     }
 
     private String getActionFacingAllIn(List<Card> botHoleCards, double handStrengthLowerLimit) {
@@ -252,119 +306,21 @@ public class PreflopActionBuilder {
     }
 
     private String get2betF3bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
-        Call3bet call3Bet = new Call3bet(actionBuilderUtil);
-        _4bet x4Bet = new _4bet(actionBuilderUtil);
+        List<Card> botHoleCardsReverseOrder = new ArrayList<>();
+        botHoleCardsReverseOrder.add(botHoleCards.get(1));
+        botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        Map<Integer, Set<Card>> call3bet_comboMap100Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap100Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap94Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap94Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap89Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap89Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap80Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap80Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap73Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap73Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap50Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap34Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap34Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap29Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap29Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap27Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap27Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap19Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap19Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap8Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap8Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap7Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap7Percent());
-        Map<Integer, Set<Card>> call3bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (call3Bet.getComboMap5Percent());
+        List<List<Card>> pre4betPoule = getPre4betPoule();
+        List<List<Card>> preCall3betPoule = getPreCall3betPoule(pre4betPoule);
 
-
-        Map<Integer, Set<Card>> x4bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4Bet.getComboMap95Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4Bet.getComboMap50Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap20Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4Bet.getComboMap20Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap11Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4Bet.getComboMap11Percent());
-        Map<Integer, Set<Card>> x4bet_comboMap6Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x4Bet.getComboMap6Percent());
-
-        double percentageCall3bet;
-        double percentage4bet;
-
-        Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(botHoleCards);
-
-        percentageCall3bet = setPercentage(call3bet_comboMap100Percent, holeCardsAsSet, 1);
-
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap94Percent, holeCardsAsSet, 0.94);
-        }
-        //changed this to 100
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap89Percent, holeCardsAsSet, 1.0);
-        }
-        //changed this to 100
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap80Percent, holeCardsAsSet, 1.0);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap73Percent, holeCardsAsSet, 0.73);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap50Percent, holeCardsAsSet, 0.50);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap34Percent, holeCardsAsSet, 0.34);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap29Percent, holeCardsAsSet, 0.29);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap27Percent, holeCardsAsSet, 0.27);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap19Percent, holeCardsAsSet, 0.19);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap8Percent, holeCardsAsSet, 0.08);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap7Percent, holeCardsAsSet, 0.07);
-        }
-        if(percentageCall3bet == 0) {
-            percentageCall3bet = setPercentage(call3bet_comboMap5Percent, holeCardsAsSet, 0.05);
-        }
-
-        percentage4bet = setPercentage(x4bet_comboMap95Percent, holeCardsAsSet, 0.95);
-
-        if(percentage4bet == 0) {
-            percentage4bet = setPercentage(x4bet_comboMap50Percent, holeCardsAsSet, 0.50);
-        }
-        if(percentage4bet == 0) {
-            percentage4bet = setPercentage(x4bet_comboMap20Percent, holeCardsAsSet, 0.20);
-        }
-        if(percentage4bet == 0) {
-            percentage4bet = setPercentage(x4bet_comboMap11Percent, holeCardsAsSet, 0.11);
-        }
-        if(percentage4bet == 0) {
-            percentage4bet = setPercentage(x4bet_comboMap6Percent, holeCardsAsSet, 0.06);
-        }
-
-        double random = Math.random();
-        if(random <= 1 - percentage4bet - percentageCall3bet) {
-            return "fold";
-        } else if ((random <= 1 - percentage4bet) && (random >= 1 - percentage4bet - percentageCall3bet)){
+        if(pre4betPoule.contains(botHoleCards) || pre4betPoule.contains(botHoleCardsReverseOrder)) {
+            continuousTableable.setPre3betOrPostRaisedPot(true);
+            return "raise";
+        } else if(preCall3betPoule.contains(botHoleCards) || preCall3betPoule.contains(botHoleCardsReverseOrder)) {
             continuousTableable.setPre3betOrPostRaisedPot(true);
             return "call";
         } else {
-            continuousTableable.setPre3betOrPostRaisedPot(true);
-            return "raise";
+            return "fold";
         }
     }
 
