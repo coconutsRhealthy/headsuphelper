@@ -28,7 +28,7 @@ public class FoldStatBluffAdjuster {
                         }
 
                         if(sizing / bigBlind <= 70) {
-                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot, myStack, board)) {
+                            if(bluffOddsAreOk(sizing, facingBetSize, facingStack, pot, myStack, board, myBetSize)) {
                                 String actionToUse;
 
                                 if(action.equals("check")) {
@@ -289,9 +289,13 @@ public class FoldStatBluffAdjuster {
     }
 
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
-                                   double ownStackSize, List<Card> board) {
+                                   double ownStackSize, List<Card> board, double ownBetSize) {
         boolean bluffOddsAreOk = false;
         double sizingInMethod;
+
+        if(sizing > ownStackSize + ownBetSize) {
+            sizing = ownStackSize + ownBetSize;
+        }
 
         if(sizing > (facingBetSize + facingStackSize)) {
             sizingInMethod = facingBetSize + facingStackSize;

@@ -48,7 +48,7 @@ public class MachineLearning {
         if(!opponentHasInitiative) {
             if(actionVariables.getBotHandStrength() < 0.7) {
                 if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(),
-                        gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
+                        gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                     String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                     System.out.println("##Route: " + route);
                     List<Double> bluffBetData = getDataFromDb(route, "bet75pct", actionVariables.getBotHandStrength());
@@ -83,7 +83,7 @@ public class MachineLearning {
 
         if(raiseIsEligible(gameVariables.getBoard(), pre3BetOrPostRaisedPot)) {
             if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
-                    gameVariables.getBotStack(), gameVariables.getBoard())) {
+                    gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                 String raiseRoute;
 
                 if(actionVariables.getBotHandStrength() < 0.7) {
@@ -391,7 +391,7 @@ public class MachineLearning {
             if(raiseIsEligible(gameVariables.getBoard(), pre3BetOrPostRaisedPot)) {
                 if(actionVariables.getBotHandStrength() >= 0.7 ||
                         bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(),
-                                gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
+                                gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
 
                     String raiseRoute;
 
@@ -582,9 +582,13 @@ public class MachineLearning {
     }
 
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
-                                   double ownStackSize, List<Card> board) {
+                                   double ownStackSize, List<Card> board, double ownBetSize) {
         boolean bluffOddsAreOk = false;
         double sizingInMethod;
+
+        if(sizing > ownStackSize + ownBetSize) {
+            sizing = ownStackSize + ownBetSize;
+        }
 
         if(sizing > (facingBetSize + facingStackSize)) {
             sizingInMethod = facingBetSize + facingStackSize;
@@ -660,7 +664,7 @@ public class MachineLearning {
             if(actionVariables.getBotHandStrength() < 0.7) {
                 if(!opponentHasInitiative) {
                     if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(),
-                            gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
+                            gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                         String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
 
                         List<String> pilotRoutes = getPilotBluffRaiseRoutes();
@@ -691,7 +695,7 @@ public class MachineLearning {
         } else if(currentAction.equals("fold") || currentAction.equals("call")) {
             if(actionVariables.getBotHandStrength() < 0.7) {
                 if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(),
-                        gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard())) {
+                        gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                     String route = calculateBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
 
                     List<String> pilotRoutes = getPilotBluffRaiseRoutes();
