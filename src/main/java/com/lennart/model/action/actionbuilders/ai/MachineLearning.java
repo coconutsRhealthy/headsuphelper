@@ -581,27 +581,28 @@ public class MachineLearning {
         return route;
     }
 
-    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
+    public boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
                                    double ownStackSize, List<Card> board, double ownBetSize) {
         boolean bluffOddsAreOk = false;
         double sizingInMethod;
+        double sizingCopy = sizing;
 
-        if(sizing > ownStackSize + ownBetSize) {
-            sizing = ownStackSize + ownBetSize;
+        if(sizingCopy > ownStackSize + ownBetSize) {
+            sizingCopy = ownStackSize + ownBetSize;
         }
 
-        if(sizing > (facingBetSize + facingStackSize)) {
+        if(sizingCopy > (facingBetSize + facingStackSize)) {
             sizingInMethod = facingBetSize + facingStackSize;
         } else {
-            sizingInMethod = sizing;
+            sizingInMethod = sizingCopy;
         }
 
         double odds = (sizingInMethod - facingBetSize) / (facingBetSize + sizingInMethod + pot);
 
         if(board != null) {
             if(board.size() == 3 || board.size() == 4) {
-                double ownStackAfterBluff = ownStackSize - sizing;
-                double facingStackAfterBluff = facingStackSize - (sizing - facingBetSize);
+                double ownStackAfterBluff = ownStackSize - sizingCopy;
+                double facingStackAfterBluff = facingStackSize - (sizingCopy - facingBetSize);
 
                 if(ownStackAfterBluff > 0 && facingStackAfterBluff > 0) {
                     bluffOddsAreOk = odds > 0.2;
