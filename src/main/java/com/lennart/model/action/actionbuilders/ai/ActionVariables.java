@@ -351,8 +351,15 @@ public class ActionVariables {
             }
         }
 
+        action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
+                amountToCallBb, gameVariables.getBigBlind());
+
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
+        }
+
+        if(action.equals("raise") && boardInMethod != null && boardInMethod.size() >= 3) {
+            continuousTable.setPre3betOrPostRaisedPot(true);
         }
 
         if(realGame) {
@@ -855,6 +862,46 @@ public class ActionVariables {
                         }
                     } else {
                         actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String neverFoldStrongEquity(String action, List<Card> board, List<String> eligibleActions, boolean pre3betOrPostRaisedPot,
+                                         double amountToCallBb, double bigBlind) {
+        String actionToReturn;
+
+        if(action.equals("fold") && amountToCallBb < 100) {
+            if(board != null && (board.size() == 3 || board.size() == 4)) {
+                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                boolean strongOvercards = handEvaluator.hasDrawOfType("strongOvercards");
+
+                if((botHandStrength >= 0.64 && (strongFd || strongOosd || strongGutshot || strongOvercards)) ||
+                        ((strongFd && strongOosd) || (strongFd && strongGutshot) || (strongFd && strongOvercards) || (strongOosd && strongOvercards) || (strongGutshot && strongOvercards))) {
+                    if(eligibleActions.contains("raise") && !pre3betOrPostRaisedPot && sizing / bigBlind < 100) {
+                        double random = Math.random();
+
+                        if(random <= 0.5) {
+                            actionToReturn = "call";
+                            System.out.println("A neverFoldStrongEquity() -> call");
+                        } else {
+                            actionToReturn = "raise";
+                            System.out.println("B neverFoldStrongEquity() -> call");
+                        }
+                    } else {
+                        actionToReturn = "call";
+                        System.out.println("C neverFoldStrongEquity() -> call");
                     }
                 } else {
                     actionToReturn = action;
