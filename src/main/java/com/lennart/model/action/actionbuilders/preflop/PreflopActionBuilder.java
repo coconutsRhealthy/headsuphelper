@@ -253,58 +253,6 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betFcheck(List<Card> botHoleCards) {
-        _3bet x3Bet = new _3bet(actionBuilderUtil);
-
-        Map<Integer, Set<Card>> x3bet_comboMap95Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap95Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap70Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap70Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap50Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap50Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap35Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap35Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap20Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap20Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap10Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap10Percent());
-        Map<Integer, Set<Card>> x3bet_comboMap5Percent = actionBuilderUtil.convertPreflopComboMapToSimpleComboMap
-                (x3Bet.getComboMap5Percent());
-
-        double percentage2bet;
-
-        Set<Card> holeCardsAsSet = new HashSet<>();
-        holeCardsAsSet.addAll(botHoleCards);
-
-        percentage2bet = setPercentage(x3bet_comboMap95Percent, holeCardsAsSet, 0.95);
-
-        if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap70Percent, holeCardsAsSet, 0.70);
-        }
-        if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap50Percent, holeCardsAsSet, 0.50);
-        }
-        if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap35Percent, holeCardsAsSet, 0.35);
-        }
-        if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap20Percent, holeCardsAsSet, 0.20);
-        }
-        if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap10Percent, holeCardsAsSet, 0.10);
-        }
-        if(percentage2bet == 0) {
-            percentage2bet = setPercentage(x3bet_comboMap5Percent, holeCardsAsSet, 0.05);
-        }
-
-        double random = Math.random();
-        if(random <= 1 - percentage2bet) {
-            return "check";
-        } else {
-            return "raise";
-        }
-    }
-
     private String get2betF3bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
@@ -339,6 +287,22 @@ public class PreflopActionBuilder {
             return "call";
         } else {
             return "fold";
+        }
+    }
+
+    private String get1betFcheck(List<Card> botHoleCards) {
+        List<Card> botHoleCardsReverseOrder = new ArrayList<>();
+        botHoleCardsReverseOrder.add(botHoleCards.get(1));
+        botHoleCardsReverseOrder.add(botHoleCards.get(0));
+
+        List<List<Card>> pre3betPoule = getPre3betPoule();
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule);
+
+        if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)
+                || preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
+            return "raise";
+        } else {
+            return "check";
         }
     }
 
