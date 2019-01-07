@@ -1,11 +1,10 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+import com.lennart.model.card.Card;
+import com.lennart.model.handevaluation.PreflopHandStength;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,6 +101,149 @@ public class DbSavePersisterPreflop {
         closeDbConnection();
     }
 
+    private void migrateExtensivePfDbToCompact(String table) throws Exception {
+        String extensiveTable = table.replace("_compact", "");
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM " + extensiveTable + ";");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            String route = rs.getString("route");
+            double total = rs.getDouble("total");
+            double success = rs.getDouble("success");
+
+            String handAsString;
+
+            if(route.contains("Ip")) {
+                handAsString = route.substring(0, route.indexOf("Ip"));
+            } else {
+                handAsString = route.substring(0, route.indexOf("Oop"));
+            }
+
+            List<Card> holeCards = convertStringToCardCombo(handAsString);
+            double handStrength = new PreflopHandStength().getPreflopHandStength(holeCards);
+
+            String handStrengthForCompactRoute;
+
+            if(handStrength <= 0.2) {
+                handStrengthForCompactRoute = "HS_0_20_";
+            } else if(handStrength <= 0.35) {
+                handStrengthForCompactRoute = "HS_20_35_";
+            } else if(handStrength <= 0.50) {
+                handStrengthForCompactRoute = "HS_35_50_";
+            } else if(handStrength <= 0.60) {
+                handStrengthForCompactRoute = "HS_50_60_";
+            } else if(handStrength <= 0.70) {
+                handStrengthForCompactRoute = "HS_60_70_";
+            } else if(handStrength <= 0.75) {
+                handStrengthForCompactRoute = "HS_70_75_";
+            } else if(handStrength <= 0.80) {
+                handStrengthForCompactRoute = "HS_75_80_";
+            } else if(handStrength <= 0.85) {
+                handStrengthForCompactRoute = "HS_80_85_";
+            } else if(handStrength <= 0.90) {
+                handStrengthForCompactRoute = "HS_85_90_";
+            } else if(handStrength <= 0.95) {
+                handStrengthForCompactRoute = "HS_90_95_";
+            } else {
+                handStrengthForCompactRoute = "HS_95_100_";
+            }
+
+            String usabelPartOfExtensiveRoute;
+
+            if(route.contains("Ip")) {
+                usabelPartOfExtensiveRoute = route.substring(route.indexOf("Ip"));
+            } else {
+                usabelPartOfExtensiveRoute = route.substring(route.indexOf("Oop"));
+            }
+
+            String compactRoute = handStrengthForCompactRoute + usabelPartOfExtensiveRoute;
+
+            Statement st2 = con.createStatement();
+
+            st2.executeUpdate("UPDATE " + table + " SET total = total + " + total + " WHERE route = '" + compactRoute + "'");
+            st2.executeUpdate("UPDATE " + table + " SET success = success + " + success + " WHERE route = '" + compactRoute + "'");
+
+            st2.close();
+
+            counter++;
+
+            if(counter == 100) {
+                System.out.println();
+                counter = 0;
+            } else {
+                System.out.print(".");
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private List<String> getAllPfRaiseRoutesCompact() {
+        List<String> handStrength = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> sizing = new ArrayList<>();
+        List<String> foldStatGroup = new ArrayList<>();
+        List<String> effectiveStack = new ArrayList<>();
+
+        handStrength.add("HS_0_20_");
+        handStrength.add("HS_20_35_");
+        handStrength.add("HS_35_50_");
+        handStrength.add("HS_50_60_");
+        handStrength.add("HS_60_70_");
+        handStrength.add("HS_70_75_");
+        handStrength.add("HS_75_80_");
+        handStrength.add("HS_80_85_");
+        handStrength.add("HS_85_90_");
+        handStrength.add("HS_90_95_");
+        handStrength.add("HS_95_100_");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        sizing.add("Sizing_0-5bb");
+        sizing.add("Sizing_5-13bb");
+        sizing.add("Sizing_13-26bb");
+        sizing.add("Sizing_26bb_up");
+
+        foldStatGroup.add("Foldstat_unknown");
+        foldStatGroup.add("Foldstat_0_33_");
+        foldStatGroup.add("Foldstat_33_66_");
+        foldStatGroup.add("Foldstat_66_100_");
+
+        effectiveStack.add("Effstack_0-10bb");
+        effectiveStack.add("Effstack_10-30bb");
+        effectiveStack.add("Effstack_30-50bb");
+        effectiveStack.add("Effstack_50-75bb");
+        effectiveStack.add("Effstack_75-110bb");
+        effectiveStack.add("Effstack_110bb_up");
+
+        List<String> allRoutes = new ArrayList<>();
+
+        for(String a : handStrength) {
+            for(String b : position) {
+                for(String c : sizing) {
+                    for(String d : foldStatGroup) {
+                        for(String e : effectiveStack) {
+                            allRoutes.add(a + b + c + d + e);
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(allRoutes.size());
+
+        return allRoutes;
+    }
+
     private List<String> getAllPfRaiseRoutes() {
         List<String> holeCards;
         List<String> position = new ArrayList<>();
@@ -137,6 +279,64 @@ public class DbSavePersisterPreflop {
             for(String b : position) {
                 for(String c : sizing) {
                     for(String d : foldStatGroup) {
+                        for(String e : effectiveStack) {
+                            allRoutes.add(a + b + c + d + e);
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(allRoutes.size());
+
+        return allRoutes;
+    }
+
+    private List<String> getAllPfCallRoutesCompact() {
+        List<String> handStrength = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> amountToCall = new ArrayList<>();
+        List<String> oppAggroGroup = new ArrayList<>();
+        List<String> effectiveStack = new ArrayList<>();
+
+        handStrength.add("HS_0_20_");
+        handStrength.add("HS_20_35_");
+        handStrength.add("HS_35_50_");
+        handStrength.add("HS_50_60_");
+        handStrength.add("HS_60_70_");
+        handStrength.add("HS_70_75_");
+        handStrength.add("HS_75_80_");
+        handStrength.add("HS_80_85_");
+        handStrength.add("HS_85_90_");
+        handStrength.add("HS_90_95_");
+        handStrength.add("HS_95_100_");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        amountToCall.add("Atc_0-5bb");
+        amountToCall.add("Atc_5-13bb");
+        amountToCall.add("Atc_13-26bb");
+        amountToCall.add("Atc_26bb_up");
+
+        oppAggroGroup.add("Aggro_0_33_");
+        oppAggroGroup.add("Aggro_33_66_");
+        oppAggroGroup.add("Aggro_66_100_");
+        oppAggroGroup.add("Aggro_unknown");
+
+        effectiveStack.add("Effstack_0-10bb");
+        effectiveStack.add("Effstack_10-30bb");
+        effectiveStack.add("Effstack_30-50bb");
+        effectiveStack.add("Effstack_50-75bb");
+        effectiveStack.add("Effstack_75-110bb");
+        effectiveStack.add("Effstack_110bb_up");
+
+        List<String> allRoutes = new ArrayList<>();
+
+        for(String a : handStrength) {
+            for(String b : position) {
+                for(String c : amountToCall) {
+                    for(String d : oppAggroGroup) {
                         for(String e : effectiveStack) {
                             allRoutes.add(a + b + c + d + e);
                         }
@@ -233,6 +433,75 @@ public class DbSavePersisterPreflop {
         }
 
         return allHoleCardCombos;
+    }
+
+    private List<Card> convertStringToCardCombo(String handAsString) {
+        List<Card> comboToReturn = new ArrayList<>();
+
+        String firstCard = handAsString.substring(0, 1);
+        String seconCard = handAsString.substring(1, 2);
+
+        boolean suited;
+
+        if(handAsString.length() == 2) {
+            suited = false;
+        } else {
+            suited = handAsString.substring(2, 3).equals("s");
+        }
+
+        List<String> cardsAsString = new ArrayList<>();
+        cardsAsString.add(firstCard);
+        cardsAsString.add(seconCard);
+
+        List<Integer> ranks = new ArrayList<>();
+
+        for(String card : cardsAsString) {
+            if(card.equals("A")) {
+                ranks.add(14);
+            } else if(card.equals("K")) {
+                ranks.add(13);
+            } else if(card.equals("Q")) {
+                ranks.add(12);
+            } else if(card.equals("J")) {
+                ranks.add(11);
+            } else if(card.equals("T")) {
+                ranks.add(10);
+            } else if(card.equals("9")) {
+                ranks.add(9);
+            } else if(card.equals("8")) {
+                ranks.add(8);
+            } else if(card.equals("7")) {
+                ranks.add(7);
+            } else if(card.equals("6")) {
+                ranks.add(6);
+            } else if(card.equals("5")) {
+                ranks.add(5);
+            } else if(card.equals("4")) {
+                ranks.add(4);
+            } else if(card.equals("3")) {
+                ranks.add(3);
+            } else if(card.equals("2")) {
+                ranks.add(2);
+            }
+        }
+
+        boolean first = true;
+
+        for(Integer i : ranks) {
+            if(first) {
+                comboToReturn.add(new Card(i, 's'));
+            } else {
+                if(suited) {
+                    comboToReturn.add(new Card(i, 's'));
+                } else {
+                    comboToReturn.add(new Card(i, 'h'));
+                }
+            }
+
+            first = false;
+        }
+
+        return comboToReturn;
     }
 
     private void initializeDbConnection() throws Exception {
