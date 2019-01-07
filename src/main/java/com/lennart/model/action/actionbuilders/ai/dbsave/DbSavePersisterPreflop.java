@@ -19,18 +19,26 @@ public class DbSavePersisterPreflop {
 
         Statement st = con.createStatement();
 
-        String callTable;
         String raiseTable;
+        String raiseTableCompact;
+        String callTable;
+        String callTableCompact;
 
         if(continuousTable.getGame().equals("playMoney")) {
             raiseTable = "toImplement";
+            raiseTableCompact = "toImplement";
             callTable = "toImplement";
+            callTableCompact = "toImplement";
         } else if (continuousTable.getGame().equals("sng")) {
             raiseTable = "dbstats_pf_raise_sng";
+            raiseTableCompact = "dbstats_pf_raise_sng_compact";
             callTable = "dbstats_pf_call_sng";
+            callTableCompact = "dbstats_pf_call_sng_compact";
         } else {
             raiseTable = "toImplement";
+            raiseTableCompact = "toImplement";
             callTable = "toImplement";
+            callTableCompact = "toImplement";
         }
 
         for(DbSave dbSave : dbSaveList) {
@@ -41,11 +49,17 @@ public class DbSavePersisterPreflop {
                         dbSavePreflopRaise.getSizing() + dbSavePreflopRaise.getFoldStatGroup() +
                         dbSavePreflopRaise.getEffectiveStack();
 
+                String routeCompact = convertComboStringToCompactHandStrengthString(dbSavePreflopRaise.getCombo()) +
+                        dbSavePreflopRaise.getPosition() + dbSavePreflopRaise.getSizing() +
+                        dbSavePreflopRaise.getFoldStatGroup() + dbSavePreflopRaise.getEffectiveStack();
+
                 if(new DbSavePersister().actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + raiseTable + " SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + raiseTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
 
                 st.executeUpdate("UPDATE " + raiseTable + " SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + raiseTableCompact + " SET total = total + 1 WHERE route = '" + routeCompact + "'");
             } else if(dbSave instanceof DbSavePreflopCall) {
                 DbSavePreflopCall dbSavePreflopCall = (DbSavePreflopCall) dbSave;
 
@@ -53,11 +67,17 @@ public class DbSavePersisterPreflop {
                         dbSavePreflopCall.getAmountToCallBb() + dbSavePreflopCall.getOppAggroGroup() +
                         dbSavePreflopCall.getEffectiveStack();
 
+                String routeCompact = convertComboStringToCompactHandStrengthString(dbSavePreflopCall.getCombo()) +
+                        dbSavePreflopCall.getPosition() + dbSavePreflopCall.getAmountToCallBb() +
+                        dbSavePreflopCall.getOppAggroGroup() + dbSavePreflopCall.getEffectiveStack();
+
                 if(new DbSavePersister().actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + callTable + " SET success = success + 1 WHERE route = '" + route + "'");
+                    st.executeUpdate("UPDATE " + callTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
 
                 st.executeUpdate("UPDATE " + callTable + " SET total = total + 1 WHERE route = '" + route + "'");
+                st.executeUpdate("UPDATE " + callTableCompact + " SET total = total + 1 WHERE route = '" + routeCompact + "'");
             }
         }
 
@@ -125,33 +145,7 @@ public class DbSavePersisterPreflop {
             }
 
             List<Card> holeCards = convertStringToCardCombo(handAsString);
-            double handStrength = new PreflopHandStength().getPreflopHandStength(holeCards);
-
-            String handStrengthForCompactRoute;
-
-            if(handStrength <= 0.2) {
-                handStrengthForCompactRoute = "HS_0_20_";
-            } else if(handStrength <= 0.35) {
-                handStrengthForCompactRoute = "HS_20_35_";
-            } else if(handStrength <= 0.50) {
-                handStrengthForCompactRoute = "HS_35_50_";
-            } else if(handStrength <= 0.60) {
-                handStrengthForCompactRoute = "HS_50_60_";
-            } else if(handStrength <= 0.70) {
-                handStrengthForCompactRoute = "HS_60_70_";
-            } else if(handStrength <= 0.75) {
-                handStrengthForCompactRoute = "HS_70_75_";
-            } else if(handStrength <= 0.80) {
-                handStrengthForCompactRoute = "HS_75_80_";
-            } else if(handStrength <= 0.85) {
-                handStrengthForCompactRoute = "HS_80_85_";
-            } else if(handStrength <= 0.90) {
-                handStrengthForCompactRoute = "HS_85_90_";
-            } else if(handStrength <= 0.95) {
-                handStrengthForCompactRoute = "HS_90_95_";
-            } else {
-                handStrengthForCompactRoute = "HS_95_100_";
-            }
+            String handStrengthForCompactRoute = convertListCardToHandStrengthString(holeCards);
 
             String usabelPartOfExtensiveRoute;
 
@@ -502,6 +496,43 @@ public class DbSavePersisterPreflop {
         }
 
         return comboToReturn;
+    }
+
+    public String convertComboStringToCompactHandStrengthString(String combo) {
+        List<Card> comboAsCardList = convertStringToCardCombo(combo);
+        return convertListCardToHandStrengthString(comboAsCardList);
+    }
+
+    public String convertListCardToHandStrengthString(List<Card> combo) {
+        double handStrength = new PreflopHandStength().getPreflopHandStength(combo);
+
+        String handStrengthString;
+
+        if(handStrength <= 0.2) {
+            handStrengthString = "HS_0_20_";
+        } else if(handStrength <= 0.35) {
+            handStrengthString = "HS_20_35_";
+        } else if(handStrength <= 0.50) {
+            handStrengthString = "HS_35_50_";
+        } else if(handStrength <= 0.60) {
+            handStrengthString = "HS_50_60_";
+        } else if(handStrength <= 0.70) {
+            handStrengthString = "HS_60_70_";
+        } else if(handStrength <= 0.75) {
+            handStrengthString = "HS_70_75_";
+        } else if(handStrength <= 0.80) {
+            handStrengthString = "HS_75_80_";
+        } else if(handStrength <= 0.85) {
+            handStrengthString = "HS_80_85_";
+        } else if(handStrength <= 0.90) {
+            handStrengthString = "HS_85_90_";
+        } else if(handStrength <= 0.95) {
+            handStrengthString = "HS_90_95_";
+        } else {
+            handStrengthString = "HS_95_100_";
+        }
+
+        return handStrengthString;
     }
 
     private void initializeDbConnection() throws Exception {
