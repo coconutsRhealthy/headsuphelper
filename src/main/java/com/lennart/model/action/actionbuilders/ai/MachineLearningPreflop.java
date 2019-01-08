@@ -13,45 +13,119 @@ public class MachineLearningPreflop {
         String actionToReturn = actionVariables.getAction();
 
         if(actionToReturn.equals("call")) {
-            actionToReturn = adjustCallAction(actionVariables.getAction(), gameVariables);
+            actionToReturn = adjustCallAction(actionVariables.getAction(), gameVariables, actionVariables);
         }
 
         return actionToReturn;
     }
 
-    private String adjustCallAction(String action, GameVariables gameVariables) throws Exception {
-        String actionToReturn;
+    public static void main(String[] args) throws Exception {
+        new MachineLearningPreflop().testMethodNew();
+    }
 
-        if(!gameVariables.isBotIsButton()) {
-            String route = calculateCallRoute(gameVariables);
+    private void testMethodNew() throws Exception {
+        initializeDbConnection();
 
-            initializeDbConnection();
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_call_sng_compact;");
 
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM dbstats_pf_call_sng_compact WHERE route = '" + route + "';");
+        double successTotal = 0;
+        double totalTotal = 0;
 
-            rs.next();
+        int counter = 0;
 
-            if(rs.getDouble("total") >= 15) {
+        while(rs.next()) {
+            String route = rs.getString("route");
+
+            if(rs.getDouble("total") >= 20) {
+                counter++;
                 double success = rs.getDouble("success");
                 double total = rs.getDouble("total");
 
-                if(success / total < 0.5) {
-                    actionToReturn = "fold";
+                if(success / total >= 0.47) {
+                    System.out.println(route + "     " + success + "      " + total);
                 } else {
-                    actionToReturn = action;
+                    //System.out.println("x");
+                }
+
+                successTotal = successTotal + success;
+                totalTotal = totalTotal + total;
+            }
+        }
+
+        rs.close();
+        st.close();
+        closeDbConnection();
+
+        System.out.println(counter);
+//        System.out.println(totalTotal);
+//        System.out.println(successTotal / totalTotal);
+    }
+
+    private String adjustCallAction(String action, GameVariables gameVariables, ActionVariables actionVariables) throws Exception {
+        String actionToReturn;
+
+        String route = calculateCallRoute(gameVariables);
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_pf_call_sng_compact WHERE route = '" + route + "';");
+
+        rs.next();
+
+        if(rs.getDouble("total") >= 10) {
+            System.out.println("a1a1");
+            double success = rs.getDouble("success");
+            double total = rs.getDouble("total");
+
+            if(success / total < 0.5) {
+                System.out.println("b1b1");
+                double random = Math.random();
+
+                if(gameVariables.isBotIsButton()) {
+                    System.out.println("c1c1");
+                    if(random < 0.43) {
+                        if(actionVariables.getBotHandStrength() > 0.95) {
+                            actionToReturn = "call";
+                            System.out.println("MachineLearning preflop IP ignored because hs > 0.95 : " + route);
+                        } else {
+                            actionToReturn = "fold";
+                            System.out.println("MachineLearning preflop IP fold. Route: " + route);
+                        }
+                    } else {
+                        System.out.println("d1d1");
+                        actionToReturn = action;
+                    }
+                } else {
+                    System.out.println("e1e1");
+                    if(random < 0.75) {
+                        System.out.println("f1f1");
+                        if(actionVariables.getBotHandStrength() > 0.95) {
+                            actionToReturn = "call";
+                            System.out.println("MachineLearning preflop OOP ignored because hs > 0.95 : " + route);
+                        } else {
+                            actionToReturn = "fold";
+                            System.out.println("MachineLearning preflop OOP fold. Route: " + route);
+                        }
+                    } else {
+                        System.out.println("g1g1");
+                        actionToReturn = action;
+                    }
                 }
             } else {
+                System.out.println("h1h1");
                 actionToReturn = action;
             }
-
-            rs.close();
-            st.close();
-
-            closeDbConnection();
         } else {
+            System.out.println("z1z1");
             actionToReturn = action;
         }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
 
         return actionToReturn;
     }
