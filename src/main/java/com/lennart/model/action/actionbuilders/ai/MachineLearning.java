@@ -292,10 +292,10 @@ public class MachineLearning {
 
         String extensiveCallRoute = calculateExtensiveCallRoute(actionVariables, gameVariables);
         String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
-        System.out.println("##ExtensiveRoute: " + extensiveCallRoute);
-        System.out.println("##CompactRoute: " + compactCallRoute);
+        System.out.println("##ExtensiveCallRoute: " + extensiveCallRoute);
+        System.out.println("##CompactCallRoute: " + compactCallRoute);
         List<Double> callData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", actionVariables.getBotHandStrength());
-        actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables, sizing, pre3BetOrPostRaisedPot);
+        actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables, sizing, pre3BetOrPostRaisedPot, compactCallRoute, extensiveCallRoute);
 
         return actionToReturn;
     }
@@ -395,22 +395,36 @@ public class MachineLearning {
 
     private String changeToFoldOrRaiseOrKeepCallGivenData(List<Double> callData, ActionVariables actionVariables,
                                                           GameVariables gameVariables, double sizing,
-                                                          boolean pre3BetOrPostRaisedPot) throws Exception {
+                                                          boolean pre3BetOrPostRaisedPot, String compactCallRoute,
+                                                          String extensiveCallRoute) throws Exception {
         String actionToReturn = null;
 
         if(callData.get(1) >= 20) {
             double callRatio = callData.get(0) / callData.get(1);
             double facingOdds = actionVariables.getFacingOdds(gameVariables);
+            double callLimit = getCallRatioLimit(facingOdds);
 
-            if(callRatio > facingOdds) {
+            if(callRatio >= callLimit) {
                 actionToReturn = "call";
             } else {
                 double random = Math.random();
 
-                if(random < 0.75) {
-                    //keep actionToReturn to null so that call will be changed
+                if(gameVariables.isBotIsButton()) {
+                    if(random < 0.54) {
+                        System.out.println("IP call should be changed. actionToReturn kept null. CompactRoute: "
+                                + compactCallRoute + " -------------- extensive route: " + extensiveCallRoute);
+                        System.out.println("callLimit: " + callLimit);
+                    } else {
+                        actionToReturn = "call";
+                    }
                 } else {
-                    actionToReturn = "call";
+                    if(random < 0.78) {
+                        System.out.println("OOP call should be changed. actionToReturn kept null. CompactRoute: "
+                                + compactCallRoute + " -------------- extensive route: " + extensiveCallRoute);
+                        System.out.println("callLimit: " + callLimit);
+                    } else {
+                        actionToReturn = "call";
+                    }
                 }
             }
         } else {
@@ -1143,6 +1157,20 @@ public class MachineLearning {
         }
 
         return raiseIsEligible;
+    }
+
+    private double getCallRatioLimit(double facingOdds) {
+        double ratioLimit;
+
+        if(facingOdds <= 0.2) {
+            ratioLimit = facingOdds * 1.05;
+        } else if(facingOdds <= 0.35) {
+            ratioLimit = 0.44;
+        } else {
+            ratioLimit = 0.49;
+        }
+
+        return ratioLimit;
     }
 
     private void initializeDbConnection() throws Exception {

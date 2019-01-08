@@ -2,6 +2,8 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopCall;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopRaise;
+import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 
 import java.sql.*;
 
@@ -9,11 +11,13 @@ public class MachineLearningPreflop {
 
     private Connection con;
 
-    public String adjustActionToDbSaveData(ActionVariables actionVariables, GameVariables gameVariables) throws Exception {
+    public String adjustActionToDbSaveData(ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
         String actionToReturn = actionVariables.getAction();
 
         if(actionToReturn.equals("call")) {
             actionToReturn = adjustCallAction(actionVariables.getAction(), gameVariables, actionVariables);
+        } else if(actionToReturn.equals("raise")) {
+            actionToReturn = adjustRaiseAction(actionVariables.getAction(), gameVariables, actionVariables, sizing);
         }
 
         return actionToReturn;
@@ -130,6 +134,47 @@ public class MachineLearningPreflop {
         return actionToReturn;
     }
 
+    private String adjustRaiseAction(String action, GameVariables gameVariables, ActionVariables actionVariables, double sizing) throws Exception {
+        String actionToReturn;
+
+        String route = calculateRaiseRoute(gameVariables, sizing);
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_pf_raise_sng_compact WHERE route = '" + route + "';");
+
+        rs.next();
+
+        if(rs.getDouble("total") >= 10) {
+            double success = rs.getDouble("success");
+            double total = rs.getDouble("total");
+
+            if(success / total < 0.5) {
+                double random = Math.random();
+
+                if(random < 0.75) {
+                    if(gameVariables.getOpponentAction().equals("call")) {
+                        actionToReturn = "check";
+                        System.out.println("MachineLearning preflop Raise change to check. Route: " + route);
+                    } else {
+                        System.out.println("MachineLearning preflop Raise change to fold or call. Route: " + route);
+                        actionToReturn = adjustCallAction("call", gameVariables, actionVariables);
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+
+    }
+
     private String calculateCallRoute(GameVariables gameVariables) throws Exception {
         double amountToCallBb = gameVariables.getOpponentBetSize() - gameVariables.getBotBetSize();
 
@@ -148,6 +193,20 @@ public class MachineLearningPreflop {
         String effectiveStack = dbSavePreflopCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
 
         String route = handStrength + position + amountToCallGroup + oppAggroGroup + effectiveStack;
+
+        return route;
+    }
+
+    private String calculateRaiseRoute(GameVariables gameVariables, double sizing) throws Exception {
+        DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
+
+        String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
+        String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
+        String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
+        String foldStatGroup = dbSavePreflopRaise.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+        String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+
+        String route = handStrength + position + sizingString + foldStatGroup + effectiveStackString;
 
         return route;
     }
