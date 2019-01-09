@@ -134,7 +134,7 @@ public class MachineLearning {
                     System.out.println("CompactRoute: " + compactCallRoute);
                 }
             } else {
-                actionToReturn = doFreakyCallMachineLearning(actionVariables, gameVariables);
+                //actionToReturn = doFreakyCallMachineLearning(actionVariables, gameVariables);
 
                 if(actionToReturn != null && actionToReturn.equals("call")) {
                     System.out.println("Machinelearning K) (freaky) Changed fold to call");
@@ -399,12 +399,15 @@ public class MachineLearning {
                                                           String extensiveCallRoute) throws Exception {
         String actionToReturn = null;
 
-        if(callData.get(1) >= 20) {
+        if(callData.get(1) >= 10) {
             double callRatio = callData.get(0) / callData.get(1);
             double facingOdds = actionVariables.getFacingOdds(gameVariables);
             double callLimit = getCallRatioLimit(facingOdds);
 
+            System.out.println("callLimit: " + callLimit);
+
             if(callRatio >= callLimit) {
+                System.out.println("callRatio above callLimit, callratio: " + callRatio + "   callLimit: " + callLimit);
                 actionToReturn = "call";
             } else {
                 double random = Math.random();
@@ -416,6 +419,7 @@ public class MachineLearning {
                         System.out.println("callLimit: " + callLimit);
                     } else {
                         actionToReturn = "call";
+                        System.out.println("call zzz1. Route: " + compactCallRoute);
                     }
                 } else {
                     if(random < 0.78) {
@@ -424,11 +428,13 @@ public class MachineLearning {
                         System.out.println("callLimit: " + callLimit);
                     } else {
                         actionToReturn = "call";
+                        System.out.println("call zzz2. Route: " + compactCallRoute);
                     }
                 }
             }
         } else {
             actionToReturn = "call";
+            System.out.println("calldata below 20. Route: " + compactCallRoute);
         }
 
         if(actionToReturn == null) {
@@ -936,23 +942,17 @@ public class MachineLearning {
         List<String> pilotBluffRaiseRoutes = new ArrayList<>();
 
         pilotBluffRaiseRoutes.add("FlopBetIpSizing_0-10bbFoldstat_33_66_StrongDrawTrue");
-        pilotBluffRaiseRoutes.add("FlopBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopBetIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_0-10bbFoldstat_33_66_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_33_66_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
-        pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_0-10bbFoldstat_33_66_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_unknownStrongDrawTrue");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("TurnBetIpSizing_0-10bbFoldstat_unknownStrongDrawTrue");
-        pilotBluffRaiseRoutes.add("TurnRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("RiverBetIpSizing_0-10bbFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverBetIpSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("RiverBetOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
-        pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
-        pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
 
         return pilotBluffRaiseRoutes;
     }
@@ -960,23 +960,16 @@ public class MachineLearning {
     private List<String> getPilotFloatRoutes() {
         List<String> pilotFloatRoutes = new ArrayList<>();
 
-        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_33_66_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
-        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawFalse");
-        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_50_60_StrongDrawFalse");
-        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_unknownHS_30_50_StrongDrawTrue");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_0_30_StrongDrawTrue");
-        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_33_66_HS_50_60_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
-        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
-        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_unknownHS_0_30_StrongDrawTrue");
-        pilotFloatRoutes.add("TurnFacingBetOopAtc_0-10bbAggro_unknownHS_30_50_StrongDrawTrue");
-        pilotFloatRoutes.add("TurnFacingBetOopAtc_0-10bbAggro_unknownHS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("TurnFacingBetOopAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("TurnFacingRaiseOopAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
 
         return pilotFloatRoutes;
     }

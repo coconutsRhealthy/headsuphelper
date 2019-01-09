@@ -153,26 +153,38 @@ public class MachineLearningPreflop {
             if(success / total < 0.5) {
                 double random = Math.random();
 
+                System.out.println("Preflop raise action success below 0,5. Route: " + route);
+                System.out.println("Opponentaction equals: " + gameVariables.getOpponentAction());
+
                 if(random < 0.75) {
                     if(gameVariables.getOpponentAction().equals("call")) {
                         actionToReturn = "check";
                         System.out.println("MachineLearning preflop Raise change to check. Route: " + route);
                     } else {
                         System.out.println("MachineLearning preflop Raise change to fold or call. Route: " + route);
-                        actionToReturn = adjustCallAction("call", gameVariables, actionVariables);
+
+                        if(gameVariables.getBotBetSize() < gameVariables.getBigBlind()) {
+                            actionToReturn = "fold";
+                            System.out.println("Changed to fold because was IP open from SB");
+                        } else {
+                            System.out.println("Call adjustCallAction() because it concerns call other than IP open from SB");
+                            actionToReturn = adjustCallAction("call", gameVariables, actionVariables);
+                        }
                     }
                 } else {
                     actionToReturn = action;
+                    System.out.println("zzz preflop raise adjuster");
                 }
             } else {
                 actionToReturn = action;
+                System.out.println("Preflop raise success above 0,5. Route: " + route);
             }
         } else {
             actionToReturn = action;
+            System.out.println("Less than 10 hands preflop for route: " + route);
         }
 
         return actionToReturn;
-
     }
 
     private String calculateCallRoute(GameVariables gameVariables) throws Exception {
