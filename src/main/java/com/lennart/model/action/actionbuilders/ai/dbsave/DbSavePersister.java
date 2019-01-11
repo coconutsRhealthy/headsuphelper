@@ -928,6 +928,9 @@ public class DbSavePersister {
                         convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroup()) +
                         dbSaveBluff.getFoldStatGroup() + dbSaveBluff.getStrongDraw();
 
+                verifyRouteExists(route, bluffTable);
+                verifyRouteExists(routeCompact, bluffTableCompact);
+
                 if(actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + bluffTable + " SET success = success + 1 WHERE route = '" + route + "'");
                     st.executeUpdate("UPDATE " + bluffTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
@@ -946,6 +949,9 @@ public class DbSavePersister {
                 String routeCompact = dbSaveCall.getStreet() + dbSaveCall.getFacingAction() + dbSaveCall.getPosition() +
                         convertCallAtcToCompact(dbSaveCall.getAmountToCallGroup()) + dbSaveCall.getOppAggroGroup() +
                         dbSaveCall.getHandStrength() + dbSaveCall.getStrongDraw();
+
+                verifyRouteExists(route, callTable);
+                verifyRouteExists(routeCompact, callTableCompact);
 
                 if(actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + callTable + " SET success = success + 1 WHERE route = '" + route + "'");
@@ -966,6 +972,9 @@ public class DbSavePersister {
                         convertBluffOrValueSizingToCompact(dbSaveValue.getSizingGroup()) + dbSaveValue.getOppLoosenessGroup() +
                         dbSaveValue.getHandStrength();
 
+                verifyRouteExists(route, valueTable);
+                verifyRouteExists(routeCompact, valueTableCompact);
+
                 if(actionWasSuccessfull(bigBlind)) {
                     st.executeUpdate("UPDATE " + valueTable + " SET success = success + 1 WHERE route = '" + route + "'");
                     st.executeUpdate("UPDATE " + valueTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
@@ -978,6 +987,21 @@ public class DbSavePersister {
 
         st.close();
         closeDbConnection();
+    }
+
+    private void verifyRouteExists(String route, String table) throws Exception {
+        Statement st2 = con.createStatement();
+
+        ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
+
+        if(!rs2.next()) {
+            System.out.println("Postflop Route does not exist! " + route + "    table: " + table);
+        } else {
+            System.out.println("Postflop Route exists: " + route + "     table: " + table);
+        }
+
+        rs2.close();
+        st2.close();
     }
 
     public String convertBluffOrValueSizingToCompact(String sizing) {
