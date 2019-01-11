@@ -187,6 +187,8 @@ public class DbSave {
                 break;
                 case 11:
                     comboString = comboString + "J";
+                case 10:
+                    comboString = comboString + "T";
                 break;
                 default:
                     comboString = comboString + String.valueOf(rank);
