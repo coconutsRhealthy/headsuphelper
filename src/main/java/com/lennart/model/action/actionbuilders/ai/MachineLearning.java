@@ -38,7 +38,218 @@ public class MachineLearning {
 
         actionToReturn = doPilotFloating(actionToReturn, actionVariables, gameVariables);
 
+        doMachineLearningLogging(actionToReturn, actionVariables, gameVariables, sizing);
+
         return actionToReturn;
+    }
+
+    private void doMachineLearningLogging(String action, ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
+        double handStrength = actionVariables.getBotHandStrength();
+
+        if(action.equals("fold")) {
+            String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
+            String extensiveCallRoute = calculateExtensiveCallRoute(actionVariables, gameVariables);
+
+            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength);
+
+            String compactRaiseRoute;
+            String extensiveRaiseRoute;
+
+            if(handStrength < 0.7) {
+                compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+            } else {
+                compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+            }
+
+            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength);
+
+            double callRatio = callRouteData.get(0) / callRouteData.get(1);
+            double raiseRatio = raiseRouteData.get(0) / raiseRouteData.get(1);
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Postflop Machine Learning logging *****");
+            System.out.println("Action is: FOLD");
+            System.out.println("Callroute success: " + callRouteData.get(0));
+            System.out.println("Callroute total: " + callRouteData.get(1));
+            System.out.println("Callroute ratio: " + callRatio);
+            System.out.println("Compact callroute: " + compactCallRoute);
+            System.out.println("Extensive callroute: " + extensiveCallRoute);
+            System.out.println();
+            System.out.println("Raiseroute success: " + raiseRouteData.get(0));
+            System.out.println("Raiseroute total: " + raiseRouteData.get(1));
+            System.out.println("Raiseroute ratio: " + raiseRatio);
+            System.out.println("Compact raiseRoute: " + compactRaiseRoute);
+            System.out.println("Extensive raiseRoute: " + extensiveRaiseRoute);
+
+            if((callRatio >= 0.5 && callRouteData.get(1) >= 10) || (raiseRatio >= 0.5 && raiseRouteData.get(1) >= 10)) {
+                System.out.println("May be of interest Postflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        } else if(action.equals("check")) {
+            String compactBetRoute;
+            String extensiveBetRoute;
+
+            if(handStrength < 0.7) {
+                compactBetRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                extensiveBetRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+            } else {
+                compactBetRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                extensiveBetRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+            }
+
+            List<Double> betRouteData = getDataFromDb(compactBetRoute, extensiveBetRoute, "bet75pct", handStrength);
+
+            double betRouteRatio = betRouteData.get(0) / betRouteData.get(1);
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Postflop Machine Learning logging *****");
+            System.out.println("Action is: CHECK");
+            System.out.println("Betroute success: " + betRouteData.get(0));
+            System.out.println("Betroute total: " + betRouteData.get(1));
+            System.out.println("Betroute ratio: " + betRouteRatio);
+            System.out.println("Compact betroute: " + compactBetRoute);
+            System.out.println("Extensive betroute: " + extensiveBetRoute);
+            System.out.println();
+
+            if(betRouteRatio >= 0.5 && betRouteData.get(1) >= 10) {
+                System.out.println("May be of interest Postflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        } else if(action.equals("call")) {
+            String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
+            String extensiveCallRoute = calculateExtensiveCallRoute(actionVariables, gameVariables);
+
+            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength);
+
+            String compactRaiseRoute;
+            String extensiveRaiseRoute;
+
+            if(handStrength < 0.7) {
+                compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+            } else {
+                compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+            }
+
+            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength);
+
+            double callRatio = callRouteData.get(0) / callRouteData.get(1);
+            double raiseRatio = raiseRouteData.get(0) / raiseRouteData.get(1);
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Postflop Machine Learning logging *****");
+            System.out.println("Action is: CALL");
+            System.out.println("Callroute success: " + callRouteData.get(0));
+            System.out.println("Callroute total: " + callRouteData.get(1));
+            System.out.println("Callroute ratio: " + callRatio);
+            System.out.println("Compact callroute: " + compactCallRoute);
+            System.out.println("Extensive callroute: " + extensiveCallRoute);
+            System.out.println();
+            System.out.println("Raiseroute success: " + raiseRouteData.get(0));
+            System.out.println("Raiseroute total: " + raiseRouteData.get(1));
+            System.out.println("Raiseroute ratio: " + raiseRatio);
+            System.out.println("Compact raiseRoute: " + compactRaiseRoute);
+            System.out.println("Extensive raiseRoute: " + extensiveRaiseRoute);
+
+            if(callRatio < 0.5 && callRouteData.get(1) >= 10) {
+                System.out.println("May be of interest Postflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        } else if(action.equals("bet75pct")) {
+            String compactBetRoute;
+            String extensiveBetRoute;
+
+            if(handStrength < 0.7) {
+                compactBetRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                extensiveBetRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+            } else {
+                compactBetRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                extensiveBetRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+            }
+
+            List<Double> betRouteData = getDataFromDb(compactBetRoute, extensiveBetRoute, "bet75pct", handStrength);
+
+            double betRouteRatio = betRouteData.get(0) / betRouteData.get(1);
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Postflop Machine Learning logging *****");
+            System.out.println("Action is: BET75PCT");
+            System.out.println("Betroute success: " + betRouteData.get(0));
+            System.out.println("Betroute total: " + betRouteData.get(1));
+            System.out.println("Betroute ratio: " + betRouteRatio);
+            System.out.println("Compact betroute: " + compactBetRoute);
+            System.out.println("Extensive betroute: " + extensiveBetRoute);
+            System.out.println();
+
+            if(betRouteRatio < 0.5 && betRouteData.get(1) >= 10) {
+                System.out.println("May be of interest Postflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        } else if(action.equals("raise")) {
+            String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
+            String extensiveCallRoute = calculateExtensiveCallRoute(actionVariables, gameVariables);
+
+            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength);
+
+            String compactRaiseRoute;
+            String extensiveRaiseRoute;
+
+            if(handStrength < 0.7) {
+                compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+            } else {
+                compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+            }
+
+            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength);
+
+            double callRatio = callRouteData.get(0) / callRouteData.get(1);
+            double raiseRatio = raiseRouteData.get(0) / raiseRouteData.get(1);
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Postflop Machine Learning logging *****");
+            System.out.println("Action is: RAISE");
+            System.out.println("Raiseroute success: " + raiseRouteData.get(0));
+            System.out.println("Raiseroute total: " + raiseRouteData.get(1));
+            System.out.println("Raiseroute ratio: " + raiseRatio);
+            System.out.println("Compact raiseRoute: " + compactRaiseRoute);
+            System.out.println("Extensive raiseRoute: " + extensiveRaiseRoute);
+            System.out.println();
+            System.out.println("Callroute success: " + callRouteData.get(0));
+            System.out.println("Callroute total: " + callRouteData.get(1));
+            System.out.println("Callroute ratio: " + callRatio);
+            System.out.println("Compact callroute: " + compactCallRoute);
+            System.out.println("Extensive callroute: " + extensiveCallRoute);
+
+            if(raiseRatio < 0.5 && raiseRouteData.get(1) >= 10) {
+                System.out.println("May be of interest Postflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        }
     }
 
     private String adjustCheckAction(ActionVariables actionVariables, GameVariables gameVariables,
@@ -941,18 +1152,18 @@ public class MachineLearning {
     private List<String> getPilotBluffRaiseRoutes() {
         List<String> pilotBluffRaiseRoutes = new ArrayList<>();
 
-        pilotBluffRaiseRoutes.add("FlopBetIpSizing_0-10bbFoldstat_33_66_StrongDrawTrue");
         pilotBluffRaiseRoutes.add("FlopBetIpSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_0-10bbFoldstat_33_66_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseIpSizing_10-20bbFoldstat_33_66_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_0-10bbFoldstat_33_66_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawTrue");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_10-20bbFoldstat_unknownStrongDrawTrue");
         pilotBluffRaiseRoutes.add("FlopRaiseOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("TurnBetIpSizing_10-20bbFoldstat_unknownStrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverBetIpSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
-        pilotBluffRaiseRoutes.add("RiverBetOopSizing_20bb_upFoldstat_66_100_StrongDrawFalse");
+        pilotBluffRaiseRoutes.add("RiverBetOopSizing_0-10bbFoldstat_0_33_StrongDrawFalse");
         pilotBluffRaiseRoutes.add("RiverRaiseIpSizing_0-10bbFoldstat_unknownStrongDrawFalse");
-        pilotBluffRaiseRoutes.add("RiverRaiseOopSizing_10-20bbFoldstat_66_100_StrongDrawFalse");
 
         return pilotBluffRaiseRoutes;
     }
@@ -960,15 +1171,18 @@ public class MachineLearning {
     private List<String> getPilotFloatRoutes() {
         List<String> pilotFloatRoutes = new ArrayList<>();
 
-        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
+        pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_33_66_HS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
         pilotFloatRoutes.add("FlopFacingBetIpAtc_0-10bbAggro_unknownHS_30_50_StrongDrawTrue");
+        pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_0_33_HS_30_50_StrongDrawFalse");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("FlopFacingBetOopAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
-        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_33_66_HS_50_60_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_30_50_StrongDrawTrue");
+        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_66_100_HS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("TurnFacingBetIpAtc_0-10bbAggro_unknownHS_0_30_StrongDrawTrue");
         pilotFloatRoutes.add("TurnFacingBetOopAtc_0-10bbAggro_33_66_HS_60_70_StrongDrawFalse");
+        pilotFloatRoutes.add("TurnFacingBetOopAtc_0-10bbAggro_66_100_HS_50_60_StrongDrawFalse");
         pilotFloatRoutes.add("TurnFacingRaiseOopAtc_0-10bbAggro_66_100_HS_0_30_StrongDrawTrue");
 
         return pilotFloatRoutes;

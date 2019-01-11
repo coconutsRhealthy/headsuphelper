@@ -20,7 +20,194 @@ public class MachineLearningPreflop {
             actionToReturn = adjustRaiseAction(actionVariables.getAction(), gameVariables, actionVariables, sizing);
         }
 
+        doMachineLearningLogging(actionToReturn, gameVariables, sizing);
+
         return actionToReturn;
+    }
+
+    private void doMachineLearningLogging(String action, GameVariables gameVariables, double sizing) throws Exception {
+        initializeDbConnection();
+
+        if(action.equals("fold")) {
+            String callRoute = calculateCallRoute(gameVariables);
+            String raiseRoute = calculateRaiseRoute(gameVariables, sizing);
+
+            Statement st1 = con.createStatement();
+            ResultSet rs1 = st1.executeQuery("SELECT * FROM dbstats_pf_call_sng_compact WHERE route = '" + callRoute + "';");
+
+            rs1.next();
+
+            double callSuccess = rs1.getDouble("success");
+            double callTotal = rs1.getDouble("total");
+            double callRatio = callSuccess / callTotal;
+
+            rs1.close();
+            st1.close();
+
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM dbstats_pf_raise_sng_compact WHERE route = '" + raiseRoute + "';");
+
+            rs2.next();
+
+            double raiseSuccess = rs2.getDouble("success");
+            double raiseTotal = rs2.getDouble("total");
+            double raiseRatio = raiseSuccess / raiseTotal;
+
+            rs2.close();
+            st2.close();
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Preflop Machine Learning logging *****");
+            System.out.println("Action is: FOLD");
+            System.out.println("Callroute success: " + callSuccess);
+            System.out.println("Callroute total: " + callTotal);
+            System.out.println("Callroute ratio: " + callRatio);
+            System.out.println("Callroute: " + callRoute);
+            System.out.println();
+            System.out.println("Raiseroute success: " + raiseSuccess);
+            System.out.println("Raiseroute total: " + raiseTotal);
+            System.out.println("Raiseroute ratio: " + raiseRatio);
+            System.out.println("Raiseroute: " + raiseRoute);
+
+            if((callRatio >= 0.5 && callTotal >= 10) || (raiseRatio >= 0.5 && raiseTotal >= 10)) {
+                System.out.println("May be of interest Preflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        } else if(action.equals("call")) {
+            String callRoute = calculateCallRoute(gameVariables);
+            String raiseRoute = calculateRaiseRoute(gameVariables, sizing);
+
+            Statement st1 = con.createStatement();
+            ResultSet rs1 = st1.executeQuery("SELECT * FROM dbstats_pf_call_sng_compact WHERE route = '" + callRoute + "';");
+
+            rs1.next();
+
+            double callSuccess = rs1.getDouble("success");
+            double callTotal = rs1.getDouble("total");
+            double callRatio = callSuccess / callTotal;
+
+            rs1.close();
+            st1.close();
+
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM dbstats_pf_raise_sng_compact WHERE route = '" + raiseRoute + "';");
+
+            rs2.next();
+
+            double raiseSuccess = rs2.getDouble("success");
+            double raiseTotal = rs2.getDouble("total");
+            double raiseRatio = raiseSuccess / raiseTotal;
+
+            rs2.close();
+            st2.close();
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Preflop Machine Learning logging *****");
+            System.out.println("Action is: CALL");
+            System.out.println("Callroute success: " + callSuccess);
+            System.out.println("Callroute total: " + callTotal);
+            System.out.println("Callroute ratio: " + callRatio);
+            System.out.println("Callroute: " + callRoute);
+            System.out.println();
+            System.out.println("Raiseroute success: " + raiseSuccess);
+            System.out.println("Raiseroute total: " + raiseTotal);
+            System.out.println("Raiseroute ratio: " + raiseRatio);
+            System.out.println("Raiseroute: " + raiseRoute);
+
+            if(callRatio < 0.5 && callTotal >= 10) {
+                System.out.println("May be of interest Preflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        } else if(action.equals("check")) {
+            String raiseRoute = calculateRaiseRoute(gameVariables, sizing);
+
+            Statement st1 = con.createStatement();
+            ResultSet rs1 = st1.executeQuery("SELECT * FROM dbstats_pf_raise_sng_compact WHERE route = '" + raiseRoute + "';");
+
+            rs1.next();
+
+            double raiseSuccess = rs1.getDouble("success");
+            double raiseTotal = rs1.getDouble("total");
+            double raiseRatio = raiseSuccess / raiseTotal;
+
+            rs1.close();
+            st1.close();
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Preflop Machine Learning logging *****");
+            System.out.println("Action is: CHECK");
+            System.out.println("Raiseroute success: " + raiseSuccess);
+            System.out.println("Raiseroute total: " + raiseTotal);
+            System.out.println("Raiseroute ratio: " + raiseRatio);
+            System.out.println("Raiseroute: " + raiseRoute);
+            System.out.println();
+
+            if(raiseRatio >= 0.5 && raiseTotal >= 10) {
+                System.out.println("May be of interest Preflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        } else if(action.equals("raise")) {
+            String callRoute = calculateCallRoute(gameVariables);
+            String raiseRoute = calculateRaiseRoute(gameVariables, sizing);
+
+            Statement st1 = con.createStatement();
+            ResultSet rs1 = st1.executeQuery("SELECT * FROM dbstats_pf_call_sng_compact WHERE route = '" + callRoute + "';");
+
+            rs1.next();
+
+            double callSuccess = rs1.getDouble("success");
+            double callTotal = rs1.getDouble("total");
+            double callRatio = callSuccess / callTotal;
+
+            rs1.close();
+            st1.close();
+
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM dbstats_pf_raise_sng_compact WHERE route = '" + raiseRoute + "';");
+
+            rs2.next();
+
+            double raiseSuccess = rs2.getDouble("success");
+            double raiseTotal = rs2.getDouble("total");
+            double raiseRatio = raiseSuccess / raiseTotal;
+
+            rs2.close();
+            st2.close();
+
+            System.out.println();
+            System.out.println();
+            System.out.println("***** Preflop Machine Learning logging *****");
+            System.out.println("Action is: RAISE");
+            System.out.println("Raiseroute success: " + raiseSuccess);
+            System.out.println("Raiseroute total: " + raiseTotal);
+            System.out.println("Raiseroute ratio: " + raiseRatio);
+            System.out.println("Raiseroute: " + raiseRoute);
+            System.out.println();
+            System.out.println("Callroute success: " + callSuccess);
+            System.out.println("Callroute total: " + callTotal);
+            System.out.println("Callroute ratio: " + callRatio);
+            System.out.println("Callroute: " + callRoute);
+
+            if(raiseRatio < 0.5 && raiseTotal >= 10) {
+                System.out.println("May be of interest Preflop Machine Learning logging!");
+            }
+
+            System.out.println("*****************");
+            System.out.println();
+            System.out.println();
+        }
     }
 
     public static void main(String[] args) throws Exception {
