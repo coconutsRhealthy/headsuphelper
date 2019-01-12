@@ -37,6 +37,23 @@ public class HandHistoryReaderStars {
         return opponentActions;
     }
 
+    public List<String> getOpponentActionsOfLastHand(boolean postflop, double bigBlind) throws Exception {
+        List<String> total = readTextFile();
+        List<String> lastHand = getLinesOfLastGame(total, 1, bigBlind);
+
+        List<String> relevantLines;
+
+        if(postflop) {
+            relevantLines = getLinesOfHandFromFlopUntilRiver(lastHand);
+        } else {
+            relevantLines = getPreflopLines(lastHand);
+        }
+
+        List<String> opponentActions = getOpponentActions(relevantLines);
+
+        return opponentActions;
+    }
+
     public List<String> readTextFile() throws Exception  {
         File textFile = getLatestFilefromDir("/Users/LennartMac/Library/Application Support/PokerStarsEU/HandHistory/vegeta11223");
 
@@ -189,6 +206,20 @@ public class HandHistoryReaderStars {
         }
 
         return flopUntilRiverLines;
+    }
+
+    private List<String> getPreflopLines(List<String> lastGame) {
+        List<String> preflopLines = new ArrayList<>();
+
+        for(String line : lastGame) {
+            if(line.contains("*** FLOP ***")) {
+                break;
+            } else {
+                preflopLines.add(line);
+            }
+        }
+
+        return preflopLines;
     }
 
     private List<String> getOpponentActions(List<String> linesFromFlopUntilRiver) {

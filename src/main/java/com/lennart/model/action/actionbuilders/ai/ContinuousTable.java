@@ -4,6 +4,7 @@ import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
@@ -109,6 +110,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
                         new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlind);
+                        new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, bigBlind);
                     }
 
                     gameVariables = new GameVariables(bigBlind, game.equals("sng"));
