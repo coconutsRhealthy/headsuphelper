@@ -813,8 +813,11 @@ public class MachineLearning {
         String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
         String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
         String strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
+        String effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
+                dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+                        gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String route = street + bluffAction + position + sizingGroup + foldStatGroup + strongDraw;
+        String route = street + bluffAction + position + sizingGroup + foldStatGroup + strongDraw + effectiveStack;
 
         return route;
     }
@@ -859,8 +862,11 @@ public class MachineLearning {
         String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveValue.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
         String oppLoosenessGroup = dbSaveValue.getOppLoosenessGroupViaLogic(gameVariables.getOpponentName());
         String handStrength = dbSaveValue.getHandStrengthLogic(actionVariables.getBotHandStrength());
+        String effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
+                dbSaveValue.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+                        gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String route = street + valueAction + postion + sizingGroup + oppLoosenessGroup + handStrength;
+        String route = street + valueAction + postion + sizingGroup + oppLoosenessGroup + handStrength + effectiveStack;
 
         return route;
     }
@@ -908,8 +914,11 @@ public class MachineLearning {
         String oppAggroGroup = dbSaveCall.getOppAggroGroupViaLogic(gameVariables.getOpponentName());
         String handStrength = dbSaveCall.getHandStrengthLogic(actionVariables.getBotHandStrength());
         String strongDraw = dbSaveCall.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
+        String effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
+                dbSaveCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+                        gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String route = street + facingAction + postion + amountToCallGroup + oppAggroGroup + handStrength + strongDraw;
+        String route = street + facingAction + postion + amountToCallGroup + oppAggroGroup + handStrength + strongDraw + effectiveStack;
 
         return route;
     }
