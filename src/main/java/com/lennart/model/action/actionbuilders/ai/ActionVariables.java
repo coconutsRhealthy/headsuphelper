@@ -493,7 +493,35 @@ public class ActionVariables {
                     continuousTable.getDbSaveList().add(dbSavePreflopCall);
                 }
             }
-            ///////
+
+            //DbSaveRaw
+            DbSaveRaw dbSaveRaw = new DbSaveRaw();
+
+            String boardString = dbSaveRaw.getBoardLogic(gameVariables.getBoard());
+            String holeCardsString = dbSaveRaw.getHoleCardsLogic(gameVariables.getBotHoleCards());
+            String positionString = dbSaveRaw.getPositionLogic(botIsButtonInMethod);
+            String opponentData = dbSaveRaw.getOpponentDataLogic(gameVariables.getOpponentName());
+            String strongDrawString = dbSaveRaw.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+
+            dbSaveRaw.setBotAction(action);
+            dbSaveRaw.setOppAction(gameVariables.getOpponentAction());
+            dbSaveRaw.setBoard(boardString);
+            dbSaveRaw.setHoleCards(holeCardsString);
+            dbSaveRaw.setHandStrength(botHandStrength);
+            dbSaveRaw.setBotStack(gameVariables.getBotStack());
+            dbSaveRaw.setOpponentStack(gameVariables.getOpponentStack());
+            dbSaveRaw.setBotTotalBetSize(gameVariables.getBotBetSize());
+            dbSaveRaw.setOpponentTotalBetSize(gameVariables.getOpponentBetSize());
+            dbSaveRaw.setSizing(sizing);
+            dbSaveRaw.setPosition(positionString);
+            dbSaveRaw.setStake("1.50sng");
+            dbSaveRaw.setOpponentName(gameVariables.getOpponentName());
+            dbSaveRaw.setOpponentData(opponentData);
+            dbSaveRaw.setBigBlind(gameVariables.getBigBlind());
+            dbSaveRaw.setStrongDraw(strongDrawString);
+
+            continuousTable.getDbSaveList().add(dbSaveRaw);
+            //DbSaveRaw
         }
 
         if(realGame) {

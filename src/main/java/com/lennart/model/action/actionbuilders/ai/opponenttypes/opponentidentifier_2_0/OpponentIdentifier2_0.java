@@ -30,13 +30,15 @@ public class OpponentIdentifier2_0 {
         for(String action : opponentPostflopActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_postflop");
         }
+
+        updateNumberOfHands(opponentPlayerNameOfLastHand);
     }
 
     private void updateCountsInDb(String opponentNick, String action, String table) throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-              ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE playerName = '" + opponentNick + "';");
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE playerName = '" + opponentNick + "';");
 
         if(!rs.next()) {
             st.executeUpdate("INSERT INTO " + table + " (playerName) VALUES ('" + opponentNick + "')");
@@ -55,6 +57,17 @@ public class OpponentIdentifier2_0 {
         }
 
         rs.close();
+        st.close();
+        closeDbConnection();
+    }
+
+    private void updateNumberOfHands(String opponentNick) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        st.executeUpdate("UPDATE opponentidentifier_2_0_preflop SET totalHandCount = totalHandCount + 1 WHERE playerName = '" + opponentNick + "'");
+        st.executeUpdate("UPDATE opponentidentifier_2_0_postflop SET totalHandCount = totalHandCount + 1 WHERE playerName = '" + opponentNick + "'");
+
         st.close();
         closeDbConnection();
     }

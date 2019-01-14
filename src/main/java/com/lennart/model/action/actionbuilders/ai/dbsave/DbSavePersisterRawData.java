@@ -4,6 +4,8 @@ import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
 
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import java.util.List;
 public class DbSavePersisterRawData {
 
     private Connection con;
+    List<String> lastHand = null;
 
     public void doBigDbSaveUpdate(ContinuousTable continuousTable, double biglind) throws Exception {
         List<DbSave> dbSaveList = continuousTable.getDbSaveList();
@@ -37,6 +40,7 @@ public class DbSavePersisterRawData {
                     "opponentstack, " +
                     "bot_total_betsize, " +
                     "opponent_total_betsize, " +
+                    "sizing, " +
                     "position, " +
                     "stake, " +
                     "opponent_name, " +
@@ -56,12 +60,13 @@ public class DbSavePersisterRawData {
                     dbSaveRaw.getBotStack() + "', '" +
                     dbSaveRaw.getOpponentStack() + "', '" +
                     dbSaveRaw.getBotTotalBetSize() + "', '" +
-                    dbSaveRaw.getOpponentTotalBetSize() + "', '" + dbSaveRaw.getPosition() + "', '" +
+                    dbSaveRaw.getOpponentTotalBetSize() + "', '" +
+                    dbSaveRaw.getSizing() + "', '" +
                     dbSaveRaw.getPosition() + "', '" +
                     dbSaveRaw.getStake() + "', '" +
                     dbSaveRaw.getOpponentName() + "', '" +
                     dbSaveRaw.getOpponentData() + "', '" +
-                    showdownOccurred() + "', '" +
+                    showdownOccurred(biglind) + "', '" +
                     botWonHand(biglind) + "', '" +
                     dbSaveRaw.getBigBlind() + "', '" +
                     dbSaveRaw.getStrongDraw() + "', '" +
@@ -76,9 +81,12 @@ public class DbSavePersisterRawData {
     private boolean botWonHand(double bigBlind) throws Exception {
         boolean botWonHand = false;
 
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+        if(lastHand == null) {
+            HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+            List<String> total = handHistoryReaderStars.readTextFile();
+            lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+        }
+
         Collections.reverse(lastHand);
 
         for(String line : lastHand) {
@@ -91,28 +99,51 @@ public class DbSavePersisterRawData {
         return botWonHand;
     }
 
-    private boolean showdownOccurred() {
-        return false;
+    private boolean showdownOccurred(double bigBlind) throws Exception {
+        boolean showdownOccurred = false;
+
+        if(lastHand == null) {
+            HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+            List<String> total = handHistoryReaderStars.readTextFile();
+            lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+        }
+
+        Collections.reverse(lastHand);
+
+        for(String line : lastHand) {
+            if(line.contains("*** SHOW DOWN ***")) {
+                showdownOccurred = true;
+                break;
+            }
+        }
+
+        return showdownOccurred;
     }
 
-    private int getHighestIntEntry(String database) throws Exception {
+    private int getHighestIntEntry(String table) throws Exception {
+        int highestIntEntry = 0;
+
+        initializeDbConnection();
+
         Statement st = con.createStatement();
-        String sql = ("SELECT * FROM " + database + " ORDER BY entry DESC;");
-        ResultSet rs = st.executeQuery(sql);
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " ORDER BY entry DESC;");
 
         if(rs.next()) {
-            int highestIntEntry = rs.getInt("entry");
-            st.close();
-            rs.close();
-            return highestIntEntry;
+            highestIntEntry = rs.getInt("entry");
         }
+
         st.close();
         rs.close();
-        return 0;
+
+        closeDbConnection();
+
+        return highestIntEntry;
     }
 
     private String getCurrentDate() {
-        return null;
+        java.util.Date date = new java.util.Date();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return dateFormat.format(date);
     }
 
     private void initializeDbConnection() throws Exception {

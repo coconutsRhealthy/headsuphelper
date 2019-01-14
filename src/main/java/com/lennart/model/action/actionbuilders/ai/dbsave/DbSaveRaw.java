@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.card.Card;
 
+import java.sql.*;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ public class DbSaveRaw extends DbSave {
     private double opponentStack;
     private double botTotalBetSize;
     private double opponentTotalBetSize;
+    private double sizing;
     private String position;
     private String stake;
     private String opponentName;
@@ -25,65 +27,86 @@ public class DbSaveRaw extends DbSave {
     private double bigBlind;
     private String strongDraw;
 
+    private Connection con;
+
     //logic getters
-    public String getBotActionLogic(String botAction) {
-        return null;
-    }
-
-    public String getOpponentActionLogic(String opponentAction) {
-        return null;
-    }
-
     public String getBoardLogic(List<Card> board) {
-        return null;
+        String boardString = "";
+
+        for(Card c : board) {
+            boardString = boardString + c.getRank();
+            boardString = boardString + c.getSuit();
+        }
+
+        return boardString;
     }
 
     public String getHoleCardsLogic(List<Card> holeCards) {
-        return null;
+        String holeCardsString = "";
+
+        for(Card c : holeCards) {
+            holeCardsString = holeCardsString + c.getRank();
+            holeCardsString = holeCardsString + c.getSuit();
+        }
+
+        return holeCardsString;
     }
 
-    public double getHandStrengthLogic(double handStrength) {
-        return 0;
-    }
+    public String getOpponentDataLogic(String opponentName) throws Exception {
+        String oppDataLogicString;
 
-    public double getBotStackLogic(double botStack) {
-        return 0;
-    }
+        double numberOfHands = -1;
+        double preFoldCount = -1;
+        double preCheckCount = -1;
+        double preCallCount = -1;
+        double preRaiseCount = -1;
 
-    public double getOpponentSackLogic(double opponentStack) {
-        return 0;
-    }
+        double postFoldCount = -1;
+        double postCheckCount = -1;
+        double postCallCount = -1;
+        double postBetCount = -1;
+        double postRaiseCount = -1;
 
-    public double getBotTotalBetSizeLogic(double botTotalBetSize) {
-        return 0;
-    }
+        initializeDbConnection();
 
-    public double getOpponentTotalBetSizeLogic(double opponentTotalBetSize) {
-        return 0;
-    }
+        Statement st1 = con.createStatement();
+        ResultSet rs1 = st1.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop WHERE playerName = '" + opponentName + "'");
 
-    public String getPositionLogic(boolean position) {
-        return null;
-    }
+        if(rs1.next()) {
+            numberOfHands = rs1.getDouble("numberOfHands");
+            preFoldCount = rs1.getDouble("foldCount");
+            preCheckCount = rs1.getDouble("checkCount");
+            preCallCount = rs1.getDouble("callCount");
+            preRaiseCount = rs1.getDouble("raiseCount");
+        } else {
+            System.out.println("Couldnt find player in opponentidentifier_2_0_preflop: " + opponentName);
+        }
 
-    public String getStakeLogic(String stake) {
-        return null;
-    }
+        st1.close();
+        rs1.close();
 
-    public String getOpponentNameLogic(String opponentName) {
-        return null;
-    }
+        Statement st2 = con.createStatement();
+        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop WHERE playerName = '" + opponentName + "'");
 
-    public String getOpponentDataLogic(String opponentName) {
-        return null;
-    }
+        if(rs2.next()) {
+            postFoldCount = rs2.getDouble("foldCount");
+            postCheckCount = rs2.getDouble("checkCount");
+            postCallCount = rs2.getDouble("callCount");
+            postBetCount = rs2.getDouble("betCount");
+            postRaiseCount = rs2.getDouble("raiseCount");
+        } else {
+            System.out.println("Couldnt find player in opponentidentifier_2_0_pstflop: " + opponentName);
+        }
 
-    public double getBigBlindLogic(double bigBlind) {
-        return 0;
-    }
+        closeDbConnection();
 
-    public String getStrongDrawLogic(boolean strongDraw) {
-        return null;
+        oppDataLogicString = "numberOfHands: " + numberOfHands + "preFoldCount: " + preFoldCount +
+                "preCheckCount: " + preCheckCount + "preCallCount: " + preCallCount +
+                "preRaiseCount: " + preRaiseCount + "postFoldCount: " + postFoldCount +
+                "postCheckCount: " + postCheckCount + "postCallCount: " + postCallCount +
+                "postBetCount: " + postBetCount + "postRaiseCount: " + postRaiseCount;
+
+        return oppDataLogicString;
     }
 
     //regular getters and setters
@@ -159,6 +182,14 @@ public class DbSaveRaw extends DbSave {
         this.opponentTotalBetSize = opponentTotalBetSize;
     }
 
+    public double getSizing() {
+        return sizing;
+    }
+
+    public void setSizing(double sizing) {
+        this.sizing = sizing;
+    }
+
     public String getPosition() {
         return position;
     }
@@ -205,5 +236,14 @@ public class DbSaveRaw extends DbSave {
 
     public void setStrongDraw(String strongDraw) {
         this.strongDraw = strongDraw;
+    }
+
+    private void initializeDbConnection() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker?&serverTimezone=UTC", "root", "");
+    }
+
+    private void closeDbConnection() throws SQLException {
+        con.close();
     }
 }
