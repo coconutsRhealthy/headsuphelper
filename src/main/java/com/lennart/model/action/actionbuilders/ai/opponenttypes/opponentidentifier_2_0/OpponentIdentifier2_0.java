@@ -65,8 +65,8 @@ public class OpponentIdentifier2_0 {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        st.executeUpdate("UPDATE opponentidentifier_2_0_preflop SET totalHandCount = totalHandCount + 1 WHERE playerName = '" + opponentNick + "'");
-        st.executeUpdate("UPDATE opponentidentifier_2_0_postflop SET totalHandCount = totalHandCount + 1 WHERE playerName = '" + opponentNick + "'");
+        st.executeUpdate("UPDATE opponentidentifier_2_0_preflop SET numberOfHands = numberOfHands + 1 WHERE playerName = '" + opponentNick + "'");
+        st.executeUpdate("UPDATE opponentidentifier_2_0_postflop SET numberOfHands = numberOfHands + 1 WHERE playerName = '" + opponentNick + "'");
 
         st.close();
         closeDbConnection();

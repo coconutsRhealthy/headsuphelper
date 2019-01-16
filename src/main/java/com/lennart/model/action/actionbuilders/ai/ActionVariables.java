@@ -501,7 +501,14 @@ public class ActionVariables {
             String holeCardsString = dbSaveRaw.getHoleCardsLogic(gameVariables.getBotHoleCards());
             String positionString = dbSaveRaw.getPositionLogic(botIsButtonInMethod);
             String opponentData = dbSaveRaw.getOpponentDataLogic(gameVariables.getOpponentName());
-            String strongDrawString = dbSaveRaw.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+            String strongDrawString;
+
+            if(handEvaluator == null) {
+                strongDrawString = "StrongDrawFalse";
+            } else {
+                strongDrawString = dbSaveRaw.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+            }
+
 
             dbSaveRaw.setBotAction(action);
             dbSaveRaw.setOppAction(gameVariables.getOpponentAction());

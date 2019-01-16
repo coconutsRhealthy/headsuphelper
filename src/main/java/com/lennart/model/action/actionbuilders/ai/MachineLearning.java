@@ -750,27 +750,15 @@ public class MachineLearning {
             table = getTable(actionToConsider, handStrength, "sng", true);
 
             Statement st2 = con.createStatement();
-            ResultSet rs2 = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + compactRoute + "';");
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + compactRoute + "';");
 
             rs2.next();
 
             if(rs2.getDouble("total") < 20) {
-                table = getTable(actionToConsider, handStrength, "play", true);
+                //System.out.println("insufficient data for MachineLearning. Route: " + compactRoute + " Total: " + rs2.getDouble("total"));
 
-                Statement st3 = con.createStatement();
-                ResultSet rs3 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + compactRoute + "';");
-
-                rs3.next();
-
-                successNumber = rs3.getDouble("success");
-                totalNumber = rs3.getDouble("total");
-
-                if(totalNumber >= 20) {
-                    System.out.println("playmoney machine learning data used for compact route: " + compactRoute);
-                }
-
-                rs3.close();
-                st3.close();
+                successNumber = rs2.getDouble("success");
+                totalNumber = rs2.getDouble("total");
             } else {
                 System.out.println("compact sng machine learning data used for route: " + compactRoute);
 
@@ -1015,12 +1003,12 @@ public class MachineLearning {
 
         if(compact) {
             if(actionToConsider.equals("call")) {
-                table = "dbstats_call_" + gameType + "_compact";
+                table = "dbstats_call_" + gameType + "_compact_stackdepth";
             } else {
                 if(handStrength < 0.7) {
-                    table = "dbstats_bluff_" + gameType + "_compact";
+                    table = "dbstats_bluff_" + gameType + "_compact_stackdepth";
                 } else {
-                    table = "dbstats_value_" + gameType + "_compact";
+                    table = "dbstats_value_" + gameType + "_compact_stackdepth";
                 }
             }
         } else {

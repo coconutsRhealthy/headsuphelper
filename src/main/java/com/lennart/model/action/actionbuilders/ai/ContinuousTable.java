@@ -3,6 +3,7 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterRawData;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.botgame.MouseKeyboard;
@@ -98,6 +99,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
+                    new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     dbSaveList = new ArrayList<>();
 
                     if(botBluffActionDone) {

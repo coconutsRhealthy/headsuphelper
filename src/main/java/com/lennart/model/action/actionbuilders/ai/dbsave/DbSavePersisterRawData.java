@@ -50,7 +50,7 @@ public class DbSavePersisterRawData {
                     "bigblind, " +
                     "strongdraw) " +
                     "VALUES ('" +
-                    getHighestIntEntry("dbstats_raw") + "', '" +
+                    (getHighestIntEntry("dbstats_raw") + 1) + "', '" +
                     getCurrentDate() + "', '" +
                     dbSaveRaw.getBotAction() + "', '" +
                     dbSaveRaw.getOppAction() + "', '" +
@@ -69,7 +69,7 @@ public class DbSavePersisterRawData {
                     showdownOccurred(biglind) + "', '" +
                     botWonHand(biglind) + "', '" +
                     dbSaveRaw.getBigBlind() + "', '" +
-                    dbSaveRaw.getStrongDraw() + "', '" +
+                    dbSaveRaw.getStrongDraw() + "'" +
                     ")");
             }
         }
@@ -78,7 +78,7 @@ public class DbSavePersisterRawData {
         closeDbConnection();
     }
 
-    private boolean botWonHand(double bigBlind) throws Exception {
+    private String botWonHand(double bigBlind) throws Exception {
         boolean botWonHand = false;
 
         if(lastHand == null) {
@@ -96,10 +96,10 @@ public class DbSavePersisterRawData {
             }
         }
 
-        return botWonHand;
+        return String.valueOf(botWonHand);
     }
 
-    private boolean showdownOccurred(double bigBlind) throws Exception {
+    private String showdownOccurred(double bigBlind) throws Exception {
         boolean showdownOccurred = false;
 
         if(lastHand == null) {
@@ -117,7 +117,7 @@ public class DbSavePersisterRawData {
             }
         }
 
-        return showdownOccurred;
+        return String.valueOf(showdownOccurred);
     }
 
     private int getHighestIntEntry(String table) throws Exception {
