@@ -187,6 +187,7 @@ public class DbSave {
                 break;
                 case 11:
                     comboString = comboString + "J";
+                break;
                 case 10:
                     comboString = comboString + "T";
                 break;

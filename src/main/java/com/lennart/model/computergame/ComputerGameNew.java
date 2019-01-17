@@ -74,6 +74,48 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
         //default constructor
     }
 
+    public static void main(String[] args) {
+        new ComputerGameNew().testBoardWetnessMethod();
+    }
+
+    private void testBoardWetnessMethod() {
+        for(int z = 0; z < 10; z++) {
+            List<Integer> boardWetnessList = new ArrayList<>();
+
+            for(int i = 0; i < 120; i++) {
+                deck = BoardEvaluator.getCompleteCardDeck();
+
+                List<Card> turn = new ArrayList<>();
+                turn.add(getAndRemoveRandomCardFromDeck());
+                turn.add(getAndRemoveRandomCardFromDeck());
+                turn.add(getAndRemoveRandomCardFromDeck());
+                turn.add(getAndRemoveRandomCardFromDeck());
+
+                List<Card> river = new ArrayList<>();
+                river.addAll(turn);
+                river.add(getAndRemoveRandomCardFromDeck());
+
+                BoardEvaluator turnBoardEvaluator = new BoardEvaluator(turn);
+                BoardEvaluator riverBoardEvaluator = new BoardEvaluator(river);
+
+                List<Set<Card>> top10percentTurnCombos = turnBoardEvaluator.getTop10percentCombos();
+                List<Set<Card>> top10percentRiverCombos = riverBoardEvaluator.getTop10percentCombos();
+
+                int boardWetness = BoardEvaluator.getBoardWetness(top10percentTurnCombos, top10percentRiverCombos);
+
+                boardWetnessList.add(boardWetness);
+            }
+
+            Collections.sort(boardWetnessList);
+
+            System.out.println(boardWetnessList.get(40));
+            System.out.println(boardWetnessList.get(80));
+            System.out.println();
+        }
+    }
+
+
+
     public ComputerGameNew(String initialize) {
         numberOfHandsPlayed = 0;
         getNewCardDeck();

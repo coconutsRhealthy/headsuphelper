@@ -857,11 +857,11 @@ public class ActionVariables {
         int boardWetnessTurn = 200;
 
         if(!continuousTable.getTop10percentRiverCombos().isEmpty()) {
-            boardWetnessRiver = BoardEvaluator.getBoardWetnessGroup(top10PercentTurnCombosCopy, top10PercentRiverCombosCopy);
+            boardWetnessRiver = BoardEvaluator.getBoardWetness(top10PercentTurnCombosCopy, top10PercentRiverCombosCopy);
         }
 
         if(!continuousTable.getTop10percentTurnCombos().isEmpty()) {
-            boardWetnessTurn = BoardEvaluator.getBoardWetnessGroup(top10PercentFlopCombosCopy, top10PercentTurnCombosCopy);
+            boardWetnessTurn = BoardEvaluator.getBoardWetness(top10PercentFlopCombosCopy, top10PercentTurnCombosCopy);
         }
 
         if(boardWetnessRiver < boardWetnessTurn) {

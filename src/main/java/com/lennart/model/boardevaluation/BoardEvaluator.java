@@ -869,7 +869,7 @@ public class BoardEvaluator {
         return cleanedSortedCombos;
     }
 
-    public static int getBoardWetnessGroup(List<Set<Card>> top10percentPreviousStreetCombos, List<Set<Card>> top10percentCurrentStreetCombos) {
+    public static int getBoardWetness(List<Set<Card>> top10percentPreviousStreetCombos, List<Set<Card>> top10percentCurrentStreetCombos) {
         int boardWetness = 200;
 
         if(top10percentPreviousStreetCombos != null && top10percentPreviousStreetCombos.size() > 1
