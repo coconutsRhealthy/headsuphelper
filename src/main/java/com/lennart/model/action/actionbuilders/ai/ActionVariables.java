@@ -386,6 +386,7 @@ public class ActionVariables {
                         String drawWetnessString = dbSaveBluff.getDrawWetnessLogic(boardInMethod, drawWetness);
                         String boatWetnessString = dbSaveBluff.getBoatWetnessLogic(boardInMethod, boatWetness);
                         String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
+                        String opponentType = dbSaveBluff.getOpponentTypeLogic(gameVariables.getOpponentName());
 
                         dbSaveBluff.setSizingGroup(sizingGroup);
                         dbSaveBluff.setStreet(street);
@@ -397,6 +398,7 @@ public class ActionVariables {
                         dbSaveBluff.setDrawWetness(drawWetnessString);
                         dbSaveBluff.setBoatWetness(boatWetnessString);
                         dbSaveBluff.setStrongDraw(strongDraw);
+                        dbSaveBluff.setOpponentType(opponentType);
 
                         continuousTable.getDbSaveList().add(dbSaveBluff);
                     }

@@ -24,8 +24,8 @@ public class OpponentIdentifier2_0 {
 
             DbSaveBluff_2_0 dbSaveBluff_2_0 = new DbSaveBluff_2_0();
 
-            String preflopType = dbSaveBluff_2_0.getOpponentPreflopTypeLogig(opponentName, true);
-            String postflopType = dbSaveBluff_2_0.getOpponentPostflopTypeLogig(opponentName, true);
+            String preflopType = dbSaveBluff_2_0.getOpponentPreflopTypeLogic(opponentName, true);
+            String postflopType = dbSaveBluff_2_0.getOpponentPostflopTypeLogic(opponentName, true);
 
             System.out.println(preflopType + postflopType);
         }

@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.action.actionbuilders.ai.RangeTracker;
+import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.card.Card;
 
@@ -205,5 +206,16 @@ public class DbSave {
         }
 
         return comboString;
+    }
+
+    public String getOpponentTypeLogic(String opponentName) throws Exception {
+        String opponentType;
+
+        DbSaveBluff_2_0 dbSaveBluff_2_0 = new DbSaveBluff_2_0();
+
+        opponentType = dbSaveBluff_2_0.getOpponentPreflopTypeLogic(opponentName, false);
+        opponentType = opponentType + dbSaveBluff_2_0.getOpponentPostflopTypeLogic(opponentName, false);
+
+        return opponentType;
     }
 }

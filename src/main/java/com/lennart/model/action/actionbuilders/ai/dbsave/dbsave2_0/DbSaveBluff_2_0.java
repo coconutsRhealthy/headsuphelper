@@ -45,7 +45,7 @@ public class DbSaveBluff_2_0 {
         return boardWetnessGroup;
     }
 
-    public String getOpponentPreflopTypeLogig(String opponentName, boolean includingMedium) throws Exception {
+    public String getOpponentPreflopTypeLogic(String opponentName, boolean includingMedium) throws Exception {
         String opponentType;
 
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0();
@@ -75,13 +75,13 @@ public class DbSaveBluff_2_0 {
                     opponentType = opponentType + "a";
                 }
             } else {
-                if(preflopLooseness < 0.73) {
+                if(preflopLooseness < 0.725) {
                     opponentType = "t";
                 } else {
                     opponentType = "l";
                 }
 
-                if(preflopAggroness < 0.38) {
+                if(preflopAggroness < 0.375) {
                     opponentType = opponentType + "p";
                 } else {
                     opponentType = opponentType + "a";
@@ -92,7 +92,7 @@ public class DbSaveBluff_2_0 {
         return opponentType;
     }
 
-    public String getOpponentPostflopTypeLogig(String opponentName, boolean includingMedium) throws Exception {
+    public String getOpponentPostflopTypeLogic(String opponentName, boolean includingMedium) throws Exception {
         String opponentType;
 
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0();
@@ -128,7 +128,7 @@ public class DbSaveBluff_2_0 {
                     opponentType = "l";
                 }
 
-                if(postflopAggroness < 0.33) {
+                if(postflopAggroness < 0.343) {
                     opponentType = opponentType + "p";
                 } else {
                     opponentType = opponentType + "a";

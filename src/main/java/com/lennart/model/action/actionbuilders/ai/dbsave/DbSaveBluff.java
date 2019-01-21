@@ -13,6 +13,7 @@ public class DbSaveBluff extends DbSave {
     private String drawWetness;
     private String boatWetness;
     private String strongDraw;
+    private String opponentType;
 
     public String getFoldStatGroupLogic(double foldStat) {
         String foldStatGroup;
@@ -134,5 +135,13 @@ public class DbSaveBluff extends DbSave {
 
     public void setStrongDraw(String strongDraw) {
         this.strongDraw = strongDraw;
+    }
+
+    public String getOpponentType() {
+        return opponentType;
+    }
+
+    public void setOpponentType(String opponentType) {
+        this.opponentType = opponentType;
     }
 }
