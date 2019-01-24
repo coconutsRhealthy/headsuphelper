@@ -13,6 +13,28 @@ public class OpponentIdentifier2_0 {
 
     private Connection con;
 
+    private double numberOfHands;
+    private double oppPre3bet;
+    private double oppPreLooseness;
+    private double oppPostRaise;
+    private double oppPostBet;
+    private double oppPostLooseness;
+
+    public OpponentIdentifier2_0() {
+        //default constructor
+    }
+
+    public OpponentIdentifier2_0(String opponentName) throws Exception {
+        Map<String, Double> opponentData = getAllDataOfOpponent(opponentName);
+
+        numberOfHands = opponentData.get("preNumberOfHands");
+        oppPre3bet = getOpponentPre3bet(opponentData);
+        oppPreLooseness = getOpponentPreLooseness(opponentData);
+        oppPostRaise = getOpponentPostRaise(opponentData);
+        oppPostBet = getOpponentPostBet(opponentData);
+        oppPostLooseness = getOpponentPostLooseness(opponentData);
+    }
+
     private void testMethod() throws Exception {
         initializeDbConnection();
 
@@ -96,7 +118,55 @@ public class OpponentIdentifier2_0 {
             System.out.println("Aggro passive below: " + allAggro.get(oneThirdAggroness));
             System.out.println("Aggro medium below: " + allAggro.get(twoThirdAggroness));
         }
+    }
 
+    public static void main(String[] args) throws Exception {
+        new OpponentIdentifier2_0().printStatsBoundries();
+    }
+
+    private void printStatsBoundries() throws Exception {
+        List<Double> allOppPre3betStats = new ArrayList<>();
+        List<Double> allOppPreLoosenessStats = new ArrayList<>();
+        List<Double> allOppPostRaiseStats = new ArrayList<>();
+        List<Double> allOppPostBetStats = new ArrayList<>();
+        List<Double> allOppPostLoosenessStats = new ArrayList<>();
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
+
+        while(rs.next()) {
+            String opponentName = rs.getString("playerName");
+
+            Map<String, Double> opponentData = getAllDataOfOpponent(opponentName);
+
+            if(!opponentData.isEmpty()) {
+                double numberOfHands = opponentData.get("preNumberOfHands");
+
+                if(numberOfHands >= 20) {
+                    allOppPre3betStats.add(getOpponentPre3bet(opponentData));
+                    allOppPreLoosenessStats.add(getOpponentPreLooseness(opponentData));
+                    allOppPostRaiseStats.add(getOpponentPostRaise(opponentData));
+                    allOppPostBetStats.add(getOpponentPostBet(opponentData));
+                    allOppPostLoosenessStats.add(getOpponentPostLooseness(opponentData));
+                }
+            } else {
+                System.out.println("opponentData is empty for: " + opponentName);
+            }
+        }
+
+        Collections.sort(allOppPre3betStats);
+        Collections.sort(allOppPreLoosenessStats);
+        Collections.sort(allOppPostRaiseStats);
+        Collections.sort(allOppPostBetStats);
+        Collections.sort(allOppPostLoosenessStats);
+
+        System.out.println("pre3bet: " + allOppPre3betStats.get(allOppPre3betStats.size() / 2));
+        System.out.println("preLooseness: " + allOppPreLoosenessStats.get(allOppPreLoosenessStats.size() / 2));
+        System.out.println("postRaise: " + allOppPostRaiseStats.get(allOppPostRaiseStats.size() / 2));
+        System.out.println("postBet: " + allOppPostBetStats.get(allOppPostBetStats.size() / 2));
+        System.out.println("postLooseness: " + allOppPostLoosenessStats.get(allOppPostLoosenessStats.size() / 2));
     }
 
     public List<Double> getOpponentLoosenessAndAggroness(String opponentName, boolean preflop) throws Exception {
@@ -141,6 +211,99 @@ public class OpponentIdentifier2_0 {
         }
 
         return oppLoosenessAndAggroness;
+    }
+
+    public double getOpponentPre3bet(Map<String, Double> opponentData) {
+        //Oop raise tov total hands
+
+        double oopRaiseNumber = opponentData.get("preOopRaiseCount");
+        double totalNumberOfHands = opponentData.get("preNumberOfHands");
+        double opponentPre3bet = oopRaiseNumber / totalNumberOfHands;
+
+        return opponentPre3bet;
+    }
+
+    public double getOpponentPreLooseness(Map<String, Double> opponentData) {
+        //call count tov call + fold count
+
+        double callCount = opponentData.get("preCallCount");
+        double foldCount = opponentData.get("preFoldCount");
+        double oppPreLooseness = callCount / (callCount + foldCount);
+
+        return oppPreLooseness;
+    }
+
+    public double getOpponentPostRaise(Map<String, Double> opponentData) {
+        //Post all raises tov fold + call + raise
+
+        double postRaiseCount = opponentData.get("postRaiseCount");
+        double postFoldCount = opponentData.get("postFoldCount");
+        double postCallCount = opponentData.get("postCallCount");
+        double oppPostRaise = postRaiseCount / (postFoldCount + postCallCount + postRaiseCount);
+
+        return oppPostRaise;
+    }
+
+    public double getOpponentPostBet(Map<String, Double> opponentData) {
+        //post bet tov bet + check
+
+        double postBetCount = opponentData.get("postBetCount");
+        double postCheckCount = opponentData.get("postCheckCount");
+        double oppPostBet = postBetCount / (postBetCount + postCheckCount);
+
+        return oppPostBet;
+    }
+
+    public double getOpponentPostLooseness(Map<String, Double> opponentData) {
+        //call count tov call + fold count
+
+        double postCallCount = opponentData.get("postCallCount");
+        double postFoldCount = opponentData.get("postFoldCount");
+        double oppPostLooseness = postCallCount / (postCallCount + postFoldCount);
+
+        return oppPostLooseness;
+    }
+
+
+
+    private Map<String, Double> getAllDataOfOpponent(String opponentName) throws Exception {
+        Map<String, Double> opponentData = new HashMap<>();
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop WHERE playerName = '" + opponentName + "';");
+
+        if(rs.next()) {
+            opponentData.put("preNumberOfHands", rs.getDouble("numberOfHands"));
+            opponentData.put("preFoldCount", rs.getDouble("foldCount"));
+            opponentData.put("preCheckCount", rs.getDouble("checkCount"));
+            opponentData.put("preCallCount", rs.getDouble("callCount"));
+            opponentData.put("preIpRaiseCount", rs.getDouble("ipRaiseCount"));
+            opponentData.put("preOopRaiseCount", rs.getDouble("oopRaiseCount"));
+        }
+
+        rs.close();
+        st.close();
+
+        Statement st2 = con.createStatement();
+        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop WHERE playerName = '" + opponentName + "';");
+
+        if(rs2.next()) {
+            opponentData.put("postNumberOfHands", rs2.getDouble("numberOfHands"));
+            opponentData.put("postFoldCount", rs2.getDouble("foldCount"));
+            opponentData.put("postCheckCount", rs2.getDouble("checkCount"));
+            opponentData.put("postCallCount", rs2.getDouble("callCount"));
+            opponentData.put("postBetCount", rs2.getDouble("betCount"));
+            opponentData.put("postRaiseCount", rs2.getDouble("raiseCount"));
+        }
+
+        rs2.close();
+        st2.close();
+
+        closeDbConnection();
+
+        return opponentData;
     }
 
     public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, double bigBlind) throws Exception {
@@ -206,5 +369,29 @@ public class OpponentIdentifier2_0 {
 
     private void closeDbConnection() throws SQLException {
         con.close();
+    }
+
+    public double getNumberOfHands() {
+        return numberOfHands;
+    }
+
+    public double getOppPre3bet() {
+        return oppPre3bet;
+    }
+
+    public double getOppPreLooseness() {
+        return oppPreLooseness;
+    }
+
+    public double getOppPostRaise() {
+        return oppPostRaise;
+    }
+
+    public double getOppPostBet() {
+        return oppPostBet;
+    }
+
+    public double getOppPostLooseness() {
+        return oppPostLooseness;
     }
 }
