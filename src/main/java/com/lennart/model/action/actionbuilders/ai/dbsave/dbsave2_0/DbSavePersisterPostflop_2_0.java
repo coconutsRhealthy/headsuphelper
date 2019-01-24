@@ -95,9 +95,13 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         List<String> bluffAction = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> sizingGroup = new ArrayList<>();
-        List<String> opponentTypeGroup = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
+        List<String> oppPre3bet = new ArrayList<>();
+        List<String> oppPreLooseness = new ArrayList<>();
+        List<String> oppPostRaise = new ArrayList<>();
+        List<String> oppPostBet = new ArrayList<>();
+        List<String> oppPostLooseness = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -113,29 +117,26 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         sizingGroup.add("Sizing_10-20bb");
         sizingGroup.add("Sizing_20bb_up");
 
-        opponentTypeGroup.add("Uuuu");
-        opponentTypeGroup.add("Tptp");
-        opponentTypeGroup.add("Tpta");
-        opponentTypeGroup.add("Tplp");
-        opponentTypeGroup.add("Tpla");
-        opponentTypeGroup.add("Tatp");
-        opponentTypeGroup.add("Tata");
-        opponentTypeGroup.add("Talp");
-        opponentTypeGroup.add("Tala");
-        opponentTypeGroup.add("Lptp");
-        opponentTypeGroup.add("Lpta");
-        opponentTypeGroup.add("Lplp");
-        opponentTypeGroup.add("Lpla");
-        opponentTypeGroup.add("Latp");
-        opponentTypeGroup.add("Lata");
-        opponentTypeGroup.add("Lalp");
-        opponentTypeGroup.add("Lala");
-
         strongDraw.add("StrongDrawTrue");
         strongDraw.add("StrongDrawFalse");
 
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
+
+        oppPre3bet.add("OppPre3betLow");
+        oppPre3bet.add("OppPre3betHigh");
+
+        oppPreLooseness.add("OppPreLoosenessTight");
+        oppPreLooseness.add("OppPreLoosenessLoose");
+
+        oppPostRaise.add("OppPostRaiseLow");
+        oppPostRaise.add("OppPostRaiseHigh");
+
+        oppPostBet.add("OppPostBetLow");
+        oppPostBet.add("OppPostBetHigh");
+
+        oppPostLooseness.add("OppPostLoosenessTight");
+        oppPostLooseness.add("OppPostLoosenessLoose");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -143,11 +144,21 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
             for(String b : bluffAction) {
                 for(String c : position) {
                     for(String d : sizingGroup) {
-                        for(String e : opponentTypeGroup) {
-                            for(String f : strongDraw) {
-                                for(String g : effectiveStack) {
-                                    allRoutes.add(a + b + c + d + e + f + g);
+                        for(String e : strongDraw) {
+                            for(String f : effectiveStack) {
+                                for(String g : oppPre3bet) {
+                                    for(String h : oppPreLooseness) {
+                                        for(String i : oppPostRaise) {
+                                            for(String j : oppPostBet) {
+                                                for(String k : oppPostLooseness) {
+                                                    allRoutes.add(a + b + c + d + e + f + g + h + i + j + k);
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+
+                                allRoutes.add(a + b + c + d + e + f + "OpponentUnknown");
                             }
                         }
                     }
