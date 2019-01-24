@@ -75,13 +75,13 @@ public class DbSaveBluff_2_0 {
                     opponentType = opponentType + "a";
                 }
             } else {
-                if(preflopLooseness < 0.725) {
+                if(preflopLooseness < 0.7096774193548387) {
                     opponentType = "t";
                 } else {
                     opponentType = "l";
                 }
 
-                if(preflopAggroness < 0.375) {
+                if(preflopAggroness < 0.3958333333333333) {
                     opponentType = opponentType + "p";
                 } else {
                     opponentType = opponentType + "a";
@@ -128,7 +128,7 @@ public class DbSaveBluff_2_0 {
                     opponentType = "l";
                 }
 
-                if(postflopAggroness < 0.343) {
+                if(postflopAggroness < 0.3287671232876712) {
                     opponentType = opponentType + "p";
                 } else {
                     opponentType = opponentType + "a";

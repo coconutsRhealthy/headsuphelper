@@ -3,6 +3,7 @@ package com.lennart.model.action.actionbuilders.ai.dbsave;
 import com.lennart.model.action.actionbuilders.ai.RangeTracker;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.card.Card;
 
 import java.util.ArrayList;
@@ -217,5 +218,75 @@ public class DbSave {
         opponentType = opponentType + dbSaveBluff_2_0.getOpponentPostflopTypeLogic(opponentName, false);
 
         return opponentType;
+    }
+
+    public String getOppPre3betLogic(OpponentIdentifier2_0 opponentIdentifier2_0) {
+        String oppPre3betString;
+
+        double oppPre3bet = opponentIdentifier2_0.getOppPre3bet();
+
+        if(oppPre3bet < 0.09523809523809523) {
+            oppPre3betString = "OppPre3betLow";
+        } else {
+            oppPre3betString = "OppPre3betHigh";
+        }
+
+        return oppPre3betString;
+    }
+
+    public String getOppPreLoosenessLogic(OpponentIdentifier2_0 opponentIdentifier2_0) {
+        String oppPreLoosenessString;
+
+        double oppPreLooseness = opponentIdentifier2_0.getOppPreLooseness();
+
+        if(oppPreLooseness < 0.7096774193548387) {
+            oppPreLoosenessString = "OppPreLoosenessTight";
+        } else {
+            oppPreLoosenessString = "OppPreLoosenessLoose";
+        }
+
+        return oppPreLoosenessString;
+    }
+
+    public String getOppPostRaiseLogic(OpponentIdentifier2_0 opponentIdentifier2_0) {
+        String oppPostRaiseString;
+
+        double oppPostRaise = opponentIdentifier2_0.getOppPostRaise();
+
+        if(oppPostRaise < 0.12162162162162163) {
+            oppPostRaiseString = "OppPostRaiseLow";
+        } else {
+            oppPostRaiseString = "OppPostRaiseHigh";
+        }
+
+        return oppPostRaiseString;
+    }
+
+    public String getOppPostBetLogic(OpponentIdentifier2_0 opponentIdentifier2_0) {
+        String oppPostBetString;
+
+        double oppPostBet = opponentIdentifier2_0.getOppPostBet();
+
+        if(oppPostBet < 0.35) {
+            oppPostBetString = "OppPostBetLow";
+        } else {
+            oppPostBetString = "OppPostBetHigh";
+        }
+
+        return oppPostBetString;
+    }
+
+    public String getOppPostLoosenessLogic(OpponentIdentifier2_0 opponentIdentifier2_0) {
+        String oppPostLoosenessString;
+
+        double oppPostLooseness = opponentIdentifier2_0.getOppPostLooseness();
+
+        if(oppPostLooseness < 0.5) {
+            oppPostLoosenessString = "OppPostLoosenessTight";
+        } else {
+            oppPostLoosenessString = "OppPostLoosenessLoose";
+        }
+
+        return oppPostLoosenessString;
     }
 }
