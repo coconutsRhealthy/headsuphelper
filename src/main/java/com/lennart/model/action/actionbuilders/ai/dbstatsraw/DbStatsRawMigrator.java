@@ -1,7 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
+
 import java.sql.*;
-import java.util.*;
 
 /**
  * Created by LennartMac on 23/01/2019.
@@ -19,40 +20,38 @@ public class DbStatsRawMigrator {
         ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
 
         while(rs.next()) {
-            if(rs.getDouble("entry") > 6403) {
-                String board = rs.getString("board");
+            String board = rs.getString("board");
 
-                if(!board.equals("")) {
-                    String botAction = rs.getString("bot_action");
+            if(!board.equals("")) {
+                String botAction = rs.getString("bot_action");
 
-                    if(botAction.equals("bet75pct") || botAction.equals("raise")) {
-                        double handStrength = rs.getDouble("handstrength");
+                if(botAction.equals("bet75pct") || botAction.equals("raise")) {
+                    double handStrength = rs.getDouble("handstrength");
 
-                        if(handStrength < 0.7) {
-                            String street = getStreetString(rs.getString("board"));
-                            String bluffAction = getAction(rs.getString("bot_action"));
-                            String position = rs.getString("position");
-                            String sizingGroup = getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
-                            String opponentTypeGroup = getOpponentTypeGroup(rs.getString("opponent_data"));
-                            String strongDraw = rs.getString("strongdraw");
-                            String effectiveStack = getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
+                    if(handStrength < 0.7) {
+                        String street = getStreetString(rs.getString("board"));
+                        String bluffAction = getAction(rs.getString("bot_action"));
+                        String position = rs.getString("position");
+                        String sizingGroup = getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
+                        String strongDraw = rs.getString("strongdraw");
+                        String effectiveStack = getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
+                        String opponentStatsString = getOpponentStatsString(rs.getString("opponent_name"));
 
-                            String route = street + bluffAction + position + sizingGroup + opponentTypeGroup + strongDraw + effectiveStack;
+                        String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + opponentStatsString;
 
-                            Statement st2 = con.createStatement();
+                        Statement st2 = con.createStatement();
 
-                            if(Boolean.valueOf(rs.getString("bot_won_hand"))) {
-                                st2.executeUpdate("UPDATE testdbff SET success = success + 1 WHERE route = '" + route + "'");
-                            }
-
-                            st2.executeUpdate("UPDATE testdbff SET total = total + 1 WHERE route = '" + route + "'");
-
-                            st2.close();
-
-                            counter++;
-
-                            System.out.println(counter);
+                        if(Boolean.valueOf(rs.getString("bot_won_hand"))) {
+                            st2.executeUpdate("UPDATE testdbff SET success = success + 1 WHERE route = '" + route + "'");
                         }
+
+                        st2.executeUpdate("UPDATE testdbff SET total = total + 1 WHERE route = '" + route + "'");
+
+                        st2.close();
+
+                        counter++;
+
+                        System.out.println(counter);
                     }
                 }
             }
@@ -119,70 +118,46 @@ public class DbStatsRawMigrator {
         return sizingGroup;
     }
 
-    public String getOpponentTypeGroup(String opponentData) {
-        String opponentType;
+    public String getOpponentStatsString(String opponentName) throws Exception {
+        String opponentStatsString;
 
-        String[] opponentDataSplitted = opponentData.split("\\.0");
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
 
-        List<Double> correctValues = new ArrayList<>();
-
-        for(String s : opponentDataSplitted) {
-            String subS = s.substring(s.indexOf(" "), s.length());
-            correctValues.add(Double.valueOf(subS));
-        }
-
-        double numberOfHands = correctValues.get(0);
-
-        if(numberOfHands >= 20) {
-            double preFoldCount = correctValues.get(1);
-            double preCheckCount = correctValues.get(2);
-            double preCallCount = correctValues.get(3);
-            double preRaiseCount = correctValues.get(4);
-            double postFoldCount = correctValues.get(5);
-            double postCheckCount = correctValues.get(6);
-            double postCallCount = correctValues.get(7);
-            double postBetCount = correctValues.get(8);
-            double postRaiseCount = correctValues.get(9);
-
-            double preflopLooseness;
-            double preflopAggressiveness;
-            double postflopLooseness;
-            double postflopAggressiveness;
-
-            preflopLooseness = preCallCount / (preCallCount + preFoldCount);
-            preflopAggressiveness = preRaiseCount / (preRaiseCount + preCheckCount + preCallCount);
-
-            postflopLooseness = postCallCount / (postCallCount + postFoldCount);
-            postflopAggressiveness = (postRaiseCount + postBetCount) / (postRaiseCount + postBetCount + postCheckCount + postCallCount);
-
-            if(preflopLooseness < 0.7096774193548387) {
-                opponentType = "t";
+        if(opponentIdentifier2_0.getNumberOfHands() >= 20) {
+            if(opponentIdentifier2_0.getOppPre3bet() < 0.09523809523809523) {
+                opponentStatsString = "OppPre3betLow";
             } else {
-                opponentType = "l";
+                opponentStatsString = "OppPre3betHigh";
             }
 
-            if(preflopAggressiveness < 0.3958333333333333) {
-                opponentType = opponentType + "p";
+            if(opponentIdentifier2_0.getOppPreLooseness() < 0.7096774193548387) {
+                opponentStatsString = opponentStatsString + "OppPreLoosenessTight";
             } else {
-                opponentType = opponentType + "a";
+                opponentStatsString = opponentStatsString + "OppPreLoosenessLoose";
             }
 
-            if(postflopLooseness < 0.5) {
-                opponentType = opponentType + "t";
+            if(opponentIdentifier2_0.getOppPostRaise() < 0.12162162162162163) {
+                opponentStatsString = opponentStatsString + "OppPostRaiseLow";
             } else {
-                opponentType = opponentType + "l";
+                opponentStatsString = opponentStatsString + "OppPostRaiseHigh";
             }
 
-            if(postflopAggressiveness < 0.3287671232876712) {
-                opponentType = opponentType + "p";
+            if(opponentIdentifier2_0.getOppPostBet() < 0.35) {
+                opponentStatsString = opponentStatsString + "OppPostBetLow";
             } else {
-                opponentType = opponentType + "a";
+                opponentStatsString = opponentStatsString + "OppPostBetHigh";
+            }
+
+            if(opponentIdentifier2_0.getOppPostLooseness() < 0.5) {
+                opponentStatsString = opponentStatsString + "OppPostLoosenessTight";
+            } else {
+                opponentStatsString = opponentStatsString + "OppPostLoosenessLoose";
             }
         } else {
-            opponentType = "uuuu";
+            opponentStatsString = "OpponentUnknown";
         }
 
-        return opponentType;
+        return opponentStatsString;
     }
 
     public String getEffectiveStack(double botStack, double opponentStack, double bigBlind) {
