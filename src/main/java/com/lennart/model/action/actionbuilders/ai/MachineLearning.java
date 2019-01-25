@@ -53,20 +53,23 @@ public class MachineLearning {
             String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
             String extensiveCallRoute = calculateExtensiveCallRoute(actionVariables, gameVariables);
 
-            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength);
+            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength, null);
 
             String compactRaiseRoute;
             String extensiveRaiseRoute;
+            String compactBluffRoute_2_0;
 
             if(handStrength < 0.7) {
                 compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
             } else {
                 compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                compactBluffRoute_2_0 = null;
             }
 
-            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength);
+            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength, compactBluffRoute_2_0);
 
             double callRatio = callRouteData.get(0) / callRouteData.get(1);
             double raiseRatio = raiseRouteData.get(0) / raiseRouteData.get(1);
@@ -86,6 +89,7 @@ public class MachineLearning {
             System.out.println("Raiseroute ratio: " + raiseRatio);
             System.out.println("Compact raiseRoute: " + compactRaiseRoute);
             System.out.println("Extensive raiseRoute: " + extensiveRaiseRoute);
+            System.out.println("Compact_2_0 route: " + compactBluffRoute_2_0);
 
             if((callRatio >= 0.5 && callRouteData.get(1) >= 10) || (raiseRatio >= 0.5 && raiseRouteData.get(1) >= 10)) {
                 System.out.println("May be of interest Postflop Machine Learning logging!");
@@ -97,16 +101,19 @@ public class MachineLearning {
         } else if(action.equals("check")) {
             String compactBetRoute;
             String extensiveBetRoute;
+            String compactBluffRoute_2_0;
 
             if(handStrength < 0.7) {
                 compactBetRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                 extensiveBetRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "bet75pct", sizing);
             } else {
                 compactBetRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                 extensiveBetRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                compactBluffRoute_2_0 = null;
             }
 
-            List<Double> betRouteData = getDataFromDb(compactBetRoute, extensiveBetRoute, "bet75pct", handStrength);
+            List<Double> betRouteData = getDataFromDb(compactBetRoute, extensiveBetRoute, "bet75pct", handStrength, compactBluffRoute_2_0);
 
             double betRouteRatio = betRouteData.get(0) / betRouteData.get(1);
 
@@ -119,6 +126,7 @@ public class MachineLearning {
             System.out.println("Betroute ratio: " + betRouteRatio);
             System.out.println("Compact betroute: " + compactBetRoute);
             System.out.println("Extensive betroute: " + extensiveBetRoute);
+            System.out.println("Compact_2_0 route: " + compactBluffRoute_2_0);
             System.out.println();
 
             if(betRouteRatio >= 0.5 && betRouteData.get(1) >= 10) {
@@ -132,20 +140,23 @@ public class MachineLearning {
             String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
             String extensiveCallRoute = calculateExtensiveCallRoute(actionVariables, gameVariables);
 
-            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength);
+            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength, null);
 
             String compactRaiseRoute;
             String extensiveRaiseRoute;
+            String compactBluffRoute_2_0;
 
             if(handStrength < 0.7) {
                 compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
             } else {
                 compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                compactBluffRoute_2_0 = null;
             }
 
-            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength);
+            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength, compactBluffRoute_2_0);
 
             double callRatio = callRouteData.get(0) / callRouteData.get(1);
             double raiseRatio = raiseRouteData.get(0) / raiseRouteData.get(1);
@@ -165,6 +176,7 @@ public class MachineLearning {
             System.out.println("Raiseroute ratio: " + raiseRatio);
             System.out.println("Compact raiseRoute: " + compactRaiseRoute);
             System.out.println("Extensive raiseRoute: " + extensiveRaiseRoute);
+            System.out.println("Compact_2_0 route: " + compactBluffRoute_2_0);
 
             if(callRatio < 0.5 && callRouteData.get(1) >= 10) {
                 System.out.println("May be of interest Postflop Machine Learning logging!");
@@ -176,16 +188,19 @@ public class MachineLearning {
         } else if(action.equals("bet75pct")) {
             String compactBetRoute;
             String extensiveBetRoute;
+            String compactBluffRoute_2_0;
 
             if(handStrength < 0.7) {
                 compactBetRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                 extensiveBetRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "bet75pct", sizing);
             } else {
                 compactBetRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                 extensiveBetRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                compactBluffRoute_2_0 = null;
             }
 
-            List<Double> betRouteData = getDataFromDb(compactBetRoute, extensiveBetRoute, "bet75pct", handStrength);
+            List<Double> betRouteData = getDataFromDb(compactBetRoute, extensiveBetRoute, "bet75pct", handStrength, compactBluffRoute_2_0);
 
             double betRouteRatio = betRouteData.get(0) / betRouteData.get(1);
 
@@ -198,6 +213,7 @@ public class MachineLearning {
             System.out.println("Betroute ratio: " + betRouteRatio);
             System.out.println("Compact betroute: " + compactBetRoute);
             System.out.println("Extensive betroute: " + extensiveBetRoute);
+            System.out.println("Compact_2_0 route: " + compactBluffRoute_2_0);
             System.out.println();
 
             if(betRouteRatio < 0.5 && betRouteData.get(1) >= 10) {
@@ -211,20 +227,23 @@ public class MachineLearning {
             String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
             String extensiveCallRoute = calculateExtensiveCallRoute(actionVariables, gameVariables);
 
-            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength);
+            List<Double> callRouteData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", handStrength, null);
 
             String compactRaiseRoute;
             String extensiveRaiseRoute;
+            String compactBluffRoute_2_0;
 
             if(handStrength < 0.7) {
                 compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
             } else {
                 compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                 extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                compactBluffRoute_2_0 = null;
             }
 
-            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength);
+            List<Double> raiseRouteData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", handStrength, compactBluffRoute_2_0);
 
             double callRatio = callRouteData.get(0) / callRouteData.get(1);
             double raiseRatio = raiseRouteData.get(0) / raiseRouteData.get(1);
@@ -238,6 +257,7 @@ public class MachineLearning {
             System.out.println("Raiseroute ratio: " + raiseRatio);
             System.out.println("Compact raiseRoute: " + compactRaiseRoute);
             System.out.println("Extensive raiseRoute: " + extensiveRaiseRoute);
+            System.out.println("Compact_2_0 Route: " + compactBluffRoute_2_0);
             System.out.println();
             System.out.println("Callroute success: " + callRouteData.get(0));
             System.out.println("Callroute total: " + callRouteData.get(1));
@@ -265,9 +285,11 @@ public class MachineLearning {
                         gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                     String extensiveRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                     String compactRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+                    String compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "bet75pct", sizing);
                     System.out.println("##ExtensiveRoute: " + extensiveRoute);
                     System.out.println("##CompactRoute: " + compactRoute);
-                    List<Double> bluffBetData = getDataFromDb(compactRoute, extensiveRoute, "bet75pct", actionVariables.getBotHandStrength());
+                    System.out.println("##ComapctRoute_2_0: " + compactBluffRoute_2_0);
+                    List<Double> bluffBetData = getDataFromDb(compactRoute, extensiveRoute, "bet75pct", actionVariables.getBotHandStrength(), compactBluffRoute_2_0);
                     actionToReturn = changeToBetOrKeepCheckGivenData(bluffBetData, compactRoute, extensiveRoute);
                 } else {
                     actionToReturn = actionVariables.getAction();
@@ -279,7 +301,7 @@ public class MachineLearning {
                         String compactRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
                         System.out.println("##ExtensiveRoute: " + extensiveRoute);
                         System.out.println("##CompactRoute: " + compactRoute);
-                        List<Double> valueBetData = getDataFromDb(compactRoute, extensiveRoute, "bet75pct", actionVariables.getBotHandStrength());
+                        List<Double> valueBetData = getDataFromDb(compactRoute, extensiveRoute, "bet75pct", actionVariables.getBotHandStrength(), null);
                         actionToReturn = changeToBetOrKeepCheckGivenData(valueBetData, compactRoute, extensiveRoute);
                     } else {
                         actionToReturn = actionVariables.getAction();
@@ -304,18 +326,23 @@ public class MachineLearning {
                     gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                 String extensiveRaiseRoute;
                 String compactRaiseRoute;
+                String compactBluffRoute_2_0;
 
                 if(actionVariables.getBotHandStrength() < 0.7) {
                     extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                     compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                    compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
                 } else {
                     extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                     compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                    compactBluffRoute_2_0 = null;
                 }
 
                 System.out.println("##ExtensiveRoute: " + extensiveRaiseRoute);
                 System.out.println("##CompactRoute: " + compactRaiseRoute);
-                List<Double> raiseData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", actionVariables.getBotHandStrength());
+                System.out.println("##CompactRoute_2_0: " + compactBluffRoute_2_0);
+                List<Double> raiseData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise",
+                        actionVariables.getBotHandStrength(), compactBluffRoute_2_0);
 
                 if(raiseData.get(1) >= 20) {
                     double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
@@ -335,7 +362,7 @@ public class MachineLearning {
             String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
             System.out.println("##ExtensiveCallRoute: " + extensiveCallRoute);
             System.out.println("##CompactCallRoute: " + compactCallRoute);
-            List<Double> callData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", actionVariables.getBotHandStrength());
+            List<Double> callData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", actionVariables.getBotHandStrength(), null);
 
             if(callData.get(1) >= 20) {
                 double callSuccessRatio = callData.get(0) / callData.get(1);
@@ -435,20 +462,24 @@ public class MachineLearning {
 
         String extensiveRoute;
         String compactRoute;
+        String compactBluffRoute_2_0;
 
         if(actionVariables.getBotHandStrength() < 0.7) {
             extensiveRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
             compactRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+            compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "bet75pct", sizing);
             System.out.println("##ExtensiveRoute: " + extensiveRoute);
             System.out.println("##CompactRoute: " + compactRoute);
+            System.out.println("##ComactRoute_2_0: " + compactBluffRoute_2_0);
         } else {
             extensiveRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
             compactRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "bet75pct", sizing);
+            compactBluffRoute_2_0 = null;
             System.out.println("##ExtensiveRoute: " + extensiveRoute);
             System.out.println("##CompactRoute: " + compactRoute);
         }
 
-        List<Double> betData = getDataFromDb(compactRoute, extensiveRoute, "bet75pct", actionVariables.getBotHandStrength());
+        List<Double> betData = getDataFromDb(compactRoute, extensiveRoute, "bet75pct", actionVariables.getBotHandStrength(), compactBluffRoute_2_0);
 
         if(betData.get(1) >= 20) {
             double ratio = betData.get(0) / betData.get(1);
@@ -482,9 +513,11 @@ public class MachineLearning {
         if(actionVariables.getBotHandStrength() < 0.7) {
             String extensiveBluffRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
             String compactBluffRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+            String compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
             System.out.println("##ExtensiveRoute: " + extensiveBluffRaiseRoute);
             System.out.println("##CompactRoute: " + compactBluffRaiseRoute);
-            List<Double> bluffRaiseData = getDataFromDb(compactBluffRaiseRoute, extensiveBluffRaiseRoute, "raise", actionVariables.getBotHandStrength());
+            System.out.println("##CompactRoute_2_0: " + compactBluffRoute_2_0);
+            List<Double> bluffRaiseData = getDataFromDb(compactBluffRaiseRoute, extensiveBluffRaiseRoute, "raise", actionVariables.getBotHandStrength(), compactBluffRoute_2_0);
             actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(bluffRaiseData, actionVariables, gameVariables,
                     continuousTable);
         } else {
@@ -492,7 +525,7 @@ public class MachineLearning {
             String compactValueRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
             System.out.println("##ExtensiveRoute: " + extensiveValueRaiseRoute);
             System.out.println("##CompactRoute: " + compactValueRaiseRoute);
-            List<Double> valueRaiseData = getDataFromDb(compactValueRaiseRoute, extensiveValueRaiseRoute, "raise", actionVariables.getBotHandStrength());
+            List<Double> valueRaiseData = getDataFromDb(compactValueRaiseRoute, extensiveValueRaiseRoute, "raise", actionVariables.getBotHandStrength(), null);
             actionToReturn = changeToFoldOrCallOrKeepRaiseGivenData(valueRaiseData, actionVariables, gameVariables,
                     continuousTable);
         }
@@ -508,7 +541,7 @@ public class MachineLearning {
         String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
         System.out.println("##ExtensiveCallRoute: " + extensiveCallRoute);
         System.out.println("##CompactCallRoute: " + compactCallRoute);
-        List<Double> callData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", actionVariables.getBotHandStrength());
+        List<Double> callData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", actionVariables.getBotHandStrength(), null);
         actionToReturn = changeToFoldOrRaiseOrKeepCallGivenData(callData, actionVariables, gameVariables, sizing, pre3BetOrPostRaisedPot, compactCallRoute, extensiveCallRoute);
 
         return actionToReturn;
@@ -577,7 +610,7 @@ public class MachineLearning {
             String compactCallRoute = calculateCompactCallRoute(actionVariables, gameVariables);
             System.out.println("##ExtensiveRoute: " + extensiveCallRoute);
             System.out.println("##CompactRoute: " + compactCallRoute);
-            List<Double> callData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", actionVariables.getBotHandStrength());
+            List<Double> callData = getDataFromDb(compactCallRoute, extensiveCallRoute, "call", actionVariables.getBotHandStrength(), null);
 
             if(callData.get(1) >= 20) {
                 double callSuccessRatio = callData.get(0) / callData.get(1);
@@ -659,18 +692,21 @@ public class MachineLearning {
 
                     String extensiveRaiseRoute;
                     String compactRaiseRoute;
+                    String compactBluffRoute_2_0;
 
                     if(actionVariables.getBotHandStrength() >= 0.7) {
                         extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                         compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                        compactBluffRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
                     } else {
                         extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                         compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
+                        compactBluffRoute_2_0 = null;
                     }
 
                     System.out.println("##ExtensiveRoute: " + extensiveRaiseRoute);
                     System.out.println("##CompactRoute: " + compactRaiseRoute);
-                    List<Double> raiseData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", actionVariables.getBotHandStrength());
+                    List<Double> raiseData = getDataFromDb(compactRaiseRoute, extensiveRaiseRoute, "raise", actionVariables.getBotHandStrength(), compactBluffRoute_2_0);
 
                     if (raiseData.get(1) >= 20) {
                         double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
@@ -734,84 +770,116 @@ public class MachineLearning {
         return actionFromPoker;
     }
 
-    private List<Double> getDataFromDb(String compactRoute, String extensiveRoute, String actionToConsider, double handStrength) throws Exception {
-        if(compactRoute.contains("OppPostRaise")) {
-            return getDataFrom_2_0_Db(compactRoute);
-        }
-
-        //je hebt hier nog de andere compactRoute nodig...
-
+    private List<Double> getDataFromDb(String compactRoute, String extensiveRoute, String actionToConsider,
+                                       double handStrength, String compactBluffRoute_2_0) throws Exception {
         List<Double> valuesToReturn = new ArrayList<>();
 
-        initializeDbConnection();
+        if(compactBluffRoute_2_0 != null) {
+            initialize_2_0_DbConnection();
 
-        String table = getTable(actionToConsider, handStrength, "sng", false);
+            Statement st_2_0 = con_2_0.createStatement();
+            ResultSet rs_2_0 = st_2_0.executeQuery("SELECT * FROM dbstats_bluff_sng_compact_2_0 WHERE route = '" + compactBluffRoute_2_0 + "';");
 
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + extensiveRoute + "';");
+            rs_2_0.next();
 
-        rs.next();
-
-        double successNumber;
-        double totalNumber;
-
-        if(rs.getDouble("total") < 20) {
-            table = getTable(actionToConsider, handStrength, "sng", true);
-
-            Statement st2 = con.createStatement();
-            ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + compactRoute + "';");
-
-            rs2.next();
-
-            if(rs2.getDouble("total") < 20) {
-                successNumber = rs2.getDouble("success");
-                totalNumber = rs2.getDouble("total");
+            if(rs_2_0.getDouble("total") >= 20) {
+                valuesToReturn.add(rs_2_0.getDouble("success"));
+                valuesToReturn.add(rs_2_0.getDouble("total"));
+                System.out.println("Use compact_2_0 data! " + compactBluffRoute_2_0);
             } else {
-                System.out.println("compact sng machine learning data used for route: " + compactRoute);
-
-                successNumber = rs2.getDouble("success");
-                totalNumber = rs2.getDouble("total");
+                System.out.println("Comapct_2_0 data too small: " + compactBluffRoute_2_0);
             }
 
-            rs2.close();
-            st2.close();
-        } else {
-            System.out.println("extensive sng machine learning data used for route: " + extensiveRoute);
+            rs_2_0.close();
+            st_2_0.close();
 
-            successNumber = rs.getDouble("success");
-            totalNumber = rs.getDouble("total");
+            close_2_0_DbConnection();
         }
 
-        valuesToReturn.add(successNumber);
-        valuesToReturn.add(totalNumber);
+        if(valuesToReturn.isEmpty()) {
+            initializeDbConnection();
 
-        rs.close();
-        st.close();
+            String table = getTable(actionToConsider, handStrength, "sng", false);
 
-        closeDbConnection();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + extensiveRoute + "';");
+
+            rs.next();
+
+            double successNumber;
+            double totalNumber;
+
+            if(rs.getDouble("total") < 20) {
+                table = getTable(actionToConsider, handStrength, "sng", true);
+
+                Statement st2 = con.createStatement();
+                ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + compactRoute + "';");
+
+                rs2.next();
+
+                if(rs2.getDouble("total") < 20) {
+                    //System.out.println("insufficient data for MachineLearning. Route: " + compactRoute + " Total: " + rs2.getDouble("total"));
+
+                    successNumber = rs2.getDouble("success");
+                    totalNumber = rs2.getDouble("total");
+                } else {
+                    System.out.println("compact sng machine learning data used for route: " + compactRoute);
+
+                    successNumber = rs2.getDouble("success");
+                    totalNumber = rs2.getDouble("total");
+                }
+
+                rs2.close();
+                st2.close();
+            } else {
+                System.out.println("extensive sng machine learning data used for route: " + extensiveRoute);
+
+                successNumber = rs.getDouble("success");
+                totalNumber = rs.getDouble("total");
+            }
+
+            valuesToReturn.add(successNumber);
+            valuesToReturn.add(totalNumber);
+
+            rs.close();
+            st.close();
+
+            closeDbConnection();
+        }
 
         return valuesToReturn;
     }
 
-    private List<Double> getDataFrom_2_0_Db(String compact_2_0_Route) throws Exception {
-        List<Double> valuesToReturn = new ArrayList<>();
+    private String calculateCompactBluffBetOrRaiseRoute_2_0(ActionVariables actionVariables, GameVariables gameVariables,
+                                                            String actionToConsider, double sizing) throws Exception {
+        if(actionToConsider.equals("bet75pct")) {
+            actionToConsider = "Bet";
+        } else {
+            actionToConsider = "Raise";
+        }
 
-        initialize_2_0_DbConnection();
+        DbSaveBluff dbSaveBluff = new DbSaveBluff();
 
-        Statement st = con_2_0.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_sng_compact_2_0 WHERE route = '" + compact_2_0_Route + "';");
+        String street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
+        String bluffAction = actionToConsider;
+        String position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
+        String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
+        String strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
+        String effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
+                dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+                        gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        rs.next();
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+        String oppPostRaise = dbSaveBluff.getOppPostRaiseLogic(opponentIdentifier2_0);
+        String oppPostLooseness = dbSaveBluff.getOppPostLoosenessLogic(opponentIdentifier2_0);
 
-        valuesToReturn.add(rs.getDouble("success"));
-        valuesToReturn.add(rs.getDouble("total"));
+        String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + oppPostRaise + oppPostLooseness;
 
-        rs.close();
-        st.close();
+        while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
+            route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
+        }
 
-        close_2_0_DbConnection();
-
-        return valuesToReturn;
+        return route;
     }
 
     private String calculateCompactBluffBetOrRaiseRoute(ActionVariables actionVariables, GameVariables gameVariables, String actionToConsider, double sizing) throws Exception {
@@ -822,67 +890,18 @@ public class MachineLearning {
         }
 
         DbSaveBluff dbSaveBluff = new DbSaveBluff();
-        String street;
-        String bluffAction;
-        String position;
-        String sizingGroup;
-        String strongDraw;
-        String effectiveStack;
 
-        String route;
-
-        //maak hier eerst even de nieuwe opponentstats route, en check hoeveel die totaal heeft...
-        street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
-        bluffAction = actionToConsider;
-        position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
-        sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
-        strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
-        effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
-                dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
-                        gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
-
-        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
-        String oppPostRaise = dbSaveBluff.getOppPostRaiseLogic(opponentIdentifier2_0);
-        String oppPostLooseness = dbSaveBluff.getOppPostLoosenessLogic(opponentIdentifier2_0);
-
-        route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + oppPostRaise + oppPostLooseness;
-
-        while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
-            route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
-        }
-
-        double newRouteTotal;
-        initialize_2_0_DbConnection();
-
-        Statement st1 = con_2_0.createStatement();
-        ResultSet rs1 = st1.executeQuery("SELECT * FROM dbstats_bluff_sng_compact_2_0 WHERE route = '" + route + "';");
-
-        if(rs1.next()) {
-            newRouteTotal = rs1.getDouble("total");
-
-            if(newRouteTotal >= 20) {
-                System.out.println("make use of new route! " + route);
-                return route;
-            }
-        } else {
-            System.out.println("new route does not exist! " + route);
-        }
-
-        rs1.close();
-        st1.close();
-        close_2_0_DbConnection();
-
-        street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
-        bluffAction = actionToConsider;
-        position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
-        sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
+        String street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
+        String bluffAction = actionToConsider;
+        String position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
+        String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
         String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
-        strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
-        effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
+        String strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
+        String effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
                 dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        route = street + bluffAction + position + sizingGroup + foldStatGroup + strongDraw + effectiveStack;
+        String route = street + bluffAction + position + sizingGroup + foldStatGroup + strongDraw + effectiveStack;
 
         return route;
     }
