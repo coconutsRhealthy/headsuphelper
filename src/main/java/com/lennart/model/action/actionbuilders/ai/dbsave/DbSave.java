@@ -255,7 +255,7 @@ public class DbSave {
 
         if(oppPostRaise == -1) {
             oppPostRaiseString = "OpponentUnknown";
-        } else if(oppPostRaise < 0.12162162162162163) {
+        } else if(oppPostRaise < 0.11764705882352941) {
             oppPostRaiseString = "OppPostRaiseLow";
         } else {
             oppPostRaiseString = "OppPostRaiseHigh";

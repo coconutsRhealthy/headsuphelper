@@ -774,7 +774,7 @@ public class MachineLearning {
                                        double handStrength, String compactBluffRoute_2_0) throws Exception {
         List<Double> valuesToReturn = new ArrayList<>();
 
-        if(compactBluffRoute_2_0 != null) {
+        if(compactBluffRoute_2_0 != null && !compactBluffRoute_2_0.contains("OpponentUnknown")) {
             initialize_2_0_DbConnection();
 
             Statement st_2_0 = con_2_0.createStatement();

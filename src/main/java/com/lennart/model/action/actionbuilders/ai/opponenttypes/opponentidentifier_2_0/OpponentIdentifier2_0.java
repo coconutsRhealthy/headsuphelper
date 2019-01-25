@@ -278,8 +278,6 @@ public class OpponentIdentifier2_0 {
         return oppPostLooseness;
     }
 
-
-
     private Map<String, Double> getAllDataOfOpponent(String opponentName) throws Exception {
         Map<String, Double> opponentData = new HashMap<>();
 
@@ -287,23 +285,17 @@ public class OpponentIdentifier2_0 {
 
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop WHERE playerName = '" + opponentName + "';");
+        Statement st2 = con.createStatement();
+        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop WHERE playerName = '" + opponentName + "';");
 
-        if(rs.next()) {
+        if(rs.next() && rs2.next()) {
             opponentData.put("preNumberOfHands", rs.getDouble("numberOfHands"));
             opponentData.put("preFoldCount", rs.getDouble("foldCount"));
             opponentData.put("preCheckCount", rs.getDouble("checkCount"));
             opponentData.put("preCallCount", rs.getDouble("callCount"));
             opponentData.put("preIpRaiseCount", rs.getDouble("ipRaiseCount"));
             opponentData.put("preOopRaiseCount", rs.getDouble("oopRaiseCount"));
-        }
 
-        rs.close();
-        st.close();
-
-        Statement st2 = con.createStatement();
-        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop WHERE playerName = '" + opponentName + "';");
-
-        if(rs2.next()) {
             opponentData.put("postNumberOfHands", rs2.getDouble("numberOfHands"));
             opponentData.put("postFoldCount", rs2.getDouble("foldCount"));
             opponentData.put("postCheckCount", rs2.getDouble("checkCount"));
@@ -312,6 +304,8 @@ public class OpponentIdentifier2_0 {
             opponentData.put("postRaiseCount", rs2.getDouble("raiseCount"));
         }
 
+        rs.close();
+        st.close();
         rs2.close();
         st2.close();
 
@@ -331,7 +325,7 @@ public class OpponentIdentifier2_0 {
             opponentData.put("postBetCount", 0.0);
             opponentData.put("postRaiseCount", 0.0);
 
-            System.out.println("Opponentname: " + opponentName + " not found in opponentidentifier_2_0_postflop !");
+            System.out.println("Opponentname: " + opponentName + " not found in opponentidentifier db !");
         }
 
         return opponentData;
