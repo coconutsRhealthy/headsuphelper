@@ -236,10 +236,17 @@ public class OpponentIdentifier2_0 {
     public double getOpponentPostRaise(Map<String, Double> opponentData) {
         //Post all raises tov fold + call + raise
 
-        double postRaiseCount = opponentData.get("postRaiseCount");
-        double postFoldCount = opponentData.get("postFoldCount");
-        double postCallCount = opponentData.get("postCallCount");
-        double oppPostRaise = postRaiseCount / (postFoldCount + postCallCount + postRaiseCount);
+        double oppPostRaise;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 20) {
+            double postRaiseCount = opponentData.get("postRaiseCount");
+            double postFoldCount = opponentData.get("postFoldCount");
+            double postCallCount = opponentData.get("postCallCount");
+            oppPostRaise = postRaiseCount / (postFoldCount + postCallCount + postRaiseCount);
+        } else {
+            oppPostRaise = -1;
+        }
 
         return oppPostRaise;
     }
@@ -257,9 +264,16 @@ public class OpponentIdentifier2_0 {
     public double getOpponentPostLooseness(Map<String, Double> opponentData) {
         //call count tov call + fold count
 
-        double postCallCount = opponentData.get("postCallCount");
-        double postFoldCount = opponentData.get("postFoldCount");
-        double oppPostLooseness = postCallCount / (postCallCount + postFoldCount);
+        double oppPostLooseness;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 20) {
+            double postCallCount = opponentData.get("postCallCount");
+            double postFoldCount = opponentData.get("postFoldCount");
+            oppPostLooseness = postCallCount / (postCallCount + postFoldCount);
+        } else {
+            oppPostLooseness = -1;
+        }
 
         return oppPostLooseness;
     }
@@ -302,6 +316,23 @@ public class OpponentIdentifier2_0 {
         st2.close();
 
         closeDbConnection();
+
+        if(opponentData.isEmpty()) {
+            opponentData.put("preNumberOfHands", 0.0);
+            opponentData.put("preFoldCount", 0.0);
+            opponentData.put("preCheckCount", 0.0);
+            opponentData.put("preCallCount", 0.0);
+            opponentData.put("preIpRaiseCount", 0.0);
+            opponentData.put("preOopRaiseCount", 0.0);
+            opponentData.put("postNumberOfHands", 0.0);
+            opponentData.put("postFoldCount", 0.0);
+            opponentData.put("postCheckCount", 0.0);
+            opponentData.put("postCallCount", 0.0);
+            opponentData.put("postBetCount", 0.0);
+            opponentData.put("postRaiseCount", 0.0);
+
+            System.out.println("Opponentname: " + opponentName + " not found in opponentidentifier_2_0_postflop !");
+        }
 
         return opponentData;
     }

@@ -253,7 +253,9 @@ public class DbSave {
 
         double oppPostRaise = opponentIdentifier2_0.getOppPostRaise();
 
-        if(oppPostRaise < 0.12162162162162163) {
+        if(oppPostRaise == -1) {
+            oppPostRaiseString = "OpponentUnknown";
+        } else if(oppPostRaise < 0.12162162162162163) {
             oppPostRaiseString = "OppPostRaiseLow";
         } else {
             oppPostRaiseString = "OppPostRaiseHigh";
@@ -281,7 +283,9 @@ public class DbSave {
 
         double oppPostLooseness = opponentIdentifier2_0.getOppPostLooseness();
 
-        if(oppPostLooseness < 0.5) {
+        if(oppPostLooseness == -1) {
+            oppPostLoosenessString = "OpponentUnknown";
+        } else if(oppPostLooseness < 0.5) {
             oppPostLoosenessString = "OppPostLoosenessTight";
         } else {
             oppPostLoosenessString = "OppPostLoosenessLoose";

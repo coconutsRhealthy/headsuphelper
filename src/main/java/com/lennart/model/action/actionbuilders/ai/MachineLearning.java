@@ -5,7 +5,9 @@ import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveValue;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.card.Card;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.List;
 public class MachineLearning {
 
     private Connection con;
+    private Connection con_2_0;
 
     public String adjustActionToDbSaveData(ActionVariables actionVariables, GameVariables gameVariables,
                                            ContinuousTable continuousTable, double sizing) throws Exception {
@@ -732,6 +735,12 @@ public class MachineLearning {
     }
 
     private List<Double> getDataFromDb(String compactRoute, String extensiveRoute, String actionToConsider, double handStrength) throws Exception {
+        if(compactRoute.contains("OppPostRaise")) {
+            return getDataFrom_2_0_Db(compactRoute);
+        }
+
+        //je hebt hier nog de andere compactRoute nodig...
+
         List<Double> valuesToReturn = new ArrayList<>();
 
         initializeDbConnection();
@@ -755,8 +764,6 @@ public class MachineLearning {
             rs2.next();
 
             if(rs2.getDouble("total") < 20) {
-                //System.out.println("insufficient data for MachineLearning. Route: " + compactRoute + " Total: " + rs2.getDouble("total"));
-
                 successNumber = rs2.getDouble("success");
                 totalNumber = rs2.getDouble("total");
             } else {
@@ -786,6 +793,27 @@ public class MachineLearning {
         return valuesToReturn;
     }
 
+    private List<Double> getDataFrom_2_0_Db(String compact_2_0_Route) throws Exception {
+        List<Double> valuesToReturn = new ArrayList<>();
+
+        initialize_2_0_DbConnection();
+
+        Statement st = con_2_0.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_bluff_sng_compact_2_0 WHERE route = '" + compact_2_0_Route + "';");
+
+        rs.next();
+
+        valuesToReturn.add(rs.getDouble("success"));
+        valuesToReturn.add(rs.getDouble("total"));
+
+        rs.close();
+        st.close();
+
+        close_2_0_DbConnection();
+
+        return valuesToReturn;
+    }
+
     private String calculateCompactBluffBetOrRaiseRoute(ActionVariables actionVariables, GameVariables gameVariables, String actionToConsider, double sizing) throws Exception {
         if(actionToConsider.equals("bet75pct")) {
             actionToConsider = "Bet";
@@ -794,18 +822,67 @@ public class MachineLearning {
         }
 
         DbSaveBluff dbSaveBluff = new DbSaveBluff();
+        String street;
+        String bluffAction;
+        String position;
+        String sizingGroup;
+        String strongDraw;
+        String effectiveStack;
 
-        String street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
-        String bluffAction = actionToConsider;
-        String position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
-        String sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
-        String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
-        String strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
-        String effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
+        String route;
+
+        //maak hier eerst even de nieuwe opponentstats route, en check hoeveel die totaal heeft...
+        street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
+        bluffAction = actionToConsider;
+        position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
+        sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
+        strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
+        effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
                 dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String route = street + bluffAction + position + sizingGroup + foldStatGroup + strongDraw + effectiveStack;
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+        String oppPostRaise = dbSaveBluff.getOppPostRaiseLogic(opponentIdentifier2_0);
+        String oppPostLooseness = dbSaveBluff.getOppPostLoosenessLogic(opponentIdentifier2_0);
+
+        route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + oppPostRaise + oppPostLooseness;
+
+        while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
+            route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
+        }
+
+        double newRouteTotal;
+        initialize_2_0_DbConnection();
+
+        Statement st1 = con_2_0.createStatement();
+        ResultSet rs1 = st1.executeQuery("SELECT * FROM dbstats_bluff_sng_compact_2_0 WHERE route = '" + route + "';");
+
+        if(rs1.next()) {
+            newRouteTotal = rs1.getDouble("total");
+
+            if(newRouteTotal >= 20) {
+                System.out.println("make use of new route! " + route);
+                return route;
+            }
+        } else {
+            System.out.println("new route does not exist! " + route);
+        }
+
+        rs1.close();
+        st1.close();
+        close_2_0_DbConnection();
+
+        street = dbSaveBluff.getStreetViaLogic(gameVariables.getBoard());
+        bluffAction = actionToConsider;
+        position = dbSaveBluff.getPositionLogic(gameVariables.isBotIsButton());
+        sizingGroup = new DbSavePersister().convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroupViaLogic(sizing / gameVariables.getBigBlind()));
+        String foldStatGroup = dbSaveBluff.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+        strongDraw = dbSaveBluff.getStrongDrawLogic(actionVariables.getHandEvaluator().hasDrawOfType("strongFlushDraw"), actionVariables.getHandEvaluator().hasDrawOfType("strongOosd"));
+        effectiveStack = new DbSavePersister().convertEffectiveStackToCompact(
+                dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
+                        gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
+
+        route = street + bluffAction + position + sizingGroup + foldStatGroup + strongDraw + effectiveStack;
 
         return route;
     }
@@ -1384,5 +1461,14 @@ public class MachineLearning {
 
     private void closeDbConnection() throws SQLException {
         con.close();
+    }
+
+    private void initialize_2_0_DbConnection() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con_2_0 = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker_2_0?&serverTimezone=UTC", "root", "");
+    }
+
+    private void close_2_0_DbConnection() throws SQLException {
+        con_2_0.close();
     }
 }

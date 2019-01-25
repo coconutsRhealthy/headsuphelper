@@ -15,6 +15,9 @@ public class DbSaveBluff extends DbSave {
     private String strongDraw;
     private String opponentType;
 
+    private String oppPostRaise;
+    private String oppPostLooseness;
+
     public String getFoldStatGroupLogic(double foldStat) {
         String foldStatGroup;
 
@@ -143,5 +146,21 @@ public class DbSaveBluff extends DbSave {
 
     public void setOpponentType(String opponentType) {
         this.opponentType = opponentType;
+    }
+
+    public String getOppPostRaise() {
+        return oppPostRaise;
+    }
+
+    public void setOppPostRaise(String oppPostRaise) {
+        this.oppPostRaise = oppPostRaise;
+    }
+
+    public String getOppPostLooseness() {
+        return oppPostLooseness;
+    }
+
+    public void setOppPostLooseness(String oppPostLooseness) {
+        this.oppPostLooseness = oppPostLooseness;
     }
 }

@@ -4,6 +4,7 @@ import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveBluff;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
 
     public static void main(String[] args) throws Exception {
         new DbSavePersisterPostflop_2_0().initializeDb("dbstats_bluff_sng_compact_2_0");
-        //new DbSavePersisterPostflop_2_0().testMethod();
     }
 
     private void testMethod() {
@@ -57,8 +57,12 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
 
                 String routeCompact_2_0 = dbSaveBluff.getStreet() + dbSaveBluff.getBluffAction() + dbSaveBluff.getPosition() +
                         convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroup()) +
-                        dbSaveBluff.getOpponentType() + dbSaveBluff.getStrongDraw() +
-                        convertEffectiveStackToCompact(dbSaveBluff.getEffectiveStack());
+                        dbSaveBluff.getStrongDraw() + convertEffectiveStackToCompact(dbSaveBluff.getEffectiveStack()) +
+                        dbSaveBluff.getOppPostRaise() + dbSaveBluff.getOppPostLooseness();
+
+                while(StringUtils.countMatches(routeCompact_2_0, "OpponentUnknown") > 1) {
+                    routeCompact_2_0 = routeCompact_2_0.substring(0, routeCompact_2_0.lastIndexOf("OpponentUnknown"));
+                }
 
                 verifyRouteExists(routeCompact_2_0, "dbstats_bluff_sng_compact_2_0");
 
@@ -97,10 +101,7 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         List<String> sizingGroup = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
-        List<String> oppPre3bet = new ArrayList<>();
-        List<String> oppPreLooseness = new ArrayList<>();
         List<String> oppPostRaise = new ArrayList<>();
-        List<String> oppPostBet = new ArrayList<>();
         List<String> oppPostLooseness = new ArrayList<>();
 
         street.add("Flop");
@@ -123,17 +124,8 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
 
-        oppPre3bet.add("OppPre3betLow");
-        oppPre3bet.add("OppPre3betHigh");
-
-        oppPreLooseness.add("OppPreLoosenessTight");
-        oppPreLooseness.add("OppPreLoosenessLoose");
-
         oppPostRaise.add("OppPostRaiseLow");
         oppPostRaise.add("OppPostRaiseHigh");
-
-        oppPostBet.add("OppPostBetLow");
-        oppPostBet.add("OppPostBetHigh");
 
         oppPostLooseness.add("OppPostLoosenessTight");
         oppPostLooseness.add("OppPostLoosenessLoose");
@@ -146,15 +138,9 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
                     for(String d : sizingGroup) {
                         for(String e : strongDraw) {
                             for(String f : effectiveStack) {
-                                for(String g : oppPre3bet) {
-                                    for(String h : oppPreLooseness) {
-                                        for(String i : oppPostRaise) {
-                                            for(String j : oppPostBet) {
-                                                for(String k : oppPostLooseness) {
-                                                    allRoutes.add(a + b + c + d + e + f + g + h + i + j + k);
-                                                }
-                                            }
-                                        }
+                                for(String g : oppPostRaise) {
+                                    for(String h : oppPostLooseness) {
+                                        allRoutes.add(a + b + c + d + e + f + g + h);
                                     }
                                 }
 

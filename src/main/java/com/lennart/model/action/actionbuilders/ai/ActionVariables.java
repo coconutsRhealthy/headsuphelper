@@ -4,6 +4,7 @@ import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
@@ -386,7 +387,10 @@ public class ActionVariables {
                         String drawWetnessString = dbSaveBluff.getDrawWetnessLogic(boardInMethod, drawWetness);
                         String boatWetnessString = dbSaveBluff.getBoatWetnessLogic(boardInMethod, boatWetness);
                         String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
-                        String opponentType = dbSaveBluff.getOpponentTypeLogic(gameVariables.getOpponentName());
+
+                        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+                        String oppPostRaise = dbSaveBluff.getOppPostRaiseLogic(opponentIdentifier2_0);
+                        String oppPostLooseness = dbSaveBluff.getOppPostLoosenessLogic(opponentIdentifier2_0);
 
                         dbSaveBluff.setSizingGroup(sizingGroup);
                         dbSaveBluff.setStreet(street);
@@ -398,7 +402,8 @@ public class ActionVariables {
                         dbSaveBluff.setDrawWetness(drawWetnessString);
                         dbSaveBluff.setBoatWetness(boatWetnessString);
                         dbSaveBluff.setStrongDraw(strongDraw);
-                        dbSaveBluff.setOpponentType(opponentType);
+                        dbSaveBluff.setOppPostRaise(oppPostRaise);
+                        dbSaveBluff.setOppPostLooseness(oppPostLooseness);
 
                         continuousTable.getDbSaveList().add(dbSaveBluff);
                     }

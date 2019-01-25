@@ -10,6 +10,7 @@ import java.sql.*;
 public class DbStatsRawMigrator {
 
     private Connection con;
+    private Connection con_2_0;
 
     private void migrateRawDataToBluffRouteCompact2_0() throws Exception {
         int counter = 0;
@@ -39,15 +40,17 @@ public class DbStatsRawMigrator {
 
                         String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + opponentStatsString;
 
-                        Statement st2 = con.createStatement();
+                        initialize_2_0_DbConnection();
+                        Statement st2 = con_2_0.createStatement();
 
                         if(Boolean.valueOf(rs.getString("bot_won_hand"))) {
-                            st2.executeUpdate("UPDATE testdbff SET success = success + 1 WHERE route = '" + route + "'");
+                            st2.executeUpdate("UPDATE dbstats_bluff_sng_compact_2_0 SET success = success + 1 WHERE route = '" + route + "'");
                         }
 
-                        st2.executeUpdate("UPDATE testdbff SET total = total + 1 WHERE route = '" + route + "'");
+                        st2.executeUpdate("UPDATE dbstats_bluff_sng_compact_2_0 SET total = total + 1 WHERE route = '" + route + "'");
 
                         st2.close();
+                        close_2_0_DbConnection();
 
                         counter++;
 
@@ -124,28 +127,10 @@ public class DbStatsRawMigrator {
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
 
         if(opponentIdentifier2_0.getNumberOfHands() >= 20) {
-            if(opponentIdentifier2_0.getOppPre3bet() < 0.09523809523809523) {
-                opponentStatsString = "OppPre3betLow";
-            } else {
-                opponentStatsString = "OppPre3betHigh";
-            }
-
-            if(opponentIdentifier2_0.getOppPreLooseness() < 0.7096774193548387) {
-                opponentStatsString = opponentStatsString + "OppPreLoosenessTight";
-            } else {
-                opponentStatsString = opponentStatsString + "OppPreLoosenessLoose";
-            }
-
             if(opponentIdentifier2_0.getOppPostRaise() < 0.12162162162162163) {
-                opponentStatsString = opponentStatsString + "OppPostRaiseLow";
+                opponentStatsString = "OppPostRaiseLow";
             } else {
-                opponentStatsString = opponentStatsString + "OppPostRaiseHigh";
-            }
-
-            if(opponentIdentifier2_0.getOppPostBet() < 0.35) {
-                opponentStatsString = opponentStatsString + "OppPostBetLow";
-            } else {
-                opponentStatsString = opponentStatsString + "OppPostBetHigh";
+                opponentStatsString = "OppPostRaiseHigh";
             }
 
             if(opponentIdentifier2_0.getOppPostLooseness() < 0.5) {
@@ -188,7 +173,16 @@ public class DbStatsRawMigrator {
         con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker?&serverTimezone=UTC", "root", "");
     }
 
+    private void initialize_2_0_DbConnection() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con_2_0 = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker_2_0?&serverTimezone=UTC", "root", "");
+    }
+
     private void closeDbConnection() throws SQLException {
         con.close();
+    }
+
+    private void close_2_0_DbConnection() throws SQLException {
+        con_2_0.close();
     }
 }
