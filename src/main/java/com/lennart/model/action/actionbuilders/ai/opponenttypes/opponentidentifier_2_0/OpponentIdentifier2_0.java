@@ -144,7 +144,7 @@ public class OpponentIdentifier2_0 {
             if(!opponentData.isEmpty()) {
                 double numberOfHands = opponentData.get("preNumberOfHands");
 
-                if(numberOfHands >= 20) {
+                if(numberOfHands >= 14) {
                     allOppPre3betStats.add(getOpponentPre3bet(opponentData));
                     allOppPreLoosenessStats.add(getOpponentPreLooseness(opponentData));
                     allOppPostRaiseStats.add(getOpponentPostRaise(opponentData));
@@ -216,19 +216,33 @@ public class OpponentIdentifier2_0 {
     public double getOpponentPre3bet(Map<String, Double> opponentData) {
         //Oop raise tov total hands
 
-        double oopRaiseNumber = opponentData.get("preOopRaiseCount");
-        double totalNumberOfHands = opponentData.get("preNumberOfHands");
-        double opponentPre3bet = oopRaiseNumber / totalNumberOfHands;
+        double oppPre3bet;
+        double numberOfHands = opponentData.get("preNumberOfHands");
 
-        return opponentPre3bet;
+        if(numberOfHands >= 14) {
+            double oopRaiseNumber = opponentData.get("preOopRaiseCount");
+            double totalNumberOfHands = opponentData.get("preNumberOfHands");
+            oppPre3bet = oopRaiseNumber / totalNumberOfHands;
+        } else {
+            oppPre3bet = -1;
+        }
+
+        return oppPre3bet;
     }
 
     public double getOpponentPreLooseness(Map<String, Double> opponentData) {
         //call count tov call + fold count
 
-        double callCount = opponentData.get("preCallCount");
-        double foldCount = opponentData.get("preFoldCount");
-        double oppPreLooseness = callCount / (callCount + foldCount);
+        double oppPreLooseness;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 14) {
+            double callCount = opponentData.get("preCallCount");
+            double foldCount = opponentData.get("preFoldCount");
+            oppPreLooseness = callCount / (callCount + foldCount);
+        } else {
+            oppPreLooseness = -1;
+        }
 
         return oppPreLooseness;
     }
@@ -239,7 +253,7 @@ public class OpponentIdentifier2_0 {
         double oppPostRaise;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 20) {
+        if(numberOfHands >= 14) {
             double postRaiseCount = opponentData.get("postRaiseCount");
             double postFoldCount = opponentData.get("postFoldCount");
             double postCallCount = opponentData.get("postCallCount");
@@ -254,9 +268,16 @@ public class OpponentIdentifier2_0 {
     public double getOpponentPostBet(Map<String, Double> opponentData) {
         //post bet tov bet + check
 
-        double postBetCount = opponentData.get("postBetCount");
-        double postCheckCount = opponentData.get("postCheckCount");
-        double oppPostBet = postBetCount / (postBetCount + postCheckCount);
+        double oppPostBet;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 14) {
+            double postBetCount = opponentData.get("postBetCount");
+            double postCheckCount = opponentData.get("postCheckCount");
+            oppPostBet = postBetCount / (postBetCount + postCheckCount);
+        } else {
+            oppPostBet = -1;
+        }
 
         return oppPostBet;
     }

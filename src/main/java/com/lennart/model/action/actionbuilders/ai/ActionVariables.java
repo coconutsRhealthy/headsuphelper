@@ -389,7 +389,10 @@ public class ActionVariables {
                         String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
 
                         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+                        String oppPre3bet = dbSaveBluff.getOppPre3betLogic(opponentIdentifier2_0);
+                        String oppPreLooseness = dbSaveBluff.getOppPreLoosenessLogic(opponentIdentifier2_0);
                         String oppPostRaise = dbSaveBluff.getOppPostRaiseLogic(opponentIdentifier2_0);
+                        String oppPostBet = dbSaveBluff.getOppPostBetLogic(opponentIdentifier2_0);
                         String oppPostLooseness = dbSaveBluff.getOppPostLoosenessLogic(opponentIdentifier2_0);
 
                         dbSaveBluff.setSizingGroup(sizingGroup);
@@ -402,7 +405,10 @@ public class ActionVariables {
                         dbSaveBluff.setDrawWetness(drawWetnessString);
                         dbSaveBluff.setBoatWetness(boatWetnessString);
                         dbSaveBluff.setStrongDraw(strongDraw);
+                        dbSaveBluff.setOppPre3bet(oppPre3bet);
+                        dbSaveBluff.setOppPreLooseness(oppPreLooseness);
                         dbSaveBluff.setOppPostRaise(oppPostRaise);
+                        dbSaveBluff.setOppPostBet(oppPostBet);
                         dbSaveBluff.setOppPostLooseness(oppPostLooseness);
 
                         continuousTable.getDbSaveList().add(dbSaveBluff);

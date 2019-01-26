@@ -131,7 +131,7 @@ public class DbStatsRawMigrator {
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
 
         if(opponentIdentifier2_0.getNumberOfHands() >= 20) {
-            if(opponentIdentifier2_0.getOppPre3bet() < 0.06382978723404255) {
+            if(opponentIdentifier2_0.getOppPre3bet() < 0.0625) {
                 opponentStatsString = "OppPre3betLow";
             } else {
                 opponentStatsString = "OppPre3betHigh";
@@ -143,7 +143,7 @@ public class DbStatsRawMigrator {
                 opponentStatsString = opponentStatsString + "OppPreLoosenessLoose";
             }
 
-            if(opponentIdentifier2_0.getOppPostRaise() < 0.12162162162162163) {
+            if(opponentIdentifier2_0.getOppPostRaise() < 0.125) {
                 opponentStatsString = opponentStatsString + "OppPostRaiseLow";
             } else {
                 opponentStatsString = opponentStatsString + "OppPostRaiseHigh";
@@ -155,7 +155,7 @@ public class DbStatsRawMigrator {
                 opponentStatsString = opponentStatsString + "OppPostBetHigh";
             }
 
-            if(opponentIdentifier2_0.getOppPostLooseness() < 0.5) {
+            if(opponentIdentifier2_0.getOppPostLooseness() < 0.47619047619047616) {
                 opponentStatsString = opponentStatsString + "OppPostLoosenessTight";
             } else {
                 opponentStatsString = opponentStatsString + "OppPostLoosenessLoose";

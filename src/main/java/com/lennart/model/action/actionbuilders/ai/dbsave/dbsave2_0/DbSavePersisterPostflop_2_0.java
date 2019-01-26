@@ -37,7 +37,8 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
                 String routeCompact_2_0 = dbSaveBluff.getStreet() + dbSaveBluff.getBluffAction() + dbSaveBluff.getPosition() +
                         convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroup()) +
                         dbSaveBluff.getStrongDraw() + convertEffectiveStackToCompact(dbSaveBluff.getEffectiveStack()) +
-                        dbSaveBluff.getOppPostRaise() + dbSaveBluff.getOppPostLooseness();
+                        dbSaveBluff.getOppPre3bet() + dbSaveBluff.getOppPreLooseness() + dbSaveBluff.getOppPostRaise() +
+                        dbSaveBluff.getOppPostBet() + dbSaveBluff.getOppPostLooseness();
 
                 while(StringUtils.countMatches(routeCompact_2_0, "OpponentUnknown") > 1) {
                     routeCompact_2_0 = routeCompact_2_0.substring(0, routeCompact_2_0.lastIndexOf("OpponentUnknown"));

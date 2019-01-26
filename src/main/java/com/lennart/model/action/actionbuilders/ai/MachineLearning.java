@@ -870,10 +870,15 @@ public class MachineLearning {
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+
+        String oppPre3bet = dbSaveBluff.getOppPre3betLogic(opponentIdentifier2_0);
+        String oppPreLooseness = dbSaveBluff.getOppPreLoosenessLogic(opponentIdentifier2_0);
         String oppPostRaise = dbSaveBluff.getOppPostRaiseLogic(opponentIdentifier2_0);
+        String oppPostBet = dbSaveBluff.getOppPostBetLogic(opponentIdentifier2_0);
         String oppPostLooseness = dbSaveBluff.getOppPostLoosenessLogic(opponentIdentifier2_0);
 
-        String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + oppPostRaise + oppPostLooseness;
+        String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack +
+                oppPre3bet + oppPreLooseness + oppPostRaise + oppPostBet + oppPostLooseness;
 
         while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
             route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
