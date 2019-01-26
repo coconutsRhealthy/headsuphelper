@@ -12,6 +12,10 @@ public class DbStatsRawMigrator {
     private Connection con;
     private Connection con_2_0;
 
+    public static void main(String[] args) throws Exception {
+        new DbStatsRawMigrator().migrateRawDataToBluffRouteCompact2_0();
+    }
+
     private void migrateRawDataToBluffRouteCompact2_0() throws Exception {
         int counter = 0;
 
@@ -127,10 +131,28 @@ public class DbStatsRawMigrator {
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
 
         if(opponentIdentifier2_0.getNumberOfHands() >= 20) {
-            if(opponentIdentifier2_0.getOppPostRaise() < 0.12162162162162163) {
-                opponentStatsString = "OppPostRaiseLow";
+            if(opponentIdentifier2_0.getOppPre3bet() < 0.06382978723404255) {
+                opponentStatsString = "OppPre3betLow";
             } else {
-                opponentStatsString = "OppPostRaiseHigh";
+                opponentStatsString = "OppPre3betHigh";
+            }
+
+            if(opponentIdentifier2_0.getOppPreLooseness() < 0.7105263157894737) {
+                opponentStatsString = opponentStatsString + "OppPreLoosenessTight";
+            } else {
+                opponentStatsString = opponentStatsString + "OppPreLoosenessLoose";
+            }
+
+            if(opponentIdentifier2_0.getOppPostRaise() < 0.12162162162162163) {
+                opponentStatsString = opponentStatsString + "OppPostRaiseLow";
+            } else {
+                opponentStatsString = opponentStatsString + "OppPostRaiseHigh";
+            }
+
+            if(opponentIdentifier2_0.getOppPostBet() < 0.35) {
+                opponentStatsString = opponentStatsString + "OppPostBetLow";
+            } else {
+                opponentStatsString = opponentStatsString + "OppPostBetHigh";
             }
 
             if(opponentIdentifier2_0.getOppPostLooseness() < 0.5) {

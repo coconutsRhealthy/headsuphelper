@@ -15,41 +15,20 @@ import java.util.List;
  */
 public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
 
-    private Connection con;
+    private Connection con_2_0;
 
     public static void main(String[] args) throws Exception {
-        new DbSavePersisterPostflop_2_0().initializeDb("dbstats_bluff_sng_compact_2_0");
-    }
-
-    private void testMethod() {
-        List<String> hmm = new ArrayList<>();
-        List<String> hmm2 = new ArrayList<>();
-
-        hmm.add("Tp");
-        hmm.add("Ta");
-        hmm.add("Lp");
-        hmm.add("La");
-
-        hmm2.add("tp");
-        hmm2.add("ta");
-        hmm2.add("lp");
-        hmm2.add("la");
-
-
-        for(String s : hmm) {
-            for(String g : hmm2) {
-                System.out.println("opponentTypeGroup.add(\"" + s + g + "\");");
-            }
-        }
+        //new DbSavePersisterPostflop_2_0().getAllCallRoutesCompact();
+        new DbSavePersisterPostflop_2_0().initializeDb("dbstats_call_sng_compact_2_0");
     }
 
     @Override
     public void doDbSaveUpdate(ContinuousTable continuousTable, double bigBlind) throws Exception {
         List<DbSave> dbSaveList = continuousTable.getDbSaveList();
 
-        initializeDbConnection();
+        initialize_2_0_DbConnection();
 
-        Statement st = con.createStatement();
+        Statement st = con_2_0.createStatement();
 
         for(DbSave dbSave : dbSaveList) {
             if(dbSave instanceof DbSaveBluff) {
@@ -75,23 +54,23 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         }
 
         st.close();
-        closeDbConnection();
+        close_2_0_DbConnection();
     }
 
     private void initializeDb(String table) throws Exception {
-        List<String> allRoutes = getAllBluffRoutesCompact();
+        List<String> allRoutes = getAllCallRoutesCompact();
 
-        initializeDbConnection();
+        initialize_2_0_DbConnection();
 
         for(String route : allRoutes) {
-            Statement st = con.createStatement();
+            Statement st = con_2_0.createStatement();
 
             st.executeUpdate("INSERT INTO " + table + " (route) VALUES ('" + route + "')");
 
             st.close();
         }
 
-        closeDbConnection();
+        close_2_0_DbConnection();
     }
 
     private List<String> getAllBluffRoutesCompact() {
@@ -101,7 +80,10 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         List<String> sizingGroup = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
+        List<String> oppPre3bet = new ArrayList<>();
+        List<String> oppPreLooseness = new ArrayList<>();
         List<String> oppPostRaise = new ArrayList<>();
+        List<String> oppPostBet = new ArrayList<>();
         List<String> oppPostLooseness = new ArrayList<>();
 
         street.add("Flop");
@@ -124,8 +106,17 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
 
+        oppPre3bet.add("OppPre3betLow");
+        oppPre3bet.add("OppPre3betHigh");
+
+        oppPreLooseness.add("OppPreLoosenessTight");
+        oppPreLooseness.add("OppPreLoosenessLoose");
+
         oppPostRaise.add("OppPostRaiseLow");
         oppPostRaise.add("OppPostRaiseHigh");
+
+        oppPostBet.add("OppPostBetLow");
+        oppPostBet.add("OppPostBetHigh");
 
         oppPostLooseness.add("OppPostLoosenessTight");
         oppPostLooseness.add("OppPostLoosenessLoose");
@@ -138,9 +129,15 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
                     for(String d : sizingGroup) {
                         for(String e : strongDraw) {
                             for(String f : effectiveStack) {
-                                for(String g : oppPostRaise) {
-                                    for(String h : oppPostLooseness) {
-                                        allRoutes.add(a + b + c + d + e + f + g + h);
+                                for(String g : oppPre3bet) {
+                                    for(String h : oppPreLooseness) {
+                                        for(String i : oppPostRaise) {
+                                            for(String j : oppPostBet) {
+                                                for(String k : oppPostLooseness) {
+                                                    allRoutes.add(a + b + c + d + e + f + g + h + i + j + k);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
 
@@ -157,8 +154,185 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         return allRoutes;
     }
 
+    private List<String> getAllValueRoutesCompact() {
+        List<String> street = new ArrayList<>();
+        List<String> valueAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> sizing = new ArrayList<>();
+        List<String> handStrength = new ArrayList<>();
+        List<String> effectiveStack = new ArrayList<>();
+        List<String> oppPre3bet = new ArrayList<>();
+        List<String> oppPreLooseness = new ArrayList<>();
+        List<String> oppPostRaise = new ArrayList<>();
+        List<String> oppPostBet = new ArrayList<>();
+        List<String> oppPostLooseness = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        valueAction.add("Bet");
+        valueAction.add("Raise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        sizing.add("Sizing_0-10bb");
+        sizing.add("Sizing_10-20bb");
+        sizing.add("Sizing_20bb_up");
+
+        handStrength.add("HS_70_75_");
+        handStrength.add("HS_75_80_");
+        handStrength.add("HS_80_85_");
+        handStrength.add("HS_85_90_");
+        handStrength.add("HS_90_95_");
+        handStrength.add("HS_95_100_");
+
+        effectiveStack.add("EffStack_0_35_");
+        effectiveStack.add("EffStack_35_up_");
+
+        oppPre3bet.add("OppPre3betLow");
+        oppPre3bet.add("OppPre3betHigh");
+
+        oppPreLooseness.add("OppPreLoosenessTight");
+        oppPreLooseness.add("OppPreLoosenessLoose");
+
+        oppPostRaise.add("OppPostRaiseLow");
+        oppPostRaise.add("OppPostRaiseHigh");
+
+        oppPostBet.add("OppPostBetLow");
+        oppPostBet.add("OppPostBetHigh");
+
+        oppPostLooseness.add("OppPostLoosenessTight");
+        oppPostLooseness.add("OppPostLoosenessLoose");
+
+        List<String> allRoutes = new ArrayList<>();
+
+        for(String a : street) {
+            for(String b : valueAction) {
+                for(String c : position) {
+                    for(String d : sizing) {
+                        for(String e : handStrength) {
+                            for(String f : effectiveStack) {
+                                for(String g : oppPre3bet) {
+                                    for(String h : oppPreLooseness) {
+                                        for(String i : oppPostRaise) {
+                                            for(String j : oppPostBet) {
+                                                for(String k : oppPostLooseness) {
+                                                    allRoutes.add(a + b + c + d + e + f + g + h + i + j + k);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                allRoutes.add(a + b + c + d + e + f + "OpponentUnknown");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(allRoutes.size());
+
+        return allRoutes;
+    }
+
+    private List<String> getAllCallRoutesCompact() {
+        List<String> street = new ArrayList<>();
+        List<String> facingAction = new ArrayList<>();
+        List<String> position = new ArrayList<>();
+        List<String> amountToCallGroup = new ArrayList<>();
+        List<String> handStrength = new ArrayList<>();
+        List<String> strongDraw = new ArrayList<>();
+        List<String> effectiveStack = new ArrayList<>();
+        List<String> oppPre3bet = new ArrayList<>();
+        List<String> oppPreLooseness = new ArrayList<>();
+        List<String> oppPostRaise = new ArrayList<>();
+        List<String> oppPostBet = new ArrayList<>();
+        List<String> oppPostLooseness = new ArrayList<>();
+
+        street.add("Flop");
+        street.add("Turn");
+        street.add("River");
+
+        facingAction.add("FacingBet");
+        facingAction.add("FacingRaise");
+
+        position.add("Ip");
+        position.add("Oop");
+
+        amountToCallGroup.add("Atc_0-10bb");
+        amountToCallGroup.add("Atc_10-20bb");
+        amountToCallGroup.add("Atc_20bb_up");
+
+        handStrength.add("HS_0_30_");
+        handStrength.add("HS_30_50_");
+        handStrength.add("HS_50_60_");
+        handStrength.add("HS_60_70_");
+        handStrength.add("HS_70_80_");
+        handStrength.add("HS_80_90_");
+        handStrength.add("HS_90_100_");
+
+        strongDraw.add("StrongDrawTrue");
+        strongDraw.add("StrongDrawFalse");
+
+        effectiveStack.add("EffStack_0_35_");
+        effectiveStack.add("EffStack_35_up_");
+
+        oppPre3bet.add("OppPre3betLow");
+        oppPre3bet.add("OppPre3betHigh");
+
+        oppPreLooseness.add("OppPreLoosenessTight");
+        oppPreLooseness.add("OppPreLoosenessLoose");
+
+        oppPostRaise.add("OppPostRaiseLow");
+        oppPostRaise.add("OppPostRaiseHigh");
+
+        oppPostBet.add("OppPostBetLow");
+        oppPostBet.add("OppPostBetHigh");
+
+        oppPostLooseness.add("OppPostLoosenessTight");
+        oppPostLooseness.add("OppPostLoosenessLoose");
+
+        List<String> allRoutes = new ArrayList<>();
+
+        for(String a : street) {
+            for(String b : facingAction) {
+                for(String c : position) {
+                    for(String d : amountToCallGroup) {
+                        for(String e : handStrength) {
+                            for(String f : strongDraw) {
+                                for(String g : effectiveStack) {
+                                    for(String h : oppPre3bet) {
+                                        for(String i : oppPreLooseness) {
+                                            for(String j : oppPostRaise) {
+                                                for(String k : oppPostBet) {
+                                                    for(String l : oppPostLooseness) {
+                                                        allRoutes.add(a + b + c + d + e + f + g + h + i + j + k + l);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    allRoutes.add(a + b + c + d + e + f + g + "OpponentUnknown");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(allRoutes.size());
+
+        return allRoutes;
+    }
+
     private void verifyRouteExists(String route, String table) throws Exception {
-        Statement st2 = con.createStatement();
+        Statement st2 = con_2_0.createStatement();
 
         ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
 
@@ -172,13 +346,12 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         st2.close();
     }
 
-    private void initializeDbConnection() throws Exception {
+    private void initialize_2_0_DbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
-        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker_2_0?&serverTimezone=UTC", "root", "");
+        con_2_0 = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker_2_0?&serverTimezone=UTC", "root", "");
     }
 
-    private void closeDbConnection() throws SQLException {
-        con.close();
+    private void close_2_0_DbConnection() throws SQLException {
+        con_2_0.close();
     }
-
 }
