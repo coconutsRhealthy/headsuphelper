@@ -25,12 +25,12 @@ public class Analysis {
         int success = 0;
         int counter = 0;
 
-        DbStatsRawMigrator dbStatsRawMigrator = new DbStatsRawMigrator();
+        DbStatsRawBluffPostflopMigrator dbStatsRawBluffPostflopMigrator = new DbStatsRawBluffPostflopMigrator();
 
         while(rs.next()) {
             String board = rs.getString("board");
 
-            if(!board.equals("") && dbStatsRawMigrator.getStreetString(board).equals("Turn")) {
+            if(!board.equals("") && dbStatsRawBluffPostflopMigrator.getStreetString(board).equals("Turn")) {
                 String botAction = rs.getString("bot_action");
 
                 if(botAction.equals("bet75pct") || botAction.equals("raise")) {

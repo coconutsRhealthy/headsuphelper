@@ -1,9 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterRawData;
+import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPostflop_2_0;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
@@ -114,7 +111,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
                         new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlind);
-                        new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, bigBlind);
+                        new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, bigBlind, botWasButtonInLastHand());
                     }
 
                     gameVariables = new GameVariables(bigBlind, game.equals("sng"));
@@ -284,6 +281,24 @@ public class ContinuousTable implements ContinuousTableable {
         }
 
         return bluffSuccessful;
+    }
+
+    private boolean botWasButtonInLastHand() {
+        boolean botWasButtonInLastHand = false;
+
+        for(DbSave dbSave : dbSaveList) {
+            if(dbSave instanceof DbSaveRaw) {
+                DbSaveRaw dbSaveRaw = (DbSaveRaw) dbSave;
+
+                if(dbSaveRaw.getPosition().equals("Ip")) {
+                    botWasButtonInLastHand = true;
+                }
+
+                break;
+            }
+        }
+
+        return botWasButtonInLastHand;
     }
 
     private void doSngContinuousLogic(long startTime) throws Exception {

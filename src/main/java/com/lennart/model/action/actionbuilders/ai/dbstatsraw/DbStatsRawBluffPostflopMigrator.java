@@ -7,13 +7,13 @@ import java.sql.*;
 /**
  * Created by LennartMac on 23/01/2019.
  */
-public class DbStatsRawMigrator {
+public class DbStatsRawBluffPostflopMigrator {
 
     private Connection con;
     private Connection con_2_0;
 
     public static void main(String[] args) throws Exception {
-        new DbStatsRawMigrator().migrateRawDataToBluffRouteCompact2_0();
+        new DbStatsRawBluffPostflopMigrator().migrateRawDataToBluffRouteCompact2_0();
     }
 
     private void migrateRawDataToBluffRouteCompact2_0() throws Exception {
@@ -46,6 +46,14 @@ public class DbStatsRawMigrator {
 
                         initialize_2_0_DbConnection();
                         Statement st2 = con_2_0.createStatement();
+
+                        ResultSet rsTest = st2.executeQuery("SELECT * FROM dbstats_bluff_sng_compact_2_0 WHERE route = '" + route + "';");
+
+                        if(!rsTest.next()) {
+                            System.out.println("Route not found! " + route);
+                        }
+
+                        rsTest.close();
 
                         if(Boolean.valueOf(rs.getString("bot_won_hand"))) {
                             st2.executeUpdate("UPDATE dbstats_bluff_sng_compact_2_0 SET success = success + 1 WHERE route = '" + route + "'");
@@ -131,31 +139,31 @@ public class DbStatsRawMigrator {
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
 
         if(opponentIdentifier2_0.getNumberOfHands() >= 20) {
-            if(opponentIdentifier2_0.getOppPre3bet() < 0.0625) {
+            if(opponentIdentifier2_0.getOppPre3bet() < OpponentIdentifier2_0.PRE_3_BET) {
                 opponentStatsString = "OppPre3betLow";
             } else {
                 opponentStatsString = "OppPre3betHigh";
             }
 
-            if(opponentIdentifier2_0.getOppPreLooseness() < 0.7105263157894737) {
+            if(opponentIdentifier2_0.getOppPreLooseness() < OpponentIdentifier2_0.PRE_LOOSENESS) {
                 opponentStatsString = opponentStatsString + "OppPreLoosenessTight";
             } else {
                 opponentStatsString = opponentStatsString + "OppPreLoosenessLoose";
             }
 
-            if(opponentIdentifier2_0.getOppPostRaise() < 0.125) {
+            if(opponentIdentifier2_0.getOppPostRaise() < OpponentIdentifier2_0.POST_RAISE) {
                 opponentStatsString = opponentStatsString + "OppPostRaiseLow";
             } else {
                 opponentStatsString = opponentStatsString + "OppPostRaiseHigh";
             }
 
-            if(opponentIdentifier2_0.getOppPostBet() < 0.35) {
+            if(opponentIdentifier2_0.getOppPostBet() < OpponentIdentifier2_0.POST_BET) {
                 opponentStatsString = opponentStatsString + "OppPostBetLow";
             } else {
                 opponentStatsString = opponentStatsString + "OppPostBetHigh";
             }
 
-            if(opponentIdentifier2_0.getOppPostLooseness() < 0.47619047619047616) {
+            if(opponentIdentifier2_0.getOppPostLooseness() < OpponentIdentifier2_0.POST_LOOSENESS) {
                 opponentStatsString = opponentStatsString + "OppPostLoosenessTight";
             } else {
                 opponentStatsString = opponentStatsString + "OppPostLoosenessLoose";

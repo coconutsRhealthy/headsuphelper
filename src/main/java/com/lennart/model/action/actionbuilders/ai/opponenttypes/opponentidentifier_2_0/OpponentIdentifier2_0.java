@@ -20,6 +20,12 @@ public class OpponentIdentifier2_0 {
     private double oppPostBet;
     private double oppPostLooseness;
 
+    public static double PRE_3_BET = 0.08;
+    public static double PRE_LOOSENESS = 0.7105263157894737;
+    public static double POST_RAISE = 0.125;
+    public static double POST_BET = 0.35;
+    public static double POST_LOOSENESS = 0.47619047619047616;
+
     public OpponentIdentifier2_0() {
         //default constructor
     }
@@ -122,6 +128,16 @@ public class OpponentIdentifier2_0 {
 
     public static void main(String[] args) throws Exception {
         new OpponentIdentifier2_0().printStatsBoundries();
+
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0("dukeRH888");
+
+        System.out.println();
+
+        System.out.println("3bet: " + opponentIdentifier2_0.getOppPre3bet());
+        System.out.println("preLooseness: " + opponentIdentifier2_0.getOppPreLooseness());
+        System.out.println("oppPostRaise: " + opponentIdentifier2_0.getOppPostRaise());
+        System.out.println("oppPostBet: " + opponentIdentifier2_0.getOppPostBet());
+        System.out.println("oppPostLooseness: " + opponentIdentifier2_0.getOppPostLooseness());
     }
 
     private void printStatsBoundries() throws Exception {
@@ -352,25 +368,25 @@ public class OpponentIdentifier2_0 {
         return opponentData;
     }
 
-    public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, double bigBlind) throws Exception {
+    public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, double bigBlind, boolean botWasButton) throws Exception {
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
 
         List<String> opponentPreflopActions = handHistoryReaderStars.getOpponentActionsOfLastHand(false, bigBlind);
 
         for(String action : opponentPreflopActions) {
-            updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_preflop");
+            updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_preflop", botWasButton);
         }
 
         List<String> opponentPostflopActions = handHistoryReaderStars.getOpponentActionsOfLastHand(true, bigBlind);
 
         for(String action : opponentPostflopActions) {
-            updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_postflop");
+            updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_postflop", botWasButton);
         }
 
         updateNumberOfHands(opponentPlayerNameOfLastHand);
     }
 
-    private void updateCountsInDb(String opponentNick, String action, String table) throws Exception {
+    private void updateCountsInDb(String opponentNick, String action, String table, boolean botWasButton) throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();
@@ -390,6 +406,14 @@ public class OpponentIdentifier2_0 {
             st.executeUpdate("UPDATE " + table + " SET betCount = betCount + 1 WHERE playerName = '" + opponentNick + "'");
         } else if(action.equals("raise")) {
             st.executeUpdate("UPDATE " + table + " SET raiseCount = raiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+
+            if(table.contains("preflop")) {
+                if(botWasButton) {
+                    st.executeUpdate("UPDATE " + table + " SET oopRaiseCount = ipRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+                } else {
+                    st.executeUpdate("UPDATE " + table + " SET ipRaiseCount = oopRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+                }
+            }
         }
 
         rs.close();

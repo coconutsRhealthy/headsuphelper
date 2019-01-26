@@ -227,7 +227,7 @@ public class DbSave {
 
         if(oppPre3bet == -1) {
             oppPre3betString = "OpponentUnknown";
-        } else if(oppPre3bet < 0.0625) {
+        } else if(oppPre3bet < OpponentIdentifier2_0.PRE_3_BET) {
             oppPre3betString = "OppPre3betLow";
         } else {
             oppPre3betString = "OppPre3betHigh";
@@ -243,7 +243,7 @@ public class DbSave {
 
         if(oppPreLooseness == -1) {
             oppPreLoosenessString = "OpponentUnknown";
-        } else if(oppPreLooseness < 0.7105263157894737) {
+        } else if(oppPreLooseness < OpponentIdentifier2_0.PRE_LOOSENESS) {
             oppPreLoosenessString = "OppPreLoosenessTight";
         } else {
             oppPreLoosenessString = "OppPreLoosenessLoose";
@@ -259,7 +259,7 @@ public class DbSave {
 
         if(oppPostRaise == -1) {
             oppPostRaiseString = "OpponentUnknown";
-        } else if(oppPostRaise < 0.125) {
+        } else if(oppPostRaise < OpponentIdentifier2_0.POST_RAISE) {
             oppPostRaiseString = "OppPostRaiseLow";
         } else {
             oppPostRaiseString = "OppPostRaiseHigh";
@@ -275,7 +275,7 @@ public class DbSave {
 
         if(oppPostBet == -1) {
             oppPostBetString = "OpponentUnknown";
-        } else if(oppPostBet < 0.35) {
+        } else if(oppPostBet < OpponentIdentifier2_0.POST_BET) {
             oppPostBetString = "OppPostBetLow";
         } else {
             oppPostBetString = "OppPostBetHigh";
@@ -291,7 +291,7 @@ public class DbSave {
 
         if(oppPostLooseness == -1) {
             oppPostLoosenessString = "OpponentUnknown";
-        } else if(oppPostLooseness < 0.47619047619047616) {
+        } else if(oppPostLooseness < OpponentIdentifier2_0.POST_LOOSENESS) {
             oppPostLoosenessString = "OppPostLoosenessTight";
         } else {
             oppPostLoosenessString = "OppPostLoosenessLoose";

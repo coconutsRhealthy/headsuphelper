@@ -526,7 +526,10 @@ public class DbSavePersisterPreflop {
 
     public String convertListCardToHandStrengthString(List<Card> combo) {
         double handStrength = new PreflopHandStength().getPreflopHandStength(combo);
+        return convertNumericHandstrengthToString(handStrength);
+    }
 
+    public String convertNumericHandstrengthToString(double handStrength) {
         String handStrengthString;
 
         if(handStrength <= 0.2) {
