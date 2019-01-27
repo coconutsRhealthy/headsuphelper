@@ -21,10 +21,10 @@ public class OpponentIdentifier2_0 {
     private double oppPostLooseness;
 
     public static double PRE_3_BET = 0.08;
-    public static double PRE_LOOSENESS = 0.7105263157894737;
-    public static double POST_RAISE = 0.125;
+    public static double PRE_LOOSENESS = 0.7142857142857143;
+    public static double POST_RAISE = 0.13043478260869565;
     public static double POST_BET = 0.35;
-    public static double POST_LOOSENESS = 0.47619047619047616;
+    public static double POST_LOOSENESS = 0.46875;
 
     public OpponentIdentifier2_0() {
         //default constructor
@@ -409,9 +409,9 @@ public class OpponentIdentifier2_0 {
 
             if(table.contains("preflop")) {
                 if(botWasButton) {
-                    st.executeUpdate("UPDATE " + table + " SET oopRaiseCount = ipRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+                    st.executeUpdate("UPDATE " + table + " SET oopRaiseCount = oopRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
                 } else {
-                    st.executeUpdate("UPDATE " + table + " SET ipRaiseCount = oopRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
+                    st.executeUpdate("UPDATE " + table + " SET ipRaiseCount = ipRaiseCount + 1 WHERE playerName = '" + opponentNick + "'");
                 }
             }
         }

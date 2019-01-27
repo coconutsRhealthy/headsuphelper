@@ -98,7 +98,7 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
-                    new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
+                    //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
                     dbSaveList = new ArrayList<>();
 
                     if(botBluffActionDone) {

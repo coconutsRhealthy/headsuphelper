@@ -5,8 +5,7 @@ import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by LennartMac on 26/01/2019.
@@ -14,6 +13,98 @@ import java.util.List;
 public class Analysis {
 
     private Connection con;
+
+    private void winAgainstOpponentTypeAnalysis() throws Exception {
+        Map<String, List<Double>> oppTypeMap = new HashMap<>();
+
+        List<String> allOpponentTypes = new ArrayList<>();
+
+        List<String> oppPre3bet = new ArrayList<>();
+        List<String> oppPreLooseness = new ArrayList<>();
+        List<String> oppPostRaise = new ArrayList<>();
+        List<String> oppPostBet = new ArrayList<>();
+        List<String> oppPostLooseness = new ArrayList<>();
+
+        oppPre3bet.add("OppPre3betLow");
+        oppPre3bet.add("OppPre3betHigh");
+
+        oppPreLooseness.add("OppPreLoosenessTight");
+        oppPreLooseness.add("OppPreLoosenessLoose");
+
+        oppPostRaise.add("OppPostRaiseLow");
+        oppPostRaise.add("OppPostRaiseHigh");
+
+        oppPostBet.add("OppPostBetLow");
+        oppPostBet.add("OppPostBetHigh");
+
+        oppPostLooseness.add("OppPostLoosenessTight");
+        oppPostLooseness.add("OppPostLoosenessLoose");
+
+        for(String a : oppPre3bet) {
+            for(String b : oppPreLooseness) {
+                for(String c : oppPostRaise) {
+                    for(String d : oppPostBet) {
+                        for(String e : oppPostLooseness) {
+                            allOpponentTypes.add(a + b + c + d + e);
+                        }
+                    }
+                }
+            }
+        }
+
+        allOpponentTypes.add("OpponentUnknown");
+
+        for(String type : allOpponentTypes) {
+            oppTypeMap.put(type, Arrays.asList(0.0, 0.0));
+        }
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
+
+        while(rs.next()) {
+            String opponentName = rs.getString("opponent_name");
+            String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(opponentName);
+            boolean botWonHand = rs.getString("bot_won_hand").equals("true");
+
+            double oldSuccessValue = oppTypeMap.get(opponentType).get(0);
+            double oldTotalValue = oppTypeMap.get(opponentType).get(1);
+
+            double newSuccessValue;
+
+            if(botWonHand) {
+                newSuccessValue = oldSuccessValue + 1.0;
+            } else {
+                newSuccessValue = oldSuccessValue;
+            }
+
+            double newTotalValue = oldTotalValue + 1.0;
+
+            List<Double> newListForType = new ArrayList<>();
+            newListForType.add(newSuccessValue);
+            newListForType.add(newTotalValue);
+
+            oppTypeMap.put(opponentType, newListForType);
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        Map<String, Double> finalMap = new HashMap<>();
+
+        for (Map.Entry<String, List<Double>> entry : oppTypeMap.entrySet()) {
+            finalMap.put(entry.getKey(), entry.getValue().get(0) / entry.getValue().get(1));
+        }
+
+        finalMap = sortByValueHighToLow(finalMap);
+
+        for (Map.Entry<String, Double> entry : finalMap.entrySet()) {
+            System.out.println(entry.getKey() + "        " + entry.getValue());
+        }
+    }
 
     private void boardWetnessBluffTestMethod() throws Exception {
         initializeDbConnection();
@@ -103,6 +194,22 @@ public class Analysis {
         }
 
         return boardCardList;
+    }
+
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o2.getValue() ).compareTo( o1.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 
     private void initializeDbConnection() throws Exception {
