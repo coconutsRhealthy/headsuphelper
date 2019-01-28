@@ -74,7 +74,7 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         close_2_0_DbConnection();
     }
 
-    private List<String> getAllBluffRoutesCompact() {
+    public List<String> getAllBluffRoutesCompact() {
         List<String> street = new ArrayList<>();
         List<String> bluffAction = new ArrayList<>();
         List<String> position = new ArrayList<>();
@@ -155,7 +155,7 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         return allRoutes;
     }
 
-    private List<String> getAllValueRoutesCompact() {
+    public List<String> getAllValueRoutesCompact() {
         List<String> street = new ArrayList<>();
         List<String> valueAction = new ArrayList<>();
         List<String> position = new ArrayList<>();
@@ -240,7 +240,7 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         return allRoutes;
     }
 
-    private List<String> getAllCallRoutesCompact() {
+    public List<String> getAllCallRoutesCompact() {
         List<String> street = new ArrayList<>();
         List<String> facingAction = new ArrayList<>();
         List<String> position = new ArrayList<>();

@@ -99,6 +99,8 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
+
+                    boolean botWasButtonInLastHand = botWasButtonInLastHand();
                     dbSaveList = new ArrayList<>();
 
                     if(botBluffActionDone) {
@@ -111,7 +113,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
                         new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlind);
-                        new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, bigBlind, botWasButtonInLastHand());
+                        new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, bigBlind, botWasButtonInLastHand);
                     }
 
                     gameVariables = new GameVariables(bigBlind, game.equals("sng"));

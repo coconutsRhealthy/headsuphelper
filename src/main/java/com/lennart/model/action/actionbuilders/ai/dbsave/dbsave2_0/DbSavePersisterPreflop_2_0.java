@@ -35,7 +35,7 @@ public class DbSavePersisterPreflop_2_0 {
         close_2_0_DbConnection();
     }
 
-    private List<String> getAllPfRaiseRoutesCompact() {
+    public List<String> getAllPfRaiseRoutesCompact() {
         List<String> handStrength = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> sizing = new ArrayList<>();
@@ -117,7 +117,7 @@ public class DbSavePersisterPreflop_2_0 {
         return allRoutes;
     }
 
-    private List<String> getAllPfCallRoutesCompact() {
+    public List<String> getAllPfCallRoutesCompact() {
         List<String> handStrength = new ArrayList<>();
         List<String> position = new ArrayList<>();
         List<String> amountToCall = new ArrayList<>();

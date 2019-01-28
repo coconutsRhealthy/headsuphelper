@@ -2,8 +2,10 @@ package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
+import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPostflop_2_0;
 
 import java.sql.*;
+import java.util.List;
 
 /**
  * Created by LennartMac on 27/01/2019.
@@ -18,6 +20,9 @@ public class DbStatsRawCallPostflopMigrator {
     }
 
     private void migrateRawDataToCallRouteCompact2_0() throws Exception {
+        clearTable();
+        initializeDb();
+
         int counter = 0;
 
         initializeDbConnection();
@@ -98,6 +103,33 @@ public class DbStatsRawCallPostflopMigrator {
         amountToCallString = new DbSavePersister().convertCallAtcToCompact(amountToCallString);
 
         return amountToCallString;
+    }
+
+    private void clearTable() throws Exception {
+        initialize_2_0_DbConnection();
+
+        Statement st = con_2_0.createStatement();
+        st.executeUpdate("DELETE FROM dbstats_call_sng_compact_2_0;");
+
+        st.close();
+
+        close_2_0_DbConnection();
+    }
+
+    private void initializeDb() throws Exception {
+        List<String> allRoutes = new DbSavePersisterPostflop_2_0().getAllCallRoutesCompact();
+
+        initialize_2_0_DbConnection();
+
+        for(String route : allRoutes) {
+            Statement st = con_2_0.createStatement();
+
+            st.executeUpdate("INSERT INTO dbstats_call_sng_compact_2_0 (route) VALUES ('" + route + "')");
+
+            st.close();
+        }
+
+        close_2_0_DbConnection();
     }
 
     private void initializeDbConnection() throws Exception {

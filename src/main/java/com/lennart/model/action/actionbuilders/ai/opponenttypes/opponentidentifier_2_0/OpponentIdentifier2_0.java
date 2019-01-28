@@ -20,11 +20,11 @@ public class OpponentIdentifier2_0 {
     private double oppPostBet;
     private double oppPostLooseness;
 
-    public static double PRE_3_BET = 0.08;
-    public static double PRE_LOOSENESS = 0.7142857142857143;
-    public static double POST_RAISE = 0.13043478260869565;
+    public static double PRE_3_BET = 0.08108108108108109;
+    public static double PRE_LOOSENESS = 0.7105263157894737;
+    public static double POST_RAISE = 0.1276595744680851;
     public static double POST_BET = 0.35;
-    public static double POST_LOOSENESS = 0.46875;
+    public static double POST_LOOSENESS = 0.46153846153846156;
 
     public OpponentIdentifier2_0() {
         //default constructor

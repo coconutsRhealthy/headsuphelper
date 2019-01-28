@@ -1,8 +1,10 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
+import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPreflop_2_0;
 
 import java.sql.*;
+import java.util.List;
 
 /**
  * Created by LennartMac on 27/01/2019.
@@ -17,6 +19,9 @@ public class DbStatsRawCallPreflopMigrator {
     }
 
     private void migrateRawDataToPreflopCallRouteCompact2_0() throws Exception {
+        clearTable();
+        initializeDb();
+
         int counter = 0;
 
         initializeDbConnection();
@@ -92,6 +97,33 @@ public class DbStatsRawCallPreflopMigrator {
         amountToCallString = sizingGroup.replace("Sizing_", "Atc_");
 
         return amountToCallString;
+    }
+
+    private void clearTable() throws Exception {
+        initialize_2_0_DbConnection();
+
+        Statement st = con_2_0.createStatement();
+        st.executeUpdate("DELETE FROM dbstats_pf_call_sng_compact_2_0;");
+
+        st.close();
+
+        close_2_0_DbConnection();
+    }
+
+    private void initializeDb() throws Exception {
+        List<String> allRoutes = new DbSavePersisterPreflop_2_0().getAllPfCallRoutesCompact();
+
+        initialize_2_0_DbConnection();
+
+        for(String route : allRoutes) {
+            Statement st = con_2_0.createStatement();
+
+            st.executeUpdate("INSERT INTO dbstats_pf_call_sng_compact_2_0 (route) VALUES ('" + route + "')");
+
+            st.close();
+        }
+
+        close_2_0_DbConnection();
     }
 
     private void initializeDbConnection() throws Exception {

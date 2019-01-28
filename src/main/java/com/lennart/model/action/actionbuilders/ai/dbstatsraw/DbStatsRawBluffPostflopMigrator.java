@@ -1,8 +1,10 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
+import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPostflop_2_0;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 
 import java.sql.*;
+import java.util.List;
 
 /**
  * Created by LennartMac on 23/01/2019.
@@ -17,6 +19,9 @@ public class DbStatsRawBluffPostflopMigrator {
     }
 
     private void migrateRawDataToBluffRouteCompact2_0() throws Exception {
+        clearTable();
+        initializeDb();
+
         int counter = 0;
 
         initializeDbConnection();
@@ -196,6 +201,33 @@ public class DbStatsRawBluffPostflopMigrator {
         }
 
         return effectiveStack;
+    }
+
+    private void clearTable() throws Exception {
+        initialize_2_0_DbConnection();
+
+        Statement st = con_2_0.createStatement();
+        st.executeUpdate("DELETE FROM dbstats_bluff_sng_compact_2_0;");
+
+        st.close();
+
+        close_2_0_DbConnection();
+    }
+
+    private void initializeDb() throws Exception {
+        List<String> allRoutes = new DbSavePersisterPostflop_2_0().getAllBluffRoutesCompact();
+
+        initialize_2_0_DbConnection();
+
+        for(String route : allRoutes) {
+            Statement st = con_2_0.createStatement();
+
+            st.executeUpdate("INSERT INTO dbstats_bluff_sng_compact_2_0 (route) VALUES ('" + route + "')");
+
+            st.close();
+        }
+
+        close_2_0_DbConnection();
     }
 
     private void initializeDbConnection() throws Exception {
