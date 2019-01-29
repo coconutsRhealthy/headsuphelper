@@ -711,11 +711,11 @@ public class MachineLearning {
                     if(actionVariables.getBotHandStrength() >= 0.7) {
                         extensiveRaiseRoute = calculateExtensiveValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                         compactRaiseRoute = calculateCompactValueBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
-                        compactRaiseRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
+                        compactRaiseRoute_2_0 = calculateCompactValueBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
                     } else {
                         extensiveRaiseRoute = calculateExtensiveBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
                         compactRaiseRoute = calculateCompactBluffBetOrRaiseRoute(actionVariables, gameVariables, "raise", sizing);
-                        compactRaiseRoute_2_0 = calculateCompactValueBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
+                        compactRaiseRoute_2_0 = calculateCompactBluffBetOrRaiseRoute_2_0(actionVariables, gameVariables, "raise", sizing);
                     }
 
                     System.out.println("##ExtensiveRoute: " + extensiveRaiseRoute);
