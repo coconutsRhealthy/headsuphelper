@@ -4,12 +4,14 @@ import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopRaise;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 
 import java.sql.*;
 
 public class MachineLearningPreflop {
 
     private Connection con;
+    private Connection con_2_0;
 
     public String adjustActionToDbSaveData(ActionVariables actionVariables, GameVariables gameVariables, double sizing) throws Exception {
         String actionToReturn = actionVariables.getAction();
@@ -210,58 +212,36 @@ public class MachineLearningPreflop {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        new MachineLearningPreflop().testMethodNew();
-    }
-
-    private void testMethodNew() throws Exception {
-        initializeDbConnection();
-
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_call_sng_compact;");
-
-        double successTotal = 0;
-        double totalTotal = 0;
-
-        int counter = 0;
-
-        while(rs.next()) {
-            String route = rs.getString("route");
-
-            if(rs.getDouble("total") >= 20) {
-                counter++;
-                double success = rs.getDouble("success");
-                double total = rs.getDouble("total");
-
-                if(success / total >= 0.47) {
-                    System.out.println(route + "     " + success + "      " + total);
-                } else {
-                    //System.out.println("x");
-                }
-
-                successTotal = successTotal + success;
-                totalTotal = totalTotal + total;
-            }
-        }
-
-        rs.close();
-        st.close();
-        closeDbConnection();
-
-        System.out.println(counter);
-//        System.out.println(totalTotal);
-//        System.out.println(successTotal / totalTotal);
-    }
-
     private String adjustCallAction(String action, GameVariables gameVariables, ActionVariables actionVariables) throws Exception {
         String actionToReturn;
 
-        String route = calculateCallRoute(gameVariables);
+        String route = calculateCallRoute_2_0(gameVariables);
 
-        initializeDbConnection();
+        actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact_2_0", true, route);
 
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_pf_call_sng_compact WHERE route = '" + route + "';");
+        if(actionToReturn == null) {
+            route = calculateCallRoute(gameVariables);
+            actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact", false, route);
+        }
+
+        return actionToReturn;
+    }
+
+    private String adjustCallActionDbLogic(String action, GameVariables gameVariables, ActionVariables actionVariables,
+                                           String table, boolean db_2_0, String route) throws Exception {
+        String actionToReturn;
+
+        Statement st;
+
+        if(db_2_0) {
+            initialize_2_0_DbConnection();
+            st = con_2_0.createStatement();
+        } else {
+            initializeDbConnection();
+            st = con.createStatement();
+        }
+
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
 
         rs.next();
 
@@ -310,13 +290,22 @@ public class MachineLearningPreflop {
             }
         } else {
             System.out.println("z1z1");
-            actionToReturn = action;
+
+            if(db_2_0) {
+                actionToReturn = null;
+            } else {
+                actionToReturn = action;
+            }
         }
 
         rs.close();
         st.close();
 
-        closeDbConnection();
+        if(db_2_0) {
+            close_2_0_DbConnection();
+        } else {
+            closeDbConnection();
+        }
 
         return actionToReturn;
     }
@@ -324,12 +313,33 @@ public class MachineLearningPreflop {
     private String adjustRaiseAction(String action, GameVariables gameVariables, ActionVariables actionVariables, double sizing) throws Exception {
         String actionToReturn;
 
-        String route = calculateRaiseRoute(gameVariables, sizing);
+        String route = calculateRaiseRoute_2_0(gameVariables, sizing);
 
-        initializeDbConnection();
+        actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact_2_0", true, route);
 
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_pf_raise_sng_compact WHERE route = '" + route + "';");
+        if(actionToReturn == null) {
+            route = calculateRaiseRoute(gameVariables, sizing);
+            actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact", false, route);
+        }
+
+        return actionToReturn;
+    }
+
+    private String adjustRaiseActionDbLogic(String action, GameVariables gameVariables, ActionVariables actionVariables,
+                                           String table, boolean db_2_0, String route) throws Exception {
+        String actionToReturn;
+
+        Statement st;
+
+        if(db_2_0) {
+            initialize_2_0_DbConnection();
+            st = con_2_0.createStatement();
+        } else {
+            initializeDbConnection();
+            st = con.createStatement();
+        }
+
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
 
         rs.next();
 
@@ -367,8 +377,22 @@ public class MachineLearningPreflop {
                 System.out.println("Preflop raise success above 0,5. Route: " + route);
             }
         } else {
-            actionToReturn = action;
+            if(db_2_0) {
+                actionToReturn = null;
+            } else {
+                actionToReturn = action;
+            }
+
             System.out.println("Less than 10 hands preflop for route: " + route);
+        }
+
+        rs.close();
+        st.close();
+
+        if(db_2_0) {
+            close_2_0_DbConnection();
+        } else {
+            closeDbConnection();
         }
 
         return actionToReturn;
@@ -396,6 +420,58 @@ public class MachineLearningPreflop {
         return route;
     }
 
+    private String calculateCallRoute_2_0(GameVariables gameVariables) throws Exception {
+        double amountToCallBb = gameVariables.getOpponentBetSize() - gameVariables.getBotBetSize();
+
+        if(amountToCallBb > gameVariables.getBotStack()) {
+            amountToCallBb = gameVariables.getBotStack();
+        }
+
+        amountToCallBb = amountToCallBb / gameVariables.getBigBlind();
+
+        DbSavePreflopCall dbSavePreflopCall = new DbSavePreflopCall();
+
+        String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
+        String position = dbSavePreflopCall.getPositionLogic(gameVariables.isBotIsButton());
+        String amountToCallGroup = dbSavePreflopCall.getAmountToCallViaLogic(amountToCallBb);
+        String effectiveStack = dbSavePreflopCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+
+        String oppPre3bet = dbSavePreflopCall.getOppPre3betLogic(opponentIdentifier2_0);
+        String oppPreLooseness = dbSavePreflopCall.getOppPreLoosenessLogic(opponentIdentifier2_0);
+        String oppPostRaise = dbSavePreflopCall.getOppPostRaiseLogic(opponentIdentifier2_0);
+        String oppPostBet = dbSavePreflopCall.getOppPostBetLogic(opponentIdentifier2_0);
+        String oppPostLooseness = dbSavePreflopCall.getOppPostLoosenessLogic(opponentIdentifier2_0);
+
+        String route = handStrength + position + amountToCallGroup + effectiveStack + oppPre3bet + oppPreLooseness +
+                oppPostRaise + oppPostBet + oppPostLooseness;
+
+        return route;
+    }
+
+    private String calculateRaiseRoute_2_0(GameVariables gameVariables, double sizing) throws Exception {
+        DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
+
+        String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
+        String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
+        String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
+        String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+
+        String oppPre3bet = dbSavePreflopRaise.getOppPre3betLogic(opponentIdentifier2_0);
+        String oppPreLooseness = dbSavePreflopRaise.getOppPreLoosenessLogic(opponentIdentifier2_0);
+        String oppPostRaise = dbSavePreflopRaise.getOppPostRaiseLogic(opponentIdentifier2_0);
+        String oppPostBet = dbSavePreflopRaise.getOppPostBetLogic(opponentIdentifier2_0);
+        String oppPostLooseness = dbSavePreflopRaise.getOppPostLoosenessLogic(opponentIdentifier2_0);
+
+        String route = handStrength + position + sizingString + effectiveStackString + oppPre3bet + oppPreLooseness +
+                oppPostRaise + oppPostBet + oppPostLooseness;
+
+        return route;
+    }
+
     private String calculateRaiseRoute(GameVariables gameVariables, double sizing) throws Exception {
         DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
 
@@ -417,5 +493,14 @@ public class MachineLearningPreflop {
 
     private void closeDbConnection() throws SQLException {
         con.close();
+    }
+
+    private void initialize_2_0_DbConnection() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con_2_0 = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker_2_0?&serverTimezone=UTC", "root", "");
+    }
+
+    private void close_2_0_DbConnection() throws SQLException {
+        con_2_0.close();
     }
 }
