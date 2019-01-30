@@ -935,6 +935,10 @@ public class MachineLearning {
         String route = street + valueAction + position + sizingGroup + handStrength + effectiveStack +
                 oppPre3bet + oppPreLooseness + oppPostRaise + oppPostBet + oppPostLooseness;
 
+        while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
+            route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
+        }
+
         return route;
     }
 
@@ -969,6 +973,10 @@ public class MachineLearning {
 
         String route = street + facingAction + position + amountToCallGroup + handStrength + strongDraw +
                 effectiveStack + oppPre3bet + oppPreLooseness + oppPostRaise + oppPostBet + oppPostLooseness;
+
+        while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
+            route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
+        }
 
         return route;
     }

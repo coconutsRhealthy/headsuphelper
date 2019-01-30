@@ -5,6 +5,7 @@ import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopRaise;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 
@@ -245,7 +246,7 @@ public class MachineLearningPreflop {
 
         rs.next();
 
-        if(rs.getDouble("total") >= 10) {
+        if(rs.getDouble("total") >= 10 && !route.contains("OpponentUnknown")) {
             System.out.println("a1a1");
             double success = rs.getDouble("success");
             double total = rs.getDouble("total");
@@ -343,7 +344,7 @@ public class MachineLearningPreflop {
 
         rs.next();
 
-        if(rs.getDouble("total") >= 10) {
+        if(rs.getDouble("total") >= 10 && !route.contains("OpponentUnknown")) {
             double success = rs.getDouble("success");
             double total = rs.getDouble("total");
 
@@ -447,6 +448,24 @@ public class MachineLearningPreflop {
         String route = handStrength + position + amountToCallGroup + effectiveStack + oppPre3bet + oppPreLooseness +
                 oppPostRaise + oppPostBet + oppPostLooseness;
 
+        while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
+            route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
+        }
+
+        return route;
+    }
+
+    private String calculateRaiseRoute(GameVariables gameVariables, double sizing) throws Exception {
+        DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
+
+        String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
+        String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
+        String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
+        String foldStatGroup = dbSavePreflopRaise.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+        String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+
+        String route = handStrength + position + sizingString + foldStatGroup + effectiveStackString;
+
         return route;
     }
 
@@ -469,19 +488,9 @@ public class MachineLearningPreflop {
         String route = handStrength + position + sizingString + effectiveStackString + oppPre3bet + oppPreLooseness +
                 oppPostRaise + oppPostBet + oppPostLooseness;
 
-        return route;
-    }
-
-    private String calculateRaiseRoute(GameVariables gameVariables, double sizing) throws Exception {
-        DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
-
-        String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
-        String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
-        String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
-        String foldStatGroup = dbSavePreflopRaise.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
-        String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
-
-        String route = handStrength + position + sizingString + foldStatGroup + effectiveStackString;
+        while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
+            route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
+        }
 
         return route;
     }
