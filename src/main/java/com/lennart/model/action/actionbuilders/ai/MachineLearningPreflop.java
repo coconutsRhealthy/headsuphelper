@@ -221,8 +221,18 @@ public class MachineLearningPreflop {
         actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact_2_0", true, route);
 
         if(actionToReturn == null) {
-            route = calculateCallRoute(gameVariables);
+            route = calculateCallRoute_1_0_extensive(gameVariables);
             actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact", false, route);
+
+            if(actionToReturn == null) {
+                route = calculateCallRoute(gameVariables);
+                actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact", false, route);
+                System.out.println("Use compact pf call db. Route: " + route);
+            } else {
+                System.out.println("Use extensive pf call db. Route: " + route);
+            }
+        } else {
+            System.out.println("Use 2_0 pf call db. Route: " + route);
         }
 
         return actionToReturn;
@@ -295,7 +305,11 @@ public class MachineLearningPreflop {
             if(db_2_0) {
                 actionToReturn = null;
             } else {
-                actionToReturn = action;
+                if(!route.contains("HS_")) {
+                    actionToReturn = null;
+                } else {
+                    actionToReturn = action;
+                }
             }
         }
 
@@ -319,8 +333,18 @@ public class MachineLearningPreflop {
         actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact_2_0", true, route);
 
         if(actionToReturn == null) {
-            route = calculateRaiseRoute(gameVariables, sizing);
+            route = calculateRaiseRoute_1_0_extensive(gameVariables, sizing);
             actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact", false, route);
+
+            if(actionToReturn == null) {
+                route = calculateRaiseRoute(gameVariables, sizing);
+                actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact", false, route);
+                System.out.println("Use compact pf raise db. Route: " + route);
+            } else {
+                System.out.println("Use extensive pf raise db. Route: " + route);
+            }
+        } else {
+            System.out.println("Use 2_0 pf raise db. Route: " + route);
         }
 
         return actionToReturn;
@@ -381,7 +405,11 @@ public class MachineLearningPreflop {
             if(db_2_0) {
                 actionToReturn = null;
             } else {
-                actionToReturn = action;
+                if(!route.contains("HS_")) {
+                    actionToReturn = null;
+                } else {
+                    actionToReturn = action;
+                }
             }
 
             System.out.println("Less than 10 hands preflop for route: " + route);
@@ -455,6 +483,28 @@ public class MachineLearningPreflop {
         return route;
     }
 
+    private String calculateCallRoute_1_0_extensive(GameVariables gameVariables) throws Exception {
+        double amountToCallBb = gameVariables.getOpponentBetSize() - gameVariables.getBotBetSize();
+
+        if(amountToCallBb > gameVariables.getBotStack()) {
+            amountToCallBb = gameVariables.getBotStack();
+        }
+
+        amountToCallBb = amountToCallBb / gameVariables.getBigBlind();
+
+        DbSavePreflopCall dbSavePreflopCall = new DbSavePreflopCall();
+
+        String combo = dbSavePreflopCall.getComboLogic(gameVariables.getBotHoleCards());
+        String position = dbSavePreflopCall.getPositionLogic(gameVariables.isBotIsButton());
+        String amountToCallGroup = dbSavePreflopCall.getAmountToCallViaLogic(amountToCallBb);
+        String oppAggroGroup = dbSavePreflopCall.getOppAggroGroupViaLogic(gameVariables.getOpponentName());
+        String effectiveStack = dbSavePreflopCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+
+        String route = combo + position + amountToCallGroup + oppAggroGroup + effectiveStack;
+
+        return route;
+    }
+
     private String calculateRaiseRoute(GameVariables gameVariables, double sizing) throws Exception {
         DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
 
@@ -491,6 +541,20 @@ public class MachineLearningPreflop {
         while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
             route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
         }
+
+        return route;
+    }
+
+    private String calculateRaiseRoute_1_0_extensive(GameVariables gameVariables, double sizing) throws Exception {
+        DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
+
+        String combo = dbSavePreflopRaise.getComboLogic(gameVariables.getBotHoleCards());
+        String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
+        String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
+        String foldStatGroup = dbSavePreflopRaise.getFoldStatGroupLogic(new FoldStatsKeeper().getFoldStatFromDb(gameVariables.getOpponentName()));
+        String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+
+        String route = combo + position + sizingString + foldStatGroup + effectiveStackString;
 
         return route;
     }
