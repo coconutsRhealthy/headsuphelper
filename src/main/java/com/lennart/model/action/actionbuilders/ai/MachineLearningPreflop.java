@@ -222,7 +222,7 @@ public class MachineLearningPreflop {
 
         if(actionToReturn == null) {
             route = calculateCallRoute_1_0_extensive(gameVariables);
-            actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact", false, route);
+            actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng", false, route);
 
             if(actionToReturn == null) {
                 route = calculateCallRoute(gameVariables);
@@ -334,7 +334,7 @@ public class MachineLearningPreflop {
 
         if(actionToReturn == null) {
             route = calculateRaiseRoute_1_0_extensive(gameVariables, sizing);
-            actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact", false, route);
+            actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng", false, route);
 
             if(actionToReturn == null) {
                 route = calculateRaiseRoute(gameVariables, sizing);
