@@ -20,10 +20,10 @@ public class OpponentIdentifier2_0 {
     private double oppPostBet;
     private double oppPostLooseness;
 
-    public static double PRE_3_BET = 0.08108108108108109;
+    public static double PRE_3_BET = 0.08;
     public static double PRE_LOOSENESS = 0.7105263157894737;
-    public static double POST_RAISE = 0.1276595744680851;
-    public static double POST_BET = 0.35;
+    public static double POST_RAISE = 0.13636363636363635;
+    public static double POST_BET = 0.35714285714285715;
     public static double POST_LOOSENESS = 0.46153846153846156;
 
     public OpponentIdentifier2_0() {
@@ -304,7 +304,7 @@ public class OpponentIdentifier2_0 {
         double oppPostLooseness;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 20) {
+        if(numberOfHands >= 14) {
             double postCallCount = opponentData.get("postCallCount");
             double postFoldCount = opponentData.get("postFoldCount");
             oppPostLooseness = postCallCount / (postCallCount + postFoldCount);
