@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 
 import java.sql.*;
@@ -196,6 +197,166 @@ public class Analysis {
         return boardCardList;
     }
 
+    private void migrateRawDbToIncludeOppPre3betPostRaiseStats() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
+
+        Statement st2 = con.createStatement();
+
+        int counter = 0;
+
+        while(rs.next()) {
+            List<Integer> entriesToUpdate = getEntriesToSetToOppDidPre3betOrPostRaiseTrue(rs.getInt("entry"));
+
+            for(Integer i : entriesToUpdate) {
+                st2.executeUpdate("UPDATE dbstats_raw SET opp_pre3bet_postraise = 'true' WHERE entry = " + i);
+            }
+
+            System.out.print(".");
+            counter++;
+
+            if(counter == 150) {
+                System.out.println();
+                counter = 0;
+                MouseKeyboard.click(20, 20);
+                MouseKeyboard.moveMouseToLocation(70, 70);
+            }
+        }
+
+        rs.close();
+        st.close();
+        st2.close();
+
+        closeDbConnection();
+    }
+
+    private List<Integer> getEntriesToSetToOppDidPre3betOrPostRaiseTrue(int handEntry) throws Exception {
+        List<Integer> entriesToUpdate = new ArrayList<>();
+        List<Integer> allEntriesOfHand = getAllEntryNumbersOfSameHand(handEntry);
+        List<Double> allEntriesOfHandAsDouble = new ArrayList<>();
+
+        for(Integer z : allEntriesOfHand) {
+            allEntriesOfHandAsDouble.add((double) z);
+        }
+
+        initializeDbConnection();
+
+        int limit = -1;
+
+        for(int i = 0; i < allEntriesOfHandAsDouble.size(); i++) {
+            int entry = allEntriesOfHandAsDouble.get(i).intValue();
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry = " + entry + ";");
+
+            rs.next();
+
+            if(rs.getString("board").equals("") && rs.getString("position").equals("Ip") && rs.getString("opponent_action").equals("raise")) {
+                limit = i;
+                break;
+            }
+
+            if(!rs.getString("board").equals("") && rs.getString("opponent_action").equals("raise")) {
+                limit = i;
+                break;
+            }
+        }
+
+        if(limit != -1) {
+            for(int y = limit; y < allEntriesOfHandAsDouble.size(); y++) {
+                entriesToUpdate.add(allEntriesOfHandAsDouble.get(y).intValue());
+            }
+        }
+
+        closeDbConnection();
+
+        return entriesToUpdate;
+    }
+
+    private boolean opponentDidPre3betOrPostRaiseInHand(int handEntry) throws Exception {
+        boolean opponentDidPre3betOrPostRaise = false;
+
+        List<Integer> allEntriesOfHand = getAllEntryNumbersOfSameHand(handEntry);
+
+        initializeDbConnection();
+
+        for(Integer i : allEntriesOfHand) {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry = " + i + ";");
+
+            rs.next();
+
+            if(rs.getString("board").equals("") && rs.getString("position").equals("Ip") && rs.getString("opponent_action").equals("raise")) {
+                opponentDidPre3betOrPostRaise = true;
+                break;
+            }
+
+            if(!rs.getString("board").equals("") && rs.getString("opponent_action").equals("raise")) {
+                opponentDidPre3betOrPostRaise = true;
+                break;
+            }
+        }
+
+        closeDbConnection();
+
+        return opponentDidPre3betOrPostRaise;
+    }
+
+    private List<Integer> getAllEntryNumbersOfSameHand(int handEntry) throws Exception {
+        List<Integer> allEntriesOfHand = new ArrayList<>();
+        allEntriesOfHand.add(handEntry);
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry = " + handEntry + ";");
+
+        rs.next();
+
+        String holeCards = rs.getString("holecards");
+
+        for(int i = 1; i < 20; i++) {
+            int newEntry = handEntry + i;
+            rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry = " + newEntry + ";");
+
+            if(rs.next()) {
+                if(rs.getString("holecards").equals(holeCards)) {
+                    allEntriesOfHand.add(newEntry);
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        for(int i = 1; i < 20; i++) {
+            int newEntry = handEntry - i;
+            rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry = " + newEntry + ";");
+
+            if(rs.next()) {
+                if(rs.getString("holecards").equals(holeCards)) {
+                    allEntriesOfHand.add(newEntry);
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        Collections.sort(allEntriesOfHand);
+
+        return allEntriesOfHand;
+    }
+
     private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
         Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
@@ -220,7 +381,4 @@ public class Analysis {
     private void closeDbConnection() throws SQLException {
         con.close();
     }
-
-
-
 }
