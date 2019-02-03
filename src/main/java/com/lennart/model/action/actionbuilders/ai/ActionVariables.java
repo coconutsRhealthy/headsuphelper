@@ -105,6 +105,41 @@ public class ActionVariables {
         ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
     }
 
+    public String getDummyAction(ContinuousTable continuousTableInput, GameVariables gameVariablesInput) throws Exception {
+        ContinuousTable continuousTableInMethod = new ContinuousTable();
+
+        continuousTableInMethod.setOpponentHasInitiative(continuousTableInput.isOpponentHasInitiative());
+        continuousTableInMethod.setPre3betOrPostRaisedPot(continuousTableInput.isPre3betOrPostRaisedPot());
+        continuousTableInMethod.setOpponentDidPreflop4betPot(continuousTableInput.isOpponentDidPreflop4betPot());
+        continuousTableInMethod.setOppDidPre3betPostRaise(continuousTableInput.isOppDidPre3betPostRaise());
+
+        GameVariables gameVariablesInMethod = new GameVariables();
+
+        gameVariablesInMethod.setOpponentStack(0);
+        gameVariablesInMethod.setOpponentBetSize(gameVariablesInput.getOpponentBetSize());
+        gameVariablesInMethod.setPot(gameVariablesInput.getPot());
+        gameVariablesInMethod.setBotBetSize(gameVariablesInput.getBotBetSize());
+        gameVariablesInMethod.setBotStack(gameVariablesInput.getBotStack());
+        gameVariablesInMethod.setBigBlind(gameVariablesInput.getBigBlind());
+        gameVariablesInMethod.setBotIsButton(gameVariablesInput.isBotIsButton());
+
+        gameVariablesInMethod.setOpponentAction(gameVariablesInput.getOpponentAction());
+        gameVariablesInMethod.setOpponentName(gameVariablesInput.getOpponentName());
+
+        gameVariablesInMethod.setFlopCard1(gameVariablesInput.getFlopCard1());
+        gameVariablesInMethod.setFlopCard2(gameVariablesInput.getFlopCard2());
+        gameVariablesInMethod.setFlopCard3(gameVariablesInput.getFlopCard3());
+        gameVariablesInMethod.setTurnCard(gameVariablesInput.getTurnCard());
+        gameVariablesInMethod.setRiverCard(gameVariablesInput.getRiverCard());
+
+        gameVariablesInMethod.setBotHoleCards(gameVariablesInput.getBotHoleCards());
+        gameVariablesInMethod.setBoard(gameVariablesInput.getBoard());
+
+        ActionVariables actionVariables = new ActionVariables(gameVariablesInMethod, continuousTableInMethod, false);
+
+        return actionVariables.getAction();
+    }
+
     public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean realGame) throws Exception {
         calculateHandStrengthAndDraws(gameVariables, continuousTable);
 
@@ -365,6 +400,12 @@ public class ActionVariables {
         if(action.equals("raise") && boardInMethod != null && boardInMethod.size() >= 3) {
             continuousTable.setPre3betOrPostRaisedPot(true);
         }
+
+        //hier de nieuwe logic
+        opp3betPostRaiseLogic(continuousTable, gameVariables);
+        RuleApplierAfterML ruleApplierAfterML = new RuleApplierAfterML();
+        action = ruleApplierAfterML.moderateBluffInOpp3betPostRaisedPost(action, botHandStrength, continuousTable, gameVariables);
+        action = ruleApplierAfterML.moderateValueBettingInOpp3betPostRaisedPot(action, botHandStrength, continuousTable, gameVariables);
 
         if(realGame) {
             //fill dbsave
@@ -965,6 +1006,28 @@ public class ActionVariables {
         }
 
         return actionToReturn;
+    }
+
+    private void opp3betPostRaiseLogic(ContinuousTable continuousTable, GameVariables gameVariables) {
+        if(!continuousTable.isOppDidPre3betPostRaise()) {
+            List<Card> board = gameVariables.getBoard();
+
+            if(board == null || board.isEmpty()) {
+                if(gameVariables.isBotIsButton()) {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        continuousTable.setOppDidPre3betPostRaise(true);
+                        System.out.println("opp did pre3bet");
+                    }
+                }
+            }
+
+            if(board != null && !board.isEmpty()) {
+                if(gameVariables.getOpponentAction().equals("raise")) {
+                    continuousTable.setOppDidPre3betPostRaise(true);
+                    System.out.println("opp did post raise");
+                }
+            }
+        }
     }
 
     public void setAction(String action) {

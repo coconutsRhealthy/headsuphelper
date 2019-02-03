@@ -39,6 +39,8 @@ public class ContinuousTable implements ContinuousTableable {
 
     private String game;
 
+    private boolean oppDidPre3betPostRaise = false;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -83,6 +85,9 @@ public class ContinuousTable implements ContinuousTableable {
                         long currentTime = new Date().getTime();
 
                         if(currentTime - startTime > 13_920_000) {
+                            new DbSavePersister().doDbSaveUpdate(this, bigBlind);
+                            new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
+                            new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                             System.out.println("3.4 hours have passed, force quit");
                             throw new RuntimeException();
                         }
@@ -91,6 +96,7 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
+                    oppDidPre3betPostRaise = false;
                     top10percentFlopCombos = new ArrayList<>();
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
@@ -434,5 +440,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setGame(String game) {
         this.game = game;
+    }
+
+    public boolean isOppDidPre3betPostRaise() {
+        return oppDidPre3betPostRaise;
+    }
+
+    public void setOppDidPre3betPostRaise(boolean oppDidPre3betPostRaise) {
+        this.oppDidPre3betPostRaise = oppDidPre3betPostRaise;
     }
 }
