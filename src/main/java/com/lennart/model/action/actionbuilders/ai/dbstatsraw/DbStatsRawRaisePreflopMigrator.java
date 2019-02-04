@@ -1,7 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPreflop_2_0;
+import com.lennart.model.card.Card;
 
 import java.sql.*;
 import java.util.List;
@@ -58,13 +59,14 @@ public class DbStatsRawRaisePreflopMigrator {
                 String botAction = rs.getString("bot_action");
 
                 if(botAction.equals("raise")) {
-                    String handStrength = new DbSavePersisterPreflop().convertNumericHandstrengthToString(rs.getDouble("handstrength"));
+                    List<Card> holeCards = new Analysis().convertCardStringToCardList(rs.getString("holecards"));
+                    String combo = new DbSave().getComboLogic(holeCards);
                     String position = rs.getString("position");
                     String sizingGroup = getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
-                    String effectiveStack = getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
+                    String effectiveStack = new DbStatsRawBluffPostflopMigrator().getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
                     String opponentStatsString = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(rs.getString("opponent_name"));
 
-                    String route = handStrength + position + sizingGroup + effectiveStack + opponentStatsString;
+                    String route = combo + position + sizingGroup + effectiveStack + opponentStatsString;
 
                     initialize_2_0_DbConnection();
                     Statement st2 = con_2_0.createStatement();

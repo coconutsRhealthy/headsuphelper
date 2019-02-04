@@ -81,11 +81,7 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         List<String> sizingGroup = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
-        List<String> oppPre3bet = new ArrayList<>();
-        List<String> oppPreLooseness = new ArrayList<>();
-        List<String> oppPostRaise = new ArrayList<>();
-        List<String> oppPostBet = new ArrayList<>();
-        List<String> oppPostLooseness = new ArrayList<>();
+        List<String> oppType = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -97,7 +93,8 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         position.add("Ip");
         position.add("Oop");
 
-        sizingGroup.add("Sizing_0-10bb");
+        sizingGroup.add("Sizing_0-5bb");
+        sizingGroup.add("Sizing_5-10bb");
         sizingGroup.add("Sizing_10-20bb");
         sizingGroup.add("Sizing_20bb_up");
 
@@ -107,20 +104,10 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
 
-        oppPre3bet.add("OppPre3betLow");
-        oppPre3bet.add("OppPre3betHigh");
-
-        oppPreLooseness.add("OppPreLoosenessTight");
-        oppPreLooseness.add("OppPreLoosenessLoose");
-
-        oppPostRaise.add("OppPostRaiseLow");
-        oppPostRaise.add("OppPostRaiseHigh");
-
-        oppPostBet.add("OppPostBetLow");
-        oppPostBet.add("OppPostBetHigh");
-
-        oppPostLooseness.add("OppPostLoosenessTight");
-        oppPostLooseness.add("OppPostLoosenessLoose");
+        oppType.add("OppTypeA");
+        oppType.add("OppTypeB");
+        oppType.add("OppTypeC");
+        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -130,19 +117,9 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
                     for(String d : sizingGroup) {
                         for(String e : strongDraw) {
                             for(String f : effectiveStack) {
-                                for(String g : oppPre3bet) {
-                                    for(String h : oppPreLooseness) {
-                                        for(String i : oppPostRaise) {
-                                            for(String j : oppPostBet) {
-                                                for(String k : oppPostLooseness) {
-                                                    allRoutes.add(a + b + c + d + e + f + g + h + i + j + k);
-                                                }
-                                            }
-                                        }
-                                    }
+                                for(String g : oppType) {
+                                    allRoutes.add(a + b + c + d + e + f + g);
                                 }
-
-                                allRoutes.add(a + b + c + d + e + f + "OpponentUnknown");
                             }
                         }
                     }
@@ -162,11 +139,7 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         List<String> sizing = new ArrayList<>();
         List<String> handStrength = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
-        List<String> oppPre3bet = new ArrayList<>();
-        List<String> oppPreLooseness = new ArrayList<>();
-        List<String> oppPostRaise = new ArrayList<>();
-        List<String> oppPostBet = new ArrayList<>();
-        List<String> oppPostLooseness = new ArrayList<>();
+        List<String> oppType = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -178,7 +151,8 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         position.add("Ip");
         position.add("Oop");
 
-        sizing.add("Sizing_0-10bb");
+        sizing.add("Sizing_0-5bb");
+        sizing.add("Sizing_5-10bb");
         sizing.add("Sizing_10-20bb");
         sizing.add("Sizing_20bb_up");
 
@@ -192,20 +166,10 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
 
-        oppPre3bet.add("OppPre3betLow");
-        oppPre3bet.add("OppPre3betHigh");
-
-        oppPreLooseness.add("OppPreLoosenessTight");
-        oppPreLooseness.add("OppPreLoosenessLoose");
-
-        oppPostRaise.add("OppPostRaiseLow");
-        oppPostRaise.add("OppPostRaiseHigh");
-
-        oppPostBet.add("OppPostBetLow");
-        oppPostBet.add("OppPostBetHigh");
-
-        oppPostLooseness.add("OppPostLoosenessTight");
-        oppPostLooseness.add("OppPostLoosenessLoose");
+        oppType.add("OppTypeA");
+        oppType.add("OppTypeB");
+        oppType.add("OppTypeC");
+        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -215,19 +179,9 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
                     for(String d : sizing) {
                         for(String e : handStrength) {
                             for(String f : effectiveStack) {
-                                for(String g : oppPre3bet) {
-                                    for(String h : oppPreLooseness) {
-                                        for(String i : oppPostRaise) {
-                                            for(String j : oppPostBet) {
-                                                for(String k : oppPostLooseness) {
-                                                    allRoutes.add(a + b + c + d + e + f + g + h + i + j + k);
-                                                }
-                                            }
-                                        }
-                                    }
+                                for(String g : oppType) {
+                                    allRoutes.add(a + b + c + d + e + f + g);
                                 }
-
-                                allRoutes.add(a + b + c + d + e + f + "OpponentUnknown");
                             }
                         }
                     }
@@ -248,11 +202,7 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         List<String> handStrength = new ArrayList<>();
         List<String> strongDraw = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
-        List<String> oppPre3bet = new ArrayList<>();
-        List<String> oppPreLooseness = new ArrayList<>();
-        List<String> oppPostRaise = new ArrayList<>();
-        List<String> oppPostBet = new ArrayList<>();
-        List<String> oppPostLooseness = new ArrayList<>();
+        List<String> oppType = new ArrayList<>();
 
         street.add("Flop");
         street.add("Turn");
@@ -282,20 +232,10 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
 
-        oppPre3bet.add("OppPre3betLow");
-        oppPre3bet.add("OppPre3betHigh");
-
-        oppPreLooseness.add("OppPreLoosenessTight");
-        oppPreLooseness.add("OppPreLoosenessLoose");
-
-        oppPostRaise.add("OppPostRaiseLow");
-        oppPostRaise.add("OppPostRaiseHigh");
-
-        oppPostBet.add("OppPostBetLow");
-        oppPostBet.add("OppPostBetHigh");
-
-        oppPostLooseness.add("OppPostLoosenessTight");
-        oppPostLooseness.add("OppPostLoosenessLoose");
+        oppType.add("OppTypeA");
+        oppType.add("OppTypeB");
+        oppType.add("OppTypeC");
+        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -306,19 +246,9 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
                         for(String e : handStrength) {
                             for(String f : strongDraw) {
                                 for(String g : effectiveStack) {
-                                    for(String h : oppPre3bet) {
-                                        for(String i : oppPreLooseness) {
-                                            for(String j : oppPostRaise) {
-                                                for(String k : oppPostBet) {
-                                                    for(String l : oppPostLooseness) {
-                                                        allRoutes.add(a + b + c + d + e + f + g + h + i + j + k + l);
-                                                    }
-                                                }
-                                            }
-                                        }
+                                    for(String h : oppType) {
+                                        allRoutes.add(a + b + c + d + e + f + g + h);
                                     }
-
-                                    allRoutes.add(a + b + c + d + e + f + g + "OpponentUnknown");
                                 }
                             }
                         }

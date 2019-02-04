@@ -413,7 +413,7 @@ public class DbSavePersisterPreflop {
         return allRoutes;
     }
 
-    private List<String> getAllHoleCardCombos() {
+    public List<String> getAllHoleCardCombos() {
         List<String> allHoleCardCombos = new ArrayList<>();
 
         List<String> values = new ArrayList<>();

@@ -129,7 +129,7 @@ public class Analysis {
                     double handStrength = rs.getDouble("handstrength");
 
                     if(handStrength < 0.7) {
-                        List<Card> boardRiver = convertBoardStringToCardList(board);
+                        List<Card> boardRiver = convertCardStringToCardList(board);
 
                         List<Card> boardTurn = new ArrayList<>();
                         boardTurn.addAll(boardRiver);
@@ -173,7 +173,7 @@ public class Analysis {
         System.out.println("total: " + total);
     }
 
-    private List<Card> convertBoardStringToCardList(String board) {
+    public List<Card> convertCardStringToCardList(String board) {
         List<Card> boardCardList = new ArrayList<>();
 
         String boardCopy = board;
@@ -189,7 +189,7 @@ public class Analysis {
 
         char[] suits = onlySuits.toCharArray();
 
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < ranks.length; i++) {
             Card card = new Card(Integer.valueOf(ranks[i]), suits[i]);
             boardCardList.add(card);
         }
