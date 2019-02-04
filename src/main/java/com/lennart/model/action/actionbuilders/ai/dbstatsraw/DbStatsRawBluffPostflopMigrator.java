@@ -46,9 +46,9 @@ public class DbStatsRawBluffPostflopMigrator {
                         String sizingGroup = getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
                         String strongDraw = rs.getString("strongdraw");
                         String effectiveStack = getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                        String opponentStatsString = getOpponentStatsString(rs.getString("opponent_name"));
+                        String opponentType = getOpponentGroup(rs.getString("opponent_name"));
 
-                        String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + opponentStatsString;
+                        String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + opponentType;
 
                         initialize_2_0_DbConnection();
                         Statement st2 = con_2_0.createStatement();
@@ -141,12 +141,12 @@ public class DbStatsRawBluffPostflopMigrator {
         return sizingGroup;
     }
 
-    public String getOpponentStatsString(String opponentName) throws Exception {
+    public String getOpponentGroup(String opponentName) throws Exception {
         String opponentStatsString;
 
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
 
-        if(opponentIdentifier2_0.getNumberOfHands() >= 20) {
+        if(opponentIdentifier2_0.getNumberOfHands() >= 14) {
             if(opponentIdentifier2_0.getOppPre3bet() < OpponentIdentifier2_0.PRE_3_BET) {
                 opponentStatsString = "OppPre3betLow";
             } else {
@@ -180,9 +180,9 @@ public class DbStatsRawBluffPostflopMigrator {
             opponentStatsString = "OpponentUnknown";
         }
 
-        opponentStatsString = getOppGroupFromOppStatString(opponentStatsString);
+        String opponentGroup = getOppGroupFromOppStatString(opponentStatsString);
 
-        return opponentStatsString;
+        return opponentGroup;
     }
 
     private String getOppGroupFromOppStatString(String oppStatString) {

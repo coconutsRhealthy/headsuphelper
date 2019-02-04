@@ -42,7 +42,7 @@ public class DbSavePreflopRaise extends DbSave {
 
     @Override
     public String getEffectiveStackLogic(double botStackBb, double opponentStackBb) {
-        String effectiveStackBbString;
+        String effectiveStack;
         double effectiveStackBb;
 
         if(botStackBb > opponentStackBb) {
@@ -51,21 +51,13 @@ public class DbSavePreflopRaise extends DbSave {
             effectiveStackBb = botStackBb;
         }
 
-        if(effectiveStackBb <= 10) {
-            effectiveStackBbString = "Effstack_0-10bb";
-        } else if(effectiveStackBb <= 30) {
-            effectiveStackBbString = "Effstack_10-30bb";
-        } else if(effectiveStackBb <= 50) {
-            effectiveStackBbString = "Effstack_30-50bb";
-        } else if(effectiveStackBb <= 75) {
-            effectiveStackBbString = "Effstack_50-75bb";
-        } else if(effectiveStackBb <= 110) {
-            effectiveStackBbString = "Effstack_75-110bb";
+        if(effectiveStackBb <= 35) {
+            effectiveStack = "EffStack_0_35_";
         } else {
-            effectiveStackBbString = "Effstack_110bb_up";
+            effectiveStack = "EffStack_35_up_";
         }
 
-        return effectiveStackBbString;
+        return effectiveStack;
     }
 
     public String getCombo() {

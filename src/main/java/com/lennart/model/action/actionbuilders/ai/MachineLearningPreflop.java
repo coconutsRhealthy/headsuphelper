@@ -3,8 +3,8 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopRaise;
+import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
@@ -464,17 +464,9 @@ public class MachineLearningPreflop {
         String position = dbSavePreflopCall.getPositionLogic(gameVariables.isBotIsButton());
         String amountToCallGroup = dbSavePreflopCall.getAmountToCallViaLogic(amountToCallBb);
         String effectiveStack = dbSavePreflopCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+        String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName());
 
-        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
-
-        String oppPre3bet = dbSavePreflopCall.getOppPre3betLogic(opponentIdentifier2_0);
-        String oppPreLooseness = dbSavePreflopCall.getOppPreLoosenessLogic(opponentIdentifier2_0);
-        String oppPostRaise = dbSavePreflopCall.getOppPostRaiseLogic(opponentIdentifier2_0);
-        String oppPostBet = dbSavePreflopCall.getOppPostBetLogic(opponentIdentifier2_0);
-        String oppPostLooseness = dbSavePreflopCall.getOppPostLoosenessLogic(opponentIdentifier2_0);
-
-        String route = handStrength + position + amountToCallGroup + effectiveStack + oppPre3bet + oppPreLooseness +
-                oppPostRaise + oppPostBet + oppPostLooseness;
+        String route = handStrength + position + amountToCallGroup + effectiveStack + opponentType;
 
         while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
             route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
@@ -522,21 +514,13 @@ public class MachineLearningPreflop {
     private String calculateRaiseRoute_2_0(GameVariables gameVariables, double sizing) throws Exception {
         DbSavePreflopRaise dbSavePreflopRaise = new DbSavePreflopRaise();
 
-        String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
+        String combo = dbSavePreflopRaise.getComboLogic(gameVariables.getBotHoleCards());
         String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
         String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
         String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+        String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName());
 
-        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
-
-        String oppPre3bet = dbSavePreflopRaise.getOppPre3betLogic(opponentIdentifier2_0);
-        String oppPreLooseness = dbSavePreflopRaise.getOppPreLoosenessLogic(opponentIdentifier2_0);
-        String oppPostRaise = dbSavePreflopRaise.getOppPostRaiseLogic(opponentIdentifier2_0);
-        String oppPostBet = dbSavePreflopRaise.getOppPostBetLogic(opponentIdentifier2_0);
-        String oppPostLooseness = dbSavePreflopRaise.getOppPostLoosenessLogic(opponentIdentifier2_0);
-
-        String route = handStrength + position + sizingString + effectiveStackString + oppPre3bet + oppPreLooseness +
-                oppPostRaise + oppPostBet + oppPostLooseness;
+        String route = combo + position + sizingString + effectiveStackString + opponentType;
 
         while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
             route = route.substring(0, route.lastIndexOf("OpponentUnknown"));

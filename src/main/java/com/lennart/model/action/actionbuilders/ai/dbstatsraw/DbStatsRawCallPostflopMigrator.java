@@ -48,10 +48,10 @@ public class DbStatsRawCallPostflopMigrator {
                     String handStrengthString = dbSaveCall.getHandStrengthLogic(rs.getDouble("handstrength"));
                     String strongDrawString = rs.getString("strongdraw");
                     String effectiveStack = dbStatsRawBluffPostflopMigrator.getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                    String opponentStatsString = dbStatsRawBluffPostflopMigrator.getOpponentStatsString(rs.getString("opponent_name"));
+                    String opponentType = dbStatsRawBluffPostflopMigrator.getOpponentGroup(rs.getString("opponent_name"));
 
                     String route = street + facingAction + position + amountToCallGroup + handStrengthString +
-                            strongDrawString + effectiveStack + opponentStatsString;
+                            strongDrawString + effectiveStack + opponentType;
 
                     initialize_2_0_DbConnection();
                     Statement st2 = con_2_0.createStatement();

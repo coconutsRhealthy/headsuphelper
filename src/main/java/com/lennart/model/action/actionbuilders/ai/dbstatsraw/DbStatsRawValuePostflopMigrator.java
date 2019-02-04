@@ -47,9 +47,9 @@ public class DbStatsRawValuePostflopMigrator {
                         String sizingGroup = dbStatsRawBluffPostflopMigrator.getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
                         String handStrengthString = new DbSaveValue().getHandStrengthLogic(handStrength);
                         String effectiveStack = dbStatsRawBluffPostflopMigrator.getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                        String opponentStatsString = dbStatsRawBluffPostflopMigrator.getOpponentStatsString(rs.getString("opponent_name"));
+                        String opponentType = dbStatsRawBluffPostflopMigrator.getOpponentGroup(rs.getString("opponent_name"));
 
-                        String route = street + valueAction + position + sizingGroup + handStrengthString + effectiveStack + opponentStatsString;
+                        String route = street + valueAction + position + sizingGroup + handStrengthString + effectiveStack + opponentType;
 
                         initialize_2_0_DbConnection();
                         Statement st2 = con_2_0.createStatement();
