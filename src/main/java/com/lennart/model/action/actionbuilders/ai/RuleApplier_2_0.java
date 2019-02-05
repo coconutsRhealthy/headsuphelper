@@ -7,6 +7,8 @@ import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPost
  */
 public class RuleApplier_2_0 {
 
+    //new method to prevent bluff raising against opp type D, unless route proves otherwise later
+
     public String moderateBluffInOpp3betPostRaisedPost(String action, double handStrength, ContinuousTable continuousTable,
                                                        GameVariables gameVariables) throws Exception {
         String actionToReturn;

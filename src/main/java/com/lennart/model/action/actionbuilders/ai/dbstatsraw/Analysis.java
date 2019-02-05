@@ -149,6 +149,37 @@ public class Analysis {
         for (Map.Entry<String, Double> entry : finalMap.entrySet()) {
             System.out.println(entry.getKey() + "        " + entry.getValue());
         }
+
+        System.out.println();
+        System.out.println();
+
+        int counter = 0;
+
+        for (Map.Entry<String, Double> entry : finalMap.entrySet()) {
+            counter++;
+
+            if(counter <= 8) {
+                System.out.println("groupAstats.add(\"" + entry.getKey() + "\");");
+            } else if(counter <= 16) {
+                if(counter == 9) {
+                    System.out.println();
+                }
+
+                System.out.println("groupBstats.add(\"" + entry.getKey() + "\");");
+            } else if(counter <= 24) {
+                if(counter == 17) {
+                    System.out.println();
+                }
+
+                System.out.println("groupCstats.add(\"" + entry.getKey() + "\");");
+            } else {
+                if(counter == 25) {
+                    System.out.println();
+                }
+
+                System.out.println("groupDstats.add(\"" + entry.getKey() + "\");");
+            }
+        }
     }
 
     private void boardWetnessBluffTestMethod() throws Exception {
