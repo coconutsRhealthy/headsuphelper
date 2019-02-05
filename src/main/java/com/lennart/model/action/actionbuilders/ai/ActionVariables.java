@@ -337,7 +337,7 @@ public class ActionVariables {
                     botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
                     botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
 
-            action = new RuleApplier_2_0().moderatePostRaiseCalls(action, gameVariables, this, effectiveStack / bigBlind, facingOdds);
+            action = new RuleApplier_2_0().moderatePostRaiseCalls(action, gameVariables, this, effectiveStack, facingOdds);
 
             //machine learning
             String actionBeforeMachineLearning = action;
@@ -354,7 +354,7 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
         } else {
-            action = new RuleApplier_2_0().moderatePre3betCalls(action, gameVariables, this, effectiveStack / gameVariables.getBigBlind());
+            action = new RuleApplier_2_0().moderatePre3betCalls(action, gameVariables, this, effectiveStack);
 
             double sizingForMachineLearning = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             action = new MachineLearningPreflop().adjustActionToDbSaveData(this, gameVariables, sizingForMachineLearning);

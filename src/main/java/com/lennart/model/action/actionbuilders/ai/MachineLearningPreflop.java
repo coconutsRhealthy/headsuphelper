@@ -517,8 +517,11 @@ public class MachineLearningPreflop {
         String combo = dbSavePreflopRaise.getComboLogic(gameVariables.getBotHoleCards());
         String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
         String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
-        String effectiveStackString = dbSavePreflopRaise.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
-        String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName());
+
+        DbStatsRawBluffPostflopMigrator dbStatsRawBluffPostflopMigrator = new DbStatsRawBluffPostflopMigrator();
+
+        String effectiveStackString = dbStatsRawBluffPostflopMigrator.getEffectiveStack(gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBigBlind());
+        String opponentType = dbStatsRawBluffPostflopMigrator.getOpponentGroup(gameVariables.getOpponentName());
 
         String route = combo + position + sizingString + effectiveStackString + opponentType;
 
