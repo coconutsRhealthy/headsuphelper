@@ -15,6 +15,50 @@ public class Analysis {
 
     private Connection con;
 
+    private TreeMap<String, Integer> getOpponentTypesForDate(String date) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
+
+        Set<String> opponents = new HashSet<>();
+
+        while(rs.next()) {
+            if(rs.getString("date").contains(date)) {
+                opponents.add(rs.getString("opponent_name"));
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        List<String> opponentsAsList = new ArrayList<>();
+        opponentsAsList.addAll(opponents);
+
+        List<String> opponentTypes = new ArrayList<>();
+
+        TreeMap<String, Integer> frequencyMap = new TreeMap<>();
+
+        for(String opponent : opponentsAsList) {
+            try {
+                String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(opponent);
+                opponentTypes.add(opponentType);
+            } catch (Exception e) {
+                System.out.println("opponent not found: " + opponent);
+            }
+        }
+
+        Collections.sort(opponentTypes);
+
+        for(String type : opponentTypes) {
+            frequencyMap.put(type, Collections.frequency(opponentTypes, type));
+        }
+
+        return frequencyMap;
+    }
+
     private void winAgainstOpponentTypeAnalysis() throws Exception {
         Map<String, List<Double>> oppTypeMap = new HashMap<>();
 
