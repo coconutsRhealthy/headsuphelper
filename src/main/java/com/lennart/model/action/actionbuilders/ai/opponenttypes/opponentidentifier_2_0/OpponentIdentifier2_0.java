@@ -21,7 +21,7 @@ public class OpponentIdentifier2_0 {
     private double oppPostLooseness;
 
     public static double PRE_3_BET = 0.08;
-    public static double PRE_LOOSENESS = 0.7021276595744681;
+    public static double PRE_LOOSENESS = 0.7096774193548387;
     public static double POST_RAISE = 0.13333333333333333;
     public static double POST_BET = 0.34782608695652173;
     public static double POST_LOOSENESS = 0.5;
@@ -129,15 +129,15 @@ public class OpponentIdentifier2_0 {
     public static void main(String[] args) throws Exception {
         new OpponentIdentifier2_0().printStatsBoundries();
 
-        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0("dukeRH888");
-
-        System.out.println();
-
-        System.out.println("3bet: " + opponentIdentifier2_0.getOppPre3bet());
-        System.out.println("preLooseness: " + opponentIdentifier2_0.getOppPreLooseness());
-        System.out.println("oppPostRaise: " + opponentIdentifier2_0.getOppPostRaise());
-        System.out.println("oppPostBet: " + opponentIdentifier2_0.getOppPostBet());
-        System.out.println("oppPostLooseness: " + opponentIdentifier2_0.getOppPostLooseness());
+//        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0("dukeRH888");
+//
+//        System.out.println();
+//
+//        System.out.println("3bet: " + opponentIdentifier2_0.getOppPre3bet());
+//        System.out.println("preLooseness: " + opponentIdentifier2_0.getOppPreLooseness());
+//        System.out.println("oppPostRaise: " + opponentIdentifier2_0.getOppPostRaise());
+//        System.out.println("oppPostBet: " + opponentIdentifier2_0.getOppPostBet());
+//        System.out.println("oppPostLooseness: " + opponentIdentifier2_0.getOppPostLooseness());
     }
 
     private void printStatsBoundries() throws Exception {
