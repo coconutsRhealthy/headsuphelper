@@ -80,6 +80,54 @@ public class RuleApplier_2_0 {
         return actionToReturn;
     }
 
+    public String betWithInitiativeOnWetBoardTurnAndRiver(String action, ContinuousTable continuousTable, List<Card> board,
+                                                          double sizing, double facingBetSize, double facingStackSize, double pot,
+                                                          double ownStackSize, double ownBetSize, boolean botHasInitiative) {
+        String actionToReturn;
+
+        if(action.equals("check")) {
+            if(botHasInitiative) {
+                if(board != null && (board.size() == 4 || board.size() == 5)) {
+                    if(bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot, ownStackSize, board, ownBetSize)) {
+                        int boardWetness;
+
+                        if(board.size() == 4) {
+                            boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentFlopCombos(), continuousTable.getTop10percentTurnCombos());
+                        } else {
+                            boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(), continuousTable.getTop10percentRiverCombos());
+                        }
+
+                        String boardWetnessGroup = new DbSaveBluff_2_0().getBoardWetnessGroupLogic(board, boardWetness);
+
+                        if(boardWetnessGroup.equals("wet")) {
+                            double random = Math.random();
+
+                            if(random < 0.8) {
+                                actionToReturn = "bet";
+                                System.out.println("Changed action to bet in betWithInitiativeOnWetBoardTurnAndRiver()");
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("zzz in betWithInitiativeOnWetBoardTurnAndRiver()");
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else{
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
                                    double ownStackSize, List<Card> board, double ownBetSize) {
         return new MachineLearning().bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot, ownStackSize, board, ownBetSize);

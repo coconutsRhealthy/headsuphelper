@@ -42,6 +42,8 @@ public class ContinuousTable implements ContinuousTableable {
 
     private boolean oppDidPre3betPostRaise = false;
 
+    private boolean botHasInitiative = false;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -450,5 +452,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setOppDidPre3betPostRaise(boolean oppDidPre3betPostRaise) {
         this.oppDidPre3betPostRaise = oppDidPre3betPostRaise;
+    }
+
+    public boolean isBotHasInitiative() {
+        return botHasInitiative;
+    }
+
+    public void setBotHasInitiative(boolean botHasInitiative) {
+        this.botHasInitiative = botHasInitiative;
     }
 }
