@@ -23,7 +23,7 @@ public class MachineLearningPreflop {
             actionToReturn = adjustRaiseAction(actionVariables.getAction(), gameVariables, actionVariables, sizing);
         }
 
-        doMachineLearningLogging(actionToReturn, gameVariables, sizing);
+        //doMachineLearningLogging(actionToReturn, gameVariables, sizing);
 
         return actionToReturn;
     }
@@ -221,16 +221,19 @@ public class MachineLearningPreflop {
         actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact_2_0", true, route);
 
         if(actionToReturn == null) {
-            route = calculateCallRoute_1_0_extensive(gameVariables);
-            actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng", false, route);
+            actionToReturn = action;
+            System.out.println("pf machinelearning 2_0 call data too small for route: " + route);
 
-            if(actionToReturn == null) {
-                route = calculateCallRoute(gameVariables);
-                actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact", false, route);
-                System.out.println("Use compact pf call db. Route: " + route);
-            } else {
-                System.out.println("Use extensive pf call db. Route: " + route);
-            }
+//            route = calculateCallRoute_1_0_extensive(gameVariables);
+//            actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng", false, route);
+//
+//            if(actionToReturn == null) {
+//                route = calculateCallRoute(gameVariables);
+//                actionToReturn = adjustCallActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_call_sng_compact", false, route);
+//                System.out.println("Use compact pf call db. Route: " + route);
+//            } else {
+//                System.out.println("Use extensive pf call db. Route: " + route);
+//            }
         } else {
             System.out.println("Use 2_0 pf call db. Route: " + route);
         }
@@ -256,7 +259,7 @@ public class MachineLearningPreflop {
 
         rs.next();
 
-        if(rs.getDouble("total") >= 10 && !route.contains("OpponentUnknown")) {
+        if(rs.getDouble("total") >= 13) {
             System.out.println("a1a1");
             double success = rs.getDouble("success");
             double total = rs.getDouble("total");
@@ -333,16 +336,19 @@ public class MachineLearningPreflop {
         actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact_2_0", true, route);
 
         if(actionToReturn == null) {
-            route = calculateRaiseRoute_1_0_extensive(gameVariables, sizing);
-            actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng", false, route);
+            actionToReturn = action;
+            System.out.println("pf machinelearning 2_0 raise data too small for route: " + route);
 
-            if(actionToReturn == null) {
-                route = calculateRaiseRoute(gameVariables, sizing);
-                actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact", false, route);
-                System.out.println("Use compact pf raise db. Route: " + route);
-            } else {
-                System.out.println("Use extensive pf raise db. Route: " + route);
-            }
+//            route = calculateRaiseRoute_1_0_extensive(gameVariables, sizing);
+//            actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng", false, route);
+//
+//            if(actionToReturn == null) {
+//                route = calculateRaiseRoute(gameVariables, sizing);
+//                actionToReturn = adjustRaiseActionDbLogic(action, gameVariables, actionVariables, "dbstats_pf_raise_sng_compact", false, route);
+//                System.out.println("Use compact pf raise db. Route: " + route);
+//            } else {
+//                System.out.println("Use extensive pf raise db. Route: " + route);
+//            }
         } else {
             System.out.println("Use 2_0 pf raise db. Route: " + route);
         }
@@ -368,7 +374,7 @@ public class MachineLearningPreflop {
 
         rs.next();
 
-        if(rs.getDouble("total") >= 10 && !route.contains("OpponentUnknown")) {
+        if(rs.getDouble("total") >= 13) {
             double success = rs.getDouble("success");
             double total = rs.getDouble("total");
 

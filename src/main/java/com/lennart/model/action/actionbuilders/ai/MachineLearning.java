@@ -42,7 +42,7 @@ public class MachineLearning {
 
         actionToReturn = doPilotFloating(actionToReturn, actionVariables, gameVariables);
 
-        doMachineLearningLogging(actionToReturn, actionVariables, gameVariables, sizing);
+        //doMachineLearningLogging(actionToReturn, actionVariables, gameVariables, sizing);
 
         return actionToReturn;
     }
@@ -791,7 +791,7 @@ public class MachineLearning {
                                        double handStrength, String compactRoute_2_0) throws Exception {
         List<Double> valuesToReturn = new ArrayList<>();
 
-        if(compactRoute_2_0 != null && !compactRoute_2_0.contains("OpponentUnknown")) {
+        if(compactRoute_2_0 != null) {
             String table_2_0 = getTable_2_0(actionToConsider, handStrength);
 
             initialize_2_0_DbConnection();
@@ -816,54 +816,59 @@ public class MachineLearning {
         }
 
         if(valuesToReturn.isEmpty()) {
-            initializeDbConnection();
+            double successNumber = 0;
+            double totalNumber = 0;
 
-            String table = getTable(actionToConsider, handStrength, "sng", false);
+            System.out.println("postflop machinelearning 2_0 data too small for route: " + compactRoute_2_0);
 
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + extensiveRoute + "';");
-
-            rs.next();
-
-            double successNumber;
-            double totalNumber;
-
-            if(rs.getDouble("total") < 20) {
-                table = getTable(actionToConsider, handStrength, "sng", true);
-
-                Statement st2 = con.createStatement();
-                ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + compactRoute + "';");
-
-                rs2.next();
-
-                if(rs2.getDouble("total") < 20) {
-                    //System.out.println("insufficient data for MachineLearning. Route: " + compactRoute + " Total: " + rs2.getDouble("total"));
-
-                    successNumber = rs2.getDouble("success");
-                    totalNumber = rs2.getDouble("total");
-                } else {
-                    System.out.println("compact sng machine learning data used for route: " + compactRoute);
-
-                    successNumber = rs2.getDouble("success");
-                    totalNumber = rs2.getDouble("total");
-                }
-
-                rs2.close();
-                st2.close();
-            } else {
-                System.out.println("extensive sng machine learning data used for route: " + extensiveRoute);
-
-                successNumber = rs.getDouble("success");
-                totalNumber = rs.getDouble("total");
-            }
+//            initializeDbConnection();
+//
+//            String table = getTable(actionToConsider, handStrength, "sng", false);
+//
+//            Statement st = con.createStatement();
+//            ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE route = '" + extensiveRoute + "';");
+//
+//            rs.next();
+//
+//            double successNumber;
+//            double totalNumber;
+//
+//            if(rs.getDouble("total") < 20) {
+//                table = getTable(actionToConsider, handStrength, "sng", true);
+//
+//                Statement st2 = con.createStatement();
+//                ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + compactRoute + "';");
+//
+//                rs2.next();
+//
+//                if(rs2.getDouble("total") < 20) {
+//                    //System.out.println("insufficient data for MachineLearning. Route: " + compactRoute + " Total: " + rs2.getDouble("total"));
+//
+//                    successNumber = rs2.getDouble("success");
+//                    totalNumber = rs2.getDouble("total");
+//                } else {
+//                    System.out.println("compact sng machine learning data used for route: " + compactRoute);
+//
+//                    successNumber = rs2.getDouble("success");
+//                    totalNumber = rs2.getDouble("total");
+//                }
+//
+//                rs2.close();
+//                st2.close();
+//            } else {
+//                System.out.println("extensive sng machine learning data used for route: " + extensiveRoute);
+//
+//                successNumber = rs.getDouble("success");
+//                totalNumber = rs.getDouble("total");
+//            }
 
             valuesToReturn.add(successNumber);
             valuesToReturn.add(totalNumber);
 
-            rs.close();
-            st.close();
-
-            closeDbConnection();
+//            rs.close();
+//            st.close();
+//
+//            closeDbConnection();
         }
 
         return valuesToReturn;
