@@ -110,7 +110,7 @@ public class Analysis {
 
         while(rs.next()) {
             String opponentName = rs.getString("opponent_name");
-            String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(opponentName);
+            String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(opponentName);
             boolean botWonHand = rs.getString("bot_won_hand").equals("true");
 
             double oldSuccessValue = oppTypeMap.get(opponentType).get(0);

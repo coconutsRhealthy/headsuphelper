@@ -142,6 +142,12 @@ public class DbStatsRawBluffPostflopMigrator {
     }
 
     public String getOpponentGroup(String opponentName) throws Exception {
+        String opponentStatsString = getOpponentStatsString(opponentName);
+        String opponentGroup = getOppGroupFromOppStatString(opponentStatsString);
+        return opponentGroup;
+    }
+
+    public String getOpponentStatsString(String opponentName) throws Exception {
         String opponentStatsString;
 
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
@@ -180,9 +186,7 @@ public class DbStatsRawBluffPostflopMigrator {
             opponentStatsString = "OpponentUnknown";
         }
 
-        String opponentGroup = getOppGroupFromOppStatString(opponentStatsString);
-
-        return opponentGroup;
+        return opponentStatsString;
     }
 
     private String getOppGroupFromOppStatString(String oppStatString) {
