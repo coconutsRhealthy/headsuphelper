@@ -337,8 +337,6 @@ public class ActionVariables {
                     botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
                     botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
 
-            action = new RuleApplier_2_0().moderatePostRaiseCalls(action, gameVariables, this, effectiveStack, facingOdds);
-
             //machine learning
             String actionBeforeMachineLearning = action;
 
@@ -354,8 +352,6 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
         } else {
-            action = new RuleApplier_2_0().moderatePre3betCalls(action, gameVariables, this, effectiveStack);
-
             double sizingForMachineLearning = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             action = new MachineLearningPreflop().adjustActionToDbSaveData(this, gameVariables, sizingForMachineLearning);
         }
@@ -404,12 +400,6 @@ public class ActionVariables {
         if(action.equals("raise") && boardInMethod != null && boardInMethod.size() >= 3) {
             continuousTable.setPre3betOrPostRaisedPot(true);
         }
-
-        //hier de nieuwe logic
-        opp3betPostRaiseLogic(continuousTable, gameVariables);
-        RuleApplier_2_0 ruleApplier2_0 = new RuleApplier_2_0();
-        action = ruleApplier2_0.moderateBluffInOpp3betPostRaisedPost(action, botHandStrength, continuousTable, gameVariables);
-        action = ruleApplier2_0.moderateValueBettingInOpp3betPostRaisedPot(action, botHandStrength, continuousTable, gameVariables);
 
         if(realGame) {
             //fill dbsave
