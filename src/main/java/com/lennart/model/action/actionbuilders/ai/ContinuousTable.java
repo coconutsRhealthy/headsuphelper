@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPostflop_2_0;
+import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.botgame.MouseKeyboard;
@@ -149,6 +150,7 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Sizing: " + sizing);
                 System.out.println("Route: " + actionVariables.getRoute());
                 System.out.println("Table: " + actionVariables.getTable());
+                System.out.println("OppType: " + new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName()));
                 System.out.println("********************");
                 System.out.println();
 
