@@ -941,14 +941,10 @@ public class ActionVariables {
         if(action.equals("call")) {
             if(board == null || board.size() < 5) {
                 if(opponentStackBb > 0) {
-                    System.out.println("abc-- opponentStackBb" + opponentStackBb);
                     double botStackBbAfterCall = botStackBb - amountToCallBb;
-                    System.out.println("abc-- amountToCallBb" + amountToCallBb);
-                    System.out.println("abc-- botStackBb" + botStackBb);
-                    System.out.println("abc-- botStackBbAfterCall" + botStackBbAfterCall);
+
                     if(botStackBbAfterCall > 0) {
                         double potSizeBbAfterCall = potSizeBb + (2 * botTotalBetSizeBb) + (2 * amountToCallBb);
-                        System.out.println("abc-- potSizeBbAfterCall" + potSizeBbAfterCall);
 
                         if((botStackBbAfterCall / potSizeBbAfterCall < 0.5) || (opponentStackBb / potSizeBbAfterCall < 0.5)) {
                             actionToReturn = "raise";
