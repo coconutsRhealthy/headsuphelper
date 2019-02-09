@@ -128,6 +128,104 @@ public class RuleApplier_2_0 {
         return actionToReturn;
     }
 
+    public String aggro3betPreOopShortStacked(String action, boolean position, double effectiveStackBb, String opponentAction,
+                                               double handStrength, List<Card> board, String opponentName, double botTotalBetSize,
+                                               double bigBlind, double opponentStack) throws Exception {
+        String actionToReturn;
+
+        if(!action.equals("raise")) {
+            if(board == null || board.isEmpty()) {
+                if(effectiveStackBb <= 30) {
+                    if(!position) {
+                        if(opponentAction.equals("raise")) {
+                            if(opponentStack > 0) {
+                                if(botTotalBetSize == bigBlind) {
+                                    if(handStrength >= 0.7) {
+                                        String opponentStatsString = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(opponentName);
+
+                                        if(opponentStatsString.contains("OppPreLoosenessTight")) {
+                                            actionToReturn = "raise";
+                                            System.out.println("aggro3betPreOopShortStacked() changed to raise");
+                                        } else {
+                                            actionToReturn = action;
+                                        }
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String callLightPre3betsAgainstAggroShoves(String action, boolean position, String opponentAction,
+                                                      double handStrength, List<Card> board, String opponentName, double botTotalBetSize,
+                                                      double bigBlind, double opponentStack, double opponentTotalBetsize) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("fold")) {
+            if(board == null || board.isEmpty()) {
+                if(position) {
+                    if(opponentAction.equals("raise")) {
+                        if(opponentStack == 0) {
+                            if(botTotalBetSize < 2.7 * bigBlind) {
+                                if(opponentTotalBetsize / bigBlind <= 30) {
+                                    if(handStrength >= 0.7) {
+                                        String opponentStatsString = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(opponentName);
+
+                                        if(opponentStatsString.contains("OppPre3betHigh")) {
+                                            actionToReturn = "call";
+                                            System.out.println("callLightPre3betsAgainstAggroShoves() changed to call");
+                                        } else {
+                                            actionToReturn = action;
+                                        }
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
     private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
                                    double ownStackSize, List<Card> board, double ownBetSize) {
         return new MachineLearning().bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot, ownStackSize, board, ownBetSize);

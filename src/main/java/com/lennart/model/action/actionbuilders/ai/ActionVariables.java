@@ -404,6 +404,20 @@ public class ActionVariables {
                 sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
                 gameVariables.getBotStack(), gameVariables.getBotBetSize(), continuousTable.isBotHasInitiative());
 
+        action = ruleApplier_2_0.callLightPre3betsAgainstAggroShoves(action, botIsButtonInMethod, gameVariables.getOpponentAction(),
+                botHandStrength, boardInMethod, gameVariables.getOpponentName(), gameVariables.getBotBetSize(), gameVariables.getBigBlind(),
+                gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize());
+
+        String actionBeforeAggroPreOopShortStacked = action;
+
+        action = ruleApplier_2_0.aggro3betPreOopShortStacked(action, botIsButtonInMethod, effectiveStack, gameVariables.getOpponentAction(),
+                botHandStrength, boardInMethod, gameVariables.getOpponentName(), gameVariables.getBotBetSize(),
+                gameVariables.getBigBlind(), gameVariables.getOpponentStack());
+
+        if(!action.equals(actionBeforeAggroPreOopShortStacked)) {
+            sizing = 5000 * gameVariables.getBigBlind();
+        }
+
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
         }
