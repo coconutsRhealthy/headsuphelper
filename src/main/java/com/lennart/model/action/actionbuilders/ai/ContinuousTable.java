@@ -1,7 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
-import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPostflop_2_0;
 import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
@@ -39,10 +38,6 @@ public class ContinuousTable implements ContinuousTableable {
     private double bigBlind;
 
     private String game;
-
-    private boolean oppDidPre3betPostRaise = false;
-
-    private boolean botHasInitiative = false;
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -99,7 +94,6 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println("is new hand");
                     opponentDidPreflop4betPot = false;
                     pre3betOrPostRaisedPot = false;
-                    oppDidPre3betPostRaise = false;
                     top10percentFlopCombos = new ArrayList<>();
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
@@ -444,21 +438,5 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setGame(String game) {
         this.game = game;
-    }
-
-    public boolean isOppDidPre3betPostRaise() {
-        return oppDidPre3betPostRaise;
-    }
-
-    public void setOppDidPre3betPostRaise(boolean oppDidPre3betPostRaise) {
-        this.oppDidPre3betPostRaise = oppDidPre3betPostRaise;
-    }
-
-    public boolean isBotHasInitiative() {
-        return botHasInitiative;
-    }
-
-    public void setBotHasInitiative(boolean botHasInitiative) {
-        this.botHasInitiative = botHasInitiative;
     }
 }

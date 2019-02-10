@@ -111,7 +111,6 @@ public class ActionVariables {
         continuousTableInMethod.setOpponentHasInitiative(continuousTableInput.isOpponentHasInitiative());
         continuousTableInMethod.setPre3betOrPostRaisedPot(continuousTableInput.isPre3betOrPostRaisedPot());
         continuousTableInMethod.setOpponentDidPreflop4betPot(continuousTableInput.isOpponentDidPreflop4betPot());
-        continuousTableInMethod.setOppDidPre3betPostRaise(continuousTableInput.isOppDidPre3betPostRaise());
 
         GameVariables gameVariablesInMethod = new GameVariables();
 
@@ -162,7 +161,6 @@ public class ActionVariables {
 
         if(realGame) {
             setOpponentHasInitiative(opponentActionInMethod, continuousTable, gameVariables);
-            setBotHasInitiativeBeforeBotAction(opponentActionInMethod, continuousTable);
         }
 
         setOpponentDidPostflopFlopOrTurnRaiseOrOverbet(opponentActionInMethod, boardInMethod, continuousTable, opponentBetsizeBb, potSizeBb);
@@ -394,40 +392,12 @@ public class ActionVariables {
         action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
                 amountToCallBb, gameVariables.getBigBlind());
 
-        RuleApplier_2_0 ruleApplier_2_0 = new RuleApplier_2_0();
-        action = ruleApplier_2_0.raisePostflopAgainstAggroOpps(action, gameVariables.getOpponentName(), continuousTable,
-                gameVariables.getBoard(), sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(),
-                gameVariables.getPot(), gameVariables.getBotStack(), gameVariables.getBotBetSize(), gameVariables.getOpponentAction(),
-                boardEvaluator);
-
-        action = ruleApplier_2_0.betWithInitiativeOnWetBoardTurnAndRiver(action, continuousTable, gameVariables.getBoard(),
-                sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
-                gameVariables.getBotStack(), gameVariables.getBotBetSize(), continuousTable.isBotHasInitiative());
-
-        action = ruleApplier_2_0.callLightPre3betsAgainstAggroShoves(action, botIsButtonInMethod, gameVariables.getOpponentAction(),
-                botHandStrength, boardInMethod, gameVariables.getOpponentName(), gameVariables.getBotBetSize(), gameVariables.getBigBlind(),
-                gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize());
-
-        String actionBeforeAggroPreOopShortStacked = action;
-
-        action = ruleApplier_2_0.aggro3betPreOopShortStacked(action, botIsButtonInMethod, effectiveStack, gameVariables.getOpponentAction(),
-                botHandStrength, boardInMethod, gameVariables.getOpponentName(), gameVariables.getBotBetSize(),
-                gameVariables.getBigBlind(), gameVariables.getOpponentStack());
-
-        if(!action.equals(actionBeforeAggroPreOopShortStacked)) {
-            sizing = 5000 * gameVariables.getBigBlind();
-        }
-
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
         }
 
         if(action.equals("raise") && boardInMethod != null && boardInMethod.size() >= 3) {
             continuousTable.setPre3betOrPostRaisedPot(true);
-        }
-
-        if(realGame) {
-            setBotHasInitiativeAfterBotAction(action, continuousTable);
         }
 
         if(realGame) {
@@ -682,20 +652,6 @@ public class ActionVariables {
                     }
                 }
             }
-        }
-    }
-
-    private void setBotHasInitiativeBeforeBotAction(String opponentAction, ContinuousTable continuousTable) {
-        if(opponentAction.equals("bet75pct") || opponentAction.equals("raise")) {
-            continuousTable.setBotHasInitiative(false);
-        }
-    }
-
-    private void setBotHasInitiativeAfterBotAction(String action, ContinuousTable continuousTable) {
-        if(action.equals("bet75pct") || action.equals("raise")) {
-            continuousTable.setBotHasInitiative(true);
-        } else {
-            continuousTable.setBotHasInitiative(false);
         }
     }
 
@@ -1039,28 +995,6 @@ public class ActionVariables {
         }
 
         return actionToReturn;
-    }
-
-    private void opp3betPostRaiseLogic(ContinuousTable continuousTable, GameVariables gameVariables) {
-        if(!continuousTable.isOppDidPre3betPostRaise()) {
-            List<Card> board = gameVariables.getBoard();
-
-            if(board == null || board.isEmpty()) {
-                if(gameVariables.isBotIsButton()) {
-                    if(gameVariables.getOpponentAction().equals("raise")) {
-                        continuousTable.setOppDidPre3betPostRaise(true);
-                        System.out.println("opp did pre3bet");
-                    }
-                }
-            }
-
-            if(board != null && !board.isEmpty()) {
-                if(gameVariables.getOpponentAction().equals("raise")) {
-                    continuousTable.setOppDidPre3betPostRaise(true);
-                    System.out.println("opp did post raise");
-                }
-            }
-        }
     }
 
     public void setAction(String action) {
