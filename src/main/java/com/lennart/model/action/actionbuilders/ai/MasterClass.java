@@ -1,0 +1,358 @@
+package com.lennart.model.action.actionbuilders.ai;
+
+/**
+ * Created by LennartMac on 09/02/2019.
+ */
+public class MasterClass {
+
+    public String adjustToOppPre3betStat(String action, double handStrength, String oppStatsString, GameVariables gameVariables) {
+        String actionToReturn;
+
+        if(oppStatsString.contains("OppPre3betHigh")) {
+            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                if(gameVariables.isBotIsButton()) {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        if(gameVariables.getOpponentBetSize() / gameVariables.getBigBlind() <= 11 ||
+                                (gameVariables.getOpponentStack() == 0 &&
+                                        (gameVariables.getOpponentBetSize() / gameVariables.getBigBlind() < 30))) {
+                            if(action.equals("fold")) {
+                                if(handStrength > 0.9 && gameVariables.getOpponentStack() != 0) {
+                                    double random = Math.random();
+
+                                    if(random > 0.1) {
+                                        actionToReturn  = "raise";
+                                        System.out.println("MasterClass set action to raise in adjustToOppPre3betStat(). A");
+                                    } else {
+                                        actionToReturn = "call";
+                                        System.out.println("MasterClass set action to call in adjustToOppPre3betStat(). B");
+                                    }
+                                } else if(handStrength >= 0.70) {
+                                    actionToReturn = "call";
+                                    System.out.println("MasterClass set action to call in adjustToOppPre3betStat(). C");
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else if(action.equals("call")) {
+                                if(handStrength > 0.9 && gameVariables.getOpponentStack() != 0) {
+                                    double random = Math.random();
+
+                                    if(random > 0.1) {
+                                        actionToReturn = "raise";
+                                        System.out.println("MasterClass set action to raise in adjustToOppPre3betStat(). D");
+                                    } else {
+                                        actionToReturn = "call";
+                                        System.out.println("MasterClass set action to call in adjustToOppPre3betStat(). E");
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else if(oppStatsString.contains("OppPre3betLow")) {
+            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                if(gameVariables.isBotIsButton()) {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        if(action.equals("call")) {
+                            if (handStrength < 0.87) {
+                                actionToReturn = "fold";
+                                System.out.println("MasterClass set action to fold in adjustToOppPre3betStat(). F");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String adjustToOppPreLooseness(String action, double handStrength, String oppStatsString,
+                                           GameVariables gameVariables, boolean oppUnknown) {
+        String actionToReturn;
+
+        if(oppStatsString.contains("OppPreLoosenessTight") && !oppUnknown) {
+            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                if(!gameVariables.isBotIsButton()) {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        if(gameVariables.getOpponentStack() != 0) {
+                            if(gameVariables.getBotBetSize() == gameVariables.getBigBlind()) {
+                                if(!action.equals("raise")) {
+                                    if(handStrength >= 0.7) {
+                                        actionToReturn = "raise";
+                                        System.out.println("MasterClass set action to raise in adjustToOppPreLooseness(). G");
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String adjustToOppPostRaise(String action, double handStrength, String oppStatsString,
+                                        GameVariables gameVariables, double facingOdds) {
+        String actionToReturn;
+
+        if(oppStatsString.contains("OppPostRaiseHigh")) {
+            if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                if(gameVariables.getOpponentAction().equals("raise")) {
+                    if(action.equals("fold")) {
+                        if(handStrength >= 0.75) {
+                            actionToReturn = "call";
+                            System.out.println("MasterClass set action to call in adjustToOppPostRaise(). H");
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else if(oppStatsString.contains("OppPostRaiseLow")) {
+            if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                if(gameVariables.getOpponentAction().equals("raise")) {
+                    if(action.equals("call")) {
+                        if(facingOdds > (1.0 / 6.0)) {
+                            if(handStrength < 0.9) {
+                                actionToReturn = "fold";
+                                System.out.println("MasterClass set action to fold in adjustToOppPostRaise(). I");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String adjustToOppPostBet(String action, double handStrength, String oppStatsString,
+                                      GameVariables gameVariables, double facingOdds, ContinuousTable continuousTable) throws Exception {
+        String actionToReturn;
+
+        if(oppStatsString.contains("OppPostBetHigh")) {
+            if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                if(gameVariables.getOpponentAction().equals("bet75pct")) {
+                    if(action.equals("fold")) {
+                        if(handStrength >= 0.72) {
+                            actionToReturn = "call";
+                            System.out.println("MasterClass set action to call in adjustToOppPostBet(). J");
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else if(oppStatsString.contains("OppPostBetLow")) {
+            if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                if(gameVariables.getOpponentAction().equals("bet75pct")) {
+                    if(action.equals("call")) {
+                        if(facingOdds > (1.0 / 6.0)) {
+                            if(handStrength < 0.83) {
+                                actionToReturn = "fold";
+                                System.out.println("MasterClass set action to fold in adjustToOppPostBet(). K");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else if(action.equals("raise")) {
+                        if(handStrength >= 0.95) {
+                            actionToReturn = action;
+                        } else {
+                            actionToReturn = new ActionVariables().getDummyAction(continuousTable, gameVariables);
+                            System.out.println("MasterClass set action from raise to call or fold in adjustToOppPostBet(). L");
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String adjustToOppPostLooseness(String action, double handStrength, String oppStatsString,
+                                            GameVariables gameVariables, ContinuousTable continuousTable) throws Exception {
+        String actionToReturn;
+
+        if(oppStatsString.contains("OppPostLoosenessLoose")) {
+            if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                if(action.equals("bet75pct")) {
+                    if(handStrength < 0.7) {
+                        actionToReturn = "check";
+                        System.out.println("MasterClass set action to check in adjustToOppPostLooseness(). M");
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else if(action.equals("raise")) {
+                    if(handStrength < 0.8) {
+                        actionToReturn = new ActionVariables().getDummyAction(continuousTable, gameVariables);
+                        System.out.println("MasterClass set action from raise to call or fold in adjustToOppPostLooseness(). N");
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String alwaysValueBetAgainstLoosePassivePostflop(String action, double handStrength, String opponentStatsString,
+                                                            boolean opponentHasInitiative) {
+        String actionToReturn;
+
+        if(opponentStatsString.contains("OppPostBetLowOppPostLoosenessLoose")) {
+            if(!action.equals("bet75pct") && !opponentHasInitiative) {
+                if(handStrength >= 0.8) {
+                    //maybe refine this
+                    actionToReturn = "bet75pct";
+                    System.out.println("MasterClass set action to bet in alwaysValueBetAgainstLoosePassivePostflop(). O");
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public double adjustRaiseSizingToSng(double currentSizing, String action, GameVariables gameVariables,
+                                          double effectiveStackBb) {
+        double sngSizingToReturn;
+
+        if(action.equals("raise")) {
+            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                if(!gameVariables.isBotIsButton()) {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        if(effectiveStackBb <= 30) {
+                            sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                            System.out.println("MasterClass change pre3bet sizing to shove in adjustRaiseSizingToSng(). P");
+                        } else {
+                            sngSizingToReturn = currentSizing;
+                        }
+                    } else {
+                        sngSizingToReturn = currentSizing;
+                    }
+                } else {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        //4bet
+                        sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                        System.out.println("MasterClass change pre4bet sizing to shove in adjustRaiseSizingToSng(). Q");
+                    } else {
+                        sngSizingToReturn = currentSizing;
+                    }
+                }
+            } else {
+                //postflop
+                if(currentSizing > 300 || effectiveStackBb <= 30) {
+                    sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                    System.out.println("MasterClass change postRaise sizing to shove in adjustRaiseSizingToSng(). R");
+                } else {
+                    sngSizingToReturn = currentSizing;
+                }
+            }
+        } else {
+            sngSizingToReturn = currentSizing;
+        }
+
+        return sngSizingToReturn;
+    }
+
+    public String alterUnknownOpponentToWeakTight(String oppStatsString) {
+        String statsStringToReturn;
+
+        if(oppStatsString.contains("OpponentUnknown")) {
+            statsStringToReturn = "OppPre3betLowOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessTight";
+        } else {
+            statsStringToReturn = oppStatsString;
+        }
+
+        return statsStringToReturn;
+    }
+}

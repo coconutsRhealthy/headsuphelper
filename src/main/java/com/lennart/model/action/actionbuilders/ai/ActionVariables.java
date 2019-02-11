@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
+import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
 import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
@@ -245,7 +246,7 @@ public class ActionVariables {
 
             System.out.println("botFoldStat against " + gameVariables.getOpponentName() + ": " + botFoldStat);
 
-            if(botFoldStat > 0.43) {
+            if(botFoldStat > 1.2) {
                 double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
                         streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack,
                         botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb,
@@ -389,8 +390,29 @@ public class ActionVariables {
             }
         }
 
+        //MasterClass
+        MasterClass masterClass = new MasterClass();
+        String opponentStatsString = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(gameVariables.getOpponentName());
+        boolean oppUnknown = opponentStatsString.contains("OpponentUnknown");
+        opponentStatsString = masterClass.alterUnknownOpponentToWeakTight(opponentStatsString);
+
+        action = masterClass.adjustToOppPre3betStat(action, botHandStrength, opponentStatsString, gameVariables);
+        action = masterClass.adjustToOppPreLooseness(action, botHandStrength, opponentStatsString, gameVariables, oppUnknown);
+        action = masterClass.adjustToOppPostRaise(action, botHandStrength, opponentStatsString, gameVariables, facingOdds);
+        action = masterClass.adjustToOppPostBet(action, botHandStrength, opponentStatsString, gameVariables, facingOdds, continuousTable);
+        action = masterClass.adjustToOppPostLooseness(action, botHandStrength, opponentStatsString, gameVariables, continuousTable);
+        action = masterClass.alwaysValueBetAgainstLoosePassivePostflop(action, botHandStrength, opponentStatsString, continuousTable.isOpponentHasInitiative());
+
         action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
                 amountToCallBb, gameVariables.getBigBlind());
+
+        action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            sizing = masterClass.adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
+        }
+        //MasterClass
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
