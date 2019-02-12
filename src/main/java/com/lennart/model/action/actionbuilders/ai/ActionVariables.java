@@ -394,14 +394,14 @@ public class ActionVariables {
         MasterClass masterClass = new MasterClass();
         String opponentStatsString = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(gameVariables.getOpponentName());
         boolean oppUnknown = opponentStatsString.contains("OpponentUnknown");
-        opponentStatsString = masterClass.alterUnknownOpponentToWeakTight(opponentStatsString);
+        opponentStatsString = masterClass.alterUnknownOpponentToLoosePassive(opponentStatsString);
 
         action = masterClass.adjustToOppPre3betStat(action, botHandStrength, opponentStatsString, gameVariables);
         action = masterClass.adjustToOppPreLooseness(action, botHandStrength, opponentStatsString, gameVariables, oppUnknown);
         action = masterClass.adjustToOppPostRaise(action, botHandStrength, opponentStatsString, gameVariables, facingOdds);
         action = masterClass.adjustToOppPostBet(action, botHandStrength, opponentStatsString, gameVariables, facingOdds, continuousTable);
         action = masterClass.adjustToOppPostLooseness(action, botHandStrength, opponentStatsString, gameVariables, continuousTable);
-        action = masterClass.alwaysValueBetAgainstLoosePassivePostflop(action, botHandStrength, opponentStatsString, continuousTable.isOpponentHasInitiative());
+        action = masterClass.alwaysValueBetAgainstLoosePassivePostflop(action, botHandStrength, opponentStatsString, continuousTable.isOpponentHasInitiative(), gameVariables.getBoard());
 
         action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
                 amountToCallBb, gameVariables.getBigBlind());

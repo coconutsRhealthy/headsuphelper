@@ -1,5 +1,9 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.card.Card;
+
+import java.util.List;
+
 /**
  * Created by LennartMac on 09/02/2019.
  */
@@ -280,15 +284,19 @@ public class MasterClass {
     }
 
     public String alwaysValueBetAgainstLoosePassivePostflop(String action, double handStrength, String opponentStatsString,
-                                                            boolean opponentHasInitiative) {
+                                                            boolean opponentHasInitiative, List<Card> board) {
         String actionToReturn;
 
         if(opponentStatsString.contains("OppPostBetLowOppPostLoosenessLoose")) {
-            if(!action.equals("bet75pct") && !opponentHasInitiative) {
-                if(handStrength >= 0.8) {
-                    //maybe refine this
-                    actionToReturn = "bet75pct";
-                    System.out.println("MasterClass set action to bet in alwaysValueBetAgainstLoosePassivePostflop(). O");
+            if(board != null && !board.isEmpty()) {
+                if(action.equals("check") && !opponentHasInitiative) {
+                    if(handStrength >= 0.8) {
+                        //maybe refine this
+                        actionToReturn = "bet75pct";
+                        System.out.println("MasterClass set action to bet in alwaysValueBetAgainstLoosePassivePostflop(). O");
+                    } else {
+                        actionToReturn = action;
+                    }
                 } else {
                     actionToReturn = action;
                 }
@@ -344,11 +352,11 @@ public class MasterClass {
         return sngSizingToReturn;
     }
 
-    public String alterUnknownOpponentToWeakTight(String oppStatsString) {
+    public String alterUnknownOpponentToLoosePassive(String oppStatsString) {
         String statsStringToReturn;
 
         if(oppStatsString.contains("OpponentUnknown")) {
-            statsStringToReturn = "OppPre3betLowOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessTight";
+            statsStringToReturn = "OppPre3betLowOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose";
         } else {
             statsStringToReturn = oppStatsString;
         }
