@@ -69,6 +69,49 @@ public class HandEvaluator {
         return false;
     }
 
+    public boolean hasNonTopPairWithOverKicker(List<Card> board, List<Card> holeCards, BoardEvaluator boardEvaluator) {
+        boolean hasThirdPairOverKicker = false;
+
+        List<Integer> boardRanks = boardEvaluator.getSortedCardRanksFromCardList(board);
+        List<Integer> holeCardRanks = boardEvaluator.getSortedCardRanksFromCardList(holeCards);
+
+        Set<Integer> boardRanksAsSet = new HashSet<>();
+        boardRanksAsSet.addAll(boardRanks);
+
+        if(boardEvaluator.getFlushEvaluator().getFlushCombos().isEmpty() && boardEvaluator.getStraightEvaluator().getMapOfStraightCombos().isEmpty()) {
+            if(boardRanks.size() == boardRanksAsSet.size()) {
+                //unpaired board
+
+                List<Integer> boardRanksCopy = new ArrayList<>();
+                boardRanksCopy.addAll(boardRanks);
+                Collections.sort(boardRanksCopy, Collections.reverseOrder());
+
+                boardRanksCopy.remove(0);
+
+                boardRanksCopy.retainAll(holeCardRanks);
+
+                if(boardRanksCopy.size() == 1) {
+                    //1 holecard is paired
+
+                    List<Integer> holeCardRanksCopy = new ArrayList<>();
+                    holeCardRanksCopy.addAll(holeCardRanks);
+
+                    holeCardRanksCopy.removeAll(boardRanksCopy);
+
+                    if(!holeCardRanksCopy.isEmpty()) {
+                        int kickerRank = holeCardRanksCopy.get(0);
+
+                        if(!boardRanks.contains(kickerRank)) {
+                            hasThirdPairOverKicker = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return hasThirdPairOverKicker;
+    }
+
     //helper methods
     private double getIndexOfHandInSortedCombos(Integer key, Map<Integer, Set<Set<Card>>> sortedCombos) {
         double index;

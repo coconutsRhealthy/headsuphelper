@@ -4,6 +4,13 @@ import com.lennart.model.card.Card;
 
 import java.util.List;
 
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
+import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.card.Card;
+import com.lennart.model.handevaluation.HandEvaluator;
+
+import java.util.List;
+
 /**
  * Created by LennartMac on 09/02/2019.
  */
@@ -250,11 +257,11 @@ public class MasterClass {
         return actionToReturn;
     }
 
-    public String adjustToOppPostLooseness(String action, double handStrength, String oppStatsString,
-                                            GameVariables gameVariables, ContinuousTable continuousTable) throws Exception {
+    public String adjustToOppPostLooseness(String action, double handStrength, GameVariables gameVariables,
+                                           ContinuousTable continuousTable, double postLooseness) throws Exception {
         String actionToReturn;
 
-        if(oppStatsString.contains("OppPostLoosenessLoose")) {
+        if(postLooseness > OpponentIdentifier2_0.POST_LOOSENESS_TIGHT_69PCT) {
             if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
                 if(action.equals("bet75pct")) {
                     if(handStrength < 0.7) {
@@ -294,6 +301,72 @@ public class MasterClass {
                         //maybe refine this
                         actionToReturn = "bet75pct";
                         System.out.println("MasterClass set action to bet in alwaysValueBetAgainstLoosePassivePostflop(). O");
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String raiseWeapon(String action, GameVariables gameVariables, double sizing, double handStrength, HandEvaluator handEvaluator, ContinuousTable continuousTable, BoardEvaluator boardEvaluator) throws Exception {
+
+        String actionToReturn;
+
+        if(action.equals("fold") || action.equals("call")) {
+            if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                if(gameVariables.getOpponentAction().equals("bet75pct")) {
+                    if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
+                            gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
+                        if(gameVariables.getBoard().size() == 3 || gameVariables.getBoard().size() == 4) {
+                            boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                            boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                            boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                            boolean strongThirdPair = handEvaluator.hasNonTopPairWithOverKicker(gameVariables.getBoard(), gameVariables.getBotHoleCards(), boardEvaluator);
+
+                            if(handStrength > 0.91 || strongFd || strongOosd || strongGutshot || strongThirdPair) {
+                                OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+
+                                double postLooseness = opponentIdentifier2_0.getOppPostLooseness();
+                                double postBet = opponentIdentifier2_0.getOppPostBet();
+
+                                if(postLooseness <= OpponentIdentifier2_0.POST_LOOSENESS_TIGHT_69PCT && postBet >= OpponentIdentifier2_0.POST_BET_AGGRO_69_PCT) {
+                                    actionToReturn = "raise";
+                                    System.out.println("raiseWeapon changed action to raise flop or turn");
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            int boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(),
+                                    continuousTable.getTop10percentRiverCombos());
+
+                            if(handStrength > 0.91 || (boardWetness <= 66 && action.equals("fold"))) {
+                                OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+
+                                double postLooseness = opponentIdentifier2_0.getOppPostLooseness();
+                                double postBet = opponentIdentifier2_0.getOppPostBet();
+
+                                if(postLooseness <= OpponentIdentifier2_0.POST_LOOSENESS_TIGHT_69PCT && postBet >= OpponentIdentifier2_0.POST_BET_AGGRO_69_PCT) {
+                                    actionToReturn = "raise";
+                                    System.out.println("raiseWeapon changed action to raise river");
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        }
                     } else {
                         actionToReturn = action;
                     }
@@ -362,5 +435,10 @@ public class MasterClass {
         }
 
         return statsStringToReturn;
+    }
+
+    private boolean bluffOddsAreOk(double sizing, double facingBetSize, double facingStackSize, double pot,
+                                   double ownStackSize, List<Card> board, double ownBetSize) {
+        return new MachineLearning().bluffOddsAreOk(sizing, facingBetSize, facingStackSize, pot, ownStackSize, board, ownBetSize);
     }
 }

@@ -953,6 +953,10 @@ public class BoardEvaluator {
         return straightEvaluator;
     }
 
+    public FlushEvaluator getFlushEvaluator() {
+        return flushEvaluator;
+    }
+
     public HighCardDrawEvaluator getHighCardDrawEvaluator() {
         return highCardDrawEvaluator;
     }

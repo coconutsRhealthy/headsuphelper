@@ -400,8 +400,11 @@ public class ActionVariables {
         action = masterClass.adjustToOppPreLooseness(action, botHandStrength, opponentStatsString, gameVariables, oppUnknown);
         action = masterClass.adjustToOppPostRaise(action, botHandStrength, opponentStatsString, gameVariables, facingOdds);
         action = masterClass.adjustToOppPostBet(action, botHandStrength, opponentStatsString, gameVariables, facingOdds, continuousTable);
-        action = masterClass.adjustToOppPostLooseness(action, botHandStrength, opponentStatsString, gameVariables, continuousTable);
+        action = masterClass.adjustToOppPostLooseness(action, botHandStrength, gameVariables, continuousTable, new OpponentIdentifier2_0(gameVariables.getOpponentName()).getOppPostLooseness());
         action = masterClass.alwaysValueBetAgainstLoosePassivePostflop(action, botHandStrength, opponentStatsString, continuousTable.isOpponentHasInitiative(), gameVariables.getBoard());
+
+        double sizingForRaiseMethod = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+        action = masterClass.raiseWeapon(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable, boardEvaluator);
 
         action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
                 amountToCallBb, gameVariables.getBigBlind());

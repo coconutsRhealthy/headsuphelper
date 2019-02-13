@@ -26,6 +26,9 @@ public class OpponentIdentifier2_0 {
     public static double POST_BET = 0.34782608695652173;
     public static double POST_LOOSENESS = 0.5;
 
+    public static double POST_BET_AGGRO_69_PCT = 0.2727272727272727;
+    public static double POST_LOOSENESS_TIGHT_69PCT = 0.5714285714285714;
+
     public OpponentIdentifier2_0() {
         //default constructor
     }
