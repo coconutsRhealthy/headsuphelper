@@ -407,8 +407,8 @@ public class ActionVariables {
         //action = masterClass.raiseWeapon(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable, boardEvaluator);
 
         action = masterClass.aggro4betPre(action, botHandStrength, gameVariables.getBoard());
-        action = masterClass.aggroPlayFlop(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable, boardEvaluator);
-        action = masterClass.changeTurnAndRiverPlayToBoardWetness(action, gameVariables, continuousTable);
+        action = masterClass.aggroPlayFlopAndTurn(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable);
+        action = masterClass.changeRiverPlayToBoardWetness(action, gameVariables, continuousTable, botHandStrength);
 
         action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
                 amountToCallBb, gameVariables.getBigBlind());

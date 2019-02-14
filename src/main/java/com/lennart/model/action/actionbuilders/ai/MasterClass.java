@@ -429,24 +429,17 @@ public class MasterClass {
         return sngSizingToReturn;
     }
 
-    public String changeTurnAndRiverPlayToBoardWetness(String action, GameVariables gameVariables, ContinuousTable continuousTable) {
+    public String changeRiverPlayToBoardWetness(String action, GameVariables gameVariables, ContinuousTable continuousTable, double handStrength) {
         String actionToReturn;
 
         List<Card> board = gameVariables.getBoard();
 
         if(action.equals("fold") || action.equals("call") || action.equals("check")) {
-            if(board != null && (board.size() == 4 || board.size() == 5)) {
-                int boardWetness;
-
-                if(board.size() == 4) {
-                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentFlopCombos(),
-                            continuousTable.getTop10percentTurnCombos());
-                } else {
-                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(),
+            if(board != null && board.size() == 5) {
+                int boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(),
                             continuousTable.getTop10percentRiverCombos());
-                }
 
-                if(boardWetness < 68 ) {
+                if(boardWetness <= 33 || handStrength > 0.90) {
                     double sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(),
                             gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), board);
 
@@ -502,26 +495,36 @@ public class MasterClass {
         return actionToReturn;
     }
 
-    public String aggroPlayFlop(String action, GameVariables gameVariables, double sizing, double handStrength,
-                                HandEvaluator handEvaluator, ContinuousTable continuousTable, BoardEvaluator boardEvaluator) {
+    public String aggroPlayFlopAndTurn(String action, GameVariables gameVariables, double sizing, double handStrength,
+                                HandEvaluator handEvaluator, ContinuousTable continuousTable) {
         String actionToReturn;
 
         List<Card> board = gameVariables.getBoard();
 
-        if(board != null && board.size() == 3) {
+        if(board != null && (board.size() == 3 || board.size() == 4)) {
             if(action.equals("check") || action.equals("fold") || action.equals("call")) {
                 boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
                 boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
                 boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
-                boolean strongThirdPair = handEvaluator.hasNonTopPairWithOverKicker(gameVariables.getBoard(), gameVariables.getBotHoleCards(), boardEvaluator);
+
+                boolean drawBoolean;
+                String street;
+
+                if(board.size() == 3) {
+                    drawBoolean = strongFd || strongOosd || strongGutshot;
+                    street = "flop";
+                } else {
+                    drawBoolean = strongFd || strongOosd;
+                    street = "turn";
+                }
 
                 if(action.equals("check")) {
                     if(!continuousTable.isOpponentHasInitiative()) {
-                        if(handStrength > 0.85 || strongFd || strongOosd || strongGutshot || strongThirdPair) {
+                        if(handStrength > 0.90 || drawBoolean) {
                             if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
                                     gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                                 actionToReturn = "bet75pct";
-                                System.out.println("Extreme, change to bet on flop");
+                                System.out.println("Extreme, change to bet on: " + street);
                             } else {
                                 actionToReturn = action;
                             }
@@ -532,11 +535,11 @@ public class MasterClass {
                         actionToReturn = action;
                     }
                 } else {
-                    if(handStrength > 0.85 || strongFd || strongOosd || strongGutshot || strongThirdPair) {
+                    if(handStrength > 0.90 || drawBoolean) {
                         if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
                                 gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
                             actionToReturn = "raise";
-                            System.out.println("Extreme, change to raise on flop");
+                            System.out.println("Extreme, change to raise on: " + street);
                         } else {
                             actionToReturn = action;
                         }
