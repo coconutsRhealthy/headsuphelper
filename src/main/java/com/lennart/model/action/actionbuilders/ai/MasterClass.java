@@ -332,13 +332,14 @@ public class MasterClass {
                             boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
                             boolean strongThirdPair = handEvaluator.hasNonTopPairWithOverKicker(gameVariables.getBoard(), gameVariables.getBotHoleCards(), boardEvaluator);
 
-                            if(handStrength > 0.91 || strongFd || strongOosd || strongGutshot || strongThirdPair) {
+                            if(handStrength > 0.82 || strongFd || strongOosd || strongGutshot || strongThirdPair) {
                                 OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
 
                                 double postLooseness = opponentIdentifier2_0.getOppPostLooseness();
                                 double postBet = opponentIdentifier2_0.getOppPostBet();
 
-                                if(postLooseness <= OpponentIdentifier2_0.POST_LOOSENESS_TIGHT_69PCT && postBet >= OpponentIdentifier2_0.POST_BET_AGGRO_69_PCT) {
+                                if(postLooseness != -1 && postLooseness <= OpponentIdentifier2_0.POST_LOOSENESS_TIGHT_69PCT &&
+                                        postBet != -1 && postBet >= OpponentIdentifier2_0.POST_BET_AGGRO_69_PCT) {
                                     actionToReturn = "raise";
                                     System.out.println("raiseWeapon changed action to raise flop or turn");
                                 } else {
@@ -351,13 +352,16 @@ public class MasterClass {
                             int boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(),
                                     continuousTable.getTop10percentRiverCombos());
 
-                            if(handStrength > 0.91 || (boardWetness <= 66 && action.equals("fold"))) {
+                            System.out.println(boardWetness + " : this is river boardwetness");
+
+                            if(handStrength > 0.82 || (boardWetness <= 66 && action.equals("fold"))) {
                                 OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
 
                                 double postLooseness = opponentIdentifier2_0.getOppPostLooseness();
                                 double postBet = opponentIdentifier2_0.getOppPostBet();
 
-                                if(postLooseness <= OpponentIdentifier2_0.POST_LOOSENESS_TIGHT_69PCT && postBet >= OpponentIdentifier2_0.POST_BET_AGGRO_69_PCT) {
+                                if(postLooseness != -1 && postLooseness <= OpponentIdentifier2_0.POST_LOOSENESS_TIGHT_69PCT &&
+                                        postBet != -1 && postBet >= OpponentIdentifier2_0.POST_BET_AGGRO_69_PCT) {
                                     actionToReturn = "raise";
                                     System.out.println("raiseWeapon changed action to raise river");
                                 } else {
@@ -423,6 +427,131 @@ public class MasterClass {
         }
 
         return sngSizingToReturn;
+    }
+
+    public String changeTurnAndRiverPlayToBoardWetness(String action, GameVariables gameVariables, ContinuousTable continuousTable) {
+        String actionToReturn;
+
+        List<Card> board = gameVariables.getBoard();
+
+        if(action.equals("fold") || action.equals("call") || action.equals("check")) {
+            if(board != null && (board.size() == 4 || board.size() == 5)) {
+                int boardWetness;
+
+                if(board.size() == 4) {
+                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentFlopCombos(),
+                            continuousTable.getTop10percentTurnCombos());
+                } else {
+                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(),
+                            continuousTable.getTop10percentRiverCombos());
+                }
+
+                if(boardWetness < 68 ) {
+                    double sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(),
+                            gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), board);
+
+                    if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
+                            gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
+                        if(action.equals("check")) {
+                            if(!continuousTable.isOpponentHasInitiative()) {
+                                actionToReturn = "bet75pct";
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = "raise";
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        if(!action.equals(actionToReturn)) {
+            System.out.println("BoardWetness change to: " + actionToReturn);
+        }
+
+        return actionToReturn;
+    }
+
+    public String aggro4betPre(String action, double handStrength, List<Card> board) {
+        String actionToReturn;
+
+        if(board == null || board.isEmpty()) {
+            if(action.equals("fold") || action.equals("call")) {
+                if(handStrength >= 0.8) {
+                    actionToReturn = "raise";
+                    System.out.println("Extreme, change preflop to raise");
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    public String aggroPlayFlop(String action, GameVariables gameVariables, double sizing, double handStrength,
+                                HandEvaluator handEvaluator, ContinuousTable continuousTable, BoardEvaluator boardEvaluator) {
+        String actionToReturn;
+
+        List<Card> board = gameVariables.getBoard();
+
+        if(board != null && board.size() == 3) {
+            if(action.equals("check") || action.equals("fold") || action.equals("call")) {
+                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                boolean strongThirdPair = handEvaluator.hasNonTopPairWithOverKicker(gameVariables.getBoard(), gameVariables.getBotHoleCards(), boardEvaluator);
+
+                if(action.equals("check")) {
+                    if(!continuousTable.isOpponentHasInitiative()) {
+                        if(handStrength > 0.85 || strongFd || strongOosd || strongGutshot || strongThirdPair) {
+                            if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
+                                    gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("Extreme, change to bet on flop");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else{
+                        actionToReturn = action;
+                    }
+                } else {
+                    if(handStrength > 0.85 || strongFd || strongOosd || strongGutshot || strongThirdPair) {
+                        if(bluffOddsAreOk(sizing, gameVariables.getOpponentBetSize(), gameVariables.getOpponentStack(), gameVariables.getPot(),
+                                gameVariables.getBotStack(), gameVariables.getBoard(), gameVariables.getBotBetSize())) {
+                            actionToReturn = "raise";
+                            System.out.println("Extreme, change to raise on flop");
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
     public String alterUnknownOpponentToLoosePassive(String oppStatsString) {

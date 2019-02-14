@@ -329,16 +329,26 @@ public class ContinuousTable implements ContinuousTableable {
             TimeUnit.MILLISECONDS.sleep(100);
             starsTableReader.registerNewSng();
 
+            int counter = 0;
+
             boolean newTableNotYetOpened = true;
             while(newTableNotYetOpened) {
-                System.out.println(",");
-                TimeUnit.SECONDS.sleep(1);
+                if(counter == 30) {
+                    MouseKeyboard.moveMouseToLocation(7, 100);
+                    MouseKeyboard.click(7, 100);
+                    System.out.println();
+                    counter = 0;
+                }
 
-                TimeUnit.MILLISECONDS.sleep(100);
+                System.out.println(",");
+
+                TimeUnit.MILLISECONDS.sleep(1100);
+
                 if(starsTableReader.newSngTableIsOpened()) {
                     newTableNotYetOpened = false;
                     System.out.println("New sng table is opened b");
                 } else {
+                    counter++;
                     newTableNotYetOpened = true;
                 }
             }

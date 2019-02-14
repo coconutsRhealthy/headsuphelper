@@ -404,7 +404,11 @@ public class ActionVariables {
         action = masterClass.alwaysValueBetAgainstLoosePassivePostflop(action, botHandStrength, opponentStatsString, continuousTable.isOpponentHasInitiative(), gameVariables.getBoard());
 
         double sizingForRaiseMethod = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-        action = masterClass.raiseWeapon(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable, boardEvaluator);
+        //action = masterClass.raiseWeapon(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable, boardEvaluator);
+
+        action = masterClass.aggro4betPre(action, botHandStrength, gameVariables.getBoard());
+        action = masterClass.aggroPlayFlop(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable, boardEvaluator);
+        action = masterClass.changeTurnAndRiverPlayToBoardWetness(action, gameVariables, continuousTable);
 
         action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
                 amountToCallBb, gameVariables.getBigBlind());
@@ -412,7 +416,10 @@ public class ActionVariables {
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
-            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            if(sizing == 0) {
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            }
+
             sizing = masterClass.adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
         //MasterClass

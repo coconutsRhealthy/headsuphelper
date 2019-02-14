@@ -242,8 +242,6 @@ public class StarsTableReader {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(197, 489, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
-        System.out.println(pixelRgb);
-
         if(pixelRgb / 1000 == -15832) {
             //expected rgb: -15.832.802
             System.out.println("new sng table is opened a");
