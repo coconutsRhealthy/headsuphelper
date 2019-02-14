@@ -198,41 +198,41 @@ public class DbStatsRawBluffPostflopMigrator {
         List<String> groupDstats = new ArrayList<>();
 
         groupAstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessTight");
+        groupAstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessTight");
         groupAstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseLowOppPostBetHighOppPostLoosenessTight");
-        groupAstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessTight");
         groupAstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseHighOppPostBetHighOppPostLoosenessTight");
+        groupAstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessTight");
         groupAstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseHighOppPostBetLowOppPostLoosenessTight");
-        groupAstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseHighOppPostBetLowOppPostLoosenessTight");
+        groupAstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose");
         groupAstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose");
-        groupAstats.add("OpponentUnknown");
 
-        groupBstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessTight");
-        groupBstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose");
-        groupBstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose");
-        groupBstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseHighOppPostBetHighOppPostLoosenessTight");
-        groupBstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose");
         groupBstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseLowOppPostBetHighOppPostLoosenessTight");
-        groupBstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseHighOppPostBetLowOppPostLoosenessTight");
-        groupBstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseLowOppPostBetHighOppPostLoosenessLoose");
+        groupBstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseHighOppPostBetLowOppPostLoosenessTight");
+        groupBstats.add("OpponentUnknown");
+        groupBstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseHighOppPostBetHighOppPostLoosenessTight");
+        groupBstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetLowOppPostLoosenessTight");
+        groupBstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose");
+        groupBstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessLoose");
+        groupBstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetHighOppPostLoosenessTight");
 
-        groupCstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetHighOppPostLoosenessTight");
-        groupCstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseHighOppPostBetHighOppPostLoosenessLoose");
         groupCstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseLowOppPostBetHighOppPostLoosenessLoose");
+        groupCstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseHighOppPostBetLowOppPostLoosenessTight");
         groupCstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseHighOppPostBetLowOppPostLoosenessTight");
-        groupCstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetHighOppPostLoosenessTight");
+        groupCstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseHighOppPostBetLowOppPostLoosenessLoose");
+        groupCstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseLowOppPostBetHighOppPostLoosenessLoose");
         groupCstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseHighOppPostBetHighOppPostLoosenessTight");
-        groupCstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetLowOppPostLoosenessTight");
+        groupCstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseHighOppPostBetHighOppPostLoosenessLoose");
         groupCstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseHighOppPostBetLowOppPostLoosenessLoose");
 
-        groupDstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseHighOppPostBetLowOppPostLoosenessLoose");
-        groupDstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseHighOppPostBetHighOppPostLoosenessLoose");
-        groupDstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseHighOppPostBetHighOppPostLoosenessLoose");
         groupDstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseHighOppPostBetHighOppPostLoosenessTight");
-        groupDstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetHighOppPostLoosenessLoose");
-        groupDstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetHighOppPostLoosenessLoose");
+        groupDstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetHighOppPostLoosenessTight");
+        groupDstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseHighOppPostBetHighOppPostLoosenessLoose");
         groupDstats.add("OppPre3betLowOppPreLoosenessTightOppPostRaiseHighOppPostBetLowOppPostLoosenessLoose");
-        groupDstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseHighOppPostBetLowOppPostLoosenessLoose");
+        groupDstats.add("OppPre3betHighOppPreLoosenessTightOppPostRaiseLowOppPostBetHighOppPostLoosenessLoose");
+        groupDstats.add("OppPre3betLowOppPreLoosenessLooseOppPostRaiseHighOppPostBetHighOppPostLoosenessLoose");
+        groupDstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseLowOppPostBetHighOppPostLoosenessLoose");
         groupDstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseHighOppPostBetHighOppPostLoosenessLoose");
+        groupDstats.add("OppPre3betHighOppPreLoosenessLooseOppPostRaiseHighOppPostBetLowOppPostLoosenessLoose");
 
         if(groupAstats.contains(oppStatString)) {
             oppGroup = "OppTypeA";
