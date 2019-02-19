@@ -82,23 +82,13 @@ public class DbSavePersisterPreflop_2_0 {
     }
 
     public List<String> getAllPfCallRoutesCompact() {
-        List<String> handStrength = new ArrayList<>();
+        List<String> holeCards;
         List<String> position = new ArrayList<>();
         List<String> amountToCall = new ArrayList<>();
         List<String> effectiveStack = new ArrayList<>();
         List<String> oppType = new ArrayList<>();
 
-        handStrength.add("HS_0_20_");
-        handStrength.add("HS_20_35_");
-        handStrength.add("HS_35_50_");
-        handStrength.add("HS_50_60_");
-        handStrength.add("HS_60_70_");
-        handStrength.add("HS_70_75_");
-        handStrength.add("HS_75_80_");
-        handStrength.add("HS_80_85_");
-        handStrength.add("HS_85_90_");
-        handStrength.add("HS_90_95_");
-        handStrength.add("HS_95_100_");
+        holeCards = new DbSavePersisterPreflop().getAllHoleCardCombos();
 
         position.add("Ip");
         position.add("Oop");
@@ -108,12 +98,8 @@ public class DbSavePersisterPreflop_2_0 {
         amountToCall.add("Atc_13-26bb");
         amountToCall.add("Atc_26bb_up");
 
-        effectiveStack.add("Effstack_0-10bb");
-        effectiveStack.add("Effstack_10-30bb");
-        effectiveStack.add("Effstack_30-50bb");
-        effectiveStack.add("Effstack_50-75bb");
-        effectiveStack.add("Effstack_75-110bb");
-        effectiveStack.add("Effstack_110bb_up");
+        effectiveStack.add("EffStack_0_35_");
+        effectiveStack.add("EffStack_35_up_");
 
         oppType.add("OppTypeA");
         oppType.add("OppTypeB");
@@ -122,7 +108,7 @@ public class DbSavePersisterPreflop_2_0 {
 
         List<String> allRoutes = new ArrayList<>();
 
-        for(String a : handStrength) {
+        for(String a : holeCards) {
             for(String b : position) {
                 for(String c : amountToCall) {
                     for(String d : effectiveStack) {

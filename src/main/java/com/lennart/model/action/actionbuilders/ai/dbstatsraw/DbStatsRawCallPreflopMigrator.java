@@ -1,8 +1,9 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
 import com.lennart.model.action.actionbuilders.ai.GameFlow;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPreflop_2_0;
+import com.lennart.model.card.Card;
 
 import java.sql.*;
 import java.util.List;
@@ -37,16 +38,15 @@ public class DbStatsRawCallPreflopMigrator {
                 String botAction = rs.getString("bot_action");
 
                 if(botAction.equals("call")) {
-                    DbStatsRawRaisePreflopMigrator dbStatsRawRaisePreflopMigrator = new DbStatsRawRaisePreflopMigrator();
-
-                    String handStrength = new DbSavePersisterPreflop().convertNumericHandstrengthToString(rs.getDouble("handstrength"));
+                    List<Card> holeCards = new Analysis().convertCardStringToCardList(rs.getString("holecards"));
+                    String combo = new DbSave().getComboLogic(holeCards);
                     String position = rs.getString("position");
                     String amountToCallGroup = getAmountToCallString(rs.getDouble("opponent_total_betsize"),
                             rs.getDouble("bot_total_betsize"), rs.getDouble("botstack"), rs.getDouble("bigblind"));
-                    String effectiveStack = dbStatsRawRaisePreflopMigrator.getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
+                    String effectiveStack = new DbStatsRawBluffPostflopMigrator().getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
                     String opponentType = new GameFlow().getOpponentGroup(rs.getDouble("recent_hands_won"));
 
-                    String route = handStrength + position + amountToCallGroup + effectiveStack + opponentType;
+                    String route = combo + position + amountToCallGroup + effectiveStack + opponentType;
 
                     initialize_2_0_DbConnection();
                     Statement st2 = con_2_0.createStatement();
