@@ -51,6 +51,23 @@ public class GameFlow {
         return ratio;
     }
 
+    public String getOpponentGroup(String opponentName) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE opponent_name = '" + opponentName + "' ORDER BY entry DESC;");
+
+        double recentHandsWonRatio;
+
+        if(rs.next()) {
+            recentHandsWonRatio = rs.getDouble("recent_hands_won");
+        } else {
+            recentHandsWonRatio = -2;
+        }
+
+        return getOpponentGroup(recentHandsWonRatio);
+    }
+
     public String getOpponentGroup(double recentHandsWon) {
         String oppGroup;
 

@@ -893,7 +893,7 @@ public class MachineLearning {
                 dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName());
+        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
 
         String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + opponentType;
 
@@ -923,7 +923,7 @@ public class MachineLearning {
                 dbSaveValue.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName());
+        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
 
         String route = street + valueAction + position + sizingGroup + handStrength + effectiveStack + opponentType;
 
@@ -955,7 +955,7 @@ public class MachineLearning {
                 dbSaveCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName());
+        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
 
         String route = street + facingAction + position + amountToCallGroup + handStrength + strongDraw +
                 effectiveStack + opponentType;

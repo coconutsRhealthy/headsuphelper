@@ -146,7 +146,7 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Sizing: " + sizing);
                 System.out.println("Route: " + actionVariables.getRoute());
                 System.out.println("Table: " + actionVariables.getTable());
-                System.out.println("OppType: " + new DbStatsRawBluffPostflopMigrator().getOpponentGroup(gameVariables.getOpponentName()));
+                System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
                 System.out.println("********************");
                 System.out.println();
 
