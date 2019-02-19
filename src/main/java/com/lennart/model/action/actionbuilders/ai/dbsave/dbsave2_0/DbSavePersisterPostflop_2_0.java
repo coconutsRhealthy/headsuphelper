@@ -67,7 +67,6 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         oppType.add("OppTypeA");
         oppType.add("OppTypeB");
         oppType.add("OppTypeC");
-        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -129,7 +128,6 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         oppType.add("OppTypeA");
         oppType.add("OppTypeB");
         oppType.add("OppTypeC");
-        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -195,7 +193,6 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         oppType.add("OppTypeA");
         oppType.add("OppTypeB");
         oppType.add("OppTypeC");
-        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 

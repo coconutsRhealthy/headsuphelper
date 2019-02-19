@@ -60,7 +60,6 @@ public class DbSavePersisterPreflop_2_0 {
         oppType.add("OppTypeA");
         oppType.add("OppTypeB");
         oppType.add("OppTypeC");
-        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -104,7 +103,6 @@ public class DbSavePersisterPreflop_2_0 {
         oppType.add("OppTypeA");
         oppType.add("OppTypeB");
         oppType.add("OppTypeC");
-        oppType.add("OppTypeD");
 
         List<String> allRoutes = new ArrayList<>();
 
