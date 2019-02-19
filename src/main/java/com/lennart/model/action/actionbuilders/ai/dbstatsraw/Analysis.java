@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
+import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.botgame.MouseKeyboard;
@@ -14,6 +15,51 @@ import java.util.*;
 public class Analysis {
 
     private Connection con;
+
+    private void addGameflowToDbStatsRaw() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
+
+        GameFlow gameFlow = new GameFlow();
+
+        int counter = 0;
+        int counter2 = 0;
+
+        while(rs.next()) {
+            int entry = rs.getInt("entry");
+            double recentWinRatio = gameFlow.getNumberOfHandsWonAgainstOppInLast20Hands(rs.getString("opponent_name"), entry);
+
+            Statement st2 = con.createStatement();
+
+            st2.executeUpdate("UPDATE dbstats_raw SET recent_hands_won = " + recentWinRatio + " WHERE entry = '" + entry + "'");
+
+            st2.close();
+
+            counter++;
+
+            if(counter < 100) {
+                System.out.print(".");
+            } else {
+                System.out.println();
+                counter = 0;
+
+                counter2++;
+
+                if(counter2 == 15) {
+                    MouseKeyboard.click(30, 30);
+                    MouseKeyboard.moveMouseToLocation(90, 90);
+                    counter2 = 0;
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
 
     private TreeMap<String, Integer> getOpponentTypesForDate(String date) throws Exception {
         initializeDbConnection();
