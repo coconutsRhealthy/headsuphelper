@@ -48,7 +48,8 @@ public class DbSavePersisterRawData {
                     "showdown_occured, " +
                     "bot_won_hand, " +
                     "bigblind, " +
-                    "strongdraw) " +
+                    "strongdraw, " +
+                    "recent_hands_won) " +
                     "VALUES ('" +
                     (getHighestIntEntry("dbstats_raw") + 1) + "', '" +
                     getCurrentDate() + "', '" +
@@ -69,7 +70,8 @@ public class DbSavePersisterRawData {
                     showdownOccurred(biglind) + "', '" +
                     botWonHand(biglind) + "', '" +
                     dbSaveRaw.getBigBlind() + "', '" +
-                    dbSaveRaw.getStrongDraw() + "'" +
+                    dbSaveRaw.getStrongDraw() + "', '" +
+                    dbSaveRaw.getRecentHandsWon() + "'" +
                     ")");
             }
         }

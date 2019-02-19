@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
+import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.card.Card;
 
 import java.sql.*;
@@ -26,6 +27,7 @@ public class DbSaveRaw extends DbSave {
     private String opponentData;
     private double bigBlind;
     private String strongDraw;
+    private double recentHandsWon;
 
     private Connection con;
 
@@ -107,6 +109,10 @@ public class DbSaveRaw extends DbSave {
                 "postBetCount: " + postBetCount + "postRaiseCount: " + postRaiseCount;
 
         return oppDataLogicString;
+    }
+
+    public double getRecentHandsWonLogic(String opponentName) throws Exception {
+        return new GameFlow().getNumberOfHandsWonAgainstOppInLast20Hands(opponentName, -1);
     }
 
     //regular getters and setters
@@ -236,6 +242,14 @@ public class DbSaveRaw extends DbSave {
 
     public void setStrongDraw(String strongDraw) {
         this.strongDraw = strongDraw;
+    }
+
+    public double getRecentHandsWon() {
+        return recentHandsWon;
+    }
+
+    public void setRecentHandsWon(double recentHandsWon) {
+        this.recentHandsWon = recentHandsWon;
     }
 
     private void initializeDbConnection() throws Exception {
