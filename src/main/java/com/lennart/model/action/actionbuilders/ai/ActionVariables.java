@@ -390,26 +390,6 @@ public class ActionVariables {
             }
         }
 
-        //MasterClass
-        MasterClass masterClass = new MasterClass();
-        String opponentStatsString = new DbStatsRawBluffPostflopMigrator().getOpponentStatsString(gameVariables.getOpponentName());
-        boolean oppUnknown = opponentStatsString.contains("OpponentUnknown");
-        opponentStatsString = masterClass.alterUnknownOpponentToLoosePassive(opponentStatsString);
-
-        action = masterClass.adjustToOppPre3betStat(action, botHandStrength, opponentStatsString, gameVariables);
-        action = masterClass.adjustToOppPreLooseness(action, botHandStrength, opponentStatsString, gameVariables, oppUnknown);
-        action = masterClass.adjustToOppPostRaise(action, botHandStrength, opponentStatsString, gameVariables, facingOdds);
-        action = masterClass.adjustToOppPostBet(action, botHandStrength, opponentStatsString, gameVariables, facingOdds, continuousTable);
-        action = masterClass.adjustToOppPostLooseness(action, botHandStrength, gameVariables, continuousTable, new OpponentIdentifier2_0(gameVariables.getOpponentName()).getOppPostLooseness());
-        action = masterClass.alwaysValueBetAgainstLoosePassivePostflop(action, botHandStrength, opponentStatsString, continuousTable.isOpponentHasInitiative(), gameVariables.getBoard());
-
-        double sizingForRaiseMethod = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-        //action = masterClass.raiseWeapon(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable, boardEvaluator);
-
-        action = masterClass.aggro4betPre(action, botHandStrength, gameVariables.getBoard());
-        action = masterClass.aggroPlayFlopAndTurn(action, gameVariables, sizingForRaiseMethod, botHandStrength, handEvaluator, continuousTable);
-        action = masterClass.changeRiverPlayToBoardWetness(action, gameVariables, continuousTable, botHandStrength);
-
         action = neverFoldStrongEquity(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
                 amountToCallBb, gameVariables.getBigBlind());
 
@@ -420,9 +400,8 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
 
-            sizing = masterClass.adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
+            sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
-        //MasterClass
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
@@ -454,13 +433,6 @@ public class ActionVariables {
                         String boatWetnessString = dbSaveBluff.getBoatWetnessLogic(boardInMethod, boatWetness);
                         String strongDraw = dbSaveBluff.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
 
-                        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
-                        String oppPre3bet = dbSaveBluff.getOppPre3betLogic(opponentIdentifier2_0);
-                        String oppPreLooseness = dbSaveBluff.getOppPreLoosenessLogic(opponentIdentifier2_0);
-                        String oppPostRaise = dbSaveBluff.getOppPostRaiseLogic(opponentIdentifier2_0);
-                        String oppPostBet = dbSaveBluff.getOppPostBetLogic(opponentIdentifier2_0);
-                        String oppPostLooseness = dbSaveBluff.getOppPostLoosenessLogic(opponentIdentifier2_0);
-
                         dbSaveBluff.setSizingGroup(sizingGroup);
                         dbSaveBluff.setStreet(street);
                         dbSaveBluff.setFoldStatGroup(foldStatGroup);
@@ -471,11 +443,6 @@ public class ActionVariables {
                         dbSaveBluff.setDrawWetness(drawWetnessString);
                         dbSaveBluff.setBoatWetness(boatWetnessString);
                         dbSaveBluff.setStrongDraw(strongDraw);
-                        dbSaveBluff.setOppPre3bet(oppPre3bet);
-                        dbSaveBluff.setOppPreLooseness(oppPreLooseness);
-                        dbSaveBluff.setOppPostRaise(oppPostRaise);
-                        dbSaveBluff.setOppPostBet(oppPostBet);
-                        dbSaveBluff.setOppPostLooseness(oppPostLooseness);
 
                         continuousTable.getDbSaveList().add(dbSaveBluff);
                     }
@@ -1029,6 +996,48 @@ public class ActionVariables {
         }
 
         return actionToReturn;
+    }
+
+    private double adjustRaiseSizingToSng(double currentSizing, String action, GameVariables gameVariables,
+                                         double effectiveStackBb) {
+        double sngSizingToReturn;
+
+        if(action.equals("raise")) {
+            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                if(!gameVariables.isBotIsButton()) {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        if(effectiveStackBb <= 30) {
+                            sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                            System.out.println("Change pre3bet sizing to shove in adjustRaiseSizingToSng(). P");
+                        } else {
+                            sngSizingToReturn = currentSizing;
+                        }
+                    } else {
+                        sngSizingToReturn = currentSizing;
+                    }
+                } else {
+                    if(gameVariables.getOpponentAction().equals("raise")) {
+                        //4bet
+                        sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                        System.out.println("Change pre4bet sizing to shove in adjustRaiseSizingToSng(). Q");
+                    } else {
+                        sngSizingToReturn = currentSizing;
+                    }
+                }
+            } else {
+                //postflop
+                if(currentSizing > 300 || effectiveStackBb <= 30) {
+                    sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                    System.out.println("Change postRaise sizing to shove in adjustRaiseSizingToSng(). R");
+                } else {
+                    sngSizingToReturn = currentSizing;
+                }
+            }
+        } else {
+            sngSizingToReturn = currentSizing;
+        }
+
+        return sngSizingToReturn;
     }
 
     public void setAction(String action) {

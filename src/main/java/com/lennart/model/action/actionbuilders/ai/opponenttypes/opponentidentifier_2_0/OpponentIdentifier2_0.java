@@ -1,7 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0;
 
 import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
-import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 
 import java.sql.*;
 import java.util.*;
@@ -26,9 +25,6 @@ public class OpponentIdentifier2_0 {
     public static double POST_BET = 0.34782608695652173;
     public static double POST_LOOSENESS = 0.5;
 
-    public static double POST_BET_AGGRO_69_PCT = 0.2727272727272727;
-    public static double POST_LOOSENESS_TIGHT_69PCT = 0.5714285714285714;
-
     public OpponentIdentifier2_0() {
         //default constructor
     }
@@ -42,29 +38,6 @@ public class OpponentIdentifier2_0 {
         oppPostRaise = getOpponentPostRaise(opponentData);
         oppPostBet = getOpponentPostBet(opponentData);
         oppPostLooseness = getOpponentPostLooseness(opponentData);
-    }
-
-    private void testMethod() throws Exception {
-        initializeDbConnection();
-
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
-
-        while(rs.next()) {
-            String opponentName = rs.getString("playerName");
-
-            DbSaveBluff_2_0 dbSaveBluff_2_0 = new DbSaveBluff_2_0();
-
-            String preflopType = dbSaveBluff_2_0.getOpponentPreflopTypeLogic(opponentName, true);
-            String postflopType = dbSaveBluff_2_0.getOpponentPostflopTypeLogic(opponentName, true);
-
-            System.out.println(preflopType + postflopType);
-        }
-
-        rs.close();
-        st.close();
-
-        closeDbConnection();
     }
 
     private void printLoosenessAndTightnessBoundries(boolean includingMedium, String table) throws Exception {

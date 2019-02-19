@@ -150,44 +150,4 @@ public class DbSaveBluff extends DbSave {
     public void setOpponentType(String opponentType) {
         this.opponentType = opponentType;
     }
-
-    public String getOppPre3bet() {
-        return oppPre3bet;
-    }
-
-    public void setOppPre3bet(String oppPre3bet) {
-        this.oppPre3bet = oppPre3bet;
-    }
-
-    public String getOppPreLooseness() {
-        return oppPreLooseness;
-    }
-
-    public void setOppPreLooseness(String oppPreLooseness) {
-        this.oppPreLooseness = oppPreLooseness;
-    }
-
-    public String getOppPostRaise() {
-        return oppPostRaise;
-    }
-
-    public void setOppPostRaise(String oppPostRaise) {
-        this.oppPostRaise = oppPostRaise;
-    }
-
-    public String getOppPostBet() {
-        return oppPostBet;
-    }
-
-    public void setOppPostBet(String oppPostBet) {
-        this.oppPostBet = oppPostBet;
-    }
-
-    public String getOppPostLooseness() {
-        return oppPostLooseness;
-    }
-
-    public void setOppPostLooseness(String oppPostLooseness) {
-        this.oppPostLooseness = oppPostLooseness;
-    }
 }
