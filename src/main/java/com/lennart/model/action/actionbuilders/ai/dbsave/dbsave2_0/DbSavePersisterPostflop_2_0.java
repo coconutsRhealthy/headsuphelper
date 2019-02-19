@@ -1,10 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0;
 
-import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveBluff;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -20,42 +16,6 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
     public static void main(String[] args) throws Exception {
         //new DbSavePersisterPostflop_2_0().getAllCallRoutesCompact();
         new DbSavePersisterPostflop_2_0().initializeDb("dbstats_call_sng_compact_2_0");
-    }
-
-    @Override
-    public void doDbSaveUpdate(ContinuousTable continuousTable, double bigBlind) throws Exception {
-        List<DbSave> dbSaveList = continuousTable.getDbSaveList();
-
-        initialize_2_0_DbConnection();
-
-        Statement st = con_2_0.createStatement();
-
-        for(DbSave dbSave : dbSaveList) {
-            if(dbSave instanceof DbSaveBluff) {
-                DbSaveBluff dbSaveBluff = (DbSaveBluff) dbSave;
-
-                String routeCompact_2_0 = dbSaveBluff.getStreet() + dbSaveBluff.getBluffAction() + dbSaveBluff.getPosition() +
-                        convertBluffOrValueSizingToCompact(dbSaveBluff.getSizingGroup()) +
-                        dbSaveBluff.getStrongDraw() + convertEffectiveStackToCompact(dbSaveBluff.getEffectiveStack()) +
-                        dbSaveBluff.getOppPre3bet() + dbSaveBluff.getOppPreLooseness() + dbSaveBluff.getOppPostRaise() +
-                        dbSaveBluff.getOppPostBet() + dbSaveBluff.getOppPostLooseness();
-
-                while(StringUtils.countMatches(routeCompact_2_0, "OpponentUnknown") > 1) {
-                    routeCompact_2_0 = routeCompact_2_0.substring(0, routeCompact_2_0.lastIndexOf("OpponentUnknown"));
-                }
-
-                verifyRouteExists(routeCompact_2_0, "dbstats_bluff_sng_compact_2_0");
-
-                if(actionWasSuccessfull(bigBlind)) {
-                    st.executeUpdate("UPDATE dbstats_bluff_sng_compact_2_0 SET success = success + 1 WHERE route = '" + routeCompact_2_0 + "'");
-                }
-
-                st.executeUpdate("UPDATE dbstats_bluff_sng_compact_2_0 SET total = total + 1 WHERE route = '" + routeCompact_2_0 + "'");
-            }
-        }
-
-        st.close();
-        close_2_0_DbConnection();
     }
 
     private void initializeDb(String table) throws Exception {
@@ -260,21 +220,6 @@ public class DbSavePersisterPostflop_2_0 extends DbSavePersister {
         System.out.println(allRoutes.size());
 
         return allRoutes;
-    }
-
-    private void verifyRouteExists(String route, String table) throws Exception {
-        Statement st2 = con_2_0.createStatement();
-
-        ResultSet rs2 = st2.executeQuery("SELECT * FROM " + table + " WHERE route = '" + route + "';");
-
-        if(!rs2.next()) {
-            System.out.println("Postflop Route does not exist! " + route + "    table: " + table);
-        } else {
-            System.out.println("Postflop Route exists: " + route + "     table: " + table);
-        }
-
-        rs2.close();
-        st2.close();
     }
 
     private void initialize_2_0_DbConnection() throws Exception {
