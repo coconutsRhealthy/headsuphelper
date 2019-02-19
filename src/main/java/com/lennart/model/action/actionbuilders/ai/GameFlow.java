@@ -6,6 +6,11 @@ public class GameFlow {
 
     private Connection con;
 
+    public static double GROUP_D_MAX = 0.4;
+    public static double GROUP_C_MAX = 0.5128;
+    public static double GROUP_B_MAX = 0.65;
+    public static double LESS_THAN_20_HANDS = -2;
+
     public double getNumberOfHandsWonAgainstOppInLast20Hands(String opponentName, int entry) throws Exception {
         initializeDbConnection();
 
@@ -44,6 +49,24 @@ public class GameFlow {
         }
 
         return ratio;
+    }
+
+    public String getOpponentGroup(double recentHandsWon) {
+        String oppGroup;
+
+        if(recentHandsWon == LESS_THAN_20_HANDS) {
+            oppGroup = "OppTypeB";
+        } else if(recentHandsWon < GROUP_D_MAX) {
+            oppGroup = "OppTypeD";
+        } else if(recentHandsWon < GROUP_C_MAX) {
+            oppGroup = "OppTypeC";
+        } else if(recentHandsWon < GROUP_B_MAX) {
+            oppGroup = "OppTypeB";
+        } else {
+            oppGroup = "OppTypeA";
+        }
+
+        return oppGroup;
     }
 
     private void initializeDbConnection() throws Exception {

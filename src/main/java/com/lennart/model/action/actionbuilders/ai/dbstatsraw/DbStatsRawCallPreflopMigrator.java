@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
+import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPreflop_2_0;
 
@@ -43,7 +44,7 @@ public class DbStatsRawCallPreflopMigrator {
                     String amountToCallGroup = getAmountToCallString(rs.getDouble("opponent_total_betsize"),
                             rs.getDouble("bot_total_betsize"), rs.getDouble("botstack"), rs.getDouble("bigblind"));
                     String effectiveStack = dbStatsRawRaisePreflopMigrator.getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                    String opponentType = new DbStatsRawBluffPostflopMigrator().getOpponentGroup(rs.getString("opponent_name"));
+                    String opponentType = new GameFlow().getOpponentGroup(rs.getDouble("recent_hands_won"));
 
                     String route = handStrength + position + amountToCallGroup + effectiveStack + opponentType;
 

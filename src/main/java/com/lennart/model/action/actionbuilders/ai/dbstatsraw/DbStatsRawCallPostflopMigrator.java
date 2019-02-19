@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
+import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPostflop_2_0;
@@ -48,7 +49,7 @@ public class DbStatsRawCallPostflopMigrator {
                     String handStrengthString = dbSaveCall.getHandStrengthLogic(rs.getDouble("handstrength"));
                     String strongDrawString = rs.getString("strongdraw");
                     String effectiveStack = dbStatsRawBluffPostflopMigrator.getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                    String opponentType = dbStatsRawBluffPostflopMigrator.getOpponentGroup(rs.getString("opponent_name"));
+                    String opponentType = new GameFlow().getOpponentGroup(rs.getDouble("recent_hands_won"));
 
                     String route = street + facingAction + position + amountToCallGroup + handStrengthString +
                             strongDrawString + effectiveStack + opponentType;
