@@ -293,7 +293,7 @@ public class MachineLearning {
                                                           boolean pre3BetOrPostRaisedPot) throws Exception {
         String actionToReturn = null;
 
-        if(callData.get(1) >= 10) {
+        if(callData.get(1) >= 20) {
             double callRatio = callData.get(0) / callData.get(1);
             double facingOdds = actionVariables.getFacingOdds(gameVariables);
             double callLimit = getCallRatioLimit(facingOdds);
@@ -307,14 +307,14 @@ public class MachineLearning {
                 double random = Math.random();
 
                 if(gameVariables.isBotIsButton()) {
-                    if(random < 0.54) {
-                        System.out.println("zzz callLimit: " + callLimit);
+                    if(random < 0.8) {
+                        System.out.println("MachineLearning change postflop call A");
                     } else {
                         actionToReturn = "call";
                     }
                 } else {
-                    if(random < 0.78) {
-                        System.out.println("zzz callLimit: " + callLimit);
+                    if(random < 0.8) {
+                        System.out.println("MachineLearning change postflop call A");
                     } else {
                         actionToReturn = "call";
                     }
