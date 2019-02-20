@@ -1,13 +1,16 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GameFlow {
 
     private Connection con;
 
-    public static double GROUP_C_MAX = 0.375;
-    public static double GROUP_B_MAX = 0.525;
+    public static double GROUP_C_MAX = 0.425;
+    public static double GROUP_B_MAX = 0.55;
     public static double LESS_THAN_20_HANDS = -2;
 
     public double getNumberOfHandsWonAgainstOppInLast20Hands(String opponentName, int entry) throws Exception {
@@ -87,6 +90,32 @@ public class GameFlow {
         }
 
         return oppGroup;
+    }
+
+    private void printStatsBoundries() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
+
+        List<Double> allGameFlowRatios = new ArrayList<>();
+
+        while(rs.next()) {
+            if(rs.getDouble("recent_hands_won") != -2) {
+                allGameFlowRatios.add(rs.getDouble("recent_hands_won"));
+            }
+        }
+
+        Collections.sort(allGameFlowRatios);
+
+        double oneThird = allGameFlowRatios.size() * 0.33333;
+        int oneThirdInt = (int) oneThird;
+
+        double twoThird = allGameFlowRatios.size() * 0.66666;
+        int twoThirdInt = (int) twoThird;
+
+        System.out.println(allGameFlowRatios.get(oneThirdInt));
+        System.out.println(allGameFlowRatios.get(twoThirdInt));
     }
 
     private void initializeDbConnection() throws Exception {
