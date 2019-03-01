@@ -967,10 +967,9 @@ public class ActionVariables {
                 boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
                 boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
                 boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
-                boolean strongOvercards = handEvaluator.hasDrawOfType("strongOvercards");
 
-                if((botHandStrength >= 0.64 && (strongFd || strongOosd || strongGutshot || strongOvercards)) ||
-                        ((strongFd && strongOosd) || (strongFd && strongGutshot) || (strongFd && strongOvercards) || (strongOosd && strongOvercards) || (strongGutshot && strongOvercards))) {
+                if((botHandStrength >= 0.64 && (strongFd || strongOosd)) ||
+                        ((strongFd && strongOosd) || (strongFd && strongGutshot))) {
                     if(eligibleActions.contains("raise") && !pre3betOrPostRaisedPot && sizing / bigBlind < 100) {
                         double random = Math.random();
 
@@ -996,6 +995,21 @@ public class ActionVariables {
         }
 
         return actionToReturn;
+    }
+
+    private String dontShoveWithAirPostflop(String action, double sizing, double botStack, double handStrength,
+                                            boolean strongFd, boolean strongOosd, List<Card> board) {
+        String actionToReturn;
+
+        if(action.equals("raise")) {
+            if(board != null && !board.isEmpty()) {
+                if(sizing >= 0.8 * botStack) {
+
+                }
+            }
+        }
+
+        return null;
     }
 
     private double adjustRaiseSizingToSng(double currentSizing, String action, GameVariables gameVariables,
