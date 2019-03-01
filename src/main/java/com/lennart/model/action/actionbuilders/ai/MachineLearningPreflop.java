@@ -51,54 +51,57 @@ public class MachineLearningPreflop {
 
         ResultSet rs = st.executeQuery("SELECT * FROM dbstats_pf_call_sng_compact_2_0 WHERE route = '" + route + "';");
 
-        rs.next();
+        if(rs.next()) {
+            if(rs.getDouble("total") >= 13) {
+                System.out.println("a1a1");
+                double success = rs.getDouble("success");
+                double total = rs.getDouble("total");
 
-        if(rs.getDouble("total") >= 13) {
-            System.out.println("a1a1");
-            double success = rs.getDouble("success");
-            double total = rs.getDouble("total");
+                if(success / total < 0.5) {
+                    System.out.println("b1b1");
+                    double random = Math.random();
 
-            if(success / total < 0.5) {
-                System.out.println("b1b1");
-                double random = Math.random();
-
-                if(gameVariables.isBotIsButton()) {
-                    System.out.println("c1c1");
-                    if(random < 0.43) {
-                        if(actionVariables.getBotHandStrength() > 0.95) {
-                            actionToReturn = "call";
-                            System.out.println("MachineLearning preflop IP ignored because hs > 0.95 : " + route);
+                    if(gameVariables.isBotIsButton()) {
+                        System.out.println("c1c1");
+                        if(random < 0.43) {
+                            if(actionVariables.getBotHandStrength() > 0.95) {
+                                actionToReturn = "call";
+                                System.out.println("MachineLearning preflop IP ignored because hs > 0.95 : " + route);
+                            } else {
+                                actionToReturn = "fold";
+                                System.out.println("MachineLearning preflop IP fold. Route: " + route);
+                            }
                         } else {
-                            actionToReturn = "fold";
-                            System.out.println("MachineLearning preflop IP fold. Route: " + route);
+                            System.out.println("d1d1");
+                            actionToReturn = action;
                         }
                     } else {
-                        System.out.println("d1d1");
-                        actionToReturn = action;
+                        System.out.println("e1e1");
+                        if(random < 0.75) {
+                            System.out.println("f1f1");
+                            if(actionVariables.getBotHandStrength() > 0.95) {
+                                actionToReturn = "call";
+                                System.out.println("MachineLearning preflop OOP ignored because hs > 0.95 : " + route);
+                            } else {
+                                actionToReturn = "fold";
+                                System.out.println("MachineLearning preflop OOP fold. Route: " + route);
+                            }
+                        } else {
+                            System.out.println("g1g1");
+                            actionToReturn = action;
+                        }
                     }
                 } else {
-                    System.out.println("e1e1");
-                    if(random < 0.75) {
-                        System.out.println("f1f1");
-                        if(actionVariables.getBotHandStrength() > 0.95) {
-                            actionToReturn = "call";
-                            System.out.println("MachineLearning preflop OOP ignored because hs > 0.95 : " + route);
-                        } else {
-                            actionToReturn = "fold";
-                            System.out.println("MachineLearning preflop OOP fold. Route: " + route);
-                        }
-                    } else {
-                        System.out.println("g1g1");
-                        actionToReturn = action;
-                    }
+                    System.out.println("h1h1");
+                    actionToReturn = action;
                 }
             } else {
-                System.out.println("h1h1");
-                actionToReturn = action;
+                System.out.println("z1z1");
+                actionToReturn = null;
             }
         } else {
-            System.out.println("z1z1");
             actionToReturn = null;
+            System.out.println("EMPTY ROUTE! " + route);
         }
 
         rs.close();
@@ -195,6 +198,8 @@ public class MachineLearningPreflop {
         amountToCallBb = amountToCallBb / gameVariables.getBigBlind();
 
         DbSavePreflopCall dbSavePreflopCall = new DbSavePreflopCall();
+
+        //todo: convert holecards to string
 
         String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
         String position = dbSavePreflopCall.getPositionLogic(gameVariables.isBotIsButton());
