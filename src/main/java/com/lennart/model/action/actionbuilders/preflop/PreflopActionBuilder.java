@@ -44,7 +44,7 @@ public class PreflopActionBuilder {
             } else if(amountToCallBb <= 25) {
                 action = getActionFacingAllIn(botHoleCards, 0.80);
             } else if(amountToCallBb <= 40) {
-                action = getActionFacingAllIn(botHoleCards, 0.85);
+                action = getActionFacingAllIn(botHoleCards, 0.90);
             } else {
                 action = get4betF5bet(botHoleCards, amountToCallBb);
             }
