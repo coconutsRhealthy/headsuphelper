@@ -73,7 +73,65 @@ public class GameFlow {
             recentHandsWonRatio = -2;
         }
 
-        return getOpponentGroup(recentHandsWonRatio);
+        String oppGroup = getOpponentGroup(recentHandsWonRatio);
+        oppGroup = adjustOppGroupToCifNeeded(oppGroup, rs);
+
+        rs.close();
+        st.close();
+
+        return oppGroup;
+    }
+
+    private String adjustOppGroupToCifNeeded(String oppGroup, ResultSet rs) throws Exception {
+        String oppGroupToReturn;
+
+        if(!oppGroup.equals("OppTypeC")) {
+            int counter = 0;
+            boolean shouldBeAdjusted = false;
+
+            while(rs.next()) {
+                counter++;
+
+                if(counter <= 40) {
+                    String board = rs.getString("board");
+
+                    if(!board.equals("")) {
+                        double botTotalBetSize = rs.getDouble("bot_total_betsize");
+
+                        if(botTotalBetSize >= 300) {
+                            boolean botWonHand = rs.getString("bot_won_hand").equals("true");
+
+                            if(!botWonHand) {
+                                double handStrength = rs.getDouble("handstrength");
+                                boolean showDownOccured = rs.getString("showdown_occured").equals("true");
+
+                                if(handStrength < 0.7 && showDownOccured) {
+                                    shouldBeAdjusted = true;
+                                    int relevantEntry = rs.getInt("entry");
+                                    System.out.println("Adjusted oppgroup from: " + oppGroup + " to oppGroupC! Because of entry: " + relevantEntry);
+                                    break;
+                                }
+                            } else {
+                                shouldBeAdjusted = false;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            if(shouldBeAdjusted) {
+                oppGroupToReturn = "OppTypeC";
+            } else {
+                oppGroupToReturn = oppGroup;
+            }
+        } else {
+            oppGroupToReturn = oppGroup;
+        }
+
+        return oppGroupToReturn;
     }
 
     public String getOpponentGroup(double recentHandsWon) {
