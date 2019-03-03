@@ -48,7 +48,7 @@ public class DbStatsRawValuePostflopMigrator {
                         String sizingGroup = dbStatsRawBluffPostflopMigrator.getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
                         String handStrengthString = new DbSaveValue().getHandStrengthLogic(handStrength);
                         String effectiveStack = dbStatsRawBluffPostflopMigrator.getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                        String opponentType = new GameFlow().getOpponentGroup(rs.getDouble("recent_hands_won"));
+                        String opponentType = rs.getString("opp_type");
 
                         String route = street + valueAction + position + sizingGroup + handStrengthString + effectiveStack + opponentType;
 

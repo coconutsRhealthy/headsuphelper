@@ -44,7 +44,7 @@ public class DbStatsRawCallPreflopMigrator {
                     String amountToCallGroup = getAmountToCallString(rs.getDouble("opponent_total_betsize"),
                             rs.getDouble("bot_total_betsize"), rs.getDouble("botstack"), rs.getDouble("bigblind"));
                     String effectiveStack = new DbStatsRawBluffPostflopMigrator().getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                    String opponentType = new GameFlow().getOpponentGroup(rs.getDouble("recent_hands_won"));
+                    String opponentType = rs.getString("opp_type");
 
                     String route = combo + position + amountToCallGroup + effectiveStack + opponentType;
 

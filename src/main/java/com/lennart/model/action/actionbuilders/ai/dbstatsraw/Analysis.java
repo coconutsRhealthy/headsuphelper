@@ -16,7 +16,56 @@ public class Analysis {
 
     private Connection con;
 
-    private void addGameflowToDbStatsRaw() throws Exception {
+    private void addOppTypeToDbStatsRaw() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
+
+        int counter = 0;
+        int counter2 = 0;
+
+        while(rs.next()) {
+            double recentHandsWonRatio = rs.getDouble("recent_hands_won");
+
+            GameFlow gameFlow = new GameFlow();
+
+            int entry = rs.getInt("entry");
+
+            String oppType = gameFlow.getOpponentGroupInitialFromRatio(recentHandsWonRatio);
+            String oppTypeAfterAdjustment = gameFlow.adjustOppTypeForRecentBigPots(rs.getString("opponent_name"), oppType, entry);
+
+            if(!oppTypeAfterAdjustment.equals(oppType)) {
+                Statement st2 = con.createStatement();
+
+                st2.executeUpdate("UPDATE dbstats_raw SET ajdusted_opp_type = '" + oppTypeAfterAdjustment + "' WHERE entry = '" + entry + "'");
+
+                st2.close();
+            }
+
+            if(counter < 100) {
+                System.out.print(".");
+            } else {
+                System.out.println();
+                counter = 0;
+
+                counter2++;
+
+                if(counter2 == 15) {
+                    MouseKeyboard.click(30, 30);
+                    MouseKeyboard.moveMouseToLocation(90, 90);
+                    counter2 = 0;
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private void addRecentHandsWonToDbStatsRaw() throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();

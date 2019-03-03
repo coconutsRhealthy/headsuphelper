@@ -115,6 +115,11 @@ public class DbSaveRaw extends DbSave {
         return new GameFlow().getNumberOfHandsWonAgainstOppInLast20Hands(opponentName, -1);
     }
 
+    public double getAdjustedOppTypeLogic() throws Exception {
+        //return new GameFlow().adjustOppTypeForRecentBigPots();
+        return 0;
+    }
+
     //regular getters and setters
     public String getBotAction() {
         return botAction;

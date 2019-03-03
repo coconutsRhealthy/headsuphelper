@@ -73,68 +73,73 @@ public class GameFlow {
             recentHandsWonRatio = -2;
         }
 
-        String oppGroup = getOpponentGroup(recentHandsWonRatio);
-        oppGroup = adjustOppGroupToCifNeeded(oppGroup, rs);
-
         rs.close();
         st.close();
+
+        closeDbConnection();
+
+        String oppGroup = getOpponentGroupInitialFromRatio(recentHandsWonRatio);
+        oppGroup = adjustOppTypeForRecentBigPots(opponentName, oppGroup, -1);
 
         return oppGroup;
     }
 
-    private String adjustOppGroupToCifNeeded(String oppGroup, ResultSet rs) throws Exception {
-        String oppGroupToReturn;
+    public String adjustOppTypeForRecentBigPots(String opponentName, String oppType, int entryFromAnalysis) throws Exception {
+        String oppGroupToReturn = oppType;
 
-        if(!oppGroup.equals("OppTypeC")) {
-            int counter = 0;
-            boolean shouldBeAdjusted = false;
+        int counter = 0;
 
-            while(rs.next()) {
-                counter++;
+        initializeDbConnection();
 
-                if(counter <= 40) {
-                    String board = rs.getString("board");
+        Statement st = con.createStatement();
+        ResultSet rs;
 
-                    if(!board.equals("")) {
-                        double botTotalBetSize = rs.getDouble("bot_total_betsize");
-
-                        if(botTotalBetSize >= 300) {
-                            boolean botWonHand = rs.getString("bot_won_hand").equals("true");
-
-                            if(!botWonHand) {
-                                double handStrength = rs.getDouble("handstrength");
-                                boolean showDownOccured = rs.getString("showdown_occured").equals("true");
-
-                                if(handStrength < 0.7 && showDownOccured) {
-                                    shouldBeAdjusted = true;
-                                    int relevantEntry = rs.getInt("entry");
-                                    System.out.println("Adjusted oppgroup from: " + oppGroup + " to oppGroupC! Because of entry: " + relevantEntry);
-                                    break;
-                                }
-                            } else {
-                                shouldBeAdjusted = false;
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    break;
-                }
-            }
-
-            if(shouldBeAdjusted) {
-                oppGroupToReturn = "OppTypeC";
-            } else {
-                oppGroupToReturn = oppGroup;
-            }
+        if(entryFromAnalysis != -1) {
+            rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE opponent_name = '" + opponentName + "' AND entry < " + entryFromAnalysis + " ORDER BY entry DESC;");
         } else {
-            oppGroupToReturn = oppGroup;
+            rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE opponent_name = '" + opponentName + "' ORDER BY entry DESC;");
         }
+
+        while(rs.next()) {
+            counter++;
+
+            if(counter <= 40) {
+                String board = rs.getString("board");
+
+                if(!board.equals("")) {
+                    double botTotalBetSize = rs.getDouble("bot_total_betsize");
+                    double opponentTotalBetSize = rs.getDouble("opponent_total_betsize");
+                    String botAction = rs.getString("bot_action");
+
+                    if(botTotalBetSize >= 300 || (opponentTotalBetSize >= 300 && !botAction.equals("fold"))) {
+                        boolean botWonHand = rs.getString("bot_won_hand").equals("true");
+                        int entry = rs.getInt("entry");
+
+                        if(botWonHand) {
+                            oppGroupToReturn = "OppTypeA";
+                            System.out.println("Adjusted opptype to OppTypeA (from: " + oppType + ") entry: + " + entry);
+                        } else {
+                            oppGroupToReturn = "OppTypeC";
+                            System.out.println("Adjusted opptype to OppTypeC (from: " + oppType + ") entry: + " + entry);
+                        }
+
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
 
         return oppGroupToReturn;
     }
 
-    public String getOpponentGroup(double recentHandsWon) {
+    public String getOpponentGroupInitialFromRatio(double recentHandsWon) {
         String oppGroup;
 
         if(recentHandsWon == LESS_THAN_20_HANDS) {
