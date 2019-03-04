@@ -49,7 +49,8 @@ public class DbSavePersisterRawData {
                     "bot_won_hand, " +
                     "bigblind, " +
                     "strongdraw, " +
-                    "recent_hands_won) " +
+                    "recent_hands_won, " +
+                    "adjusted_opp_type) " +
                     "VALUES ('" +
                     (getHighestIntEntry("dbstats_raw") + 1) + "', '" +
                     getCurrentDate() + "', '" +
@@ -71,7 +72,8 @@ public class DbSavePersisterRawData {
                     botWonHand(biglind) + "', '" +
                     dbSaveRaw.getBigBlind() + "', '" +
                     dbSaveRaw.getStrongDraw() + "', '" +
-                    dbSaveRaw.getRecentHandsWon() + "'" +
+                    dbSaveRaw.getRecentHandsWon() + "', '" +
+                    dbSaveRaw.getAdjustedOppType() + "'" +
                     ")");
             }
         }

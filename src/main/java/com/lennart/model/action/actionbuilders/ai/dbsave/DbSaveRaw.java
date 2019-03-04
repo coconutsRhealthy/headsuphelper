@@ -28,6 +28,7 @@ public class DbSaveRaw extends DbSave {
     private double bigBlind;
     private String strongDraw;
     private double recentHandsWon;
+    private String adjustedOppType;
 
     private Connection con;
 
@@ -115,9 +116,8 @@ public class DbSaveRaw extends DbSave {
         return new GameFlow().getNumberOfHandsWonAgainstOppInLast20Hands(opponentName, -1);
     }
 
-    public double getAdjustedOppTypeLogic() throws Exception {
-        //return new GameFlow().adjustOppTypeForRecentBigPots();
-        return 0;
+    public String getAdjustedOppTypeLogic(String opponentName) throws Exception {
+        return new GameFlow().getAdjustedOppTypeForRecentBigPots(opponentName, -1);
     }
 
     //regular getters and setters
@@ -255,6 +255,14 @@ public class DbSaveRaw extends DbSave {
 
     public void setRecentHandsWon(double recentHandsWon) {
         this.recentHandsWon = recentHandsWon;
+    }
+
+    public String getAdjustedOppType() {
+        return adjustedOppType;
+    }
+
+    public void setAdjustedOppType(String adjustedOppType) {
+        this.adjustedOppType = adjustedOppType;
     }
 
     private void initializeDbConnection() throws Exception {

@@ -505,6 +505,7 @@ public class ActionVariables {
             String positionString = dbSaveRaw.getPositionLogic(botIsButtonInMethod);
             String opponentData = dbSaveRaw.getOpponentDataLogic(gameVariables.getOpponentName());
             double recentHandsWon = dbSaveRaw.getRecentHandsWonLogic(gameVariables.getOpponentName());
+            String adjustedOppType = dbSaveRaw.getAdjustedOppTypeLogic(gameVariables.getOpponentName());
             String strongDrawString;
 
             if(handEvaluator == null) {
@@ -531,6 +532,7 @@ public class ActionVariables {
             dbSaveRaw.setBigBlind(gameVariables.getBigBlind());
             dbSaveRaw.setStrongDraw(strongDrawString);
             dbSaveRaw.setRecentHandsWon(recentHandsWon);
+            dbSaveRaw.setAdjustedOppType(adjustedOppType);
 
             continuousTable.getDbSaveList().add(dbSaveRaw);
             //DbSaveRaw

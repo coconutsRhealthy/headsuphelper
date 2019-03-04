@@ -65,7 +65,7 @@ public class DbStatsRawRaisePreflopMigrator {
                     String position = rs.getString("position");
                     String sizingGroup = getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
                     String effectiveStack = new DbStatsRawBluffPostflopMigrator().getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                    String opponentType = rs.getString("opp_type");
+                    String opponentType = new GameFlow().getOpponentGroupForMigratorClasses(rs.getDouble("recent_hands_won"), rs.getString("adjusted_opp_type"));
 
                     String route = combo + position + sizingGroup + effectiveStack + opponentType;
 
