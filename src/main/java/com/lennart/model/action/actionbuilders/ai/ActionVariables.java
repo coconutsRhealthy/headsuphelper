@@ -1,11 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
-import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
-import com.lennart.model.action.actionbuilders.ai.foldstats.AdjustToFoldStats;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
@@ -40,8 +37,6 @@ public class ActionVariables {
     private boolean strongBackdoorSd;
 
     private HandEvaluator handEvaluator;
-
-    private String actionBeforeFoldStat;
 
     private BoardEvaluator boardEvaluator;
 
@@ -106,7 +101,7 @@ public class ActionVariables {
         ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
     }
 
-    public String getDummyAction(ContinuousTable continuousTableInput, GameVariables gameVariablesInput) throws Exception {
+    public String getDummyActionOppAllIn(ContinuousTable continuousTableInput, GameVariables gameVariablesInput) throws Exception {
         ContinuousTable continuousTableInMethod = new ContinuousTable();
 
         continuousTableInMethod.setOpponentHasInitiative(continuousTableInput.isOpponentHasInitiative());
@@ -236,47 +231,6 @@ public class ActionVariables {
             }
         }
 
-        actionBeforeFoldStat = action;
-
-        //now follows the adjustToFoldStat logic
-        AdjustToFoldStats adjustToFoldStats = new AdjustToFoldStats();
-
-        if(action.equals("fold")) {
-            double botFoldStat = new FoldStatsKeeper().getFoldStatFromDb("bot-V-" + gameVariables.getOpponentName());
-
-            System.out.println("botFoldStat against " + gameVariables.getOpponentName() + ": " + botFoldStat);
-
-            if(botFoldStat > 1.2) {
-                double handStrengthRequiredToCall = adjustToFoldStats.getHandStrengthRequiredToCall(this, eligibleActions,
-                        streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack,
-                        botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb,
-                        opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot,
-                        gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(),
-                        continuousTable.isPre3betOrPostRaisedPot(), false, false, false, boardWetness, continuousTable.isOpponentHasInitiative());
-
-                action = adjustToFoldStats.adjustPlayToBotFoldStat(action, botHandStrengthInMethod, handStrengthRequiredToCall, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, gameVariables.getOpponentName(), botBetsizeBb, opponentBetsizeBb, false);
-
-                if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb == 1) {
-                    action = "fold";
-                }
-
-                if(action.equals("call")) {
-                    System.out.println();
-                    System.out.println("CHANGED FROM FOLD TO CALL!");
-                    System.out.println("street: " + streetInMethod);
-                    System.out.println();
-                }
-
-                if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb > 4) {
-                    continuousTable.setPre3betOrPostRaisedPot(true);
-                }
-
-                if(action.equals("call") && streetInMethod.equals("preflop") && opponentBetsizeBb > 16) {
-                    continuousTable.setOpponentDidPreflop4betPot(true);
-                }
-            }
-        }
-
         if(boardInMethod != null && boardInMethod.size() >= 3) {
             double bigBlind = gameVariables.getBigBlind();
             RangeTracker rangeTracker = new RangeTracker();
@@ -336,6 +290,9 @@ public class ActionVariables {
             action = new PlayerBluffer().doOpponentBluffSuccessAction(action, gameVariables.getOpponentName(), bigBlind,
                     botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
                     botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
+
+            String oppType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
+            action = preventCertainBluffs(action, botHandStrength, strongFlushDraw, sizing, bigBlind, oppType, continuousTable, gameVariables, boardInMethod);
 
             //machine learning
             String actionBeforeMachineLearning = action;
@@ -997,19 +954,78 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String dontShoveWithAirPostflop(String action, double sizing, double botStack, double handStrength,
-                                            boolean strongFd, boolean strongOosd, List<Card> board) {
+    private String preventCertainBluffs(String action, double handStrength, boolean strongFdOrOosd, double sizing,
+                                        double bigBlind, String oppType, ContinuousTable continuousTable,
+                                        GameVariables gameVariables, List<Card> board) throws Exception {
         String actionToReturn;
 
-        if(action.equals("raise")) {
-            if(board != null && !board.isEmpty()) {
-                if(sizing >= 0.8 * botStack) {
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct") || action.equals("raise")) {
+                if(handStrength < 0.7 && !strongFdOrOosd) {
+                    if(action.equals("bet75pct")) {
+                        if(oppType.equals("OppTypeB")) {
+                            double sizingBb = sizing / bigBlind;
 
+                            if(sizingBb > 20) {
+                                double random = Math.random();
+
+                                if(random > 0.2) {
+                                    actionToReturn = "check";
+                                    System.out.println("Prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
+                                } else {
+                                    actionToReturn = action;
+                                    System.out.println("zzz prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else if(oppType.equals("OppTypeC")) {
+                            double sizingBb = sizing / bigBlind;
+
+                            if(sizingBb > 5) {
+                                double random = Math.random();
+
+                                if(random > 0.2) {
+                                    actionToReturn = "check";
+                                    System.out.println("Prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
+                                } else {
+                                    actionToReturn = action;
+                                    System.out.println("zzz prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        double sizingBb = sizing / bigBlind;
+
+                        if(sizingBb > 10) {
+                            double random = Math.random();
+
+                            if(random > 0.2) {
+                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                System.out.println("Prevent bluffraise in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("zzz prevent bluffraise in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
                 }
+            } else {
+                actionToReturn = action;
             }
+        } else {
+            actionToReturn = action;
         }
 
-        return null;
+        return actionToReturn;
     }
 
     private double adjustRaiseSizingToSng(double currentSizing, String action, GameVariables gameVariables,
@@ -1164,14 +1180,6 @@ public class ActionVariables {
 
     public void setHandEvaluator(HandEvaluator handEvaluator) {
         this.handEvaluator = handEvaluator;
-    }
-
-    public String getActionBeforeFoldStat() {
-        return actionBeforeFoldStat;
-    }
-
-    public void setActionBeforeFoldStat(String actionBeforeFoldStat) {
-        this.actionBeforeFoldStat = actionBeforeFoldStat;
     }
 
     public BoardEvaluator getBoardEvaluator() {
