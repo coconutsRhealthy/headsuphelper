@@ -33,7 +33,7 @@ public class Analysis {
             int entry = rs.getInt("entry");
 
             String oppType = gameFlow.getOpponentGroupInitialFromRatio(recentHandsWonRatio);
-            String oppTypeAfterAdjustment = gameFlow.getAdjustedOppTypeForRecentBigPots(rs.getString("opponent_name"), entry);
+            String oppTypeAfterAdjustment = gameFlow.getAdjustedOppTypeForRecentBigPots(rs.getString("opponent_name"), entry, oppType);
 
             if(!oppTypeAfterAdjustment.equals("") && !oppTypeAfterAdjustment.equals(oppType)) {
                 Statement st2 = con.createStatement();

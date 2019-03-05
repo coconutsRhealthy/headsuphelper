@@ -291,8 +291,13 @@ public class ActionVariables {
                     botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
                     botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
 
+            if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            }
+
             String oppType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
-            action = preventCertainBluffs(action, botHandStrength, strongFlushDraw, sizing, bigBlind, oppType, continuousTable, gameVariables, boardInMethod);
+            action = preventCertainBluffs(action, botHandStrength, strongFd || strongOosd, sizing, bigBlind, oppType, continuousTable, gameVariables, boardInMethod);
+            action = preventBigAirFlopAndTurnBluffs(action, sizing, botHandStrength, strongFd || strongOosd || strongGutshot, boardInMethod, continuousTable, gameVariables);
 
             //machine learning
             String actionBeforeMachineLearning = action;
@@ -1007,8 +1012,8 @@ public class ActionVariables {
                             double random = Math.random();
 
                             if(random > 0.2) {
-                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
                                 System.out.println("Prevent bluffraise in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
+                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
                             } else {
                                 actionToReturn = action;
                                 System.out.println("zzz prevent bluffraise in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
@@ -1016,6 +1021,37 @@ public class ActionVariables {
                         } else {
                             actionToReturn = action;
                         }
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventBigAirFlopAndTurnBluffs(String action, double sizing, double handStrength, boolean stongFdOosGutshot,
+                                                  List<Card> board, ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            if(board != null && (board.size() == 3 || board.size() == 4)) {
+                if(handStrength <= 0.5 && !stongFdOosGutshot) {
+                    if(sizing >= 300) {
+                        if(action.equals("bet75pct")) {
+                            actionToReturn = "check";
+                            System.out.println("Prevent air flop/turn big bluffbet in preventBigAirFlopAndTurnBluffs()");
+                        } else {
+                            System.out.println("Prevent air flop/turn big bluffraise in preventBigAirFlopAndTurnBluffs()");
+                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                        }
+                    } else {
+                        actionToReturn = action;
                     }
                 } else {
                     actionToReturn = action;

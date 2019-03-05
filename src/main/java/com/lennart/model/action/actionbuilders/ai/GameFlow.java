@@ -79,7 +79,7 @@ public class GameFlow {
         closeDbConnection();
 
         String oppGroup = getOpponentGroupInitialFromRatio(recentHandsWonRatio);
-        String adjustedOppGroup = getAdjustedOppTypeForRecentBigPots(opponentName, -1);
+        String adjustedOppGroup = getAdjustedOppTypeForRecentBigPots(opponentName, -1, oppGroup);
 
         if(!adjustedOppGroup.equals("")) {
             oppGroup = adjustedOppGroup;
@@ -100,7 +100,7 @@ public class GameFlow {
         return oppGroup;
     }
 
-    public String getAdjustedOppTypeForRecentBigPots(String opponentName, int entryFromAnalysis) throws Exception {
+    public String getAdjustedOppTypeForRecentBigPots(String opponentName, int entryFromAnalysis, String initialOppGroup) throws Exception {
         String oppGroupToReturn = "";
 
         int counter = 0;
@@ -133,10 +133,16 @@ public class GameFlow {
 
                         if(botWonHand) {
                             oppGroupToReturn = "OppTypeA";
-                            System.out.println("OppType will be set to OppTypeA for entry: + " + entry);
+
+                            if(initialOppGroup != null && !oppGroupToReturn.equals(initialOppGroup)) {
+                                System.out.println("OppType will be set to OppTypeA (from " + initialOppGroup + ") for entry: + " + entry);
+                            }
                         } else {
                             oppGroupToReturn = "OppTypeC";
-                            System.out.println("OppType will be set to OppTypeC for entry: + " + entry);
+
+                            if(initialOppGroup != null && !oppGroupToReturn.equals(initialOppGroup)) {
+                                System.out.println("OppType will be set to OppTypeC (from " + initialOppGroup + ") for entry: + " + entry);
+                            }
                         }
 
                         break;

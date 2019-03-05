@@ -117,7 +117,7 @@ public class DbSaveRaw extends DbSave {
     }
 
     public String getAdjustedOppTypeLogic(String opponentName) throws Exception {
-        return new GameFlow().getAdjustedOppTypeForRecentBigPots(opponentName, -1);
+        return new GameFlow().getAdjustedOppTypeForRecentBigPots(opponentName, -1, null);
     }
 
     //regular getters and setters
