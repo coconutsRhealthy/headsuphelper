@@ -310,6 +310,8 @@ public class ActionVariables {
             }
             //machine learning
 
+            action = preventMoreBluffs(action, botHandStrength, strongFd || strongOosd, boardInMethod, continuousTable, gameVariables);
+
             if((action.equals("bet75pct") || action.equals("raise"))) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
@@ -1048,6 +1050,39 @@ public class ActionVariables {
                             System.out.println("Prevent air flop/turn big bluffbet in preventBigAirFlopAndTurnBluffs()");
                         } else {
                             System.out.println("Prevent air flop/turn big bluffraise in preventBigAirFlopAndTurnBluffs()");
+                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventMoreBluffs(String action, double handStrength, boolean strongFdOrOosd, List<Card> board,
+                                     ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct") || action.equals("raise")) {
+                if(handStrength < 0.7 && !strongFdOrOosd) {
+                    double random = Math.random();
+
+                    if(random < 0.5) {
+                        if(action.equals("bet75pct")) {
+                            actionToReturn = "check";
+                            System.out.println("prevented bluff bet action 50%");
+                        } else {
+                            System.out.println("prevented bluff raise action 50%");
                             actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
                         }
                     } else {
