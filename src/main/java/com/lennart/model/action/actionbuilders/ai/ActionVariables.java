@@ -311,6 +311,7 @@ public class ActionVariables {
             //machine learning
 
             action = preventMoreBluffs(action, botHandStrength, strongFd || strongOosd, boardInMethod, continuousTable, gameVariables);
+            action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables);
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -1077,7 +1078,7 @@ public class ActionVariables {
                 if(handStrength < 0.7 && !strongFdOrOosd) {
                     double random = Math.random();
 
-                    if(random < 0.5) {
+                    if(random < 0.12) {
                         if(action.equals("bet75pct")) {
                             actionToReturn = "check";
                             System.out.println("prevented bluff bet action 50%");
@@ -1087,6 +1088,105 @@ public class ActionVariables {
                         }
                     } else {
                         actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String solidifySngBot(String action, double botHandStrength, boolean strongFd, boolean strongOosd,
+                                  boolean strongGutshot, List<Card> board, double sizing, ContinuousTable continuousTable,
+                                  GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct") || action.equals("raise")) {
+                if(sizing >= 200) {
+                    if(botHandStrength < 0.87) {
+                        if(board.size() == 3) {
+                            if(action.equals("bet75pct")) {
+                                if(strongFd || strongOosd || strongGutshot) {
+                                    actionToReturn = action;
+                                    System.out.println("kept flop action bet75pct because strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
+                                } else {
+                                    actionToReturn = "check";
+                                    System.out.println("change flop action to check because no strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
+                                }
+                            } else {
+                                if(strongFd || strongOosd || strongGutshot) {
+                                    actionToReturn = action;
+                                    System.out.println("kept flop action raise because strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
+                                } else {
+                                    System.out.println("change flop action to fold or call because no strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
+                            }
+                        } else if(board.size() == 4) {
+                            if(action.equals("bet75pct")) {
+                                if(strongFd || strongOosd) {
+                                    actionToReturn = action;
+                                    System.out.println("kept turn action bet75pct because strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                } else {
+                                    actionToReturn = "check";
+                                    System.out.println("change turn action to check because no strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                }
+                            } else {
+                                if(strongFd || strongOosd) {
+                                    actionToReturn = action;
+                                    System.out.println("kept turn action raise because strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                } else {
+                                    System.out.println("change turn action to fold or call because no strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
+                            }
+                        } else {
+                            List<Set<Card>> top10percentTurnCombosCopy = new ArrayList<>();
+                            List<Set<Card>> top10percentRiverCombosCopy = new ArrayList<>();
+
+                            top10percentTurnCombosCopy.addAll(continuousTable.getTop10percentTurnCombos());
+                            top10percentRiverCombosCopy.addAll(continuousTable.getTop10percentRiverCombos());
+
+                            int boardWetness = BoardEvaluator.getBoardWetness(top10percentTurnCombosCopy, top10percentRiverCombosCopy);
+
+                            if(action.equals("bet75pct")) {
+                                if(botHandStrength < 0.6) {
+                                    if(boardWetness < 20) {
+                                        actionToReturn = action;
+                                        System.out.println("kept river action bet75pct because boardwetness is: " + boardWetness + " hs: " + botHandStrength + " sizing: " + sizing);
+                                    } else {
+                                        actionToReturn = "check";
+                                        System.out.println("change river action to check because boardwetness is: " + boardWetness + " hs: " + botHandStrength + " sizing: " + sizing);
+                                    }
+                                } else {
+                                    actionToReturn = "check";
+                                    System.out.println("Change river thin value bet action to check. Hs: " + botHandStrength);
+                                }
+                            } else {
+                                if(botHandStrength < 0.6) {
+                                    if(boardWetness < 20) {
+                                        actionToReturn = action;
+                                        System.out.println("kept river action raise because boardwetness is: " + boardWetness + " hs: " + botHandStrength + " sizing: " + sizing);
+                                    } else {
+                                        System.out.println("change river action to call or fold because boardwetness is: " + boardWetness + " hs: " + botHandStrength + " sizing: " + sizing);
+                                        actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                    }
+                                } else {
+                                    System.out.println("Change river thin value raise to call or fold. Hs: " + botHandStrength);
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
+                            }
+                        }
+                    } else {
+                        actionToReturn = action;
+                        System.out.println("pure value action. action: " + action + " hs: " + botHandStrength + " sizing: " + sizing);
                     }
                 } else {
                     actionToReturn = action;
