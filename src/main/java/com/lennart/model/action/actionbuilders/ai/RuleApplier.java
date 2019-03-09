@@ -1313,4 +1313,40 @@ public class RuleApplier {
 
         return actionToRetun;
     }
+
+    public String valueBetInPosition(String action, double handStrength, boolean botIsButton, List<Card> board) {
+        String actionToReturn;
+
+        if(action.equals("check")) {
+            if(botIsButton) {
+                if(handStrength >= 0.9) {
+                    if(board != null && !board.isEmpty()) {
+                        if(board.size() == 3 || board.size() == 4) {
+                            double random = Math.random();
+
+                            if(random > 0.15) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("valueBetInPosition() flop or turn");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = "bet75pct";
+                            System.out.println("valueBetInPosition() river");
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
 }

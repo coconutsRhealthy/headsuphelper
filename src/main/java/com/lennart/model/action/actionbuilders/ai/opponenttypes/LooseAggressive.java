@@ -518,13 +518,13 @@ public class LooseAggressive extends AbstractOpponent {
                     if(strongDraw) {
                         action = "call";
                     } else {
-                        if(handStrength > 0.44) {
+                        if(handStrength > 0.63) {
                             action = "call";
                         } else {
                             if(isFloatOpportunity(handStrength, position, board)) {
                                 double random = Math.random();
 
-                                if(random > 0.50) {
+                                if(random > 1) {
                                     action = "call";
                                 } else {
                                     action = "fold";

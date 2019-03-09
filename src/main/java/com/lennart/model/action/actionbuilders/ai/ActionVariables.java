@@ -295,9 +295,9 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
 
-            String oppType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
-            action = preventCertainBluffs(action, botHandStrength, strongFd || strongOosd, sizing, bigBlind, oppType, continuousTable, gameVariables, boardInMethod);
-            action = preventBigAirFlopAndTurnBluffs(action, sizing, botHandStrength, strongFd || strongOosd || strongGutshot, boardInMethod, continuousTable, gameVariables);
+            //String oppType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
+            //action = preventCertainBluffs(action, botHandStrength, strongFd || strongOosd, sizing, bigBlind, oppType, continuousTable, gameVariables, boardInMethod);
+            //action = preventBigAirFlopAndTurnBluffs(action, sizing, botHandStrength, strongFd || strongOosd || strongGutshot, boardInMethod, continuousTable, gameVariables);
 
             //machine learning
             String actionBeforeMachineLearning = action;
@@ -311,6 +311,11 @@ public class ActionVariables {
             //machine learning
 
             //action = preventMoreBluffs(action, botHandStrength, strongFd || strongOosd, boardInMethod, continuousTable, gameVariables);
+
+            if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            }
+
             action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables);
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
@@ -1110,7 +1115,15 @@ public class ActionVariables {
         if(board != null && !board.isEmpty()) {
             if(action.equals("bet75pct") || action.equals("raise")) {
                 if(sizing > 150) {
-                    if(botHandStrength < 0.87) {
+                    double hsLimit;
+
+                    if(sizing < 300) {
+                        hsLimit = 0.87;
+                    } else {
+                        hsLimit = 0.9;
+                    }
+
+                    if(botHandStrength < hsLimit) {
                         if(board.size() == 3) {
                             if (strongFd || strongOosd || strongGutshot) {
                                 actionToReturn = action;
