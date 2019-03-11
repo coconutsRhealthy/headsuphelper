@@ -296,10 +296,8 @@ public class PreflopActionBuilder {
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
         List<List<Card>> pre3betPoule = getPre3betPoule();
-        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule);
 
-        if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)
-                || preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
+        if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
             return "raise";
         } else {
             return "check";
@@ -382,4 +380,63 @@ public class PreflopActionBuilder {
         return 0;
     }
 
+    public static void main(String[] args) {
+        new PreflopActionBuilder().getPreCall3betSngDeepPoule();
+    }
+
+    public List<List<Card>> getPreCall3betSngDeepPoule() {
+        List<List<Card>> call3betCombos = new ArrayList<>();
+        List<Map<Integer, Set<Card>>> allCombosInMapsInList = new ArrayList<>();
+
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(14));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(13));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(12));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(11));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(10));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(9));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(8));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(7));
+
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(14));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(13));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(12));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(11));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(10));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(9));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(8));
+        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(7));
+
+        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 13));
+        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 12));
+        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 11));
+
+        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(13, 12));
+
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 13));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 12));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 11));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 10));
+
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(13, 12));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(12, 11));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(11, 10));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(10, 9));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(9, 8));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(8, 7));
+
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(13, 11));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(12, 10));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(11, 9));
+        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(10, 8));
+
+        for(Map<Integer, Set<Card>> map : allCombosInMapsInList) {
+            for(Map.Entry<Integer, Set<Card>> entry : map.entrySet()) {
+                List<Card> combo = new ArrayList<>();
+                combo.addAll(entry.getValue());
+                call3betCombos.add(combo);
+            }
+        }
+
+        return call3betCombos;
+    }
 }

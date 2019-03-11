@@ -147,11 +147,11 @@ public class Sizing {
         double potSizePlusAllBetsInBb =  computerTotalBetSizeInBb + opponentTotalBetSizeInBb;
 
         if(potSizePlusAllBetsInBb == 1.5) {
-            size = 2.5 * bigBlind;
+            size = 2.1 * bigBlind;
         } else if(potSizePlusAllBetsInBb == 2) {
             size = 3.5 * bigBlind;
         } else if(opponentTotalBetSizeInBb >= 2 && opponentTotalBetSizeInBb <= 4) {
-            size = 3.2 * facingBetSize;
+            size = 3 * facingBetSize;
         } else if(opponentTotalBetSizeInBb > 4 && opponentTotalBetSizeInBb <= 16) {
             size = 2.25 * facingBetSize;
         } else {

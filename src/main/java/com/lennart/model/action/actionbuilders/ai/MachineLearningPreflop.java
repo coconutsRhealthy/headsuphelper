@@ -18,7 +18,7 @@ public class MachineLearningPreflop {
         if(actionToReturn.equals("call")) {
             actionToReturn = adjustCallAction(actionVariables.getAction(), gameVariables, actionVariables);
         } else if(actionToReturn.equals("raise")) {
-            actionToReturn = adjustRaiseAction(actionVariables.getAction(), gameVariables, actionVariables, sizing);
+            //actionToReturn = adjustRaiseAction(actionVariables.getAction(), gameVariables, actionVariables, sizing);
         }
 
         return actionToReturn;

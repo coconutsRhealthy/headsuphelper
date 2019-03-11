@@ -317,6 +317,8 @@ public class ActionVariables {
             }
 
             action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables);
+            action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd);
+            action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, botHandStrength, boardInMethod);
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -324,6 +326,7 @@ public class ActionVariables {
         } else {
             double sizingForMachineLearning = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             action = new MachineLearningPreflop().adjustActionToDbSaveData(this, gameVariables, sizingForMachineLearning);
+            action = solidifySngDeepPre3betCalls(action, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, opponentBetsizeBb, effectiveStack);
         }
 
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
@@ -1185,6 +1188,100 @@ public class ActionVariables {
                     } else {
                         actionToReturn = action;
                         System.out.println("xagkpure pure value action. action: " + action + " hs: " + botHandStrength + " sizing: " + sizing);
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String solidifySngBotCalls(String action, double botHandStrength, List<Card> board, double facingOdds,
+                                       boolean strongFd, boolean strongOosd)  {
+        String actionToReturn;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("call")) {
+                if(facingOdds > 0.23) {
+                    if(botHandStrength < 0.80 && !strongFd && !strongOosd) {
+                        actionToReturn = "fold";
+                        System.out.println("gsfdg change call to fold. HS: " + botHandStrength);
+                    } else {
+                        actionToReturn = action;
+                        System.out.println("gsfdg kept value call. HS: " + botHandStrength);
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String solidifySngDeepPre3betCalls(String action, List<Card> botHoleCards, List<Card> board, boolean botIsButton,
+                                               double opponentBetSizeBb, double effectiveStackBb) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(board == null || board.isEmpty()) {
+                if(botIsButton) {
+                    if(opponentBetSizeBb > 4) {
+                        if(effectiveStackBb >= 35) {
+                            List<List<Card>> preCall3betSngDeepPoule = new PreflopActionBuilder().getPreCall3betSngDeepPoule();
+
+                            List<Card> botHoleCardsReverseOrder = new ArrayList<>();
+                            botHoleCardsReverseOrder.add(botHoleCards.get(1));
+                            botHoleCardsReverseOrder.add(botHoleCards.get(0));
+
+                            if(preCall3betSngDeepPoule.contains(botHoleCards) || preCall3betSngDeepPoule.contains(botHoleCardsReverseOrder)) {
+                                actionToReturn = action;
+                            } else {
+                                actionToReturn = "fold";
+                                System.out.println("sdgbg changed preflop 3bet call to fold. Combo: " +
+                                        botHoleCards.get(0).getRank() + botHoleCards.get(0).getSuit() + " " +
+                                        botHoleCards.get(1).getRank() + botHoleCards.get(1).getSuit());
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn  = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String solidifyPostflopLimpedDonks(String action, double pot, double bigblind, double botHandStrength, List<Card> board) {
+        String actionToReturn;
+
+        if(action.equals("bet75pct")) {
+            if(board != null && !board.isEmpty()) {
+                if(pot == (2 * bigblind)) {
+                    if(botHandStrength < 0.8) {
+                        actionToReturn = "check";
+                        System.out.println("Changed postflop donket in limped pot to check");
+                    } else {
+                        actionToReturn = action;
                     }
                 } else {
                     actionToReturn = action;
