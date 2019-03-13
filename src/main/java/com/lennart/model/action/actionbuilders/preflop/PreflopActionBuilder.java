@@ -9,7 +9,6 @@ import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip.Call5bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.ip._2bet;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop.Call4bet;
-import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._3bet;
 import com.lennart.model.handevaluation.PreflopHandStength;
 
 import java.util.*;
@@ -27,7 +26,7 @@ public class PreflopActionBuilder {
 
     public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind,
                             List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable,
-                            String opponentType, double amountToCallBb, String opponentName) throws Exception {
+                            String opponentType, double amountToCallBb, String opponentName, double effStackBb, double handStrength) throws Exception {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -52,12 +51,12 @@ public class PreflopActionBuilder {
         } else {
             if(bbOpponentTotalBetSize == 1) {
                 if(botIsButton) {
-                    action = get05betF1bet(botHoleCards);
+                    action = get05betF1bet(botHoleCards, bigBlind, effStackBb);
                 } else {
                     action = get1betFcheck(botHoleCards, bigBlind);
                 }
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
-                action = get1betF2bet(botHoleCards, continuousTableable, bigBlind);
+                action = get1betF2bet(botHoleCards, continuousTableable, bigBlind, botIsButton, handStrength);
             } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
                 double oppPre3betStat = new OpponentIdentifier2_0(opponentName).getOppPre3bet();
 
@@ -239,7 +238,7 @@ public class PreflopActionBuilder {
         return size;
     }
 
-    private String get05betF1bet(List<Card> botHoleCards) {
+    private String get05betF1bet(List<Card> botHoleCards, double bigBlind, double effStackBb) {
         Map<Integer, Set<Card>> comboMap100Percent;
         Map<Integer, Set<Card>> comboMap5Percent;
 
@@ -273,7 +272,19 @@ public class PreflopActionBuilder {
         }
 
         if(Math.random() <= percentageBet) {
-            return "raise";
+            String actionToReturn;
+
+            if(bigBlind < 40) {
+                actionToReturn = "raise";
+            } else {
+                if(effStackBb > 10) {
+                    actionToReturn = "call";
+                } else {
+                    actionToReturn = "raise";
+                }
+            }
+
+            return actionToReturn;
         } else {
             return "fold";
         }
@@ -298,7 +309,12 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, double bigBlind) {
+    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, double bigBlind,
+                                  boolean position, double handStrength) {
+        if(position) {
+            return get1betF2betIp(botHoleCards, bigBlind, handStrength);
+        }
+
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
@@ -314,6 +330,22 @@ public class PreflopActionBuilder {
         } else {
             return "fold";
         }
+    }
+
+    private String get1betF2betIp(List<Card> botHoleCards, double bigBlind, double handStrength) {
+        String actionToReturn;
+
+        List<List<Card>> pre3betPoule = getPre3betPoule(bigBlind);
+
+        if(pre3betPoule.contains(botHoleCards)) {
+            actionToReturn = "raise";
+        } else if(handStrength > 0.5) {
+            actionToReturn = "call";
+        } else {
+            actionToReturn = "fold";
+        }
+
+        return actionToReturn;
     }
 
     private String get1betFcheck(List<Card> botHoleCards, double bigBlind) {
