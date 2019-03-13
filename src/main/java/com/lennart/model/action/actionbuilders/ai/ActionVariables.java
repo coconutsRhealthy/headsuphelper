@@ -316,7 +316,10 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
 
-            //action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables);
+            if(bigBlind < 40) {
+                action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables);
+            }
+
             action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd);
             action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, botHandStrength, boardInMethod);
 
