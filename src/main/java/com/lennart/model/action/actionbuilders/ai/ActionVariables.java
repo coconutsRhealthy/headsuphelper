@@ -316,10 +316,7 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
 
-            if(bigBlind < 40) {
-                action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables);
-            }
-
+            action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables, bigBlind);
             action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd);
             action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, boardInMethod, botIsButtonInMethod);
 
@@ -1115,12 +1112,20 @@ public class ActionVariables {
 
     private String solidifySngBot(String action, double botHandStrength, boolean strongFd, boolean strongOosd,
                                   boolean strongGutshot, List<Card> board, double sizing, ContinuousTable continuousTable,
-                                  GameVariables gameVariables) throws Exception {
+                                  GameVariables gameVariables, double bigBlind) throws Exception {
         String actionToReturn;
 
         if(board != null && !board.isEmpty()) {
             if(action.equals("bet75pct") || action.equals("raise")) {
-                if(sizing > 150) {
+                double sizingLimit;
+
+                if(bigBlind < 40) {
+                    sizingLimit = 150;
+                } else {
+                    sizingLimit = 200;
+                }
+
+                if(sizing > sizingLimit) {
                     double hsLimit;
 
                     if(sizing < 300) {
@@ -1131,11 +1136,21 @@ public class ActionVariables {
 
                     if(botHandStrength < hsLimit) {
                         if(board.size() == 3) {
-                            if (strongFd || strongOosd || strongGutshot) {
-                                actionToReturn = action;
-                                System.out.println("xagkflop kept flop action " + action + " because strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
+                            if(strongFd || strongOosd || strongGutshot) {
+                                if(action.equals("bet75pct")) {
+                                    actionToReturn = action;
+                                    System.out.println("xagkflop kept flop action bet because strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
+                                } else {
+                                    if(strongFd || strongOosd) {
+                                        actionToReturn = action;
+                                        System.out.println("xagkflop kept flop action raise because strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                    } else {
+                                        System.out.println("xagkflop change flop raise to fold or call because no strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                        actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                    }
+                                }
                             } else {
-                                if (action.equals("bet75pct")) {
+                                if(action.equals("bet75pct")) {
                                     actionToReturn = "check";
                                     System.out.println("xagkflop change flop action to check because no strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
                                 } else {
@@ -1144,9 +1159,14 @@ public class ActionVariables {
                                 }
                             }
                         } else if(board.size() == 4) {
-                            if (strongFd || strongOosd) {
-                                actionToReturn = action;
-                                System.out.println("xagkturn kept turn action " + action + " because strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
+                            if(strongFd || strongOosd) {
+                                if(action.equals("bet75pct")) {
+                                    actionToReturn = action;
+                                    System.out.println("xagkturn kept turn action bet because strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                } else {
+                                    System.out.println("xagkturn change turn raise to fold or call despite strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
                             } else {
                                 if (action.equals("bet75pct")) {
                                     actionToReturn = "check";
@@ -1157,35 +1177,12 @@ public class ActionVariables {
                                 }
                             }
                         } else {
-                            if(botHandStrength < 0.6) {
-                                List<Set<Card>> top10percentTurnCombosCopy = new ArrayList<>();
-                                List<Set<Card>> top10percentRiverCombosCopy = new ArrayList<>();
-
-                                top10percentTurnCombosCopy.addAll(continuousTable.getTop10percentTurnCombos());
-                                top10percentRiverCombosCopy.addAll(continuousTable.getTop10percentRiverCombos());
-
-                                int boardWetness = BoardEvaluator.getBoardWetness(top10percentTurnCombosCopy, top10percentRiverCombosCopy);
-
-                                if(boardWetness < 20) {
-                                    actionToReturn = action;
-                                    System.out.println("xagkriver kept river action " + action + " because boardwetness is: " + boardWetness + " hs: " + botHandStrength + " sizing: " + sizing);
-                                } else {
-                                    if(action.equals("bet75pct")) {
-                                        actionToReturn = "check";
-                                        System.out.println("xagkriver Change river bet to check because too low boardwetness. Hs: " + botHandStrength + " BW: " + boardWetness);
-                                    } else {
-                                        System.out.println("xagkriver Change river raise to call or fold because too low boardwetness. Hs: " + botHandStrength + " BW: " + boardWetness);
-                                        actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                    }
-                                }
+                            if(action.equals("bet75pct")) {
+                                actionToReturn = "check";
+                                System.out.println("xagkriver Change river bet to check. Hs: " + botHandStrength);
                             } else {
-                                if(action.equals("bet75pct")) {
-                                    actionToReturn = "check";
-                                    System.out.println("xagkriver Change river thin value bet action to check. Hs: " + botHandStrength);
-                                } else {
-                                    System.out.println("xagkriver Change river thin value raise to call or fold. Hs: " + botHandStrength);
-                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                }
+                                System.out.println("xagkriver Change river raise to call or fold. Hs: " + botHandStrength);
+                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
                             }
                         }
                     } else {
