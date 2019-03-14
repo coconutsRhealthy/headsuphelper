@@ -26,7 +26,7 @@ public class PreflopActionBuilder {
 
     public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind,
                             List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable,
-                            String opponentType, double amountToCallBb, double effStackBb, double handStrength) throws Exception {
+                            String opponentType, double amountToCallBb, double effStackBb, double handStrength, String opponentName) throws Exception {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -49,14 +49,16 @@ public class PreflopActionBuilder {
                 action = get4betF5bet(botHoleCards, amountToCallBb);
             }
         } else {
+            double oppPreIp2betStat = new OpponentIdentifier2_0(opponentName).getOppPre2bet();
+
             if(bbOpponentTotalBetSize == 1) {
                 if(botIsButton) {
                     action = get05betF1bet(botHoleCards, bigBlind, effStackBb);
                 } else {
-                    action = get1betFcheck(botHoleCards, bigBlind);
+                    action = get1betFcheck(botHoleCards);
                 }
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
-                action = get1betF2bet(botHoleCards, continuousTableable, bigBlind, botIsButton, handStrength);
+                action = get1betF2bet(botHoleCards, continuousTableable, botIsButton, handStrength, effStackBb, oppPreIp2betStat);
             } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
                 action = get2betF3bet(botHoleCards, continuousTableable, bigBlind);
             } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
@@ -73,7 +75,7 @@ public class PreflopActionBuilder {
         return action;
     }
 
-    private List<List<Card>> getPre3betPoule(double bigBlind) {
+    private List<List<Card>> getPre3betPoule(double effectiveStackBb, double oppIpPre2betStat) {
         List<List<Card>> pre3betPoule = new ArrayList<>();
 
         Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
@@ -81,12 +83,12 @@ public class PreflopActionBuilder {
         double limit1;
         double limit2;
 
-        if(bigBlind < 40) {
+        if(effectiveStackBb <= 25 && oppIpPre2betStat > 0.22) {
+            limit1 = 0.6;
+            limit2 = 0.82;
+        } else {
             limit1 = 0.85;
             limit2 = 0.9;
-        } else {
-            limit1 = 0.50;
-            limit2 = 0.82;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
@@ -303,17 +305,17 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, double bigBlind,
-                                  boolean position, double handStrength) {
+    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable,
+                                  boolean position, double handStrength, double effectiveStackBb, double oppIpPre2betStat) {
         if(position) {
-            return get1betF2betIp(botHoleCards, bigBlind, handStrength);
+            return get1betF2betIp(botHoleCards, handStrength, effectiveStackBb, oppIpPre2betStat);
         }
 
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule = getPre3betPoule(bigBlind);
+        List<List<Card>> pre3betPoule = getPre3betPoule(effectiveStackBb, oppIpPre2betStat);
         List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule);
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
@@ -326,10 +328,10 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betF2betIp(List<Card> botHoleCards, double bigBlind, double handStrength) {
+    private String get1betF2betIp(List<Card> botHoleCards, double handStrength, double effStackBb, double oppPreIp2betStat) {
         String actionToReturn;
 
-        List<List<Card>> pre3betPoule = getPre3betPoule(bigBlind);
+        List<List<Card>> pre3betPoule = getPre3betPoule(effStackBb, oppPreIp2betStat);
 
         if(pre3betPoule.contains(botHoleCards)) {
             actionToReturn = "raise";
@@ -342,12 +344,12 @@ public class PreflopActionBuilder {
         return actionToReturn;
     }
 
-    private String get1betFcheck(List<Card> botHoleCards, double bigBlind) {
+    private String get1betFcheck(List<Card> botHoleCards) {
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule = getPre3betPoule(bigBlind);
+        List<List<Card>> pre3betPoule = getPre3betPoule(100, 0.01);
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
             return "raise";

@@ -13,6 +13,7 @@ public class OpponentIdentifier2_0 {
     private Connection con;
 
     private double numberOfHands;
+    private double oppPre2bet;
     private double oppPre3bet;
     private double oppPreLooseness;
     private double oppPostRaise;
@@ -33,6 +34,7 @@ public class OpponentIdentifier2_0 {
         Map<String, Double> opponentData = getAllDataOfOpponent(opponentName);
 
         numberOfHands = opponentData.get("preNumberOfHands");
+        oppPre2bet = getOpponentPreIp2bet(opponentData);
         oppPre3bet = getOpponentPre3bet(opponentData);
         oppPreLooseness = getOpponentPreLooseness(opponentData);
         oppPostRaise = getOpponentPostRaise(opponentData);
@@ -203,6 +205,23 @@ public class OpponentIdentifier2_0 {
         }
 
         return oppLoosenessAndAggroness;
+    }
+
+    public double getOpponentPreIp2bet(Map<String, Double> opponentData) {
+        //Ip raise tov total hands
+
+        double oppPre2bet;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 14) {
+            double oopIpRaiseNumber = opponentData.get("preIpRaiseCount");
+            double totalNumberOfHands = opponentData.get("preNumberOfHands");
+            oppPre2bet = oopIpRaiseNumber / totalNumberOfHands;
+        } else {
+            oppPre2bet = -1;
+        }
+
+        return oppPre2bet;
     }
 
     public double getOpponentPre3bet(Map<String, Double> opponentData) {
@@ -439,5 +458,13 @@ public class OpponentIdentifier2_0 {
 
     public double getOppPostLooseness() {
         return oppPostLooseness;
+    }
+
+    public double getOppPre2bet() {
+        return oppPre2bet;
+    }
+
+    public void setOppPre2bet(double oppPre2bet) {
+        this.oppPre2bet = oppPre2bet;
     }
 }
