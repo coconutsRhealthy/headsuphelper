@@ -26,7 +26,7 @@ public class PreflopActionBuilder {
 
     public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind,
                             List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable,
-                            String opponentType, double amountToCallBb, String opponentName, double effStackBb, double handStrength) throws Exception {
+                            String opponentType, double amountToCallBb, double effStackBb, double handStrength) throws Exception {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -58,9 +58,7 @@ public class PreflopActionBuilder {
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
                 action = get1betF2bet(botHoleCards, continuousTableable, bigBlind, botIsButton, handStrength);
             } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
-                double oppPre3betStat = new OpponentIdentifier2_0(opponentName).getOppPre3bet();
-
-                action = get2betF3bet(botHoleCards, continuousTableable, oppPre3betStat, bigBlind);
+                action = get2betF3bet(botHoleCards, continuousTableable, bigBlind);
             } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
                 action = get3betF4bet(botHoleCards, continuousTableable, opponentType);
             } else {
@@ -135,10 +133,7 @@ public class PreflopActionBuilder {
         return preCall2betPoule;
     }
 
-    private List<List<Card>> getPre4betPoule(double oppPre3betStat, double bigBlind) {
-        if(oppPre3betStat >= 0.0625) {
-            return getPre3betPoule(bigBlind);
-        } else {
+    private List<List<Card>> getPre4betPoule() {
             List<Set<Card>> pre4betPouleAsSets = new ArrayList<>();
 
             pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(14).values());
@@ -171,7 +166,6 @@ public class PreflopActionBuilder {
             }
 
             return pre4betpoule;
-        }
     }
 
     private List<List<Card>> getPreCall3betPoule(List<List<Card>> pre4betPoule, double bigBlind) {
@@ -290,12 +284,12 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get2betF3bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, double oppPre3betStat, double bigBlind) {
+    private String get2betF3bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, double bigBlind) {
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre4betPoule = getPre4betPoule(oppPre3betStat, bigBlind);
+        List<List<Card>> pre4betPoule = getPre4betPoule();
         List<List<Card>> preCall3betPoule = getPreCall3betPoule(pre4betPoule, bigBlind);
 
         if(pre4betPoule.contains(botHoleCards) || pre4betPoule.contains(botHoleCardsReverseOrder)) {

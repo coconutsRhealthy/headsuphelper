@@ -166,7 +166,7 @@ public class ActionVariables {
         boolean defaultCheck = false;
 
         if(preflop) {
-            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb, gameVariables.getOpponentName(), effectiveStack, botHandStrengthInMethod);
+            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb, effectiveStack, botHandStrengthInMethod);
 
             if(action.equals("raise")) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -321,7 +321,7 @@ public class ActionVariables {
             }
 
             action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd);
-            action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, botHandStrength, boardInMethod);
+            action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, boardInMethod, botIsButtonInMethod);
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -1274,15 +1274,15 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String solidifyPostflopLimpedDonks(String action, double pot, double bigblind, double botHandStrength, List<Card> board) {
+    private String solidifyPostflopLimpedDonks(String action, double pot, double bigblind, List<Card> board, boolean position) {
         String actionToReturn;
 
         if(action.equals("bet75pct")) {
             if(board != null && !board.isEmpty()) {
                 if(pot == (2 * bigblind)) {
-                    if(botHandStrength < 0.8) {
+                    if(board.size() == 3 && !position) {
                         actionToReturn = "check";
-                        System.out.println("Changed postflop donket in limped pot to check");
+                        System.out.println("Changed postflop flop donket in limped pot to check");
                     } else {
                         actionToReturn = action;
                     }
