@@ -20,6 +20,9 @@ public class OpponentIdentifier2_0 {
     private double oppPostBet;
     private double oppPostLooseness;
 
+    private double oppPostBetToCheckRatio;
+    private double oppPostFoldToCallRaiseRatio;
+
     public static double PRE_3_BET = 0.07806691449814127;
     public static double PRE_LOOSENESS = 0.7;
     public static double POST_RAISE = 0.13043478260869565;
@@ -40,6 +43,9 @@ public class OpponentIdentifier2_0 {
         oppPostRaise = getOpponentPostRaise(opponentData);
         oppPostBet = getOpponentPostBet(opponentData);
         oppPostLooseness = getOpponentPostLooseness(opponentData);
+
+        oppPostBetToCheckRatio = getOppPostBetToCheckRatio(opponentData);
+        oppPostFoldToCallRaiseRatio = getOppPostFoldToCallRaiseRatio(opponentData);
     }
 
     private void printLoosenessAndTightnessBoundries(boolean includingMedium, String table) throws Exception {
@@ -310,6 +316,41 @@ public class OpponentIdentifier2_0 {
         return oppPostLooseness;
     }
 
+    public double getOppPostBetToCheckRatio(Map<String, Double> opponentData) {
+        //bet tov bet + check
+
+        double oppPostBetToCheckRatio;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 14) {
+            double postCheckCount = opponentData.get("postCheckCount");
+            double postBetCount = opponentData.get("postBetCount");
+            oppPostBetToCheckRatio = postBetCount / (postCheckCount + postBetCount);
+        } else {
+            oppPostBetToCheckRatio = -1;
+        }
+
+        return oppPostBetToCheckRatio;
+    }
+
+    public double getOppPostFoldToCallRaiseRatio(Map<String, Double> opponentData) {
+        //fold tov fold + call + raise
+
+        double oppPostFoldToCallRaiseRatio;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 14) {
+            double postFoldCount = opponentData.get("postFoldCount");
+            double postCallCount = opponentData.get("postCallCount");
+            double postRaiseCount = opponentData.get("postRaiseCount");
+            oppPostFoldToCallRaiseRatio = postFoldCount / (postFoldCount + postCallCount + postRaiseCount);
+        } else {
+            oppPostFoldToCallRaiseRatio = -1;
+        }
+
+        return oppPostFoldToCallRaiseRatio;
+    }
+
     private Map<String, Double> getAllDataOfOpponent(String opponentName) throws Exception {
         Map<String, Double> opponentData = new HashMap<>();
 
@@ -464,7 +505,11 @@ public class OpponentIdentifier2_0 {
         return oppPre2bet;
     }
 
-    public void setOppPre2bet(double oppPre2bet) {
-        this.oppPre2bet = oppPre2bet;
+    public double getOppPostBetToCheckRatio() {
+        return oppPostBetToCheckRatio;
+    }
+
+    public double getOppPostFoldToCallRaiseRatio() {
+        return oppPostFoldToCallRaiseRatio;
     }
 }

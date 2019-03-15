@@ -3,6 +3,7 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.card.Card;
@@ -316,8 +317,8 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
 
-            action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables, bigBlind);
-            action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd);
+            action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables, bigBlind, gameVariables.getOpponentName());
+            action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd, gameVariables.getOpponentAction(), gameVariables.getOpponentName());
             action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, boardInMethod, botIsButtonInMethod);
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
@@ -1112,18 +1113,34 @@ public class ActionVariables {
 
     private String solidifySngBot(String action, double botHandStrength, boolean strongFd, boolean strongOosd,
                                   boolean strongGutshot, List<Card> board, double sizing, ContinuousTable continuousTable,
-                                  GameVariables gameVariables, double bigBlind) throws Exception {
+                                  GameVariables gameVariables, double bigBlind, String opponentName) throws Exception {
         String actionToReturn;
 
         if(board != null && !board.isEmpty()) {
             if(action.equals("bet75pct") || action.equals("raise")) {
                 double sizingLimit;
 
+                double oppPostFoldToCallRaiseRatio = new OpponentIdentifier2_0(opponentName).getOppPostFoldToCallRaiseRatio();
+
                 if(bigBlind < 40) {
-                    sizingLimit = 150;
+                    if(oppPostFoldToCallRaiseRatio == -1 || oppPostFoldToCallRaiseRatio < 0.375) {
+                        sizingLimit = 150;
+                    } else if(oppPostFoldToCallRaiseRatio < 0.483) {
+                        sizingLimit = 200;
+                    } else {
+                        sizingLimit = 250;
+                    }
                 } else {
-                    sizingLimit = 200;
+                    if(oppPostFoldToCallRaiseRatio == -1 || oppPostFoldToCallRaiseRatio < 0.375) {
+                        sizingLimit = 200;
+                    } else if(oppPostFoldToCallRaiseRatio < 0.483) {
+                        sizingLimit = 250;
+                    } else {
+                        sizingLimit = 300;
+                    }
                 }
+
+                System.out.println("sizingLimit for " + opponentName + ": " + sizingLimit + " oppPostFoldToCallRaiseRatio: " + oppPostFoldToCallRaiseRatio);
 
                 if(sizing > sizingLimit) {
                     double hsLimit;
@@ -1203,13 +1220,31 @@ public class ActionVariables {
     }
 
     private String solidifySngBotCalls(String action, double botHandStrength, List<Card> board, double facingOdds,
-                                       boolean strongFd, boolean strongOosd)  {
+                                       boolean strongFd, boolean strongOosd, String opponentAction, String opponentName) throws Exception  {
         String actionToReturn;
 
         if(board != null && !board.isEmpty()) {
             if(action.equals("call")) {
                 if(facingOdds > 0.23) {
-                    if(botHandStrength < 0.80 && !strongFd && !strongOosd) {
+                    double limit;
+
+                    if(opponentAction.equals("raise")) {
+                        limit = 0.8;
+                    } else {
+                        double oppPostBetToCheckRatio = new OpponentIdentifier2_0(opponentName).getOppPostBetToCheckRatio();
+
+                        if(oppPostBetToCheckRatio == -1 || oppPostBetToCheckRatio < 0.28) {
+                            limit = 0.8;
+                        } else if(oppPostBetToCheckRatio < 0.43) {
+                            limit = 0.75;
+                        } else {
+                            limit = 0.7;
+                        }
+
+                        System.out.println("postCallLimit for " + opponentName + ": " + limit + " betToCheckRatio: " + oppPostBetToCheckRatio);
+                    }
+
+                    if(botHandStrength < limit && !strongFd && !strongOosd) {
                         actionToReturn = "fold";
                         System.out.println("gsfdg change call to fold. HS: " + botHandStrength);
                     } else {
