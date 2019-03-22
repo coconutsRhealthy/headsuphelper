@@ -82,17 +82,20 @@ public class PreflopActionBuilder {
 
         double limit1;
         double limit2;
+        double limitValue;
 
         if(effectiveStackBb <= 25 && oppIpPre2betStat > 0.22) {
-            limit1 = 0.6;
-            limit2 = 0.82;
+            limit1 = 0.75;
+            limit2 = 0.65;
+            limitValue = 0.9;
         } else {
             limit1 = 0.85;
             limit2 = 0.9;
+            limitValue = 0.95;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
-            if(entry.getKey() > 0.95) {
+            if(entry.getKey() > limitValue) {
                 for(Set<Card> combo : entry.getValue()) {
                     List<Card> comboToAdd = new ArrayList<>();
                     comboToAdd.addAll(combo);
