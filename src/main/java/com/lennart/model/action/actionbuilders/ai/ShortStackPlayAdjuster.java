@@ -72,7 +72,7 @@ public class ShortStackPlayAdjuster {
                     actionToUse = "raise";
                 }
 
-                if(actionVariables.getBotHandStrength() >= 0.57) {
+                if(actionVariables.getBotHandStrength() >= 0.75) {
                     actionToReturn = actionToUse;
                 } else {
                     HandEvaluator handEvaluator = actionVariables.getHandEvaluator();
@@ -92,7 +92,7 @@ public class ShortStackPlayAdjuster {
             }
         } else {
             if(action.equals("fold")) {
-                if(actionVariables.getBotHandStrength() >= 0.57) {
+                if(actionVariables.getBotHandStrength() >= 0.65) {
                     actionToReturn = "call";
                 } else {
                     HandEvaluator handEvaluator = actionVariables.getHandEvaluator();
