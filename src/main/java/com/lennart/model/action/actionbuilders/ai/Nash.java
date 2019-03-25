@@ -1,297 +1,441 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.card.Card;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Nash {
 
-    //postflop:
-        //pushen met 73% plus
-        //checkcallen met 56% plus
+    public boolean nashActionIsPossible(double effectiveStackBb, boolean position, double botBetSizeBb, List<Card> board,
+                                        String opponentAction, double opponentStackBb) {
+        boolean nashActionIsPossible = false;
 
+        if(board == null || board.isEmpty()) {
+            if(effectiveStackBb <= 20) {
+                if(position) {
+                    if(botBetSizeBb == 0.5) {
+                        nashActionIsPossible = true;
+                        System.out.println("IP Nash action is possible!");
+                    }
+                } else {
+                    if(botBetSizeBb == 1 && opponentAction.equals("raise") && opponentStackBb == 0) {
+                        nashActionIsPossible = true;
+                        System.out.println("OOP Nash action is possible!");
+                    }
+                }
+            }
+        }
 
-
-    //DbSave#getComboLogic()
-
-    public double getMinEffStackToShove(List<Card> holeCards) {
-        return 0;
+        return nashActionIsPossible;
     }
 
-    public double getMinEffStackToCall(List<Card> holeCards) {
-        return 0;
+    public String doNashAction(List<Card> holeCards, boolean position, double effectiveStack, double amountToCallBb) {
+        String holeCardsAsString = new DbSave().getComboLogic(holeCards);
+        String nashAction;
+
+        if(position) {
+            Map<String, Double> pushMap = getPushMap();
+            double stackLimitToPushBb = pushMap.get(holeCardsAsString);
+
+            if(effectiveStack <= stackLimitToPushBb) {
+                nashAction = "raise";
+                System.out.println("Set IP Nash action to raise for: " + holeCardsAsString);
+            } else {
+                nashAction = "fold";
+                System.out.println("Set IP Nash action to fold for: " + holeCardsAsString);
+            }
+        } else {
+            Map<String, Double> callMap = getCallMap();
+            double stackLimitToCallBb = callMap.get(holeCardsAsString);
+
+            if(stackLimitToCallBb <= amountToCallBb) {
+                nashAction = "call";
+                System.out.println("Set OOP Nash action to call for: " + holeCardsAsString);
+            } else {
+                nashAction = "fold";
+                System.out.println("Set OOP Nash action to fold for: " + holeCardsAsString);
+            }
+        }
+
+        return nashAction;
     }
 
-    private void aMethod() {
-        //push
+    private Map<String, Double> getPushMap() {
+        Map<String, Double> pushMap = new HashMap<>();
 
-        List<String> _20_group = new ArrayList<>();
-        List<String> _19_5_group = new ArrayList<>();
-        List<String> _18_3_group = new ArrayList<>();
-        List<String> _18_group = new ArrayList<>();
-        List<String> _17_6_group = new ArrayList<>();
-        List<String> _17_1_group = new ArrayList<>();
-        List<String> _16_6_group = new ArrayList<>();
-        List<String> _16_1_group = new ArrayList<>();
-        List<String> _15_8_group = new ArrayList<>();
-        List<String> _15_3_group = new ArrayList<>();
-        List<String> _15_2_group = new ArrayList<>();
-        List<String> _15_group = new ArrayList<>();
-        List<String> _14_3_group = new ArrayList<>();
-        List<String> _13_8_group = new ArrayList<>();
-        List<String> _13_4_group = new ArrayList<>();
-        List<String> _13_2_group = new ArrayList<>();
-        List<String> _13_group = new ArrayList<>();
-        List<String> _12_7_group = new ArrayList<>();
-        List<String> _12_4_group = new ArrayList<>();
-        List<String> _12_1_group = new ArrayList<>();
-        List<String> _11_7_group = new ArrayList<>();
-        List<String> _11_5_group = new ArrayList<>();
-        List<String> _11_4_group = new ArrayList<>();
-        List<String> _11_group = new ArrayList<>();
-        List<String> _10_7_group = new ArrayList<>();
-        List<String> _11_6_group = new ArrayList<>();
-        List<String> _10_5_group = new ArrayList<>();
-        List<String> _10_2_group = new ArrayList<>();
-        List<String> _9_9_group = new ArrayList<>();
-        List<String> _9_7_group = new ArrayList<>();
-        List<String> _9_5_group = new ArrayList<>();
-        List<String> _9_3_group = new ArrayList<>();
-        List<String> _9_1_group = new ArrayList<>();
-        List<String> _8_9_group = new ArrayList<>();
-        List<String> _8_8_group = new ArrayList<>();
-        List<String> _8_7_group = new ArrayList<>();
-        List<String> _8_4_group = new ArrayList<>();
-        List<String> _8_2_group = new ArrayList<>();
-        List<String> _8_1_group = new ArrayList<>();
-        List<String> _8_group = new ArrayList<>();
-        List<String> _7_8_group = new ArrayList<>();
-        List<String> _7_6_group = new ArrayList<>();
-        List<String> _7_4_group = new ArrayList<>();
-        List<String> _7_3_group = new ArrayList<>();
-        List<String> _7_2_group = new ArrayList<>();
-        List<String> _7_group = new ArrayList<>();
-        List<String> _6_9_group = new ArrayList<>();
-        List<String> _6_8_group = new ArrayList<>();
-        List<String> _6_6_group = new ArrayList<>();
-        List<String> _6_5_group = new ArrayList<>();
-        List<String> _6_4_group = new ArrayList<>();
-        List<String> _6_3_group = new ArrayList<>();
-        List<String> _6_2_group = new ArrayList<>();
-        List<String> _6_1_group = new ArrayList<>();
-        List<String> _6_group = new ArrayList<>();
-        List<String> _5_9_group = new ArrayList<>();
-        List<String> _5_8_group = new ArrayList<>();
-        List<String> _5_6_group = new ArrayList<>();
-        List<String> _5_5_group = new ArrayList<>();
-        List<String> _5_4_group = new ArrayList<>();
-        List<String> _5_2_group = new ArrayList<>();
-        List<String> _5_1_group = new ArrayList<>();
-        List<String> _5_group = new ArrayList<>();
-        List<String> _4_9_group = new ArrayList<>();
-        List<String> _4_8_group = new ArrayList<>();
-        List<String> _4_7_group = new ArrayList<>();
-        List<String> _4_6_group = new ArrayList<>();
-        List<String> _4_5_group = new ArrayList<>();
-        List<String> _4_3_group = new ArrayList<>();
-        List<String> _4_2_group = new ArrayList<>();
-        List<String> _4_1_group = new ArrayList<>();
-        List<String> _4_group = new ArrayList<>();
-        List<String> _3_9_group = new ArrayList<>();
-        List<String> _3_8_group = new ArrayList<>();
-        List<String> _3_7_group = new ArrayList<>();
-        List<String> _3_6_group = new ArrayList<>();
-        List<String> _3_5_group = new ArrayList<>();
-        List<String> _3_4_group = new ArrayList<>();
-        List<String> _3_3_group = new ArrayList<>();
-        List<String> _3_2_group = new ArrayList<>();
-        List<String> _3_1_group = new ArrayList<>();
-        List<String> _3_group = new ArrayList<>();
-        List<String> _2_9_group = new ArrayList<>();
-        List<String> _2_8_group = new ArrayList<>();
-        List<String> _2_7_group = new ArrayList<>();
-        List<String> _2_6_group = new ArrayList<>();
+        pushMap.put("AA", 20.0);
+        pushMap.put("AKs", 20.0);
+        pushMap.put("AQs", 20.0);
+        pushMap.put("AJs", 20.0);
+        pushMap.put("ATs", 20.0);
+        pushMap.put("A9s", 20.0);
+        pushMap.put("A8s", 20.0);
+        pushMap.put("A7s", 20.0);
+        pushMap.put("A6s", 20.0);
+        pushMap.put("A5s", 20.0);
+        pushMap.put("A4s", 20.0);
+        pushMap.put("A3s", 20.0);
+        pushMap.put("A2s", 20.0);
 
-//        List<String> _20_group = new ArrayList<>();
-        _20_group.add("AA");
-        _20_group.add("AKs");
-        _20_group.add("AQs");
-        _20_group.add("AJs");
-        _20_group.add("ATs");
-        _20_group.add("A9s");
-        _20_group.add("A8s");
-        _20_group.add("A7s");
-        _20_group.add("A6s");
-        _20_group.add("A5s");
-        _20_group.add("A4s");
-        _20_group.add("A3s");
-        _20_group.add("A2s");
-        _20_group.add("AKo");
-        _20_group.add("KK");
-        _20_group.add("KQs");
-        _20_group.add("KJs");
-        _20_group.add("KTs");
-        _20_group.add("K9s");
-        _20_group.add("K8s");
-        _20_group.add("K7s");
-        _20_group.add("K6s");
-        _20_group.add("K5s");
-        _20_group.add("K4s");
-        _20_group.add("AQo");
-        _20_group.add("KQo");
-        _20_group.add("QQ");
-        _20_group.add("QJs");
-        _20_group.add("QTs");
-        _20_group.add("Q9s");
-        _20_group.add("Q8s");
-        _20_group.add("Q7s");
-        _20_group.add("Q6s");
-        _20_group.add("Q5s");
-        _20_group.add("AJo");
-        _20_group.add("KJo");
-        _20_group.add("QJo");
-        _20_group.add("JJ");
-        _20_group.add("JTs");
-        _20_group.add("J9s");
-        _20_group.add("J8s");
-        _20_group.add("J7s");
-        _20_group.add("ATo");
-        _20_group.add("KTo");
-        _20_group.add("QTo");
-        _20_group.add("JTo");
-        _20_group.add("TT");
-        _20_group.add("T9s");
-        _20_group.add("T8s");
-        _20_group.add("T7s");
-        _20_group.add("T6s");
-        _20_group.add("A9o");
-        _20_group.add("K9o");
-        _20_group.add("Q9o");
-        _20_group.add("J9o");
-        _20_group.add("T9o");
-        _20_group.add("99");
-        _20_group.add("98s");
-        _20_group.add("97s");
-        _20_group.add("96s");
-        _20_group.add("A8o");
-        _20_group.add("98o");
-        _20_group.add("88");
-        _20_group.add("87s");
-        _20_group.add("86s");
-        _20_group.add("A7o");
-        _20_group.add("77");
-        _20_group.add("76s");
-        _20_group.add("75s");
-        _20_group.add("A6o");
-        _20_group.add("66");
-        _20_group.add("65s");
-        _20_group.add("A5o");
-        _20_group.add("55");
-        _20_group.add("54s");
-        _20_group.add("A4o");
-        _20_group.add("44");
-        _20_group.add("A3o");
-        _20_group.add("33");
-        _20_group.add("A2o");
-        _20_group.add("22");
+        pushMap.put("AKo", 20.0);
+        pushMap.put("KK", 20.0);
+        pushMap.put("KQs", 20.0);
+        pushMap.put("KJs", 20.0);
+        pushMap.put("KTs", 20.0);
+        pushMap.put("K9s", 20.0);
+        pushMap.put("K8s", 20.0);
+        pushMap.put("K7s", 20.0);
+        pushMap.put("K6s", 20.0);
+        pushMap.put("K5s", 20.0);
+        pushMap.put("K4s", 20.0);
+        pushMap.put("K3s", 19.9);
+        pushMap.put("K2s", 19.3);
 
+        pushMap.put("AQo", 20.0);
+        pushMap.put("KQo", 20.0);
+        pushMap.put("QQ", 20.0);
+        pushMap.put("QJs", 20.0);
+        pushMap.put("QTs", 20.0);
+        pushMap.put("Q9s", 20.0);
+        pushMap.put("Q8s", 20.0);
+        pushMap.put("Q7s", 20.0);
+        pushMap.put("Q6s", 20.0);
+        pushMap.put("Q5s", 20.0);
+        pushMap.put("Q4s", 16.3);
+        pushMap.put("Q3s", 13.5);
+        pushMap.put("Q2s", 12.7);
 
+        pushMap.put("AJo", 20.0);
+        pushMap.put("KJo", 20.0);
+        pushMap.put("QJo", 20.0);
+        pushMap.put("JJ", 20.0);
+        pushMap.put("JTs", 20.0);
+        pushMap.put("J9s", 20.0);
+        pushMap.put("J8s", 20.0);
+        pushMap.put("J7s", 20.0);
+        pushMap.put("J6s", 18.6);
+        pushMap.put("J5s", 14.7);
+        pushMap.put("J4s", 13.5);
+        pushMap.put("J3s", 10.6);
+        pushMap.put("J2s", 8.5);
 
+        pushMap.put("ATo", 20.0);
+        pushMap.put("KTo", 20.0);
+        pushMap.put("QTo", 20.0);
+        pushMap.put("JTo", 20.0);
+        pushMap.put("TT", 20.0);
+        pushMap.put("T9s", 20.0);
+        pushMap.put("T8s", 20.0);
+        pushMap.put("T7s", 20.0);
+        pushMap.put("T6s", 20.0);
+        pushMap.put("T5s", 11.9);
+        pushMap.put("T4s", 10.5);
+        pushMap.put("T3s", 7.7);
+        pushMap.put("T2s", 6.5);
 
+        pushMap.put("A9o", 20.0);
+        pushMap.put("K9o", 20.0);
+        pushMap.put("Q9o", 20.0);
+        pushMap.put("J9o", 20.0);
+        pushMap.put("T9o", 20.0);
+        pushMap.put("99", 20.0);
+        pushMap.put("98s", 20.0);
+        pushMap.put("97s", 20.0);
+        pushMap.put("96s", 20.0);
+        pushMap.put("95s", 14.4);
+        pushMap.put("94s", 6.9);
+        pushMap.put("93s", 4.9);
+        pushMap.put("92s", 3.7);
 
-//        List<String> _19_5_group = new ArrayList<>();
-//        List<String> _18_3_group = new ArrayList<>();
-//        List<String> _18_group = new ArrayList<>();
-//        List<String> _17_6_group = new ArrayList<>();
-//        List<String> _17_1_group = new ArrayList<>();
-//        List<String> _16_6_group = new ArrayList<>();
-//        List<String> _16_1_group = new ArrayList<>();
-//        List<String> _15_8_group = new ArrayList<>();
-//        List<String> _15_3_group = new ArrayList<>();
-//        List<String> _15_2_group = new ArrayList<>();
-//        List<String> _15_group = new ArrayList<>();
-//        List<String> _14_3_group = new ArrayList<>();
-//        List<String> _13_8_group = new ArrayList<>();
-//        List<String> _13_4_group = new ArrayList<>();
-//        List<String> _13_2_group = new ArrayList<>();
-//        List<String> _13_group = new ArrayList<>();
-//        List<String> _12_7_group = new ArrayList<>();
-//        List<String> _12_4_group = new ArrayList<>();
-//        List<String> _12_1_group = new ArrayList<>();
-//        List<String> _11_7_group = new ArrayList<>();
-//        List<String> _11_5_group = new ArrayList<>();
-//        List<String> _11_4_group = new ArrayList<>();
-//        List<String> _11_group = new ArrayList<>();
-//        List<String> _10_7_group = new ArrayList<>();
-//        List<String> _11_6_group = new ArrayList<>();
-//        List<String> _10_5_group = new ArrayList<>();
-//        List<String> _10_2_group = new ArrayList<>();
-//        List<String> _9_9_group = new ArrayList<>();
-//        List<String> _9_7_group = new ArrayList<>();
-//        List<String> _9_5_group = new ArrayList<>();
-//        List<String> _9_3_group = new ArrayList<>();
-//        List<String> _9_1_group = new ArrayList<>();
-//        List<String> _8_9_group = new ArrayList<>();
-//        List<String> _8_8_group = new ArrayList<>();
-//        List<String> _8_7_group = new ArrayList<>();
-//        List<String> _8_4_group = new ArrayList<>();
-//        List<String> _8_2_group = new ArrayList<>();
-//        List<String> _8_1_group = new ArrayList<>();
-//        List<String> _8_group = new ArrayList<>();
-//        List<String> _7_8_group = new ArrayList<>();
-//        List<String> _7_6_group = new ArrayList<>();
-//        List<String> _7_4_group = new ArrayList<>();
-//        List<String> _7_3_group = new ArrayList<>();
-//        List<String> _7_2_group = new ArrayList<>();
-//        List<String> _7_group = new ArrayList<>();
-//        List<String> _6_9_group = new ArrayList<>();
-//        List<String> _6_8_group = new ArrayList<>();
-//        List<String> _6_6_group = new ArrayList<>();
-//        List<String> _6_5_group = new ArrayList<>();
-//        List<String> _6_4_group = new ArrayList<>();
-//        List<String> _6_3_group = new ArrayList<>();
-//        List<String> _6_2_group = new ArrayList<>();
-//        List<String> _6_1_group = new ArrayList<>();
-//        List<String> _6_group = new ArrayList<>();
-//        List<String> _5_9_group = new ArrayList<>();
-//        List<String> _5_8_group = new ArrayList<>();
-//        List<String> _5_6_group = new ArrayList<>();
-//        List<String> _5_5_group = new ArrayList<>();
-//        List<String> _5_4_group = new ArrayList<>();
-//        List<String> _5_2_group = new ArrayList<>();
-//        List<String> _5_1_group = new ArrayList<>();
-//        List<String> _5_group = new ArrayList<>();
-//        List<String> _4_9_group = new ArrayList<>();
-//        List<String> _4_8_group = new ArrayList<>();
-//        List<String> _4_7_group = new ArrayList<>();
-//        List<String> _4_6_group = new ArrayList<>();
-//        List<String> _4_5_group = new ArrayList<>();
-//        List<String> _4_3_group = new ArrayList<>();
-//        List<String> _4_2_group = new ArrayList<>();
-//        List<String> _4_1_group = new ArrayList<>();
-//        List<String> _4_group = new ArrayList<>();
-//        List<String> _3_9_group = new ArrayList<>();
-//        List<String> _3_8_group = new ArrayList<>();
-//        List<String> _3_7_group = new ArrayList<>();
-//        List<String> _3_6_group = new ArrayList<>();
-//        List<String> _3_5_group = new ArrayList<>();
-//        List<String> _3_4_group = new ArrayList<>();
-//        List<String> _3_3_group = new ArrayList<>();
-//        List<String> _3_2_group = new ArrayList<>();
-//        List<String> _3_1_group = new ArrayList<>();
-//        List<String> _3_group = new ArrayList<>();
-//        List<String> _2_9_group = new ArrayList<>();
-//        List<String> _2_8_group = new ArrayList<>();
-//        List<String> _2_7_group = new ArrayList<>();
-//        List<String> _2_6_group = new ArrayList<>();
+        pushMap.put("A8o", 20.0);
+        pushMap.put("K8o", 18.0);
+        pushMap.put("Q8o", 13.0);
+        pushMap.put("J8o", 13.3);
+        pushMap.put("T8o", 17.5);
+        pushMap.put("98o", 20.0);
+        pushMap.put("88s", 20.0);
+        pushMap.put("87s", 20.0);
+        pushMap.put("86s", 20.0);
+        pushMap.put("85s", 18.8);
+        pushMap.put("84s", 10.1);
+        pushMap.put("83s", 2.7);
+        pushMap.put("82s", 2.5);
 
+        pushMap.put("A7o", 20.0);
+        pushMap.put("K7o", 16.1);
+        pushMap.put("Q7o", 10.3);
+        pushMap.put("J7o", 8.5);
+        pushMap.put("T7o", 9.0);
+        pushMap.put("97o", 10.8);
+        pushMap.put("87o", 14.7);
+        pushMap.put("77", 20.0);
+        pushMap.put("76s", 20.0);
+        pushMap.put("75s", 20.0);
+        pushMap.put("74s", 13.9);
+        pushMap.put("73s", 2.5);
+        pushMap.put("72s", 2.1);
 
+        pushMap.put("A6o", 20.0);
+        pushMap.put("K6o", 15.1);
+        pushMap.put("Q6o", 9.6);
+        pushMap.put("J6o", 6.5);
+        pushMap.put("T6o", 5.7);
+        pushMap.put("96o", 5.2);
+        pushMap.put("86o", 7.0);
+        pushMap.put("76o", 10.7);
+        pushMap.put("66", 20.0);
+        pushMap.put("65s", 20.0);
+        pushMap.put("64s", 16.3);
+        pushMap.put("63s", 7.1);
+        pushMap.put("62s", 2.0);
+
+        pushMap.put("A5o", 20.0);
+        pushMap.put("K5o", 14.2);
+        pushMap.put("Q5o", 8.9);
+        pushMap.put("J5o", 6.0);
+        pushMap.put("T5o", 4.1);
+        pushMap.put("95o", 3.5);
+        pushMap.put("85o", 3.0);
+        pushMap.put("75o", 2.6);
+        pushMap.put("65o", 2.4);
+        pushMap.put("55", 20.0);
+        pushMap.put("54s", 16.3);
+        pushMap.put("53s", 12.9);
+        pushMap.put("52s", 2.0);
+
+        pushMap.put("A4o", 20.0);
+        pushMap.put("K4o", 13.1);
+        pushMap.put("Q4o", 7.9);
+        pushMap.put("J4o", 5.4);
+        pushMap.put("T4o", 3.8);
+        pushMap.put("94o", 2.7);
+        pushMap.put("84o", 2.3);
+        pushMap.put("74o", 2.1);
+        pushMap.put("64o", 2.0);
+        pushMap.put("54o", 2.1);
+        pushMap.put("44", 20.0);
+        pushMap.put("43s", 10.0);
+        pushMap.put("42s", 1.8);
+
+        pushMap.put("A3o", 20.0);
+        pushMap.put("K3o", 12.2);
+        pushMap.put("Q3o", 7.5);
+        pushMap.put("J3o", 5.0);
+        pushMap.put("T3o", 3.4);
+        pushMap.put("93o", 2.5);
+        pushMap.put("83o", 1.9);
+        pushMap.put("73o", 1.8);
+        pushMap.put("63o", 1.7);
+        pushMap.put("53o", 1.8);
+        pushMap.put("43o", 1.6);
+        pushMap.put("33", 20.0);
+        pushMap.put("32s", 1.7);
+
+        pushMap.put("A2o", 20.0);
+        pushMap.put("K2o", 11.6);
+        pushMap.put("Q2o", 7.0);
+        pushMap.put("J2o", 4.6);
+        pushMap.put("T2o", 2.9);
+        pushMap.put("92o", 2.2);
+        pushMap.put("82o", 1.8);
+        pushMap.put("72o", 1.6);
+        pushMap.put("62o", 1.5);
+        pushMap.put("52o", 1.5);
+        pushMap.put("42o", 1.4);
+        pushMap.put("32o", 1.4);
+        pushMap.put("22", 20.0);
+
+        return pushMap;
     }
 
+    private Map<String, Double> getCallMap() {
+        Map<String, Double> callMap = new HashMap<>();
 
+        callMap.put("AA", 20.0);
+        callMap.put("AKs", 20.0);
+        callMap.put("AQs", 20.0);
+        callMap.put("AJs", 20.0);
+        callMap.put("ATs", 20.0);
+        callMap.put("A9s", 20.0);
+        callMap.put("A8s", 20.0);
+        callMap.put("A7s", 20.0);
+        callMap.put("A6s", 20.0);
+        callMap.put("A5s", 20.0);
+        callMap.put("A4s", 20.0);
+        callMap.put("A3s", 20.0);
+        callMap.put("A2s", 20.0);
 
+        callMap.put("AKo", 20.0);
+        callMap.put("KK", 20.0);
+        callMap.put("KQs", 20.0);
+        callMap.put("KJs", 20.0);
+        callMap.put("KTs", 20.0);
+        callMap.put("K9s", 20.0);
+        callMap.put("K8s", 17.6);
+        callMap.put("K7s", 15.2);
+        callMap.put("K6s", 14.3);
+        callMap.put("K5s", 13.2);
+        callMap.put("K4s", 12.1);
+        callMap.put("K3s", 11.4);
+        callMap.put("K2s", 10.7);
 
+        callMap.put("AQo", 20.0);
+        callMap.put("KQo", 20.0);
+        callMap.put("QQ", 20.0);
+        callMap.put("QJs", 20.0);
+        callMap.put("QTs", 20.0);
+        callMap.put("Q9s", 16.1);
+        callMap.put("Q8s", 13.0);
+        callMap.put("Q7s", 10.5);
+        callMap.put("Q6s", 9.9);
+        callMap.put("Q5s", 8.9);
+        callMap.put("Q4s", 8.4);
+        callMap.put("Q3s", 7.8);
+        callMap.put("Q2s", 7.2);
 
+        callMap.put("AJo", 20.0);
+        callMap.put("KJo", 20.0);
+        callMap.put("QJo", 19.5);
+        callMap.put("JJ", 20.0);
+        callMap.put("JTs", 18.0);
+        callMap.put("J9s", 13.4);
+        callMap.put("J8s", 10.6);
+        callMap.put("J7s", 8.8);
+        callMap.put("J6s", 7.0);
+        callMap.put("J5s", 6.9);
+        callMap.put("J4s", 6.1);
+        callMap.put("J3s", 5.8);
+        callMap.put("J2s", 5.6);
 
+        callMap.put("ATo", 20.0);
+        callMap.put("KTo", 20.0);
+        callMap.put("QTo", 15.3);
+        callMap.put("JTo", 12.7);
+        callMap.put("TT", 20.0);
+        callMap.put("T9s", 11.5);
+        callMap.put("T8s", 9.3);
+        callMap.put("T7s", 7.4);
+        callMap.put("T6s", 6.3);
+        callMap.put("T5s", 5.2);
+        callMap.put("T4s", 5.2);
+        callMap.put("T3s", 4.8);
+        callMap.put("T2s", 4.5);
+
+        callMap.put("A9o", 20.0);
+        callMap.put("K9o", 17.1);
+        callMap.put("Q9o", 11.7);
+        callMap.put("J9o", 9.5);
+        callMap.put("T9o", 8.4);
+        callMap.put("99", 20.0);
+        callMap.put("98s", 8.2);
+        callMap.put("97s", 7.0);
+        callMap.put("96s", 5.8);
+        callMap.put("95s", 5.0);
+        callMap.put("94s", 4.3);
+        callMap.put("93s", 4.1);
+        callMap.put("92s", 3.9);
+
+        callMap.put("A8o", 20.0);
+        callMap.put("K8o", 13.8);
+        callMap.put("Q8o", 9.7);
+        callMap.put("J8o", 7.6);
+        callMap.put("T8o", 6.6);
+        callMap.put("98o", 6.0);
+        callMap.put("88", 20.0);
+        callMap.put("87s", 6.5);
+        callMap.put("86s", 5.6);
+        callMap.put("85s", 4.8);
+        callMap.put("84s", 4.1);
+        callMap.put("83s", 3.6);
+        callMap.put("82s", 3.5);
+
+        callMap.put("A7o", 20.0);
+        callMap.put("K7o", 12.4);
+        callMap.put("Q7o", 8.0);
+        callMap.put("J7o", 6.4);
+        callMap.put("T7o", 5.5);
+        callMap.put("97o", 5.0);
+        callMap.put("87o", 4.7);
+        callMap.put("77", 20.0);
+        callMap.put("76s", 5.4);
+        callMap.put("75s", 4.8);
+        callMap.put("74s", 4.1);
+        callMap.put("73s", 3.6);
+        callMap.put("72s", 3.3);
+
+        callMap.put("A6o", 20.0);
+        callMap.put("K6o", 11.0);
+        callMap.put("Q6o", 7.3);
+        callMap.put("J6o", 5.4);
+        callMap.put("T6o", 4.6);
+        callMap.put("96o", 4.2);
+        callMap.put("86o", 4.1);
+        callMap.put("76o", 4.0);
+        callMap.put("66", 20.0);
+        callMap.put("65s", 4.9);
+        callMap.put("64s", 4.3);
+        callMap.put("63s", 3.8);
+        callMap.put("62s", 3.3);
+
+        callMap.put("A5o", 20.0);
+        callMap.put("K5o", 10.2);
+        callMap.put("Q5o", 6.8);
+        callMap.put("J5o", 5.1);
+        callMap.put("T5o", 4.0);
+        callMap.put("95o", 3.7);
+        callMap.put("85o", 3.6);
+        callMap.put("75o", 3.6);
+        callMap.put("65o", 3.7);
+        callMap.put("55", 20.0);
+        callMap.put("54s", 4.6);
+        callMap.put("53s", 4.0);
+        callMap.put("52s", 3.6);
+
+        callMap.put("A4o", 18.3);
+        callMap.put("K4o", 9.1);
+        callMap.put("Q4o", 6.2);
+        callMap.put("J4o", 4.7);
+        callMap.put("T4o", 3.8);
+        callMap.put("94o", 3.3);
+        callMap.put("84o", 3.2);
+        callMap.put("74o", 3.2);
+        callMap.put("64o", 3.3);
+        callMap.put("54o", 3.5);
+        callMap.put("44", 20.0);
+        callMap.put("43s", 3.8);
+        callMap.put("42s", 3.4);
+
+        callMap.put("A3o", 16.6);
+        callMap.put("K3o", 8.7);
+        callMap.put("Q3o", 5.9);
+        callMap.put("J3o", 4.5);
+        callMap.put("T3o", 3.6);
+        callMap.put("93o", 3.1);
+        callMap.put("83o", 2.9);
+        callMap.put("73o", 2.9);
+        callMap.put("63o", 2.9);
+        callMap.put("53o", 3.1);
+        callMap.put("43o", 3.0);
+        callMap.put("33", 20.0);
+        callMap.put("32s", 3.3);
+
+        callMap.put("A2o", 15.8);
+        callMap.put("K2o", 8.1);
+        callMap.put("Q2o", 5.6);
+        callMap.put("J2o", 4.2);
+        callMap.put("T2o", 3.5);
+        callMap.put("92o", 3.0);
+        callMap.put("82o", 2.8);
+        callMap.put("72o", 2.6);
+        callMap.put("62o", 2.7);
+        callMap.put("52o", 2.8);
+        callMap.put("42o", 2.7);
+        callMap.put("32o", 2.6);
+        callMap.put("22", 15.0);
+
+        return callMap;
+    }
 }
