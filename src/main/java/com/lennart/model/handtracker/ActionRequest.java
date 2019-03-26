@@ -166,6 +166,14 @@ public class ActionRequest {
 
                     PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, previousTotalBotBetSize, totalOpponentBetSize, "thecorrectstreet", "raise");
                     actionsSinceLastRequest.add(playerActionRound);
+                } else if(botLastAction.equals("call")) {
+                    //must have been bot preflop limp
+
+                    double previousTotalBotBetSize = botLastActionRound.getTotalBotBetSize();
+                    double totalOpponentBetSize = topTotalPotSize - previousTotalBotBetSize;
+
+                    PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, previousTotalBotBetSize, totalOpponentBetSize, "thecorrectstreet", "raise");
+                    actionsSinceLastRequest.add(playerActionRound);
                 }
             } else {
                 //nieuwe straat...
