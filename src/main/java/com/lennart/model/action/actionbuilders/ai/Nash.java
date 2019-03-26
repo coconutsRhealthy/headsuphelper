@@ -10,7 +10,7 @@ import java.util.Map;
 public class Nash {
 
     public boolean nashActionIsPossible(double effectiveStackBb, boolean position, double botBetSizeBb, List<Card> board,
-                                        String opponentAction, double opponentStackBb) {
+                                        String opponentAction, double opponentStackBb, double amountToCallBb) {
         boolean nashActionIsPossible = false;
 
         if(board == null || board.isEmpty()) {
@@ -21,7 +21,7 @@ public class Nash {
                         System.out.println("IP Nash action is possible!");
                     }
                 } else {
-                    if(botBetSizeBb == 1 && opponentAction.equals("raise") && opponentStackBb == 0) {
+                    if(botBetSizeBb == 1 && opponentAction.equals("raise") && opponentStackBb == 0 && amountToCallBb <= 20) {
                         nashActionIsPossible = true;
                         System.out.println("OOP Nash action is possible!");
                     }
@@ -51,7 +51,7 @@ public class Nash {
             Map<String, Double> callMap = getCallMap();
             double stackLimitToCallBb = callMap.get(holeCardsAsString);
 
-            if(stackLimitToCallBb <= amountToCallBb) {
+            if(amountToCallBb <= stackLimitToCallBb) {
                 nashAction = "call";
                 System.out.println("Set OOP Nash action to call for: " + holeCardsAsString);
             } else {
