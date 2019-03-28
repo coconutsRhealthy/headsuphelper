@@ -174,6 +174,8 @@ public class ActionRequest {
 
                     PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, previousTotalBotBetSize, totalOpponentBetSize, "thecorrectstreet", "raise");
                     actionsSinceLastRequest.add(playerActionRound);
+
+                    System.out.println("Bot preflop limp facing raise. Opp sizing: " + totalOpponentBetSize + " total botsizing: " + previousTotalBotBetSize);
                 }
             } else {
                 //nieuwe straat...

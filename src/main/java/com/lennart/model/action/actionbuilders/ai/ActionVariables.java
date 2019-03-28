@@ -377,16 +377,29 @@ public class ActionVariables {
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
 
-        Nash nash = new Nash();
-        boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb, boardInMethod, gameVariables.getOpponentAction(), opponentStackBb);
+        String actionBeforeNash = action;
+        double sizingBeforeNash = sizing;
 
-        if(nashActionIsPossible) {
-            action = nash.doNashAction(gameVariables.getBotHoleCards(), botIsButtonInMethod, effectiveStack, amountToCallBb);
+        try {
+            Nash nash = new Nash();
+            boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb, boardInMethod, gameVariables.getOpponentAction(), opponentStackBb, amountToCallBb);
 
-            if(action.equals("raise")) {
-                sizing = 5000 * gameVariables.getBigBlind();
-                System.out.println("Set Nash action raise sizing to shove: " + sizing);
+            if(nashActionIsPossible) {
+                action = nash.doNashAction(gameVariables.getBotHoleCards(), botIsButtonInMethod, effectiveStack, amountToCallBb);
+
+                if(action.equals("raise")) {
+                    sizing = 5000 * gameVariables.getBigBlind();
+                    System.out.println("Set Nash action raise sizing to shove: " + sizing);
+                }
             }
+        } catch (Exception e) {
+            System.out.println("Nash error!");
+            System.out.println();
+            e.printStackTrace();
+            System.out.println();
+
+            action = actionBeforeNash;
+            sizing = sizingBeforeNash;
         }
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {

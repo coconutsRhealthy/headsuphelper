@@ -156,7 +156,7 @@ public class Nash {
         pushMap.put("J8o", 13.3);
         pushMap.put("T8o", 17.5);
         pushMap.put("98o", 20.0);
-        pushMap.put("88s", 20.0);
+        pushMap.put("88", 20.0);
         pushMap.put("87s", 20.0);
         pushMap.put("86s", 20.0);
         pushMap.put("85s", 18.8);
