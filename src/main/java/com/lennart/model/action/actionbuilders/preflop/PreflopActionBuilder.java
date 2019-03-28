@@ -40,9 +40,9 @@ public class PreflopActionBuilder {
             if(amountToCallBb <= 4) {
                 action = getActionFacingAllIn(botHoleCards, 0.5);
             } else if(amountToCallBb <= 16) {
-                action = getActionFacingAllIn(botHoleCards, 0.75);
+                action = getActionFacingAllIn(botHoleCards, 0.85);
             } else if(amountToCallBb <= 25) {
-                action = getActionFacingAllIn(botHoleCards, 0.80);
+                action = getActionFacingAllIn(botHoleCards, 0.90);
             } else if(amountToCallBb <= 40) {
                 action = getActionFacingAllIn(botHoleCards, 0.90);
             } else {
@@ -85,12 +85,16 @@ public class PreflopActionBuilder {
         double limitValue;
 
         if(effectiveStackBb <= 25 && oppIpPre2betStat > 0.22) {
-            limit1 = 0.75;
-            limit2 = 0.65;
-            limitValue = 0.9;
+            //limit1 = 0.75;
+            //limit2 = 0.65;
+            //limitValue = 0.9;
+
+            limit1 = 0.90;
+            limit2 = 0.96;
+            limitValue = 0.95;
         } else {
-            limit1 = 0.85;
-            limit2 = 0.9;
+            limit1 = 0.90;
+            limit2 = 0.96;
             limitValue = 0.95;
         }
 
@@ -123,7 +127,8 @@ public class PreflopActionBuilder {
         Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
-            if(entry.getKey() > 0.5) {
+            //aanpassen naar alles wat pushbaar is 20bb plus binnen Nash?
+            if(entry.getKey() > 0.65) {
                 for(Set<Card> combo : entry.getValue()) {
                     List<Card> comboAsList = new ArrayList<>();
                     comboAsList.addAll(combo);

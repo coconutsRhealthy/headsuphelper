@@ -17,8 +17,10 @@ public class Nash {
             if(effectiveStackBb <= 20) {
                 if(position) {
                     if(botBetSizeBb == 0.5) {
-                        nashActionIsPossible = true;
-                        System.out.println("IP Nash action is possible!");
+                        if(effectiveStackBb <= 10) {
+                            nashActionIsPossible = true;
+                            System.out.println("IP Nash action is possible!");
+                        }
                     }
                 } else {
                     if(botBetSizeBb == 1 && opponentAction.equals("raise") && opponentStackBb == 0 && amountToCallBb <= 20) {

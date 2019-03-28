@@ -179,7 +179,7 @@ public class StarsTableReader {
         return firstCheck && secondCheck;
     }
 
-    public static boolean sngIsFinished() {
+    public static boolean sngIsFinished() throws Exception {
         boolean sngIsFinished = false;
 
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
@@ -188,7 +188,7 @@ public class StarsTableReader {
         if(pixelRgb / 100 == -15790) {
             //expected rgb: -1.579.033
 
-            System.out.println("sng is finished");
+            System.out.println("sng is finished A1");
             sngIsFinished = true;
         }
 
@@ -199,9 +199,39 @@ public class StarsTableReader {
             if(pixelRgb2 / 100 == -31580) {
                 //expected rgb: -3.158.065
 
-                System.out.println("sng is finished");
+                System.out.println("sng is finished A2");
                 sngIsFinished = true;
             }
+        }
+
+        //temp for spin of the day
+        if(sngIsFinished) {
+            sngIsFinished = false;
+
+            TimeUnit.SECONDS.sleep(30);
+
+            BufferedImage bufferedImage3 = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
+            int pixelRgb3 = bufferedImage3.getRGB(0, 0);
+
+            if(pixelRgb3 / 100 == -15790) {
+                //expected rgb: -1.579.033
+
+                System.out.println("sng is finished B1");
+                sngIsFinished = true;
+            }
+
+            if(!sngIsFinished) {
+                BufferedImage bufferedImage4 = ImageProcessor.getBufferedImageScreenShot(74, 167, 1, 1);
+                int pixelRgb4 = bufferedImage4.getRGB(0, 0);
+
+                if(pixelRgb4 / 100 == -31580) {
+                    //expected rgb: -3.158.065
+
+                    System.out.println("sng is finished B2");
+                    sngIsFinished = true;
+                }
+            }
+
         }
 
         return sngIsFinished;
