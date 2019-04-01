@@ -159,11 +159,12 @@ public class StarsTableReader {
     public static boolean botIsToAct() {
         boolean firstCheck = false;
         boolean secondCheck = false;
+        boolean thirdCheck = false;
 
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1048, 773, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
 
-        if(suitRgb / 1_000_000 == -14) {
+        if(suitRgb / 1_000 == -14614) {
             //expected rgb: -14.614.527
             firstCheck = true;
         }
@@ -171,12 +172,31 @@ public class StarsTableReader {
         BufferedImage bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(928, 737, 1, 1);
         int suitRgb2 = bufferedImage2.getRGB(0, 0);
 
-        if(suitRgb2 / 1_000_000 == -10) {
+        if(suitRgb2 / 1_000 == -10745) {
             //expected rgb: -10.745.589
             secondCheck = true;
         }
 
-        return firstCheck && secondCheck;
+        //third check.. the timebox below your name...
+        BufferedImage bufferedImage3 = ImageProcessor.getBufferedImageScreenShot(474, 194, 1, 1);
+        int suitRgb3 = bufferedImage3.getRGB(0, 0);
+
+        if(suitRgb3 / 1_000 == -8132) {
+            //expected rgb: -8.132.603
+            thirdCheck = true;
+        }
+
+        if(firstCheck && secondCheck && !thirdCheck) {
+            System.out.println("weird bot is to act!");
+        }
+
+        if(firstCheck && secondCheck && thirdCheck) {
+            System.out.println();
+            System.out.println("Bot is to act");
+            System.out.println();
+        }
+
+        return firstCheck && secondCheck && thirdCheck;
     }
 
     public static boolean sngIsFinished() throws Exception {

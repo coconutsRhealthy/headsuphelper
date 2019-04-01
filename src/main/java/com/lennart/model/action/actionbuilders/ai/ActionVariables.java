@@ -313,8 +313,12 @@ public class ActionVariables {
 
             //action = preventMoreBluffs(action, botHandStrength, strongFd || strongOosd, boardInMethod, continuousTable, gameVariables);
 
-            if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            if((action.equals("bet75pct") || action.equals("raise"))) {
+                if(sizing == 0) {
+                    sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                }
+
+                sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
 
             action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables, bigBlind, gameVariables.getOpponentName());
@@ -357,8 +361,8 @@ public class ActionVariables {
             //sng specific
             if(total > 2500 && total < 3500) {
                 ShortStackPlayAdjuster shortStackPlayAdjuster = new ShortStackPlayAdjuster();
-                action = shortStackPlayAdjuster.adjustAction(action, gameVariables, this);
-                sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, gameVariables.getBigBlind());
+                action = shortStackPlayAdjuster.adjustAction(action, gameVariables, this, continuousTable.isOpponentHasInitiative());
+                //sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, gameVariables.getBigBlind());
             } else {
                 System.out.println("No shortstack play, total is wrong");
             }

@@ -38,7 +38,7 @@ public class PreflopActionBuilder {
 
         if(opponentStack <= 0 || effectiveAllIn) {
             if(amountToCallBb <= 4) {
-                action = getActionFacingAllIn(botHoleCards, 0.5);
+                action = getActionFacingAllIn(botHoleCards, 0.55);
             } else if(amountToCallBb <= 16) {
                 action = getActionFacingAllIn(botHoleCards, 0.85);
             } else if(amountToCallBb <= 25) {

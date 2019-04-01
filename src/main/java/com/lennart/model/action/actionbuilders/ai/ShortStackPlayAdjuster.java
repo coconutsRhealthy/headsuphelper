@@ -7,13 +7,13 @@ import java.util.List;
 
 public class ShortStackPlayAdjuster {
 
-    public String adjustAction(String action, GameVariables gameVariables, ActionVariables actionVariables) {
+    public String adjustAction(String action, GameVariables gameVariables, ActionVariables actionVariables, boolean opponentHasInitiative) {
         String actionToReturn;
 
         if(isPreflop(gameVariables.getBoard())) {
             actionToReturn = adjustPreflopAction(action, gameVariables, actionVariables);
         } else {
-            actionToReturn = adjustPostflopAction(action, gameVariables, actionVariables);
+            actionToReturn = adjustPostflopAction(action, gameVariables, actionVariables, opponentHasInitiative);
         }
 
         return actionToReturn;
@@ -59,11 +59,11 @@ public class ShortStackPlayAdjuster {
         return actionToReturn;
     }
 
-    private String adjustPostflopAction(String action, GameVariables gameVariables, ActionVariables actionVariables) {
+    private String adjustPostflopAction(String action, GameVariables gameVariables, ActionVariables actionVariables, boolean opponentHasInitiative) {
         String actionToReturn;
 
         if(gameVariables.getOpponentStack() > 0) {
-            if(action.equals("check") || action.equals("fold") || action.equals("call")) {
+            if((action.equals("check") && !opponentHasInitiative) || action.equals("fold") || action.equals("call")) {
                 String actionToUse;
 
                 if(action.equals("check")) {
