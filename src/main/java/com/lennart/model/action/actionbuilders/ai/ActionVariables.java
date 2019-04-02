@@ -322,7 +322,7 @@ public class ActionVariables {
             }
 
             action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables, bigBlind, gameVariables.getOpponentName());
-            action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd, gameVariables.getOpponentAction(), gameVariables.getOpponentName());
+            action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd, gameVariables.getOpponentAction(), gameVariables.getOpponentName(), opponentBetsizeBb * bigBlind);
             action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, boardInMethod, botIsButtonInMethod);
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
@@ -1249,29 +1249,38 @@ public class ActionVariables {
     }
 
     private String solidifySngBotCalls(String action, double botHandStrength, List<Card> board, double facingOdds,
-                                       boolean strongFd, boolean strongOosd, String opponentAction, String opponentName) throws Exception  {
+                                       boolean strongFd, boolean strongOosd, String opponentAction, String opponentName,
+                                       double oppBetSize) throws Exception  {
         String actionToReturn;
 
         if(board != null && !board.isEmpty()) {
             if(action.equals("call")) {
-                if(facingOdds > 0.23) {
+                if(facingOdds > 0.22) {
                     double limit;
 
-                    if(opponentAction.equals("raise")) {
+                    if(oppBetSize >= 150) {
+                        limit = 0.85;
+                    } else if(oppBetSize >= 100) {
                         limit = 0.8;
+                    } else if(oppBetSize >= 50 && !opponentAction.equals("raise")) {
+                        limit = 0.78;
                     } else {
-                        double oppPostBetToCheckRatio = new OpponentIdentifier2_0(opponentName).getOppPostBetToCheckRatio();
-
-                        if(oppPostBetToCheckRatio == -1 || oppPostBetToCheckRatio < 0.28) {
+                        if(opponentAction.equals("raise")) {
                             limit = 0.8;
-                        } else if(oppPostBetToCheckRatio < 0.43) {
-                            limit = 0.75;
                         } else {
-                            limit = 0.7;
-                        }
+                            double oppPostBetToCheckRatio = new OpponentIdentifier2_0(opponentName).getOppPostBetToCheckRatio();
 
-                        System.out.println("postCallLimit for " + opponentName + ": " + limit + " betToCheckRatio: " + oppPostBetToCheckRatio);
+                            if(oppPostBetToCheckRatio == -1 || oppPostBetToCheckRatio < 0.28) {
+                                limit = 0.8;
+                            } else if(oppPostBetToCheckRatio < 0.43) {
+                                limit = 0.75;
+                            } else {
+                                limit = 0.7;
+                            }
+                        }
                     }
+
+                    System.out.println("postCallLimit for " + opponentName + ": " + limit);
 
                     if(botHandStrength < limit && !strongFd && !strongOosd) {
                         actionToReturn = "fold";
