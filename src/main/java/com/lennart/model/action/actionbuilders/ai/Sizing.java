@@ -216,7 +216,7 @@ public class Sizing {
         } else {
             if(opponentBetSize == 0) {
                 if(potSizeBb <= 8) {
-                    flopSizing = 0.75 * potSize;
+                    flopSizing = 0.58 * potSize;
                 } else if(potSizeBb > 8 && potSizeBb <= 24) {
                     double flopBetPercentage = getFlopBetPercentage(effectiveStack, potSize, 0.7, 0.75);
 
@@ -269,7 +269,7 @@ public class Sizing {
                 double turnBetPercentage4bet = getTurnBetPercentage(effectiveStack, potSize, 0.51);
 
                 if(turnBetPercentage3bet > 0.75) {
-                    turnSizing = 0.75 * potSize;
+                    turnSizing = 0.58 * potSize;
                 } else if(turnBetPercentage3bet > 0.5) {
                     turnSizing = turnBetPercentage3bet * potSize;
                 } else if(turnBetPercentage3bet > 0.4) {
@@ -304,7 +304,7 @@ public class Sizing {
             if(botStack <= 1.2 * potSize) {
                 riverSizing = botStack + (0.05 * botStack);
             } else {
-                riverSizing = 0.75 * potSize;
+                riverSizing = 0.58 * potSize;
             }
         } else {
             riverSizing = calculateRaiseAmount(opponentBetSize, potSize, effectiveStack, 2.33, bigBlind);
