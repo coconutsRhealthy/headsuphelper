@@ -170,12 +170,12 @@ public class ActionRequest {
                     //must have been bot preflop limp
 
                     double previousTotalBotBetSize = botLastActionRound.getTotalBotBetSize();
-                    double totalOpponentBetSize = topTotalPotSize - previousTotalBotBetSize;
+                    double totalOpponentBetSize = topTotalPotSize - (previousTotalBotBetSize * 2);
 
-                    PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, previousTotalBotBetSize, totalOpponentBetSize, "thecorrectstreet", "raise");
+                    PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, (previousTotalBotBetSize * 2), totalOpponentBetSize, "thecorrectstreet", "raise");
                     actionsSinceLastRequest.add(playerActionRound);
 
-                    System.out.println("Bot preflop limp facing raise. Opp sizing: " + totalOpponentBetSize + " total botsizing: " + previousTotalBotBetSize);
+                    System.out.println("Bot preflop limp facing raise. Opp sizing: " + totalOpponentBetSize + " total botsizing: " + (previousTotalBotBetSize * 2));
                 }
             } else {
                 //nieuwe straat...
