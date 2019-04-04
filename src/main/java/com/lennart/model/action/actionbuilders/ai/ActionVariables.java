@@ -321,7 +321,7 @@ public class ActionVariables {
                 sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
 
-            action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables, bigBlind, gameVariables.getOpponentName());
+            action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables);
             action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd, gameVariables.getOpponentAction(), gameVariables.getOpponentName(), opponentBetsizeBb * bigBlind);
             action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, boardInMethod, botIsButtonInMethod);
 
@@ -1142,34 +1142,12 @@ public class ActionVariables {
 
     private String solidifySngBot(String action, double botHandStrength, boolean strongFd, boolean strongOosd,
                                   boolean strongGutshot, List<Card> board, double sizing, ContinuousTable continuousTable,
-                                  GameVariables gameVariables, double bigBlind, String opponentName) throws Exception {
+                                  GameVariables gameVariables) throws Exception {
         String actionToReturn;
 
         if(board != null && !board.isEmpty()) {
             if(action.equals("bet75pct") || action.equals("raise")) {
-                double sizingLimit;
-
-                double oppPostFoldToCallRaiseRatio = new OpponentIdentifier2_0(opponentName).getOppPostFoldToCallRaiseRatio();
-
-                if(bigBlind < 40) {
-                    if(oppPostFoldToCallRaiseRatio == -1 || oppPostFoldToCallRaiseRatio < 0.375) {
-                        sizingLimit = 150;
-                    } else if(oppPostFoldToCallRaiseRatio < 0.483) {
-                        sizingLimit = 200;
-                    } else {
-                        sizingLimit = 250;
-                    }
-                } else {
-                    if(oppPostFoldToCallRaiseRatio == -1 || oppPostFoldToCallRaiseRatio < 0.375) {
-                        sizingLimit = 200;
-                    } else if(oppPostFoldToCallRaiseRatio < 0.483) {
-                        sizingLimit = 250;
-                    } else {
-                        sizingLimit = 300;
-                    }
-                }
-
-                System.out.println("sizingLimit for " + opponentName + ": " + sizingLimit + " oppPostFoldToCallRaiseRatio: " + oppPostFoldToCallRaiseRatio);
+                double sizingLimit = 140;
 
                 if(sizing > sizingLimit) {
                     double hsLimit;
@@ -1236,7 +1214,29 @@ public class ActionVariables {
                         System.out.println("xagkpure pure value action. action: " + action + " hs: " + botHandStrength + " sizing: " + sizing);
                     }
                 } else {
-                    actionToReturn = action;
+                    if(action.equals("raise")) {
+                        if(botHandStrength < 0.7) {
+                            if(board.size() == 3) {
+                                if(strongFd || strongOosd || strongGutshot) {
+                                    actionToReturn = action;
+                                } else {
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
+                            } else if(board.size() == 4) {
+                                if(strongFd || strongOosd) {
+                                    actionToReturn = action;
+                                } else {
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
                 }
             } else {
                 actionToReturn = action;
@@ -1255,7 +1255,7 @@ public class ActionVariables {
 
         if(board != null && !board.isEmpty()) {
             if(action.equals("call")) {
-                if(facingOdds > 0.22) {
+                if(facingOdds > 0.3) {
                     double limit;
 
                     if(oppBetSize >= 150) {
@@ -1282,9 +1282,14 @@ public class ActionVariables {
 
                     System.out.println("postCallLimit for " + opponentName + ": " + limit);
 
-                    if(botHandStrength < limit && !strongFd && !strongOosd) {
-                        actionToReturn = "fold";
-                        System.out.println("gsfdg change call to fold. HS: " + botHandStrength);
+                    if(botHandStrength < limit) {
+                        if((strongFd || strongOosd) && board.size() == 3) {
+                            actionToReturn = action;
+                            System.out.println("gsfdg kept call because strong draw on flop");
+                        } else {
+                            actionToReturn = "fold";
+                            System.out.println("gsfdg change call to fold. HS: " + botHandStrength);
+                        }
                     } else {
                         actionToReturn = action;
                         System.out.println("gsfdg kept value call. HS: " + botHandStrength);
