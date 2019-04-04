@@ -186,9 +186,11 @@ public class PreflopActionBuilder {
         double limit;
 
         if(bigBlind < 40) {
-            limit = 0.8;
+            limit = 0.80;
+        } else if(bigBlind <= 60) {
+            limit = 0.85;
         } else {
-            limit = 0.6;
+            limit = 0.90;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
