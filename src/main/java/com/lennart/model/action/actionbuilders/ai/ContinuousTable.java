@@ -47,6 +47,8 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     public void runTableContinously() throws Exception {
+        doSngStartSessionLogic();
+
         GameVariables gameVariables = new GameVariables();
         int numberOfActionRequests = 0;
         int milliSecondsTotal = 0;
@@ -69,7 +71,13 @@ public class ContinuousTable implements ContinuousTableable {
 
                 if(isNewHand) {
                     if(game.equals("sng")) {
+                        double previousBigBlind = bigBlind;
                         bigBlind = new StarsTableReader().readBigBlindFromSngScreen();
+
+                        if(bigBlind < 0) {
+                            System.out.println("Error in reading bb. Set it to previous value: " + previousBigBlind);
+                            bigBlind = previousBigBlind;
+                        }
                     }
 
                     int numberOfHsAbove85 = getNumberOfHsAbove85();
@@ -358,6 +366,40 @@ public class ContinuousTable implements ContinuousTableable {
 
             TimeUnit.SECONDS.sleep(6);
         }
+    }
+
+    private void doSngStartSessionLogic() throws Exception {
+        StarsTableReader starsTableReader = new StarsTableReader();
+        starsTableReader.registerNewSng();
+
+        int counter = 0;
+
+        boolean newTableNotYetOpened = true;
+        while(newTableNotYetOpened) {
+            if(counter == 30) {
+                MouseKeyboard.moveMouseToLocation(7, 100);
+                MouseKeyboard.click(7, 100);
+                System.out.println();
+                counter = 0;
+            }
+
+            System.out.println(",");
+
+            TimeUnit.MILLISECONDS.sleep(1100);
+
+            if(starsTableReader.newSngTableIsOpened()) {
+                newTableNotYetOpened = false;
+                System.out.println("New sng table is opened b");
+            } else {
+                counter++;
+                newTableNotYetOpened = true;
+            }
+        }
+
+        TimeUnit.MILLISECONDS.sleep(100);
+        starsTableReader.maximizeNewSngTable();
+
+        TimeUnit.SECONDS.sleep(6);
     }
 
     @Override

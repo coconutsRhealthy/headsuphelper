@@ -6,6 +6,7 @@ import com.lennart.model.imageprocessing.ImageProcessor;
 import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -228,7 +229,7 @@ public class StarsTableReader {
         if(sngIsFinished) {
             sngIsFinished = false;
 
-            TimeUnit.SECONDS.sleep(30);
+            TimeUnit.MILLISECONDS.sleep(5590);
 
             BufferedImage bufferedImage3 = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
             int pixelRgb3 = bufferedImage3.getRGB(0, 0);
@@ -271,21 +272,43 @@ public class StarsTableReader {
     }
 
     public void registerNewSng() throws Exception {
-        System.out.println("registering new sng");
-        MouseKeyboard.click(782, 603);
+        if(noPlayerIsReggedYet()) {
+            System.out.println("registering new sng");
+            MouseKeyboard.click(782, 603);
 
-        TimeUnit.MILLISECONDS.sleep(950);
+            TimeUnit.MILLISECONDS.sleep(950);
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(441, 426, 1, 1);
-        int pixelRgb = bufferedImage.getRGB(0, 0);
+            BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(441, 426, 1, 1);
+            int pixelRgb = bufferedImage.getRGB(0, 0);
 
-        if(pixelRgb / 100 == -13158 ) {
-            System.out.println("registration was already closed. Click OK and call method again");
-            MouseKeyboard.click(489, 449);
+            if(pixelRgb / 100 == -13158 ) {
+                System.out.println("registration was already closed. Click OK and call method again");
+                MouseKeyboard.click(489, 449);
 
-            TimeUnit.MILLISECONDS.sleep(200);
+                TimeUnit.MILLISECONDS.sleep(200);
+                registerNewSng();
+            }
+        } else {
+            System.out.println("Already one regged player, wait...");
+            TimeUnit.SECONDS.sleep(5);
             registerNewSng();
         }
+    }
+
+    private boolean noPlayerIsReggedYet() throws Exception {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(929, 438, 1, 1);
+
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+        boolean noPlayerIsRegged = true;
+
+        if(pixelRgb / 1000 == -9934) {
+            //expected: -9.934.744
+            noPlayerIsRegged = false;
+        } else {
+            System.out.println("empty sng, will register");
+        }
+
+        return noPlayerIsRegged;
     }
 
     public boolean newSngTableIsOpened() {
@@ -559,7 +582,7 @@ public class StarsTableReader {
         return ImageProcessor.removeAllNonNumericCharacters(totalPotSize);
     }
 
-    public double readBigBlindFromSngScreen() {
+    public double readBigBlindFromSngScreen() throws Exception {
         double bigBlind;
 
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(361, 25, 199, 19);
@@ -590,7 +613,22 @@ public class StarsTableReader {
             }
         }
 
-        bigBlind = Double.valueOf(bigBlindString);
+        try {
+            bigBlind = Double.valueOf(bigBlindString);
+        } catch (Exception e) {
+            System.out.println();
+            System.out.println("Error in reading bigblind!");
+            System.out.println("bb String: " + bigBlindString);
+            long currentTime = new Date().getTime();
+            System.out.println("Screenshot saved with time: " + currentTime);
+            saveScreenshotOfEntireScreen(currentTime);
+            System.out.println();
+
+            e.printStackTrace();
+
+            bigBlind = -1;
+        }
+
         return bigBlind * 2;
     }
 
