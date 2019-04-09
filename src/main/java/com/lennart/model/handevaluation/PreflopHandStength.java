@@ -20,7 +20,7 @@ public class PreflopHandStength {
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(holeCards);
 
-        Map<Double, List<Set<Card>>> allGroups = getMapWithAllPreflopHandstrengthGroups();
+        Map<Double, List<Set<Card>>> allGroups = getMapWithAllPreflopHandstrengthGroups(false);
 
         loop: for (Map.Entry<Double, List<Set<Card>>> entry : allGroups.entrySet()) {
             List<Set<Card>> group = entry.getValue();
@@ -37,7 +37,7 @@ public class PreflopHandStength {
     }
 
 
-    public Map<Double, List<Set<Card>>> getMapWithAllPreflopHandstrengthGroups() {
+    public Map<Double, List<Set<Card>>> getMapWithAllPreflopHandstrengthGroups(boolean pre3betDeep) {
         Map<Double, List<Set<Card>>> allGroups = new HashMap<>();
 
         allGroups.put(0.02, get0_5_group());
@@ -58,7 +58,7 @@ public class PreflopHandStength {
         allGroups.put(0.77, get75_80_group());
         allGroups.put(0.82, get80_85_group());
         allGroups.put(0.87, get85_90_group());
-        allGroups.put(0.92, get90_95_group());
+        allGroups.put(0.92, get90_95_group(pre3betDeep));
         allGroups.put(0.97, get95_100_group());
 
         return allGroups;
@@ -338,7 +338,7 @@ public class PreflopHandStength {
         return group_85_90;
     }
 
-    private List<Set<Card>> get90_95_group() {
+    private List<Set<Card>> get90_95_group(boolean pre3bet) {
         List<Set<Card>> group_90_95 = new ArrayList<>();
 
         group_90_95.addAll(getOffSuitCombosOfGivenRanks(14, 11).values());
@@ -351,6 +351,20 @@ public class PreflopHandStength {
         group_90_95.addAll(getSuitedCombosOfGivenRanks(12, 11).values());
         group_90_95.addAll(getSuitedCombosOfGivenRanks(13, 11).values());
         group_90_95.addAll(getPocketPairCombosOfGivenRank(8).values());
+
+        if(pre3bet) {
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(5, 4).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(6, 5).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(7, 6).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(8, 7).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(9, 8).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(10, 9).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(6, 4).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(7, 5).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(8, 6).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(9, 7).values());
+            group_90_95.addAll(getSuitedCombosOfGivenRanks(10, 8).values());
+        }
 
         return group_90_95;
     }

@@ -273,6 +273,7 @@ public class StarsTableReader {
 
     public void registerNewSng() throws Exception {
         if(noPlayerIsReggedYet()) {
+            TimeUnit.SECONDS.sleep(2);
             System.out.println("registering new sng");
             MouseKeyboard.click(782, 603);
 
@@ -624,6 +625,13 @@ public class StarsTableReader {
             saveScreenshotOfEntireScreen(currentTime);
             System.out.println();
 
+            BufferedImage bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(361, 25, 199, 19);
+            bufferedImage2 = ImageProcessor.zoomInImage(bufferedImage2, 2);
+            bufferedImage2 = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage2);
+            String bigBlindString2 = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage2);
+
+            System.out.println("new bigblindstring: " + bigBlindString2);
+            System.out.println();
             e.printStackTrace();
 
             bigBlind = -1;
