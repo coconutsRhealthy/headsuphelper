@@ -290,15 +290,15 @@ public class PreflopActionBuilder {
         if(Math.random() <= percentageBet) {
             String actionToReturn;
 
-            if(bigBlind < 40) {
-                actionToReturn = "raise";
-            } else {
+//            if(bigBlind < 40) {
+//                actionToReturn = "raise";
+//            } else {
                 if(effStackBb > 10) {
                     actionToReturn = "call";
                 } else {
                     actionToReturn = "raise";
                 }
-            }
+//            }
 
             return actionToReturn;
         } else {

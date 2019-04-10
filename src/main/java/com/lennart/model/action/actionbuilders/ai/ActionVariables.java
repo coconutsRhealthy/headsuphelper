@@ -434,7 +434,7 @@ public class ActionVariables {
 //                boardInMethod,
 //                botBetsizeBb * gameVariables.getBigBlind());
 
-        action = superSolidify(action, botHandStrengthInMethod, boardInMethod, continuousTable, gameVariables, facingOdds, strongFlushDraw, strongOosd);
+        action = superSolidify(action, botHandStrengthInMethod, boardInMethod, continuousTable, gameVariables, facingOdds, strongFlushDraw, strongOosd, strongGutshot);
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
@@ -1530,9 +1530,20 @@ public class ActionVariables {
                     }
                 } else {
                     if(gameVariables.getOpponentAction().equals("raise")) {
-                        //4bet
-                        sngSizingToReturn = 5000 * gameVariables.getBigBlind();
-                        System.out.println("Change pre4bet sizing to shove in adjustRaiseSizingToSng(). Q");
+                        if(gameVariables.getBotBetSize() < 2 * gameVariables.getBigBlind()) {
+                            //you did limp
+                            if(gameVariables.getBigBlind() < 40) {
+                                sngSizingToReturn = currentSizing;
+                                System.out.println("Sizing for preflop limp facing raise and then 3bet...");
+                            } else {
+                                sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                                System.out.println("bigblind above 40...");
+                            }
+                        } else {
+                            //4bet
+                            sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                            System.out.println("Change pre4bet sizing to shove in adjustRaiseSizingToSng(). Q");
+                        }
                     } else {
                         sngSizingToReturn = currentSizing;
                     }
@@ -1554,12 +1565,12 @@ public class ActionVariables {
     }
 
     private String superSolidify(String action, double handStrength, List<Card> board, ContinuousTable continuousTable,
-                                 GameVariables gameVariables, double facingOdds, boolean strongFlushDraw, boolean strongOosd) throws Exception {
+                                 GameVariables gameVariables, double facingOdds, boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot) throws Exception {
         String actionToReturn;
 
         if(board != null && !board.isEmpty()) {
             if(action.equals("bet75pct")) {
-                if(handStrength < 0.8 && !strongFlushDraw && !strongOosd) {
+                if(handStrength < 0.8 && !strongFlushDraw && !strongOosd && !(board.size() == 3 && strongGutshot)) {
                     actionToReturn = "check";
                     System.out.print("non bluff change bet to check");
                 } else {
@@ -1573,7 +1584,7 @@ public class ActionVariables {
                     actionToReturn = action;
                 }
             } else if(action.equals("call")) {
-                if(handStrength < 0.8 && facingOdds >= 0.22 && !strongFlushDraw && !strongOosd) {
+                if(handStrength < 0.8 && facingOdds >= 0.33 && !strongFlushDraw && !strongOosd) {
                     actionToReturn = "fold";
                     System.out.println("non bluff change call to fold");
                 } else {
