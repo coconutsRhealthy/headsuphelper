@@ -23,11 +23,17 @@ public class OpponentIdentifier2_0 {
     private double oppPostBetToCheckRatio;
     private double oppPostFoldToCallRaiseRatio;
 
+    private double oppLooseness;
+    private double oppAggressiveness;
+
     public static double PRE_3_BET = 0.07806691449814127;
     public static double PRE_LOOSENESS = 0.7;
     public static double POST_RAISE = 0.13043478260869565;
     public static double POST_BET = 0.34782608695652173;
     public static double POST_LOOSENESS = 0.5;
+
+    public static double OVERALL_LOOSENESS_MEDIAN = 0.625;
+    public static double OVERALL_AGGRESSIVENESS_MEDIAN = 0.4;
 
     public OpponentIdentifier2_0() {
         //default constructor
@@ -46,6 +52,9 @@ public class OpponentIdentifier2_0 {
 
         oppPostBetToCheckRatio = getOppPostBetToCheckRatio(opponentData);
         oppPostFoldToCallRaiseRatio = getOppPostFoldToCallRaiseRatio(opponentData);
+
+        oppLooseness = getOppLooseness(opponentData);
+        oppAggressiveness = getOppAggressiveness(opponentData);
     }
 
     private void printLoosenessAndTightnessBoundries(boolean includingMedium, String table) throws Exception {
@@ -131,6 +140,9 @@ public class OpponentIdentifier2_0 {
         List<Double> allOppPostBetStats = new ArrayList<>();
         List<Double> allOppPostLoosenessStats = new ArrayList<>();
 
+        List<Double> allOppLoosenessStats = new ArrayList<>();
+        List<Double> allOppAggressivenessStats = new ArrayList<>();
+
         initializeDbConnection();
 
         Statement st = con.createStatement();
@@ -150,6 +162,9 @@ public class OpponentIdentifier2_0 {
                     allOppPostRaiseStats.add(getOpponentPostRaise(opponentData));
                     allOppPostBetStats.add(getOpponentPostBet(opponentData));
                     allOppPostLoosenessStats.add(getOpponentPostLooseness(opponentData));
+
+                    allOppLoosenessStats.add(getOppLooseness(opponentData));
+                    allOppAggressivenessStats.add(getOppAggressiveness(opponentData));
                 }
             } else {
                 System.out.println("opponentData is empty for: " + opponentName);
@@ -162,11 +177,17 @@ public class OpponentIdentifier2_0 {
         Collections.sort(allOppPostBetStats);
         Collections.sort(allOppPostLoosenessStats);
 
+        Collections.sort(allOppLoosenessStats);
+        Collections.sort(allOppAggressivenessStats);
+
         System.out.println("pre3bet: " + allOppPre3betStats.get(allOppPre3betStats.size() / 2));
         System.out.println("preLooseness: " + allOppPreLoosenessStats.get(allOppPreLoosenessStats.size() / 2));
         System.out.println("postRaise: " + allOppPostRaiseStats.get(allOppPostRaiseStats.size() / 2));
         System.out.println("postBet: " + allOppPostBetStats.get(allOppPostBetStats.size() / 2));
         System.out.println("postLooseness: " + allOppPostLoosenessStats.get(allOppPostLoosenessStats.size() / 2));
+
+        System.out.println("overallLooseness: " + allOppLoosenessStats.get(allOppLoosenessStats.size() / 2));
+        System.out.println("overallAggressiveness: " + allOppAggressivenessStats.get(allOppAggressivenessStats.size() / 2));
     }
 
     public List<Double> getOpponentLoosenessAndAggroness(String opponentName, boolean preflop) throws Exception {
@@ -351,7 +372,53 @@ public class OpponentIdentifier2_0 {
         return oppPostFoldToCallRaiseRatio;
     }
 
-    private Map<String, Double> getAllDataOfOpponent(String opponentName) throws Exception {
+    private double getOppLooseness(Map<String, Double> opponentData) {
+        //oppLooseness
+            //(precalls + postcalls) / (prefolds + postfolds)
+
+        double oppLooseness;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 14) {
+            double preCallCount = opponentData.get("preCallCount");
+            double postCallCount = opponentData.get("postCallCount");
+            double preFoldCount = opponentData.get("preFoldCount");
+            double postFoldCount = opponentData.get("postFoldCount");
+
+            oppLooseness = (preCallCount + postCallCount) / (preFoldCount + postFoldCount + preCallCount + postCallCount);
+        } else {
+            oppLooseness = -1;
+        }
+
+        return oppLooseness;
+    }
+
+    private double getOppAggressiveness(Map<String, Double> opponentData) {
+        //oppAggroness
+            //(preraise + postbet + postraise) / (precall + postcheck + postcall)
+
+        double oppAggressiveness;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 14) {
+            double preRaiseCount = opponentData.get("preIpRaiseCount") + opponentData.get("preOopRaiseCount");
+            double postBetCount = opponentData.get("postBetCount");
+            double postRaiseCount = opponentData.get("postRaiseCount");
+
+            double preCallCount = opponentData.get("preCallCount");
+            double postCheckCount = opponentData.get("postCheckCount");
+            double postCallCount = opponentData.get("postCallCount");
+
+            oppAggressiveness = (preRaiseCount + postBetCount + postRaiseCount) / (preCallCount + postCheckCount + postCallCount
+                    + preRaiseCount + postBetCount + postRaiseCount);
+        } else {
+            oppAggressiveness = -1;
+        }
+
+        return oppAggressiveness;
+    }
+
+    public Map<String, Double> getAllDataOfOpponent(String opponentName) throws Exception {
         Map<String, Double> opponentData = new HashMap<>();
 
         initializeDbConnection();
@@ -420,6 +487,25 @@ public class OpponentIdentifier2_0 {
         }
 
         updateNumberOfHands(opponentPlayerNameOfLastHand);
+    }
+
+    public String getOppType(double looseness, double aggressiveness) {
+        String opponentType = "";
+
+        if(looseness < 0 && aggressiveness < 0) {
+            //unknown opp
+            opponentType = "OppTypeLp";
+        } else if(looseness <= OVERALL_LOOSENESS_MEDIAN && aggressiveness <= OVERALL_AGGRESSIVENESS_MEDIAN) {
+            opponentType = "OppTypeTp";
+        } else if(looseness > OVERALL_LOOSENESS_MEDIAN && aggressiveness <= OVERALL_AGGRESSIVENESS_MEDIAN) {
+            opponentType = "OppTypeLp";
+        } else if(looseness <= OVERALL_LOOSENESS_MEDIAN && aggressiveness > OVERALL_AGGRESSIVENESS_MEDIAN) {
+            opponentType = "OppTypeTa";
+        } else if(looseness > OVERALL_LOOSENESS_MEDIAN && aggressiveness > OVERALL_AGGRESSIVENESS_MEDIAN) {
+            opponentType = "OppTypeLa";
+        }
+
+        return opponentType;
     }
 
     private void updateCountsInDb(String opponentNick, String action, String table, boolean botWasButton) throws Exception {
@@ -511,5 +597,13 @@ public class OpponentIdentifier2_0 {
 
     public double getOppPostFoldToCallRaiseRatio() {
         return oppPostFoldToCallRaiseRatio;
+    }
+
+    public double getOppLooseness() {
+        return oppLooseness;
+    }
+
+    public double getOppAggressiveness() {
+        return oppAggressiveness;
     }
 }

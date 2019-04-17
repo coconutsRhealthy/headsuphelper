@@ -57,9 +57,10 @@ public class DbSavePersisterPreflop_2_0 {
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
 
-        oppType.add("OppTypeA");
-        oppType.add("OppTypeB");
-        oppType.add("OppTypeC");
+        oppType.add("OppTypeTa");
+        oppType.add("OppTypeTp");
+        oppType.add("OppTypeLa");
+        oppType.add("OppTypeLp");
 
         List<String> allRoutes = new ArrayList<>();
 
@@ -100,9 +101,10 @@ public class DbSavePersisterPreflop_2_0 {
         effectiveStack.add("EffStack_0_35_");
         effectiveStack.add("EffStack_35_up_");
 
-        oppType.add("OppTypeA");
-        oppType.add("OppTypeB");
-        oppType.add("OppTypeC");
+        oppType.add("OppTypeTa");
+        oppType.add("OppTypeTp");
+        oppType.add("OppTypeLa");
+        oppType.add("OppTypeLp");
 
         List<String> allRoutes = new ArrayList<>();
 

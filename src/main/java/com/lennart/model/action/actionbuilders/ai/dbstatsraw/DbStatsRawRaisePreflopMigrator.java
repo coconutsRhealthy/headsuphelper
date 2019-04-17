@@ -1,8 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
-import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSavePersisterPreflop_2_0;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.card.Card;
 
 import java.sql.*;
@@ -65,7 +65,9 @@ public class DbStatsRawRaisePreflopMigrator {
                     String position = rs.getString("position");
                     String sizingGroup = getSizingGroup(rs.getDouble("sizing"), rs.getDouble("bigblind"));
                     String effectiveStack = new DbStatsRawBluffPostflopMigrator().getEffectiveStack(rs.getDouble("botstack"), rs.getDouble("opponentstack"), rs.getDouble("bigblind"));
-                    String opponentType = new GameFlow().getOpponentGroupForMigratorClasses(rs.getDouble("recent_hands_won"), rs.getString("adjusted_opp_type"));
+
+                    OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(rs.getString("opponent_name"));
+                    String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
 
                     String route = combo + position + sizingGroup + effectiveStack + opponentType;
 
