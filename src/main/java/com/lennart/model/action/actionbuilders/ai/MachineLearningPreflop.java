@@ -1,9 +1,9 @@
 package com.lennart.model.action.actionbuilders.ai;
 
-import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersisterPreflop;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopRaise;
 import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
@@ -18,7 +18,7 @@ public class MachineLearningPreflop {
         if(actionToReturn.equals("call")) {
             actionToReturn = adjustCallAction(actionVariables.getAction(), gameVariables, actionVariables);
         } else if(actionToReturn.equals("raise")) {
-            //actionToReturn = adjustRaiseAction(actionVariables.getAction(), gameVariables, actionVariables, sizing);
+            actionToReturn = adjustRaiseAction(actionVariables.getAction(), gameVariables, actionVariables, sizing);
         }
 
         return actionToReturn;
@@ -199,15 +199,15 @@ public class MachineLearningPreflop {
 
         DbSavePreflopCall dbSavePreflopCall = new DbSavePreflopCall();
 
-        //todo: convert holecards to string
-
-        String handStrength = new DbSavePersisterPreflop().convertListCardToHandStrengthString(gameVariables.getBotHoleCards());
+        String combo = dbSavePreflopCall.getComboLogic(gameVariables.getBotHoleCards());
         String position = dbSavePreflopCall.getPositionLogic(gameVariables.isBotIsButton());
         String amountToCallGroup = dbSavePreflopCall.getAmountToCallViaLogic(amountToCallBb);
         String effectiveStack = dbSavePreflopCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
-        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
 
-        String route = handStrength + position + amountToCallGroup + effectiveStack + opponentType;
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+        String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
+
+        String route = combo + position + amountToCallGroup + effectiveStack + opponentType;
 
         while(StringUtils.countMatches(route, "OpponentUnknown") > 1) {
             route = route.substring(0, route.lastIndexOf("OpponentUnknown"));
@@ -226,7 +226,9 @@ public class MachineLearningPreflop {
         DbStatsRawBluffPostflopMigrator dbStatsRawBluffPostflopMigrator = new DbStatsRawBluffPostflopMigrator();
 
         String effectiveStackString = dbStatsRawBluffPostflopMigrator.getEffectiveStack(gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBigBlind());
-        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
+
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+        String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
 
         String route = combo + position + sizingString + effectiveStackString + opponentType;
 

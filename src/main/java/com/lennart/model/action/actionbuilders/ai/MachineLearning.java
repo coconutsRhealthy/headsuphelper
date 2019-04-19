@@ -5,6 +5,7 @@ import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveCall;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePersister;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveValue;
 import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.card.Card;
 import org.apache.commons.lang3.StringUtils;
 
@@ -461,7 +462,8 @@ public class MachineLearning {
                 dbSaveBluff.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+        String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
 
         String route = street + bluffAction + position + sizingGroup + strongDraw + effectiveStack + opponentType;
 
@@ -491,7 +493,8 @@ public class MachineLearning {
                 dbSaveValue.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+        String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
 
         String route = street + valueAction + position + sizingGroup + handStrength + effectiveStack + opponentType;
 
@@ -523,7 +526,8 @@ public class MachineLearning {
                 dbSaveCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(),
                         gameVariables.getOpponentStack() / gameVariables.getBigBlind()));
 
-        String opponentType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
+        OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
+        String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
 
         String route = street + facingAction + position + amountToCallGroup + handStrength + strongDraw +
                 effectiveStack + opponentType;
