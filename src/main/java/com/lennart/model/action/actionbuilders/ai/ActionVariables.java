@@ -167,7 +167,7 @@ public class ActionVariables {
         boolean defaultCheck = false;
 
         if(preflop) {
-            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb, effectiveStack, botHandStrengthInMethod, gameVariables.getOpponentName());
+            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, opponentType, amountToCallBb);
 
             if(action.equals("raise")) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -294,11 +294,8 @@ public class ActionVariables {
 
             if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
-
-            //String oppType = new GameFlow().getOpponentGroup(gameVariables.getOpponentName());
-            //action = preventCertainBluffs(action, botHandStrength, strongFd || strongOosd, sizing, bigBlind, oppType, continuousTable, gameVariables, boardInMethod);
-            //action = preventBigAirFlopAndTurnBluffs(action, sizing, botHandStrength, strongFd || strongOosd || strongGutshot, boardInMethod, continuousTable, gameVariables);
 
             //machine learning
             String actionBeforeMachineLearning = action;
@@ -311,27 +308,13 @@ public class ActionVariables {
             }
             //machine learning
 
-            //action = preventMoreBluffs(action, botHandStrength, strongFd || strongOosd, boardInMethod, continuousTable, gameVariables);
-
-            if((action.equals("bet75pct") || action.equals("raise"))) {
-                if(sizing == 0) {
-                    sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-                }
-
-                sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
-            }
-
-            action = solidifySngBot(action, botHandStrength, strongFd, strongOosd, strongGutshot, boardInMethod, sizing, continuousTable, gameVariables, bigBlind, gameVariables.getOpponentName());
-            action = solidifySngBotCalls(action, botHandStrength, boardInMethod, facingOdds, strongFd, strongOosd, gameVariables.getOpponentAction(), gameVariables.getOpponentName());
-            action = solidifyPostflopLimpedDonks(action, gameVariables.getPot(), bigBlind, boardInMethod, botIsButtonInMethod);
-
             if((action.equals("bet75pct") || action.equals("raise"))) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
         } else {
             double sizingForMachineLearning = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             action = new MachineLearningPreflop().adjustActionToDbSaveData(this, gameVariables, sizingForMachineLearning);
-            action = solidifySngDeepPre3betCalls(action, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod, opponentBetsizeBb, effectiveStack);
         }
 
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
@@ -416,25 +399,6 @@ public class ActionVariables {
 
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
-
-//        if(sizing == 0) {
-//            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
-//        }
-//
-//        action = raiseWithStrongDraws(
-//                action,
-//                strongFlushDraw,
-//                strongOosd,
-//                strongGutshot,
-//                sizing,
-//                opponentBetsizeBb * gameVariables.getBigBlind(),
-//                opponentStackBb * gameVariables.getBigBlind(),
-//                potSizeBb * gameVariables.getBigBlind(),
-//                botStackBb * gameVariables.getBigBlind(),
-//                boardInMethod,
-//                botBetsizeBb * gameVariables.getBigBlind());
-
-        action = superSolidify(action, botHandStrengthInMethod, boardInMethod, continuousTable, gameVariables, facingOdds, strongFlushDraw, strongOosd, strongGutshot);
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
@@ -922,46 +886,6 @@ public class ActionVariables {
         return boardIsUnpaired && hasMaxTwoSuitedCards;
     }
 
-    private int getBoardWetness(ContinuousTable continuousTable) {
-        List<Set<Card>> top10PercentFlopCombosCopy = new ArrayList<>();
-        List<Set<Card>> top10PercentTurnCombosCopy = new ArrayList<>();
-        List<Set<Card>> top10PercentRiverCombosCopy = new ArrayList<>();
-
-        if(continuousTable.getTop10percentFlopCombos() != null) {
-            top10PercentFlopCombosCopy.addAll(continuousTable.getTop10percentFlopCombos());
-        }
-
-        if(continuousTable.getTop10percentTurnCombos() != null) {
-            top10PercentTurnCombosCopy.addAll(continuousTable.getTop10percentTurnCombos());
-        }
-
-        if(continuousTable.getTop10percentRiverCombos() != null) {
-            top10PercentRiverCombosCopy.addAll(continuousTable.getTop10percentRiverCombos());
-        }
-
-        int boardWetnessToReturn;
-        int boardWetnessRiver = 200;
-        int boardWetnessTurn = 200;
-
-        if(!continuousTable.getTop10percentRiverCombos().isEmpty()) {
-            boardWetnessRiver = BoardEvaluator.getBoardWetness(top10PercentTurnCombosCopy, top10PercentRiverCombosCopy);
-        }
-
-        if(!continuousTable.getTop10percentTurnCombos().isEmpty()) {
-            boardWetnessTurn = BoardEvaluator.getBoardWetness(top10PercentFlopCombosCopy, top10PercentTurnCombosCopy);
-        }
-
-        if(boardWetnessRiver < boardWetnessTurn) {
-            boardWetnessToReturn = boardWetnessRiver;
-        } else {
-            boardWetnessToReturn = boardWetnessTurn;
-        }
-
-        System.out.println("BoardWetness: " + boardWetnessToReturn);
-
-        return boardWetnessToReturn;
-    }
-
     private String preventCallIfOpponentOrBotAlmostAllInAfterCall(String action, double opponentStackBb, double botStackBb,
                                                                   double botTotalBetSizeBb, double potSizeBb, double amountToCallBb,
                                                                   List<Card> board) {
@@ -1036,400 +960,13 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String preventCertainBluffs(String action, double handStrength, boolean strongFdOrOosd, double sizing,
-                                        double bigBlind, String oppType, ContinuousTable continuousTable,
-                                        GameVariables gameVariables, List<Card> board) throws Exception {
-        String actionToReturn;
-
-        if(board != null && !board.isEmpty()) {
-            if(action.equals("bet75pct") || action.equals("raise")) {
-                if(handStrength < 0.7 && !strongFdOrOosd) {
-                    if(action.equals("bet75pct")) {
-                        if(oppType.equals("OppTypeB")) {
-                            double sizingBb = sizing / bigBlind;
-
-                            if(sizingBb > 20) {
-                                double random = Math.random();
-
-                                if(random > 0.2) {
-                                    actionToReturn = "check";
-                                    System.out.println("Prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
-                                } else {
-                                    actionToReturn = action;
-                                    System.out.println("zzz prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else if(oppType.equals("OppTypeC")) {
-                            double sizingBb = sizing / bigBlind;
-
-                            if(sizingBb > 5) {
-                                double random = Math.random();
-
-                                if(random > 0.2) {
-                                    actionToReturn = "check";
-                                    System.out.println("Prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
-                                } else {
-                                    actionToReturn = action;
-                                    System.out.println("zzz prevent bluffbet in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        double sizingBb = sizing / bigBlind;
-
-                        if(sizingBb > 10) {
-                            double random = Math.random();
-
-                            if(random > 0.2) {
-                                System.out.println("Prevent bluffraise in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
-                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                            } else {
-                                actionToReturn = action;
-                                System.out.println("zzz prevent bluffraise in preventCertainBluffs(). Sizing: " + sizing + " Opptype: " + oppType);
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String preventBigAirFlopAndTurnBluffs(String action, double sizing, double handStrength, boolean stongFdOosGutshot,
-                                                  List<Card> board, ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
-        String actionToReturn;
-
-        if(action.equals("bet75pct") || action.equals("raise")) {
-            if(board != null && (board.size() == 3 || board.size() == 4)) {
-                if(handStrength <= 0.5 && !stongFdOosGutshot) {
-                    if(sizing >= 300) {
-                        if(action.equals("bet75pct")) {
-                            actionToReturn = "check";
-                            System.out.println("Prevent air flop/turn big bluffbet in preventBigAirFlopAndTurnBluffs()");
-                        } else {
-                            System.out.println("Prevent air flop/turn big bluffraise in preventBigAirFlopAndTurnBluffs()");
-                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String preventMoreBluffs(String action, double handStrength, boolean strongFdOrOosd, List<Card> board,
-                                     ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
-        String actionToReturn;
-
-        if(board != null && !board.isEmpty()) {
-            if(action.equals("bet75pct") || action.equals("raise")) {
-                if(handStrength < 0.7 && !strongFdOrOosd) {
-                    double random = Math.random();
-
-                    if(random < 0.12) {
-                        if(action.equals("bet75pct")) {
-                            actionToReturn = "check";
-                            System.out.println("prevented bluff bet action 50%");
-                        } else {
-                            System.out.println("prevented bluff raise action 50%");
-                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String solidifySngBot(String action, double botHandStrength, boolean strongFd, boolean strongOosd,
-                                  boolean strongGutshot, List<Card> board, double sizing, ContinuousTable continuousTable,
-                                  GameVariables gameVariables, double bigBlind, String opponentName) throws Exception {
-        String actionToReturn;
-
-        if(board != null && !board.isEmpty()) {
-            if(action.equals("bet75pct") || action.equals("raise")) {
-                double sizingLimit;
-
-                double oppPostFoldToCallRaiseRatio = new OpponentIdentifier2_0(opponentName).getOppPostFoldToCallRaiseRatio();
-
-                if(bigBlind < 40) {
-                    if(oppPostFoldToCallRaiseRatio == -1 || oppPostFoldToCallRaiseRatio < 0.375) {
-                        sizingLimit = 150;
-                    } else if(oppPostFoldToCallRaiseRatio < 0.483) {
-                        sizingLimit = 200;
-                    } else {
-                        sizingLimit = 250;
-                    }
-                } else {
-                    if(oppPostFoldToCallRaiseRatio == -1 || oppPostFoldToCallRaiseRatio < 0.375) {
-                        sizingLimit = 200;
-                    } else if(oppPostFoldToCallRaiseRatio < 0.483) {
-                        sizingLimit = 250;
-                    } else {
-                        sizingLimit = 300;
-                    }
-                }
-
-                System.out.println("sizingLimit for " + opponentName + ": " + sizingLimit + " oppPostFoldToCallRaiseRatio: " + oppPostFoldToCallRaiseRatio);
-
-                if(sizing > sizingLimit) {
-                    double hsLimit;
-
-                    if(sizing < 300) {
-                        hsLimit = 0.87;
-                    } else {
-                        hsLimit = 0.9;
-                    }
-
-                    if(botHandStrength < hsLimit) {
-                        if(board.size() == 3) {
-                            if(strongFd || strongOosd || strongGutshot) {
-                                if(action.equals("bet75pct")) {
-                                    actionToReturn = action;
-                                    System.out.println("xagkflop kept flop action bet because strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
-                                } else {
-                                    if(strongFd || strongOosd) {
-                                        actionToReturn = action;
-                                        System.out.println("xagkflop kept flop action raise because strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
-                                    } else {
-                                        System.out.println("xagkflop change flop raise to fold or call because no strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
-                                        actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                    }
-                                }
-                            } else {
-                                if(action.equals("bet75pct")) {
-                                    actionToReturn = "check";
-                                    System.out.println("xagkflop change flop action to check because no strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
-                                } else {
-                                    System.out.println("xagkflop change flop action to fold or call because no strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
-                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                }
-                            }
-                        } else if(board.size() == 4) {
-                            if(strongFd || strongOosd) {
-                                if(action.equals("bet75pct")) {
-                                    actionToReturn = action;
-                                    System.out.println("xagkturn kept turn action bet because strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
-                                } else {
-                                    System.out.println("xagkturn change turn raise to fold or call despite strongFd or strongOosd, hs: " + botHandStrength + " sizing: " + sizing);
-                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                }
-                            } else {
-                                if (action.equals("bet75pct")) {
-                                    actionToReturn = "check";
-                                    System.out.println("xagkturn change turn action to check because no strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
-                                } else {
-                                    System.out.println("xagkturn change turn action to fold or call because no strongFd, strongOosd or strongGutshot, hs: " + botHandStrength + " sizing: " + sizing);
-                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                }
-                            }
-                        } else {
-                            if(action.equals("bet75pct")) {
-                                actionToReturn = "check";
-                                System.out.println("xagkriver Change river bet to check. Hs: " + botHandStrength);
-                            } else {
-                                System.out.println("xagkriver Change river raise to call or fold. Hs: " + botHandStrength);
-                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                            }
-                        }
-                    } else {
-                        actionToReturn = action;
-                        System.out.println("xagkpure pure value action. action: " + action + " hs: " + botHandStrength + " sizing: " + sizing);
-                    }
-                } else {
-                    if(action.equals("raise")) {
-                        if(botHandStrength < 0.7) {
-                            if(board.size() == 3) {
-                                if(strongFd || strongOosd || strongGutshot) {
-                                    actionToReturn = action;
-                                } else {
-                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                }
-                            } else if(board.size() == 4) {
-                                if(strongFd || strongOosd) {
-                                    actionToReturn = action;
-                                } else {
-                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String solidifySngBotCalls(String action, double botHandStrength, List<Card> board, double facingOdds,
-                                       boolean strongFd, boolean strongOosd, String opponentAction, String opponentName) throws Exception  {
-        String actionToReturn;
-
-        if(board != null && !board.isEmpty()) {
-            if(action.equals("call")) {
-                if(facingOdds > 0.23) {
-                    double limit;
-
-                    if(opponentAction.equals("raise")) {
-                        limit = 0.8;
-                    } else {
-                        double oppPostBetToCheckRatio = new OpponentIdentifier2_0(opponentName).getOppPostBetToCheckRatio();
-
-                        if(oppPostBetToCheckRatio == -1 || oppPostBetToCheckRatio < 0.28) {
-                            limit = 0.8;
-                        } else if(oppPostBetToCheckRatio < 0.43) {
-                            limit = 0.75;
-                        } else {
-                            limit = 0.7;
-                        }
-
-                        System.out.println("postCallLimit for " + opponentName + ": " + limit + " betToCheckRatio: " + oppPostBetToCheckRatio);
-                    }
-
-                    System.out.println("postCallLimit for " + opponentName + ": " + limit);
-
-                    if(botHandStrength < limit) {
-                        if((strongFd || strongOosd) && board.size() == 3) {
-                            actionToReturn = action;
-                            System.out.println("gsfdg kept call because strong draw on flop");
-                        } else {
-                            actionToReturn = "fold";
-                            System.out.println("gsfdg change call to fold. HS: " + botHandStrength);
-                        }
-                    } else {
-                        actionToReturn = action;
-                        System.out.println("gsfdg kept value call. HS: " + botHandStrength);
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String solidifySngDeepPre3betCalls(String action, List<Card> botHoleCards, List<Card> board, boolean botIsButton,
-                                               double opponentBetSizeBb, double effectiveStackBb) {
-        String actionToReturn;
-
-        if(action.equals("call")) {
-            if(board == null || board.isEmpty()) {
-                if(botIsButton) {
-                    if(opponentBetSizeBb > 4) {
-                        if(effectiveStackBb >= 35) {
-                            List<List<Card>> preCall3betSngDeepPoule = new PreflopActionBuilder().getPreCall3betSngDeepPoule();
-
-                            List<Card> botHoleCardsReverseOrder = new ArrayList<>();
-                            botHoleCardsReverseOrder.add(botHoleCards.get(1));
-                            botHoleCardsReverseOrder.add(botHoleCards.get(0));
-
-                            if(preCall3betSngDeepPoule.contains(botHoleCards) || preCall3betSngDeepPoule.contains(botHoleCardsReverseOrder)) {
-                                actionToReturn = action;
-                            } else {
-                                actionToReturn = "fold";
-                                System.out.println("sdgbg changed preflop 3bet call to fold. Combo: " +
-                                        botHoleCards.get(0).getRank() + botHoleCards.get(0).getSuit() + " " +
-                                        botHoleCards.get(1).getRank() + botHoleCards.get(1).getSuit());
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn  = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String solidifyPostflopLimpedDonks(String action, double pot, double bigblind, List<Card> board, boolean position) {
-        String actionToReturn;
-
-        if(action.equals("bet75pct")) {
-            if(board != null && !board.isEmpty()) {
-                if(pot == (2 * bigblind)) {
-                    if(board.size() == 3 && !position) {
-                        actionToReturn = "check";
-                        System.out.println("Changed postflop flop donket in limped pot to check");
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
     private String raiseFlopAndTurnWithStrongHand(String action, double handStrength, List<Card> board, double amountToCallBb,
                                                   double botStackBb, double oppStackBb) {
         String actionToReturn;
 
         if(action.equals("call")) {
             if(board != null && (board.size() == 3 || board.size() == 4)) {
-                if(handStrength >= 0.9) {
+                if(handStrength >= 0.95) {
                     if(oppStackBb > 0) {
                         if(botStackBb > amountToCallBb) {
                             actionToReturn = "raise";
@@ -1439,64 +976,6 @@ public class ActionVariables {
                         }
                     } else {
                         actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String raiseWithStrongDraws(String action, boolean strongFd, boolean strongOosd, boolean strongGutshot
-                                        ,double sizing, double facingBetSize, double facingStackSize, double pot,
-                                        double ownStackSize, List<Card> board, double ownBetSize) {
-        String actionToReturn;
-
-        if(strongFd || strongOosd || strongGutshot) {
-            if(action.equals("call") || action.equals("fold")) {
-                if(board != null && (board.size() == 3 || board.size() == 4)) {
-                    if(board.size() == 3) {
-                        if(strongFd || strongOosd) {
-                            boolean bluffOddsAreOk = new MachineLearning().bluffOddsAreOk(sizing, facingBetSize,
-                                    facingStackSize, pot, ownStackSize, board, ownBetSize);
-
-                            if(bluffOddsAreOk) {
-                                actionToReturn = "raise";
-                                System.out.println("Flop raise with strong draw");
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        if(strongFd || strongOosd) {
-                            if(strongFd) {
-                                if(strongOosd || strongGutshot) {
-                                    boolean bluffOddsAreOk = new MachineLearning().bluffOddsAreOk(sizing, facingBetSize,
-                                            facingStackSize, pot, ownStackSize, board, ownBetSize);
-
-                                    if(bluffOddsAreOk) {
-                                        actionToReturn = "raise";
-                                        System.out.println("Turn raise with strong draw");
-                                    } else {
-                                        actionToReturn = action;
-                                    }
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
                     }
                 } else {
                     actionToReturn = action;
@@ -1562,42 +1041,6 @@ public class ActionVariables {
         }
 
         return sngSizingToReturn;
-    }
-
-    private String superSolidify(String action, double handStrength, List<Card> board, ContinuousTable continuousTable,
-                                 GameVariables gameVariables, double facingOdds, boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot) throws Exception {
-        String actionToReturn;
-
-        if(board != null && !board.isEmpty()) {
-            if(action.equals("bet75pct")) {
-                if(handStrength < 0.8 && !strongFlushDraw && !strongOosd && !(board.size() == 3 && strongGutshot)) {
-                    actionToReturn = "check";
-                    System.out.print("non bluff change bet to check");
-                } else {
-                    actionToReturn = action;
-                }
-            } else if(action.equals("raise")) {
-                if(handStrength < 0.8 && !strongFlushDraw && !strongOosd) {
-                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                    System.out.println("non bluff change raise to call or fold");
-                } else {
-                    actionToReturn = action;
-                }
-            } else if(action.equals("call")) {
-                if(handStrength < 0.8 && facingOdds >= 0.33 && !strongFlushDraw && !strongOosd) {
-                    actionToReturn = "fold";
-                    System.out.println("non bluff change call to fold");
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
     }
 
     public void setAction(String action) {

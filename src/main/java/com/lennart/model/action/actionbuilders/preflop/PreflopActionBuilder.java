@@ -2,7 +2,6 @@ package com.lennart.model.action.actionbuilders.preflop;
 
 import com.lennart.model.action.Actionable;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTableable;
-import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.preflop.bettingrounds.oop._5bet;
 import com.lennart.model.card.Card;
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
@@ -26,7 +25,7 @@ public class PreflopActionBuilder {
 
     public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind,
                             List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable,
-                            String opponentType, double amountToCallBb, double effStackBb, double handStrength, String opponentName) throws Exception {
+                            String opponentType, double amountToCallBb) {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -38,29 +37,27 @@ public class PreflopActionBuilder {
 
         if(opponentStack <= 0 || effectiveAllIn) {
             if(amountToCallBb <= 4) {
-                action = getActionFacingAllIn(botHoleCards, 0.55);
+                action = getActionFacingAllIn(botHoleCards, 0.5);
             } else if(amountToCallBb <= 16) {
-                action = getActionFacingAllIn(botHoleCards, 0.85);
+                action = getActionFacingAllIn(botHoleCards, 0.75);
             } else if(amountToCallBb <= 25) {
-                action = getActionFacingAllIn(botHoleCards, 0.90);
+                action = getActionFacingAllIn(botHoleCards, 0.80);
             } else if(amountToCallBb <= 40) {
                 action = getActionFacingAllIn(botHoleCards, 0.90);
             } else {
                 action = get4betF5bet(botHoleCards, amountToCallBb);
             }
         } else {
-            double oppPreIp2betStat = new OpponentIdentifier2_0(opponentName).getOppPre2bet();
-
             if(bbOpponentTotalBetSize == 1) {
                 if(botIsButton) {
-                    action = get05betF1bet(botHoleCards, bigBlind, effStackBb);
+                    action = get05betF1bet(botHoleCards);
                 } else {
                     action = get1betFcheck(botHoleCards);
                 }
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
-                action = get1betF2bet(botHoleCards, continuousTableable, botIsButton, handStrength, effStackBb, oppPreIp2betStat, bigBlind);
+                action = get1betF2bet(botHoleCards, continuousTableable);
             } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
-                action = get2betF3bet(botHoleCards, continuousTableable, bigBlind);
+                action = get2betF3bet(botHoleCards, continuousTableable);
             } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
                 action = get3betF4bet(botHoleCards, continuousTableable, opponentType);
             } else {
@@ -75,45 +72,23 @@ public class PreflopActionBuilder {
         return action;
     }
 
-    private List<List<Card>> getPre3betPoule(double effectiveStackBb, double oppIpPre2betStat, boolean realOopPre3betDeep) {
+    private List<List<Card>> getPre3betPoule() {
         List<List<Card>> pre3betPoule = new ArrayList<>();
 
-        Map<Double, List<Set<Card>>> allHands;
-
-        if(realOopPre3betDeep) {
-            allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups(true);
-        } else {
-            allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups(false);
-        }
-
-        double limit1;
-        double limit2;
-        double limitValue;
-
-        //hier iets van altijd shoven ip als je gelimped hebt...
-
-        if(effectiveStackBb <= 25) {
-            limit1 = 0.90;
-            limit2 = 1;
-            limitValue = 0.95;
-        } else {
-            limit1 = 0.90;
-            limit2 = 0.96;
-            limitValue = 0.95;
-        }
+        Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
-            if(entry.getKey() > limitValue) {
+            if(entry.getKey() > 0.95) {
                 for(Set<Card> combo : entry.getValue()) {
                     List<Card> comboToAdd = new ArrayList<>();
                     comboToAdd.addAll(combo);
                     pre3betPoule.add(comboToAdd);
                 }
-            } else if(entry.getKey() > limit1) {
+            } else if(entry.getKey() > 0.75) {
                 for(Set<Card> combo : entry.getValue()) {
                     double random = Math.random();
 
-                    if(random <= limit2) {
+                    if(random <= 0.65) {
                         List<Card> comboToAdd = new ArrayList<>();
                         comboToAdd.addAll(combo);
                         pre3betPoule.add(comboToAdd);
@@ -128,11 +103,10 @@ public class PreflopActionBuilder {
     private List<List<Card>> getPreCall2betPoule(List<List<Card>> pre3betPoule) {
         List<List<Card>> preCall2betPoule = new ArrayList<>();
 
-        Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups(false);
+        Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
-            //aanpassen naar alles wat pushbaar is 20bb plus binnen Nash?
-            if(entry.getKey() > 0.65) {
+            if(entry.getKey() > 0.5) {
                 for(Set<Card> combo : entry.getValue()) {
                     List<Card> comboAsList = new ArrayList<>();
                     comboAsList.addAll(combo);
@@ -148,63 +122,47 @@ public class PreflopActionBuilder {
     }
 
     private List<List<Card>> getPre4betPoule() {
-            List<Set<Card>> pre4betPouleAsSets = new ArrayList<>();
+        List<Set<Card>> pre4betPouleAsSets = new ArrayList<>();
 
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(14).values());
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 13).values());
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 12).values());
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 13).values());
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(13).values());
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 12).values());
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(12).values());
-            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(11).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(14).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 13).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 12).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 13).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(13).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 12).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(12).values());
+        pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(11).values());
 
-            if(Math.random() < 0.5) {
-                pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(10).values());
-            }
+        if(Math.random() < 0.5) {
+            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(10).values());
+        }
 
-            if(Math.random() < 0.5) {
-                pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(9).values());
-            }
+        if(Math.random() < 0.5) {
+            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(9).values());
+        }
 
-            if(Math.random() < 0.5) {
-                pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(8).values());
-            }
+        if(Math.random() < 0.5) {
+            pre4betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(8).values());
+        }
 
-            List<List<Card>> pre4betpoule = new ArrayList<>();
+        List<List<Card>> pre4betpoule = new ArrayList<>();
 
-            for(Set<Card> set : pre4betPouleAsSets) {
-                List<Card> setAsList = new ArrayList<>();
-                setAsList.addAll(set);
-                pre4betpoule.add(setAsList);
-            }
+        for(Set<Card> set : pre4betPouleAsSets) {
+            List<Card> setAsList = new ArrayList<>();
+            setAsList.addAll(set);
+            pre4betpoule.add(setAsList);
+        }
 
-            return pre4betpoule;
+        return pre4betpoule;
     }
 
-    private List<List<Card>> getPreCall3betPoule(List<List<Card>> pre4betPoule, double bigBlind) {
+    private List<List<Card>> getPreCall3betPoule(List<List<Card>> pre4betPoule) {
         List<List<Card>> preCall3betPoule = new ArrayList<>();
 
-        Map<Double, List<Set<Card>>> allHands;
-
-        if(bigBlind <= 30) {
-            allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups(true);
-        } else {
-            allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups(false);
-        }
-
-        double limit;
-
-        if(bigBlind < 40) {
-            limit = 0.80;
-        } else if(bigBlind <= 60) {
-            limit = 0.85;
-        } else {
-            limit = 0.90;
-        }
+        Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
-            if(entry.getKey() > limit) {
+            if(entry.getKey() > 0.60) {
                 for(Set<Card> combo : entry.getValue()) {
                     List<Card> comboAsList = new ArrayList<>();
                     comboAsList.addAll(combo);
@@ -254,7 +212,7 @@ public class PreflopActionBuilder {
         return size;
     }
 
-    private String get05betF1bet(List<Card> botHoleCards, double bigBlind, double effStackBb) {
+    private String get05betF1bet(List<Card> botHoleCards) {
         Map<Integer, Set<Card>> comboMap100Percent;
         Map<Integer, Set<Card>> comboMap5Percent;
 
@@ -288,31 +246,19 @@ public class PreflopActionBuilder {
         }
 
         if(Math.random() <= percentageBet) {
-            String actionToReturn;
-
-//            if(bigBlind < 40) {
-//                actionToReturn = "raise";
-//            } else {
-                if(effStackBb > 10) {
-                    actionToReturn = "call";
-                } else {
-                    actionToReturn = "raise";
-                }
-//            }
-
-            return actionToReturn;
+            return "raise";
         } else {
             return "fold";
         }
     }
 
-    private String get2betF3bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, double bigBlind) {
+    private String get2betF3bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
         List<List<Card>> pre4betPoule = getPre4betPoule();
-        List<List<Card>> preCall3betPoule = getPreCall3betPoule(pre4betPoule, bigBlind);
+        List<List<Card>> preCall3betPoule = getPreCall3betPoule(pre4betPoule);
 
         if(pre4betPoule.contains(botHoleCards) || pre4betPoule.contains(botHoleCardsReverseOrder)) {
             continuousTableable.setPre3betOrPostRaisedPot(true);
@@ -325,24 +271,12 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable,
-                                  boolean position, double handStrength, double effectiveStackBb, double oppIpPre2betStat, double bigBlind) {
-        if(position) {
-            return get1betF2betIp(botHoleCards, handStrength, effectiveStackBb, oppIpPre2betStat);
-        }
-
+    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable) {
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule;
-
-        if(bigBlind <= 30) {
-            pre3betPoule = getPre3betPoule(effectiveStackBb, oppIpPre2betStat, true);
-        } else {
-            pre3betPoule = getPre3betPoule(effectiveStackBb, oppIpPre2betStat, false);
-        }
-
+        List<List<Card>> pre3betPoule = getPre3betPoule();
         List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule);
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
@@ -355,30 +289,16 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betF2betIp(List<Card> botHoleCards, double handStrength, double effStackBb, double oppPreIp2betStat) {
-        String actionToReturn;
-
-        List<List<Card>> pre3betPoule = getPre3betPoule(effStackBb, oppPreIp2betStat, false);
-
-        if(pre3betPoule.contains(botHoleCards)) {
-            actionToReturn = "raise";
-        } else if(handStrength > 0.5) {
-            actionToReturn = "call";
-        } else {
-            actionToReturn = "fold";
-        }
-
-        return actionToReturn;
-    }
-
     private String get1betFcheck(List<Card> botHoleCards) {
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule = getPre3betPoule(100, 0.01, false);
+        List<List<Card>> pre3betPoule = getPre3betPoule();
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule);
 
-        if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
+        if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)
+                || preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
             return "raise";
         } else {
             return "check";
@@ -461,63 +381,4 @@ public class PreflopActionBuilder {
         return 0;
     }
 
-    public static void main(String[] args) {
-        new PreflopActionBuilder().getPreCall3betSngDeepPoule();
-    }
-
-    public List<List<Card>> getPreCall3betSngDeepPoule() {
-        List<List<Card>> call3betCombos = new ArrayList<>();
-        List<Map<Integer, Set<Card>>> allCombosInMapsInList = new ArrayList<>();
-
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(14));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(13));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(12));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(11));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(10));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(9));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(8));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(7));
-
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(14));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(13));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(12));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(11));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(10));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(9));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(8));
-        allCombosInMapsInList.add(actionBuilderUtil.getPocketPairCombosOfGivenRank(7));
-
-        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 13));
-        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 12));
-        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(14, 11));
-
-        allCombosInMapsInList.add(actionBuilderUtil.getOffSuitCombosOfGivenRanks(13, 12));
-
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 13));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 12));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 11));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 10));
-
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(13, 12));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(12, 11));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(11, 10));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(10, 9));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(9, 8));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(8, 7));
-
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(13, 11));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(12, 10));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(11, 9));
-        allCombosInMapsInList.add(actionBuilderUtil.getSuitedCombosOfGivenRanks(10, 8));
-
-        for(Map<Integer, Set<Card>> map : allCombosInMapsInList) {
-            for(Map.Entry<Integer, Set<Card>> entry : map.entrySet()) {
-                List<Card> combo = new ArrayList<>();
-                combo.addAll(entry.getValue());
-                call3betCombos.add(combo);
-            }
-        }
-
-        return call3betCombos;
-    }
 }
