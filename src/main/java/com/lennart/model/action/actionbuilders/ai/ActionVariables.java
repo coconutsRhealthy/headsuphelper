@@ -389,7 +389,6 @@ public class ActionVariables {
             sizing = sizingBeforeNash;
         }
 
-        //hier de methodes toevoegen
         action = raiseFlopAndTurnWithStrongHand(action, botHandStrengthInMethod, boardInMethod, amountToCallBb, botStackBb, opponentStackBb);
 
         if(action.equals("bet75pct") || action.equals("raise")) {

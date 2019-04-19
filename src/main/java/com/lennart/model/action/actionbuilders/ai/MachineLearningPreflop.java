@@ -202,7 +202,7 @@ public class MachineLearningPreflop {
         String combo = dbSavePreflopCall.getComboLogic(gameVariables.getBotHoleCards());
         String position = dbSavePreflopCall.getPositionLogic(gameVariables.isBotIsButton());
         String amountToCallGroup = dbSavePreflopCall.getAmountToCallViaLogic(amountToCallBb);
-        String effectiveStack = dbSavePreflopCall.getEffectiveStackLogic(gameVariables.getBotStack() / gameVariables.getBigBlind(), gameVariables.getOpponentStack() / gameVariables.getBigBlind());
+        String effectiveStack = new DbStatsRawBluffPostflopMigrator().getEffectiveStack(gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBigBlind());
 
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
         String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
@@ -222,10 +222,7 @@ public class MachineLearningPreflop {
         String combo = dbSavePreflopRaise.getComboLogic(gameVariables.getBotHoleCards());
         String position = dbSavePreflopRaise.getPositionLogic(gameVariables.isBotIsButton());
         String sizingString = dbSavePreflopRaise.getSizingLogic(sizing / gameVariables.getBigBlind());
-
-        DbStatsRawBluffPostflopMigrator dbStatsRawBluffPostflopMigrator = new DbStatsRawBluffPostflopMigrator();
-
-        String effectiveStackString = dbStatsRawBluffPostflopMigrator.getEffectiveStack(gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBigBlind());
+        String effectiveStackString = new DbStatsRawBluffPostflopMigrator().getEffectiveStack(gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getBigBlind());
 
         OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(gameVariables.getOpponentName());
         String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());

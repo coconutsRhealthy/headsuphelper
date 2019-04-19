@@ -240,10 +240,10 @@ public class MachineLearning {
                                                           GameVariables gameVariables, ContinuousTable continuousTable) throws Exception {
         String actionToReturn = null;
 
-        if(raiseData.get(1) >= 20) {
+        if(raiseData.get(1) >= 13) {
             double raiseRatio = raiseData.get(0) / raiseData.get(1);
 
-            if(raiseRatio > 0.51) {
+            if(raiseRatio > 0.6) {
                 actionToReturn = "raise";
             } else {
                 double random = Math.random();
