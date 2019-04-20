@@ -965,7 +965,7 @@ public class ActionVariables {
 
         if(action.equals("call")) {
             if(board != null && (board.size() == 3 || board.size() == 4)) {
-                if(handStrength >= 0.95) {
+                if(handStrength >= 0.94) {
                     if(oppStackBb > 0) {
                         if(botStackBb > amountToCallBb) {
                             actionToReturn = "raise";

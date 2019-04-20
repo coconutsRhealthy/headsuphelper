@@ -63,7 +63,7 @@ public class MachineLearningPreflop {
 
                     if(gameVariables.isBotIsButton()) {
                         System.out.println("c1c1");
-                        if(random < 0.43) {
+                        if(random < 0.65) {
                             if(actionVariables.getBotHandStrength() > 0.95) {
                                 actionToReturn = "call";
                                 System.out.println("MachineLearning preflop IP ignored because hs > 0.95 : " + route);

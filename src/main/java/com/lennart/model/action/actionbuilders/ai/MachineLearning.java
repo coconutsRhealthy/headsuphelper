@@ -92,10 +92,10 @@ public class MachineLearning {
                 System.out.println("##CompactRoute_2_0: " + compactRoute_2_0);
                 List<Double> raiseData = getDataFromDb("raise", actionVariables.getBotHandStrength(), compactRoute_2_0);
 
-                if(raiseData.get(1) >= 20) {
+                if(raiseData.get(1) >= 13) {
                     double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
 
-                    if(raiseSuccessRatio >= 0.57) {
+                    if(raiseSuccessRatio >= 0.6) {
                         actionToReturn = "raise";
                         System.out.println("Machinelearning I) Changed fold to raise");
                     }
@@ -146,7 +146,15 @@ public class MachineLearning {
 
         List<Double> betData = getDataFromDb("bet75pct", actionVariables.getBotHandStrength(), compactRoute_2_0);
 
-        if(betData.get(1) >= 20) {
+        int limit;
+
+        if(compactRoute_2_0.contains("20bb_up")) {
+            limit = 13;
+        } else {
+            limit = 20;
+        }
+
+        if(betData.get(1) >= limit) {
             double ratio = betData.get(0) / betData.get(1);
 
             if(ratio < 0.51) {
@@ -208,7 +216,15 @@ public class MachineLearning {
         double successNumber = data.get(0);
         double totalNumber = data.get(1);
 
-        if(totalNumber >= 20) {
+        int limit;
+
+        if(route.contains("20bb_up")) {
+            limit = 13;
+        } else {
+            limit = 20;
+        }
+
+        if(totalNumber >= limit) {
             double successRatio = successNumber / totalNumber;
 
             if(successRatio > 0.51) {
@@ -342,10 +358,10 @@ public class MachineLearning {
                     System.out.println("##ComapctRoute_2_0: " + compactRaiseRoute_2_0);
                     List<Double> raiseData = getDataFromDb("raise", actionVariables.getBotHandStrength(), compactRaiseRoute_2_0);
 
-                    if (raiseData.get(1) >= 20) {
+                    if (raiseData.get(1) >= 13) {
                         double raiseSuccessRatio = raiseData.get(0) / raiseData.get(1);
 
-                        if (raiseSuccessRatio > 0.57) {
+                        if (raiseSuccessRatio > 0.6) {
                             actionToReturn = "raise";
                             System.out.println("Machinelearning F) Changed call to raise");
                             System.out.println("CompactRoute_2_0: " + compactRaiseRoute_2_0);
