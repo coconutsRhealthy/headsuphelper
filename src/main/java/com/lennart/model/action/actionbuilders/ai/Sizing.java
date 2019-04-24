@@ -151,7 +151,7 @@ public class Sizing {
         } else if(potSizePlusAllBetsInBb == 2) {
             size = 3.5 * bigBlind;
         } else if(opponentTotalBetSizeInBb >= 2 && opponentTotalBetSizeInBb <= 4) {
-            size = 3.4 * facingBetSize;
+            size = 3.27 * facingBetSize;
         } else if(opponentTotalBetSizeInBb > 4 && opponentTotalBetSizeInBb <= 16) {
             size = 2.25 * facingBetSize;
         } else {

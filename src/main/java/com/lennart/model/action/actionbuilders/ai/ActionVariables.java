@@ -399,7 +399,8 @@ public class ActionVariables {
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
 
-        action = solidifyFlopAndTurnRaises(action, boardInMethod, botHandStrength, strongFlushDraw, strongOosd, continuousTable, gameVariables);
+        action = solidifyPostflopRaises(action, boardInMethod, botHandStrength, strongFlushDraw, strongOosd, continuousTable, gameVariables, sizing);
+        action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
@@ -991,23 +992,48 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String solidifyFlopAndTurnRaises(String action, List<Card> board, double handStrength,
-                                             boolean strongFd, boolean strongOosd, ContinuousTable continuousTable,
-                                             GameVariables gameVariables) throws Exception {
+    private String solidifyPostflopRaises(String action, List<Card> board, double handStrength,
+                                          boolean strongFd, boolean strongOosd, ContinuousTable continuousTable,
+                                          GameVariables gameVariables, double sizing) throws Exception {
         String actionToReturn;
 
-        if(board != null && (board.size() == 3 || board.size() == 4)) {
-            if(action.equals("raise")) {
-                if(handStrength < 0.83) {
-                    if(strongFd || strongOosd) {
+        if(action.equals("raise")) {
+            if(board != null && !board.isEmpty()) {
+                if(board.size() == 3 || board.size() == 4) {
+                    if(sizing < 300) {
                         actionToReturn = action;
-                        System.out.println("Keep flop or turn raise cause strong draw!");
+
+                        if(handStrength < 0.6) {
+                            System.out.println("Kept small flop or turn bluffraise as is");
+                        }
                     } else {
-                        System.out.println("Change flop or turn spew raise to fold or call!");
-                        actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                        if(handStrength < 0.83) {
+                            if (strongFd || strongOosd) {
+                                actionToReturn = action;
+                                System.out.println("Keep flop or turn raise cause strong draw!");
+                            } else {
+                                System.out.println("Change flop or turn spew raise to fold or call!");
+                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
                     }
                 } else {
-                    actionToReturn = action;
+                    if(sizing < 300) {
+                        actionToReturn = action;
+
+                        if(handStrength < 0.6) {
+                            System.out.println("Kept small river bluffraise as is");
+                        }
+                    } else {
+                        if(handStrength < 0.78) {
+                            System.out.println("Change river big spew raise to fold or call!");
+                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                        } else {
+                            actionToReturn = action;
+                        }
+                    }
                 }
             } else {
                 actionToReturn = action;
