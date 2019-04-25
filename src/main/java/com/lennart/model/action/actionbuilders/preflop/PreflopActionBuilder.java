@@ -97,7 +97,46 @@ public class PreflopActionBuilder {
             }
         }
 
+        pre3betPoule = addMoreCombosToPre3betPoule(pre3betPoule);
+
         return pre3betPoule;
+    }
+
+    private List<List<Card>> addMoreCombosToPre3betPoule(List<List<Card>> currentPre3betPoule) {
+        Set<List<Card>> checkSet = new HashSet<>();
+
+        for(List<Card> combo : currentPre3betPoule) {
+            checkSet.add(combo);
+        }
+
+        ActionBuilderUtil actionBuilderUtil = new ActionBuilderUtil();
+        Map<Integer, Set<Card>> mapSuited = actionBuilderUtil.getSuitedHoleCards(2, 2, 100);
+        Map<Integer, Set<Card>> mapPocketPairs = actionBuilderUtil.getPocketPairs(2, 100);
+
+        for (Map.Entry<Integer, Set<Card>> entry : mapSuited.entrySet()) {
+            double random = Math.random();
+
+            if(random < 0.33) {
+                List<Card> combo = new ArrayList<>();
+                combo.addAll(entry.getValue());
+                checkSet.add(combo);
+            }
+        }
+
+        for (Map.Entry<Integer, Set<Card>> entry : mapPocketPairs.entrySet()) {
+            double random = Math.random();
+
+            if(random < 0.75) {
+                List<Card> combo = new ArrayList<>();
+                combo.addAll(entry.getValue());
+                checkSet.add(combo);
+            }
+        }
+
+        List<List<Card>> pre3betPouleToReturn = new ArrayList<>();
+        pre3betPouleToReturn.addAll(checkSet);
+
+        return pre3betPouleToReturn;
     }
 
     private List<List<Card>> getPreCall2betPoule(List<List<Card>> pre3betPoule) {
