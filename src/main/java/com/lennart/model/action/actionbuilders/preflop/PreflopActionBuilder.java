@@ -116,7 +116,7 @@ public class PreflopActionBuilder {
         for (Map.Entry<Integer, Set<Card>> entry : mapSuited.entrySet()) {
             double random = Math.random();
 
-            if(random < 0.33) {
+            if(random < 0.795) {
                 List<Card> combo = new ArrayList<>();
                 combo.addAll(entry.getValue());
                 checkSet.add(combo);
