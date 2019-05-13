@@ -402,6 +402,16 @@ public class ActionVariables {
         action = solidifyPostflopRaises(action, boardInMethod, botHandStrength, strongFlushDraw, strongOosd, continuousTable, gameVariables, sizing);
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
+        action = raiseFlopAndTurnWithStrongTwoCardDraws(action, gameVariables, effectiveStack);
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            if(sizing == 0) {
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            }
+
+            sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
+        }
+
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
         }
@@ -976,6 +986,36 @@ public class ActionVariables {
                         } else {
                             actionToReturn = action;
                         }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String raiseFlopAndTurnWithStrongTwoCardDraws(String action, GameVariables gameVariables, double effectiveStackBb) {
+        String actionToReturn;
+
+        if(action.equals("call") || action.equals("fold")) {
+            if(gameVariables.getOpponentStack() > 0) {
+                if(handEvaluator.isHasTwoCardsGutshot() || handEvaluator.isHasTwoCardsOosd() || handEvaluator.isHasTwoCardsFlushDraw()) {
+                    double dummySizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                    dummySizing = adjustRaiseSizingToSng(dummySizing, action, gameVariables, effectiveStackBb);
+
+                    if(new MachineLearning().bluffOddsAreOk(dummySizing, gameVariables.getOpponentBetSize(),
+                            gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBotStack(),
+                            gameVariables.getBoard(), gameVariables.getBotBetSize())) {
+                        actionToReturn = "raise";
+                        System.out.println("Postflop strongTwoCardDraw raise!");
                     } else {
                         actionToReturn = action;
                     }

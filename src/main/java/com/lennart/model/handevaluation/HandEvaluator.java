@@ -19,6 +19,10 @@ public class HandEvaluator {
     private HighCardDrawEvaluator highCardDrawEvaluator;
     private Map<String, Boolean> handDrawEvaluation;
 
+    private boolean hasTwoCardsOosd;
+    private boolean hasTwoCardsGutshot;
+    private boolean hasTwoCardsFlushDraw;
+
     public HandEvaluator(BoardEvaluator boardEvaluator) {
         //Constructor to be used for end of hand evalution in ComputerGame and when table is misread in BotHand
         this.boardEvaluator = boardEvaluator;
@@ -31,6 +35,7 @@ public class HandEvaluator {
         flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
         highCardDrawEvaluator = boardEvaluator.getHighCardDrawEvaluator();
         fillHandDrawEvaluation();
+        fillTwoCardsDrawBooleans(holeCards, boardEvaluator);
     }
 
     public double getHandStrength(List<Card> hand) {
@@ -42,11 +47,11 @@ public class HandEvaluator {
         double handStrength = 0;
 
         for (Map.Entry<Integer, Set<Set<Card>>> entry : sortedCombos.entrySet()) {
-           for(Set<Card> s : entry.getValue()) {
-               if(s.equals(handSet)) {
-                   handStrength = getIndexOfHandInSortedCombos(entry.getKey(), sortedCombos);
-               }
-           }
+            for(Set<Card> s : entry.getValue()) {
+                if(s.equals(handSet)) {
+                    handStrength = getIndexOfHandInSortedCombos(entry.getKey(), sortedCombos);
+                }
+            }
         }
         return handStrength;
     }
@@ -197,6 +202,73 @@ public class HandEvaluator {
         handDrawEvaluation.put("weakBackDoorStraight", comboPresentInMap(straightDrawEvaluator.getWeakBackDoorCombos(), holeCards));
     }
 
+    private void fillTwoCardsDrawBooleans(List<Card> holeCards, BoardEvaluator boardEvaluator) {
+        Card holeCard1 = holeCards.get(0);
+        Card holeCard2 = holeCards.get(1);
+
+        if(handDrawEvaluation.get("strongOosd")) {
+            int card1counter = 0;
+            int card2counter = 0;
+
+            Map<Integer, Set<Card>> strongOosdCombos = straightDrawEvaluator.getStrongOosdCombos();
+
+            for(Map.Entry<Integer, Set<Card>> entry : strongOosdCombos.entrySet()) {
+                if(entry.getValue().contains(holeCard1)) {
+                    card1counter++;
+                }
+
+                if(entry.getValue().contains(holeCard2)) {
+                    card2counter++;
+                }
+            }
+
+            if(card1counter <= 35 && card2counter <= 35) {
+                hasTwoCardsOosd = true;
+            } else {
+                hasTwoCardsOosd = false;
+            }
+        } else {
+            hasTwoCardsOosd = false;
+        }
+
+        if(handDrawEvaluation.get("strongGutshot")) {
+            int card1counter = 0;
+            int card2counter = 0;
+
+            Map<Integer, Set<Card>> strongGutshotCombos = straightDrawEvaluator.getStrongGutshotCombos();
+
+            for(Map.Entry<Integer, Set<Card>> entry : strongGutshotCombos.entrySet()) {
+                if(entry.getValue().contains(holeCard1)) {
+                    card1counter++;
+                }
+
+                if(entry.getValue().contains(holeCard2)) {
+                    card2counter++;
+                }
+            }
+
+            if(card1counter <= 35 && card2counter <= 35) {
+                hasTwoCardsGutshot = true;
+            } else {
+                hasTwoCardsGutshot = false;
+            }
+        } else {
+            hasTwoCardsGutshot = false;
+        }
+
+        if(handDrawEvaluation.get("strongFlushDraw")) {
+            int numberOfSuitedCardsOnBoard = boardEvaluator.getNumberOfSuitedCardsOnBoard(boardEvaluator.getBoard());
+
+            if(numberOfSuitedCardsOnBoard > 2) {
+                hasTwoCardsFlushDraw = false;
+            } else {
+                hasTwoCardsFlushDraw = true;
+            }
+        } else {
+            hasTwoCardsFlushDraw = false;
+        }
+    }
+
     private Set<Card> convertListToSet(List<Card> list) {
         Set<Card> set = new HashSet<>();
         set.addAll(list);
@@ -212,5 +284,17 @@ public class HandEvaluator {
             }
         }
         return false;
+    }
+
+    public boolean isHasTwoCardsOosd() {
+        return hasTwoCardsOosd;
+    }
+
+    public boolean isHasTwoCardsGutshot() {
+        return hasTwoCardsGutshot;
+    }
+
+    public boolean isHasTwoCardsFlushDraw() {
+        return hasTwoCardsFlushDraw;
     }
 }
