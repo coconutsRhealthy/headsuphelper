@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class StarsTableReader {
 
+    private int regNewSngWaitCouner = 0;
+
     public double getBotStackFromImage() throws Exception {
         String botStackAsString = readTopPlayerStack();
 
@@ -290,6 +292,15 @@ public class StarsTableReader {
                 registerNewSng();
             }
         } else {
+            regNewSngWaitCouner++;
+
+            if(regNewSngWaitCouner == 12) {
+                MouseKeyboard.moveMouseToLocation(7, 100);
+                MouseKeyboard.click(7, 100);
+                System.out.println("click action in waiting for sng registration");
+                regNewSngWaitCouner = 0;
+            }
+
             System.out.println("Already one regged player, wait...");
             TimeUnit.SECONDS.sleep(5);
             registerNewSng();
@@ -586,7 +597,7 @@ public class StarsTableReader {
     public double readBigBlindFromSngScreen() throws Exception {
         double bigBlind;
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(361, 25, 199, 19);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(383, 25, 199, 19);
 
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -595,12 +606,14 @@ public class StarsTableReader {
 
         System.out.println(bigBlindString);
 
-        bigBlindString = bigBlindString.substring(bigBlindString.indexOf("Blinds"));
-        bigBlindString = bigBlindString.replace("Blinds ", "");
+        int indexOfDollar = bigBlindString.indexOf("$");
 
-        int x = bigBlindString.indexOf("- T");
+        if(indexOfDollar == -1) {
+            System.out.println("weird bigblind string!");
+            return -2;
+        }
 
-        bigBlindString = bigBlindString.substring(0, x);
+        bigBlindString = bigBlindString.substring(indexOfDollar);
         bigBlindString = bigBlindString.replaceAll("\\s+","");
         bigBlindString = bigBlindString.replaceAll("\\$", "");
 
