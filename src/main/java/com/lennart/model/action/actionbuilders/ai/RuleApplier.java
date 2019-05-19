@@ -1106,7 +1106,7 @@ public class RuleApplier {
     private boolean facingPostFlop3bet(double potSizeBb, double botTotalBetsizeBb, double opponentTotalBetsizeBb) {
         boolean facingPostFlop3bet = false;
 
-        if(botTotalBetsizeBb > potSizeBb && opponentTotalBetsizeBb > botTotalBetsizeBb) {
+        if(botTotalBetsizeBb > (potSizeBb * 1.3) && opponentTotalBetsizeBb > botTotalBetsizeBb) {
             facingPostFlop3bet = true;
             System.out.println("facing postflop 3bet");
         }

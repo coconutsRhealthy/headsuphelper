@@ -416,6 +416,30 @@ public class ActionVariables {
             sizing = 0;
         }
 
+        action = changePlayToBoardWetness(
+                action,
+                boardInMethod,
+                continuousTable.isOpponentHasInitiative(),
+                gameVariables.getOpponentBetSize(),
+                gameVariables.getBotBetSize(),
+                gameVariables.getBotStack(),
+                gameVariables.getOpponentStack(),
+                gameVariables.getPot(),
+                botHandStrengthInMethod,
+                gameVariables.getBigBlind(),
+                gameVariables,
+                continuousTable);
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            if(sizing == 0) {
+                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            }
+
+            sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
+        }
+
+        sizing = adjustSizingToBoardWetness(action, sizing, continuousTable, boardInMethod);
+
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
         }
@@ -977,8 +1001,8 @@ public class ActionVariables {
         String actionToReturn;
 
         if(action.equals("call")) {
-            if(board != null && (board.size() == 3 || board.size() == 4)) {
-                if(handStrength >= 0.94) {
+            if(board != null && !board.isEmpty()) {
+                if(handStrength >= 0.90) {
                     if(oppStackBb > 0) {
                         if(botStackBb > amountToCallBb) {
                             actionToReturn = "raise";
@@ -1007,7 +1031,7 @@ public class ActionVariables {
 
         if(action.equals("call") || action.equals("fold")) {
             if(gameVariables.getOpponentStack() > 0) {
-                if(handEvaluator.isHasTwoCardsGutshot() || handEvaluator.isHasTwoCardsOosd() || handEvaluator.isHasTwoCardsFlushDraw()) {
+                if(handEvaluator != null && (handEvaluator.isHasTwoCardsGutshot() || handEvaluator.isHasTwoCardsOosd() || handEvaluator.isHasTwoCardsFlushDraw())) {
                     double dummySizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
                     dummySizing = adjustRaiseSizingToSng(dummySizing, action, gameVariables, effectiveStackBb);
 
@@ -1136,6 +1160,129 @@ public class ActionVariables {
         }
 
         return sngSizingToReturn;
+    }
+
+    private String changePlayToBoardWetness(String action, List<Card> board, boolean opponentHasInitiative,
+                                           double facingBetSize, double myBetSize, double myStack, double facingStack,
+                                           double pot, double handStrenght, double bigBlind,
+                                           GameVariables gameVariables, ContinuousTable continuousTable) {
+        String actionToReturn;
+
+        int maxValue = -1;
+
+        if(board != null) {
+            if(board.size() == 4) {
+                maxValue = 68;
+            } else if (board.size() == 5) {
+                maxValue = 76;
+            }
+        }
+
+        if(action.equals("fold") || action.equals("call") || action.equals("check")) {
+            if(maxValue > -1) {
+                int boardWetness;
+
+                if(board.size() == 4) {
+                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentFlopCombos(), continuousTable.getTop10percentTurnCombos());
+                } else {
+                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(), continuousTable.getTop10percentRiverCombos());
+                }
+
+                if(boardWetness <= maxValue) {
+                    double dummySizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+
+                    if(action.equals("check")) {
+                        dummySizing = dummySizing * 1.6;
+                    }
+
+                    if(new MachineLearning().bluffOddsAreOk(dummySizing, gameVariables.getOpponentBetSize(),
+                            gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBotStack(),
+                            gameVariables.getBoard(), gameVariables.getBotBetSize())) {
+                        if(action.equals("check")) {
+                            if(!opponentHasInitiative) {
+                                if(handStrenght > 0.8 || handStrenght < 0.53) {
+                                    double random = Math.random();
+
+                                    if(random > 0.2) {
+                                        actionToReturn = "bet75pct";
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            if(handStrenght > 0.8 || handStrenght < 0.53) {
+                                double random = Math.random();
+
+                                if(random > 0.2) {
+                                    actionToReturn = "raise";
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        if(!action.equals(actionToReturn)) {
+            System.out.println("Action changed because of boardWetness to: " + actionToReturn);
+        }
+
+        return actionToReturn;
+    }
+
+    private double adjustSizingToBoardWetness(String action, double sizing, ContinuousTable continuousTable, List<Card> board) {
+        double sizingToReturn;
+
+        //ook handstrength?
+
+        if(action.equals("bet75pct")) {
+            if(board != null && (board.size() == 4 || board.size() == 5)) {
+                int boardWetness;
+
+                if(board.size() == 4) {
+                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentFlopCombos(), continuousTable.getTop10percentTurnCombos());
+                } else {
+                    boardWetness = BoardEvaluator.getBoardWetness(continuousTable.getTop10percentTurnCombos(), continuousTable.getTop10percentRiverCombos());
+                }
+
+                if(board.size() == 4) {
+                    if(boardWetness <= 68) {
+                        sizingToReturn = sizing * 1.6;
+                    } else {
+                        sizingToReturn = sizing;
+                    }
+                } else {
+                    if(boardWetness <= 76) {
+                        sizingToReturn = sizing * 1.6;
+                    } else {
+                        sizingToReturn = sizing;
+                    }
+                }
+            } else {
+                sizingToReturn = sizing;
+            }
+        } else {
+            sizingToReturn = sizing;
+        }
+
+        return sizingToReturn;
     }
 
     public void setAction(String action) {
