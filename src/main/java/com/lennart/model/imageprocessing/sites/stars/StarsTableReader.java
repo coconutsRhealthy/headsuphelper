@@ -268,6 +268,17 @@ public class StarsTableReader {
         //MouseKeyboard.click(480, 637);
     }
 
+    public void closeSpinOfTheDayScreenIfNecessary() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(321, 468, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        if(pixelRgb / 1000 == -986) {
+            //expected -986896
+            System.out.println("closing spinOfTheDay screen");
+            MouseKeyboard.click(281, 317);
+        }
+    }
+
     public void clickTopSngInList() {
         System.out.println("clicking top sng in list");
         MouseKeyboard.click(206, 278);
