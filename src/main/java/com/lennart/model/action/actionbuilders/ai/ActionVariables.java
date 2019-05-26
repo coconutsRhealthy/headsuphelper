@@ -582,6 +582,31 @@ public class ActionVariables {
 
             continuousTable.getDbSaveList().add(dbSaveRaw);
             //DbSaveRaw
+
+            //DbSavePreflopStats
+            if(boardInMethod == null || boardInMethod.isEmpty()) {
+                DbSavePreflopStats dbSavePreflopStats = new DbSavePreflopStats();
+
+                double pre2betCount = dbSavePreflopStats.getPreXbetCountLogic(
+                        gameVariables.getOpponentAction(), gameVariables.getBoard(), gameVariables.getOpponentBetSize(),
+                        gameVariables.getBigBlind(), "pre2bet");
+                double pre3betCount = dbSavePreflopStats.getPreXbetCountLogic(
+                        gameVariables.getOpponentAction(), gameVariables.getBoard(), gameVariables.getOpponentBetSize(),
+                        gameVariables.getBigBlind(), "pre3bet");
+                double pre4bet_up_count = dbSavePreflopStats.getPreXbetCountLogic(
+                        gameVariables.getOpponentAction(), gameVariables.getBoard(), gameVariables.getOpponentBetSize(),
+                        gameVariables.getBigBlind(), "pre4bet_up");
+                double preTotalCount = dbSavePreflopStats.getPreTotalCountLogic(gameVariables.getOpponentAction(), gameVariables.getBoard());
+
+                dbSavePreflopStats.setOpponentName(gameVariables.getOpponentName());
+                dbSavePreflopStats.setOppPre2betCount(pre2betCount);
+                dbSavePreflopStats.setOppPre3betCount(pre3betCount);
+                dbSavePreflopStats.setOppPre4bet_up_count(pre4bet_up_count);
+                dbSavePreflopStats.setOppPreTotalCount(preTotalCount);
+
+                continuousTable.getDbSaveList().add(dbSavePreflopStats);
+            }
+            //DbSavePreflopStats
         }
 
         if(realGame) {

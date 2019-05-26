@@ -94,6 +94,7 @@ public class ContinuousTable implements ContinuousTableable {
                             new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
+                            new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
                             System.out.println("3.4 hours have passed, force quit");
                             throw new RuntimeException();
                         }
@@ -109,6 +110,7 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
+                    new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
                     //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
 
                     boolean botWasButtonInLastHand = botWasButtonInLastHand();
