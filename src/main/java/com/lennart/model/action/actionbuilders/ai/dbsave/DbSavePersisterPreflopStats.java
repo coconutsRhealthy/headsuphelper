@@ -45,9 +45,9 @@ public class DbSavePersisterPreflopStats {
 
             st.executeUpdate(
                     "UPDATE opponentidentifier_2_0_preflopstats SET pre2bet = pre2bet + " + totalPre2betCountLastHand +
-                            " AND pre3bet = pre3bet + " + totalPre3betCountLastHand +
-                            " AND pre4bet_up = pre4bet_up + " + totalPre4bet_up_countLastHand +
-                            " AND preTotal = preTotal + " + totalTotalCountLastHand +
+                            ", pre3bet = pre3bet + " + totalPre3betCountLastHand +
+                            ", pre4bet_up = pre4bet_up + " + totalPre4bet_up_countLastHand +
+                            ", preTotal = preTotal + " + totalTotalCountLastHand +
                             " WHERE playerName = '" + opponentName + "'");
 
             st.close();
