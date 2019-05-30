@@ -20,7 +20,7 @@ public class PreflopHandStength {
         Set<Card> holeCardsAsSet = new HashSet<>();
         holeCardsAsSet.addAll(holeCards);
 
-        Map<Double, List<Set<Card>>> allGroups = getMapWithAllPreflopHandstrengthGroupsNew();
+        Map<Double, List<Set<Card>>> allGroups = getMapWithAllPreflopHandstrengthGroups();
 
         loop: for (Map.Entry<Double, List<Set<Card>>> entry : allGroups.entrySet()) {
             List<Set<Card>> group = entry.getValue();
@@ -36,7 +36,7 @@ public class PreflopHandStength {
         return handstrength;
     }
 
-    public Map<Double, List<Set<Card>>> getMapWithAllPreflopHandstrengthGroupsNew() {
+    public Map<Double, List<Set<Card>>> getMapWithAllPreflopHandstrengthGroups() {
         Map<Double, List<Set<Card>>> allGroups = new HashMap<>();
 
         allGroups.put(0.02, get0_5_group());
