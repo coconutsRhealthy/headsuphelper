@@ -219,6 +219,12 @@ public class PreflopHandStength {
         group_50_55.addAll(getSuitedCombosOfGivenRanks(11, 6).values());
         group_50_55.addAll(getSuitedCombosOfGivenRanks(9, 7).values());
 
+        group_50_55.addAll(getSuitedCombosOfGivenRanks(8, 7).values());
+        group_50_55.addAll(getSuitedCombosOfGivenRanks(8, 6).values());
+        group_50_55.addAll(getSuitedCombosOfGivenRanks(7, 6).values());
+        group_50_55.addAll(getSuitedCombosOfGivenRanks(7, 5).values());
+        group_50_55.addAll(getSuitedCombosOfGivenRanks(6, 5).values());
+
         return group_50_55;
     }
 
@@ -228,7 +234,6 @@ public class PreflopHandStength {
         group_45_50.addAll(getSuitedCombosOfGivenRanks(11, 5).values());
         group_45_50.addAll(getOffSuitCombosOfGivenRanks(12, 5).values());
         group_45_50.addAll(getOffSuitCombosOfGivenRanks(10, 8).values());
-        group_45_50.addAll(getSuitedCombosOfGivenRanks(8, 7).values());
         group_45_50.addAll(getOffSuitCombosOfGivenRanks(11, 7).values());
         group_45_50.addAll(getSuitedCombosOfGivenRanks(10, 6).values());
         group_45_50.addAll(getOffSuitCombosOfGivenRanks(12, 4).values());
@@ -246,7 +251,6 @@ public class PreflopHandStength {
         group_40_45.addAll(getSuitedCombosOfGivenRanks(9, 6).values());
         group_40_45.addAll(getOffSuitCombosOfGivenRanks(12, 2).values());
         group_40_45.addAll(getSuitedCombosOfGivenRanks(11, 2).values());
-        group_40_45.addAll(getSuitedCombosOfGivenRanks(8, 6).values());
         group_40_45.addAll(getOffSuitCombosOfGivenRanks(10, 7).values());
 
         return group_40_45;
@@ -256,16 +260,13 @@ public class PreflopHandStength {
         List<Set<Card>> group_35_40 = new ArrayList<>();
 
         group_35_40.addAll(getOffSuitCombosOfGivenRanks(11, 6).values());
-        group_35_40.addAll(getSuitedCombosOfGivenRanks(7, 6).values());
         group_35_40.addAll(getSuitedCombosOfGivenRanks(10, 5).values());
         group_35_40.addAll(getSuitedCombosOfGivenRanks(10, 4).values());
         group_35_40.addAll(getOffSuitCombosOfGivenRanks(11, 5).values());
         group_35_40.addAll(getOffSuitCombosOfGivenRanks(9, 7).values());
         group_35_40.addAll(getSuitedCombosOfGivenRanks(9, 5).values());
-        group_35_40.addAll(getSuitedCombosOfGivenRanks(6, 5).values());
         group_35_40.addAll(getSuitedCombosOfGivenRanks(10, 3).values());
         group_35_40.addAll(getSuitedCombosOfGivenRanks(8, 5).values());
-        group_35_40.addAll(getSuitedCombosOfGivenRanks(7, 5).values());
 
         return group_35_40;
     }
