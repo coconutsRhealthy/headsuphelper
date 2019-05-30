@@ -10,12 +10,12 @@ public class OppIdentifierPreflopStats {
 
     private Connection con;
 
-    private static final double PRE_2_BET_33PCT_VALUE = 0.3;
-    private static final double PRE_2_BET_66PCT_VALUE = 0.5660377358490566;
-    private static final double PRE_3_BET_33PCT_VALUE = 0.08823529411764706;
-    private static final double PRE_3_BET_66PCT_VALUE = 0.17391304347826086;
-    private static final double PRE_4_BET_33PCT_VALUE = 0.024390243902439025;
-    private static final double PRE_4_BET_66PCT_VALUE = 0.10344827586206896;
+    private static final double PRE_2_BET_33PCT_VALUE = 0.29411764705882354;
+    private static final double PRE_2_BET_66PCT_VALUE = 0.5588235294117647;
+    private static final double PRE_3_BET_33PCT_VALUE = 0.08571428571428572;
+    private static final double PRE_3_BET_66PCT_VALUE = 0.17647058823529413;
+    private static final double PRE_4_BET_33PCT_VALUE = 0.004784688995215311;
+    private static final double PRE_4_BET_66PCT_VALUE = 0.1;
 
     public static void main(String[] args) throws Exception {
         //new OppIdentifierPreflopStats().getOppPreGroupMap("Hentasy");
@@ -37,7 +37,7 @@ public class OppIdentifierPreflopStats {
             double pre3betRatio = pre3betNumber / preTotal;
             double pre4bet_up_ratio = pre4bet_up_Number / preTotal;
 
-            if(preTotal >= 16) {
+            if(preTotal >= 11) {
                 if(pre2betRatio < PRE_2_BET_33PCT_VALUE) {
                     oppPreGroupMap.put("pre2betGroup", "low");
                 } else if(pre2betRatio < PRE_2_BET_66PCT_VALUE) {
@@ -223,7 +223,7 @@ public class OppIdentifierPreflopStats {
         while(rs.next()) {
             double preTotal = rs.getDouble("preTotal");
 
-            if(preTotal >= 16) {
+            if(preTotal >= 11) {
                 double pre2betNumber = rs.getDouble("pre2bet");
                 double pre3betNumber = rs.getDouble("pre3bet");
                 double pre4bet_up_Number = rs.getDouble("pre4bet_up");
