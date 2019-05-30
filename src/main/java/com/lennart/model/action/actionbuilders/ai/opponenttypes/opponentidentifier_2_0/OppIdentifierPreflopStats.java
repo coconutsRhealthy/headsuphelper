@@ -168,6 +168,48 @@ public class OppIdentifierPreflopStats {
         closeDbConnection();
     }
 
+    private void printCountsFromDbStatsRaw(String opponentName) throws Exception {
+        double oppTotalCount = 0;
+        double opp2betCount = 0;
+        double opp3betCount = 0;
+        double opp4betCount = 0;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE opponent_name = '" + opponentName + "';");
+
+        while(rs.next()) {
+            if(rs.getString("board").equals("") && !rs.getString("opponent_action").equals("bet")) {
+                oppTotalCount++;
+
+                if(rs.getString("opponent_action").equals("raise")) {
+                    double bigBlind = rs.getDouble("bigblind");
+                    double oppBetSize = rs.getDouble("opponent_total_betsize");
+                    double oppBetSizeBb = oppBetSize / bigBlind;
+
+                    if(oppBetSizeBb > 1 && oppBetSizeBb <= 3) {
+                        opp2betCount++;
+                    } else if(oppBetSizeBb > 3 && oppBetSizeBb <= 16) {
+                        opp3betCount++;
+                    } else if(oppBetSizeBb >= 16) {
+                        opp4betCount++;
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println("oppTotalCount: " + oppTotalCount);
+        System.out.println("opp2betCount: " + opp2betCount);
+        System.out.println("opp3betCount: " + opp3betCount);
+        System.out.println("opp4betCount: " + opp4betCount);
+    }
+
     private void printGroupBorders() throws Exception {
         List<Double> allPre2betRatios = new ArrayList<>();
         List<Double> allPre3betRatios = new ArrayList<>();
