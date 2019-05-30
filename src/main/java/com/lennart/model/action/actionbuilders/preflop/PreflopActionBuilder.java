@@ -133,6 +133,8 @@ public class PreflopActionBuilder {
             if(oppPre3or4bet_up_Group.equals("high")) {
                 pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(7).values());
                 pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(6).values());
+                pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(5).values());
+                pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(4).values());
                 pre4or5betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 9).values());
                 pre4or5betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 8).values());
                 pre4or5betPouleAsSets.addAll(actionBuilderUtil.getSuitedCombosOfGivenRanks(14, 7).values());
