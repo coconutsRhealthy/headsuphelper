@@ -10,12 +10,12 @@ public class OppIdentifierPreflopStats {
 
     private Connection con;
 
-    private static final double PRE_2_BET_33PCT_VALUE = 0.29411764705882354;
-    private static final double PRE_2_BET_66PCT_VALUE = 0.5588235294117647;
-    private static final double PRE_3_BET_33PCT_VALUE = 0.08571428571428572;
-    private static final double PRE_3_BET_66PCT_VALUE = 0.17647058823529413;
-    private static final double PRE_4_BET_33PCT_VALUE = 0.004784688995215311;
-    private static final double PRE_4_BET_66PCT_VALUE = 0.1;
+    private static final double PRE_2_BET_33PCT_VALUE = 0.2980769230769231;
+    private static final double PRE_2_BET_66PCT_VALUE = 0.56;
+    private static final double PRE_3_BET_33PCT_VALUE = 0.07692307692307693;
+    private static final double PRE_3_BET_66PCT_VALUE = 0.15789473684210525;
+    private static final double PRE_4_BET_33PCT_VALUE = 0.037037037037037035;
+    private static final double PRE_4_BET_66PCT_VALUE = 0.12903225806451613;
 
     public static void main(String[] args) throws Exception {
         //new OppIdentifierPreflopStats().getOppPreGroupMap("Hentasy");
@@ -116,8 +116,6 @@ public class OppIdentifierPreflopStats {
         return oppPreStatsMap;
     }
 
-
-
     private void migrateRawDataToPreflopStats() throws Exception {
         initializeDbConnection();
 
@@ -145,9 +143,9 @@ public class OppIdentifierPreflopStats {
 
                         if(oppBetSizeBb > 1 && oppBetSizeBb <= 3) {
                             st4.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET pre2bet = pre2bet + 1 WHERE playerName = '" + opponentName + "'");
-                        } else if(oppBetSizeBb > 3 && oppBetSizeBb <= 16) {
+                        } else if(oppBetSizeBb > 3 && oppBetSizeBb <= 10) {
                             st4.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET pre3bet = pre3bet + 1 WHERE playerName = '" + opponentName + "'");
-                        } else if(oppBetSizeBb >= 16) {
+                        } else if(oppBetSizeBb > 10) {
                             st4.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET pre4bet_up = pre4bet_up + 1 WHERE playerName = '" + opponentName + "'");
                         }
 
@@ -190,9 +188,9 @@ public class OppIdentifierPreflopStats {
 
                     if(oppBetSizeBb > 1 && oppBetSizeBb <= 3) {
                         opp2betCount++;
-                    } else if(oppBetSizeBb > 3 && oppBetSizeBb <= 16) {
+                    } else if(oppBetSizeBb > 3 && oppBetSizeBb <= 10) {
                         opp3betCount++;
-                    } else if(oppBetSizeBb >= 16) {
+                    } else if(oppBetSizeBb > 10) {
                         opp4betCount++;
                     }
                 }

@@ -28,11 +28,11 @@ public class DbSavePreflopStats extends DbSave {
                         inMethodPreXbetCount = 1;
                     }
                 } else if(xBetToCheck.equals("pre3bet")) {
-                    if(oppBetSizeBb > 3 && oppBetSizeBb <= 16) {
+                    if(oppBetSizeBb > 3 && oppBetSizeBb <= 10) {
                         inMethodPreXbetCount = 1;
                     }
                 } else if(xBetToCheck.equals("pre4bet_up")) {
-                    if(oppBetSizeBb >= 16) {
+                    if(oppBetSizeBb > 10) {
                         inMethodPreXbetCount = 1;
                     }
                 }

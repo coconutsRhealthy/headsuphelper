@@ -54,9 +54,9 @@ public class PreflopActionBuilder {
                 }
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
                 action = get1betF2bet(botHoleCards, continuousTableable, oppPre2betGroup);
-            } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 16) {
+            } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 10) {
                 action = get2betF3bet(botHoleCards, continuousTableable, oppPre3betGroup);
-            } else if(bbOpponentTotalBetSize >= 16 && bbOpponentTotalBetSize <= 40) {
+            } else if(bbOpponentTotalBetSize > 10 && bbOpponentTotalBetSize <= 25) {
                 action = get3betF4bet(botHoleCards, continuousTableable, oppPre4bet_up_Group);
             } else {
                 action = get4betF5bet(botHoleCards, oppPre4bet_up_Group);
