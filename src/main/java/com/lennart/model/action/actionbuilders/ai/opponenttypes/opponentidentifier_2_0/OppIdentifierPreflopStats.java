@@ -66,8 +66,8 @@ public class OppIdentifierPreflopStats {
                 System.out.println("put everything as 'medium' because too few hands");
 
                 oppPreGroupMap.put("pre2betGroup", "medium");
-                oppPreGroupMap.put("pre3betGroup", "medium");
-                oppPreGroupMap.put("pre4bet_up_group", "medium");
+                oppPreGroupMap.put("pre3betGroup", "mediumUnknown");
+                oppPreGroupMap.put("pre4bet_up_group", "mediumUnknown");
             }
 
         } else {
@@ -75,8 +75,8 @@ public class OppIdentifierPreflopStats {
             System.out.println("put everyting as 'medium' as default");
 
             oppPreGroupMap.put("pre2betGroup", "medium");
-            oppPreGroupMap.put("pre3betGroup", "medium");
-            oppPreGroupMap.put("pre4bet_up_group", "medium");
+            oppPreGroupMap.put("pre3betGroup", "mediumUnknown");
+            oppPreGroupMap.put("pre4bet_up_group", "mediumUnknown");
         }
 
         return oppPreGroupMap;

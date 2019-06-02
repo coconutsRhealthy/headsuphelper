@@ -122,6 +122,10 @@ public class PreflopActionBuilder {
         pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(12).values());
         pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(11).values());
 
+        if(oppPre3or4bet_up_Group.equals("mediumUnknown")) {
+            pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(10).values());
+        }
+
         if(oppPre3or4bet_up_Group.equals("medium") || oppPre3or4bet_up_Group.equals("high")) {
             pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(10).values());
             pre4or5betPouleAsSets.addAll(actionBuilderUtil.getPocketPairCombosOfGivenRank(9).values());
@@ -207,7 +211,7 @@ public class PreflopActionBuilder {
 
         if(oppPre3betGroup.equals("low")) {
             limit = 0.75;
-        } else if(oppPre3betGroup.equals("medium")){
+        } else if(oppPre3betGroup.equals("medium") || oppPre3betGroup.equals("mediumUnknown")){
             limit = 0.6;
         } else {
             limit = 0.5;
@@ -236,7 +240,7 @@ public class PreflopActionBuilder {
 
         double limit;
 
-        if(oppPre4bet_up_Group.equals("low")) {
+        if(oppPre4bet_up_Group.equals("low") || oppPre4bet_up_Group.equals("mediumUnknown")) {
             limit = 0.95;
         } else if(oppPre4bet_up_Group.equals("medium")){
             limit = 0.80;
@@ -267,7 +271,7 @@ public class PreflopActionBuilder {
 
         double limit;
 
-        if(oppPre4bet_up_Group.equals("low")) {
+        if(oppPre4bet_up_Group.equals("low") || oppPre4bet_up_Group.equals("mediumUnknown")) {
             limit = 0.95;
         } else if(oppPre4bet_up_Group.equals("medium")){
             limit = 0.85;
