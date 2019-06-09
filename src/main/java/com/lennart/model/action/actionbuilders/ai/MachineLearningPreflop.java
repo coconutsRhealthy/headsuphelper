@@ -68,8 +68,8 @@ public class MachineLearningPreflop {
                                 actionToReturn = "call";
                                 System.out.println("MachineLearning preflop IP ignored because hs > 0.95 : " + route);
                             } else {
-                                actionToReturn = "fold";
-                                System.out.println("MachineLearning preflop IP fold. Route: " + route);
+                                actionToReturn = "call";
+                                System.out.println("gvbgbv MachineLearning preflop IP fold. Route: " + route);
                             }
                         } else {
                             System.out.println("d1d1");
@@ -83,8 +83,8 @@ public class MachineLearningPreflop {
                                 actionToReturn = "call";
                                 System.out.println("MachineLearning preflop OOP ignored because hs > 0.95 : " + route);
                             } else {
-                                actionToReturn = "fold";
-                                System.out.println("MachineLearning preflop OOP fold. Route: " + route);
+                                actionToReturn = "call";
+                                System.out.println("gvbgbv MachineLearning preflop OOP fold. Route: " + route);
                             }
                         } else {
                             System.out.println("g1g1");
@@ -159,11 +159,12 @@ public class MachineLearningPreflop {
                         System.out.println("MachineLearning preflop Raise change to fold or call. Route: " + route);
 
                         if(gameVariables.getBotBetSize() < gameVariables.getBigBlind()) {
-                            actionToReturn = "fold";
-                            System.out.println("Changed to fold because was IP open from SB");
+                            actionToReturn = "raise";
+                            System.out.println("gvbgbv Changed to fold because was IP open from SB");
                         } else {
-                            System.out.println("Call adjustCallAction() because it concerns call other than IP open from SB");
-                            actionToReturn = adjustCallAction("call", gameVariables, actionVariables);
+                            System.out.println("gvbgbv Call adjustCallAction() because it concerns call other than IP open from SB");
+                            //actionToReturn = adjustCallAction("call", gameVariables, actionVariables);
+                            actionToReturn = "raise";
                         }
                     }
                 } else {

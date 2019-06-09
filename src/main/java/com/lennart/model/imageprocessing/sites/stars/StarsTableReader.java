@@ -159,10 +159,14 @@ public class StarsTableReader {
         return null;
     }
 
-    public static boolean botIsToAct() {
+    public static boolean botIsToAct() throws Exception {
         boolean firstCheck = false;
         boolean secondCheck = false;
         boolean thirdCheck = false;
+
+        boolean fourthCheck = false;
+        boolean fifthCheck = false;
+        boolean sixthCheck = false;
 
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1048, 773, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
@@ -189,17 +193,43 @@ public class StarsTableReader {
             thirdCheck = true;
         }
 
-        if(firstCheck && secondCheck && !thirdCheck) {
-            System.out.println("weird bot is to act!");
-        }
-
         if(firstCheck && secondCheck && thirdCheck) {
-            System.out.println();
-            System.out.println("Bot is to act");
-            System.out.println();
-        }
+            TimeUnit.MILLISECONDS.sleep(84);
 
-        return firstCheck && secondCheck && thirdCheck;
+            BufferedImage bufferedImage4 = ImageProcessor.getBufferedImageScreenShot(1048, 773, 1, 1);
+            int suitRgb4 = bufferedImage4.getRGB(0, 0);
+
+            if(suitRgb4 / 1_000 == -14614) {
+                fourthCheck = true;
+            }
+
+            BufferedImage bufferedImage5 = ImageProcessor.getBufferedImageScreenShot(928, 737, 1, 1);
+            int suitRgb5 = bufferedImage5.getRGB(0, 0);
+
+            if(suitRgb5 / 1_000 == -10745) {
+                fifthCheck = true;
+            }
+
+            BufferedImage bufferedImage6 = ImageProcessor.getBufferedImageScreenShot(474, 194, 1, 1);
+            int suitRgb6 = bufferedImage6.getRGB(0, 0);
+
+            if(suitRgb6 / 1_000 == -8132) {
+                sixthCheck = true;
+            }
+
+            if(fourthCheck && fifthCheck && sixthCheck) {
+                System.out.println();
+                System.out.println("Bot is to act");
+                System.out.println();
+
+                return true;
+            } else {
+                System.out.println("Bot is to act first check true second not!");
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     public static boolean sngIsFinished() throws Exception {
@@ -286,7 +316,9 @@ public class StarsTableReader {
 
     public void registerNewSng() throws Exception {
         if(noPlayerIsReggedYet()) {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.MILLISECONDS.sleep(2150);
+            clickTopSngInList();
+            TimeUnit.MILLISECONDS.sleep(250);
             System.out.println("registering new sng");
             MouseKeyboard.click(782, 603);
 
