@@ -3,6 +3,7 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OppIdentifierPostflopStats;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
@@ -14,6 +15,7 @@ import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -401,6 +403,11 @@ public class ActionVariables {
 
         action = solidifyPostflopRaises(action, boardInMethod, botHandStrength, strongFlushDraw, strongOosd, continuousTable, gameVariables, sizing);
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
+
+        //postflopstats
+        action = adjustPostflopPlayToStats(action, boardInMethod, opponentBetsizeBb, gameVariables.getOpponentName(),
+                botHandStrength, strongFlushDraw, strongOosd, strongGutshot, facingOdds);
+        //postflopstats
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
@@ -1121,6 +1128,99 @@ public class ActionVariables {
         }
 
         return sngSizingToReturn;
+    }
+
+    private String adjustPostflopPlayToStats(String action, List<Card> board, double oppBetsizeBb, String opponentName, double botHandStrength,
+                                             boolean strongFd, boolean strongOosd, boolean strongGutshot, double facingOdds) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("fold")) {
+            if(board != null && !board.isEmpty()) {
+                if(oppBetsizeBb >= 4) {
+                    if(botHandStrength >= 0.68) {
+                        Map<String, String> oppPostGroupMap = new OppIdentifierPostflopStats().getOppPostGroupMap(opponentName);
+
+                        if(oppBetsizeBb <= 6.25) {
+                            if(oppPostGroupMap.get("post_4_6bb_group").equals("high")) {
+                                actionToReturn = "call";
+                                System.out.println("ff1_Change to call because " + opponentName + " is high in post_4_6bb_group");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else if(oppBetsizeBb <= 13.27) {
+                            if(oppPostGroupMap.get("post_6_13bb_group").equals("high")) {
+                                actionToReturn = "call";
+                                System.out.println("ff2_Change to call because " + opponentName + " is high in post_6_13bb_group");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            if(oppPostGroupMap.get("post_13bb_up_group").equals("high")) {
+                                actionToReturn = "call";
+                                System.out.println("ff3_Change to call because " + opponentName + " is high in post_13bb_up_group");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else if(action.equals("call")) {
+            if(board != null && !board.isEmpty()) {
+                if(oppBetsizeBb >= 4) {
+                    if(botHandStrength < 0.8) {
+                        if(facingOdds > 0.3) {
+                            if(!strongFd && !strongOosd && !strongGutshot) {
+                                Map<String, String> oppPostGroupMap = new OppIdentifierPostflopStats().getOppPostGroupMap(opponentName);
+
+                                if(oppBetsizeBb <= 6.25) {
+                                    if(oppPostGroupMap.get("post_4_6bb_group").equals("low")) {
+                                        actionToReturn = "fold";
+                                        System.out.println("gg1_Change to fold because " + opponentName + " is low in post_4_6bb_group");
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else if(oppBetsizeBb <= 13.27) {
+                                    if(oppPostGroupMap.get("post_6_13bb_group").equals("low")) {
+                                        actionToReturn = "fold";
+                                        System.out.println("gg2_Change to fold because " + opponentName + " is low in post_6_13bb_group");
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                } else {
+                                    if(oppPostGroupMap.get("post_13bb_up_group").equals("low")) {
+                                        actionToReturn = "fold";
+                                        System.out.println("gg3_Change to fold because " + opponentName + " is low in post_13bb_up_group");
+                                    } else {
+                                        actionToReturn = action;
+                                    }
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
     public void setAction(String action) {
