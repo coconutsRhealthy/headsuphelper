@@ -32,8 +32,8 @@ public class OpponentIdentifier2_0 {
     public static double POST_BET = 0.34782608695652173;
     public static double POST_LOOSENESS = 0.5;
 
-    public static double OVERALL_LOOSENESS_MEDIAN = 0.625;
-    public static double OVERALL_AGGRESSIVENESS_MEDIAN = 0.4;
+    public static double OVERALL_LOOSENESS_MEDIAN = 0.631578947368421;
+    public static double OVERALL_AGGRESSIVENESS_MEDIAN = 0.39908256880733944;
 
     public OpponentIdentifier2_0() {
         //default constructor
