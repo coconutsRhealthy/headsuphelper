@@ -396,6 +396,10 @@ public class StarsTableReader {
             fullPlayerName = fullPlayerName.substring(0, fullPlayerName.length() - 1);
         }
 
+        while(fullPlayerName.endsWith("\\")) {
+            fullPlayerName = fullPlayerName.substring(0, fullPlayerName.length() - 1);
+        }
+
         return fullPlayerName;
     }
 
@@ -605,6 +609,10 @@ public class StarsTableReader {
 
         if(bottomPlayerStack.toLowerCase().contains("all")) {
             bottomPlayerStack = "0";
+        }
+
+        if(bottomPlayerStack.toLowerCase().equals("sittingout")) {
+            bottomPlayerStack = "1500";
         }
 
         return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
