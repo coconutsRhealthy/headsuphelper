@@ -95,7 +95,6 @@ public class ContinuousTable implements ContinuousTableable {
                             new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
-                            new DbSavePersisterPostflopStats().doDbSaveUpdate(gameVariables.getOpponentName());
                             System.out.println("3.4 hours have passed, force quit");
                             throw new RuntimeException();
                         }
@@ -134,8 +133,6 @@ public class ContinuousTable implements ContinuousTableable {
                     bigBlind = gameVariables.getBigBlind();
 
                     allHandsPlayedAndPlayerNames.add(gameVariables.getOpponentName());
-
-                    new DbSavePersisterPostflopStats().doDbSaveUpdate(gameVariables.getOpponentName());
                 } else {
                     gameVariables.fillFieldsSubsequent(true);
                 }
