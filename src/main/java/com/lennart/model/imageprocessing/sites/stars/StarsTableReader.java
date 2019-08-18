@@ -290,6 +290,19 @@ public class StarsTableReader {
         return sngIsFinished;
     }
 
+    public static boolean botIsSittingOut() {
+        String botStack = readTopPlayerStackBase();
+
+        if(botStack.toLowerCase().equals("sittingout")) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void endBotIsSittingOut() {
+        MouseKeyboard.click(926, 710);
+    }
+
     public void closeRematchScreen() {
         System.out.println("closing rematch screen");
         MouseKeyboard.click(483, 648);
@@ -611,7 +624,7 @@ public class StarsTableReader {
             bottomPlayerStack = "0";
         }
 
-        if(bottomPlayerStack.toLowerCase().equals("sittingout")) {
+        if(bottomPlayerStack.toLowerCase().equals("sittingout") || bottomPlayerStack.toLowerCase().contains("isconnect")) {
             bottomPlayerStack = "1500";
         }
 
@@ -619,11 +632,7 @@ public class StarsTableReader {
     }
 
     private String readTopPlayerStack() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(468, 159, 107, 25);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
+        String topPlayerStack = readTopPlayerStackBase();
 
         System.out.println("read botstack: " + topPlayerStack);
 
@@ -633,6 +642,15 @@ public class StarsTableReader {
         }
 
         return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
+    }
+
+    private static String readTopPlayerStackBase() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(468, 159, 107, 25);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
+        return topPlayerStack;
     }
 
     private String readTotalPotSize() {

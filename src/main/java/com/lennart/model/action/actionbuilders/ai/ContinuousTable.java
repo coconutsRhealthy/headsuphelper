@@ -186,6 +186,13 @@ public class ContinuousTable implements ContinuousTableable {
                     printDotTotal = 0;
                     System.out.println();
                 }
+
+                if(StarsTableReader.botIsSittingOut()) {
+                    System.out.println("bot is SittingOut!");
+                    TimeUnit.MILLISECONDS.sleep(300);
+                    StarsTableReader.endBotIsSittingOut();
+                    TimeUnit.MILLISECONDS.sleep(500);
+                }
             }
         }
     }
