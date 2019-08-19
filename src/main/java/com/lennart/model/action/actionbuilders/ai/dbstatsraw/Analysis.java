@@ -1,6 +1,5 @@
 package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
-import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
@@ -216,7 +215,7 @@ public class Analysis {
                         int boardWetness = BoardEvaluator.getBoardWetness(turnBoardEvaluator.getTop10percentCombos(),
                                 riverBoardEvaluator.getTop10percentCombos());
 
-                        String boardWetnessGroup = new DbSaveBluff_2_0().getBoardWetnessGroupLogic(boardRiver, boardWetness);
+                        String boardWetnessGroup = getBoardWetnessGroupLogic(boardRiver, boardWetness);
 
                         if(boardWetnessGroup.equals("wet")) {
                             total++;
@@ -246,6 +245,39 @@ public class Analysis {
 
         System.out.println("success: " + success);
         System.out.println("total: " + total);
+    }
+
+    private String getBoardWetnessGroupLogic(List<Card> board, int boardWetness) {
+        String boardWetnessGroup = "";
+
+        if(board.size() == 3) {
+            //flushStraightWetness number
+            if(boardWetness <= 112) {
+                boardWetnessGroup = "dry";
+            } else if(boardWetness <= 167) {
+                boardWetnessGroup = "medium";
+            } else {
+                boardWetnessGroup = "wet";
+            }
+        } else if(board.size() == 4) {
+            if(boardWetness <= 67) {
+                boardWetnessGroup = "wet";
+            } else if(boardWetness <= 99) {
+                boardWetnessGroup = "medium";
+            } else {
+                boardWetnessGroup = "dry";
+            }
+        } else if(board.size() == 5) {
+            if(boardWetness <= 66) {
+                boardWetnessGroup = "wet";
+            } else if(boardWetness <= 94) {
+                boardWetnessGroup = "medium";
+            } else {
+                boardWetnessGroup = "dry";
+            }
+        }
+
+        return boardWetnessGroup;
     }
 
     public List<Card> convertCardStringToCardList(String board) {

@@ -91,8 +91,6 @@ public class ContinuousTable implements ContinuousTableable {
                         long currentTime = new Date().getTime();
 
                         if(currentTime - startTime > 13_920_000) {
-                            new DbSavePersister().doDbSaveUpdate(this, bigBlind);
-                            new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
                             System.out.println("3.4 hours have passed, force quit");
@@ -107,8 +105,6 @@ public class ContinuousTable implements ContinuousTableable {
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
 
-                    new DbSavePersister().doDbSaveUpdate(this, bigBlind);
-                    new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
 

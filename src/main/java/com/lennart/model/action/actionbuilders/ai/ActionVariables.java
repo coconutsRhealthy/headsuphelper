@@ -266,7 +266,6 @@ public class ActionVariables {
             if(realGame) {
                 if(boardInMethod != null && boardInMethod.size() >=3 && !defaultCheck) {
                     rangeTracker.updateRangeMapInDbSimple(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod);
-                    rangeTracker.updateRangeMapInDbExtensive(action, sizing, gameVariables.getBigBlind(), botIsButtonInMethod, botHandStrengthInMethod, boardInMethod, drawWetness, boatWetness);
                 }
             }
 
