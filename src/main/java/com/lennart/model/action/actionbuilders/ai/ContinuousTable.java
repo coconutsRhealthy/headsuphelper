@@ -111,7 +111,6 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
-                    //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
 
                     boolean botWasButtonInLastHand = botWasButtonInLastHand();
                     dbSaveList = new ArrayList<>();
@@ -156,7 +155,6 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Sizing: " + sizing);
                 System.out.println("Route: " + actionVariables.getRoute());
                 System.out.println("Table: " + actionVariables.getTable());
-                System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
                 System.out.println("********************");
                 System.out.println();
 
