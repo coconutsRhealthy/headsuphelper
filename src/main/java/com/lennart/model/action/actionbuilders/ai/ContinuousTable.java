@@ -93,6 +93,8 @@ public class ContinuousTable implements ContinuousTableable {
                         if(currentTime - startTime > 13_920_000) {
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
+                            new DbSavePersisterPreflopStats().doDbSaveUpdateIncludingStakes(this, "1.50sng");
+
                             System.out.println("3.4 hours have passed, force quit");
                             throw new RuntimeException();
                         }
@@ -107,6 +109,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
+                    new DbSavePersisterPreflopStats().doDbSaveUpdateIncludingStakes(this, "1.50sng");
 
                     boolean botWasButtonInLastHand = botWasButtonInLastHand();
                     dbSaveList = new ArrayList<>();
