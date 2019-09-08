@@ -39,10 +39,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     private String game;
 
+    private String stake;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
         continuousTable.setGame("sng");
+        continuousTable.setStake("1.50sng");
         continuousTable.runTableContinously();
     }
 
@@ -93,7 +96,7 @@ public class ContinuousTable implements ContinuousTableable {
                         if(currentTime - startTime > 13_920_000) {
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
-                            new DbSavePersisterPreflopStats().doDbSaveUpdateIncludingStakes(this, "1.50sng");
+                            new DbSavePersisterPreflopStats().doDbSaveUpdateIncludingStakes(this, stake);
 
                             System.out.println("3.4 hours have passed, force quit");
                             throw new RuntimeException();
@@ -109,7 +112,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
-                    new DbSavePersisterPreflopStats().doDbSaveUpdateIncludingStakes(this, "1.50sng");
+                    new DbSavePersisterPreflopStats().doDbSaveUpdateIncludingStakes(this, stake);
 
                     boolean botWasButtonInLastHand = botWasButtonInLastHand();
                     dbSaveList = new ArrayList<>();
@@ -124,7 +127,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
                         new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, bigBlind);
-                        new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, bigBlind, botWasButtonInLastHand);
+                        new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, bigBlind, botWasButtonInLastHand, stake);
                     }
 
                     gameVariables = new GameVariables(bigBlind, game.equals("sng"));
@@ -498,5 +501,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setGame(String game) {
         this.game = game;
+    }
+
+    public String getStake() {
+        return stake;
+    }
+
+    public void setStake(String stake) {
+        this.stake = stake;
     }
 }

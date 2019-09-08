@@ -564,7 +564,7 @@ public class ActionVariables {
             dbSaveRaw.setOpponentTotalBetSize(gameVariables.getOpponentBetSize());
             dbSaveRaw.setSizing(sizing);
             dbSaveRaw.setPosition(positionString);
-            dbSaveRaw.setStake("1.50sng");
+            dbSaveRaw.setStake(continuousTable.getStake());
             dbSaveRaw.setOpponentName(gameVariables.getOpponentName());
             dbSaveRaw.setOpponentData(opponentData);
             dbSaveRaw.setBigBlind(gameVariables.getBigBlind());

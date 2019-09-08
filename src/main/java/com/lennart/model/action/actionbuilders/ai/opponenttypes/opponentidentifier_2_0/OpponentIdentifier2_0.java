@@ -471,22 +471,25 @@ public class OpponentIdentifier2_0 {
         return opponentData;
     }
 
-    public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, double bigBlind, boolean botWasButton) throws Exception {
+    public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, double bigBlind, boolean botWasButton, String stake) throws Exception {
         HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
 
         List<String> opponentPreflopActions = handHistoryReaderStars.getOpponentActionsOfLastHand(false, bigBlind);
 
         for(String action : opponentPreflopActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_preflop", botWasButton);
+            updateCountsInDbStakes(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_preflop_stakes", botWasButton, stake);
         }
 
         List<String> opponentPostflopActions = handHistoryReaderStars.getOpponentActionsOfLastHand(true, bigBlind);
 
         for(String action : opponentPostflopActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_postflop", botWasButton);
+            updateCountsInDbStakes(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_postflop_stakes", botWasButton, stake);
         }
 
         updateNumberOfHands(opponentPlayerNameOfLastHand);
+        updateNumberOfHandsStakes(opponentPlayerNameOfLastHand, stake);
     }
 
     public String getOppType(double looseness, double aggressiveness) {
@@ -543,12 +546,58 @@ public class OpponentIdentifier2_0 {
         closeDbConnection();
     }
 
+    private void updateCountsInDbStakes(String opponentNick, String action, String table, boolean botWasButton, String stake) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM " + table + " WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+
+        if(!rs.next()) {
+            st.executeUpdate("INSERT INTO " + table + " (playerName, stakes) VALUES ('" + opponentNick + "', '" + stake + "')");
+        }
+
+        if(action.equals("fold")) {
+            st.executeUpdate("UPDATE " + table + " SET foldCount = foldCount + 1  WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+        } else if(action.equals("check")) {
+            st.executeUpdate("UPDATE " + table + " SET checkCount = checkCount + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+        } else if(action.equals("call")) {
+            st.executeUpdate("UPDATE " + table + " SET callCount = callCount + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+        } else if(action.equals("bet75pct")) {
+            st.executeUpdate("UPDATE " + table + " SET betCount = betCount + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+        } else if(action.equals("raise")) {
+            st.executeUpdate("UPDATE " + table + " SET raiseCount = raiseCount + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+
+            if(table.contains("preflop")) {
+                if(botWasButton) {
+                    st.executeUpdate("UPDATE " + table + " SET oopRaiseCount = oopRaiseCount + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+                } else {
+                    st.executeUpdate("UPDATE " + table + " SET ipRaiseCount = ipRaiseCount + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+        closeDbConnection();
+    }
+
     private void updateNumberOfHands(String opponentNick) throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();
         st.executeUpdate("UPDATE opponentidentifier_2_0_preflop SET numberOfHands = numberOfHands + 1 WHERE playerName = '" + opponentNick + "'");
         st.executeUpdate("UPDATE opponentidentifier_2_0_postflop SET numberOfHands = numberOfHands + 1 WHERE playerName = '" + opponentNick + "'");
+
+        st.close();
+        closeDbConnection();
+    }
+
+    private void updateNumberOfHandsStakes(String opponentNick, String stake) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        st.executeUpdate("UPDATE opponentidentifier_2_0_preflop_stakes SET numberOfHands = numberOfHands + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
+        st.executeUpdate("UPDATE opponentidentifier_2_0_postflop_stakes SET numberOfHands = numberOfHands + 1 WHERE playerName = '" + opponentNick + "' AND stakes = '" + stake + "'");
 
         st.close();
         closeDbConnection();
