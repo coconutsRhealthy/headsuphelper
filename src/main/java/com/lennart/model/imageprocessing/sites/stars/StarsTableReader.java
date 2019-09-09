@@ -329,7 +329,7 @@ public class StarsTableReader {
 
     public void registerNewSng() throws Exception {
         if(noPlayerIsReggedYet()) {
-            TimeUnit.MILLISECONDS.sleep(2150);
+            TimeUnit.MILLISECONDS.sleep(500);
             clickTopSngInList();
             TimeUnit.MILLISECONDS.sleep(250);
             System.out.println("registering new sng");

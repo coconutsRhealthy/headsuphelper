@@ -345,7 +345,7 @@ public class ContinuousTable implements ContinuousTableable {
             starsTableReader.closeSpinOfTheDayScreenIfNecessary();
             TimeUnit.MILLISECONDS.sleep(1200);
             starsTableReader.clickTopSngInList();
-            TimeUnit.MILLISECONDS.sleep(100);
+            TimeUnit.MILLISECONDS.sleep(2150);
             starsTableReader.registerNewSng();
 
             int counter = 0;
