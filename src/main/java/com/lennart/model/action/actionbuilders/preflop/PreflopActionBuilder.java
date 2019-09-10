@@ -338,7 +338,7 @@ public class PreflopActionBuilder {
         } else if(amountToCallBb <= 16) {
             double limit;
 
-            if(oppPre3betGroup.equals("low")) {
+            if(oppPre3betGroup.equals("low") || oppPre3betGroup.equals("mediumUnknown")) {
                 limit = 0.85;
             } else  {
                 limit = 0.75;
@@ -348,7 +348,7 @@ public class PreflopActionBuilder {
         } else if(amountToCallBb <= 25) {
             double limit;
 
-            if(oppPre4bet_up_Group.equals("low")) {
+            if(oppPre4bet_up_Group.equals("low") || oppPre4bet_up_Group.equals("mediumUnknown")) {
                 limit = 0.95;
             } else if(oppPre4bet_up_Group.equals("medium"))  {
                 limit = 0.80;
@@ -360,7 +360,7 @@ public class PreflopActionBuilder {
         } else if(amountToCallBb <= 40) {
             double limit;
 
-            if(oppPre4bet_up_Group.equals("low")) {
+            if(oppPre4bet_up_Group.equals("low") || oppPre4bet_up_Group.equals("mediumUnknown")) {
                 limit = 0.95;
             } else if(oppPre4bet_up_Group.equals("medium"))  {
                 limit = 0.85;
