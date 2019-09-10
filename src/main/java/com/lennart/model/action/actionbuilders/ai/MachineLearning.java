@@ -437,6 +437,20 @@ public class MachineLearning {
                 valuesToReturn.add(rs_2_0.getDouble("total"));
                 System.out.println("Use compact_2_0 data! " + compactRoute_2_0);
             } else {
+                if(actionToConsider.equals("call")) {
+                    double callTotal = rs_2_0.getDouble("total");
+
+                    if(callTotal >= 4 && callTotal < 20) {
+                        List<Double> increasedCallData = increaseCallData(rs_2_0.getDouble("success"), callTotal);
+                        valuesToReturn.add(increasedCallData.get(0));
+                        valuesToReturn.add(increasedCallData.get(1));
+
+                        if(increasedCallData.get(1) == 20) {
+                            System.out.println("Increased calldata! For route: " + compactRoute_2_0);
+                        }
+                    }
+                }
+
                 System.out.println("Comapct_2_0 data too small: " + compactRoute_2_0);
             }
 
@@ -635,6 +649,35 @@ public class MachineLearning {
         }
 
         return ratioLimit;
+    }
+
+    private List<Double> increaseCallData(double successNumber, double totalNumber) {
+        List<Double> callDataToReturn = new ArrayList<>();
+
+        double successNumberToUse = successNumber;
+        double totalNumberToUse = totalNumber;
+
+        if(totalNumber >= 4 && totalNumber < 20) {
+            double inclusionPercentage = getInclusionPercentage(totalNumber);
+
+            if(Math.random() < inclusionPercentage) {
+                totalNumberToUse = 20;
+                successNumberToUse = (successNumber / totalNumber) * 20;
+            }
+        }
+
+        callDataToReturn.add(successNumberToUse);
+        callDataToReturn.add(totalNumberToUse);
+
+        return callDataToReturn;
+    }
+
+    private double getInclusionPercentage(double totalNumber) {
+        double constantIncrementor = 0.040625;
+        double valueToReturn;
+        double numberOfConstantIncrementorsNeeded = totalNumber - 4;
+        valueToReturn = 0.35 + (numberOfConstantIncrementorsNeeded * constantIncrementor);
+        return valueToReturn;
     }
 
     private void initialize_2_0_DbConnection() throws Exception {

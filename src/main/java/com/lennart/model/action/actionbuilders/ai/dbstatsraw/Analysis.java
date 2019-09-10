@@ -14,6 +14,56 @@ public class Analysis {
 
     private Connection con;
 
+    private void copyTableAndAddStakesPostflop() throws Exception {
+        int counter = 0;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop;");
+
+        while(rs.next()) {
+            String playerName = rs.getString("playerName");
+            double numberOfHands = rs.getDouble("numberOfHands");
+            double foldCount = rs.getDouble("foldCount");
+            double checkCount = rs.getDouble("checkCount");
+            double callCount = rs.getDouble("callCount");
+            double betCount = rs.getDouble("betCount");
+            double raiseCount = rs.getDouble("raiseCount");
+
+            Statement st2 = con.createStatement();
+
+            st2.executeUpdate("INSERT INTO opponentidentifier_2_0_postflop_stakes (" +
+                    "playerName, " +
+                    "stakes, " +
+                    "numberOfHands, " +
+                    "foldCount, " +
+                    "checkCount, " +
+                    "callCount, " +
+                    "betCount, " +
+                    "raiseCount) " +
+                    "VALUES ('" +
+                    playerName + "', '" +
+                    "1.50sng" + "', '" +
+                    numberOfHands + "', '" +
+                    foldCount + "', '" +
+                    checkCount + "', '" +
+                    callCount + "', '" +
+                    betCount + "', '" +
+                    raiseCount + "'" +
+                    ")");
+
+            st2.close();
+
+            System.out.println(counter++);
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
     private TreeMap<String, Integer> getOpponentTypesForDate(String date) throws Exception {
         initializeDbConnection();
 
