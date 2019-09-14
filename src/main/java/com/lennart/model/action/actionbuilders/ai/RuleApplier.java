@@ -1356,106 +1356,12 @@ public class RuleApplier {
         String actionToReturn;
 
         if(action.equals("call")) {
-            if(handStrength < 0.5) {
-                if(board != null && !board.isEmpty()) {
-                    if(!strongFd && !strongOosd && !strongGutshot) {
-                        if(facingOdds >= 0.33) {
-                            actionToReturn = "fold";
-                            System.out.println("New prevent weak call method! Changed to fold");
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    public String preventCertainPostflopCallsAgainstOppTypes(String action, double handStrength, boolean strongFd, boolean strongOosd,
-                                                             boolean strongGutshot, double facingOdds, List<Card> board, String opponentName,
-                                                             boolean botIsButton) throws Exception {
-        String actionToReturn;
-
-        if(action.equals("call")) {
             if(handStrength < 0.75) {
                 if(board != null && !board.isEmpty()) {
                     if(!strongFd && !strongOosd && !strongGutshot) {
                         if(facingOdds >= 0.33) {
-                            if(opponentName != null) {
-                                OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(opponentName);
-                                String opponentType = opponentIdentifier2_0.getOppType(opponentIdentifier2_0.getOppLooseness(), opponentIdentifier2_0.getOppAggressiveness());
-
-                                if(opponentType != null) {
-                                    if(board.size() == 3) {
-                                        if(opponentType.equals("OppTypeTp")) {
-                                            if(botIsButton) {
-                                                actionToReturn = "fold";
-                                                System.out.println("ML prevent call method! TP flop IP");
-                                            } else {
-                                                actionToReturn = action;
-                                            }
-                                        } else if(opponentType.equals("OppTypeLa")) {
-                                            if(botIsButton) {
-                                                actionToReturn = "fold";
-                                                System.out.println("ML prevent call method! LA flop IP");
-                                            } else {
-                                                actionToReturn = action;
-                                            }
-                                        } else {
-                                            actionToReturn = action;
-                                        }
-                                    } else if(board.size() == 4) {
-                                        if(opponentType.equals("OppTypeTp")) {
-                                            if(botIsButton) {
-                                                actionToReturn = action;
-                                            } else {
-                                                actionToReturn = "fold";
-                                                System.out.println("ML prevent call method! TP turn OOP");
-                                            }
-                                        } else if(opponentType.equals("OppTypeLp")) {
-                                            actionToReturn = "fold";
-                                            System.out.println("ML prevent call method! LP turn");
-                                        } else if(opponentType.equals("OppTypeTa")) {
-                                            if(botIsButton) {
-                                                actionToReturn = action;
-                                            } else {
-                                                actionToReturn = "fold";
-                                                System.out.println("ML prevent call method! TA turn OOP");
-                                            }
-                                        } else {
-                                            actionToReturn = action;
-                                        }
-                                    } else {
-                                        if(opponentType.equals("OppTypeTp") || opponentType.equals("OppTypeLp")) {
-                                            actionToReturn = "fold";
-                                            System.out.println("ML prevent call method! TP or LP river");
-                                        } else if(opponentType.equals("OppTypeTa")) {
-                                            if(botIsButton) {
-                                                actionToReturn = action;
-                                            } else {
-                                                actionToReturn = "fold";
-                                                System.out.println("ML prevent call method! TA river OOP");
-                                            }
-                                        } else {
-                                            actionToReturn = action;
-                                        }
-                                    }
-                                } else {
-                                    actionToReturn = action;
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
+                            actionToReturn = "fold";
+                            System.out.println("New prevent weak call method 0.75! Changed to fold. HS: " + handStrength);
                         } else {
                             actionToReturn = action;
                         }
