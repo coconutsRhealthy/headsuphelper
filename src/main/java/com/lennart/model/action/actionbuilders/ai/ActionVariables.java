@@ -230,6 +230,10 @@ public class ActionVariables {
             }
         }
 
+        action = new RuleApplier().preventCertainPostflopCallsAgainstOppTypes(action,
+                botHandStrength, strongFlushDraw, strongOosd, strongGutshot,
+                facingOdds, boardInMethod, gameVariables.getOpponentName(), botIsButtonInMethod);
+
         if(boardInMethod != null && boardInMethod.size() >= 3) {
             double bigBlind = gameVariables.getBigBlind();
             RangeTracker rangeTracker = new RangeTracker();
