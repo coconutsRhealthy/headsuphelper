@@ -1349,34 +1349,4 @@ public class RuleApplier {
 
         return actionToReturn;
     }
-
-    public String preventCertainPostflopWeakHandCalls(String action, double handStrength, boolean strongFd, boolean strongOosd,
-                                                      boolean strongGutshot, double facingOdds, List<Card> board) {
-        String actionToReturn;
-
-        if(action.equals("call")) {
-            if(handStrength < 0.5) {
-                if(board != null && !board.isEmpty()) {
-                    if(!strongFd && !strongOosd && !strongGutshot) {
-                        if(facingOdds >= 0.33) {
-                            actionToReturn = "fold";
-                            System.out.println("New prevent weak call method! Changed to fold");
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
 }

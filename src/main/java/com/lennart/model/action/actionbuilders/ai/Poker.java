@@ -147,8 +147,6 @@ public class Poker {
 
                 action = ruleApplier.callTighterOnFlopAndturn(action, board, handStrength, actionVariables.getHandEvaluator(), opponentAction, facingOdds, opponentBetSizeBb);
 
-                action = ruleApplier.preventCertainPostflopWeakHandCalls(action, handStrength, strongFlushDraw, strongOosd, strongGutshot, facingOdds, board);
-
                 return action;
             } else {
                 Map<String, Double> sortedPayoffMap = getSortedAveragePayoffMapFromRouteData(routeData);
@@ -184,8 +182,6 @@ public class Poker {
                 action = ruleApplier.neverFoldTheNuts(action, handStrength, eligibleActions);
 
                 action = ruleApplier.callTighterOnFlopAndturn(action, board, handStrength, actionVariables.getHandEvaluator(), opponentAction, facingOdds, opponentBetSizeBb);
-
-                action = ruleApplier.preventCertainPostflopWeakHandCalls(action, handStrength, strongFlushDraw, strongOosd, strongGutshot, facingOdds, board);
 
                 return action;
             }
