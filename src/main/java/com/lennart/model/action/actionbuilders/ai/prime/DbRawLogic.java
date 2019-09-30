@@ -11,6 +11,89 @@ public class DbRawLogic {
 
     private Connection con;
 
+    public static void main(String[] args) throws Exception {
+        DbRawLogic dbRawLogic = new DbRawLogic();
+
+//        List<Integer> entriesWhereNewHandStarts = dbRawLogic.getEntriesWhereNewHandStarts();
+//        dbRawLogic.fillHandNumbersInDbStatsRaw(entriesWhereNewHandStarts);
+
+        dbRawLogic.setPotSize(true);
+    }
+
+
+
+
+    private void fillPotsizeAtEndOfHand() throws Exception {
+
+        //hier nieuw
+            //your last action in hand:
+                //check
+                    //simpel, gewoon pot
+
+                //fold
+                    //pot = 100
+                    //opp bet 75
+                    //dan verlies je: 100, dus pot
+                    //doe anders gewoon pot plus al jouw bets op huidige straat
+
+                //bet75pct
+                    //afhankelijk of opp callt
+                        //indien opp callt:
+                            //pot plus (2 * (grootste van de twee, jouw betsize of oppstack))
+                        //indien opp foldt:
+                            //gewoon pot
+
+                //call
+                    //vrij simpel, gewoon pot plus jouw betsize, plus opp betsize, plus (oppbetsize - jouw betsize) afhankelijk van botstack
+
+                    //jouw stack 200
+                    //pot is 70
+                    //jij bet 50
+                    //opp raist naar 1800
+                        //pot is dan: 70 + 50 + 50 + (2*(200 - 50))
+
+                //raise
+                    //afhankelijk of opp callt
+                        //indien opp callt:
+                            //pot plus 2 * opp betsize plus (2 * grootste van de twee, jouw raisesize minus oppbetsize of, oppstack minus oppbetsize)
+                        //indien opp foldt:
+                            //pot plus oppbetsize
+
+
+
+
+
+
+
+
+
+
+        //get last action request of hand
+
+            //check
+                //potsize end of hand is pot_plus_bets
+
+            //fold
+                //potsize end of hand is pot_plus_bets minus opp_total_betsize
+
+            //call
+                //potsize end of hand is pot_plus_bets + (opp_total_betsize - bot_total_betsize)
+
+            //bet75pct
+                //if sd occurred: end of hand is pot_plus_bets + (2 * botsizing)
+                //else: end of hand is pot_plus_bets
+
+            //raise
+                //if sd occurred: end of hand is pot_no_bets + (2 * raisesizing)
+                //else: end of hand is pot_plus_bets
+
+
+    }
+
+
+
+
+
     private void fillHandNumbersInDbStatsRaw(List<Integer> entriesWhereNewHandsStart) throws Exception {
         int handCounter = 0;
 
@@ -81,11 +164,11 @@ public class DbRawLogic {
         return entriesWhereNewHandStarts;
     }
 
-    private void analyseTotalChips() throws Exception {
+    private void setPotSize(boolean includingBets) throws Exception {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_test;");
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry < 100 ORDER BY entry ASC;");
 
         int counter = 0;
 
@@ -101,11 +184,25 @@ public class DbRawLogic {
                 pot = 3000 - (botStack + oppStack + botTotalBetsize + oppTotalBetsize);
             }
 
+            if(includingBets) {
+                pot = pot + botTotalBetsize + oppTotalBetsize;
+            }
+
             int entry = rs.getInt("entry");
 
             if(pot > 0 && pot < 3000) {
+                String potColumn;
+
+                if(includingBets) {
+                    potColumn = "pot_incl_bets";
+                } else {
+                    potColumn = "pot";
+                }
+
                 Statement st2 = con.createStatement();
-                st2.executeUpdate("UPDATE dbstats_raw_test SET pot = " + pot + " WHERE entry = '" + entry + "'");
+
+                st2.executeUpdate("UPDATE dbstats_raw SET " + potColumn + " = " + pot + " WHERE entry = '" + entry + "'");
+
                 st2.close();
                 System.out.println(counter++);
             }
@@ -115,6 +212,90 @@ public class DbRawLogic {
         st.close();
 
         closeDbConnection();
+    }
+
+    private double getPotAtEndOfHand() {
+        return 0;
+    }
+
+    private double getPotAtEndOfHandBotActionCheck(double currentPot) {
+        return currentPot;
+    }
+
+    private double getPotAtEndOfHandBotActionBet(double currentPot, double botBetSizing, double opponentStack, boolean showdown) {
+        double potAtEndOfHand;
+
+        if(showdown) {
+            double effectiveBetSize;
+
+            if(botBetSizing > opponentStack) {
+                effectiveBetSize = opponentStack;
+            } else {
+                effectiveBetSize = botBetSizing;
+            }
+
+            potAtEndOfHand = currentPot + (2 * effectiveBetSize);
+        } else {
+            potAtEndOfHand = currentPot;
+        }
+
+        return potAtEndOfHand;
+    }
+
+    private double getPotAtEndOfHandBotActionCall(double currentPot, double botBetSize, double oppBetSize, double botStack, String oppAction) {
+        double potAtEndOfHand;
+
+        if(oppAction.equals("bet75pct")) {
+            double oppEffectiveBetSize;
+
+            if(oppBetSize > botStack) {
+                oppEffectiveBetSize = botStack;
+            } else {
+                oppEffectiveBetSize = oppBetSize;
+            }
+
+            potAtEndOfHand = currentPot + (2 * oppEffectiveBetSize);
+        } else if(oppAction.equals("raise")) {
+            double oppEffectiveRaiseSize;
+
+            if(oppBetSize > (botStack - botBetSize)) {
+                oppEffectiveRaiseSize = botStack - botBetSize;
+            } else {
+                oppEffectiveRaiseSize = oppBetSize - botBetSize;
+            }
+
+            potAtEndOfHand = currentPot + botBetSize + botBetSize + (2 * oppEffectiveRaiseSize);
+        } else {
+            System.out.println("Should not come here! X");
+            potAtEndOfHand = -50;
+        }
+
+        return potAtEndOfHand;
+    }
+
+    private double getPotAtEndOfHandBotActionFold(double currentPot, double botBetSize) {
+        double potAtEndOfHand = currentPot + botBetSize;
+        return potAtEndOfHand;
+    }
+
+    private double getPotAtEndOfHandBotActionRaise(double currentPot, double botRaiseSizing, double oppBetSize, double opponentStack, boolean showdown) {
+        double potAtEndOfHand;
+
+        if(showdown) {
+            double effectiveCallAmountForOpp;
+
+            if((botRaiseSizing - oppBetSize) > (opponentStack - oppBetSize)) {
+                effectiveCallAmountForOpp = opponentStack - oppBetSize;
+            } else {
+                effectiveCallAmountForOpp = botRaiseSizing - oppBetSize;
+            }
+
+            potAtEndOfHand = currentPot + (2 * oppBetSize) + (2 * effectiveCallAmountForOpp);
+        } else {
+            potAtEndOfHand = currentPot + oppBetSize;
+        }
+
+        return potAtEndOfHand;
     }
 
     private void initializeDbConnection() throws Exception {
