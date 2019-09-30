@@ -90,7 +90,15 @@ public class DbRawLogic {
 
     }
 
+    private void testmethod() throws Exception {
+//        setPotSize(false);
+//
+//        List<Integer> entriesWhereNewHandsStart = getEntriesWhereNewHandStarts();
+//
+//        fillHandNumbersInDbStatsRaw(entriesWhereNewHandsStart);
 
+        System.out.println(getPotAtEndOfHand(5));
+    }
 
 
 
@@ -214,8 +222,44 @@ public class DbRawLogic {
         closeDbConnection();
     }
 
-    private double getPotAtEndOfHand() {
-        return 0;
+    private double getPotAtEndOfHand(int handNumber) throws Exception {
+        double potAtEndOfHand = -1;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE handnumber = " + handNumber + " ORDER BY entry DESC;");
+
+        if(rs.next()) {
+            String botAction = rs.getString("bot_action");
+            String oppAction = rs.getString("opponent_action");
+            double currentPot = rs.getDouble("pot");
+            double botStack = rs.getDouble("botstack");
+            double opponentStack = rs.getDouble("opponentstack");
+            double botTotalBetSize = rs.getDouble("bot_total_betsize");
+            double oppTotalBetSize = rs.getDouble("opponent_total_betsize");
+            double botSizing = rs.getDouble("sizing");
+            boolean showdown = rs.getString("showdown_occured").equals("true");
+
+            if(botAction.equals("fold")) {
+                potAtEndOfHand = getPotAtEndOfHandBotActionFold(currentPot, botTotalBetSize);
+            } else if(botAction.equals("check")) {
+                potAtEndOfHand = getPotAtEndOfHandBotActionCheck(currentPot);
+            } else if(botAction.equals("call")) {
+                potAtEndOfHand = getPotAtEndOfHandBotActionCall(currentPot, botTotalBetSize, oppTotalBetSize, botStack, oppAction);
+            } else if(botAction.equals("bet75pct")) {
+                potAtEndOfHand = getPotAtEndOfHandBotActionBet(currentPot, botSizing, opponentStack, showdown);
+            } else if(botAction.equals("raise")) {
+                potAtEndOfHand = getPotAtEndOfHandBotActionRaise(currentPot, botSizing, oppTotalBetSize, opponentStack, showdown);
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        return potAtEndOfHand;
     }
 
     private double getPotAtEndOfHandBotActionCheck(double currentPot) {
