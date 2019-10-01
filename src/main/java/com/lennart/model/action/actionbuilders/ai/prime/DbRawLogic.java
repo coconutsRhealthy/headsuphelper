@@ -12,95 +12,19 @@ public class DbRawLogic {
     private Connection con;
 
     public static void main(String[] args) throws Exception {
-        DbRawLogic dbRawLogic = new DbRawLogic();
-
-//        List<Integer> entriesWhereNewHandStarts = dbRawLogic.getEntriesWhereNewHandStarts();
-//        dbRawLogic.fillHandNumbersInDbStatsRaw(entriesWhereNewHandStarts);
-
-        dbRawLogic.setPotSize(true);
-    }
-
-
-
-
-    private void fillPotsizeAtEndOfHand() throws Exception {
-
-        //hier nieuw
-            //your last action in hand:
-                //check
-                    //simpel, gewoon pot
-
-                //fold
-                    //pot = 100
-                    //opp bet 75
-                    //dan verlies je: 100, dus pot
-                    //doe anders gewoon pot plus al jouw bets op huidige straat
-
-                //bet75pct
-                    //afhankelijk of opp callt
-                        //indien opp callt:
-                            //pot plus (2 * (grootste van de twee, jouw betsize of oppstack))
-                        //indien opp foldt:
-                            //gewoon pot
-
-                //call
-                    //vrij simpel, gewoon pot plus jouw betsize, plus opp betsize, plus (oppbetsize - jouw betsize) afhankelijk van botstack
-
-                    //jouw stack 200
-                    //pot is 70
-                    //jij bet 50
-                    //opp raist naar 1800
-                        //pot is dan: 70 + 50 + 50 + (2*(200 - 50))
-
-                //raise
-                    //afhankelijk of opp callt
-                        //indien opp callt:
-                            //pot plus 2 * opp betsize plus (2 * grootste van de twee, jouw raisesize minus oppbetsize of, oppstack minus oppbetsize)
-                        //indien opp foldt:
-                            //pot plus oppbetsize
-
-
-
-
-
-
-
-
-
-
-        //get last action request of hand
-
-            //check
-                //potsize end of hand is pot_plus_bets
-
-            //fold
-                //potsize end of hand is pot_plus_bets minus opp_total_betsize
-
-            //call
-                //potsize end of hand is pot_plus_bets + (opp_total_betsize - bot_total_betsize)
-
-            //bet75pct
-                //if sd occurred: end of hand is pot_plus_bets + (2 * botsizing)
-                //else: end of hand is pot_plus_bets
-
-            //raise
-                //if sd occurred: end of hand is pot_no_bets + (2 * raisesizing)
-                //else: end of hand is pot_plus_bets
-
-
+        new DbRawLogic().fillArWinnings();
     }
 
     private void testmethod() throws Exception {
-//        setPotSize(false);
-//
-//        List<Integer> entriesWhereNewHandsStart = getEntriesWhereNewHandStarts();
-//
-//        fillHandNumbersInDbStatsRaw(entriesWhereNewHandsStart);
+        setPotSize(false);
 
-        System.out.println(getPotAtEndOfHand(5));
+        List<Integer> entriesWhereNewHandsStart = getEntriesWhereNewHandStarts();
+        fillHandNumbersInDbStatsRaw(entriesWhereNewHandsStart);
+
+        for(int i = 1; i < 38; i++) {
+            fillPotAtEndOfHand(i);
+        }
     }
-
-
 
     private void fillHandNumbersInDbStatsRaw(List<Integer> entriesWhereNewHandsStart) throws Exception {
         int handCounter = 0;
@@ -222,7 +146,7 @@ public class DbRawLogic {
         closeDbConnection();
     }
 
-    private double getPotAtEndOfHand(int handNumber) throws Exception {
+    private void fillPotAtEndOfHand(int handNumber) throws Exception {
         double potAtEndOfHand = -1;
 
         initializeDbConnection();
@@ -257,9 +181,54 @@ public class DbRawLogic {
         rs.close();
         st.close();
 
-        closeDbConnection();
+        Statement st2 = con.createStatement();
+        st2.executeUpdate("UPDATE dbstats_raw SET pot_end_of_hand = " + potAtEndOfHand + " WHERE handnumber = '" + handNumber + "'");
+        st2.close();
 
-        return potAtEndOfHand;
+        closeDbConnection();
+    }
+
+    private void fillArWinnings() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+
+        for(int i = 1; i < 38; i++) {
+            ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE handnumber = " + i + ";");
+
+            double arInHandCounter = 0;
+            double potAtEndOfHand = -1;
+            boolean botWonHand = false;
+
+            while(rs.next()) {
+                arInHandCounter++;
+
+                if(potAtEndOfHand == -1) {
+                    potAtEndOfHand = rs.getDouble("pot_end_of_hand");
+                }
+
+                botWonHand = rs.getString("bot_won_hand").equals("true");
+            }
+
+            double arWinnings = potAtEndOfHand / arInHandCounter;
+
+            if(!botWonHand) {
+                arWinnings = arWinnings * -1;
+            }
+
+            if(potAtEndOfHand == 0) {
+                arWinnings = 6666.66;
+            }
+
+            System.out.println(arWinnings);
+
+            st.executeUpdate("UPDATE dbstats_raw SET ar_winnings = " + arWinnings + " WHERE handnumber = '" + i + "'");
+
+            rs.close();
+        }
+
+        st.close();
+        closeDbConnection();
     }
 
     private double getPotAtEndOfHandBotActionCheck(double currentPot) {
