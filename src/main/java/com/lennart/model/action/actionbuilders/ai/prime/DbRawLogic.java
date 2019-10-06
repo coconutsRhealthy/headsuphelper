@@ -1,5 +1,9 @@
 package com.lennart.model.action.actionbuilders.ai.prime;
 
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
+import com.lennart.model.action.actionbuilders.ai.dbstatsraw.DbStatsRawBluffPostflopMigrator;
+import com.lennart.model.card.Card;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -309,6 +313,127 @@ public class DbRawLogic {
         }
 
         return potAtEndOfHand;
+    }
+
+    private void fillStreet() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry < 100 ORDER BY entry ASC;");
+
+        DbStatsRawBluffPostflopMigrator dbStatsEtc = new DbStatsRawBluffPostflopMigrator();
+
+        int counter = 0;
+
+        while(rs.next()) {
+            int entry = rs.getInt("entry");
+            String board = rs.getString("board");
+
+            String streetString;
+
+            if(board.equals("")) {
+                streetString = "Preflop";
+            } else {
+                streetString = dbStatsEtc.getStreetString(board);
+            }
+
+            Statement st2 = con.createStatement();
+            st2.executeUpdate("UPDATE dbstats_raw SET street = '" + streetString + "' WHERE entry = '" + entry + "'");
+            st2.close();
+            System.out.println(counter++);
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private void fillCombo() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry < 100 ORDER BY entry ASC;");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            int entry = rs.getInt("entry");
+            String holeCards = rs.getString("holecards");
+            String combo = getWrittenCombo(holeCards);
+
+            Statement st2 = con.createStatement();
+            st2.executeUpdate("UPDATE dbstats_raw SET combo = '" + combo + "' WHERE entry = '" + entry + "'");
+            st2.close();
+            System.out.println(counter++);
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private String getWrittenCombo(String holeCards) {
+        String holeCardsOneSuit = holeCards.replaceAll("s", "x");
+        holeCardsOneSuit = holeCardsOneSuit.replaceAll("c", "x");
+        holeCardsOneSuit = holeCardsOneSuit.replaceAll("d", "x");
+        holeCardsOneSuit = holeCardsOneSuit.replaceAll("h", "x");
+
+        String[] hcOneSuitSplitted = holeCardsOneSuit.split("x");
+
+        int rankCard1 = Integer.valueOf(hcOneSuitSplitted[0]);
+        int rankCard2 = Integer.valueOf(hcOneSuitSplitted[1]);
+
+        String holeCardsOnlySuits = holeCards.replaceAll("[\\d.]", "");
+
+        char suitCard1 = holeCardsOnlySuits.charAt(0);
+        char suitCard2 = holeCardsOnlySuits.charAt(1);
+
+        Card holeCard1 = new Card(rankCard1, suitCard1);
+        Card holeCard2 = new Card(rankCard2, suitCard2);
+
+        List<Card> holeCardsAsCardObjects = new ArrayList<>();
+        holeCardsAsCardObjects.add(holeCard1);
+        holeCardsAsCardObjects.add(holeCard2);
+
+        String holeCardsCombo = new DbSave().getComboLogic(holeCardsAsCardObjects);
+
+        return holeCardsCombo;
+    }
+
+    private void fillOppType(boolean narrow) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponent_types;");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            String oppName = rs.getString("playerName");
+            String oppType;
+            String column;
+
+            if(narrow) {
+                oppType = rs.getString("oppTypeNarrow");
+                column = "oppTypeNarrow";
+            } else {
+                oppType = rs.getString("oppTypeBroad");
+                column = "oppTypeBroad";
+            }
+
+            Statement st2 = con.createStatement();
+            st2.executeUpdate("UPDATE dbstats_raw SET " + column + " = '" + oppType + "' WHERE opponent_name = '" + oppName + "';");
+            st2.close();
+
+            System.out.println(counter++);
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
     }
 
     private void initializeDbConnection() throws Exception {
