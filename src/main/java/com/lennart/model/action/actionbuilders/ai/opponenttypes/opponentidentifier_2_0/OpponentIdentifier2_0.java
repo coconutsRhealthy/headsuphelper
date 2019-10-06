@@ -35,6 +35,11 @@ public class OpponentIdentifier2_0 {
     public static double OVERALL_LOOSENESS_MEDIAN = 0.631578947368421;
     public static double OVERALL_AGGRESSIVENESS_MEDIAN = 0.39908256880733944;
 
+    private static double OVERALL_LOOSENESS_ONETHIRD = 0.5714285714285714;
+    private static double OVERALL_LOOSENESS_TWOTHIRD = 0.6842105263157895;
+    private static double OVERALL_AGGRESSIVENESS_ONETHIRD = 0.33884297520661155;
+    private static double OVERALL_AGGRESSIVENESS_TWOTHIRD =  0.4605809128630705;
+
     public OpponentIdentifier2_0() {
         //default constructor
     }
@@ -188,6 +193,17 @@ public class OpponentIdentifier2_0 {
 
         System.out.println("overallLooseness: " + allOppLoosenessStats.get(allOppLoosenessStats.size() / 2));
         System.out.println("overallAggressiveness: " + allOppAggressivenessStats.get(allOppAggressivenessStats.size() / 2));
+
+        int oneThirdLooseness = allOppLoosenessStats.size() / 3;
+        int twoThirdLooseness = (allOppLoosenessStats.size() / 3) * 2;
+
+        int oneThirdAggroness = allOppAggressivenessStats.size() / 3;
+        int twoThirdAggroness = (allOppAggressivenessStats.size() / 3) * 2;
+
+        System.out.println("overallLooseness 1/3: " + allOppLoosenessStats.get(oneThirdLooseness));
+        System.out.println("overallLooseness 2/3: " + allOppLoosenessStats.get(twoThirdLooseness));
+        System.out.println("overallAggressiveness 1/3: " + allOppAggressivenessStats.get(oneThirdAggroness));
+        System.out.println("overallAggressiveness 2/3: " + allOppAggressivenessStats.get(twoThirdAggroness));
     }
 
     public List<Double> getOpponentLoosenessAndAggroness(String opponentName, boolean preflop) throws Exception {
@@ -502,6 +518,45 @@ public class OpponentIdentifier2_0 {
         } else if(looseness <= OVERALL_LOOSENESS_MEDIAN && aggressiveness > OVERALL_AGGRESSIVENESS_MEDIAN) {
             opponentType = "OppTypeTa";
         } else if(looseness > OVERALL_LOOSENESS_MEDIAN && aggressiveness > OVERALL_AGGRESSIVENESS_MEDIAN) {
+            opponentType = "OppTypeLa";
+        }
+
+        return opponentType;
+    }
+
+    public String getOppTypeExtensive(double looseness, double aggressiveness) {
+        String opponentType = "";
+
+        if(looseness < 0 && aggressiveness < 0) {
+            //unknown opp
+            opponentType = "OppTypeLp";
+        } else if(looseness <= OVERALL_LOOSENESS_ONETHIRD && aggressiveness <= OVERALL_AGGRESSIVENESS_ONETHIRD) {
+            opponentType = "OppTypeTp";
+        } else if(looseness <= OVERALL_LOOSENESS_ONETHIRD &&
+                (aggressiveness > OVERALL_AGGRESSIVENESS_ONETHIRD && aggressiveness <= OVERALL_AGGRESSIVENESS_TWOTHIRD)) {
+            opponentType = "OppTypeTm";
+        } else if(looseness <= OVERALL_LOOSENESS_ONETHIRD && aggressiveness > OVERALL_AGGRESSIVENESS_TWOTHIRD) {
+            opponentType = "OppTypeTa";
+        }
+
+
+        else if((looseness > OVERALL_LOOSENESS_ONETHIRD && looseness <= OVERALL_LOOSENESS_TWOTHIRD) &&
+                aggressiveness <= OVERALL_AGGRESSIVENESS_ONETHIRD) {
+            opponentType = "OppTypeMp";
+        } else if((looseness > OVERALL_LOOSENESS_ONETHIRD && looseness <= OVERALL_LOOSENESS_TWOTHIRD) &&
+                (aggressiveness > OVERALL_AGGRESSIVENESS_ONETHIRD && aggressiveness <= OVERALL_AGGRESSIVENESS_TWOTHIRD)) {
+            opponentType = "OppTypeMm";
+        } else if((looseness > OVERALL_LOOSENESS_ONETHIRD && looseness <= OVERALL_LOOSENESS_TWOTHIRD) &&
+                aggressiveness > OVERALL_AGGRESSIVENESS_TWOTHIRD) {
+            opponentType = "OppTypeMa";
+        }
+
+        else if(looseness > OVERALL_LOOSENESS_TWOTHIRD && aggressiveness <= OVERALL_AGGRESSIVENESS_ONETHIRD) {
+            opponentType = "OppTypeLp";
+        } else if(looseness > OVERALL_LOOSENESS_TWOTHIRD &&
+                (aggressiveness > OVERALL_AGGRESSIVENESS_ONETHIRD && aggressiveness <= OVERALL_AGGRESSIVENESS_TWOTHIRD)) {
+            opponentType = "OppTypeLm";
+        } else if(looseness > OVERALL_LOOSENESS_TWOTHIRD && aggressiveness > OVERALL_AGGRESSIVENESS_TWOTHIRD) {
             opponentType = "OppTypeLa";
         }
 
