@@ -6,83 +6,121 @@ package com.lennart.model.action.actionbuilders.ai.prime;
 public class ArFinder {
 
     //handstrength
-        //1) 3%+ / 3%-
-        //2) 5%+ / 5%-                                      16
+        //1) 3%+ / 3%-                                  2
+        //2) 5%+ / 5%-
 
-    //position
+    //position                                          4
         //1) same position
-        //2) oop                                            29
+        //2) oop
 
-    //strongdraw
+    //strongdraw - ALLLEEN ALS JIJ SD HEBT
         //1) strongdraw true
-        //2) strongdraw false                               27
+        //2) strongdraw false
 
-    //street
+    //street                                            5
         //1) samestreet
-        //2) anystreet                                      28
+        //2) anystreet
 
-    //botstack
+    //oppstack                                          6
         //1) +100 / - 100
-        //2) +200 / - 200                                   2
-        //3) +300 / - 300                                   4
-        //4) +400 / - 400                                   12
-        //5) +500 / - 500                                   19
+        //2) +200 / - 200
+        //3) +300 / - 300
+        //4) +400 / - 400
+        //5) +500 / - 500
         //6) +750 / - 750
 
-    //oppstack
-        //1) +100 / - 100
-        //2) +200 / - 200                                   1
-        //3) +300 / - 300                                   3
-        //4) +400 / - 400                                   11
-        //5) +500 / - 500                                   18
-        //6) +750 / - 750
-
-    //botbetsize
+    //oppbetsize - ALLEEN ALS OPPACTION = BET OF RAISE  6
         //1) +50 / - 50
-        //2) +100 / - 100                                   7
-        //3) +200 / - 200                                   14
-        //4) +350 / - 350                                   21
-        //5) +500 / - 500                                   24
+        //2) +100 / - 100
+        //3) +200 / - 200
+        //4) +350 / - 350
+        //5) +500 / - 500
 
-    //oppbetsize
+    //pot                                               6
         //1) +50 / - 50
-        //2) +100 / - 100                                   6
-        //3) +200 / - 200                                   13
-        //4) +350 / - 350                                   20
-        //5) +500 / - 500                                   23
+        //2) +100 / - 100
+        //3) +200 / - 200
+        //4) +350 / - 350
+        //5) +500 / - 500
 
-    //pot
-        //1) +50 / - 50
-        //2) +100 / - 100                                   5
-        //3) +200 / - 200                                   15
-        //4) +350 / - 350                                   17
-        //5) +500 / - 500                                   25
-
-    //sizing
-        //1) +50 / - 50
-        //2) +100 / - 100                                   8
-        //3) +200 / - 200                                   17
-        //4) +350 / - 350                                   22
-        //5) +500 / - 500                                   26
-
-    //opptype
+    //opptype                                           3
         //1) narrow opptype match (incl medium)
-        //2) broader opptype match (only T / A)             10
-        //3) all opptypes                                   30
+        //2) broader opptype match (only T / A)
+        //3) all opptypes
 
-    //oppAction
-        //
+    //oppAction                                         1
+        //1) same oppAction
+        //2) all oppActions
 
 
-    public static void main(String[] args) {
-        ArFinder arFinder = new ArFinder();
 
-        String query = arFinder.buildQuery(0.72, true, false, null, 0, 0, 0, 0, 0, 0, null);
+    ///*********
 
-        System.out.println(query);
+    //1
+        //handstrength
+        //oppAction
+
+    //2
+        //oppType
+        //position
+        //street
+
+    //3
+        //pot
+        //oppstack
+        //opbetsize
+
+
+
+
+
+
+
+
+    ///////
+        //match gewoon eerst hs, oppaction en pot, bet en stacksizes (range van 200)
+
+        //vervolgens voeg je oppType toe
+            //narrow, broad
+
+        //dan position
+
+        //dan street
+
+
+
+
+
+    private String buildQueryNew(double handstrength,
+                                 String combo,
+                                 String oppAction,
+                                 String oppType,
+                                 boolean position,
+                                 String street,
+                                 double pot,
+                                 double oppStack,
+                                 double oppBetSize,
+                                 boolean strongDraw) {
+        String firstQuery = "SELECT * FROM dbstats_raw WHERE " + getOppActionQuery(oppAction) +
+                            "AND " + getHandStrengthOrComboQuery(street, combo, handstrength);
+
     }
 
+
+
+
+
+
+//    public static void main(String[] args) {
+//        ArFinder arFinder = new ArFinder();
+//
+//        String query = arFinder.buildQuery(0.72, true, false, "Flop", 0, 0, 0, 0, 0, 0, "LA");
+//
+//        System.out.println(query);
+//    }
+
     private String buildQuery(double handstrength,
+                              String combo,
                               boolean position,
                               boolean strongDraw,
                               String street,
@@ -95,31 +133,39 @@ public class ArFinder {
                               String oppType) {
         String query;
 
-        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
-                " AND " + getStreetQuery("aa") +
-                " AND " + getPositionQuery(position) +
-                " AND " + getOppActionQuery("bet75pct") +
-                ";";
+//        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
+//                " AND " + getStreetQuery("Turn") +
+//                " AND " + getPositionQuery(position) +
+//                " AND " + getOppActionQuery("bet75pct") +
+//                " AND " + getOppTypeQuery(oppType) +
+//                ";";
+
+//        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
+//                " AND " + getPositionQuery(position) +
+//                " AND " + getOppActionQuery("bet75pct") +
+//                " AND " + getOppTypeQuery(oppType) +
+//                ";";
 
         return query;
     }
 
-    private String getHandStrengthQuery(double handstrength) {
-        double bottomHsLimit = handstrength * 0.97;
-        double topHsLimit = handstrength * 1.03;
+    private String getHandStrengthOrComboQuery(String street, String combo, double handstrength) {
+        String hsOrComboQuery;
 
-        String hsQuery = "handstrength > " + bottomHsLimit + " AND handstrength < " + topHsLimit;
+        if(street.equals("Preflop")) {
+            hsOrComboQuery = "combo = '" + combo + "'";
+        } else {
+            double bottomHsLimit = handstrength * 0.97;
+            double topHsLimit = handstrength * 1.03;
 
-        return hsQuery;
+            hsOrComboQuery = "handstrength > " + bottomHsLimit + " AND handstrength < " + topHsLimit;
+        }
+
+        return hsOrComboQuery;
     }
 
     private String getStreetQuery(String street) {
-        String streetQuery = "z";
-
-        if(street != null && !street.isEmpty()) {
-            streetQuery = "board != ''";
-        }
-
+        String streetQuery = "street = '" + street + "'";
         return streetQuery;
     }
 
@@ -153,12 +199,57 @@ public class ArFinder {
         return oppActionQuery;
     }
 
+    private String getOppTypeQuery(String oppType) {
+        String oppTypeQuery = "oppTypeBroad = '" + oppType + "'";
+        return oppTypeQuery;
+    }
 
-    //ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry < 100 ORDER BY entry ASC;");
+    private String getPotSizeQuery(double pot) {
+        double potBottomLimit;
+        double potTopLimit;
 
+        if(pot <= 100) {
+            potBottomLimit = pot - 50;
+            potTopLimit = pot + 50;
+        } else if(pot <= 300) {
+            potBottomLimit = pot - 100;
+            potTopLimit = pot + 100;
+        } else {
+            potBottomLimit = pot - 300;
+            potTopLimit = pot + 300;
+        }
 
+        String potQuery = "pot > " + potBottomLimit + " AND pot < " + potTopLimit;
 
+        return potQuery;
+    }
 
-    //8984
-    //12708
+    private String getOppStackQuery(double oppStack) {
+        double oppStackBottomLimit = oppStack - 300;
+        double oppStackTopLimit = oppStack + 300;
+
+        String oppStackQuery = "opponentstack > " + oppStackBottomLimit + " AND opponentstack < " + oppStackTopLimit;
+
+        return oppStackQuery;
+    }
+
+    private String getOppBetSizeQuery(double oppBetSize) {
+        double oppBetSizeBottomLimit;
+        double oppBetSizeTopLimit;
+
+        if(oppBetSize <= 100) {
+            oppBetSizeBottomLimit = oppBetSize - 50;
+            oppBetSizeTopLimit = oppBetSize + 50;
+        } else if(oppBetSize <= 300) {
+            oppBetSizeBottomLimit = oppBetSize - 100;
+            oppBetSizeTopLimit = oppBetSize + 100;
+        } else {
+            oppBetSizeBottomLimit = oppBetSize - 300;
+            oppBetSizeTopLimit = oppBetSize + 300;
+        }
+
+        String oppBetSizeQuery = "oppBetSize > " + oppBetSizeBottomLimit + " AND oppBetSize < " + oppBetSizeTopLimit;
+
+        return oppBetSizeQuery;
+    }
 }
