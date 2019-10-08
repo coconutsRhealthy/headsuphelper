@@ -774,7 +774,7 @@ public class ActionVariables {
         return street;
     }
 
-    private List<String> getEligibleActions(GameVariables gameVariables) {
+    public List<String> getEligibleActions(GameVariables gameVariables) {
         List<String> eligibleActions = new ArrayList<>();
 
         if(gameVariables.getOpponentAction().contains("bet") || gameVariables.getOpponentAction().contains("raise")) {

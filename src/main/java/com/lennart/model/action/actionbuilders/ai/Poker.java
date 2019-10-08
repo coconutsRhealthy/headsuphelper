@@ -531,7 +531,7 @@ public class Poker {
         return getTableString(Double.parseDouble(handStrengthAsString), opponentType);
     }
 
-    private Map<String, Double> getSortedAveragePayoffMapFromRouteData(Map<String, Double> routeData) {
+    public Map<String, Double> getSortedAveragePayoffMapFromRouteData(Map<String, Double> routeData) {
         Map<String, Double> sortedAveragePayoffMap = new HashMap<>();
 
         sortedAveragePayoffMap.put("fold", (routeData.get("fold_payoff") / routeData.get("fold_times")));
@@ -543,7 +543,7 @@ public class Poker {
         return sortByValueHighToLow(sortedAveragePayoffMap);
     }
 
-    private Map<String, Double> retainOnlyEligibleActions(Map<String, Double> sortedActionMap, List<String> eligibleActions) {
+    public Map<String, Double> retainOnlyEligibleActions(Map<String, Double> sortedActionMap, List<String> eligibleActions) {
         Map<String, Double> sortedEligibleActions = new HashMap<>();
 
         for(String eligibleAction : eligibleActions) {

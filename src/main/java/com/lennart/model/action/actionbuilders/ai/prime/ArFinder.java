@@ -91,20 +91,20 @@ public class ArFinder {
 
 
 
-    private String buildQueryNew(double handstrength,
-                                 String combo,
-                                 String oppAction,
-                                 String oppType,
-                                 boolean position,
-                                 String street,
-                                 double pot,
-                                 double oppStack,
-                                 double oppBetSize,
-                                 boolean strongDraw) {
-        String firstQuery = "SELECT * FROM dbstats_raw WHERE " + getOppActionQuery(oppAction) +
-                            "AND " + getHandStrengthOrComboQuery(street, combo, handstrength);
-
-    }
+//    private String buildQueryNew(double handstrength,
+//                                 String combo,
+//                                 String oppAction,
+//                                 String oppType,
+//                                 boolean position,
+//                                 String street,
+//                                 double pot,
+//                                 double oppStack,
+//                                 double oppBetSize,
+//                                 boolean strongDraw) {
+//        String firstQuery = "SELECT * FROM dbstats_raw WHERE " + getOppActionQuery(oppAction) +
+//                            "AND " + getHandStrengthOrComboQuery(street, combo, handstrength);
+//
+//    }
 
 
 
@@ -119,35 +119,35 @@ public class ArFinder {
 //        System.out.println(query);
 //    }
 
-    private String buildQuery(double handstrength,
-                              String combo,
-                              boolean position,
-                              boolean strongDraw,
-                              String street,
-                              double botStack,
-                              double oppStack,
-                              double botBetSize,
-                              double oppbetsize,
-                              double pot,
-                              double sizing,
-                              String oppType) {
-        String query;
-
-//        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
-//                " AND " + getStreetQuery("Turn") +
-//                " AND " + getPositionQuery(position) +
-//                " AND " + getOppActionQuery("bet75pct") +
-//                " AND " + getOppTypeQuery(oppType) +
-//                ";";
-
-//        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
-//                " AND " + getPositionQuery(position) +
-//                " AND " + getOppActionQuery("bet75pct") +
-//                " AND " + getOppTypeQuery(oppType) +
-//                ";";
-
-        return query;
-    }
+//    private String buildQuery(double handstrength,
+//                              String combo,
+//                              boolean position,
+//                              boolean strongDraw,
+//                              String street,
+//                              double botStack,
+//                              double oppStack,
+//                              double botBetSize,
+//                              double oppbetsize,
+//                              double pot,
+//                              double sizing,
+//                              String oppType) {
+//        String query;
+//
+////        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
+////                " AND " + getStreetQuery("Turn") +
+////                " AND " + getPositionQuery(position) +
+////                " AND " + getOppActionQuery("bet75pct") +
+////                " AND " + getOppTypeQuery(oppType) +
+////                ";";
+//
+////        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
+////                " AND " + getPositionQuery(position) +
+////                " AND " + getOppActionQuery("bet75pct") +
+////                " AND " + getOppTypeQuery(oppType) +
+////                ";";
+//
+//        return query;
+//    }
 
     private String getHandStrengthOrComboQuery(String street, String combo, double handstrength) {
         String hsOrComboQuery;
@@ -248,7 +248,7 @@ public class ArFinder {
             oppBetSizeTopLimit = oppBetSize + 300;
         }
 
-        String oppBetSizeQuery = "oppBetSize > " + oppBetSizeBottomLimit + " AND oppBetSize < " + oppBetSizeTopLimit;
+        String oppBetSizeQuery = "opponent_total_betsize > " + oppBetSizeBottomLimit + " AND opponent_total_betsize < " + oppBetSizeTopLimit;
 
         return oppBetSizeQuery;
     }
