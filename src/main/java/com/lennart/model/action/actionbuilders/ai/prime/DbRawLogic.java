@@ -176,9 +176,9 @@ public class DbRawLogic {
             } else if(botAction.equals("call")) {
                 potAtEndOfHand = getPotAtEndOfHandBotActionCall(currentPot, botTotalBetSize, oppTotalBetSize, botStack, oppAction);
             } else if(botAction.equals("bet75pct")) {
-                potAtEndOfHand = getPotAtEndOfHandBotActionBet(currentPot, botSizing, opponentStack, showdown);
+                potAtEndOfHand = getPotAtEndOfHandBotActionBet(currentPot, botSizing, botStack, opponentStack, showdown);
             } else if(botAction.equals("raise")) {
-                potAtEndOfHand = getPotAtEndOfHandBotActionRaise(currentPot, botSizing, oppTotalBetSize, opponentStack, showdown);
+                potAtEndOfHand = getPotAtEndOfHandBotActionRaise(currentPot, botSizing, oppTotalBetSize, botStack, opponentStack, showdown);
             }
         }
 
@@ -239,11 +239,15 @@ public class DbRawLogic {
         return currentPot;
     }
 
-    private double getPotAtEndOfHandBotActionBet(double currentPot, double botBetSizing, double opponentStack, boolean showdown) {
+    private double getPotAtEndOfHandBotActionBet(double currentPot, double botBetSizing, double botStack, double opponentStack, boolean showdown) {
         double potAtEndOfHand;
 
         if(showdown) {
             double effectiveBetSize;
+
+            if(botBetSizing > botStack) {
+                botBetSizing = botStack;
+            }
 
             if(botBetSizing > opponentStack) {
                 effectiveBetSize = opponentStack;
@@ -295,11 +299,15 @@ public class DbRawLogic {
         return potAtEndOfHand;
     }
 
-    private double getPotAtEndOfHandBotActionRaise(double currentPot, double botRaiseSizing, double oppBetSize, double opponentStack, boolean showdown) {
+    private double getPotAtEndOfHandBotActionRaise(double currentPot, double botRaiseSizing, double oppBetSize, double botStack, double opponentStack, boolean showdown) {
         double potAtEndOfHand;
 
         if(showdown) {
             double effectiveCallAmountForOpp;
+
+            if(botRaiseSizing > botStack) {
+                botRaiseSizing = botStack;
+            }
 
             if((botRaiseSizing - oppBetSize) > (opponentStack - oppBetSize)) {
                 effectiveCallAmountForOpp = opponentStack - oppBetSize;
