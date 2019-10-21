@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class Combination {
 
-    private List<String> getAllCombinationsOfList(List<String> initialList) {
+    public List<String> getAllCombinationsOfList(List<String> initialList) {
         List<String> comboList = new ArrayList<>();
 
         String[] arr = initialList.toArray(new String[] {});
@@ -45,7 +45,7 @@ public class Combination {
             String toUse = s.replace("[", "");
             toUse = toUse.replace("]", "");
             toUse = toUse.replace(",", "");
-            toUse = toUse.replace(" ", "");
+            //toUse = toUse.replace(" ", "");
 
             cleanComboList.add(toUse);
         }

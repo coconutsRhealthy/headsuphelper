@@ -1,123 +1,15 @@
 package com.lennart.model.action.actionbuilders.ai.prime;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.sql.*;
+import java.util.*;
+
 /**
  * Created by LennartMac on 02/10/2019.
  */
 public class ArFinder {
 
-    //handstrength
-        //1) 3%+ / 3%-                                  2
-        //2) 5%+ / 5%-
-
-    //position                                          4
-        //1) same position
-        //2) oop
-
-    //strongdraw - ALLLEEN ALS JIJ SD HEBT
-        //1) strongdraw true
-        //2) strongdraw false
-
-    //street                                            5
-        //1) samestreet
-        //2) anystreet
-
-    //oppstack                                          6
-        //1) +100 / - 100
-        //2) +200 / - 200
-        //3) +300 / - 300
-        //4) +400 / - 400
-        //5) +500 / - 500
-        //6) +750 / - 750
-
-    //oppbetsize - ALLEEN ALS OPPACTION = BET OF RAISE  6
-        //1) +50 / - 50
-        //2) +100 / - 100
-        //3) +200 / - 200
-        //4) +350 / - 350
-        //5) +500 / - 500
-
-    //pot                                               6
-        //1) +50 / - 50
-        //2) +100 / - 100
-        //3) +200 / - 200
-        //4) +350 / - 350
-        //5) +500 / - 500
-
-    //opptype                                           3
-        //1) narrow opptype match (incl medium)
-        //2) broader opptype match (only T / A)
-        //3) all opptypes
-
-    //oppAction                                         1
-        //1) same oppAction
-        //2) all oppActions
-
-
-
-    ///*********
-
-    //1
-        //handstrength
-        //oppAction
-
-    //2
-        //oppType
-        //position
-        //street
-
-    //3
-        //pot
-        //oppstack
-        //opbetsize
-
-
-
-
-
-
-
-
-    ///////
-        //match gewoon eerst hs, oppaction en pot, bet en stacksizes (range van 200)
-
-        //vervolgens voeg je oppType toe
-            //narrow, broad
-
-        //dan position
-
-        //dan street
-
-
-
-
-
-//    private String buildQueryNew(double handstrength,
-//                                 String combo,
-//                                 String oppAction,
-//                                 String oppType,
-//                                 boolean position,
-//                                 String street,
-//                                 double pot,
-//                                 double oppStack,
-//                                 double oppBetSize,
-//                                 boolean strongDraw) {
-//        String firstQuery = "SELECT * FROM dbstats_raw WHERE " + getOppActionQuery(oppAction) +
-//                            "AND " + getHandStrengthOrComboQuery(street, combo, handstrength);
-//
-//    }
-
-
-
-
-
-
-//    public static void main(String[] args) {
-//        ArFinder arFinder = new ArFinder();
-//
-//        String query = arFinder.buildQuery(0.72, true, false, "Flop", 0, 0, 0, 0, 0, 0, "LA");
-//
-//        System.out.println(query);
-//    }
 
 //    private String buildQuery(double handstrength,
 //                              String combo,
@@ -149,19 +41,238 @@ public class ArFinder {
 //        return query;
 //    }
 
-    private String getHandStrengthOrComboQuery(String street, String combo, double handstrength) {
-        String hsOrComboQuery;
+    private static final int LIMIT = 100;
 
-        if(street.equals("Preflop")) {
-            hsOrComboQuery = "combo = '" + combo + "'";
+    public static void main(String[] args) throws Exception {
+        String query = new ArFinder().buildQuery(0.69,
+                "JTs",
+                "bet75pct",
+                false,
+                false,
+                "TA",
+                false,
+                "Flop",
+                80,
+                1400,
+                60);
+
+        System.out.println(query);
+    }
+
+    private Connection con;
+
+    private String buildQuery(double handstrength,
+                              String combo,
+                              String oppAction,
+                              boolean preflop,
+                              boolean strongDraw,
+                              String oppType,
+                              boolean position,
+                              String street,
+                              double pot,
+                              double oppStack,
+                              double oppBetSize) throws Exception {
+        String initialQuery;
+
+        if(preflop) {
+            initialQuery = "SELECT * FROM dbstats_raw WHERE combo = '" + combo +
+                    "' AND opponent_action = '" + oppAction +
+                    " AND board = '' ";
         } else {
-            double bottomHsLimit = handstrength * 0.97;
-            double topHsLimit = handstrength * 1.03;
-
-            hsOrComboQuery = "handstrength > " + bottomHsLimit + " AND handstrength < " + topHsLimit;
+            if(!strongDraw) {
+                initialQuery = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength, false)
+                        + "' AND opponent_action = '" + oppAction +
+                        "' AND board != '' ";
+            } else {
+                initialQuery = "SELECT * FROM dbstats_raw WHERE strongdraw = 'StrongDrawTrue' AND "
+                        + getHandStrengthQuery(0, true) +
+                        "' AND opponent_action = '" + oppAction
+                        + " AND board != '' ";
+            }
         }
 
-        return hsOrComboQuery;
+        List<String> otherQueryLines = getAllQueryLines(street, position, oppType, pot, oppStack, oppBetSize);
+        List<String> otherQueryLineCombinations = new Combination().getAllCombinationsOfList(otherQueryLines);
+
+        List<String> allPossibleQueries = new ArrayList<>();
+        allPossibleQueries.add(initialQuery);
+
+        for(String queryCombination : otherQueryLineCombinations) {
+            allPossibleQueries.add(initialQuery + queryCombination);
+        }
+
+        Map<String, Integer> initialQueryMap = new HashMap<>();
+
+        for(String query : allPossibleQueries) {
+            initialQueryMap.put(query, 0);
+        }
+
+        initialQueryMap = sortInitialQueryMapByNumberOfAnds(initialQueryMap);
+
+        TreeMap<Integer, Map<String, Integer>> bigQueryMap = convertInitialQueryMapToBigMap(initialQueryMap);
+        bigQueryMap = fillQueryMapWithNumberOfResultsNew(bigQueryMap);
+
+        String query = selectQueryFromBigQueryMap(bigQueryMap);
+        return query;
+    }
+
+    private List<String> getAllQueryLines(String street, boolean position, String oppType, double pot, double oppStack,
+                                          double oppBetSize) {
+        List<String> allQueryLines = new ArrayList<>();
+
+        allQueryLines.add(getPositionQuery(position));
+        allQueryLines.add(getStreetQuery(street));
+        allQueryLines.add(getOppTypeQuery(oppType));
+        allQueryLines.add(getPotSizeQuery(pot));
+        allQueryLines.add(getOppStackQuery(oppStack));
+        allQueryLines.add(getOppBetSizeQuery(oppBetSize));
+
+        return allQueryLines;
+    }
+
+    private Map<String, Integer> sortInitialQueryMapByNumberOfAnds(Map<String, Integer> initialQueryMap) {
+        Map<String, Integer> andCounterMap = new HashMap<>();
+
+        for (Map.Entry<String, Integer> entry : initialQueryMap.entrySet()) {
+            int andCounter = StringUtils.countMatches(entry.getKey(), "AND");
+            andCounterMap.put(entry.getKey(), andCounter);
+        }
+
+        andCounterMap = sortByValueHighToLow(andCounterMap);
+
+        return andCounterMap;
+    }
+
+    private TreeMap<Integer, Map<String, Integer>> convertInitialQueryMapToBigMap(Map<String, Integer> initialQueryMap) {
+        TreeMap<Integer, Map<String, Integer>> bigQueryMap = new TreeMap<>();
+
+        for(Map.Entry<String, Integer> entry : initialQueryMap.entrySet()) {
+            bigQueryMap.putIfAbsent(entry.getValue(), new HashMap<>());
+            bigQueryMap.get(entry.getValue()).put(entry.getKey(), 0);
+        }
+
+        return bigQueryMap;
+    }
+
+    private TreeMap<Integer, Map<String, Integer>> fillQueryMapWithNumberOfResultsNew(TreeMap<Integer, Map<String, Integer>> initialBigMap) throws Exception {
+        initializeDbConnection();
+        Statement st = con.createStatement();
+
+        for(Map.Entry<Integer, Map<String, Integer>> entry : initialBigMap.entrySet()) {
+            Map<String, Integer> numberQueryMap = entry.getValue();
+
+            for(Map.Entry<String, Integer> innerEntry : numberQueryMap.entrySet()) {
+                String query = innerEntry.getKey();
+
+                ResultSet rs = st.executeQuery(query);
+                rs.last();
+                int size = rs.getRow();
+
+                innerEntry.setValue(size);
+
+                rs.close();
+            }
+
+            if(allValuesBelowLimit(numberQueryMap)) {
+                break;
+            }
+        }
+
+        st.close();
+        closeDbConnection();
+
+        return null;
+    }
+
+    private String selectQueryFromBigQueryMap(TreeMap<Integer, Map<String, Integer>> bigQueryMap) {
+        int bigQueryMapIntegerToUse = -1;
+
+        for(Map.Entry<Integer, Map<String, Integer>> entry : bigQueryMap.entrySet()) {
+            Map<String, Integer> mapOfCurrentInt = entry.getValue();
+
+            mapOfCurrentInt = sortByValueHighToLow(mapOfCurrentInt);
+
+            int queryHighestHitNumber = mapOfCurrentInt.entrySet().iterator().next().getValue();
+
+            if(queryHighestHitNumber > 0) {
+                bigQueryMapIntegerToUse = entry.getKey();
+            } else {
+                break;
+            }
+        }
+
+        Map<String, Integer> queryMapToConsider = bigQueryMap.get(bigQueryMapIntegerToUse);
+        List<String> potentialQueries = getQueriesAboveLimitWithLowestHitsFromMapToConsider(queryMapToConsider);
+        String selectedQuery = selectQueryFromPotentialQueries(potentialQueries);
+        return selectedQuery;
+    }
+
+    private String selectQueryFromPotentialQueries(List<String> potentialQueries) {
+        String selectedQuery = null;
+
+        for(String query : potentialQueries) {
+            if(query.contains("oppTypeBroad")) {
+                selectedQuery = query;
+                break;
+            }
+        }
+
+        if(selectedQuery == null) {
+            selectedQuery = potentialQueries.get(0);
+        }
+
+        return selectedQuery;
+    }
+
+    private List<String> getQueriesAboveLimitWithLowestHitsFromMapToConsider(Map<String, Integer> queryMapToConsider) {
+        List<String> queries = new ArrayList<>();
+
+        queryMapToConsider = sortByValueLowToHigh(queryMapToConsider);
+
+        int inMethodLowestQueryNumber = -1;
+
+        for(Map.Entry<String, Integer> entry : queryMapToConsider.entrySet()) {
+            if(entry.getValue() > LIMIT) {
+
+
+                if(queries.isEmpty()) {
+                    queries.add(entry.getKey());
+                    inMethodLowestQueryNumber = entry.getValue();
+                } else {
+                    if(entry.getValue() == inMethodLowestQueryNumber) {
+                        queries.add(entry.getKey());
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return queries;
+    }
+
+    private boolean allValuesBelowLimit(Map<String, Integer> mapToCheck) {
+        mapToCheck = sortByValueHighToLow(mapToCheck);
+        int highestValueInMap = mapToCheck.entrySet().iterator().next().getValue();
+        return highestValueInMap < LIMIT;
+    }
+
+    private String getHandStrengthQuery(double handstrength, boolean strongDraw) {
+        String hsQuery;
+
+        double bottomHsLimit;
+        double topHsLmit;
+
+        if(!strongDraw) {
+            bottomHsLimit = handstrength - 0.02;
+            topHsLmit = handstrength + 0.02;
+        } else {
+            bottomHsLimit = handstrength - 0.1;
+            topHsLmit = handstrength + 0.1;
+        }
+
+        hsQuery = "handstrength > " + bottomHsLimit + " AND handstrength < " + topHsLmit;
+        return hsQuery;
     }
 
     private String getStreetQuery(String street) {
@@ -207,19 +318,29 @@ public class ArFinder {
     private String getPotSizeQuery(double pot) {
         double potBottomLimit;
         double potTopLimit;
+        String potQuery;
 
-        if(pot <= 100) {
-            potBottomLimit = pot - 50;
-            potTopLimit = pot + 50;
-        } else if(pot <= 300) {
-            potBottomLimit = pot - 100;
-            potTopLimit = pot + 100;
+        if(pot == 0) {
+            potQuery = "pot = 0";
         } else {
-            potBottomLimit = pot - 300;
-            potTopLimit = pot + 300;
-        }
+            if(pot <= 100) {
+                potBottomLimit = pot - 50;
 
-        String potQuery = "pot > " + potBottomLimit + " AND pot < " + potTopLimit;
+                if(potBottomLimit <= 0) {
+                    potBottomLimit = 1;
+                }
+
+                potTopLimit = pot + 50;
+            } else if(pot <= 300) {
+                potBottomLimit = pot - 100;
+                potTopLimit = pot + 100;
+            } else {
+                potBottomLimit = pot - 300;
+                potTopLimit = pot + 300;
+            }
+
+            potQuery = "pot > " + potBottomLimit + " AND pot < " + potTopLimit;
+        }
 
         return potQuery;
     }
@@ -237,19 +358,66 @@ public class ArFinder {
         double oppBetSizeBottomLimit;
         double oppBetSizeTopLimit;
 
-        if(oppBetSize <= 100) {
-            oppBetSizeBottomLimit = oppBetSize - 50;
-            oppBetSizeTopLimit = oppBetSize + 50;
-        } else if(oppBetSize <= 300) {
-            oppBetSizeBottomLimit = oppBetSize - 100;
-            oppBetSizeTopLimit = oppBetSize + 100;
+        String oppBetSizeQuery;
+
+        if(oppBetSize == 0) {
+            oppBetSizeQuery = "opponent_total_betsize = 0";
         } else {
-            oppBetSizeBottomLimit = oppBetSize - 300;
-            oppBetSizeTopLimit = oppBetSize + 300;
+            if(oppBetSize <= 100) {
+                oppBetSizeBottomLimit = oppBetSize - 50;
+                oppBetSizeTopLimit = oppBetSize + 50;
+            } else if(oppBetSize <= 300) {
+                oppBetSizeBottomLimit = oppBetSize - 100;
+                oppBetSizeTopLimit = oppBetSize + 100;
+            } else {
+                oppBetSizeBottomLimit = oppBetSize - 300;
+                oppBetSizeTopLimit = oppBetSize + 300;
+            }
+
+            oppBetSizeQuery = "opponent_total_betsize > " + oppBetSizeBottomLimit + " AND opponent_total_betsize < " + oppBetSizeTopLimit;
         }
 
-        String oppBetSizeQuery = "opponent_total_betsize > " + oppBetSizeBottomLimit + " AND opponent_total_betsize < " + oppBetSizeTopLimit;
-
         return oppBetSizeQuery;
+    }
+
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueLowToHigh(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o1.getValue() ).compareTo( o2.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o2.getValue() ).compareTo( o1.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    private void initializeDbConnection() throws Exception {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker?&serverTimezone=UTC", "root", "");
+    }
+
+    private void closeDbConnection() throws SQLException {
+        con.close();
     }
 }
