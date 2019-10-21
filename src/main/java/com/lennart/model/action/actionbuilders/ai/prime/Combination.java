@@ -44,8 +44,7 @@ public class Combination {
         for (String s : rawComboList) {
             String toUse = s.replace("[", "");
             toUse = toUse.replace("]", "");
-            toUse = toUse.replace(",", "");
-            //toUse = toUse.replace(" ", "");
+            toUse = toUse.replace(",", " AND");
 
             cleanComboList.add(toUse);
         }

@@ -8,43 +8,12 @@ import java.util.*;
 /**
  * Created by LennartMac on 02/10/2019.
  */
-public class ArFinder {
-
-
-//    private String buildQuery(double handstrength,
-//                              String combo,
-//                              boolean position,
-//                              boolean strongDraw,
-//                              String street,
-//                              double botStack,
-//                              double oppStack,
-//                              double botBetSize,
-//                              double oppbetsize,
-//                              double pot,
-//                              double sizing,
-//                              String oppType) {
-//        String query;
-//
-////        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
-////                " AND " + getStreetQuery("Turn") +
-////                " AND " + getPositionQuery(position) +
-////                " AND " + getOppActionQuery("bet75pct") +
-////                " AND " + getOppTypeQuery(oppType) +
-////                ";";
-//
-////        query = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength) +
-////                " AND " + getPositionQuery(position) +
-////                " AND " + getOppActionQuery("bet75pct") +
-////                " AND " + getOppTypeQuery(oppType) +
-////                ";";
-//
-//        return query;
-//    }
+public class QueryBuilder {
 
     private static final int LIMIT = 100;
 
     public static void main(String[] args) throws Exception {
-        String query = new ArFinder().buildQuery(0.69,
+        String query = new QueryBuilder().buildQuery(0.69,
                 "JTs",
                 "bet75pct",
                 false,
@@ -81,12 +50,12 @@ public class ArFinder {
         } else {
             if(!strongDraw) {
                 initialQuery = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength, false)
-                        + "' AND opponent_action = '" + oppAction +
+                        + " AND opponent_action = '" + oppAction +
                         "' AND board != '' ";
             } else {
                 initialQuery = "SELECT * FROM dbstats_raw WHERE strongdraw = 'StrongDrawTrue' AND "
                         + getHandStrengthQuery(0, true) +
-                        "' AND opponent_action = '" + oppAction
+                        " AND opponent_action = '" + oppAction
                         + " AND board != '' ";
             }
         }
@@ -98,7 +67,7 @@ public class ArFinder {
         allPossibleQueries.add(initialQuery);
 
         for(String queryCombination : otherQueryLineCombinations) {
-            allPossibleQueries.add(initialQuery + queryCombination);
+            allPossibleQueries.add(initialQuery + " AND " + queryCombination);
         }
 
         Map<String, Integer> initialQueryMap = new HashMap<>();
@@ -181,7 +150,7 @@ public class ArFinder {
         st.close();
         closeDbConnection();
 
-        return null;
+        return initialBigMap;
     }
 
     private String selectQueryFromBigQueryMap(TreeMap<Integer, Map<String, Integer>> bigQueryMap) {
@@ -194,7 +163,7 @@ public class ArFinder {
 
             int queryHighestHitNumber = mapOfCurrentInt.entrySet().iterator().next().getValue();
 
-            if(queryHighestHitNumber > 0) {
+            if(queryHighestHitNumber >= LIMIT) {
                 bigQueryMapIntegerToUse = entry.getKey();
             } else {
                 break;
@@ -339,7 +308,7 @@ public class ArFinder {
                 potTopLimit = pot + 300;
             }
 
-            potQuery = "pot > " + potBottomLimit + " AND pot < " + potTopLimit;
+            potQuery = "pot > " + potBottomLimit + " and pot < " + potTopLimit;
         }
 
         return potQuery;
@@ -349,7 +318,7 @@ public class ArFinder {
         double oppStackBottomLimit = oppStack - 300;
         double oppStackTopLimit = oppStack + 300;
 
-        String oppStackQuery = "opponentstack > " + oppStackBottomLimit + " AND opponentstack < " + oppStackTopLimit;
+        String oppStackQuery = "opponentstack > " + oppStackBottomLimit + " and opponentstack < " + oppStackTopLimit;
 
         return oppStackQuery;
     }
@@ -374,7 +343,7 @@ public class ArFinder {
                 oppBetSizeTopLimit = oppBetSize + 300;
             }
 
-            oppBetSizeQuery = "opponent_total_betsize > " + oppBetSizeBottomLimit + " AND opponent_total_betsize < " + oppBetSizeTopLimit;
+            oppBetSizeQuery = "opponent_total_betsize > " + oppBetSizeBottomLimit + " and opponent_total_betsize < " + oppBetSizeTopLimit;
         }
 
         return oppBetSizeQuery;
