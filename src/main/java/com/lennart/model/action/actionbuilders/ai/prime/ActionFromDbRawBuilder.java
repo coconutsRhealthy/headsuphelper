@@ -109,7 +109,7 @@ public class ActionFromDbRawBuilder {
             sortedAveragePayoffMap.remove("bet75pct");
         }
 
-        if(dbRawPayoffData.get("raise") < 10) {
+        if(dbRawPayoffData.get("raise_times") < 10) {
             sortedAveragePayoffMap.remove("raise");
         }
 

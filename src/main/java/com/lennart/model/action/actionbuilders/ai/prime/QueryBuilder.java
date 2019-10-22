@@ -46,17 +46,19 @@ public class QueryBuilder {
         if(preflop) {
             initialQuery = "SELECT * FROM dbstats_raw WHERE combo = '" + combo +
                     "' AND opponent_action = '" + oppAction +
-                    " AND board = '' ";
+                    "' AND board = '' AND ar_winnings != 0 AND ar_winnings != 6666.66";
         } else {
             if(!strongDraw) {
-                initialQuery = "SELECT * FROM dbstats_raw WHERE " + getHandStrengthQuery(handstrength, false)
+                initialQuery = "SELECT * FROM dbstats_raw WHERE strongdraw = 'StrongDrawFalse' AND "
+                        + getHandStrengthQuery(handstrength, false)
                         + " AND opponent_action = '" + oppAction +
-                        "' AND board != '' ";
+                        "' AND board != '' AND ar_winnings != 0 AND ar_winnings != 6666.66";
+
             } else {
                 initialQuery = "SELECT * FROM dbstats_raw WHERE strongdraw = 'StrongDrawTrue' AND "
                         + getHandStrengthQuery(0, true) +
                         " AND opponent_action = '" + oppAction
-                        + " AND board != '' ";
+                        + " AND board != '' AND ar_winnings != 0 AND ar_winnings != 6666.66";
             }
         }
 
@@ -201,9 +203,7 @@ public class QueryBuilder {
         int inMethodLowestQueryNumber = -1;
 
         for(Map.Entry<String, Integer> entry : queryMapToConsider.entrySet()) {
-            if(entry.getValue() > LIMIT) {
-
-
+            if(entry.getValue() >= LIMIT) {
                 if(queries.isEmpty()) {
                     queries.add(entry.getKey());
                     inMethodLowestQueryNumber = entry.getValue();
