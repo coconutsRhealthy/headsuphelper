@@ -1122,6 +1122,60 @@ public class ActionVariables {
         return sngSizingToReturn;
     }
 
+    private String plugLeaks(String action, double handstrength, double oppTotalBetsize, double sizing, List<Card> board,
+                             boolean strongDraw, double facingOdds) {
+        String actionToReturn;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct")) {
+                if(handstrength < 0.6) {
+                    if(board.size() == 3 || board.size() == 4) {
+                        if(sizing > 250) {
+                            if(strongDraw) {
+                                actionToReturn = action;
+                            } else {
+                                actionToReturn = "check";
+                                System.out.println("Changed flop or turn bet to check in plugLeaks");
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        if(sizing > 200) {
+                            actionToReturn = "check";
+                            System.out.println("Changed river bet to check in plugLeaks");
+                        } else {
+                            actionToReturn = action;
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else if(action.equals("call")) {
+                if(handstrength < 0.8) {
+                    if(facingOdds > 0.33) {
+                        if(oppTotalBetsize >= 225) {
+                            actionToReturn = "fold";
+                            System.out.println("Changed call to fold in plugLeaks");
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
     public void setAction(String action) {
         this.action = action;
     }
