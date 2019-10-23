@@ -399,6 +399,8 @@ public class ActionVariables {
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
 
+        action = plugLeaks(action, botHandStrengthInMethod, opponentBetsizeBb * gameVariables.getBigBlind(), sizing,
+                boardInMethod, (strongFlushDraw || strongOosd || strongGutshot), facingOdds);
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
