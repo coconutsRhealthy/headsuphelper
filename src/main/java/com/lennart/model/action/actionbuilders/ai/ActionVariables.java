@@ -295,8 +295,6 @@ public class ActionVariables {
                 sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
 
-            action = solidifyPostflopRaises(action, boardInMethod, botHandStrength, strongFlushDraw, strongOosd, continuousTable, gameVariables, sizing);
-
             //machine learning
             String actionBeforeMachineLearning = action;
 
@@ -307,6 +305,8 @@ public class ActionVariables {
                 System.out.println("---Action changed in Machinelearning from: " + actionBeforeMachineLearning + " to: " + action);
             }
             //machine learning
+
+            action = solidifyPostflopRaises(action, boardInMethod, botHandStrength, strongFlushDraw, strongOosd, continuousTable, gameVariables, sizing);
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -1025,40 +1025,38 @@ public class ActionVariables {
 
         if(action.equals("raise")) {
             if(board != null && !board.isEmpty()) {
-                if(board.size() == 3 || board.size() == 4) {
-                    if(sizing < 300) {
+                if(board.size() == 3) {
+                    if(sizing < 245) {
                         actionToReturn = action;
 
-                        if(handStrength < 0.6) {
-                            System.out.println("Kept small flop or turn bluffraise as is");
+                        if(handStrength < 0.7) {
+                            System.out.println("Kept small flop bluffraise as is, leka");
                         }
                     } else {
-                        if(handStrength < 0.83) {
-                            if (strongFd || strongOosd) {
+                        if(handStrength < 0.7) {
+                            if(strongFd || strongOosd) {
                                 actionToReturn = action;
-                                System.out.println("Keep flop or turn raise cause strong draw!");
+                                System.out.println("Keep flop raise cause strong draw! leka");
                             } else {
-                                System.out.println("Change flop or turn spew raise to fold or call!");
+                                System.out.println("Change big flop bluffraise to fold or call! leka z");
                                 actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
                             }
                         } else {
                             actionToReturn = action;
                         }
                     }
-                } else {
-                    if(sizing < 300) {
-                        actionToReturn = action;
-
-                        if(handStrength < 0.6) {
-                            System.out.println("Kept small river bluffraise as is");
-                        }
+                } else if(board.size() == 5) {
+                    if(handStrength < 0.78) {
+                        System.out.println("Change river bluff raise to fold or call! leka z");
+                        actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
                     } else {
-                        if(handStrength < 0.78) {
-                            System.out.println("Change river big spew raise to fold or call!");
-                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
-                        } else {
-                            actionToReturn = action;
-                        }
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+
+                    if(handStrength < 0.7 && !strongFd && !strongOosd) {
+                        System.out.println("Keep bluff turnraise... leka");
                     }
                 }
             } else {
