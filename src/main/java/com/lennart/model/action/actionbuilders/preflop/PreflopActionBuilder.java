@@ -182,8 +182,10 @@ public class PreflopActionBuilder {
 
         if(oppPre2betGroup.equals("low")) {
             limit = 0.65;
-        } else {
+        } else if(oppPre2betGroup.equals("facingLimp")) {
             limit = 0.5;
+        } else {
+            limit = 0.3;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
@@ -212,9 +214,9 @@ public class PreflopActionBuilder {
         if(oppPre3betGroup.equals("low")) {
             limit = 0.75;
         } else if(oppPre3betGroup.equals("medium") || oppPre3betGroup.equals("mediumUnknown")){
-            limit = 0.6;
+            limit = 0.75;
         } else {
-            limit = 0.5;
+            limit = 0.75;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
@@ -482,6 +484,12 @@ public class PreflopActionBuilder {
             continuousTableable.setPre3betOrPostRaisedPot(true);
             return "raise";
         } else if(preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
+            double preflopHs = new PreflopHandStength().getPreflopHandStength(botHoleCards);
+
+            if(preflopHs < 0.5) {
+                System.out.println("did extra preCall2bet, hs: " + preflopHs);
+            }
+
             return "call";
         } else {
             return "fold";
@@ -494,7 +502,7 @@ public class PreflopActionBuilder {
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
         List<List<Card>> pre3betPoule = getPre3betPoule("high");
-        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "high");
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "facingLimp");
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)
                 || preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
