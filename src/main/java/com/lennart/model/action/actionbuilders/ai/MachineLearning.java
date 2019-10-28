@@ -104,25 +104,27 @@ public class MachineLearning {
         }
 
         if(actionToReturn == null) {
-            String compactCallRoute_2_0 = calculateCompactCallRoute_2_0(actionVariables, gameVariables);
-            System.out.println("##CompactCallRoute_2_0: " + compactCallRoute_2_0);
-            List<Double> callData = getDataFromDb("call", actionVariables.getBotHandStrength(), compactCallRoute_2_0);
+//            String compactCallRoute_2_0 = calculateCompactCallRoute_2_0(actionVariables, gameVariables);
+//            System.out.println("##CompactCallRoute_2_0: " + compactCallRoute_2_0);
+//            List<Double> callData = getDataFromDb("call", actionVariables.getBotHandStrength(), compactCallRoute_2_0);
+//
+//            if(callData.get(1) >= 20) {
+//                double callSuccessRatio = callData.get(0) / callData.get(1);
+//                double facingOdds = actionVariables.getFacingOdds(gameVariables);
+//
+//                if(callSuccessRatio > facingOdds) {
+//                    actionToReturn = "call";
+//                    System.out.println("Machinelearning J) Changed fold to call");
+//                }
+//            } else {
+//                //actionToReturn = doFreakyCallMachineLearning(actionVariables, gameVariables);
+//
+//                if(actionToReturn != null && actionToReturn.equals("call")) {
+//                    System.out.println("Machinelearning K) (freaky) Changed fold to call");
+//                }
+//            }
 
-            if(callData.get(1) >= 20) {
-                double callSuccessRatio = callData.get(0) / callData.get(1);
-                double facingOdds = actionVariables.getFacingOdds(gameVariables);
-
-                if(callSuccessRatio > facingOdds) {
-                    actionToReturn = "call";
-                    System.out.println("Machinelearning J) Changed fold to call");
-                }
-            } else {
-                //actionToReturn = doFreakyCallMachineLearning(actionVariables, gameVariables);
-
-                if(actionToReturn != null && actionToReturn.equals("call")) {
-                    System.out.println("Machinelearning K) (freaky) Changed fold to call");
-                }
-            }
+            //keep null
         }
 
         if(actionToReturn == null) {
@@ -372,8 +374,9 @@ public class MachineLearning {
         }
 
         if(actionToReturn == null) {
-            actionToReturn = "fold";
-            System.out.println("Machinelearning G) Changed call to fold");
+            //actionToReturn = "fold";
+            actionToReturn = "call";
+            System.out.println("Machinelearning G) Changed call to call HMMMMZ");
         }
 
         return actionToReturn;

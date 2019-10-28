@@ -401,6 +401,10 @@ public class ActionVariables {
 
         action = plugLeaks(action, botHandStrengthInMethod, opponentBetsizeBb * gameVariables.getBigBlind(), sizing,
                 boardInMethod, (strongFlushDraw || strongOosd || strongGutshot), facingOdds);
+
+        action = neverFoldStrongEquity2(action, boardInMethod, eligibleActions, continuousTable.isPre3betOrPostRaisedPot(),
+                amountToCallBb, gameVariables.getBigBlind());
+
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
@@ -988,6 +992,45 @@ public class ActionVariables {
         return actionToReturn;
     }
 
+    private String neverFoldStrongEquity2(String action, List<Card> board, List<String> eligibleActions, boolean pre3betOrPostRaisedPot,
+                                         double amountToCallBb, double bigBlind) {
+        String actionToReturn;
+
+        if(action.equals("fold") && amountToCallBb < 100) {
+            if(board != null && board.size() == 3) {
+                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+
+                if((botHandStrength >= 0.64 && (strongFd || strongOosd)) ||
+                        ((strongFd && strongOosd) || (strongFd && strongGutshot))) {
+                    if(eligibleActions.contains("raise") && !pre3betOrPostRaisedPot && sizing / bigBlind < 100) {
+                        double random = Math.random();
+
+                        if(random <= 0.5) {
+                            actionToReturn = "call";
+                            System.out.println("A neverFoldStrongEquity()222 -> call");
+                        } else {
+                            actionToReturn = "raise";
+                            System.out.println("B neverFoldStrongEquity()222 -> call");
+                        }
+                    } else {
+                        actionToReturn = "call";
+                        System.out.println("C neverFoldStrongEquity()222 -> call");
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
     private String raiseFlopAndTurnWithStrongHand(String action, double handStrength, List<Card> board, double amountToCallBb,
                                                   double botStackBb, double oppStackBb) {
         String actionToReturn;
@@ -1152,7 +1195,7 @@ public class ActionVariables {
                     actionToReturn = action;
                 }
             } else if(action.equals("call")) {
-                if(handstrength < 0.8) {
+                if(handstrength < 0.8 && !strongDraw) {
                     if(facingOdds > 0.33) {
                         if(oppTotalBetsize >= 225) {
                             actionToReturn = "fold";

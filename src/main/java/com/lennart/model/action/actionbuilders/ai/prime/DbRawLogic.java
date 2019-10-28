@@ -444,6 +444,88 @@ public class DbRawLogic {
         closeDbConnection();
     }
 
+    private void fillRecentChipsWon() throws Exception {
+
+        //get the 20 most recent hands of opponent
+
+        //remove hands from those 20 that are older than 10 minutes
+
+        //make a sum of all ar_won of all lines in those 20 hands...
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats;");
+
+        int handcount = 0;
+        int latestHandNumber = -1;
+
+        while(rs.next() && handcount <= 10) {
+            String oppName = rs.getString("playerName");
+
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM dbstats_raw WHERE opponent_name = '" + oppName + "' ORDER BY entry DESC;");
+
+            int handNumberOfCurrentLine = rs2.getInt("handnumber");
+
+            if(handNumberOfCurrentLine != latestHandNumber) {
+                handcount++;
+                latestHandNumber = handNumberOfCurrentLine;
+            }
+
+
+
+        }
+
+
+
+
+
+
+
+
+    }
+
+
+    private void fillRecentChipsWon2(String oppName) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE opponent_name = '" + oppName + "' ORDER BY entry DESC;");
+
+        int counter = 0;
+
+        double recentChipsWon = 0;
+
+        while(rs.next()) {
+            loop: while(counter < 22) {
+                if(rs.next()) {
+                    recentChipsWon = recentChipsWon + rs.getDouble("ar_winnings");
+                    counter++;
+                } else {
+                    break loop;
+                }
+            }
+
+            for(int i = 0; i < counter; i++) {
+                rs.previous();
+            }
+
+            int entry = rs.getInt("entry");
+
+            st.executeUpdate("UPDATE dbstats_raw SET recent_chips_won = " + recentChipsWon + " WHERE entry = '" + entry + "'");
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+
+
+
+
     private void initializeDbConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver").newInstance();
         con = DriverManager.getConnection("jdbc:mysql://localhost:3306/pokertracker?&serverTimezone=UTC", "root", "");
