@@ -304,6 +304,13 @@ public class ActionVariables {
             action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable, sizingForMachineLearning);
 
             if(!actionBeforeMachineLearning.equals(action)) {
+                if(actionBeforeMachineLearning.equals("call") && action.equals("fold")) {
+                    if(facingOdds <= 0.2) {
+                        action = "call";
+                        System.out.println("Facing tiny bet, revert Machinelearning adjust to fold");
+                    }
+                }
+
                 System.out.println("---Action changed in Machinelearning from: " + actionBeforeMachineLearning + " to: " + action);
             }
             //machine learning
@@ -390,6 +397,7 @@ public class ActionVariables {
         }
 
         action = raiseFlopAndTurnWithStrongHand(action, botHandStrengthInMethod, boardInMethod, amountToCallBb, botStackBb, opponentStackBb);
+        action = doValueBet(action, continuousTable.isOpponentHasInitiative(), botHandStrength, boardInMethod, gameVariables.isBotIsButton());
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -399,6 +407,7 @@ public class ActionVariables {
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
 
+        action = preventTooThinValueRaises(action, botHandStrength, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, continuousTable, gameVariables);
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
@@ -1108,7 +1117,7 @@ public class ActionVariables {
                 }
             } else {
                 //postflop
-                if(currentSizing > 300 || effectiveStackBb <= 30) {
+                if(currentSizing > 700 || effectiveStackBb <= 12) {
                     sngSizingToReturn = 5000 * gameVariables.getBigBlind();
                     System.out.println("Change postRaise sizing to shove in adjustRaiseSizingToSng(). R");
                 } else {
@@ -1120,6 +1129,85 @@ public class ActionVariables {
         }
 
         return sngSizingToReturn;
+    }
+
+    private String preventTooThinValueRaises(String action, double handstrength, List<Card> board,
+                                             boolean strongFlushDraw, boolean strongOosd, boolean strongGutshot,
+                                             ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("raise")) {
+            if(board != null && !board.isEmpty()) {
+                if(!strongFlushDraw && !strongOosd && !strongGutshot) {
+                    if(handstrength >= 0.74 && handstrength < 0.9) {
+                        System.out.println("Change postflop too thin value raise...");
+                        actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String doValueBet(String action, boolean opponentHasInitiative, double handstrength, List<Card> board, boolean position) {
+        String actionToReturn;
+
+        if(action.equals("check")) {
+            if(!opponentHasInitiative) {
+                if(board != null && !board.isEmpty()) {
+                    if(handstrength > 0.83) {
+                        if(board.size() == 3 || board.size() == 4) {
+                            double random = Math.random();
+
+                            if(random > 0.1) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("Flop or Turn value bet");
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("Flop or Turn kept trapping check with good hand");
+                            }
+                        } else {
+                            if(position) {
+                                actionToReturn = action;
+                            } else {
+                                if(handstrength >= 0.9) {
+                                    double random = Math.random();
+
+                                    if(random > 0.1) {
+                                        actionToReturn = "bet75pct";
+                                        System.out.println("River value bet");
+                                    } else {
+                                        actionToReturn = action;
+                                        System.out.println("River kept trapping check with good hand");
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            }
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
     public void setAction(String action) {
