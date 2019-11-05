@@ -949,6 +949,46 @@ public class BoardEvaluator {
         return boatWetness;
     }
 
+    public int getFlopDryness() {
+        Map<Integer, Set<Set<Card>>> flushMap = flushEvaluator.getFlushCombos();
+        Map<Integer, Set<Set<Card>>> straightMap = straightEvaluator.getMapOfStraightCombos();
+
+        int flushes = getNumberOfCombosInMap(flushMap);
+        int straights = getNumberOfCombosInMap(straightMap);
+        int flushdraws = flushDrawEvaluator.getAllFlushDrawsFlop().size();
+        int sdraws = straightDrawEvaluator.getCombosThatGiveOosdOrGutshotFlop().size();
+
+        int total = flushes + straights + flushdraws + sdraws;
+
+        if(board.get(0).getRank() == 14 || board.get(1).getRank() == 14 || board.get(2).getRank() == 14) {
+            total = total + 200;
+        }
+
+        List<Integer> boardRanks = getSortedCardRanksFromCardList(board);
+
+        if((boardRanks.contains(13) && boardRanks.contains(12)) || (boardRanks.contains(13) && boardRanks.contains(11) || (boardRanks.contains(13) && boardRanks.contains(10)))
+            || (boardRanks.contains(12) && boardRanks.contains(11)) || (boardRanks.contains(12) && boardRanks.contains(10))
+                || (boardRanks.contains(11) && boardRanks.contains(10))) {
+            total = total + 200;
+        }
+
+        if((boardRanks.get(0) == boardRanks.get(1)) && (boardRanks.get(0) == boardRanks.get(2))) {
+            total = total + 200;
+        }
+
+        return total;
+    }
+
+    private int getNumberOfCombosInMap(Map<Integer, Set<Set<Card>>> map) {
+        int counter = 0;
+
+        for(Map.Entry<Integer, Set<Set<Card>>> entry : map.entrySet()) {
+            counter = counter + entry.getValue().size();
+        }
+
+        return counter;
+    }
+
     public StraightEvaluator getStraightEvaluator() {
         return straightEvaluator;
     }
