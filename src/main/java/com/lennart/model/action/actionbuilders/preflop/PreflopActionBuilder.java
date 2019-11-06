@@ -183,7 +183,7 @@ public class PreflopActionBuilder {
         if(oppPre2betGroup.equals("low")) {
             limit = 0.65;
         } else {
-            limit = 0.5;
+            limit = 0.45;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
