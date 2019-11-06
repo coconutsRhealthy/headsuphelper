@@ -1253,7 +1253,7 @@ public class ActionVariables {
                     if(board.size() == 3) {
                         int flopDryness = boardEvaluator.getFlopDryness();
 
-                        if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && actionToUse.equals("bet75pct")) || handstrength > 0.89
+                        if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && actionToUse.equals("bet75pct")) || handstrength > 0.85
                             || (numberOfScoresAbove80 >= 4 && handstrength < 0.65)) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play flop! " + actionToReturn + " strongFd: " + strongFd +
@@ -1263,7 +1263,7 @@ public class ActionVariables {
                             actionToReturn = action;
                         }
                     } else if(board.size() == 4) {
-                        if((boardWetness < 80 && handstrength < 0.7) || strongOosd || strongFd || handstrength > 0.89) {
+                        if((boardWetness < 80 && handstrength < 0.7) || strongOosd || strongFd || handstrength > 0.85) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play turn! " + actionToReturn + " bwetness: " + boardWetness
                                     + " hs: " + handstrength + " strongOosd: " + strongOosd + " strongFd: " + strongFd
@@ -1272,7 +1272,7 @@ public class ActionVariables {
                             actionToReturn = action;
                         }
                     } else {
-                        if ((boardWetness < 80 && handstrength < 0.7) || handstrength > 0.89) {
+                        if ((boardWetness < 80 && handstrength < 0.7) || handstrength > 0.85) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play river! " + actionToReturn + " bwetness: " + boardWetness
                                     + " hs: " + handstrength);
