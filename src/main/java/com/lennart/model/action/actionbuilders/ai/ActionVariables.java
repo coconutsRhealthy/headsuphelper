@@ -39,6 +39,8 @@ public class ActionVariables {
 
     private BoardEvaluator boardEvaluator;
 
+    int numberOfScoresAbove80;
+
     public ActionVariables() {
         //default constructor
     }
@@ -171,13 +173,14 @@ public class ActionVariables {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
             }
         } else {
+            //hier de equity logic
+            doEquityLogic(boardInMethod, gameVariables.getBotHoleCards());
+
             if(continuousTable != null && (continuousTable.isOpponentHasInitiative() && opponentActionInMethod.equals("empty"))) {
                 System.out.println("default check, opponent has initiative");
                 action = "check";
                 defaultCheck = true;
             } else {
-                //hier de equity logic
-                doEquityLogic(boardInMethod, gameVariables.getBotHoleCards());
                 botHasStrongDrawInMethod = botHasStrongDraw;
 
                 String actionAgainstLa = new Poker().getAction(this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, "la", opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, gameVariables.getBigBlind(), continuousTable.isOpponentDidPreflop4betPot(), continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative());
@@ -858,6 +861,7 @@ public class ActionVariables {
             List<Double> handStrengthAtRiverList = equity.getHandstrengthAtRiverList(boardCopy, botHoleCardsCopy, 25);
 
             int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
+            numberOfScoresAbove80 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.80);
 
             if(board.size() == 3) {
                 if(numberOfScoresAbove90 >= 8) {
@@ -1249,16 +1253,17 @@ public class ActionVariables {
                     if(board.size() == 3) {
                         int flopDryness = boardEvaluator.getFlopDryness();
 
-                        if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7) || handstrength > 0.89) {
+                        if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && actionToUse.equals("bet75pct")) || handstrength > 0.89
+                            || (numberOfScoresAbove80 >= 4 && handstrength < 0.65)) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play flop! " + actionToReturn + " strongFd: " + strongFd +
                                     " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot +
-                                    " flopdryness: " + flopDryness + " hs: " + handstrength);
+                                    " flopdryness: " + flopDryness + " hs: " + handstrength + " numberOfScoresAbove80: " + numberOfScoresAbove80);
                         } else {
                             actionToReturn = action;
                         }
                     } else if(board.size() == 4) {
-                        if((boardWetness < 53 && handstrength < 0.7) || strongOosd || strongFd || (strongGutshot && boardWetness < 80) || handstrength > 0.89) {
+                        if((boardWetness < 80 && handstrength < 0.7) || strongOosd || strongFd || handstrength > 0.89) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play turn! " + actionToReturn + " bwetness: " + boardWetness
                                     + " hs: " + handstrength + " strongOosd: " + strongOosd + " strongFd: " + strongFd
@@ -1267,7 +1272,7 @@ public class ActionVariables {
                             actionToReturn = action;
                         }
                     } else {
-                        if ((boardWetness < 53 && handstrength < 0.7) || handstrength > 0.89) {
+                        if ((boardWetness < 80 && handstrength < 0.7) || handstrength > 0.89) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play river! " + actionToReturn + " bwetness: " + boardWetness
                                     + " hs: " + handstrength);
