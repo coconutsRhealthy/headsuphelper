@@ -182,8 +182,10 @@ public class PreflopActionBuilder {
 
         if(oppPre2betGroup.equals("low")) {
             limit = 0.65;
+        } else if(oppPre2betGroup.equals("facingLimp")) {
+            limit = 0.5;
         } else {
-            limit = 0.45;
+            limit = 0.4;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
@@ -197,6 +199,10 @@ public class PreflopActionBuilder {
                     }
                 }
             }
+        }
+
+        if(limit == 0.4) {
+            preCall2betPoule = addMoreCombosToPreCall2betPoule(preCall2betPoule);
         }
 
         return preCall2betPoule;
@@ -327,6 +333,28 @@ public class PreflopActionBuilder {
         pre3betPouleToReturn.addAll(checkSet);
 
         return pre3betPouleToReturn;
+    }
+
+    private List<List<Card>> addMoreCombosToPreCall2betPoule(List<List<Card>> currentPreCall2betPoule) {
+        Set<List<Card>> checkSet = new HashSet<>();
+
+        for(List<Card> combo : currentPreCall2betPoule) {
+            checkSet.add(combo);
+        }
+
+        ActionBuilderUtil actionBuilderUtil = new ActionBuilderUtil();
+        Map<Integer, Set<Card>> mapSuited = actionBuilderUtil.getSuitedHoleCards(2, 2, 100);
+
+        for (Map.Entry<Integer, Set<Card>> entry : mapSuited.entrySet()) {
+            List<Card> combo = new ArrayList<>();
+            combo.addAll(entry.getValue());
+            checkSet.add(combo);
+        }
+
+        List<List<Card>> preCall2betPouleToReturn = new ArrayList<>();
+        preCall2betPouleToReturn.addAll(checkSet);
+
+        return preCall2betPouleToReturn;
     }
 
     private String getCallOrFoldActionFacingAllIn(double amountToCallBb, List<Card> botHoleCards,
@@ -494,7 +522,7 @@ public class PreflopActionBuilder {
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
         List<List<Card>> pre3betPoule = getPre3betPoule("high");
-        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "high");
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "facingLimp");
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)
                 || preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {

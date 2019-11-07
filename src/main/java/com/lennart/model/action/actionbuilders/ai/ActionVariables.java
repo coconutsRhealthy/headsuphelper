@@ -424,7 +424,7 @@ public class ActionVariables {
         boolean bluffOddsAreOk = new MachineLearning().bluffOddsAreOk(sizingForBluffOdds, gameVariables.getOpponentBetSize(),
                 gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBotStack(),
                 boardInMethod, gameVariables.getBotBetSize());
-        action = doPowerPlay(action, bluffOddsAreOk, strongFlushDraw, strongOosd, strongGutshot, boardWetness, boardInMethod, botHandStrength);
+        action = doPowerPlay(action, bluffOddsAreOk, strongFlushDraw, strongOosd, strongGutshot, boardWetness, boardInMethod, botHandStrength, gameVariables.getOpponentAction());
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -1237,7 +1237,7 @@ public class ActionVariables {
 
     private String doPowerPlay(String action, boolean bluffOddsAreOk, boolean strongFd,
                                boolean strongOosd, boolean strongGutshot, int boardWetness,
-                               List<Card> board, double handstrength) {
+                               List<Card> board, double handstrength, String opponentAction) {
         String actionToReturn;
         String actionToUse;
 
@@ -1253,8 +1253,8 @@ public class ActionVariables {
                     if(board.size() == 3) {
                         int flopDryness = boardEvaluator.getFlopDryness();
 
-                        if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && actionToUse.equals("bet75pct")) || handstrength > 0.85
-                            || (numberOfScoresAbove80 >= 4 && handstrength < 0.65)) {
+                        if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && (actionToUse.equals("bet75pct") || opponentAction.equals("bet75pct")))
+                                || handstrength > 0.85 || (numberOfScoresAbove80 >= 4 && handstrength < 0.65)) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play flop! " + actionToReturn + " strongFd: " + strongFd +
                                     " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot +
@@ -1263,11 +1263,11 @@ public class ActionVariables {
                             actionToReturn = action;
                         }
                     } else if(board.size() == 4) {
-                        if((boardWetness < 80 && handstrength < 0.7) || strongOosd || strongFd || handstrength > 0.85) {
+                        if((boardWetness < 80 && (handstrength < 0.7 || strongGutshot)) || strongOosd || strongFd || handstrength > 0.85) {
                             actionToReturn = actionToUse;
                             System.out.println("Power play turn! " + actionToReturn + " bwetness: " + boardWetness
                                     + " hs: " + handstrength + " strongOosd: " + strongOosd + " strongFd: " + strongFd
-                                    + " strongGutshotAndBwetness: " + (strongGutshot && boardWetness < 80));
+                                    + " strongGutshot: " + strongGutshot);
                         } else {
                             actionToReturn = action;
                         }
