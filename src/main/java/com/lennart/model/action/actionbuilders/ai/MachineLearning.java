@@ -515,13 +515,13 @@ public class MachineLearning {
                 if(ownStackAfterBluff > 0 && facingStackAfterBluff > 0) {
                     bluffOddsAreOk = odds > 0.2;
                 } else {
-                    bluffOddsAreOk = odds > 0.36;
+                    bluffOddsAreOk = odds > 0.29;
                 }
             } else {
-                bluffOddsAreOk = odds > 0.36;
+                bluffOddsAreOk = odds > 0.29;
             }
         } else {
-            bluffOddsAreOk = odds > 0.36;
+            bluffOddsAreOk = odds > 0.29;
         }
 
         return bluffOddsAreOk;
