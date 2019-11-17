@@ -359,6 +359,7 @@ public class StarsTableReader {
 
             System.out.println("Already one regged player, wait...");
             TimeUnit.SECONDS.sleep(5);
+            clickTopSngInList();
             registerNewSng();
         }
     }
@@ -675,16 +676,16 @@ public class StarsTableReader {
 
         System.out.println(bigBlindString);
 
-        int indexOfDollar = bigBlindString.indexOf("$");
+        int indexOfMinusSign = bigBlindString.indexOf("-");
 
-        if(indexOfDollar == -1) {
+        if(indexOfMinusSign == -1) {
             System.out.println("weird bigblind string!");
             return -2;
         }
 
-        bigBlindString = bigBlindString.substring(indexOfDollar);
+        bigBlindString = bigBlindString.substring(indexOfMinusSign);
         bigBlindString = bigBlindString.replaceAll("\\s+","");
-        bigBlindString = bigBlindString.replaceAll("\\$", "");
+        bigBlindString = bigBlindString.replaceAll("\\-", "");
 
         if(bigBlindString.charAt(2) != '0') {
             bigBlindString = bigBlindString.substring(0, 2);
