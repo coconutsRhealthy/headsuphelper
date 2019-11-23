@@ -616,6 +616,11 @@ public class StarsTableReader {
 
         System.out.println("read opp stack: " + bottomPlayerStack);
 
+        if(bottomPlayerStack.contains("s")) {
+            bottomPlayerStack = bottomPlayerStack.replace("s", "8");
+            System.out.println("opp stack contains 's', new value: " + bottomPlayerStack);
+        }
+
         if(bottomPlayerStack.contains("?")) {
             bottomPlayerStack = bottomPlayerStack.replace("?", "7");
             System.out.println("opp stack contains '?', new value: " + bottomPlayerStack);
@@ -636,6 +641,11 @@ public class StarsTableReader {
         String topPlayerStack = readTopPlayerStackBase();
 
         System.out.println("read botstack: " + topPlayerStack);
+
+        if(topPlayerStack.contains("s")) {
+            topPlayerStack = topPlayerStack.replace("s", "8");
+            System.out.println("botstack contains 's', new value: " + topPlayerStack);
+        }
 
         if(topPlayerStack.contains("?")) {
             topPlayerStack = topPlayerStack.replace("?", "7");
