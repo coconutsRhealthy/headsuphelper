@@ -378,6 +378,8 @@ public class PreflopActionBuilder {
 
             if(oppPre4bet_up_Group.equals("low")) {
                 limit = 0.95;
+            } else if(oppPre4bet_up_Group.equals("mediumUnknown")) {
+                limit = 0.90;
             } else if(oppPre4bet_up_Group.equals("medium"))  {
                 limit = 0.80;
             } else {
