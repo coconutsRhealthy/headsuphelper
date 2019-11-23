@@ -429,7 +429,14 @@ public class ActionVariables {
         boolean bluffOddsAreOk = new MachineLearning().bluffOddsAreOk(sizingForBluffOdds, gameVariables.getOpponentBetSize(),
                 gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBotStack(),
                 boardInMethod, gameVariables.getBotBetSize());
+
+        action = preventManyBluffsJudgeByBoard(action, botHandStrengthInMethod, boardWetness, boardInMethod, strongOosdInMethod, strongFdInMethod, strongGutshotInMethod,
+                continuousTable, gameVariables);
         action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds);
+        action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
+        action = adjustPfShortstackCalls(action, effectiveStack, eligibleActions, boardInMethod, botHandStrengthInMethod);
+        action = adjustPfShortstackFolds(action, effectiveStack, boardInMethod, eligibleActions, gameVariables.getBotHoleCards(), amountToCallBb);
+
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -442,6 +449,9 @@ public class ActionVariables {
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
         }
+
+        adjustPfSizingAfterOppLimp(action, effectiveStack, boardInMethod, gameVariables.getOpponentAction(), botIsButtonInMethod, gameVariables.getBigBlind());
+        adjustPostflopSizingIfSmallbet(action, boardInMethod, gameVariables.getPot(), gameVariables.getBigBlind());
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
@@ -1240,6 +1250,60 @@ public class ActionVariables {
         return actionToReturn;
     }
 
+    private String preventManyBluffsJudgeByBoard(String action, double handstrength, double boardWetness, List<Card> board,
+                                                 boolean strongOosd, boolean strongFd, boolean strongGutshot, ContinuousTable continuousTable,
+                                                 GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct") || action.equals("raise")) {
+                if(handstrength < 0.7) {
+                    if(!strongOosd && !strongFd && !strongGutshot && numberOfScoresAbove80 < 4) {
+                        if(board.size() == 3) {
+                            int flopDryness = boardEvaluator.getFlopDryness();
+
+                            if(flopDryness > 195) {
+                                if(action.equals("bet75pct")) {
+                                    actionToReturn = "check";
+                                    System.out.println("avg Change flop bluff bet on non favourable board to check");
+                                } else {
+                                    System.out.print("avg Change flop bluff raise on non favourable board to fold or call");
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("maintained bluff action");
+                            }
+                        } else {
+                            if(boardWetness > 80) {
+                                if(action.equals("bet75pct")) {
+                                    actionToReturn = "check";
+                                    System.out.println("avg Change turn/river bluff bet on non favourable board to check " + board.size());
+                                } else {
+                                    System.out.print("avg Change turn/river bluff raise on non favourable board to fold or call " + board.size());
+                                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                                }
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("maintained bluff action");
+                            }
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
     private String doPowerPlay(String action, boolean bluffOddsAreOk, boolean strongFd,
                                boolean strongOosd, boolean strongGutshot, int boardWetness,
                                List<Card> board, double handstrength, String opponentAction, double sizing) {
@@ -1306,6 +1370,126 @@ public class ActionVariables {
         }
 
         return actionToReturn;
+    }
+
+    private String alwaysCallFlopWithStrongOosdOrFd(String action, boolean strongFd, boolean strongOosd, List<Card> board, List<String> eligibleActions) {
+        String actionToReturn;
+
+        if(strongFd || strongOosd) {
+            if(action.equals("fold")) {
+                if(board != null && board.size() == 3) {
+                    if(eligibleActions.contains("raise")) {
+                        actionToReturn = "raise";
+                        System.out.println("Change fold to raise in alwaysCallFlopWithStrongOosdOrFd()");
+                    } else {
+                        actionToReturn = "call";
+                        System.out.println("Change fold to call in alwaysCallFlopWithStrongOosdOrFd()");
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String adjustPfShortstackCalls(String action, double effStackBb, List<String> eligibleActions, List<Card> board, double handstrength) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(board == null || board.isEmpty()) {
+                if(effStackBb < 11) {
+                    if(eligibleActions.contains("raise")) {
+                        if(handstrength > 0.75) {
+                            actionToReturn = "raise";
+                            System.out.println("Change pf shortstack call to shove");
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String adjustPfShortstackFolds(String action, double effStackBb, List<Card> board, List<String> eligibleActions,
+                                           List<Card> holeCards, double amountToCallBb) {
+        String actionToReturn;
+
+        if(action.equals("fold")) {
+            if(board == null || board.isEmpty()) {
+                if(effStackBb + amountToCallBb < 11) {
+                    System.out.println("effstackBB + amountToCallBb < 11. effStackBb: " + effStackBb + " amountToCallBb: " + amountToCallBb);
+
+                    Nash nash = new Nash();
+
+                    String nashAction = nash.doNashAction(holeCards, false, amountToCallBb + effStackBb, amountToCallBb + effStackBb);
+
+                    if(nashAction.equals("call") || nashAction.equals("raise")) {
+                        if(eligibleActions.contains("raise")) {
+                            actionToReturn = "raise";
+                            System.out.println("Change action via Nash from fold to raise");
+                        } else {
+                            actionToReturn = "call";
+                            System.out.println("Change action via Nash from fold to call");
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private void adjustPfSizingAfterOppLimp(String action, double effStackBb, List<Card> board, String oppAction, boolean position, double bigBlind) {
+        if(board == null || board.isEmpty()) {
+            if(effStackBb < 11) {
+                if(!position) {
+                    if(oppAction.equals("call")) {
+                        if(action.equals("raise")) {
+                            if(sizing < 1000) {
+                                System.out.println("Change pf sizing to shove after opplimp shortstack. Current sizing: " + sizing);
+                                sizing = 5000 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void adjustPostflopSizingIfSmallbet(String action, List<Card> board, double pot, double bigBlind) {
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct")) {
+                if(sizing / pot < 0.46) {
+                    System.out.println("Change postflop sizing to shove because now tiny sizing. Current sizing: " + sizing + " current pot: " + pot);
+                    sizing = 5000 * bigBlind;
+                }
+            }
+        }
     }
 
     private int getBoardWetness(ContinuousTable continuousTable, List<Card> board) {
