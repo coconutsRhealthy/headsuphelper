@@ -137,6 +137,9 @@ public class ActionVariables {
     }
 
     public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean realGame) throws Exception {
+        OpponentIdentifier opponentIdentifier = new OpponentIdentifier();
+        int numberOfHands = opponentIdentifier.getOpponentNumberOfHandsFromDb(gameVariables.getOpponentName());
+
         calculateHandStrengthAndDraws(gameVariables, continuousTable);
 
         List<String> eligibleActions = getEligibleActions(gameVariables);
@@ -172,7 +175,7 @@ public class ActionVariables {
         boolean defaultCheck = false;
 
         if(preflop) {
-            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName());
+            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName(), numberOfHandsIsBluffable(numberOfHands));
 
             if(action.equals("raise")) {
                 sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
@@ -432,7 +435,13 @@ public class ActionVariables {
 
         action = preventManyBluffsJudgeByBoard(action, botHandStrengthInMethod, boardWetness, boardInMethod, strongOosdInMethod, strongFdInMethod, strongGutshotInMethod,
                 continuousTable, gameVariables);
-        action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds);
+
+        if(numberOfHandsIsBluffable(numberOfHands)) {
+            if(sizingForBluffOdds < 400 || numberOfHands >= 50 && Math.random() < 0.25) {
+                action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds);
+            }
+        }
+
         action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
         action = adjustPfShortstackCalls(action, effectiveStack, eligibleActions, boardInMethod, botHandStrengthInMethod);
         action = adjustPfShortstackFolds(action, effectiveStack, boardInMethod, eligibleActions, gameVariables.getBotHoleCards(), amountToCallBb);
@@ -452,6 +461,16 @@ public class ActionVariables {
 
         adjustPfSizingAfterOppLimp(action, effectiveStack, boardInMethod, gameVariables.getOpponentAction(), botIsButtonInMethod, gameVariables.getBigBlind());
         adjustPostflopSizingIfSmallbet(action, boardInMethod, gameVariables.getPot(), gameVariables.getBigBlind());
+
+        if(!numberOfHandsIsBluffable(numberOfHands)) {
+            action = preventAllBluffs(action, botHandStrengthInMethod, boardInMethod, sizing, continuousTable, gameVariables);
+        }
+
+        action = preventBadPostCalls(action, botHandStrengthInMethod, strongFlushDraw, strongOosd, strongGutshot, boardInMethod, facingOdds);
+
+        if(!action.equals("bet75pct") && !action.equals("raise")) {
+            sizing = 0;
+        }
 
         if(boardInMethod != null && boardInMethod.size() >= 3 && (action.equals("bet75pct") || action.equals("raise")) && botHandStrength < 0.64) {
             continuousTable.setBotBluffActionDone(true);
@@ -1504,6 +1523,90 @@ public class ActionVariables {
         }
 
         return boardWetness;
+    }
+
+    private String preventAllBluffs(String action, double handstrength, List<Card> board, double sizing,
+                                    ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct") || action.equals("raise")) {
+                if(handstrength < 0.8) {
+                    if(sizing <= 120) {
+                        if(handstrength >= 0.7) {
+                            actionToReturn = action;
+                        } else {
+                            if(action.equals("bet75pct")) {
+                                actionToReturn = "check";
+                                System.out.println("prevent bluff A");
+                            } else {
+                                System.out.println("prevent bluff B");
+                                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                            }
+                        }
+                    } else {
+                        if(action.equals("bet75pct")) {
+                            actionToReturn = "check";
+                            System.out.println("prevent bluff C");
+                        } else {
+                            System.out.println("prevent bluff D");
+                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private boolean numberOfHandsIsBluffable(int numberOfHands) {
+        boolean numberOfHandsIsBluffable = false;
+
+        if(numberOfHands > 10) {
+            if((numberOfHands + 9) % 10 == 0 || (numberOfHands + 8) % 10 == 0 ||
+                    (numberOfHands + 7) % 10 == 0 || (numberOfHands + 6) % 10 == 0) {
+                numberOfHandsIsBluffable = true;
+            }
+        }
+
+        return numberOfHandsIsBluffable;
+    }
+
+    private String preventBadPostCalls(String action, double handstrength, boolean strongFd, boolean strongOosd, boolean strongGutshot,
+                                       List<Card> board, double facingOdds) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(board != null && !board.isEmpty()) {
+                if(handstrength < 0.532) {
+                    if(!strongFd && !strongOosd && !strongGutshot) {
+                        if(facingOdds > 0.28) {
+                            actionToReturn = "fold";
+                            System.out.println("Change bad postflop call to fold. Handstrength: " + handstrength);
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
     public void setAction(String action) {
