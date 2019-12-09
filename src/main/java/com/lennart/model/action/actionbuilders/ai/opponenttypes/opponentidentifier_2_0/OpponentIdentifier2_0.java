@@ -35,6 +35,8 @@ public class OpponentIdentifier2_0 {
     public static double OVERALL_LOOSENESS_MEDIAN = 0.631578947368421;
     public static double OVERALL_AGGRESSIVENESS_MEDIAN = 0.39908256880733944;
 
+    private double oppPostAggroness;
+
     public OpponentIdentifier2_0() {
         //default constructor
     }
@@ -55,6 +57,8 @@ public class OpponentIdentifier2_0 {
 
         oppLooseness = getOppLooseness(opponentData);
         oppAggressiveness = getOppAggressiveness(opponentData);
+
+        oppPostAggroness = getOppPostAggressiveness(opponentData);
     }
 
     private void printLoosenessAndTightnessBoundries(boolean includingMedium, String table) throws Exception {
@@ -326,7 +330,7 @@ public class OpponentIdentifier2_0 {
         double oppPostLooseness;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 10) {
             double postCallCount = opponentData.get("postCallCount");
             double postFoldCount = opponentData.get("postFoldCount");
             oppPostLooseness = postCallCount / (postCallCount + postFoldCount);
@@ -411,6 +415,25 @@ public class OpponentIdentifier2_0 {
 
             oppAggressiveness = (preRaiseCount + postBetCount + postRaiseCount) / (preCallCount + postCheckCount + postCallCount
                     + preRaiseCount + postBetCount + postRaiseCount);
+        } else {
+            oppAggressiveness = -1;
+        }
+
+        return oppAggressiveness;
+    }
+
+    private double getOppPostAggressiveness(Map<String, Double> opponentData) {
+        double oppAggressiveness;
+        double numberOfHands = opponentData.get("preNumberOfHands");
+
+        if(numberOfHands >= 10) {
+            double postBetCount = opponentData.get("postBetCount");
+            double postRaiseCount = opponentData.get("postRaiseCount");
+
+            double postCheckCount = opponentData.get("postCheckCount");
+            double postCallCount = opponentData.get("postCallCount");
+
+            oppAggressiveness = (postBetCount + postRaiseCount) / (postCheckCount + postCallCount + postBetCount + postRaiseCount);
         } else {
             oppAggressiveness = -1;
         }
@@ -605,5 +628,9 @@ public class OpponentIdentifier2_0 {
 
     public double getOppAggressiveness() {
         return oppAggressiveness;
+    }
+
+    public double getOppPostAggroness() {
+        return oppPostAggroness;
     }
 }

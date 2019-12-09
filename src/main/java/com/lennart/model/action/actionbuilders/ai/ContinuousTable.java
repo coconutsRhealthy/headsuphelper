@@ -38,6 +38,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     private String game;
 
+    private double flopHandstrength;
+    private double turnHandstrength;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -69,6 +72,9 @@ public class ContinuousTable implements ContinuousTableable {
                 boolean isNewHand = isNewHand();
 
                 if(isNewHand) {
+                    flopHandstrength = -1;
+                    turnHandstrength = -1;
+
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
                         bigBlind = new StarsTableReader().readBigBlindFromSngScreen();
@@ -500,5 +506,21 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setGame(String game) {
         this.game = game;
+    }
+
+    public double getFlopHandstrength() {
+        return flopHandstrength;
+    }
+
+    public void setFlopHandstrength(double flopHandstrength) {
+        this.flopHandstrength = flopHandstrength;
+    }
+
+    public double getTurnHandstrength() {
+        return turnHandstrength;
+    }
+
+    public void setTurnHandstrength(double turnHandstrength) {
+        this.turnHandstrength = turnHandstrength;
     }
 }
