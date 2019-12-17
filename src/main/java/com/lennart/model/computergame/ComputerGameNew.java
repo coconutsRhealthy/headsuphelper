@@ -339,7 +339,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
     }
 
     private double getComputerSizing() {
-        double sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board);
+        double sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, computerTotalBetSize, computerStack, myStack, potSize, bigBlind, board, computerHandStrength, strongFlushDraw, strongOosd);
         return sizing;
     }
 

@@ -20,7 +20,7 @@ public class FoldStatBluffAdjuster {
                     actionToReturn = action;
                 } else {
                     if(handStrength < 0.64) {
-                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board, handStrength, false, false);
                         RangeTracker rangeTracker = new RangeTracker();
 
                         if(sizing > (facingBetSize + facingStack)) {
@@ -128,7 +128,7 @@ public class FoldStatBluffAdjuster {
             if(action.equals("bet75pct") || action.equals("raise")) {
                 if(handStrength < 0.64) {
                     double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                            ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                            ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength, false, false);
 
                     RangeTracker rangeTracker = new RangeTracker();
                     String rangeRoute = rangeTracker.getRangeRoute(action, position, sizing, bigBlind, board);
@@ -219,7 +219,7 @@ public class FoldStatBluffAdjuster {
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(handStrength < 0.64) {
                 double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                        ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                        ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength, strongFlushDraw, strongOosd);
 
                 if(sizing / bigBlind >= 17.5) {
                     double opponentFoldStat = new FoldStatsKeeper().getFoldStatFromDb(opponentName);

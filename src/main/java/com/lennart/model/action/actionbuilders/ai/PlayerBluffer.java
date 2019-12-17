@@ -17,7 +17,7 @@ public class PlayerBluffer {
         if(board != null && board.size() >= 3) {
             if((action.equals("check") && !opponentHasInitiative) || action.equals("fold")) {
                 if(handStrength < 0.64) {
-                    double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                    double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board, handStrength, false, false);
 
                     if(sizing > (facingBetSize + facingStack)) {
                         sizing = (facingBetSize + facingStack);

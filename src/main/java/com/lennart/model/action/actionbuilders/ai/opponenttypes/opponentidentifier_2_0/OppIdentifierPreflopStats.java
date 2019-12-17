@@ -37,7 +37,7 @@ public class OppIdentifierPreflopStats {
             double pre3betRatio = pre3betNumber / preTotal;
             double pre4bet_up_ratio = pre4bet_up_Number / preTotal;
 
-            if(preTotal >= 11) {
+            if(preTotal >= 9) {
                 if(pre2betRatio < PRE_2_BET_33PCT_VALUE) {
                     oppPreGroupMap.put("pre2betGroup", "low");
                 } else if(pre2betRatio < PRE_2_BET_66PCT_VALUE) {

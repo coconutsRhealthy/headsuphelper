@@ -407,7 +407,7 @@ public class RuleApplier {
                 if(handStrength > 0.63 && handStrength < 0.95) {
                     if(action.equals("bet75pct")) {
                         double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                                ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                                ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength, strongFlushDraw, strongOosd);
 
                         if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
                             sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
@@ -420,7 +420,7 @@ public class RuleApplier {
                         }
                     } else if(action.equals("raise")) {
                         double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                                ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                                ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength, strongFlushDraw, strongOosd);
 
                         if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
                             sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
@@ -451,7 +451,7 @@ public class RuleApplier {
                     if(handStrength >= 0.95) {
                         if(action.equals("bet75pct")) {
                             double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength, strongFlushDraw, strongOosd);
 
                             if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
                                 sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
@@ -468,7 +468,7 @@ public class RuleApplier {
                             }
                         } else if(action.equals("raise")) {
                             double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind, ownBetSizeBb * bigBlind,
-                                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board);
+                                    ownStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, bigBlind, board, handStrength, strongFlushDraw, strongOosd);
 
                             if(sizing > ((opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind))) {
                                 sizing = (opponentBetSizeBb * bigBlind) + (opponentStackBb * bigBlind);
@@ -693,7 +693,7 @@ public class RuleApplier {
         if(action.equals("check")) {
             if(opponentType.equals("tp")) {
                 if(strongDraw) {
-                    double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                    double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board, handStrength, false, false);
 
                     if(sizing / bigBlind < 20) {
                         double random = Math.random();
@@ -708,7 +708,7 @@ public class RuleApplier {
                     }
                 } else if(board.size() == 3 || board.size() == 4) {
                     if(handStrength > 0.5 && handStrength < 0.75) {
-                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                        double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board, handStrength, false, false);
 
                         if(sizing / bigBlind < 13) {
                             double random = Math.random();
@@ -727,7 +727,7 @@ public class RuleApplier {
                 } else if(board.size() == 5) {
                     if(handStrength < 0.4) {
                         if(position) {
-                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                            double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board, handStrength, false, false);
 
                             if(sizing / bigBlind < 12) {
                                 double random = Math.random();
@@ -857,7 +857,7 @@ public class RuleApplier {
                         } else {
                             double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind,
                                     ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind,
-                                    potSizeBb * bigBlind, bigBlind, board);
+                                    potSizeBb * bigBlind, bigBlind, board, handStrength, strongFlushDraw, strongOosd);
 
                             if(sizing / bigBlind > 20) {
                                 List<String> eligibleActionsNoRaise = new ArrayList<>();
@@ -881,7 +881,7 @@ public class RuleApplier {
                     } else {
                         double sizing = new Sizing().getAiBotSizing(opponentBetSizeBb * bigBlind,
                                 ownBetSizeBb * bigBlind, ownStackBb * bigBlind, opponentStackBb * bigBlind,
-                                potSizeBb * bigBlind, bigBlind, board);
+                                potSizeBb * bigBlind, bigBlind, board, handStrength, strongFlushDraw, strongOosd);
 
                         if(sizing / bigBlind > 20) {
                             List<String> eligibleActionsNoRaise = new ArrayList<>();
@@ -931,7 +931,7 @@ public class RuleApplier {
 
         if(action.equals("bet75pct")) {
             if(!preflop) {
-                double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board);
+                double sizing = new Sizing().getAiBotSizing(facingBetSize, myBetSize, myStack, facingStack, pot, bigBlind, board, handStrength, false, false);
                 double sizingInBb = sizing / bigBlind;
 
                 if(board.size() == 3 || board.size() == 4) {

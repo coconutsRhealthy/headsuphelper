@@ -165,6 +165,8 @@ public class ActionVariables {
         boolean preflop = gameVariables.getBoard().isEmpty();
         List<Card> boardInMethod = gameVariables.getBoard();
 
+        Sizing sizingYo = new Sizing();
+
         if(realGame) {
             setOpponentHasInitiative(opponentActionInMethod, continuousTable, gameVariables);
         }
@@ -176,10 +178,10 @@ public class ActionVariables {
         boolean defaultCheck = false;
 
         if(preflop) {
-            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName(), numberOfHandsIsBluffable(numberOfHands, gameVariables.getOpponentName()));
+            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName(), numberOfHandsIsBluffable(numberOfHands));
 
             if(action.equals("raise")) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             }
         } else {
             //hier de equity logic
@@ -213,7 +215,7 @@ public class ActionVariables {
 
                     if(streetInMethod.equals("river")) {
                         if(actionAgainstLa.equals("bet75pct") || actionAgainstLa.equals("raise")) {
-                            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                            sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
 
                             if(sizing / gameVariables.getBigBlind() > 15) {
                                 action = "toDetermine";
@@ -233,7 +235,7 @@ public class ActionVariables {
                 }
 
                 if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-                    sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                    sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
                 }
             }
 
@@ -303,7 +305,7 @@ public class ActionVariables {
                     botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
 
             if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
                 sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
 
@@ -312,7 +314,7 @@ public class ActionVariables {
             //machine learning
             String actionBeforeMachineLearning = action;
 
-            double sizingForMachineLearning = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            double sizingForMachineLearning = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable, sizingForMachineLearning);
 
             if(!actionBeforeMachineLearning.equals(action)) {
@@ -328,18 +330,18 @@ public class ActionVariables {
             //machine learning
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
                 sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
         } else {
-            double sizingForMachineLearning = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            double sizingForMachineLearning = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             action = new MachineLearningPreflop().adjustActionToDbSaveData(this, gameVariables, sizingForMachineLearning);
         }
 
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
 
         if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
-            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
         }
 
         if((botStackBb <= 10) || (opponentStackBb + opponentBetsizeBb <= 10)) {
@@ -377,7 +379,7 @@ public class ActionVariables {
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             }
 
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
@@ -413,7 +415,7 @@ public class ActionVariables {
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             }
 
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
@@ -424,7 +426,7 @@ public class ActionVariables {
 
         double sizingForBluffOdds;
         if(sizing == 0) {
-            sizingForBluffOdds = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+            sizingForBluffOdds = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             sizingForBluffOdds = adjustRaiseSizingToSng(sizingForBluffOdds, action, gameVariables, effectiveStack);
         } else {
             sizingForBluffOdds = sizing;
@@ -437,9 +439,9 @@ public class ActionVariables {
         action = preventManyBluffsJudgeByBoard(action, botHandStrengthInMethod, boardWetness, boardInMethod, strongOosdInMethod, strongFdInMethod, strongGutshotInMethod,
                 continuousTable, gameVariables);
 
-        if(numberOfHandsIsBluffable(numberOfHands, gameVariables.getOpponentName())) {
+        if(numberOfHandsIsBluffable(numberOfHands)) {
             if(sizingForBluffOdds < 400 || numberOfHands >= 50 && Math.random() < 0.25) {
-                action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds);
+                action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds, facingOdds);
             }
         }
 
@@ -450,7 +452,7 @@ public class ActionVariables {
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             }
 
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
@@ -463,16 +465,16 @@ public class ActionVariables {
         adjustPfSizingAfterOppLimp(action, effectiveStack, boardInMethod, gameVariables.getOpponentAction(), botIsButtonInMethod, gameVariables.getBigBlind());
         adjustPostflopSizingIfSmallbet(action, boardInMethod, gameVariables.getPot(), gameVariables.getBigBlind());
 
-        if(!numberOfHandsIsBluffable(numberOfHands, gameVariables.getOpponentName())) {
+        if(!numberOfHandsIsBluffable(numberOfHands)) {
             action = preventAllBluffs(action, botHandStrengthInMethod, boardInMethod, sizing, continuousTable, gameVariables, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod);
         }
 
-        action = preventBadPostCalls(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, facingOdds, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength());
-        action = adjustPostFoldsToAggroness(action, gameVariables.getOpponentName(), boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb);
+        action = preventBadPostCalls(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, facingOdds);
+        action = adjustPostFoldsToAggroness(action, boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, facingOdds, gameVariables.getOpponentName());
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
-                sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard());
+                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
             }
 
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
@@ -1337,7 +1339,7 @@ public class ActionVariables {
 
     private String doPowerPlay(String action, boolean bluffOddsAreOk, boolean strongFd,
                                boolean strongOosd, boolean strongGutshot, int boardWetness,
-                               List<Card> board, double handstrength, String opponentAction, double sizing) {
+                               List<Card> board, double handstrength, String opponentAction, double sizing, double facingOdds) {
         String actionToReturn;
         String actionToUse;
 
@@ -1350,45 +1352,50 @@ public class ActionVariables {
         if(board != null && !board.isEmpty()) {
             if(!action.equals("bet75pct") && !action.equals("raise")) {
                 if(bluffOddsAreOk) {
-                    if(board.size() == 3) {
-                        int flopDryness = boardEvaluator.getFlopDryness();
+                    if(facingOdds < 0.485) {
+                        if(board.size() == 3) {
+                            int flopDryness = boardEvaluator.getFlopDryness();
 
-                        if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && (actionToUse.equals("bet75pct") || opponentAction.equals("bet75pct")))
-                                || handstrength > 0.85 || (numberOfScoresAbove80 >= 4 && handstrength < 0.65)) {
-                            actionToReturn = actionToUse;
-                            System.out.println("Power play flop! " + actionToReturn + " strongFd: " + strongFd +
-                                    " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot +
-                                    " flopdryness: " + flopDryness + " hs: " + handstrength + " numberOfScoresAbove80: " + numberOfScoresAbove80);
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else if(board.size() == 4) {
-                        if((boardWetness < 80 && (handstrength < 0.7 || strongGutshot)) || strongOosd || strongFd || handstrength > 0.85) {
-                            if(actionToUse.equals("raise") && sizing > 300 && !strongOosd && !strongFd && handstrength <= 0.85) {
-                                //don't raise, too big
-                                actionToReturn = action;
-                            } else {
+                            if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && (actionToUse.equals("bet75pct") || opponentAction.equals("bet75pct")))
+                                    || handstrength > 0.85 || (numberOfScoresAbove80 >= 4 && handstrength < 0.65)) {
                                 actionToReturn = actionToUse;
-                                System.out.println("Power play turn! " + actionToReturn + " bwetness: " + boardWetness
-                                        + " hs: " + handstrength + " strongOosd: " + strongOosd + " strongFd: " + strongFd
-                                        + " strongGutshot: " + strongGutshot);
+                                System.out.println("Power play flop! " + actionToReturn + " strongFd: " + strongFd +
+                                        " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot +
+                                        " flopdryness: " + flopDryness + " hs: " + handstrength + " numberOfScoresAbove80: " + numberOfScoresAbove80);
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else if(board.size() == 4) {
+                            if((boardWetness < 80 && (handstrength < 0.7 || strongGutshot)) || strongOosd || strongFd || handstrength > 0.85) {
+                                if(actionToUse.equals("raise") && sizing > 300 && !strongOosd && !strongFd && handstrength <= 0.85) {
+                                    //don't raise, too big
+                                    actionToReturn = action;
+                                } else {
+                                    actionToReturn = actionToUse;
+                                    System.out.println("Power play turn! " + actionToReturn + " bwetness: " + boardWetness
+                                            + " hs: " + handstrength + " strongOosd: " + strongOosd + " strongFd: " + strongFd
+                                            + " strongGutshot: " + strongGutshot);
+                                }
+                            } else {
+                                actionToReturn = action;
                             }
                         } else {
-                            actionToReturn = action;
+                            if((boardWetness < 80 && handstrength < 0.7) || handstrength > 0.85) {
+                                if(actionToUse.equals("raise") && sizing > 300 && handstrength <= 0.85) {
+                                    //don't raise, too big
+                                    actionToReturn = action;
+                                } else {
+                                    actionToReturn = actionToUse;
+                                    System.out.println("Power play river! " + actionToReturn + " bwetness: " + boardWetness
+                                            + " hs: " + handstrength);
+                                }
+                            } else {
+                                actionToReturn = action;
+                            }
                         }
                     } else {
-                        if((boardWetness < 80 && handstrength < 0.7) || handstrength > 0.85) {
-                            if(actionToUse.equals("raise") && sizing > 300 && handstrength <= 0.85) {
-                                //don't raise, too big
-                                actionToReturn = action;
-                            } else {
-                                actionToReturn = actionToUse;
-                                System.out.println("Power play river! " + actionToReturn + " bwetness: " + boardWetness
-                                        + " hs: " + handstrength);
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
+                        System.out.println("prevent powerplay, cause too high facing odds");
+                        actionToReturn = action;
                     }
                 } else {
                     actionToReturn = action;
@@ -1597,47 +1604,37 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private boolean numberOfHandsIsBluffable(int numberOfHands, String oppName) throws Exception {
-        boolean numberOfHandsIsBluffable = false;
+    private boolean numberOfHandsIsBluffable(int numberOfHands) {
+        boolean numberOfHandsIsBluffable = true;
 
-        if(numberOfHands > 10) {
-            if((numberOfHands + 9) % 10 == 0 || (numberOfHands + 8) % 10 == 0 ||
-                    (numberOfHands + 7) % 10 == 0 || (numberOfHands + 6) % 10 == 0) {
-                OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
+        if((numberOfHands + 9) % 20 == 0 || (numberOfHands + 8) % 20 == 0 ||
+                (numberOfHands + 7) % 20 == 0 || (numberOfHands + 6) % 20 == 0 ||
+                    (numberOfHands + 5) % 20 == 0 || (numberOfHands + 4) % 20 == 0 ||
+                        (numberOfHands + 3) % 20 == 0 || (numberOfHands + 2) % 20 == 0 ||
+                            (numberOfHands + 1) % 20 == 0 || (numberOfHands ) % 20 == 0) {
 
-                System.out.println("numberofhandsbluffable looseness: " + opponentIdentifier2_0.getOppPostLooseness());
-
-                if(opponentIdentifier2_0.getOppPostLooseness() <= 0.44) {
-                    numberOfHandsIsBluffable = true;
-                    System.out.println("Number of hands bluffable. OppLooseness: " + opponentIdentifier2_0.getOppPostLooseness());
-                }
-            }
+            numberOfHandsIsBluffable = false;
         }
 
         return numberOfHandsIsBluffable;
     }
 
     private String preventBadPostCalls(String action, double handstrength, boolean strongFd, boolean strongOosd,
-                                       List<Card> board, double facingOdds, double flopHs, double turnHs) {
+                                       List<Card> board, double facingOdds) {
         String actionToReturn;
 
         if(action.equals("call")) {
             if(board != null && !board.isEmpty()) {
-                if(handstrength < 0.8) {
-                    if((flopHs > 0.8 || turnHs > 0.8) && handstrength > 0.65) {
-                        actionToReturn = action;
-                        System.out.println("Kept call because: flophs: " + flopHs + " turnhs: " + turnHs + " currenths: " + handstrength);
-                    } else {
-                        if(!strongFd && !strongOosd) {
-                            if(facingOdds > 0.2) {
-                                actionToReturn = "fold";
-                                System.out.println("Change bad postflop call to fold. Handstrength: " + handstrength);
-                            } else {
-                                actionToReturn = action;
-                            }
+                if(handstrength < 0.6) {
+                    if(!strongFd && !strongOosd) {
+                        if(facingOdds > 0.2) {
+                            actionToReturn = "fold";
+                            System.out.println("Change bad postflop call to fold. Handstrength: " + handstrength);
                         } else {
                             actionToReturn = action;
                         }
+                    } else {
+                        actionToReturn = action;
                     }
                 } else {
                     actionToReturn = action;
@@ -1652,22 +1649,25 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String adjustPostFoldsToAggroness(String action, String oppName, List<Card> board, double handstrength,
-                                            double flopHandstrength, double turnHandstrength, double oppStackBb, double botStackBb, double botBetsizeBb, double potsizeBb, double amountToCallBb) throws Exception {
+    private String adjustPostFoldsToAggroness(String action, List<Card> board, double handstrength,
+                                              double flopHandstrength, double turnHandstrength, double oppStackBb,
+                                              double botStackBb, double botBetsizeBb, double potsizeBb,
+                                              double amountToCallBb, double facingOdds, String oppName) throws Exception {
         String actionToReturn;
 
         if(action.equals("fold")) {
             if(board != null && !board.isEmpty()) {
-                if(handstrength >= 0.685 || (flopHandstrength >= 0.685 && handstrength > 0.44) || (turnHandstrength >= 0.685 && handstrength > 0.44)) {
-                    OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
+                if(facingOdds < 0.448) {
+                    if(handstrength >= 0.64 || (flopHandstrength >= 0.64 && handstrength > 0.45) || (turnHandstrength >= 0.64 && handstrength > 0.45)) {
+                        double oppPostAggroness = new OpponentIdentifier2_0(oppName).getOppPostAggroness();
 
-                    System.out.println("adjust folds opp postaggroness: " + opponentIdentifier2_0.getOppPostAggroness());
-
-                    if(opponentIdentifier2_0.getOppPostAggroness() >= 0.37) {
-                        actionToReturn = "call";
-                        System.out.println("Change postflop fold to call! Against aggro. Aggroness: " + opponentIdentifier2_0.getOppPostAggroness() + " Flophs: " + flopHandstrength + " Turnhs: " + turnHandstrength + " currentHS: " + handstrength);
-
-                        actionToReturn = preventCallIfOpponentOrBotAlmostAllInAfterCall(actionToReturn, oppStackBb, botStackBb, botBetsizeBb, potsizeBb, amountToCallBb, board);
+                        if(oppPostAggroness > 0.6) {
+                            actionToReturn = "call";
+                            System.out.println("Change postflop fold to call! " + " Flophs: " + flopHandstrength + " Turnhs: " + turnHandstrength + " currentHS: " + handstrength + " oppPostAggroness: " + oppPostAggroness);
+                            actionToReturn = preventCallIfOpponentOrBotAlmostAllInAfterCall(actionToReturn, oppStackBb, botStackBb, botBetsizeBb, potsizeBb, amountToCallBb, board);
+                        } else {
+                            actionToReturn = action;
+                        }
                     } else {
                         actionToReturn = action;
                     }

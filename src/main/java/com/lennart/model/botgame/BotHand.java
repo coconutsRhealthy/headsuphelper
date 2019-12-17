@@ -162,7 +162,7 @@ public class BotHand {
         botAction = new Poker().getAction(null, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod, facingOdds, effectiveStack, botHasStrongDrawInMethod, botHandStrengthInMethod, opponentType, opponentBetsizeBb, botBetsizeBb, opponentStackBb, botStackBb, preflop, boardInMethod, false, false, false, bigBlind, false, false, false, false, false, 0, true);
 
         if(botAction.equals("bet75pct") || botAction.equals("raise")) {
-            sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, botTotalBetSize, botStack, opponentStack, potSize, bigBlind, board);
+            sizing = new Sizing().getAiBotSizing(opponentTotalBetSize, botTotalBetSize, botStack, opponentStack, potSize, bigBlind, board, 0.55, false, false);
         }
 
         //NetBetTableReader.performActionOnSite(botAction, sizing);

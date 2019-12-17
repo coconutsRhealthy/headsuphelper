@@ -9,14 +9,17 @@ import java.util.List;
  */
 public class Sizing {
 
+    private double sizingPercentage = -1;
+    private double raiseOddsToUseClassVar = -1;
+
     public double getAiBotSizing(double facingBetSize, double myBetSize, double myStack, double facingStack,
-                                 double pot, double bigBlind, List<Card> board) {
+                                 double pot, double bigBlind, List<Card> board, double handstrength, boolean strongFd, boolean strongOosd) {
         double sizing;
 
         if(board == null || board.isEmpty()) {
             sizing = getAiBotPreflopSizing(facingBetSize, myBetSize, facingStack, myStack, bigBlind);
         } else {
-            sizing = getAiBotPostFlopSizing(board, facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
+            sizing = getAiBotPostFlopSizing(board, facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize, handstrength, strongFd, strongOosd);
         }
 
         if(sizing < 0) {
@@ -24,6 +27,64 @@ public class Sizing {
         }
 
         return sizing;
+    }
+
+    private void setTheSizingPercentage(double handstrength, boolean strongFd, boolean strongOosd) {
+        if(handstrength >= 0.85) {
+            double random = Math.random();
+
+            if(random < 0.25) {
+                sizingPercentage = 1.48;
+                raiseOddsToUseClassVar = 1.86;
+            } else if(random < 0.7) {
+                sizingPercentage = 0.97;
+                raiseOddsToUseClassVar = 2.14;
+            } else {
+                sizingPercentage = 0.54;
+                raiseOddsToUseClassVar = 2.85;
+            }
+        }
+
+        if(sizingPercentage == -1 && (strongFd || strongOosd)) {
+            double random = Math.random();
+
+            if(random < 0.25) {
+                sizingPercentage = 1.48;
+                raiseOddsToUseClassVar = 1.86;
+            } else if(random < 0.5) {
+                sizingPercentage = 0.97;
+                raiseOddsToUseClassVar = 2.14;
+            } else {
+                sizingPercentage = 0.54;
+                raiseOddsToUseClassVar = 2.85;
+            }
+        }
+
+        if(sizingPercentage == -1 && (handstrength >= 0.6 && handstrength < 0.85)) {
+            sizingPercentage = 0.54;
+            raiseOddsToUseClassVar = 2.85;
+        }
+
+        if(sizingPercentage == -1 && handstrength < 0.6) {
+            double random = Math.random();
+
+            if(random < 0.1) {
+                sizingPercentage = 1.48;
+                raiseOddsToUseClassVar = 1.86;
+            } else if(random < 0.22) {
+                sizingPercentage = 0.97;
+                raiseOddsToUseClassVar = 2.14;
+            } else {
+                sizingPercentage = 0.54;
+                raiseOddsToUseClassVar = 2.85;
+            }
+        }
+
+        if(sizingPercentage == -1) {
+            sizingPercentage = 0.54;
+            raiseOddsToUseClassVar = 2.85;
+            System.out.println("sizing weird percentage default should not come here");
+        }
     }
 
     public double getRuleBotSizing(double handStrength, double facingBetSize, double myBetSize, double facingStack,
@@ -187,8 +248,10 @@ public class Sizing {
         return sizingToReturn;
     }
 
-    private double getAiBotPostFlopSizing(List<Card> board, double facingBetSize, double pot, double myStack, double facingStack, double bigBlind, double myBetSize) {
+    private double getAiBotPostFlopSizing(List<Card> board, double facingBetSize, double pot, double myStack, double facingStack, double bigBlind, double myBetSize, double handstrength, boolean strongFd, boolean strongOosd) {
         double sizing = 0;
+
+        setTheSizingPercentage(handstrength, strongFd, strongOosd);
 
         if(board.size() == 3) {
             sizing = getFlopSizing(facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
@@ -216,15 +279,15 @@ public class Sizing {
         } else {
             if(opponentBetSize == 0) {
                 if(potSizeBb <= 8) {
-                    flopSizing = 0.54 * potSize;
+                    flopSizing = sizingPercentage * potSize;
                 } else if(potSizeBb > 8 && potSizeBb <= 24) {
                     double flopBetPercentage = getFlopBetPercentage(effectiveStack, potSize, 0.7, 0.75);
 
                     if(flopBetPercentage < 0.37) {
                         flopBetPercentage = 0.5;
                     }
-                    if(flopBetPercentage > 0.54) {
-                        flopBetPercentage = 0.54;
+                    if(flopBetPercentage > sizingPercentage) {
+                        flopBetPercentage = sizingPercentage;
                     }
 
                     flopSizing = flopBetPercentage * potSize;
@@ -234,8 +297,8 @@ public class Sizing {
                     if(flopBetPercentage < 0.2) {
                         flopBetPercentage = 0.2;
                     }
-                    if(flopBetPercentage > 0.54) {
-                        flopBetPercentage = 0.54;
+                    if(flopBetPercentage > sizingPercentage) {
+                        flopBetPercentage = sizingPercentage;
                     }
 
                     flopSizing = flopBetPercentage * potSize;
@@ -244,7 +307,8 @@ public class Sizing {
                 double raiseOddsToUse;
 
                 if(myBetSize < 5) {
-                    raiseOddsToUse = 2.85;
+                    //raiseOddsToUse = 2.85;
+                    raiseOddsToUse = raiseOddsToUseClassVar;
                 } else {
                     raiseOddsToUse = 2.1;
                 }
@@ -276,23 +340,23 @@ public class Sizing {
                 double turnBetPercentage3bet = getTurnBetPercentage(effectiveStack, potSize, 0.75);
                 double turnBetPercentage4bet = getTurnBetPercentage(effectiveStack, potSize, 0.51);
 
-                if(turnBetPercentage3bet > 0.54) {
-                    turnBetPercentage3bet = 0.54;
+                if(turnBetPercentage3bet > sizingPercentage) {
+                    turnBetPercentage3bet = sizingPercentage;
                 }
 
-                if(turnBetPercentage4bet > 0.54) {
-                    turnBetPercentage4bet = 0.54;
+                if(turnBetPercentage4bet > sizingPercentage) {
+                    turnBetPercentage4bet = sizingPercentage;
                 }
 
-                if(turnBetPercentage3bet > 0.54) {
-                    turnSizing = 0.54 * potSize;
-                } else if(turnBetPercentage3bet >= 0.54) {
-                    turnSizing = 0.54 * potSize;
+                if(turnBetPercentage3bet > sizingPercentage) {
+                    turnSizing = sizingPercentage * potSize;
+                } else if(turnBetPercentage3bet >= sizingPercentage) {
+                    turnSizing = sizingPercentage * potSize;
                 } else if(turnBetPercentage3bet > 0.4) {
-                    double percentage = getTurnBetPercentage(effectiveStack, potSize, 0.54);
+                    double percentage = getTurnBetPercentage(effectiveStack, potSize, sizingPercentage);
 
-                    if(percentage > 0.54) {
-                        percentage = 0.54;
+                    if(percentage > sizingPercentage) {
+                        percentage = sizingPercentage;
                     }
 
                     turnSizing = percentage * potSize;
@@ -305,7 +369,8 @@ public class Sizing {
                 double raiseOddsToUse;
 
                 if(myBetSize < 5) {
-                    raiseOddsToUse = 2.85;
+                    //raiseOddsToUse = 2.85;
+                    raiseOddsToUse = raiseOddsToUseClassVar;
                 } else {
                     raiseOddsToUse = 2.1;
                 }
@@ -334,13 +399,14 @@ public class Sizing {
             if(botStack <= 1.2 * potSize) {
                 riverSizing = botStack + (0.05 * botStack);
             } else {
-                riverSizing = 0.54 * potSize;
+                riverSizing = sizingPercentage * potSize;
             }
         } else {
             double raiseOddsToUse;
 
             if(myBetSize < 5) {
-                raiseOddsToUse = 2.85;
+                //raiseOddsToUse = 2.85;
+                raiseOddsToUse = raiseOddsToUseClassVar;
             } else {
                 raiseOddsToUse = 2.1;
             }

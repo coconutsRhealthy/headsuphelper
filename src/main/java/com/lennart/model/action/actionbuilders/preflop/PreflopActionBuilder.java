@@ -221,9 +221,9 @@ public class PreflopActionBuilder {
 
         double limit;
 
-        if(oppPre3betGroup.equals("low")) {
+        if(oppPre3betGroup.equals("low") || oppPre3betGroup.equals("mediumUnknown")) {
             limit = 0.75;
-        } else if(oppPre3betGroup.equals("medium") || oppPre3betGroup.equals("mediumUnknown")){
+        } else if(oppPre3betGroup.equals("medium")){
             limit = 0.6;
         } else {
             limit = 0.5;
@@ -398,6 +398,8 @@ public class PreflopActionBuilder {
 
             if(oppPre4bet_up_Group.equals("low")) {
                 limit = 0.95;
+            } else if(oppPre4bet_up_Group.equals("mediumUnknown")) {
+                limit = 0.90;
             } else if(oppPre4bet_up_Group.equals("medium"))  {
                 limit = 0.85;
             } else {
