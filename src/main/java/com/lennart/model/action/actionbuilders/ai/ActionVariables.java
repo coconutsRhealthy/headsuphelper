@@ -390,7 +390,7 @@ public class ActionVariables {
 
         try {
             Nash nash = new Nash();
-            boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb, boardInMethod, gameVariables.getOpponentAction(), opponentStackBb, amountToCallBb);
+            boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb, boardInMethod, gameVariables.getOpponentAction(), opponentStackBb, amountToCallBb, gameVariables.getBigBlind());
 
             if(nashActionIsPossible) {
                 action = nash.doNashAction(gameVariables.getBotHoleCards(), botIsButtonInMethod, effectiveStack, amountToCallBb);
@@ -446,7 +446,7 @@ public class ActionVariables {
         }
 
         action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
-        action = adjustPfShortstackCalls(action, effectiveStack, eligibleActions, boardInMethod, botHandStrengthInMethod);
+        action = adjustPfShortstackCalls(action, effectiveStack, eligibleActions, boardInMethod, botHandStrengthInMethod, botIsButtonInMethod);
         action = adjustPfShortstackFolds(action, effectiveStack, boardInMethod, eligibleActions, gameVariables.getBotHoleCards(), amountToCallBb);
 
 
@@ -490,6 +490,10 @@ public class ActionVariables {
 
         if(action.equals("raise") && boardInMethod != null && boardInMethod.size() >= 3) {
             continuousTable.setPre3betOrPostRaisedPot(true);
+        }
+
+        if(boardInMethod != null && !boardInMethod.isEmpty() && action.equals("raise") && botHandStrengthInMethod < 0.8) {
+            System.out.println("bluff raise here");
         }
 
         if(realGame) {
@@ -1407,6 +1411,11 @@ public class ActionVariables {
             actionToReturn = action;
         }
 
+        if(!action.equals("raise") && actionToReturn.equals("raise")) {
+            actionToReturn = action;
+            System.out.println("revert pwerplay raise back to old action");
+        }
+
         return actionToReturn;
     }
 
@@ -1436,10 +1445,10 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String adjustPfShortstackCalls(String action, double effStackBb, List<String> eligibleActions, List<Card> board, double handstrength) {
+    private String adjustPfShortstackCalls(String action, double effStackBb, List<String> eligibleActions, List<Card> board, double handstrength, boolean position) {
         String actionToReturn;
 
-        if(action.equals("call")) {
+        if(action.equals("call") && !position) {
             if(board == null || board.isEmpty()) {
                 if(effStackBb < 11) {
                     if(eligibleActions.contains("raise")) {

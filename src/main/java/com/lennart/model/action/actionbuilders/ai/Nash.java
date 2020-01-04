@@ -10,14 +10,26 @@ import java.util.Map;
 public class Nash {
 
     public boolean nashActionIsPossible(double effectiveStackBb, boolean position, double botBetSizeBb, List<Card> board,
-                                        String opponentAction, double opponentStackBb, double amountToCallBb) {
+                                        String opponentAction, double opponentStackBb, double amountToCallBb, double bigBlind) {
+        double nashPositionBbLimit;
+
+        if(bigBlind <= 30) {
+            nashPositionBbLimit = 10;
+        } else if(bigBlind == 40) {
+            nashPositionBbLimit = 7;
+        } else if(bigBlind == 50) {
+            nashPositionBbLimit = 5;
+        } else {
+            nashPositionBbLimit = 3;
+        }
+
         boolean nashActionIsPossible = false;
 
         if(board == null || board.isEmpty()) {
             if(effectiveStackBb <= 20) {
                 if(position) {
                     if(botBetSizeBb == 0.5) {
-                        if(effectiveStackBb <= 10) {
+                        if(effectiveStackBb <= nashPositionBbLimit) {
                             if(opponentAction.equals("bet")) {
                                 nashActionIsPossible = true;
                                 System.out.println("IP Nash action is possible!");

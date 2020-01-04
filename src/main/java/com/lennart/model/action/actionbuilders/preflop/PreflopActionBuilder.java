@@ -48,12 +48,12 @@ public class PreflopActionBuilder {
         } else {
             if(bbOpponentTotalBetSize == 1) {
                 if(botIsButton) {
-                    action = get05betF1bet(botHoleCards);
+                    action = get05betF1bet(botHoleCards, bigBlind);
                 } else {
                     action = get1betFcheck(botHoleCards);
                 }
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
-                action = get1betF2bet(botHoleCards, continuousTableable, oppPre2betGroup, noOfHandIsBluffable);
+                action = get1betF2bet(botHoleCards, continuousTableable, oppPre2betGroup, noOfHandIsBluffable, botIsButton, bbOpponentTotalBetSize);
             } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 10) {
                 action = get2betF3bet(botHoleCards, continuousTableable, oppPre3betGroup);
             } else if(bbOpponentTotalBetSize > 10 && bbOpponentTotalBetSize <= 25) {
@@ -449,7 +449,7 @@ public class PreflopActionBuilder {
         return size;
     }
 
-    private String get05betF1bet(List<Card> botHoleCards) {
+    private String get05betF1bet(List<Card> botHoleCards, double bigBlind) {
         Map<Integer, Set<Card>> comboMap100Percent;
         Map<Integer, Set<Card>> comboMap5Percent;
 
@@ -483,7 +483,12 @@ public class PreflopActionBuilder {
         }
 
         if(Math.random() <= percentageBet) {
-            return "raise";
+            if(bigBlind >= 50) {
+                System.out.println("Preflop limp!");
+                return "call";
+            } else {
+                return "raise";
+            }
         } else {
             return "fold";
         }
@@ -508,7 +513,10 @@ public class PreflopActionBuilder {
         }
     }
 
-    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, String oppPre2betGroup, boolean noOfHandIsBluffable) {
+    private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, String oppPre2betGroup, boolean noOfHandIsBluffable,
+                                boolean position, double oppBetsizeBb) {
+        String actionToReturn;
+
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
@@ -518,12 +526,21 @@ public class PreflopActionBuilder {
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
             continuousTableable.setPre3betOrPostRaisedPot(true);
-            return "raise";
+            actionToReturn = "raise";
         } else if(preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
-            return "call";
+            actionToReturn = "call";
         } else {
-            return "fold";
+            actionToReturn = "fold";
         }
+
+        if(position && actionToReturn.equals("fold")) {
+            if(oppBetsizeBb < 2.5) {
+                actionToReturn = "call";
+                System.out.println("call after preflop limp");
+            }
+        }
+
+        return actionToReturn;
     }
 
     private String get1betFcheck(List<Card> botHoleCards) {
