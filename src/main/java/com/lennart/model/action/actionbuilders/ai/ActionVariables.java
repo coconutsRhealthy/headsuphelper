@@ -3,6 +3,7 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OppIdentifierPreflopStats;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
@@ -14,6 +15,7 @@ import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LennartMac on 05/03/2018.
@@ -363,7 +365,7 @@ public class ActionVariables {
             System.out.println("total: " + total);
 
             //sng specific
-            if(total > 2500 && total < 3500) {
+            if(total > 8500 && total < 9500) {
                 ShortStackPlayAdjuster shortStackPlayAdjuster = new ShortStackPlayAdjuster();
                 action = shortStackPlayAdjuster.adjustAction(action, gameVariables, this, continuousTable.isOpponentHasInitiative());
                 //sizing = shortStackPlayAdjuster.adjustSizing(action, sizing, gameVariables.getBigBlind());
@@ -390,7 +392,7 @@ public class ActionVariables {
 
         try {
             Nash nash = new Nash();
-            boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb, boardInMethod, gameVariables.getOpponentAction(), opponentStackBb, amountToCallBb, gameVariables.getBigBlind());
+            boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb, boardInMethod, gameVariables.getOpponentAction(), opponentStackBb, amountToCallBb, gameVariables.getBigBlind(), gameVariables.getOpponentName());
 
             if(nashActionIsPossible) {
                 action = nash.doNashAction(gameVariables.getBotHoleCards(), botIsButtonInMethod, effectiveStack, amountToCallBb);
@@ -447,8 +449,7 @@ public class ActionVariables {
 
         action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
         action = adjustPfShortstackCalls(action, effectiveStack, eligibleActions, boardInMethod, botHandStrengthInMethod, botIsButtonInMethod);
-        action = adjustPfShortstackFolds(action, effectiveStack, boardInMethod, eligibleActions, gameVariables.getBotHoleCards(), amountToCallBb);
-
+        action = adjustPfShortstackFolds(action, effectiveStack, boardInMethod, eligibleActions, gameVariables.getBotHoleCards(), amountToCallBb, gameVariables.getOpponentName(), gameVariables.getOpponentAction());
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -471,6 +472,9 @@ public class ActionVariables {
 
         action = preventBadPostCalls(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, facingOdds);
         action = adjustPostFoldsToAggroness(action, boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, facingOdds, gameVariables.getOpponentName());
+
+        action = dontBluff(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, continuousTable, gameVariables, boardInMethod);
+        action = dontPostCallWeak(action, boardInMethod, facingOdds, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -714,6 +718,10 @@ public class ActionVariables {
             gameVariables.setBotStack(updatedBotStack);
             gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
         }
+
+        if(botHandStrengthInMethod > 0.9 && sizing > 450) {
+            System.out.println("Strong stuff!");
+        }
     }
 
     private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {
@@ -833,7 +841,11 @@ public class ActionVariables {
         double botStack = gameVariables.getBotStack();
 
         if((opponentBetSize - botBetSize) > botStack) {
-            opponentBetSize = botStack;
+            if("raise".equals(gameVariables.getOpponentAction())) {
+                opponentBetSize = (botStack + botBetSize);
+            } else {
+                opponentBetSize = botStack;
+            }
         }
 
         double facingOdds = (opponentBetSize - botBetSize) / (gameVariables.getPot() + botBetSize + opponentBetSize);
@@ -1475,28 +1487,43 @@ public class ActionVariables {
     }
 
     private String adjustPfShortstackFolds(String action, double effStackBb, List<Card> board, List<String> eligibleActions,
-                                           List<Card> holeCards, double amountToCallBb) {
+                                           List<Card> holeCards, double amountToCallBb, String oppName, String oppAction) throws Exception {
         String actionToReturn;
 
         if(action.equals("fold")) {
             if(board == null || board.isEmpty()) {
                 if(effStackBb + amountToCallBb < 11) {
-                    System.out.println("effstackBB + amountToCallBb < 11. effStackBb: " + effStackBb + " amountToCallBb: " + amountToCallBb);
+                    if(!oppAction.equals("bet")) {
+                        Map<String, String> oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+                        String oppPre3betGroup = oppPreGroupMap.get("pre3betGroup");
 
-                    Nash nash = new Nash();
+                        if(oppPre3betGroup.equals("low") || oppPre3betGroup.equals("mediumUnknown")) {
+                            if(amountToCallBb > 5) {
+                                System.out.println("Prevent Nash call. oppPre3betGroup: " + oppPre3betGroup);
+                                return action;
+                            }
+                        }
 
-                    String nashAction = nash.doNashAction(holeCards, false, amountToCallBb + effStackBb, amountToCallBb + effStackBb);
+                        System.out.println("effstackBB + amountToCallBb < 11. effStackBb: " + effStackBb + " amountToCallBb: " + amountToCallBb);
 
-                    if(nashAction.equals("call") || nashAction.equals("raise")) {
-                        if(eligibleActions.contains("raise")) {
-                            actionToReturn = "raise";
-                            System.out.println("Change action via Nash from fold to raise");
+                        Nash nash = new Nash();
+
+                        String nashAction = nash.doNashAction(holeCards, false, amountToCallBb + effStackBb, amountToCallBb + effStackBb);
+
+                        if(nashAction.equals("call") || nashAction.equals("raise")) {
+                            if(eligibleActions.contains("raise")) {
+                                actionToReturn = "raise";
+                                System.out.println("Change action via Nash from fold to raise");
+                            } else {
+                                actionToReturn = "call";
+                                System.out.println("Change action via Nash from fold to call");
+                            }
                         } else {
-                            actionToReturn = "call";
-                            System.out.println("Change action via Nash from fold to call");
+                            actionToReturn = action;
                         }
                     } else {
                         actionToReturn = action;
+                        System.out.println("maintain Nash fold because IP first to act");
                     }
                 } else {
                     actionToReturn = action;
@@ -1676,6 +1703,78 @@ public class ActionVariables {
                             actionToReturn = preventCallIfOpponentOrBotAlmostAllInAfterCall(actionToReturn, oppStackBb, botStackBb, botBetsizeBb, potsizeBb, amountToCallBb, board);
                         } else {
                             actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String dontBluff(String action, double handstrength, boolean strongFd, boolean strongOosd,
+                             ContinuousTable continuousTable, GameVariables gameVariables, List<Card> board) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            if(board != null && !board.isEmpty()) {
+                double hsLimit;
+
+                if(action.equals("bet75pct")) {
+                    hsLimit = 0.75;
+                } else {
+                    hsLimit = 0.85;
+                }
+
+                if(handstrength < hsLimit && sizing > 100) {
+                    if(!strongFd && !strongOosd) {
+                        if(action.equals("bet75pct")) {
+                            actionToReturn = "check";
+                            System.out.println("SOLIDIFY BET. HS: " + handstrength);
+                        } else {
+                            System.out.println("SOLIDIFY RAISE. HS: " + handstrength);
+                            actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String dontPostCallWeak(String action, List<Card> board, double facingOdds, double handstrength, boolean strongFd, boolean strongOosd) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(board != null && !board.isEmpty()) {
+                if(handstrength < 0.785) {
+                    if(facingOdds > 0.2) {
+                        if(board.size() == 3 && facingOdds < 0.5 && (strongFd || strongOosd)) {
+                            actionToReturn = action;
+                            System.out.println("Maintained flop solidify call cause strongdraw");
+                        } else if (board.size() == 4 && facingOdds < 0.36 && (strongFd || strongOosd)) {
+                            actionToReturn = action;
+                            System.out.println("Maintained turn solidify call cause strongdraw");
+                        } else {
+                            actionToReturn = "fold";
+                            System.out.println("SOLIDIFY CALL. HS: " + handstrength);
                         }
                     } else {
                         actionToReturn = action;

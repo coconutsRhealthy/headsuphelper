@@ -324,7 +324,7 @@ public class StarsTableReader {
 
     public void clickTopSngInList() {
         System.out.println("clicking top sng in list");
-        MouseKeyboard.click(206, 278);
+        MouseKeyboard.click(207, 294);
     }
 
     public void registerNewSng() throws Exception {
@@ -630,7 +630,8 @@ public class StarsTableReader {
             bottomPlayerStack = "0";
         }
 
-        if(bottomPlayerStack.toLowerCase().equals("sittingout") || bottomPlayerStack.toLowerCase().contains("isconnect")) {
+        if(bottomPlayerStack.toLowerCase().equals("sittingout") || bottomPlayerStack.toLowerCase().contains("isconnect")
+                || bottomPlayerStack.toLowerCase().equals("disconnecte")) {
             bottomPlayerStack = "1500";
         }
 
@@ -709,6 +710,10 @@ public class StarsTableReader {
 
         if(bigBlindString.equals("?5") || bigBlindString.equals("IF")) {
             bigBlindString = "75";
+        }
+
+        if(bigBlindString.equals("‘I")) {
+            bigBlindString = "100";
         }
 
         try {

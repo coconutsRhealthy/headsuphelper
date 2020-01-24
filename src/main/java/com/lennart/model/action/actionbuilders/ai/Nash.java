@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OppIdentifierPreflopStats;
 import com.lennart.model.card.Card;
 
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Map;
 public class Nash {
 
     public boolean nashActionIsPossible(double effectiveStackBb, boolean position, double botBetSizeBb, List<Card> board,
-                                        String opponentAction, double opponentStackBb, double amountToCallBb, double bigBlind) {
+                                        String opponentAction, double opponentStackBb, double amountToCallBb, double bigBlind, String oppName) throws Exception {
         double nashPositionBbLimit;
 
         if(bigBlind <= 30) {
@@ -38,6 +39,16 @@ public class Nash {
                     }
                 } else {
                     if(botBetSizeBb == 1 && opponentAction.equals("raise") && opponentStackBb == 0 && amountToCallBb <= 20) {
+                        Map<String, String> oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+                        String oppPre3betGroup = oppPreGroupMap.get("pre3betGroup");
+
+                        if(oppPre3betGroup.equals("low") || oppPre3betGroup.equals("mediumUnknown")) {
+                            if(amountToCallBb > 5) {
+                                System.out.println("Prevent Nash action Possible. oppPre3betGroup: " + oppPre3betGroup);
+                                return false;
+                            }
+                        }
+
                         nashActionIsPossible = true;
                         System.out.println("OOP Nash action is possible!");
                     }

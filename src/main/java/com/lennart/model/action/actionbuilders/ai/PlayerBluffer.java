@@ -97,6 +97,11 @@ public class PlayerBluffer {
             actionToReturn = action;
         }
 
+        if(actionToReturn.equals("raise") && facingStack <= 0) {
+            actionToReturn = action;
+            System.out.println("raise action that shouldn't be the case because oppstack is zero! Change back to old action");
+        }
+
         return actionToReturn;
     }
 
