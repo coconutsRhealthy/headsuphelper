@@ -86,7 +86,7 @@ public class Sizing {
             System.out.println("sizing weird percentage default should not come here");
         }
 
-        raiseOddsToUseClassVar = 2.85;
+        raiseOddsToUseClassVar = 2.2;
     }
 
     public double getRuleBotSizing(double handStrength, double facingBetSize, double myBetSize, double facingStack,

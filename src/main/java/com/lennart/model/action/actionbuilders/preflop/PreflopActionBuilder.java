@@ -483,10 +483,13 @@ public class PreflopActionBuilder {
         }
 
         if(Math.random() <= percentageBet) {
-            if(bigBlind >= 50) {
+            if(bigBlind >= 50 && Math.random() < 0.25) {
                 System.out.println("Preflop limp!");
                 return "call";
             } else {
+                if(bigBlind >= 50) {
+                    System.out.println("Preflop raise no limp!");
+                }
                 return "raise";
             }
         } else {

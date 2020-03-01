@@ -1483,17 +1483,21 @@ public class ActionVariables {
                 if(effStackBb + amountToCallBb < 11) {
                     System.out.println("effstackBB + amountToCallBb < 11. effStackBb: " + effStackBb + " amountToCallBb: " + amountToCallBb);
 
-                    Nash nash = new Nash();
+                    if(effStackBb >= 0) {
+                        Nash nash = new Nash();
 
-                    String nashAction = nash.doNashAction(holeCards, false, amountToCallBb + effStackBb, amountToCallBb + effStackBb);
+                        String nashAction = nash.doNashAction(holeCards, false, amountToCallBb + effStackBb, amountToCallBb + effStackBb);
 
-                    if(nashAction.equals("call") || nashAction.equals("raise")) {
-                        if(eligibleActions.contains("raise")) {
-                            actionToReturn = "raise";
-                            System.out.println("Change action via Nash from fold to raise");
+                        if(nashAction.equals("call") || nashAction.equals("raise")) {
+                            if(eligibleActions.contains("raise")) {
+                                actionToReturn = "raise";
+                                System.out.println("Change action via Nash from fold to raise");
+                            } else {
+                                actionToReturn = "call";
+                                System.out.println("Change action via Nash from fold to call");
+                            }
                         } else {
-                            actionToReturn = "call";
-                            System.out.println("Change action via Nash from fold to call");
+                            actionToReturn = action;
                         }
                     } else {
                         actionToReturn = action;
@@ -1616,12 +1620,7 @@ public class ActionVariables {
     private boolean numberOfHandsIsBluffable(int numberOfHands) {
         boolean numberOfHandsIsBluffable = true;
 
-        if((numberOfHands + 9) % 20 == 0 || (numberOfHands + 8) % 20 == 0 ||
-                (numberOfHands + 7) % 20 == 0 || (numberOfHands + 6) % 20 == 0 ||
-                    (numberOfHands + 5) % 20 == 0 || (numberOfHands + 4) % 20 == 0 ||
-                        (numberOfHands + 3) % 20 == 0 || (numberOfHands + 2) % 20 == 0 ||
-                            (numberOfHands + 1) % 20 == 0 || (numberOfHands ) % 20 == 0) {
-
+        if((numberOfHands + 9) % 20 == 0 || (numberOfHands + 8) % 20 == 0 || (numberOfHands + 7) % 20 == 0 ) {
             numberOfHandsIsBluffable = false;
         }
 

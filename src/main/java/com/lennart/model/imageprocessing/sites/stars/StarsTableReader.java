@@ -707,6 +707,10 @@ public class StarsTableReader {
             }
         }
 
+        if(bigBlindString.equals("?5") || bigBlindString.equals("IF")) {
+            bigBlindString = "75";
+        }
+
         try {
             bigBlind = Double.valueOf(bigBlindString);
         } catch (Exception e) {
