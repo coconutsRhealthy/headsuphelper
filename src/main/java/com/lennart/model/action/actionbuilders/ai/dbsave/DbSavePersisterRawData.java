@@ -24,8 +24,12 @@ public class DbSavePersisterRawData {
 
         Statement st = con.createStatement();
 
+        int highestIntEntry = getHighestIntEntry("dbstats_raw");
+
         for(DbSave dbSave : dbSaveList) {
             if(dbSave instanceof DbSaveRaw) {
+                highestIntEntry++;
+
                 DbSaveRaw dbSaveRaw = (DbSaveRaw) dbSave;
 
                 st.executeUpdate("INSERT INTO dbstats_raw (" +
@@ -52,7 +56,7 @@ public class DbSavePersisterRawData {
                     "recent_hands_won, " +
                     "adjusted_opp_type) " +
                     "VALUES ('" +
-                    (getHighestIntEntry("dbstats_raw") + 1) + "', '" +
+                    highestIntEntry + "', '" +
                     getCurrentDate() + "', '" +
                     dbSaveRaw.getBotAction() + "', '" +
                     dbSaveRaw.getOppAction() + "', '" +
