@@ -235,22 +235,22 @@ public class StarsTableReader {
     public static boolean sngIsFinished() throws Exception {
         boolean sngIsFinished = false;
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(623, 371, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
-        if(pixelRgb / 100 == -15790) {
-            //expected rgb: -1.579.033
+        if(pixelRgb / 100 == -96715) {
+            //expected rgb: -9.671.572
 
             System.out.println("sng is finished A1");
             sngIsFinished = true;
         }
 
         if(!sngIsFinished) {
-            BufferedImage bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(74, 167, 1, 1);
+            BufferedImage bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(403, 584, 1, 1);
             int pixelRgb2 = bufferedImage2.getRGB(0, 0);
 
-            if(pixelRgb2 / 100 == -31580) {
-                //expected rgb: -3.158.065
+            if(pixelRgb2 == -1) {
+                //expected rgb: -1
 
                 System.out.println("sng is finished A2");
                 sngIsFinished = true;
@@ -258,34 +258,34 @@ public class StarsTableReader {
         }
 
         //temp for spin of the day
-        if(sngIsFinished) {
-            sngIsFinished = false;
-
-            TimeUnit.MILLISECONDS.sleep(5590);
-
-            BufferedImage bufferedImage3 = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
-            int pixelRgb3 = bufferedImage3.getRGB(0, 0);
-
-            if(pixelRgb3 / 100 == -15790) {
-                //expected rgb: -1.579.033
-
-                System.out.println("sng is finished B1");
-                sngIsFinished = true;
-            }
-
-            if(!sngIsFinished) {
-                BufferedImage bufferedImage4 = ImageProcessor.getBufferedImageScreenShot(74, 167, 1, 1);
-                int pixelRgb4 = bufferedImage4.getRGB(0, 0);
-
-                if(pixelRgb4 / 100 == -31580) {
-                    //expected rgb: -3.158.065
-
-                    System.out.println("sng is finished B2");
-                    sngIsFinished = true;
-                }
-            }
-
-        }
+//        if(sngIsFinished) {
+//            sngIsFinished = false;
+//
+//            TimeUnit.MILLISECONDS.sleep(5590);
+//
+//            BufferedImage bufferedImage3 = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
+//            int pixelRgb3 = bufferedImage3.getRGB(0, 0);
+//
+//            if(pixelRgb3 / 100 == -15790) {
+//                //expected rgb: -1.579.033
+//
+//                System.out.println("sng is finished B1");
+//                sngIsFinished = true;
+//            }
+//
+//            if(!sngIsFinished) {
+//                BufferedImage bufferedImage4 = ImageProcessor.getBufferedImageScreenShot(74, 167, 1, 1);
+//                int pixelRgb4 = bufferedImage4.getRGB(0, 0);
+//
+//                if(pixelRgb4 / 100 == -31580) {
+//                    //expected rgb: -3.158.065
+//
+//                    System.out.println("sng is finished B2");
+//                    sngIsFinished = true;
+//                }
+//            }
+//
+//        }
 
         return sngIsFinished;
     }
@@ -305,7 +305,7 @@ public class StarsTableReader {
 
     public void closeRematchScreen() {
         System.out.println("closing rematch screen");
-        MouseKeyboard.click(483, 648);
+        MouseKeyboard.click(510, 619);
 
         //playMoney
         //MouseKeyboard.click(480, 637);
@@ -322,12 +322,31 @@ public class StarsTableReader {
         }
     }
 
+    public static void closeAbnAmroUpdateScreenIfNecessary() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(711, 269, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        if(pixelRgb / 100 == -15_790) {
+            System.out.println("Abn Amro update screen is showing. Click close");
+            MouseKeyboard.click(683, 306);
+        }
+    }
+
+    private void efkes() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(403, 331, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+        System.out.println(pixelRgb);
+    }
+
     public void clickTopSngInList() {
         System.out.println("clicking top sng in list");
-        MouseKeyboard.click(206, 278);
+        MouseKeyboard.click(206, 282);
     }
 
     public void registerNewSng() throws Exception {
+        //close chest reward screen
+        MouseKeyboard.click(222, 44);
+
         if(noPlayerIsReggedYet()) {
             TimeUnit.MILLISECONDS.sleep(2150);
             clickTopSngInList();
@@ -370,8 +389,8 @@ public class StarsTableReader {
         int pixelRgb = bufferedImage.getRGB(0, 0);
         boolean noPlayerIsRegged = true;
 
-        if(pixelRgb / 1000 == -9934) {
-            //expected: -9.934.744
+        if(pixelRgb / 1000 == -16777) {
+            //expected: =16_777_216
             noPlayerIsRegged = false;
         } else {
             System.out.println("empty sng, will register");

@@ -41,6 +41,8 @@ public class ContinuousTable implements ContinuousTableable {
     private double flopHandstrength;
     private double turnHandstrength;
 
+    private int botSittingOutCounter = 0;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -193,6 +195,14 @@ public class ContinuousTable implements ContinuousTableable {
                 }
 
                 if(StarsTableReader.botIsSittingOut()) {
+                    botSittingOutCounter++;
+                    StarsTableReader.closeAbnAmroUpdateScreenIfNecessary();
+
+                    if(botSittingOutCounter >= 15) {
+                        System.out.println("too many bot sitting outs. Something wrong. Quit program.");
+                        throw new RuntimeException();
+                    }
+
                     System.out.println("bot is SittingOut!");
                     TimeUnit.MILLISECONDS.sleep(300);
                     StarsTableReader.endBotIsSittingOut();
@@ -354,6 +364,7 @@ public class ContinuousTable implements ContinuousTableable {
             starsTableReader.registerNewSng();
 
             int counter = 0;
+            int counter2 = 0;
 
             boolean newTableNotYetOpened = true;
             while(newTableNotYetOpened) {
@@ -362,9 +373,36 @@ public class ContinuousTable implements ContinuousTableable {
                     MouseKeyboard.click(7, 100);
                     System.out.println();
                     counter = 0;
+                    StarsTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
                 }
 
                 System.out.println(",");
+
+//                if(counter2 == 100 || counter2 == 200) {
+////                    System.out.println("Attempting to close chest shit");
+////                    MouseKeyboard.click(222, 44);
+////                    TimeUnit.MILLISECONDS.sleep(300);
+////                    MouseKeyboard.click(226, 79);
+////                    TimeUnit.MILLISECONDS.sleep(600);
+////                    MouseKeyboard.click(838, 605);
+////
+////                    TimeUnit.MILLISECONDS.sleep(600);
+//
+//                    System.out.println("Attempting to close 'registration closed' shit");
+//                    MouseKeyboard.click(489, 432);
+//                    TimeUnit.MILLISECONDS.sleep(300);
+//                }
+//
+//                if(counter2 == 150 || counter2 == 300) {
+//                    System.out.println("Trying to register again");
+//                    MouseKeyboard.click(782, 603);
+//                }
+
+                if(counter2 >= 1350) {
+                    System.out.println("Something is wrong in registering sng part, close session.");
+                    StarsTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                    throw new RuntimeException();
+                }
 
                 TimeUnit.MILLISECONDS.sleep(1100);
 
@@ -373,6 +411,7 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println("New sng table is opened b");
                 } else {
                     counter++;
+                    counter2++;
                     newTableNotYetOpened = true;
                 }
             }

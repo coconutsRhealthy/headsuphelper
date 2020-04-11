@@ -3,8 +3,10 @@ package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
+import com.lennart.model.handevaluation.HandEvaluator;
 
 import java.sql.*;
 import java.util.*;
@@ -15,6 +17,408 @@ import java.util.*;
 public class Analysis {
 
     private Connection con;
+
+    public static void main(String[] args) throws Exception {
+        new Analysis().theCheck();
+    }
+
+    private void theCheck() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
+
+        List<Double> allPre2betOdds = new ArrayList<>();
+        List<Double> allPre3betOdds = new ArrayList<>();
+
+        int counter = 0;
+
+        while(rs.next()) {
+            String opponentName = rs.getString("playerName");
+            double average2bet = getAveragePre2betOdds(opponentName);
+            double average3bet = getAveragePre3betOdds(opponentName);
+            allPre2betOdds.add(average2bet);
+            allPre3betOdds.add(average3bet);
+            System.out.println(counter++);
+        }
+
+        Collections.sort(allPre2betOdds);
+        Collections.sort(allPre3betOdds);
+
+        for(int i = 0; i < allPre2betOdds.size(); i++) {
+            System.out.println(i + "        " + allPre2betOdds.get(i));
+        }
+
+        System.out.println("******************");
+
+        for(int i = 0; i < allPre3betOdds.size(); i++) {
+            System.out.println(i + "        " + allPre3betOdds.get(i));
+        }
+
+        //System.out.println("wacht");
+    }
+
+    private void getOppPostflopAvBetOdds(String opponentName) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 280000 AND opponent_name = '" + opponentName + "';");
+
+        double totalPostflopFacingOdds = 0;
+        double counter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                if(rs.getString("opponent_action").equals("bet75pct")) {
+                    double oppTotalBetsize = rs.getDouble("opponent_total_betsize");
+                    double botStack = rs.getDouble("botstack");
+                    double oppStack = rs.getDouble("opponentstack");
+                    double pot = 2000 - botStack - oppStack;
+
+                    if(oppTotalBetsize > 0 && pot > 0) {
+                        double facingOdds = oppTotalBetsize / (pot + oppTotalBetsize);
+                        totalPostflopFacingOdds = totalPostflopFacingOdds + facingOdds;
+                        counter++;
+                    } else {
+                        System.out.println("trp");
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println("average: " + totalPostflopFacingOdds / counter);
+        System.out.println("counter: " + counter);
+    }
+
+    public double getAveragePre3betOdds(String opponentName) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 280000 AND opponent_name = '" + opponentName + "';");
+
+        double totalPreflopFacing3betOdds = 0;
+        double counter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("board").equals("")) {
+                if(rs.getString("position").equals("Ip")) {
+                    if(rs.getString("opponent_action").equals("raise")) {
+                        double botTotalBetsize = rs.getDouble("bot_total_betsize");
+                        double oppTotalBetsize = rs.getDouble("opponent_total_betsize");
+
+                        if(botTotalBetsize > 0 && oppTotalBetsize > 0 && rs.getDouble("opponentstack") > 0) {
+                            double preflopFacingOdds = (oppTotalBetsize - botTotalBetsize) / (oppTotalBetsize + botTotalBetsize);
+
+                            totalPreflopFacing3betOdds = totalPreflopFacing3betOdds + preflopFacingOdds;
+                            counter++;
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        double average = totalPreflopFacing3betOdds / counter;
+        return average;
+    }
+
+    public double getAveragePre2betOdds(String opponentName) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 280000 AND opponent_name = '" + opponentName + "';");
+
+        double totalPreflopFacingOdds = 0;
+        double counter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("board").equals("")) {
+                if(rs.getDouble("bot_total_betsize") == rs.getDouble("bigblind")) {
+                    double botTotalBetsize = rs.getDouble("bot_total_betsize");
+                    double oppTotalBetsize = rs.getDouble("opponent_total_betsize");
+
+                    if(botTotalBetsize > 0 && oppTotalBetsize > 0 && botTotalBetsize <= oppTotalBetsize) {
+                        double preflopFacingOdds = (oppTotalBetsize - botTotalBetsize) / (oppTotalBetsize + botTotalBetsize);
+
+                        totalPreflopFacingOdds = totalPreflopFacingOdds + preflopFacingOdds;
+                        counter++;
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        double average = totalPreflopFacingOdds / counter;
+
+        return average;
+    }
+
+    private void interesting2() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 314900;");
+
+        int counter = 0;
+        int trueCounter = 0;
+
+        while(rs.next()) {
+            counter++;
+
+            if(counter > 1) {
+                if(!rs.getString("board").equals("")) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 5) {
+                        if(rs.getString("bot_action").equals("check")) {
+                            if(rs.getDouble("handstrength") < 0.25) {
+                                rs.previous();
+
+                                if(!rs.getString("bot_action").equals("call")) {
+                                    trueCounter++;
+                                }
+
+                                rs.next();
+                            }
+                        }
+                    }
+                }
+            }
+
+            //System.out.println(rs.getInt("entry"));
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println(trueCounter);
+    }
+
+    private void interesting() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 314910;");
+
+        double betCounter = 0;
+        double checkCounter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                if(board.size() == 3) {
+                    if(rs.getString("bot_action").equals("bet75pct")) {
+                        betCounter++;
+                    }
+
+                    if(rs.getString("bot_action").equals("check")) {
+                        checkCounter++;
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        double total = betCounter + checkCounter;
+
+        System.out.println("bet: " + betCounter);
+        System.out.println("check: " + checkCounter);
+        System.out.println("total: " + total);
+        System.out.println("ratio: " + (betCounter / total));
+    }
+
+    private void countNumberOfStrongTurnGutshots() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 317000;");
+
+        int turnCounter = 0;
+        int gutshotCounter = 0;
+
+        List<Integer> numberOfGutshotCombos = new ArrayList<>();
+        List<Integer> numberOfStraightCombos = new ArrayList<>();
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                System.out.println(".");
+                List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                if(board.size() == 4) {
+                    turnCounter++;
+
+                    List<Card> holeCards = convertCardStringToCardList(rs.getString("holecards"));
+
+                    BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+                    HandEvaluator handEvaluator = new HandEvaluator(holeCards, boardEvaluator);
+
+                    if(handEvaluator.hasDrawOfType("strongGutshot")) {
+                        StraightDrawEvaluator straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
+
+                        int numberOfGutshotDraws = straightDrawEvaluator.getWeakGutshotCombos().size() +
+                                straightDrawEvaluator.getMediumGutshotCombos().size() + straightDrawEvaluator.getStrongGutshotCombos().size();
+                        numberOfGutshotCombos.add(numberOfGutshotDraws);
+
+                        int numberOfStraights = boardEvaluator.getStraightEvaluator().getMapOfStraightCombos().size();
+                        numberOfStraightCombos.add(numberOfStraights);
+
+                        if(numberOfStraights == 0) {
+                            //System.out.println("wacheffiez");
+                        }
+
+                        if(numberOfGutshotDraws > 182 && numberOfStraights == 0) {
+                            System.out.println("wtf");
+                        }
+
+                        gutshotCounter++;
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        Collections.sort(numberOfGutshotCombos);
+        Collections.sort(numberOfStraightCombos);
+
+        System.out.println("Turncounter: " + turnCounter);
+        System.out.println("Gutshotcounter: " + gutshotCounter);
+    }
+
+    private void countNumberOfStrongBdFds() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 317000;");
+
+        int flopCounter = 0;
+        int backdoorFdCounter = 0;
+        int tenUpBackdoorFdCounter = 0;
+        int jackUpBackdoorFdCounter = 0;
+        int queenUpBackdoorFdCounter = 0;
+        int kingUpBackdoorFdCounter = 0;
+        int aceUpBackdoorFdCounter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                System.out.println(".");
+                List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                if(board.size() == 3) {
+                    flopCounter++;
+
+                    List<Card> holeCards = convertCardStringToCardList(rs.getString("holecards"));
+
+                    BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+                    HandEvaluator handEvaluator = new HandEvaluator(holeCards, boardEvaluator);
+
+                    if(handEvaluator.hasDrawOfType("strongBackDoorFlush") && holeCards.get(0).getSuit() == holeCards.get(1).getSuit()) {
+                        if(handEvaluator.hasDrawOfType("strongFlushDraw") || handEvaluator.hasDrawOfType("mediumFlushDraw") || handEvaluator.hasDrawOfType("weakFlushDraw")) {
+                            System.out.println("JEP!");
+                        } else {
+                            System.out.println("NOPE!");
+                        }
+
+                        if(holeCards.get(0).getRank() >= 10 || holeCards.get(1).getRank() >= 10) {
+                            tenUpBackdoorFdCounter++;
+                        }
+
+                        if(holeCards.get(0).getRank() >= 11 || holeCards.get(1).getRank() >= 11) {
+                            jackUpBackdoorFdCounter++;
+                        }
+
+                        if(holeCards.get(0).getRank() >= 12 || holeCards.get(1).getRank() >= 12) {
+                            queenUpBackdoorFdCounter++;
+                        }
+
+                        if(holeCards.get(0).getRank() >= 13 || holeCards.get(1).getRank() >= 13) {
+                            kingUpBackdoorFdCounter++;
+                        }
+
+                        if(holeCards.get(0).getRank() >= 14 || holeCards.get(1).getRank() >= 14) {
+                            aceUpBackdoorFdCounter++;
+                        }
+
+                        backdoorFdCounter++;
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println("Flopcounter: " + flopCounter);
+        System.out.println("BackdoorFDcounter: " + backdoorFdCounter);
+        System.out.println("tenBackdoorFdCounter: " + tenUpBackdoorFdCounter);
+        System.out.println("jackBackdoorFdCounter: " + jackUpBackdoorFdCounter);
+        System.out.println("queenBackdoorFdCounter: " + queenUpBackdoorFdCounter);
+        System.out.println("kingBackdoorFdCounter: " + kingUpBackdoorFdCounter);
+        System.out.println("aceBackdoorFdCounter: " + aceUpBackdoorFdCounter);
+    }
+
+    private void newAlaysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 317632;");
+
+        DbStatsRawBluffPostflopMigrator dbStatsRawBluffPostflopMigrator = new DbStatsRawBluffPostflopMigrator();
+
+        int flopCounter = 0;
+        int turnCounter = 0;
+        int riverCounter = 0;
+
+        while(rs.next()) {
+            System.out.println(".");
+            if(!rs.getString("board").equals("")) {
+                String street = dbStatsRawBluffPostflopMigrator.getStreetString(rs.getString("board"));
+
+                if(street.equals("Flop")) {
+                    flopCounter++;
+                } else if(street.equals("Turn")) {
+                    turnCounter++;
+                } else if(street.equals("River")) {
+                    riverCounter++;
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println("Flop: " + flopCounter);
+        System.out.println("Turn: " + turnCounter);
+        System.out.println("River: " + riverCounter);
+    }
 
     private void addOppTypeToDbStatsRaw() throws Exception {
         initializeDbConnection();

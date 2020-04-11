@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
+import com.lennart.model.action.actionbuilders.ai.dbstatsraw.Analysis;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
@@ -156,6 +157,7 @@ public class ActionVariables {
         boolean strongFdInMethod = strongFlushDraw;
         boolean strongOosdInMethod = strongOosd;
         boolean strongGutshotInMethod = strongGutshot;
+        boolean strongBackdoorFdInMethod = strongBackdoorFd;
 
         opponentType = doOpponentTypeDbLogic(gameVariables.getOpponentName());
         double opponentBetsizeBb = gameVariables.getOpponentBetSize() / gameVariables.getBigBlind();
@@ -441,7 +443,12 @@ public class ActionVariables {
 
         if(numberOfHandsIsBluffable(numberOfHands)) {
             if(sizingForBluffOdds < 400 || numberOfHands >= 50 && Math.random() < 0.25) {
-                action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds, facingOdds);
+                List<Card> holeCards = gameVariables.getBotHoleCards();
+                action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod,
+                        strongBackdoorFdInMethod,
+                        holeCards.get(0).getSuit() == holeCards.get(1).getSuit(),
+                        holeCards.get(0).getRank() >= 10 || holeCards.get(1).getRank() >= 10, boardWetness,
+                        boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds, facingOdds, continuousTable.isOpponentHasInitiative());
             }
         }
 
@@ -471,6 +478,8 @@ public class ActionVariables {
 
         action = preventBadPostCalls(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, facingOdds);
         action = adjustPostFoldsToAggroness(action, boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, facingOdds, gameVariables.getOpponentName());
+        //action = preventBluffingAgainstFish(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, gameVariables.getOpponentName(), boardInMethod, continuousTable, gameVariables);
+        //action = preventZeBluffs(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, continuousTable, gameVariables);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -1342,8 +1351,8 @@ public class ActionVariables {
     }
 
     private String doPowerPlay(String action, boolean bluffOddsAreOk, boolean strongFd,
-                               boolean strongOosd, boolean strongGutshot, int boardWetness,
-                               List<Card> board, double handstrength, String opponentAction, double sizing, double facingOdds) {
+                               boolean strongOosd, boolean strongGutshot, boolean strongBackdoorFd, boolean suitedHolecards, boolean tenOrHigher, int boardWetness,
+                               List<Card> board, double handstrength, String opponentAction, double sizing, double facingOdds, boolean opponentHasInitiative) {
         String actionToReturn;
         String actionToUse;
 
@@ -1353,52 +1362,86 @@ public class ActionVariables {
             actionToUse = "bet75pct";
         }
 
-        if(board != null && !board.isEmpty()) {
-            if(!action.equals("bet75pct") && !action.equals("raise")) {
-                if(bluffOddsAreOk) {
-                    if(facingOdds < 0.485) {
-                        if(board.size() == 3) {
-                            int flopDryness = boardEvaluator.getFlopDryness();
+        if(!opponentHasInitiative || Math.random() < 0.5) {
+            if(board != null && !board.isEmpty()) {
+                if(!action.equals("bet75pct") && !action.equals("raise")) {
+                    if(bluffOddsAreOk) {
+                        if(facingOdds < 0.485) {
+                            if(board.size() == 3) {
+                                int flopDryness = boardEvaluator.getFlopDryness();
 
-                            if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && (actionToUse.equals("bet75pct") || opponentAction.equals("bet75pct")))
-                                    || handstrength > 0.85 || (numberOfScoresAbove80 >= 4 && handstrength < 0.65)) {
-                                actionToReturn = actionToUse;
-                                System.out.println("Power play flop! " + actionToReturn + " strongFd: " + strongFd +
-                                        " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot +
-                                        " flopdryness: " + flopDryness + " hs: " + handstrength + " numberOfScoresAbove80: " + numberOfScoresAbove80);
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else if(board.size() == 4) {
-                            if((boardWetness < 80 && (handstrength < 0.7 || strongGutshot)) || strongOosd || strongFd || handstrength > 0.85) {
-                                if(actionToUse.equals("raise") && sizing > 300 && !strongOosd && !strongFd && handstrength <= 0.85) {
-                                    //don't raise, too big
-                                    actionToReturn = action;
-                                } else {
+                                if(strongFd || strongOosd || strongGutshot || (flopDryness <= 80 && handstrength < 0.7 && (actionToUse.equals("bet75pct") || opponentAction.equals("bet75pct")))
+                                        || handstrength > 0.85 || (numberOfScoresAbove80 >= 4 && handstrength < 0.65) || strongBackdoorFd && suitedHolecards && tenOrHigher) {
                                     actionToReturn = actionToUse;
-                                    System.out.println("Power play turn! " + actionToReturn + " bwetness: " + boardWetness
-                                            + " hs: " + handstrength + " strongOosd: " + strongOosd + " strongFd: " + strongFd
-                                            + " strongGutshot: " + strongGutshot);
+                                    System.out.println("Power play flop! " + actionToReturn + " strongFd: " + strongFd +
+                                            " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot +
+                                            " flopdryness: " + flopDryness + " hs: " + handstrength + " numberOfScoresAbove80: " + numberOfScoresAbove80);
+
+                                    if(opponentHasInitiative) {
+                                        System.out.println("Donk powerflop nope");
+                                        actionToReturn = action;
+                                    } else {
+                                        System.out.println("Normal powerflop");
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
+                            } else if(board.size() == 4) {
+                                int numberOfGutshotCombos = 500;
+
+                                if(strongGutshot) {
+                                    numberOfGutshotCombos = boardEvaluator.getStraightDrawEvaluator().getWeakGutshotCombos().size() +
+                                            boardEvaluator.getStraightDrawEvaluator().getMediumGutshotCombos().size() +
+                                            boardEvaluator.getStraightDrawEvaluator().getStrongGutshotCombos().size();
+                                }
+
+                                if((boardWetness < 80 && (handstrength < 0.7 || strongGutshot)) || strongOosd || strongFd || handstrength > 0.85
+                                        || (strongGutshot && numberOfGutshotCombos <= 182)) {
+                                    if(actionToUse.equals("raise") && sizing > 300 && !strongOosd && !strongFd && handstrength <= 0.85) {
+                                        //don't raise, too big
+                                        actionToReturn = action;
+                                    } else {
+                                        actionToReturn = actionToUse;
+                                        System.out.println("Power play turn! " + actionToReturn + " bwetness: " + boardWetness
+                                                + " hs: " + handstrength + " strongOosd: " + strongOosd + " strongFd: " + strongFd
+                                                + " strongGutshot: " + strongGutshot);
+
+                                        if(opponentHasInitiative) {
+                                            System.out.println("Donk powerturn nope");
+                                            actionToReturn = action;
+                                        } else {
+                                            System.out.println("Normal powerturn");
+                                        }
+                                    }
+                                } else {
+                                    actionToReturn = action;
                                 }
                             } else {
-                                actionToReturn = action;
+                                if((boardWetness < 80 && handstrength < 0.7) || handstrength > 0.85) {
+                                    if(actionToUse.equals("raise") && sizing > 300 && handstrength <= 0.85) {
+                                        //don't raise, too big
+                                        actionToReturn = action;
+                                    } else {
+                                        actionToReturn = actionToUse;
+                                        System.out.println("Power play river! " + actionToReturn + " bwetness: " + boardWetness
+                                                + " hs: " + handstrength);
+
+                                        if(opponentHasInitiative) {
+                                            System.out.println("Donk powerriver nope");
+                                            actionToReturn = action;
+                                        } else {
+                                            System.out.println("Normal powerriver");
+                                        }
+                                    }
+                                } else {
+                                    actionToReturn = action;
+                                }
                             }
                         } else {
-                            if((boardWetness < 80 && handstrength < 0.7) || handstrength > 0.85) {
-                                if(actionToUse.equals("raise") && sizing > 300 && handstrength <= 0.85) {
-                                    //don't raise, too big
-                                    actionToReturn = action;
-                                } else {
-                                    actionToReturn = actionToUse;
-                                    System.out.println("Power play river! " + actionToReturn + " bwetness: " + boardWetness
-                                            + " hs: " + handstrength);
-                                }
-                            } else {
-                                actionToReturn = action;
-                            }
+                            System.out.println("prevent powerplay, cause too high facing odds");
+                            actionToReturn = action;
                         }
                     } else {
-                        System.out.println("prevent powerplay, cause too high facing odds");
                         actionToReturn = action;
                     }
                 } else {
@@ -1414,6 +1457,7 @@ public class ActionVariables {
         if(!action.equals("raise") && actionToReturn.equals("raise")) {
             actionToReturn = action;
             System.out.println("revert pwerplay raise back to old action");
+            //System.out.println("EIJE! Powerraise");
         }
 
         return actionToReturn;
@@ -1620,7 +1664,7 @@ public class ActionVariables {
     private boolean numberOfHandsIsBluffable(int numberOfHands) {
         boolean numberOfHandsIsBluffable = true;
 
-        if((numberOfHands + 9) % 20 == 0 || (numberOfHands + 8) % 20 == 0 || (numberOfHands + 7) % 20 == 0 ) {
+        if((numberOfHands + 9) % 20 == 0) {
             numberOfHandsIsBluffable = false;
         }
 
@@ -1687,6 +1731,136 @@ public class ActionVariables {
             }
         } else {
             actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String doTrueBluffBettingPostflop(String action, List<Card> board, double handstrength, boolean opponentHasInitiative) {
+        String actionToReturn;
+
+        if(!opponentHasInitiative) {
+            if(action.equals("check")) {
+                if(board != null && !board.isEmpty()) {
+                    if(handstrength < 0.25) {
+                        if(board.size() == 3) {
+                            if(Math.random() < 0.26) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("true flop bluffbet");
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("no flop bluffbet");
+                            }
+                        } else if(board.size() == 4) {
+                            if(Math.random() < 0.26) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("true turn bluffbet");
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("no turn bluffbet");
+                            }
+                        } else {
+                            if(Math.random() < 0.70) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("true river bluffbet");
+                            } else {
+                                actionToReturn = action;
+                                System.out.println("no river bluffbet");
+                            }
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventBluffingAgainstFish(String action, double handstrength, boolean strongFd, boolean strongOosd,
+                                             String opponentName, List<Card> board, ContinuousTable continuousTable,
+                                             GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            if(board != null && !board.isEmpty()) {
+                if(sizing >= 100) {
+                    if(handstrength < 0.57 && !strongFd && !strongOosd) {
+                        double averagePre2betOdds = new Analysis().getAveragePre2betOdds(opponentName);
+                        double averagePre3betOdds = new Analysis().getAveragePre3betOdds(opponentName);
+
+                        if(averagePre2betOdds >= 0.15 && averagePre2betOdds <= 0.6) {
+                            if((averagePre3betOdds > 0.37 && averagePre3betOdds < 0.7) || Double.isNaN(averagePre3betOdds)) {
+                                actionToReturn = action;
+                            } else {
+                                actionToReturn = "toChange";
+                                System.out.println("No bluffB, opponent incapable. averagePre2betOdds: " + averagePre2betOdds + " , averagePre3betOdds: " + averagePre3betOdds);
+                            }
+                        } else {
+                            actionToReturn = "toChange";
+                            System.out.println("No bluffA, opponent incapable. averagePre2betOdds: " + averagePre2betOdds + " , averagePre3betOdds: " + averagePre3betOdds);
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        if(actionToReturn.equals("toChange")) {
+            if(action.equals("bet75pct")) {
+                actionToReturn = "check";
+            } else {
+                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventZeBluffs(String action, double handstrength, boolean strongFd, boolean strongOosd,
+                                   List<Card> board, ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
+        String actionToReturn;
+
+        if(action.equals("bet75pct") || action.equals("raise")) {
+            if(board != null && !board.isEmpty()) {
+                if(sizing >= 100) {
+                    if(handstrength < 0.57 && !strongFd && !strongOosd) {
+                        actionToReturn = "toChange";
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        if(actionToReturn.equals("toChange")) {
+            if(action.equals("bet75pct")) {
+                System.out.println("bibi change bluff bet to check");
+                actionToReturn = "check";
+            } else {
+                System.out.println("bibi change bluff raise to call or fold");
+                actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+            }
         }
 
         return actionToReturn;

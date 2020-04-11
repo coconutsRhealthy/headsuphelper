@@ -81,7 +81,11 @@ public class PreflopActionBuilder {
             limit = 0.9;
         } else {
             if(noOfHandIsBluffable) {
-                limit = 0.75;
+                if(Math.random() < 0.5) {
+                    limit = 0.7;
+                } else {
+                    limit = 0.75;
+                }
             } else {
                 limit = 0.9;
             }
@@ -483,7 +487,7 @@ public class PreflopActionBuilder {
         }
 
         if(Math.random() <= percentageBet) {
-            if(bigBlind >= 50 && Math.random() < 0.25) {
+            if(bigBlind >= 50 && Math.random() <= 0.10) {
                 System.out.println("Preflop limp!");
                 return "call";
             } else {
