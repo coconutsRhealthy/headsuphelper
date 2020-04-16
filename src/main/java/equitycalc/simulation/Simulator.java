@@ -508,4 +508,8 @@ public final class Simulator implements WorkerNotifiable
             notifiable.onSimulationDone(event);
         }
     }
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
 }
