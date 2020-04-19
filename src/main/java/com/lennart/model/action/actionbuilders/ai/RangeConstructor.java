@@ -5,9 +5,7 @@ import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
-import com.lennart.model.handevaluation.HandEvaluator;
-import equitycalc.Example;
-import equitycalc.ExampleOld;
+import equitycalc.EquityCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,9 +16,7 @@ import java.util.stream.Collectors;
 public class RangeConstructor {
 
     public static void main(String[] args) {
-        //for(int i = 0; i < 10; i++) {
-            new RangeConstructor().testMethod();
-        //}
+        new RangeConstructor().testMethod();
     }
 
     private void testMethod() {
@@ -31,108 +27,14 @@ public class RangeConstructor {
 
         List<List<Card>> oppRange = getOpponentRange(null, boardEvaluator, botHoleCards);
 
-        //List<List<Card>> oppRange = new ArrayList<>();
-
-        //oppRange.add(Arrays.asList(new Card(7, 'c'), new Card(3, 'd')));
-        //oppRange.add(Arrays.asList(new Card(10, 'h'), new Card(10, 's')));
-        //oppRange.add(Arrays.asList(new Card(9, 'c'), new Card(5, 'd')));
-
-
-        double averageEquity = getAverageEquityOfOppRangeViaLoop(oppRange, board);
-
+        double averageEquity = getAverageEquityOfOppRange(oppRange, board);
         System.out.println(averageEquity);
     }
 
-
-    private void testMethod2() {
-        List<Card> combo = Arrays.asList(new Card(2, 'c'), new Card(10, 'd'));
-        List<Card> board = Arrays.asList(new Card(2, 'd'), new Card(3, 'd'), new Card(5, 'c'));
-        System.out.println(getEquity(combo, board));
-    }
-
-
-
-    private double getEquity(List<Card> combo, List<Card> board) {
-        double equity;
-
-        if(board.size() == 6 || board.size() == 8) {
-            List<Double> hsAtRiver = new ArrayList<>();
-
-            for(int i = 0; i < 10; i++) {
-                System.out.println("A");
-                List<Card> equityBoard = new ArrayList<>();
-                equityBoard.addAll(board);
-                equityBoard.add(drawRandomRemainingCardFromDeck(combo, board));
-
-                if(board.size() == 4) {
-                    equityBoard.add(drawRandomRemainingCardFromDeck(combo, board));
-                }
-
-                BoardEvaluator boardEvaluator = new BoardEvaluator(equityBoard);
-                hsAtRiver.add(new HandEvaluator(boardEvaluator).getHandStrength(combo));
-            }
-
-            equity = hsAtRiver.stream()
-                    .mapToDouble(hs -> hs)
-                    .average()
-                    .getAsDouble();
-        } else {
-            equity = new HandEvaluator(new BoardEvaluator(board)).getHandStrength(combo);
-        }
-
-        return equity;
-    }
-
-    private Card drawRandomRemainingCardFromDeck(List<Card> holeCards, List<Card> board) {
-        List<Card> deck = BoardEvaluator.getCompleteCardDeck();
-
-        List<Card> deckFiltered = deck.stream()
-                .filter(card -> !holeCards.contains(card) && !board.contains(card))
-                .collect(Collectors.toList());
-
-        Random randomGenerator = new Random();
-        int random = randomGenerator.nextInt(deckFiltered.size());
-        Card cardToReturn = deckFiltered.get(random);
-
-        return cardToReturn;
-    }
-
-
-
-
-    private double getAverageHsOfOppRange(List<List<Card>> oppRange, BoardEvaluator boardEvaluator) {
-        HandEvaluator handEvaluator = new HandEvaluator(boardEvaluator);
-
-        List<Double> allHandstrengths = oppRange.stream()
-                .map(handEvaluator::getHandStrength)
-                .collect(Collectors.toList());
-
-        double average = allHandstrengths.stream()
-                .mapToDouble(hs -> hs)
-                .average()
-                .getAsDouble();
-
-        return average;
-    }
-
     private double getAverageEquityOfOppRange(List<List<Card>> oppRange, List<Card> board) {
-        ExampleOld exampleOld = new ExampleOld();
+        EquityCalculator equityCalculator = new EquityCalculator();
 
-        double averageEquity = oppRange.stream()
-                .map(oppRangeCombo -> exampleOld.calculateEquity(board, oppRangeCombo))
-                .mapToDouble(average -> average)
-                .average()
-                .getAsDouble();
-
-        return averageEquity;
-    }
-
-
-
-    private double getAverageEquityOfOppRangeViaLoop(List<List<Card>> oppRange, List<Card> board) {
-        Example example = new Example();
-
-        List<Double> equities = example.getAllEquities(oppRange, board);
+        List<Double> equities = equityCalculator.getAllEquities(oppRange, board);
 
         double average;
         try {
@@ -141,15 +43,12 @@ public class RangeConstructor {
                     .average()
                     .getAsDouble();
         } catch (Exception e) {
-            average = -1;
+            e.printStackTrace();
+            return getAverageEquityOfOppRange(oppRange, board);
         }
 
         return average;
     }
-
-
-
-
 
     private List<List<Card>> getOpponentRange(List<List<Card>> startingOppRange, BoardEvaluator boardEvaluator, List<Card> botHoleCards) {
         if(startingOppRange == null) {

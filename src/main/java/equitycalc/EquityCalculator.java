@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class Example implements SimulationNotifiable
+public class EquityCalculator implements SimulationNotifiable
 {
     private Simulator simulator;
     private List<Double> equities = new ArrayList<>();
