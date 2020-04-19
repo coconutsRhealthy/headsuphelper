@@ -262,7 +262,7 @@ public final class Simulator implements WorkerNotifiable
         
         this.workers = new ArrayList<>();
         this.startTime = this.endTime = this.overallProgress = this.lastUpdatePercentage = 0;
-        this.nrOfWorkers = SystemUtils.getNrOfLogicalCPUs();
+        this.nrOfWorkers = 2;
     }
     
     public boolean isRunning()
@@ -290,23 +290,12 @@ public final class Simulator implements WorkerNotifiable
     }
     
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     @Override
     public synchronized void onSimulationProgress(WorkerEvent event)
     {
-        int totalProgress = 0;
-        for (int i = 0; i < this.nrOfWorkers; i++) {
-            totalProgress += this.workers.get(i).getProgress();
-        }
-        
-        this.overallProgress = (int) (totalProgress / this.nrOfWorkers);
-        
-        if (this.overallProgress - this.lastUpdatePercentage >= this.updateInterval) {
-            SimulationEvent mainEvent = new SimulationEvent(SimulationEvent.EVENT_SIM_PROGRESS, this.overallProgress);
-            this.notifiable.onSimulationProgress(mainEvent);
-            this.lastUpdatePercentage = this.overallProgress;
-        }
+        //made method empty
     }
     
     /**
