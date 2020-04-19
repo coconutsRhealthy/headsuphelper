@@ -47,7 +47,7 @@ public class Example implements SimulationNotifiable
         Simulator.SimulatorBuilder builder = new Simulator.SimulatorBuilder();
 
         builder.setGameType(PokerType.TEXAS_HOLDEM)
-                .setNrRounds(5000)    //simulate for 100 thousand rounds
+                .setNrRounds(50)    //simulate for 100 thousand rounds
                 .setNotifiable(this)        //call notification methods on "this" object
                 .setUpdateInterval(10)      //call update method at progress intervals of at least 10 %
                 .addPlayer(player)
@@ -66,7 +66,7 @@ public class Example implements SimulationNotifiable
     public void onSimulationStart(SimulationEvent event)
     {
         int workers = (Integer) event.getEventData();
-        System.out.println("Simulator started on " + workers + " threads");
+//        System.out.println("Simulator started on " + workers + " threads");
     }
     
     @Override
@@ -86,9 +86,9 @@ public class Example implements SimulationNotifiable
 //        double l2 = result.getLosePercentage(2);
 //        double t2 = result.getTiePercentage(2);
         
-        System.out.println("Win 1: " + w0);
-        System.out.println("Lose 1: " + l0);
-        System.out.println("Tie 1: " + t0);
+//        System.out.println("Win 1: " + w0);
+//        System.out.println("Lose 1: " + l0);
+//        System.out.println("Tie 1: " + t0);
         
 //        System.out.println("Win 2: " + w1);
 //        System.out.println("Lose 2: " + l1);
@@ -99,10 +99,10 @@ public class Example implements SimulationNotifiable
 //        System.out.println("Tie 3: " + t2);
         
         long duration = result.getDuration();
-        System.out.println("Duration: " + duration + " ms");
+        //System.out.println("Duration: " + duration + " ms");
 
         //vul hier een lijst met alle equities....
-        equities.add(w0);
+        equities.add(w0 / 100);
     }
     
     @Override
@@ -116,7 +116,7 @@ public class Example implements SimulationNotifiable
     public void onSimulationProgress(SimulationEvent event)
     {
         int progress = (Integer) event.getEventData();
-        System.out.println("Progress: " + progress + " %");
+        //System.out.println("Progress: " + progress + " %");
     }
     
     @Override
@@ -126,55 +126,64 @@ public class Example implements SimulationNotifiable
         System.err.println("The simulation encountered an error: " + e.getMessage());
     }
     
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
-        Card[] flopCards = {new Card(5, 's'), new Card('3', 's'), new Card(2, 'c')};
+        for(int i = 0; i < 10; i++) {
+            Card[] flopCards = {new Card(5, 's'), new Card('3', 's'), new Card(2, 'c')};
 
-        List<Card[]> holeCardList = new ArrayList<>();
+            List<Card[]> holeCardList = new ArrayList<>();
 
-        Card[] hc1 = {new Card(6, 's'), new Card(10, 'd')};
-        Card[] hc2 = {new Card(7, 's'), new Card(11, 'd')};
-        Card[] hc3 = {new Card(8, 's'), new Card(12, 'd')};
+            Card[] hc1 = {new Card(6, 's'), new Card(10, 'd')};
+            Card[] hc2 = {new Card(7, 's'), new Card(11, 'd')};
+            Card[] hc3 = {new Card(8, 's'), new Card(12, 'd')};
 
-        holeCardList.add(hc1);
-        holeCardList.add(hc2);
-        holeCardList.add(hc3);
+            holeCardList.add(hc1);
+            holeCardList.add(hc2);
+            holeCardList.add(hc3);
 
-        Example instance = new Example();
+            Example instance = new Example();
 
-        for(Card[] hc : holeCardList) {
-            instance.doShit(flopCards, hc);
+            for(Card[] hc : holeCardList) {
+                instance.doShit(flopCards, hc);
 
-            instance.start();
-        }
-
-//        while(instance.equities.size() < 3) {
-//            //continue;
-//        }
-
-//        try {
-//            boolean finished = instance.simulator.getExecutor().awaitTermination(7, TimeUnit.SECONDS);
-//        } catch (Exception e) {
-//            System.out.println("RRSFSFSFDDSF");
-//        }
-
-
-//        for(int i = 0; i < 100; i++) {
-//            try {
-//                while(!instance.simulator.getExecutor().awaitTermination(70, TimeUnit.SECONDS));
-//            } catch (Exception e) {
-//
-//            }
-//
-//            try {
-//                while(!instance.simulator.getExecutor().awaitTermination(70, TimeUnit.SECONDS));
-//            } catch (Exception e) {
-//
-//            }
-//        }
-
+                instance.start();
+            }
 
             while(!instance.simulator.getExecutor().isTerminated());
+
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (Exception e) {
+
+            }
+
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println(instance.equities.size());
+        }
+
+
+    }
+
+    public List<Double> getAllEquities(List<List<com.lennart.model.card.Card>> range,
+                                       List<com.lennart.model.card.Card> flop) {
+        Card[] flopCards = flop.stream()
+                .map(hhCard -> new Card(hhCard.getRank(), hhCard.getSuit()))
+                .toArray(Card[]::new);
+
+        int counter = 0;
+
+        for(List<com.lennart.model.card.Card> combo : range) {
+            Card[] cards = combo.stream()
+                    .map(hhCard -> new Card(hhCard.getRank(), hhCard.getSuit()))
+                    .toArray(Card[]::new);
+
+            System.out.println(counter++);
+
+            doShit(flopCards, cards);
+            simulator.start();
+        }
+
+        while(!simulator.getExecutor().isTerminated());
 
         try {
             TimeUnit.MILLISECONDS.sleep(10);
@@ -182,7 +191,6 @@ public class Example implements SimulationNotifiable
 
         }
 
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        System.out.println(instance.equities.size());
+        return equities;
     }
 }
