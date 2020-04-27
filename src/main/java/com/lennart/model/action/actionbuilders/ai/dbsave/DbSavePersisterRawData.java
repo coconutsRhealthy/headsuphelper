@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by LennartMac on 13/01/2019.
@@ -32,6 +33,8 @@ public class DbSavePersisterRawData {
 
                 DbSaveRaw dbSaveRaw = (DbSaveRaw) dbSave;
 
+                String showdownOccured = showdownOccurred(biglind);
+
                 st.executeUpdate("INSERT INTO dbstats_raw (" +
                     "entry, " +
                     "date, " +
@@ -54,7 +57,8 @@ public class DbSavePersisterRawData {
                     "bigblind, " +
                     "strongdraw, " +
                     "recent_hands_won, " +
-                    "adjusted_opp_type) " +
+                    "adjusted_opp_type, " +
+                    "opp_holecards) " +
                     "VALUES ('" +
                     highestIntEntry + "', '" +
                     getCurrentDate() + "', '" +
@@ -72,12 +76,13 @@ public class DbSavePersisterRawData {
                     dbSaveRaw.getStake() + "', '" +
                     dbSaveRaw.getOpponentName() + "', '" +
                     dbSaveRaw.getOpponentData() + "', '" +
-                    showdownOccurred(biglind) + "', '" +
+                    showdownOccured + "', '" +
                     botWonHand(biglind) + "', '" +
                     dbSaveRaw.getBigBlind() + "', '" +
                     dbSaveRaw.getStrongDraw() + "', '" +
                     dbSaveRaw.getRecentHandsWon() + "', '" +
-                    dbSaveRaw.getAdjustedOppType() + "'" +
+                    dbSaveRaw.getAdjustedOppType() + "', '" +
+                    getOpponentHolecards(showdownOccured, biglind) + "'" +
                     ")");
             }
         }
@@ -105,6 +110,51 @@ public class DbSavePersisterRawData {
         }
 
         return String.valueOf(botWonHand);
+    }
+
+    private String getOpponentHolecards(String showDownOccured, double bigBlind) throws Exception {
+        String opponentHolecards = "";
+
+        if(showDownOccured.equals("true")) {
+            System.out.println("showDownOccured true, we are logging opp holecards :)");
+
+            if(lastHand == null) {
+                HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+                List<String> total = handHistoryReaderStars.readTextFile();
+                lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+            }
+
+            Collections.reverse(lastHand);
+
+            List<String> relevantLines = lastHand.stream()
+                    .filter(line -> ((line.contains("showed") || line.contains("mucked")) && !line.contains("vegeta11223")))
+                    .collect(Collectors.toList());
+
+            if(relevantLines.size() == 1) {
+                String workingString = relevantLines.get(0);
+
+                if(workingString.contains("showed")) {
+                    workingString = workingString.substring(workingString.indexOf("showed"));
+                    workingString = workingString.replace("showed", "");
+                } else {
+                    workingString = workingString.substring(workingString.indexOf("mucked"));
+                    workingString = workingString.replace("mucked", "");
+                }
+
+                workingString = workingString.substring(0, workingString.indexOf("]"));
+                workingString = workingString.replace("[", "");
+                workingString = workingString.replace("]", "");
+                workingString = workingString.replace(" ", "");
+
+                opponentHolecards = workingString;
+            } else {
+                System.out.println("wtf, relevant opp showdownlines bigger than 1? " + relevantLines.size());
+                System.out.println("line 1: " + relevantLines.get(0));
+                System.out.println("line 2: " + relevantLines.get(1));
+            }
+        }
+
+        return opponentHolecards;
     }
 
     private String showdownOccurred(double bigBlind) throws Exception {
