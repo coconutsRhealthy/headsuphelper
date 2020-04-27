@@ -661,6 +661,7 @@ public class ActionVariables {
             dbSaveRaw.setStrongDraw(strongDrawString);
             dbSaveRaw.setRecentHandsWon(recentHandsWon);
             dbSaveRaw.setAdjustedOppType(adjustedOppType);
+            dbSaveRaw.setPot(gameVariables.getPot());
 
             continuousTable.getDbSaveList().add(dbSaveRaw);
             //DbSaveRaw

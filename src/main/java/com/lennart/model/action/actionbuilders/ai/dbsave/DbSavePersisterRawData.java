@@ -58,7 +58,8 @@ public class DbSavePersisterRawData {
                     "strongdraw, " +
                     "recent_hands_won, " +
                     "adjusted_opp_type, " +
-                    "opp_holecards) " +
+                    "opp_holecards, " +
+                    "pot) " +
                     "VALUES ('" +
                     highestIntEntry + "', '" +
                     getCurrentDate() + "', '" +
@@ -82,7 +83,8 @@ public class DbSavePersisterRawData {
                     dbSaveRaw.getStrongDraw() + "', '" +
                     dbSaveRaw.getRecentHandsWon() + "', '" +
                     dbSaveRaw.getAdjustedOppType() + "', '" +
-                    getOpponentHolecards(showdownOccured, biglind) + "'" +
+                    getOpponentHolecards(showdownOccured, biglind) + "', '" +
+                    dbSaveRaw.getPot() + "'" +
                     ")");
             }
         }

@@ -29,6 +29,7 @@ public class DbSaveRaw extends DbSave {
     private String strongDraw;
     private double recentHandsWon;
     private String adjustedOppType;
+    private double pot;
 
     private Connection con;
 
@@ -263,6 +264,14 @@ public class DbSaveRaw extends DbSave {
 
     public void setAdjustedOppType(String adjustedOppType) {
         this.adjustedOppType = adjustedOppType;
+    }
+
+    public double getPot() {
+        return pot;
+    }
+
+    public void setPot(double pot) {
+        this.pot = pot;
     }
 
     private void initializeDbConnection() throws Exception {
