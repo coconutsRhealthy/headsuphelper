@@ -1,7 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
-import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
@@ -9,37 +8,12 @@ import equitycalc.EquityCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by LennartMac on 11/04/2020.
  */
 public class RangeConstructor {
-
-
-
-    private void testMethodSingleCombo() {
-        List<Card> botHoleCards = Arrays.asList(new Card(14, 'c'), new Card(14, 'd'));
-        List<Card> board = Arrays.asList(new Card(2, 'd'), new Card(2, 'h'), new Card(2, 's'));
-
-        EquityCalculator equityCalculator = new EquityCalculator();
-
-        System.out.println(equityCalculator.getComboEquityFlop(botHoleCards, board));
-    }
-
-    private void testMethodRange() {
-        List<Card> botHoleCards = Arrays.asList(new Card(3, 'c'), new Card(10, 'd'));
-        List<Card> board = Arrays.asList(new Card(7, 'h'), new Card(8, 'h'), new Card(9, 'h'));
-
-        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
-
-        //List<List<Card>> oppRange = getOpponentRange(null, boardEvaluator, botHoleCards);
-        List<List<Card>> oppRange = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
-
-        oppRange = removeCombosWithKnownCards(oppRange, board);
-
-        double averageEquity = getAverageEquityOfOppRange(oppRange, board);
-        System.out.println(averageEquity);
-    }
 
     private double getAverageEquityOfOppRange(List<List<Card>> oppRange, List<Card> board) {
         EquityCalculator equityCalculator = new EquityCalculator();
@@ -60,75 +34,14 @@ public class RangeConstructor {
         return average;
     }
 
-    public static void main(String[] args) {
-//        List<List<Card>> allCombos = new PreflopEuityHs().getAllPreflopCombosEquitySorted();
-//        List<List<Card>> range = new RangeConstructor().getOppPre3betRange(allCombos, "high");
-//        System.out.println("wacht");
-//
-//        //System.out.println(new RangeConstructor().comboIsSuitedConnector(Arrays.asList(new Card(2, 'd'), new Card(14, 'd')), 1));
-
-        //new EquityCalculator().getComboEquityPreflop(Arrays.asList(new Card(8, 'd'), new Card(6, 'c')));
-
-        new RangeConstructor().ffEenTestAllEquitiesFlop();
-
-        //new EquityCalculator().getRangeEquityFlop()
-
-        //new RangeConstructor().testMethodRange();
-    }
-
-    private void ffEenTestAllEquitiesFlop() {
-        List<Card> board = Arrays.asList(new Card(8, 'c'), new Card(6, 's'), new Card(14, 'c'));
-        Map<List<Card>, Double> eije = getAllCombosEquitySortedFlop(board);
-        eije = sortByValueHighToLow(eije);
-        System.out.println("tjo");
-    }
-
-
     private Map<List<Card>, Double> getAllCombosEquitySortedFlop(List<Card> board) {
         List<List<Card>> allCombos = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
         allCombos = removeCombosWithKnownCards(allCombos, board);
-        return new EquityCalculator().getRangeEquityFlop(allCombos, board);
+        return sortByValueHighToLow(new EquityCalculator().getRangeEquityFlop(allCombos, board));
     }
 
-    private List<List<Card>> getOpponentRange(List<List<Card>> startingOppRange, BoardEvaluator boardEvaluator, List<Card> botHoleCards) {
-        if(startingOppRange == null) {
-            startingOppRange = createStartingOppRange(botHoleCards);
-        }
-
-        List<List<Card>> opponentRange = new ArrayList<>();
-
-        List<List<Card>> valueRangeTotal = getValueRange(boardEvaluator);
-        List<List<Card>> valueOppRange = new ArrayList<>();
-        valueOppRange.addAll(startingOppRange);
-        valueOppRange.retainAll(valueRangeTotal);
-
-        List<List<Card>> drawOppRange = new ArrayList<>();
-        if(boardEvaluator.getBoard().size() != 5) {
-            List<List<Card>> drawRangeTotal = getDrawRange(boardEvaluator);
-            drawOppRange.addAll(startingOppRange);
-            drawOppRange.retainAll(drawRangeTotal);
-        }
-
-        List<List<Card>> airRangeTotal = getAirRange(boardEvaluator);
-        List<List<Card>> airOppRange = new ArrayList<>();
-        airOppRange.addAll(startingOppRange);
-        airOppRange.retainAll(airRangeTotal);
-
-        opponentRange.addAll(valueOppRange);
-        opponentRange.addAll(drawOppRange);
-        opponentRange.addAll(airOppRange);
-
-        Set<List<Card>> rangeAsSet = new HashSet<>();
-        rangeAsSet.addAll(opponentRange);
-
-        opponentRange.clear();
-        opponentRange.addAll(rangeAsSet);
-
-        return opponentRange;
-    }
-
-    private List<List<Card>> removeCombosWithKnownCards(List<List<Card>> range, List<Card> knownCards) {
-        return range.stream().filter(combo -> Collections.disjoint(combo, knownCards)).collect(Collectors.toList());
+    private List<List<Card>> removeCombosWithKnownCards(List<List<Card>> listToRemoveCombosFrom, List<Card> knownCards) {
+        return listToRemoveCombosFrom.stream().filter(combo -> Collections.disjoint(combo, knownCards)).collect(Collectors.toList());
     }
 
     private List<List<Card>> createStartingOppRange(List<Card> botHoleCards) {
@@ -143,131 +56,6 @@ public class RangeConstructor {
                 .collect(Collectors.toList());
 
         return startingOppRange;
-    }
-
-    private List<List<Card>> getValueRange(BoardEvaluator boardEvaluator) {
-        int[] counter = {0};
-
-        List<List<Card>> value = boardEvaluator.getSortedCombosNew()
-                .values()
-                .stream()
-                .flatMap(Collection::stream)
-                .map(set -> {
-                    counter[0]++;
-
-                    if(counter[0] <= 530) {
-                        List<Card> valueComboList = new ArrayList<>();
-                        valueComboList.addAll(set);
-                        return valueComboList;
-                    } else {
-                        return null;
-                    }
-                })
-                .collect(Collectors.toList());
-
-        value.removeIf(Objects::isNull);
-        return value;
-    }
-
-    private List<List<Card>> getDrawRange(BoardEvaluator boardEvaluator) {
-        StraightDrawEvaluator straightDrawEvaluator = boardEvaluator.getStraightDrawEvaluator();
-        FlushDrawEvaluator flushDrawEvaluator = boardEvaluator.getFlushDrawEvaluator();
-
-        List<List<Card>> draws = new ArrayList<>();
-
-        draws.addAll(convertDrawEvaluatorMapToList(flushDrawEvaluator.getStrongFlushDrawCombos()));
-        draws.addAll(convertDrawEvaluatorMapToList(flushDrawEvaluator.getMediumFlushDrawCombos()));
-        draws.addAll(convertDrawEvaluatorMapToList(straightDrawEvaluator.getStrongOosdCombos()));
-        draws.addAll(convertDrawEvaluatorMapToList(straightDrawEvaluator.getMediumOosdCombos()));
-        draws.addAll(convertDrawEvaluatorMapToList(straightDrawEvaluator.getStrongGutshotCombos()));
-        draws.addAll(convertDrawEvaluatorMapToList(straightDrawEvaluator.getMediumGutshotCombos()));
-
-        return draws;
-    }
-
-    private List<List<Card>> getAirRange(BoardEvaluator boardEvaluator) {
-        int[] counter2 = {0};
-
-        List<List<Card>> air = boardEvaluator.getSortedCombosNew()
-                .values()
-                .stream()
-                .flatMap(Collection::stream)
-                .map(set -> {
-                    counter2[0]++;
-
-                    if(counter2[0] > 530) {
-                        if(Math.random() < 0.17) {
-                            List<Card> airComboList = new ArrayList<>();
-                            airComboList.addAll(set);
-                            return airComboList;
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        return null;
-                    }
-                })
-                .collect(Collectors.toList());
-
-        air.removeIf(Objects::isNull);
-        return air;
-    }
-
-    private List<List<Card>> convertDrawEvaluatorMapToList(Map<Integer, Set<Card>> drawEvaluatorMap) {
-        return drawEvaluatorMap.values().stream()
-                .map(combo -> {
-                    List<Card> comboList = new ArrayList<>();
-                    comboList.addAll(combo);
-                    return comboList;
-                })
-                .collect(Collectors.toList());
-    }
-
-
-
-
-    //////
-
-    //more test for ranges
-
-
-
-    private void printStarthandsInOrder() {
-        Map<Integer, List<Card>> allStarthands = ActionBuilderUtil.getAllPossibleStartHandsAsList();
-
-        //Map<List<Card>, Double> eije = allStarthands.values().stream().map(combo -> new EquityCalculator().getComboEquityPreflop(combo)).collect(Collectors.toMap())
-
-        Map<List<Card>, Double> eije = allStarthands.values().stream().collect(Collectors.toMap(combo -> combo, combo -> new EquityCalculator().getComboEquityPreflop(combo)));
-
-
-        eije = sortByValueHighToLow(eije);
-
-        //eije.entrySet().stream().sorted().co
-
-        //eije = eije.entrySet().stream().sorted().collect(Collectors.toMap(a -> a, b -> b));
-
-        //List<Card> preflopComboToTest = Arrays.asList(new Card(9, 'd'), new Card(14, 'c'));
-
-        //System.out.println(new EquityCalculator().getComboEquityPreflop(preflopComboToTest));
-
-        System.out.println("wacht");
-
-    }
-
-    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
-        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o2.getValue() ).compareTo( o1.getValue());
-            }
-        });
-
-        Map<K, V> result = new LinkedHashMap<>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
     }
 
 
@@ -498,26 +286,236 @@ public class RangeConstructor {
 
     }
 
+    public static void main(String[] args) {
+//        //System.out.println((int) (1326 * 0.6));
+//
+//        List<Card> combo1 = Arrays.asList(new Card(8, 'd'), new Card(11, 'c'));
+//        List<Card> combo2 = Arrays.asList(new Card(7, 's'), new Card(3, 'h'));
+//        List<Card> combo3 = Arrays.asList(new Card(11, 'c'), new Card(8, 'd'));
+//        List<Card> combo4 = Arrays.asList(new Card(11, 'c'), new Card(8, 'd'));
+//
+//        List<List<Card>> input = Arrays.asList(combo1, combo2, combo3, combo4);
+
+//        List<List<Card>> output = new RangeConstructor().testMethod();
+//
+//        System.out.println("wacht");
+
+        new RangeConstructor().testMethod();
+    }
+
+    private void testMethod() {
+        List<Card> board = Arrays.asList(new Card(6, 'c'), new Card(9, 'd'), new Card(12, 's'));
+        List<Card> botHoleCards = Arrays.asList(new Card(2, 's'), new Card(4, 's'));
+
+        List<List<Card>> oppStartingRange = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
+
+        long eije1 = new Date().getTime();
+        Map<List<Card>, Double> sortedEquities = getAllCombosEquitySortedFlop(board);
+        long eije2 = new Date().getTime();
+
+        System.out.println("diff1: " + (eije2 - eije1));
+
+        List<List<Card>> allCombosEquitySorted = sortedEquities.keySet().stream().collect(Collectors.toList());
+
+
+        //System.out.println("wacht");
+
+
+
+        List<Card> knownGameCards = new ArrayList<>();
+        knownGameCards.addAll(board);
+        knownGameCards.addAll(botHoleCards);
+
+        getOppBetRangeYo(oppStartingRange, allCombosEquitySorted, "low", "small", board, botHoleCards);
+//
+//        //getDraws(Arrays.asList(new Card(6, 'c'), new Card(9, 'd'), new Card(12, 's')));
+//
+//
+//        Set<String> a = new HashSet<>();
+//        a.add("Z");
+//        a.add("T");
+//
+//        Set<String> b = new HashSet<>();
+//        b.add("T");
+//        b.add("Z");
+//
+//        System.out.println(a.equals(b));
+//
+//
+//        //moet je gaan werken met Sets??
+
+    }
+
+    private List<List<Card>> getDraws(List<String> drawsToInclude, List<Card> board) {
+        StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator(board);
+        FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator(board);
+
+        List<List<Card>> draws = new ArrayList<>();
+
+        if(drawsToInclude.contains("strongOosd")) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongOosdCombos()));
+        }
+
+        if(drawsToInclude.contains("mediumOosd")) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumOosdCombos()));
+        }
+
+        if(drawsToInclude.contains("weakOosd")) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakOosdCombos()));
+        }
+
+        if(drawsToInclude.contains("strongGutshot")) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongGutshotCombos()));
+        }
+
+        if(drawsToInclude.contains("mediumGutshot")) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumOosdCombos()));
+        }
+
+        if(drawsToInclude.contains("weakGutshot")) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakGutshotCombos()));
+        }
+
+        if(drawsToInclude.contains("strongFd")) {
+            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getStrongFlushDrawCombos()));
+        }
+
+        if(drawsToInclude.contains("mediumFd")) {
+            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getMediumFlushDrawCombos()));
+        }
+
+        if(drawsToInclude.contains("weakFd")) {
+            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getWeakFlushDrawCombos()));
+        }
+
+        return draws;
+    }
+
+    private List<List<Card>> getAirCombos(List<List<Card>> allCombosEquitySorted, List<List<Card>> valueAndDrawRange,
+                                          double airPercentageToAdd, List<Card> knownGameCards) {
+        List<List<Card>> airCombosToAddToRange = new ArrayList<>();
+
+        List<List<Card>> airCombosTotal = allCombosEquitySorted.subList((int) (allCombosEquitySorted.size() * 0.55), allCombosEquitySorted.size());
+        List<List<Card>> eligibleAirCombos = removeCombosThatAreInRange(valueAndDrawRange, airCombosTotal);
+        eligibleAirCombos = removeCombosWithKnownCards(eligibleAirCombos, knownGameCards);
+
+        int numberOfCombosToAdd = (int) (valueAndDrawRange.size() * ((airPercentageToAdd / 100) + 1)) - valueAndDrawRange.size();
+        int numberOfAirCombosAdded = 0;
+
+        while(numberOfAirCombosAdded < numberOfCombosToAdd && !eligibleAirCombos.isEmpty()) {
+            List<Card> randomAirCombo = getRandomComboFromList(eligibleAirCombos);
+            airCombosToAddToRange.add(randomAirCombo);
+            eligibleAirCombos.remove(randomAirCombo);
+            numberOfAirCombosAdded++;
+        }
+
+        return airCombosToAddToRange;
+    }
+
+    private List<List<Card>> getEligibleAirCombosToAdd(List<List<Card>> airCombos, List<List<Card>> valueAndDrawRange, List<List<Card>> knownGameCards) {
+        //handhaaf de aircombos die niet in je startingRange zitten...
+        List<List<Card>> eligibleAirCombos = removeCombosThatAreInRange(valueAndDrawRange, airCombos);
+
+
+
+
+
+        return null;
+    }
+
+    private List<List<Card>> convertDrawMapToList(Map<Integer, Set<Card>> drawMap) {
+        return drawMap.values().stream()
+                .map(combo -> combo
+                        .stream()
+                        .collect(Collectors.toList()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Card> getRandomComboFromList(List<List<Card>> input) {
+        int min = 0;
+        int max = input.size() - 1;
+        int random = (int)(Math.random() * ((max - min) + 1)) + min;
+        return input.get(random);
+    }
+
+    private List<List<Card>> retainCombosThatAreInRange(List<List<Card>> range, List<List<Card>> widerList) {
+        List<Set<Card>> widerListWithSets = widerList.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        List<Set<Card>> rangeWithSets = range.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        widerListWithSets.retainAll(rangeWithSets);
+        return widerListWithSets.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
+    }
+
+    private List<List<Card>> removeCombosThatAreInRange(List<List<Card>> range, List<List<Card>> widerList) {
+        List<Set<Card>> widerListWithSets = widerList.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        List<Set<Card>> rangeWithSets = range.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        widerListWithSets.removeAll(rangeWithSets);
+        return widerListWithSets.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
+    }
+
+    private List<List<Card>> filterOutDoubleCombos(List<List<Card>> input) {
+        Set<Set<Card>> asSet = input.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toSet());
+        return asSet.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
+    }
+
     private void getOppBetRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
-                                  List<Card> knownGameCards, String oppAggroness, String oppBetsize) {
+                                  String oppAggroness, String oppBetsize, List<Card> board, List<Card> botHoleCards) {
         List<List<Card>> oppBetRange = new ArrayList<>();
+        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
         if(oppAggroness.equals("low")) {
             if(oppBetsize.equals("small")) {
-                //value
-                    //wat je hier kunt doen... alle 1326 combos sorteren
-                    //en dan... de bovenste 60% handhaven
-                    //en dan... van deze combos de combos houden die al in je range zaten...
+                double valuePercentage = 60;
+                List<List<Card>> valueCombos = allCombosEquitySorted.subList(0, (int) (allCombosEquitySorted.size() * (1 - (valuePercentage / 100))));
+                List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
+                eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
+                oppBetRange.addAll(eligibleValueCombos);
+                oppBetRange = filterOutDoubleCombos(oppBetRange);
 
-                oppBetRange = allCombosEquitySorted.subList(0, 530);
-                oppBetRange.retainAll(oppStartingRange);
-                oppBetRange = removeCombosWithKnownCards(oppBetRange, knownGameCards);
+                //draw
+                List<List<Card>> draws = getDraws(Arrays.asList("strongFd", "strongOosd", "strongGutshot"), board);
+                List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
+                eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
+                oppBetRange.addAll(eligibleDraws);
+                oppBetRange = filterOutDoubleCombos(oppBetRange);
+
+                //air
+                double airPercentage = 5;
+                List<List<Card>> airCombos = getAirCombos(allCombosEquitySorted, oppBetRange, airPercentage, knownGameCards);
+                oppBetRange.addAll(airCombos);
+                oppBetRange = filterOutDoubleCombos(oppBetRange);
+
+
+//                List<List<Card>> airComplete = allCombosEquitySorted.subList((int) (allCombosEquitySorted.size() * 0.55), allCombosEquitySorted.size() + 1);
+//
+//                //breid je range uit met air zodat range.size groeit met 5%...
+//
+//                int amountOfCombosToAdd = (int) (oppBetRange.size() * 1.05) - oppBetRange.size();
+
+                System.out.println("zzz");
             } else if(oppBetsize.equals("medium")) {
+                double valuePercentage = 70;
+                List<String> drawsToInclude = Arrays.asList("strongFd", "strongOosd");
+                double drawPercentageToInclude = 100;
+                double airPercentage = 4;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals("large")) {
+                double valuePercentage = 83;
+                List<String> drawsToInclude = Arrays.asList("strongFd", "strongOosd");
+                double drawPercentageToInclude = 50;
+                double airPercentage = 2;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
 
 
+                //value
+                //vanaf 83%
 
-            } else if(oppBetsize.equals("larg")) {
+                //draw
+                //50% strong fd en strong oosd
 
+                //air
+                //2% van onderste 50% combos
             }
         }
 
@@ -640,6 +638,43 @@ public class RangeConstructor {
                 //air
                     //25% van onderste 50% combos
 
+    }
+
+    private List<List<Card>> fillRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                       List<Card> board, List<Card> knownGameCards, double valuePercentage,
+                                       double airPercentage, List<String> drawsToInclude, double drawPercentageToInclude) {
+        List<List<Card>> range = new ArrayList<>();
+
+        //value
+        List<List<Card>> valueCombos = allCombosEquitySorted.subList(0, (int) (allCombosEquitySorted.size() * (1 - (valuePercentage / 100))));
+        List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
+        eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
+        range.addAll(eligibleValueCombos);
+        range = filterOutDoubleCombos(range);
+
+        //draw
+        List<List<Card>> draws = getDraws(drawsToInclude, board);
+        List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
+        eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
+
+        if((drawPercentageToInclude / 100) < 1) {
+            for(List<Card> draw : eligibleDraws) {
+                if(Math.random() < drawPercentageToInclude) {
+                    range.add(draw);
+                }
+            }
+        } else {
+            range.addAll(eligibleDraws);
+        }
+
+        range = filterOutDoubleCombos(range);
+
+        //air
+        List<List<Card>> airCombos = getAirCombos(allCombosEquitySorted, range, airPercentage, knownGameCards);
+        range.addAll(airCombos);
+        range = filterOutDoubleCombos(range);
+
+        return range;
     }
 
     private void getOppCheckRangeYo() {
@@ -993,5 +1028,19 @@ public class RangeConstructor {
         return comboIsSuitedConnector;
     }
 
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o2.getValue() ).compareTo( o1.getValue());
+            }
+        });
 
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
 }
