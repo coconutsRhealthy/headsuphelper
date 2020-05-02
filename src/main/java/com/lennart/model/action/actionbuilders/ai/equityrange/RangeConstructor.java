@@ -301,19 +301,23 @@ public class RangeConstructor {
 //        System.out.println("wacht");
 
         new RangeConstructor().testMethod();
+
+        System.out.println(new EquityCalculator().getComboEquityFlop(Arrays.asList(new Card(7, 's'), new Card(2, 'd')),
+                Arrays.asList(new Card(3, 'c'), new Card(7, 'd'), new Card(13, 's'))));
+        //jouw eigen single combo equity calculation moet vaker gebeuren dan 50 keer...
     }
 
     private void testMethod() {
-        List<Card> board = Arrays.asList(new Card(6, 'c'), new Card(9, 'd'), new Card(12, 's'));
+        List<Card> board = Arrays.asList(new Card(3, 'c'), new Card(7, 'd'), new Card(13, 's'));
         List<Card> botHoleCards = Arrays.asList(new Card(2, 's'), new Card(4, 's'));
 
         List<List<Card>> oppStartingRange = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
 
-        long eije1 = new Date().getTime();
-        Map<List<Card>, Double> sortedEquities = getAllCombosEquitySortedFlop(board);
-        long eije2 = new Date().getTime();
 
-        System.out.println("diff1: " + (eije2 - eije1));
+        Map<List<Card>, Double> sortedEquities = getAllCombosEquitySortedFlop(board);
+
+
+
 
         List<List<Card>> allCombosEquitySorted = sortedEquities.keySet().stream().collect(Collectors.toList());
 
@@ -326,7 +330,11 @@ public class RangeConstructor {
         knownGameCards.addAll(board);
         knownGameCards.addAll(botHoleCards);
 
-        getOppBetRangeYo(oppStartingRange, allCombosEquitySorted, "low", "small", board, botHoleCards);
+        List<List<Card>> oppBetRange = getOppBetRangeYo(oppStartingRange, allCombosEquitySorted, "low", "large", board, botHoleCards);
+
+        double averageEquity = getAverageEquityOfRangeNew(sortedEquities, oppBetRange);
+
+        System.out.println(averageEquity);
 //
 //        //getDraws(Arrays.asList(new Card(6, 'c'), new Card(9, 'd'), new Card(12, 's')));
 //
@@ -344,6 +352,28 @@ public class RangeConstructor {
 //
 //        //moet je gaan werken met Sets??
 
+    }
+
+    private double getAverageEquityOfRangeNew(Map<List<Card>, Double> sortedEquities, List<List<Card>> range) {
+        Map<List<Card>, Double> sortedEquitiesRangeFiltered = sortedEquities.entrySet().stream().filter(entry -> {
+            List<Card> combo = Arrays.asList(entry.getKey().get(0), entry.getKey().get(1));
+            List<Card> comboReverseOrder = Arrays.asList(entry.getKey().get(1), entry.getKey().get(0));
+            return range.contains(combo) || range.contains(comboReverseOrder);
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        double average = -1;
+
+        try {
+            average = sortedEquitiesRangeFiltered.values().stream()
+                    .mapToDouble(a -> a)
+                    .average()
+                    .getAsDouble();
+        } catch (Exception e) {
+            System.out.println("wtf!");
+            e.printStackTrace();
+        }
+
+        return average;
     }
 
     private List<List<Card>> getDraws(List<String> drawsToInclude, List<Card> board) {
@@ -412,17 +442,6 @@ public class RangeConstructor {
         return airCombosToAddToRange;
     }
 
-    private List<List<Card>> getEligibleAirCombosToAdd(List<List<Card>> airCombos, List<List<Card>> valueAndDrawRange, List<List<Card>> knownGameCards) {
-        //handhaaf de aircombos die niet in je startingRange zitten...
-        List<List<Card>> eligibleAirCombos = removeCombosThatAreInRange(valueAndDrawRange, airCombos);
-
-
-
-
-
-        return null;
-    }
-
     private List<List<Card>> convertDrawMapToList(Map<Integer, Set<Card>> drawMap) {
         return drawMap.values().stream()
                 .map(combo -> combo
@@ -457,7 +476,7 @@ public class RangeConstructor {
         return asSet.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
     }
 
-    private void getOppBetRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+    private List<List<Card>> getOppBetRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
                                   String oppAggroness, String oppBetsize, List<Card> board, List<Card> botHoleCards) {
         List<List<Card>> oppBetRange = new ArrayList<>();
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
@@ -465,33 +484,11 @@ public class RangeConstructor {
         if(oppAggroness.equals("low")) {
             if(oppBetsize.equals("small")) {
                 double valuePercentage = 60;
-                List<List<Card>> valueCombos = allCombosEquitySorted.subList(0, (int) (allCombosEquitySorted.size() * (1 - (valuePercentage / 100))));
-                List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
-                eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
-                oppBetRange.addAll(eligibleValueCombos);
-                oppBetRange = filterOutDoubleCombos(oppBetRange);
-
-                //draw
-                List<List<Card>> draws = getDraws(Arrays.asList("strongFd", "strongOosd", "strongGutshot"), board);
-                List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
-                eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
-                oppBetRange.addAll(eligibleDraws);
-                oppBetRange = filterOutDoubleCombos(oppBetRange);
-
-                //air
+                List<String> drawsToInclude = Arrays.asList("strongFd", "strongOosd", "strongGutshot");
+                double drawPercentageToInclude = 100;
                 double airPercentage = 5;
-                List<List<Card>> airCombos = getAirCombos(allCombosEquitySorted, oppBetRange, airPercentage, knownGameCards);
-                oppBetRange.addAll(airCombos);
-                oppBetRange = filterOutDoubleCombos(oppBetRange);
-
-
-//                List<List<Card>> airComplete = allCombosEquitySorted.subList((int) (allCombosEquitySorted.size() * 0.55), allCombosEquitySorted.size() + 1);
-//
-//                //breid je range uit met air zodat range.size groeit met 5%...
-//
-//                int amountOfCombosToAdd = (int) (oppBetRange.size() * 1.05) - oppBetRange.size();
-
-                System.out.println("zzz");
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals("medium")) {
                 double valuePercentage = 70;
                 List<String> drawsToInclude = Arrays.asList("strongFd", "strongOosd");
@@ -506,16 +503,6 @@ public class RangeConstructor {
                 double airPercentage = 2;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
-
-
-                //value
-                //vanaf 83%
-
-                //draw
-                //50% strong fd en strong oosd
-
-                //air
-                //2% van onderste 50% combos
             }
         }
 
@@ -638,6 +625,7 @@ public class RangeConstructor {
                 //air
                     //25% van onderste 50% combos
 
+        return oppBetRange;
     }
 
     private List<List<Card>> fillRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
