@@ -4,17 +4,59 @@ package equitycalc;
 import equitycalc.combination.Card;
 import equitycalc.simulation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class EquityCalculator implements SimulationNotifiable
-{
-    private Simulator simulator;
-    private List<Double> equities = new ArrayList<>();
+public class EquityCalculator implements SimulationNotifiable {
 
-    public List<Double> getAllEquities(List<List<com.lennart.model.card.Card>> range,
-                                       List<com.lennart.model.card.Card> flop) {
+    private Simulator simulator;
+    private Map<List<com.lennart.model.card.Card>, Double> equities = new HashMap<>();
+
+    public double getComboEquityPreflop(List<com.lennart.model.card.Card> combo) {
+        Card[] comboCorrect = combo.stream()
+                .map(hhCard -> new Card(hhCard.getRank(), hhCard.getSuit()))
+                .toArray(Card[]::new);
+
+        preparePreflopSimulater(comboCorrect);
+
+        simulator.start();
+
+        while(!simulator.getExecutor().isTerminated());
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(10);
+        } catch (Exception e) {
+
+        }
+
+        return equities.entrySet().iterator().next().getValue();
+    }
+
+    public double getComboEquityFlop(List<com.lennart.model.card.Card> combo, List<com.lennart.model.card.Card> flop) {
+        Card[] flopCards = flop.stream()
+                .map(hhCard -> new Card(hhCard.getRank(), hhCard.getSuit()))
+                .toArray(Card[]::new);
+
+        Card[] comboCorrect = combo.stream()
+                .map(hhCard -> new Card(hhCard.getRank(), hhCard.getSuit()))
+                .toArray(Card[]::new);
+
+        prepareTheSimulator(flopCards, comboCorrect);
+        simulator.start();
+
+        while(!simulator.getExecutor().isTerminated());
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(10);
+        } catch (Exception e) {
+
+        }
+
+        return equities.entrySet().iterator().next().getValue();
+    }
+
+    public Map<List<com.lennart.model.card.Card>, Double> getRangeEquityFlop(List<List<com.lennart.model.card.Card>> range,
+                                          List<com.lennart.model.card.Card> flop) {
         Card[] flopCards = flop.stream()
                 .map(hhCard -> new Card(hhCard.getRank(), hhCard.getSuit()))
                 .toArray(Card[]::new);
@@ -54,6 +96,21 @@ public class EquityCalculator implements SimulationNotifiable
 
         this.simulator = builder.build();
     }
+
+    private void preparePreflopSimulater(Card[] cards) {
+        PlayerProfile player = new PlayerProfile(HandType.EXACTCARDS, null, cards);
+
+        Simulator.SimulatorBuilder builder = new Simulator.SimulatorBuilder();
+
+        builder.setGameType(PokerType.TEXAS_HOLDEM)
+                .setNrRounds(50000)    //simulate for 50 rounds
+                .setNotifiable(this)        //call notification methods on "this" object
+                .setUpdateInterval(10)      //call update method at progress intervals of at least 10 %
+                .addPlayer(player)
+                .addPlayer(new PlayerProfile(HandType.RANDOM, null, null));
+
+        this.simulator = builder.build();
+    }
     
     @Override
     public void onSimulationStart(SimulationEvent event)
@@ -65,8 +122,14 @@ public class EquityCalculator implements SimulationNotifiable
     public void onSimulationDone(SimulationEvent event)
     {
         SimulationFinalResult result = (SimulationFinalResult) event.getEventData();
-        double w0 = result.getWinPercentage(0);
-        equities.add(w0 / 100);
+
+        Card[] combo = result.getPlayer(0).getCards();
+
+        List<com.lennart.model.card.Card> comboGoodCardObject = Arrays.asList(
+                new com.lennart.model.card.Card(combo[0].getRank(), combo[0].getColor()),
+                new com.lennart.model.card.Card(combo[1].getRank(), combo[1].getColor()));
+
+        equities.put(comboGoodCardObject, result.getWinPercentage(0) / 100);
     }
     
     @Override
