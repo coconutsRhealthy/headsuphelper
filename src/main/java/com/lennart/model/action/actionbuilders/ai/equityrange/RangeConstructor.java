@@ -15,6 +15,22 @@ import java.util.stream.Stream;
  */
 public class RangeConstructor {
 
+    private static final String STRONG_FD = "strongFd";
+    private static final String MEDIUM_FD = "mediumFd";
+    private static final String WEAK_FD = "weakFd";
+    private static final String STRONG_OOSD = "strongOosd";
+    private static final String MEDIUM_OOSD = "mediumOosd";
+    private static final String WEAK_OOSD = "weakOosd";
+    private static final String STRONG_GUTSHOT = "strongGutshot";
+    private static final String MEDIUM_GUTSHOT = "mediumGutshot";
+    private static final String WEAK_GUTSHOT = "weakGutshot";
+
+    private static final String LOW = "low";
+    private static final String MEDIUM = "medium";
+    private static final String HIGH = "high";
+    private static final String SMALL = "small";
+    private static final String LARGE = "large";
+
     private double getAverageEquityOfOppRange(List<List<Card>> oppRange, List<Card> board) {
         EquityCalculator equityCalculator = new EquityCalculator();
 
@@ -173,118 +189,8 @@ public class RangeConstructor {
                     //35% plus
                     //any suited
     }
-    
-    private void getOppRaiseRangeYo() {
-        //input
-
-        //opp aggroness
-            //low
-            //medium
-            //high
-
-        //betsize
-            //small
-            //medium
-            //large
-
-        //------------
-
-        //opp aggro low
-            //raisesize small
-                //value
-                    //vanaf 80%
-
-                //draw
-                    //none
-
-                //air
-                    //none
-
-            //raisesize medium
-                //value
-                    //vanaf 87%
-
-                //draw
-                    //none
-
-                //air
-                    //none
-
-            //raisesize large
-                //value
-                    //vanaf 92
-
-                //draw
-                    //none
-
-                //air
-                    //none
-
-        //opp aggro medium
-            //raisesize small
-                //value
-                    //vanaf 75%
-
-                //draw
-                    //strong draws
-
-                //air
-                    //12% onder 50%
-
-            //raisesize medium
-                //value
-                    //vanaf 79%
-
-                //draw
-                    //strong draws
-
-                //air
-                    //10% onder 50%
-
-            //raisesize large
-                //value
-                    //vanaf 83%
-
-                //draw
-                    //strong draws
-
-                //air
-                    //8% onder 50%
 
 
-        //opp aggro high
-            //raisesize small
-                //value
-                    //vanaf 60%
-
-                //draw
-                    //alle strong en medium draws
-
-                //air
-                    //24% van onderste 50% combos
-
-            //raisesize medium
-                //value
-                    //vanaf 70%
-
-                //draw
-                    //alle strong en medium draws
-
-                //air
-                    //21% van onderste 50% combos (non draw)
-
-            //raisesize large
-                //value
-                    //vanaf 78%
-
-                //draw
-                    //alle strong draws
-                    //50% van de medium draws
-
-                //air
-                    //18% van onderste 50% combos
-
-    }
 
     public static void main(String[] args) {
 //        //System.out.println((int) (1326 * 0.6));
@@ -382,39 +288,39 @@ public class RangeConstructor {
 
         List<List<Card>> draws = new ArrayList<>();
 
-        if(drawsToInclude.contains("strongOosd")) {
+        if(drawsToInclude.contains(STRONG_OOSD)) {
             draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongOosdCombos()));
         }
 
-        if(drawsToInclude.contains("mediumOosd")) {
+        if(drawsToInclude.contains(MEDIUM_OOSD)) {
             draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumOosdCombos()));
         }
 
-        if(drawsToInclude.contains("weakOosd")) {
+        if(drawsToInclude.contains(WEAK_OOSD)) {
             draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakOosdCombos()));
         }
 
-        if(drawsToInclude.contains("strongGutshot")) {
+        if(drawsToInclude.contains(STRONG_GUTSHOT)) {
             draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongGutshotCombos()));
         }
 
-        if(drawsToInclude.contains("mediumGutshot")) {
-            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumOosdCombos()));
+        if(drawsToInclude.contains(MEDIUM_GUTSHOT)) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumGutshotCombos()));
         }
 
-        if(drawsToInclude.contains("weakGutshot")) {
+        if(drawsToInclude.contains(WEAK_GUTSHOT)) {
             draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakGutshotCombos()));
         }
 
-        if(drawsToInclude.contains("strongFd")) {
+        if(drawsToInclude.contains(STRONG_FD)) {
             draws.addAll(convertDrawMapToList(flushDrawEvaluator.getStrongFlushDrawCombos()));
         }
 
-        if(drawsToInclude.contains("mediumFd")) {
+        if(drawsToInclude.contains(MEDIUM_FD)) {
             draws.addAll(convertDrawMapToList(flushDrawEvaluator.getMediumFlushDrawCombos()));
         }
 
-        if(drawsToInclude.contains("weakFd")) {
+        if(drawsToInclude.contains(WEAK_FD)) {
             draws.addAll(convertDrawMapToList(flushDrawEvaluator.getWeakFlushDrawCombos()));
         }
 
@@ -478,154 +384,189 @@ public class RangeConstructor {
 
     private List<List<Card>> getOppBetRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
                                   String oppAggroness, String oppBetsize, List<Card> board, List<Card> botHoleCards) {
-        List<List<Card>> oppBetRange = new ArrayList<>();
+        List<List<Card>> oppBetRange;
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
-        if(oppAggroness.equals("low")) {
-            if(oppBetsize.equals("small")) {
+        if(oppAggroness.equals(LOW)) {
+            if(oppBetsize.equals(SMALL)) {
                 double valuePercentage = 60;
-                List<String> drawsToInclude = Arrays.asList("strongFd", "strongOosd", "strongGutshot");
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 5;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals("medium")) {
+            } else if(oppBetsize.equals(MEDIUM)) {
                 double valuePercentage = 70;
-                List<String> drawsToInclude = Arrays.asList("strongFd", "strongOosd");
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 4;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals("large")) {
+            } else if(oppBetsize.equals(LARGE)) {
                 double valuePercentage = 83;
-                List<String> drawsToInclude = Arrays.asList("strongFd", "strongOosd");
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
                 double drawPercentageToInclude = 50;
                 double airPercentage = 2;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - betRange - A");
+                oppBetRange = new ArrayList<>();
             }
+        } else if(oppAggroness.equals(MEDIUM)) {
+            if(oppBetsize.equals(SMALL)) {
+                double valuePercentage = 53;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 20;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(MEDIUM)) {
+                double valuePercentage = 63;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 17;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(LARGE)) {
+                double valuePercentage = 77;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 15;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - betRange - B");
+                oppBetRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(HIGH)) {
+            if(oppBetsize.equals(SMALL)) {
+                double valuePercentage = 45;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT, WEAK_FD, WEAK_OOSD, WEAK_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 33;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(MEDIUM)) {
+                double valuePercentage = 55;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 28;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(LARGE)) {
+                double valuePercentage = 68;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 25;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - betRange - C");
+                oppBetRange = new ArrayList<>();
+            }
+        } else {
+            System.out.println("Should not come here Rangeconstructor - betRange - D");
+            oppBetRange = new ArrayList<>();
         }
 
-
-
-        //input
-
-        //opp aggroness
-            //low
-            //medium
-            //high
-
-        //betsize
-            //small
-            //medium
-            //large
-
-
-        //------------
-
-        //opp aggro low
-            //betsize small
-                //value
-                    //vanaf 60%
-
-                //draw
-                    //alle strong draws
-
-                //air
-                    //5% van onderste 50% combos
-
-            //betsize medium
-                //value
-                    //bovenste 70%
-
-                //draw
-                    //strong fd en strong oosd
-
-                //air
-                    //4% van onderste 50% combos
-
-            //betsize large
-                //value
-                    //vanaf 83%
-
-                //draw
-                    //50% strong fd en strong oosd
-
-                //air
-                    //2% van onderste 50% combos
-
-
-        //opp aggro medium
-            //betsize small
-                //value
-                    //vanaf 53%
-
-                //draw
-                    //alle strong draws
-                    //alle medium draws
-
-                //air
-                    //20% van onderste 50% combos
-
-            //betsize medium
-                //value
-                    //vanaf 63%
-
-                //draw
-                    //alle strong draws
-                    //50% medium draws
-
-                //air
-                    //17% van onderste 50% combos
-
-            //betsize large
-                //value
-                    //bovenste 77% combos
-
-                //draw
-                    //alle strong draws
-                    //20% medium draws
-
-                //air
-                    //15% van onderste 50% combos
-
-
-        //opp aggro high
-            //betsize small
-                //value
-                    //vanaf 45%
-
-                //draw
-                    //alle strong draws
-                    //alle medium draws
-                    //alle weak draws
-
-                //air
-                    //33% van onderste 50% combos
-
-            //betsize medium
-                //value
-                    //vanaf 55%
-
-                //draw
-                    //alle strong draws
-                    //alle medium draws
-
-                //air
-                    //28% van onderste 50% combos
-
-            //betsize large
-                //value
-                    //vanaf 68%
-
-                //draw
-                    //alle strong draws
-                    //70% medium draws
-
-                //air
-                    //25% van onderste 50% combos
-
         return oppBetRange;
+    }
+
+    private List<List<Card>> getOppRaiseRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                                String oppAggroness, String oppRaiseSize, List<Card> board, List<Card> botHoleCards) {
+        List<List<Card>> oppRaiseRange;
+        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
+
+        if(oppAggroness.equals(LOW)) {
+            if(oppRaiseSize.equals(SMALL)) {
+                double valuePercentage = 80;
+                List<String> drawsToInclude = new ArrayList<>();
+                double drawPercentageToInclude = 100;
+                double airPercentage = 0;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(MEDIUM)) {
+                double valuePercentage = 87;
+                List<String> drawsToInclude = new ArrayList<>();
+                double drawPercentageToInclude = 100;
+                double airPercentage = 0;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(LARGE)) {
+                double valuePercentage = 92;
+                List<String> drawsToInclude = new ArrayList<>();
+                double drawPercentageToInclude = 100;
+                double airPercentage = 0;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - raiseRange - A");
+                oppRaiseRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(MEDIUM)) {
+            if(oppRaiseSize.equals(SMALL)) {
+                double valuePercentage = 75;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 12;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(MEDIUM)) {
+                double valuePercentage = 79;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 10;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(LARGE)) {
+                double valuePercentage = 83;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 8;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - raiseRange - B");
+                oppRaiseRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(HIGH)) {
+            if(oppRaiseSize.equals(SMALL)) {
+                double valuePercentage = 60;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 24;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(MEDIUM)) {
+                double valuePercentage = 70;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 21;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(LARGE)) {
+                double valuePercentage = 78;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 18;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - raiseRange - C");
+                oppRaiseRange = new ArrayList<>();
+            }
+        } else {
+            System.out.println("Should not come here Rangeconstructor - raiseRange - D");
+            oppRaiseRange = new ArrayList<>();
+        }
+
+        return oppRaiseRange;
     }
 
     private List<List<Card>> fillRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
@@ -665,292 +606,335 @@ public class RangeConstructor {
         return range;
     }
 
-    private void getOppCheckRangeYo() {
+    private List<List<Card>> fillRangeOppActionIsCheck(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                       List<Card> board, List<Card> knownGameCards, double valueVsLowComboBoundry,
+                                       double valueInclusionPercentage, List<String> drawsToInclude, double drawPercentageToInclude) {
+        List<List<Card>> range = new ArrayList<>();
 
-        //input
+        //value
+        List<List<Card>> valueCombos = allCombosEquitySorted.subList(0,
+                (int) (allCombosEquitySorted.size() * (1 - (valueVsLowComboBoundry / 100))));
+        List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
+        eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
+        List<List<Card>> eligibleValueCombosFilteredForCheck = new ArrayList<>();
 
-            //opp aggroness
-                //low
-                //medium
-                //high
+        for(List<Card> combo : eligibleValueCombos) {
+            if(Math.random() < (valueInclusionPercentage / 100)) {
+                eligibleValueCombosFilteredForCheck.add(combo);
+            }
+        }
 
-            //potsize
-                //small
-                //medium
-                //large
+        range.addAll(eligibleValueCombosFilteredForCheck);
+        range = filterOutDoubleCombos(range);
 
+        //draw
+        List<List<Card>> draws = getDraws(drawsToInclude, board);
+        List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
+        eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
 
-        //------------
+        if((drawPercentageToInclude / 100) < 1) {
+            for(List<Card> draw : eligibleDraws) {
+                if(Math.random() < drawPercentageToInclude) {
+                    range.add(draw);
+                }
+            }
+        } else {
+            range.addAll(eligibleDraws);
+        }
 
-        //opp aggro low
-            //pot small
-                //value
-                    //37% van de 40% hoogste combos
+        range = filterOutDoubleCombos(range);
 
-                //draw
-                    //70% van alle strong en medium draws
+        //low combos
+        List<List<Card>> lowCombos = allCombosEquitySorted.subList(
+                (int) (allCombosEquitySorted.size() * (1 - (valueVsLowComboBoundry / 100))), allCombosEquitySorted.size());
+        range.addAll(lowCombos);
+        range = filterOutDoubleCombos(range);
 
-                //air
-                    //100% van de 60% laagste combos
-
-            //pot medium
-                //value
-                    //50% van de 30% hoogste combos
-
-                //draw
-                    //80% van alle strong draws, 100% van alle medium draws
-
-                //air
-                    //100% van de 70% laagste combos
-
-            //pot large
-                //value
-                    //50% van de 20% hoogste combos
-
-                //draw
-                    //90% van alle strong draws, 100% van alle medium draws
-
-                //air
-                    //100% van de 80% laagste combos
-
-
-
-        //opp aggro medium
-            //pot small
-                //value
-                    //25% van de 40% hoogste combos
-
-                //draw
-                    //35% van alle strong en medium draws
-
-                //air
-                    //100% van de 60% laagste combos
-
-            //pot medium
-                //value
-                    //25% van de 30% hoogste combos
-
-                //draw
-                    //40% van alle strong draws
-                    //75% van alle medium draws
-
-                //air
-                    //100% van de 70% laagste combos
-
-            //pot large
-                //value
-                    //25% van de 20% hoogste combos
-
-                //draw
-                    //50% van alle strong draws
-                    //100% van alle medium draws
-
-                //air
-                    //100% van de 80% laagste combos
-
-        //opp aggro high
-            //pot small
-                //value
-                    //15% van de 40% hoogste combos
-
-                //draw
-                    //10% van alle strong draws
-                    //20% van alle medium draws
-
-                //air
-                    //100% van de 60% laagste combos
-
-            //pot medium
-                //value
-                    //15% van de 30% hoogste combos
-
-                //draw
-                    //15% van alle strong draws
-                    //25% van alle medium draws
-
-                //air
-                    //100% van de 70% laagste combos
-
-            //pot large
-                //value
-                    //15% van de 75% hoogste combos
-
-                //draw
-                    //25% van alle strong draws
-                    //45% van alle medium draws
-
-                //air
-                    //100% van de 75% laagste combos
-
-
-
-
-        //-----------
-
-        //basis:
-
-            //onderste 60% combos
-                //if potsize > 200 && potsize < 300
-                    //onderste 70% combos
-
-            //helft van deze draws:
-                //strong fd, strong oosd, strong gutshot, medium fd, medium oosd, medium gutshot
-
-            //33% van de bovenste 40% combos
-                //if aggression low:
-
-                //if aggression medium:
-
-                //if aggresion high:
-
-
+        return range;
     }
 
-    private void getOppCallRangeYo() {
+    private List<List<Card>> getOppCheckRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                    String oppAggroness, String potSize, List<Card> board, List<Card> botHoleCards) {
+        List<List<Card>> oppCheckRange;
+        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
-        //input
+        if(oppAggroness.equals(LOW)) {
+            if(potSize.equals(SMALL)) {
+                double valueVsLowComboBoundry = 60;
+                double valueInclusionPercentage = 37;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 70;
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(potSize.equals(MEDIUM)) {
+                double valueVsLowComboBoundry = 70;
+                double valueInclusionPercentage = 50;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 85;
 
-            //opp looseness
-                //low
-                //medium
-                //high
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(potSize.equals(LARGE)) {
+                double valueVsLowComboBoundry = 80;
+                double valueInclusionPercentage = 50;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 95;
 
-            //facing bet / raise
-                //small
-                //medium
-                //large
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - checkRange - A");
+                oppCheckRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(MEDIUM)) {
+            if(potSize.equals(SMALL)) {
+                double valueVsLowComboBoundry = 60;
+                double valueInclusionPercentage = 25;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 35;
+
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(potSize.equals(MEDIUM)) {
+                double valueVsLowComboBoundry = 70;
+                double valueInclusionPercentage = 25;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 50;
+
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(potSize.equals(LARGE)) {
+                double valueVsLowComboBoundry = 80;
+                double valueInclusionPercentage = 25;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 75;
+
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - checkRange - B");
+                oppCheckRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(HIGH)) {
+            if(potSize.equals(SMALL)) {
+                double valueVsLowComboBoundry = 60;
+                double valueInclusionPercentage = 15;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 15;
+
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
 
 
-        //------------
+            } else if(potSize.equals(MEDIUM)) {
+                double valueVsLowComboBoundry = 70;
+                double valueInclusionPercentage = 15;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 20;
 
-        //opp looseness low
-            //facing bet small
-                //value
-                    //alle hoogste 70% combos
-                    //25% van combos tussen 60 en 70%
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(potSize.equals(LARGE)) {
+                double valueVsLowComboBoundry = 75;
+                double valueInclusionPercentage = 15;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
+                        MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 35;
 
-                //draw
-                    //alle strong draws
-                    //geen medium draws
+                oppCheckRange = fillRangeOppActionIsCheck(oppStartingRange, allCombosEquitySorted, board, knownGameCards,
+                        valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - checkRange - C");
+                oppCheckRange = new ArrayList<>();
+            }
+        } else {
+            System.out.println("Should not come here Rangeconstructor - checkRange - D");
+            oppCheckRange = new ArrayList<>();
+        }
 
-                //air
-                    //niks
+        return oppCheckRange;
+    }
 
-            //facing bet medium
-                //value
-                    //alle hoogste 80% combos
-                    //25% van combos tussen 70 en 80%
+    private List<List<Card>> getOppCallRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                   String oppLooseness, String botSizing, List<Card> board, List<Card> botHoleCards) {
+        List<List<Card>> oppCallRange;
+        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
-                //draw
-                    //alle strong oosd en fd
-                    //50% van strong gutshot
-                    //geen medium draws
+        if(oppLooseness.equals(LOW)) {
+            if(botSizing.equals(SMALL)) {
+                double valuePercentage = 67;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 0;
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(botSizing.equals(MEDIUM)) {
+                double valuePercentage = 77;
+                List<String> drawsToInclude;
 
-                //air
-                    //niks
+                if(board.size() == 3) {
+                    drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                } else if(board.size() == 4){
+                    drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
+                } else {
+                    drawsToInclude = new ArrayList<>();
+                }
 
-            //facing bet large
-                //value
-                    //alle hoogste 90% combos
-                    //25% van combos tussen 80 en 90%
+                double drawPercentageToInclude = 100;
 
-                //draw
-                    //alle strong oosd en fd
+                double airPercentage = 0;
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(botSizing.equals(LARGE)) {
+                double valuePercentage = 85;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
+                double drawPercentageToInclude;
 
-                //air
-                    //niks
+                if(board.size() == 3) {
+                    drawPercentageToInclude = 60;
+                } else if(board.size() == 4) {
+                    drawPercentageToInclude = 30;
+                } else {
+                    drawPercentageToInclude = 0;
+                }
 
-        //opp looseness medium
-            //facing bet small
-                //value
-                    //alle hoogste 60% combos
-                    //50% van combos tussen 50 en 60%
+                double airPercentage = 0;
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - callRange - A");
+                oppCallRange = new ArrayList<>();
+            }
+        } else if(oppLooseness.equals(MEDIUM)) {
+            if(botSizing.equals(SMALL)) {
+                double valuePercentage = 55;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage;
 
-                //draw
-                    //alle strong draws
-                    //55% van alle medium draws
+                if(board.size() == 3 || board.size() == 4) {
+                    airPercentage = 15;
+                } else {
+                    airPercentage = 0;
+                }
 
-                //air
-                    //flop en turn
-                        //15% van combos tussen 0 en 50%
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(botSizing.equals(MEDIUM)) {
+                double valuePercentage = 67;
+                List<String> drawsToInclude;
 
-                    //river
-                        //10% van combos tussen 40 en 50%
-                        //0% van combos tussen 0 en 40%
+                if(board.size() == 3) {
+                    drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD);
+                } else if(board.size() == 4) {
+                    drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                } else {
+                    drawsToInclude = new ArrayList<>();
+                }
 
-            //facing bet medium
-                //value
-                    //alle hoogste 70% combos
-                    //30% van combos tussen 60 en 70%
+                double drawPercentageToInclude = 100;
+                double airPercentage;
 
-                //draw
-                    //alle strong draws
-                    //40% van alle medium draws
+                if(board.size() == 3 || board.size() == 4) {
+                    airPercentage = 10;
+                } else {
+                    airPercentage = 0;
+                }
 
-                //air
-                    //flop en turn
-                        //10% van combos tussen 0 en 50%
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(botSizing.equals(LARGE)) {
+                double valuePercentage = 77;
+                List<String> drawsToInclude;
 
-                    //river
-                        //7% van combos tussen 40 en 50%
-                        //0% van combos tussen 0 en 40%
+                if(board.size() == 3) {
+                    drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD);
+                } else if(board.size() == 4) {
+                    drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
+                } else {
+                    drawsToInclude = new ArrayList<>();
+                }
 
-            //facing bet large
-                //value
-                    //alle hoogste 80% combos
-                    //30% van combos tussen 70 en 80%
+                double drawPercentageToInclude = 100;
+                double airPercentage;
 
-                //draw
-                    //alle strong draws
-                    //20% van alle medium draws
+                if(board.size() == 3 || board.size() == 4) {
+                    airPercentage = 5;
+                } else {
+                    airPercentage = 0;
+                }
 
-                //air
-                    //flop en turn
-                        //5% van combos tussen 40 en 50%
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - callRange - B");
+                oppCallRange = new ArrayList<>();
+            }
+        } else if(oppLooseness.equals(HIGH)) {
+            if(botSizing.equals(SMALL)) {
+                double valuePercentage = 48;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage;
 
-                    //river
-                        //5% van combos tussen 40 en 50%
-                        //0% van combos tussen 0 en 40%
+                if(board.size() == 3 || board.size() == 4) {
+                    airPercentage = 45;
+                } else {
+                    airPercentage = 30;
+                }
 
-        //opp looseness high
-            //facing bet small
-                //value
-                    //alle hoogste 50% combos
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(botSizing.equals(MEDIUM)) {
+                double valuePercentage = 55;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage;
 
-                //draw
-                    //alle strong draws
-                    //alle medium draws
+                if(board.size() == 3 || board.size() == 4) {
+                    airPercentage = 35;
+                } else {
+                    airPercentage = 20;
+                }
 
-                //air
-                    //62% van combos tussen 40 en 50%
-                    //50% van alle laagste 50% combos
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(botSizing.equals(LARGE)) {
+                double valuePercentage = 65;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD);
+                double drawPercentageToInclude = 100;
+                double airPercentage;
 
-            //facing bet medium
-                //value
-                    //alle hoogste 60% combos
-                    //50% van combos tussen 50 en 60%
+                if(board.size() == 3 || board.size() == 4) {
+                    airPercentage = 25;
+                } else {
+                    airPercentage = 15;
+                }
 
-                //draw
-                    //alle strong draws
-                    //60% van alle medium draws
+                oppCallRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - callRange - C");
+                oppCallRange = new ArrayList<>();
+            }
+        } else {
+            System.out.println("Should not come here Rangeconstructor - callRange - D");
+            oppCallRange = new ArrayList<>();
+        }
 
-                //air
-                    //43% van combos tussen 40 en 50%
-                    //30% van de laagste 40% combos
-
-            //facing bet large
-                //value
-                    //alle hoogste 70% combos
-                    //50% van combos tussen 60 en 70%
-                    //25% van combos tussen 50 en 60%
-
-                //draw
-                    //alle strong draws
-                    //20% van alle medium draws
-
-                //air
-                    //35% van combos tussen 40 en 50%
-                    //20% van de laagste 40% combos
+        return oppCallRange;
     }
 
     private void getOppFoldRangeYo() {
@@ -973,7 +957,19 @@ public class RangeConstructor {
 
     }
 
+    private String determineOppSizingGroup(double oppTotalBetsize) {
+        String oppSizingGroup;
 
+        if(oppTotalBetsize <= 60) {
+            oppSizingGroup = SMALL;
+        } else if(oppTotalBetsize <= 160) {
+            oppSizingGroup = MEDIUM;
+        } else {
+            oppSizingGroup = LARGE;
+        }
+
+        return oppSizingGroup;
+    }
 
     private boolean comboIsSuitedConnector(List<Card> combo, int gapWith) {
         boolean comboIsSuitedConnector = false;
