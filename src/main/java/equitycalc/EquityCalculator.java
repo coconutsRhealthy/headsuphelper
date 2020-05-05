@@ -12,32 +12,29 @@ public class EquityCalculator implements SimulationNotifiable {
     private Simulator simulator;
     private Map<List<com.lennart.model.card.Card>, Double> equities = new HashMap<>();
 
-    public double getComboEquity(List<com.lennart.model.card.Card> combo, List<com.lennart.model.card.Card> flop,
-                                 com.lennart.model.card.Card turn, com.lennart.model.card.Card river) {
+    public double getComboEquity(List<com.lennart.model.card.Card> combo, List<com.lennart.model.card.Card> board) {
         Card[] _combo = combo.stream()
                 .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
                 .toArray(Card[]::new);
+
+        Map<String, List<com.lennart.model.card.Card>> izoFlopTurnRiver = convertIzoBoardToFlopTurnRiver(board);
 
         Card[] _flopCards;
         Card _turn;
         Card _river;
 
-        if(flop != null) {
-            _flopCards = flop.stream()
-                    .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
-                    .toArray(Card[]::new);
-        } else {
-            _flopCards = null;
-        }
+        _flopCards = izoFlopTurnRiver.get("flop").stream()
+                .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
+                .toArray(Card[]::new);
 
-        if(turn != null) {
-            _turn = new Card(turn.getRank(), turn.getSuit());
+        if(izoFlopTurnRiver.get("turn") != null) {
+            _turn = new Card(izoFlopTurnRiver.get("turn").get(0).getRank(), izoFlopTurnRiver.get("turn").get(0).getSuit());
         } else {
             _turn = null;
         }
 
-        if(river != null) {
-            _river = new Card(river.getRank(), river.getSuit());
+        if(izoFlopTurnRiver.get("river") != null) {
+            _river = new Card(izoFlopTurnRiver.get("river").get(0).getRank(), izoFlopTurnRiver.get("river").get(0).getSuit());
         } else {
             _river = null;
         }
@@ -57,29 +54,25 @@ public class EquityCalculator implements SimulationNotifiable {
     }
 
     public Map<List<com.lennart.model.card.Card>, Double> getRangeEquities(List<List<com.lennart.model.card.Card>> range,
-                                                                           List<com.lennart.model.card.Card> flop,
-                                                                           com.lennart.model.card.Card turn,
-                                                                           com.lennart.model.card.Card river) {
+                                                                           List<com.lennart.model.card.Card> board) {
+        Map<String, List<com.lennart.model.card.Card>> izoFlopTurnRiver = convertIzoBoardToFlopTurnRiver(board);
+
         Card[] _flopCards;
         Card _turn;
         Card _river;
 
-        if(flop != null) {
-            _flopCards = flop.stream()
-                    .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
-                    .toArray(Card[]::new);
-        } else {
-            _flopCards = null;
-        }
+        _flopCards = izoFlopTurnRiver.get("flop").stream()
+                .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
+                .toArray(Card[]::new);
 
-        if(turn != null) {
-            _turn = new Card(turn.getRank(), turn.getSuit());
+        if(izoFlopTurnRiver.get("turn") != null) {
+            _turn = new Card(izoFlopTurnRiver.get("turn").get(0).getRank(), izoFlopTurnRiver.get("turn").get(0).getSuit());
         } else {
             _turn = null;
         }
 
-        if(river != null) {
-            _river = new Card(river.getRank(), river.getSuit());
+        if(izoFlopTurnRiver.get("river") != null) {
+            _river = new Card(izoFlopTurnRiver.get("river").get(0).getRank(), izoFlopTurnRiver.get("river").get(0).getSuit());
         } else {
             _river = null;
         }
@@ -102,6 +95,20 @@ public class EquityCalculator implements SimulationNotifiable {
         }
 
         return equities;
+    }
+
+    private Map<String, List<com.lennart.model.card.Card>> convertIzoBoardToFlopTurnRiver(List<com.lennart.model.card.Card> board) {
+        Map<String, List<com.lennart.model.card.Card>> flopTurnRiver = new HashMap<>();
+
+        flopTurnRiver.put("flop", board.subList(0, 3));
+
+        if(board.size() == 4) {
+            flopTurnRiver.put("turn", Arrays.asList(board.get(3)));
+        } else {
+            flopTurnRiver.put("river", Arrays.asList(board.get(4)));
+        }
+
+        return flopTurnRiver;
     }
 
     private void prepareTheSimulator(Card[] _combo, Card[] _flopCards, Card _turn, Card _river, boolean partOfRange) {
