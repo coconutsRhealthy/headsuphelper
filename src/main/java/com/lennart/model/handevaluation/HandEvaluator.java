@@ -1,10 +1,12 @@
 package com.lennart.model.handevaluation;
 
+import com.lennart.model.action.actionbuilders.ai.equityrange.RangeConstructor;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
+import equitycalc.EquityCalculator;
 
 import java.util.*;
 
@@ -49,6 +51,44 @@ public class HandEvaluator {
            }
         }
         return handStrength;
+    }
+
+    public double getHsNewStyle(List<Card> holeCards, List<Card> board) {
+        double hs;
+
+        double myEquity = new EquityCalculator().getComboEquity(holeCards, board);
+        Map<List<Card>, Double> equities = new RangeConstructor().getAllCombosEquitySorted(board);
+
+        if(board.size() == 5) {
+            hs = myEquity;
+        } else {
+            int counter = 0;
+            double tenPctEquity = -1;
+
+            for (Map.Entry<List<Card>, Double> entry : equities.entrySet()) {
+                counter++;
+
+                if(counter == 118) {
+                    tenPctEquity = entry.getValue();
+                    break;
+                }
+            }
+
+            double factor = 0.9 / tenPctEquity;
+            hs = myEquity * factor;
+
+            if(hs > 1) {
+                hs = 1;
+            }
+
+            if(hs < 0) {
+                hs = 0;
+            }
+        }
+
+        System.out.println("hs: " + hs);
+
+        return hs;
     }
 
     public boolean hasAnyDrawNonBackDoor() {
