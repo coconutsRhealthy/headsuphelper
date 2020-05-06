@@ -1,13 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
-import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 import com.lennart.model.card.Card;
-import equitycalc.EquityCalculator;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,43 +9,6 @@ import java.util.stream.Collectors;
  * Created by LennartMac on 25/04/2020.
  */
 public class PreflopEuityHs {
-
-
-
-    private void testMethodetje() {
-
-        //verkrijg alle starthanden...
-
-        List<List<Card>> allStarthands = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
-
-        Map<List<Card>, Double> rangeEquity2;
-
-        int[] counter = new int[1];
-        counter[0] = 0;
-
-        rangeEquity2 = allStarthands.stream().collect(Collectors.toMap(combo -> combo, combo -> {
-            counter[0] = counter[0] + 1;
-            System.out.println(counter[0]);
-            return new EquityCalculator().getComboEquity(combo, null);
-        }));
-
-        //Map<List<Card>, Double> rangeEquity = new EquityCalculator().getRangeEquities(allStarthands, null);
-
-        rangeEquity2 = sortByValueHighToLow(rangeEquity2);
-
-        rangeEquity2.entrySet().forEach(entry -> {
-            Card card1 = entry.getKey().get(0);
-            Card card2 = entry.getKey().get(1);
-
-            System.out.print(card1.getRank());
-            System.out.print(card1.getSuit());
-            System.out.print(" ");
-            System.out.print(card2.getRank());
-            System.out.print(card2.getSuit());
-            System.out.print("        ");
-            System.out.println(entry.getValue());
-        });
-    }
 
     public Map<List<Card>, Double> getAllPreflopCombosEquitySortedMap() {
         Map<String, Double> allCombosStringMap = getAllComboStringEquityMap();
@@ -77,64 +34,6 @@ public class PreflopEuityHs {
 
         allCombosEquityMap = sortByValueHighToLow(allCombosEquityMap);
         return allCombosEquityMap;
-    }
-
-    public static void main(String[] args) throws Exception {
-        new PreflopEuityHs().helperMethod();
-    }
-
-    private void helperMethod() throws Exception {
-        File hsFile = getLatestFilefromDir("/Users/LennartMac/Documents/corona");
-
-        List<String> textLines;
-        try (Reader fileReader = new FileReader(hsFile)) {
-            BufferedReader bufReader = new BufferedReader(fileReader);
-
-            String line = bufReader.readLine();
-
-            textLines = new ArrayList<>();
-
-            while (line != null) {
-                textLines.add(line);
-                line = bufReader.readLine();
-            }
-
-            bufReader.close();
-            fileReader.close();
-        }
-
-        for(String line : textLines) {
-            String[] splitted = line.split(" ");
-            //System.out.print("wacht");
-
-            String combo = splitted[0] + " " + splitted[1];
-            Double hs = Double.valueOf(splitted[9]);
-
-            //Map<String, Double> comboMap = new HashMap<>();
-
-            //comboMap.put(combo, hs);
-
-            System.out.println("comboMap.put(\"" + combo + "\", " + hs + ");");
-        }
-
-
-    }
-
-
-    private File getLatestFilefromDir(String dirPath){
-        File dir = new File(dirPath);
-        File[] files = dir.listFiles();
-        if (files == null || files.length == 0) {
-            return null;
-        }
-
-        File lastModifiedFile = files[0];
-        for (int i = 1; i < files.length; i++) {
-            if (lastModifiedFile.lastModified() < files[i].lastModified()) {
-                lastModifiedFile = files[i];
-            }
-        }
-        return lastModifiedFile;
     }
 
     private Map<String, Double> getAllComboStringEquityMap() {
