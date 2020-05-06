@@ -102,10 +102,12 @@ public class EquityCalculator implements SimulationNotifiable {
 
         flopTurnRiver.put("flop", board.subList(0, 3));
 
-        if(board.size() == 4) {
+        if(board.size() >= 4) {
             flopTurnRiver.put("turn", Arrays.asList(board.get(3)));
-        } else {
-            flopTurnRiver.put("river", Arrays.asList(board.get(4)));
+
+            if(board.size() == 5) {
+                flopTurnRiver.put("river", Arrays.asList(board.get(4)));
+            }
         }
 
         return flopTurnRiver;
