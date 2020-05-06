@@ -795,7 +795,13 @@ public class ActionVariables {
         } else {
             boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
             handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
-            botHandStrength = handEvaluator.getHandStrength(gameVariables.getBotHoleCards());
+
+            double hsOld = handEvaluator.getHandStrength(gameVariables.getBotHoleCards());
+            botHandStrength = handEvaluator.getHsNewStyle(gameVariables.getBotHoleCards(), gameVariables.getBoard());
+
+            System.out.println("O: " + hsOld);
+            System.out.println("N: " + botHandStrength);
+            System.out.println("DIFF: " + (botHandStrength - hsOld));
 
             strongFlushDraw = handEvaluator.hasDrawOfType("strongFlushDraw");
             strongOosd = handEvaluator.hasDrawOfType("strongOosd");
