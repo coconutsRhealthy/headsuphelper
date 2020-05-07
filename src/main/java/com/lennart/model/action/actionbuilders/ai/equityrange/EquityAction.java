@@ -12,77 +12,7 @@ import java.util.stream.Collectors;
  */
 public class EquityAction {
 
-
-
-    //je krijgt binnen
-
-    //jouw equity
-
-    //average equity van opp range
-
-    //eligible actions
-
-
-
-
-    //actually you just want to know your equity against opp range...
-
-
-    private void decideAction(double botEquity, List<String> eligibleActions) {
-
-        //je wil beslissen of je wil valuebetten of checken...
-
-        //dan heb je dus jouw equity nodig, en de average equity van de calling range van opp...
-
-
-    }
-
-
-    private void decideValueAction(double botEquity, double averageEquityOppCallingRange) {
-
-        //als jouw equity hoger is dan de average calling equity van opp, dan moet je value betten...
-
-
-
-    }
-
-    private void decideCallAction(double botEquity, double averageOppRangeEquity, double facingOdds) {
-
-        //stel jij hebt 0,38
-
-        //average equity van opp is 0,77
-
-        //maar op bet slechts 10 in 100
-
-        //dan moet je nog callen
-
-            //of gewoon helemaal die facingodds buiten beschouwing laten...
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-    ////////NEW////////
-
-
-
-    private void determineAction() {
-
-        //je mag ofwel
-            //checken / betten
-            //folden / callen / raisen
-
-
-
-    }
+    //ook nog preflop
 
     private String checkOrBet(double botEquity, double avEquityOppCallingRange) {
 
@@ -135,9 +65,7 @@ public class EquityAction {
         return actionToReturn;
     }
 
-
-
-    private double getAverageEquityOfOppRange(List<List<Card>> oppRange, List<Card> board) {
+    public double getAverageEquityOfOppRangeWithoutEquityMap(List<List<Card>> oppRange, List<Card> board) {
         EquityCalculator equityCalculator = new EquityCalculator();
 
         Map<List<Card>, Double> equities = equityCalculator.getRangeEquities(oppRange, board);
@@ -150,13 +78,13 @@ public class EquityAction {
                     .getAsDouble();
         } catch (Exception e) {
             e.printStackTrace();
-            return getAverageEquityOfOppRange(oppRange, board);
+            return getAverageEquityOfOppRangeWithoutEquityMap(oppRange, board);
         }
 
         return average;
     }
 
-    private double getAverageEquityOfRangeNew(Map<List<Card>, Double> sortedEquities, List<List<Card>> range) {
+    public double getAverageEquityOfRangeWithEquityMap(Map<List<Card>, Double> sortedEquities, List<List<Card>> range) {
         Map<List<Card>, Double> sortedEquitiesRangeFiltered = sortedEquities.entrySet().stream().filter(entry -> {
             List<Card> combo = Arrays.asList(entry.getKey().get(0), entry.getKey().get(1));
             List<Card> comboReverseOrder = Arrays.asList(entry.getKey().get(1), entry.getKey().get(0));
@@ -178,9 +106,7 @@ public class EquityAction {
         return average;
     }
 
-
-
-    public Map<List<Card>, Double> getAllCombosEquitySorted(List<Card> board) {
+    public Map<List<Card>, Double> getAllStarthandsEquitySorted(List<Card> board) {
         List<List<Card>> allCombos = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
         List<Card> knownCards = board.stream().collect(Collectors.toList());
         allCombos = RangeConstructor.removeCombosWithKnownCards(allCombos, knownCards);
@@ -202,7 +128,4 @@ public class EquityAction {
         }
         return result;
     }
-
-
-
 }
