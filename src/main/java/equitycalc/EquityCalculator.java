@@ -19,24 +19,22 @@ public class EquityCalculator implements SimulationNotifiable {
 
         Map<String, List<com.lennart.model.card.Card>> izoFlopTurnRiver = convertIzoBoardToFlopTurnRiver(board);
 
-        Card[] _flopCards;
-        Card _turn;
-        Card _river;
+        Card[] _flopCards = null;
+        Card _turn = null;
+        Card _river= null;
 
-        _flopCards = izoFlopTurnRiver.get("flop").stream()
-                .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
-                .toArray(Card[]::new);
+        if(izoFlopTurnRiver.get("flop") != null) {
+            _flopCards = izoFlopTurnRiver.get("flop").stream()
+                    .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
+                    .toArray(Card[]::new);
+        }
 
         if(izoFlopTurnRiver.get("turn") != null) {
             _turn = new Card(izoFlopTurnRiver.get("turn").get(0).getRank(), izoFlopTurnRiver.get("turn").get(0).getSuit());
-        } else {
-            _turn = null;
         }
 
         if(izoFlopTurnRiver.get("river") != null) {
             _river = new Card(izoFlopTurnRiver.get("river").get(0).getRank(), izoFlopTurnRiver.get("river").get(0).getSuit());
-        } else {
-            _river = null;
         }
 
         prepareTheSimulator(_combo, _flopCards, _turn, _river, false);
@@ -57,24 +55,22 @@ public class EquityCalculator implements SimulationNotifiable {
                                                                            List<com.lennart.model.card.Card> board) {
         Map<String, List<com.lennart.model.card.Card>> izoFlopTurnRiver = convertIzoBoardToFlopTurnRiver(board);
 
-        Card[] _flopCards;
-        Card _turn;
-        Card _river;
+        Card[] _flopCards = null;
+        Card _turn = null;
+        Card _river = null;
 
-        _flopCards = izoFlopTurnRiver.get("flop").stream()
-                .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
-                .toArray(Card[]::new);
+        if(izoFlopTurnRiver.get("flop") != null) {
+            _flopCards = izoFlopTurnRiver.get("flop").stream()
+                    .map(izoCard -> new Card(izoCard.getRank(), izoCard.getSuit()))
+                    .toArray(Card[]::new);
+        }
 
         if(izoFlopTurnRiver.get("turn") != null) {
             _turn = new Card(izoFlopTurnRiver.get("turn").get(0).getRank(), izoFlopTurnRiver.get("turn").get(0).getSuit());
-        } else {
-            _turn = null;
         }
 
         if(izoFlopTurnRiver.get("river") != null) {
             _river = new Card(izoFlopTurnRiver.get("river").get(0).getRank(), izoFlopTurnRiver.get("river").get(0).getSuit());
-        } else {
-            _river = null;
         }
 
         for(List<com.lennart.model.card.Card> combo : range) {
@@ -94,19 +90,21 @@ public class EquityCalculator implements SimulationNotifiable {
 
         }
 
-        return equities;
+        return sortByValueHighToLow(equities);
     }
 
     private Map<String, List<com.lennart.model.card.Card>> convertIzoBoardToFlopTurnRiver(List<com.lennart.model.card.Card> board) {
         Map<String, List<com.lennart.model.card.Card>> flopTurnRiver = new HashMap<>();
 
-        flopTurnRiver.put("flop", board.subList(0, 3));
+        if(board != null && !board.isEmpty()) {
+            flopTurnRiver.put("flop", board.subList(0, 3));
 
-        if(board.size() >= 4) {
-            flopTurnRiver.put("turn", Arrays.asList(board.get(3)));
+            if(board.size() >= 4) {
+                flopTurnRiver.put("turn", Arrays.asList(board.get(3)));
 
-            if(board.size() == 5) {
-                flopTurnRiver.put("river", Arrays.asList(board.get(4)));
+                if(board.size() == 5) {
+                    flopTurnRiver.put("river", Arrays.asList(board.get(4)));
+                }
             }
         }
 
@@ -125,7 +123,12 @@ public class EquityCalculator implements SimulationNotifiable {
                 .addPlayer(new PlayerProfile(HandType.RANDOM, null, null));
 
         if(_flopCards == null) {
-            builder.setNrRounds(50000);
+            if(partOfRange) {
+                builder.setNrRounds(50);
+            } else {
+                builder.setNrRounds(50000);
+                //builder.setNrRounds(200_000);
+            }
         } else {
             if(partOfRange) {
                 builder.setNrRounds(50);
@@ -186,5 +189,21 @@ public class EquityCalculator implements SimulationNotifiable {
     {
         Exception e = (Exception) event.getEventData();
         System.err.println("The simulation encountered an error: " + e.getMessage());
+    }
+
+    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o2.getValue() ).compareTo( o1.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
     }
 }
