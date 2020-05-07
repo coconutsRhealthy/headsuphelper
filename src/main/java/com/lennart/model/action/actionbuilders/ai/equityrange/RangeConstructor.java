@@ -31,99 +31,187 @@ public class RangeConstructor {
     private static final String SMALL = "small";
     private static final String LARGE = "large";
 
-    private double getAverageEquityOfOppRange(List<List<Card>> oppRange, List<Card> board) {
-        EquityCalculator equityCalculator = new EquityCalculator();
+    public static void main(String[] args) {
+        new RangeConstructor().testMethod();
+    }
 
-        Map<List<Card>, Double> equities = equityCalculator.getRangeEquityFlop(oppRange, board);
+    private void testMethod() {
+        Map<List<Card>, Double> allSortedPfEquityCombos = new PreflopEuityHs().getAllPreflopCombosEquitySortedMap();
+        List<List<Card>> startingRange = allSortedPfEquityCombos.keySet().stream().collect(Collectors.toList());
 
-        double average;
-        try {
-            average = equities.values().stream()
-                    .mapToDouble(a -> a)
-                    .average()
-                    .getAsDouble();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return getAverageEquityOfOppRange(oppRange, board);
+        List<Card> botHoleCards = Arrays.asList(new Card(3, 's'), new Card(3, 'c'));
+        List<Card> board = Arrays.asList(new Card(2, 's'), new Card(8, 'd'), new Card(13, 'h'));
+
+        startingRange = removeCombosWithKnownCards(startingRange, botHoleCards);
+        startingRange = removeCombosWithKnownCards(startingRange, board);
+
+        Map<List<Card>, Double> postflopEquityMap = new EquityCalculator().getRangeEquities(startingRange, board);
+        List<List<Card>> allPostflopCombosEquitySorted = postflopEquityMap.keySet().stream().collect(Collectors.toList());
+
+        List<List<Card>> range = getOppPostflopRaiseRange(startingRange, allPostflopCombosEquitySorted, "high", "medium", board, botHoleCards);
+        System.out.println(new EquityAction().getAverageEquityOfRangeWithEquityMap(postflopEquityMap, range));
+    }
+
+    public List<List<Card>> getOppPreLimpRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+        List<List<Card>> oppPre2betRange = new ArrayList<>();
+
+        if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.3) {
+                    if(Math.random() < 0.35) {
+                        oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                    }
+                } else {
+                    oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                }
+            }
+        } else if(pre2betGroup.equals("low")) {
+            oppPre2betRange.addAll(allSortedPfEquityCombos);
+        } else if(pre2betGroup.equals("high")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.5) {
+                    if(Math.random() < 0.3) {
+                        oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                    }
+                } else {
+                    oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                }
+            }
         }
 
-        return average;
+        oppPre2betRange = removeCombosWithKnownCards(oppPre2betRange, botHoleCards);
+        return oppPre2betRange;
     }
 
-    private Map<List<Card>, Double> getAllCombosEquitySortedFlop(List<Card> board) {
-        List<List<Card>> allCombos = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
-        allCombos = removeCombosWithKnownCards(allCombos, board);
-        return sortByValueHighToLow(new EquityCalculator().getRangeEquityFlop(allCombos, board));
+    public List<List<Card>> getOppPreCheckRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+        List<List<Card>> oppPreCheckRange = new ArrayList<>();
+
+        if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.3) {
+                    if(Math.random() < 0.35) {
+                        oppPreCheckRange.add(allSortedPfEquityCombos.get(i));
+                    }
+                } else {
+                    oppPreCheckRange.add(allSortedPfEquityCombos.get(i));
+                }
+            }
+        } else if(pre2betGroup.equals("low")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.1) {
+                    if(Math.random() < 0.3) {
+                        oppPreCheckRange.add(allSortedPfEquityCombos.get(i));
+                    }
+                } else {
+                    oppPreCheckRange.add(allSortedPfEquityCombos.get(i));
+                }
+            }
+        } else if(pre2betGroup.equals("high")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.5) {
+                    if(Math.random() < 0.3) {
+                        oppPreCheckRange.add(allSortedPfEquityCombos.get(i));
+                    }
+                } else {
+                    oppPreCheckRange.add(allSortedPfEquityCombos.get(i));
+                }
+            }
+        }
+
+        return oppPreCheckRange;
     }
 
-    private List<List<Card>> removeCombosWithKnownCards(List<List<Card>> listToRemoveCombosFrom, List<Card> knownCards) {
-        return listToRemoveCombosFrom.stream().filter(combo -> Collections.disjoint(combo, knownCards)).collect(Collectors.toList());
+    public List<List<Card>> getOppPre2betRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+        List<List<Card>> oppPre2betRange = new ArrayList<>();
+
+        double limit;
+
+        if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
+            limit = 25;
+        } else if(pre2betGroup.equals("low")) {
+            limit = 57;
+        } else if(pre2betGroup.equals("high")) {
+            limit = 0;
+        } else {
+            limit = 100;
+            System.out.println("pre2betGroup is unknown, should not come here");
+        }
+
+        for(int i = 0; i < allSortedPfEquityCombos.size() * (1.0 - (limit / 100.0)); i++) {
+            oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+        }
+
+        if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
+            List<List<Card>> suitedCombos = allSortedPfEquityCombos.stream()
+                    .filter(combo -> combo.get(0).getSuit() == combo.get(1).getSuit())
+                    .collect(Collectors.toList());
+
+            oppPre2betRange.addAll(suitedCombos);
+            oppPre2betRange = filterOutDoubleCombos(oppPre2betRange);
+        }
+
+        oppPre2betRange = removeCombosWithKnownCards(oppPre2betRange, botHoleCards);
+        return oppPre2betRange;
     }
 
-    private List<List<Card>> createStartingOppRange(List<Card> botHoleCards) {
-        List<List<Card>> startingOppRange = ActionBuilderUtil.getAllPossibleStartHandsAsList()
-                .values()
-                .stream()
-                .collect(Collectors.toList());
+    public List<List<Card>> getOppPreCall2betRange(List<List<Card>> allSortedPfEquityCombos, String preCall2betGroup, List<Card> botHoleCards) {
+        List<List<Card>> oppPreCall2betRange = new ArrayList<>();
 
-        startingOppRange = startingOppRange
-                .stream()
-                .filter(combo -> Collections.disjoint(combo, botHoleCards))
-                .collect(Collectors.toList());
+        double limit;
 
-        return startingOppRange;
+        if(preCall2betGroup.equals("mediumUnknown") || preCall2betGroup.equals("medium")) {
+            limit = 40;
+        } else if(preCall2betGroup.equals("low")) {
+            limit = 60;
+        } else if(preCall2betGroup.equals("high")) {
+            limit = 0;
+        } else {
+            limit = 0;
+            System.out.println("preCall2betGroup is unknown, should not come here");
+        }
+
+        for(int i = 0; i < allSortedPfEquityCombos.size() * (1.0 - (limit / 100.0)); i++) {
+            oppPreCall2betRange.add(allSortedPfEquityCombos.get(i));
+        }
+
+        if(preCall2betGroup.equals("low")) {
+            List<List<Card>> extraCombos = allSortedPfEquityCombos.stream()
+                    .filter(combo -> comboIsSuitedConnector(combo, 1) || comboIsSuitedConnector(combo, 2))
+                    .collect(Collectors.toList());
+            oppPreCall2betRange.addAll(extraCombos);
+            oppPreCall2betRange = filterOutDoubleCombos(oppPreCall2betRange);
+        }
+
+        if(preCall2betGroup.equals("mediumUnknown") || preCall2betGroup.equals("medium")) {
+            List<List<Card>> suitedCombos = allSortedPfEquityCombos.stream()
+                    .filter(combo -> combo.get(0).getSuit() == combo.get(1).getSuit())
+                    .collect(Collectors.toList());
+
+            oppPreCall2betRange.addAll(suitedCombos);
+            oppPreCall2betRange = filterOutDoubleCombos(oppPreCall2betRange);
+        }
+
+        oppPreCall2betRange = removeCombosWithKnownCards(oppPreCall2betRange, botHoleCards);
+        return oppPreCall2betRange;
     }
 
-
-
-
-
-    /////
-
-    private void getOppPre2betRange(List<List<Card>> sortedPreflopNashCombos) {
-        //input:
-            //pre2betGroup
-                //low
-                    //57% plus combo
-
-                //medium
-                    //25% plus combo
-                    //any suited
-
-                //high
-                    //any combo
-    }
-
-    private void getOppPreCall2betRange() {
-        //input:
-            //preCall2betGroup
-                //low
-                    //60% plus combo
-                    //all suited connectors and suited onegappers
-                //medium
-                    //40% plus combo
-                    //any suited
-                //high
-                    //any combo
-    }
-
-    private List<List<Card>> getOppPre3betRange(List<List<Card>> allSortedPfEquityCombos, String pre3betGroup) {
-        Set<List<Card>> oppPre3betRange = new LinkedHashSet<>();
+    public List<List<Card>> getOppPre3betRange(List<List<Card>> allSortedPfEquityCombos, String pre3betGroup, List<Card> botHoleCards) {
+        List<List<Card>> oppPre3betRange = new ArrayList<>();
 
         double limit;
 
         if(pre3betGroup.equals("mediumUnknown") || pre3betGroup.equals("medium")) {
-            limit = 0.30;
+            limit = 70;
         } else if(pre3betGroup.equals("low")) {
-            limit = 0.16;
+            limit = 84;
         } else if(pre3betGroup.equals("high")) {
-            limit = 0.37;
+            limit = 63;
         } else {
-            limit = 1;
+            limit = 100;
             System.out.println("pre3betGroup is unknown, should not come here");
         }
 
-        for(int i = 0; i < allSortedPfEquityCombos.size() * limit; i++) {
+        for(int i = 0; i < allSortedPfEquityCombos.size() * (1.0 - (limit / 100.0)); i++) {
             oppPre3betRange.add(allSortedPfEquityCombos.get(i));
         }
 
@@ -136,6 +224,7 @@ public class RangeConstructor {
             }).collect(Collectors.toList());
 
             oppPre3betRange.addAll(extraCombos);
+            oppPre3betRange = filterOutDoubleCombos(oppPre3betRange);
         }
 
         if(pre3betGroup.equals("high")) {
@@ -158,503 +247,134 @@ public class RangeConstructor {
                     }).collect(Collectors.toList());
 
             oppPre3betRange.addAll(extraCombos);
+            oppPre3betRange = filterOutDoubleCombos(oppPre3betRange);
         }
 
-        return oppPre3betRange.stream().collect(Collectors.toList());
-
-
-        //input:
-            //pre3betGroup
-                //low
-                    //84% plus
-                //medium
-                    //70% plus
-                    //all suited connectors and suited onegappers and two-gappers
-                //high
-                    //50% plus
-                    //any suited
-
+        oppPre3betRange = removeCombosWithKnownCards(oppPre3betRange, botHoleCards);
+        return oppPre3betRange;
     }
 
-    private void getOppPreCall3betRange() {
-        //input:
-            //preCall3betGroup
-                //low
-                    //70% plus
-                    //suited connectors
-                //medium
-                    //50% plus
-                    //all suited connectors and suited onegappers and two-gappers
-                //high
-                    //35% plus
-                    //any suited
-    }
+    public List<List<Card>> getOppPreCall3betRange(List<List<Card>> allSortedPfEquityCombos, String preCall3betGroup, List<Card> botHoleCards) {
+        List<List<Card>> preCall3betRange = new ArrayList<>();
 
+        double limit;
 
-
-    public static void main(String[] args) {
-//        //System.out.println((int) (1326 * 0.6));
-//
-//        List<Card> combo1 = Arrays.asList(new Card(8, 'd'), new Card(11, 'c'));
-//        List<Card> combo2 = Arrays.asList(new Card(7, 's'), new Card(3, 'h'));
-//        List<Card> combo3 = Arrays.asList(new Card(11, 'c'), new Card(8, 'd'));
-//        List<Card> combo4 = Arrays.asList(new Card(11, 'c'), new Card(8, 'd'));
-//
-//        List<List<Card>> input = Arrays.asList(combo1, combo2, combo3, combo4);
-
-//        List<List<Card>> output = new RangeConstructor().testMethod();
-//
-//        System.out.println("wacht");
-
-        new RangeConstructor().testMethod();
-
-        System.out.println(new EquityCalculator().getComboEquityFlop(Arrays.asList(new Card(7, 's'), new Card(2, 'd')),
-                Arrays.asList(new Card(3, 'c'), new Card(7, 'd'), new Card(13, 's'))));
-        //jouw eigen single combo equity calculation moet vaker gebeuren dan 50 keer...
-    }
-
-    private void testMethod() {
-        List<Card> board = Arrays.asList(new Card(3, 'c'), new Card(7, 'd'), new Card(13, 's'));
-        List<Card> botHoleCards = Arrays.asList(new Card(2, 's'), new Card(4, 's'));
-
-        List<List<Card>> oppStartingRange = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
-
-
-        Map<List<Card>, Double> sortedEquities = getAllCombosEquitySortedFlop(board);
-
-
-
-
-        List<List<Card>> allCombosEquitySorted = sortedEquities.keySet().stream().collect(Collectors.toList());
-
-
-        //System.out.println("wacht");
-
-
-
-        List<Card> knownGameCards = new ArrayList<>();
-        knownGameCards.addAll(board);
-        knownGameCards.addAll(botHoleCards);
-
-        List<List<Card>> oppBetRange = getOppBetRangeYo(oppStartingRange, allCombosEquitySorted, "low", "large", board, botHoleCards);
-
-        double averageEquity = getAverageEquityOfRangeNew(sortedEquities, oppBetRange);
-
-        System.out.println(averageEquity);
-//
-//        //getDraws(Arrays.asList(new Card(6, 'c'), new Card(9, 'd'), new Card(12, 's')));
-//
-//
-//        Set<String> a = new HashSet<>();
-//        a.add("Z");
-//        a.add("T");
-//
-//        Set<String> b = new HashSet<>();
-//        b.add("T");
-//        b.add("Z");
-//
-//        System.out.println(a.equals(b));
-//
-//
-//        //moet je gaan werken met Sets??
-
-    }
-
-    private double getAverageEquityOfRangeNew(Map<List<Card>, Double> sortedEquities, List<List<Card>> range) {
-        Map<List<Card>, Double> sortedEquitiesRangeFiltered = sortedEquities.entrySet().stream().filter(entry -> {
-            List<Card> combo = Arrays.asList(entry.getKey().get(0), entry.getKey().get(1));
-            List<Card> comboReverseOrder = Arrays.asList(entry.getKey().get(1), entry.getKey().get(0));
-            return range.contains(combo) || range.contains(comboReverseOrder);
-        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        double average = -1;
-
-        try {
-            average = sortedEquitiesRangeFiltered.values().stream()
-                    .mapToDouble(a -> a)
-                    .average()
-                    .getAsDouble();
-        } catch (Exception e) {
-            System.out.println("wtf!");
-            e.printStackTrace();
-        }
-
-        return average;
-    }
-
-    private List<List<Card>> getDraws(List<String> drawsToInclude, List<Card> board) {
-        StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator(board);
-        FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator(board);
-
-        List<List<Card>> draws = new ArrayList<>();
-
-        if(drawsToInclude.contains(STRONG_OOSD)) {
-            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongOosdCombos()));
-        }
-
-        if(drawsToInclude.contains(MEDIUM_OOSD)) {
-            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumOosdCombos()));
-        }
-
-        if(drawsToInclude.contains(WEAK_OOSD)) {
-            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakOosdCombos()));
-        }
-
-        if(drawsToInclude.contains(STRONG_GUTSHOT)) {
-            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongGutshotCombos()));
-        }
-
-        if(drawsToInclude.contains(MEDIUM_GUTSHOT)) {
-            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumGutshotCombos()));
-        }
-
-        if(drawsToInclude.contains(WEAK_GUTSHOT)) {
-            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakGutshotCombos()));
-        }
-
-        if(drawsToInclude.contains(STRONG_FD)) {
-            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getStrongFlushDrawCombos()));
-        }
-
-        if(drawsToInclude.contains(MEDIUM_FD)) {
-            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getMediumFlushDrawCombos()));
-        }
-
-        if(drawsToInclude.contains(WEAK_FD)) {
-            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getWeakFlushDrawCombos()));
-        }
-
-        return draws;
-    }
-
-    private List<List<Card>> getAirCombos(List<List<Card>> allCombosEquitySorted, List<List<Card>> valueAndDrawRange,
-                                          double airPercentageToAdd, List<Card> knownGameCards) {
-        List<List<Card>> airCombosToAddToRange = new ArrayList<>();
-
-        List<List<Card>> airCombosTotal = allCombosEquitySorted.subList((int) (allCombosEquitySorted.size() * 0.55), allCombosEquitySorted.size());
-        List<List<Card>> eligibleAirCombos = removeCombosThatAreInRange(valueAndDrawRange, airCombosTotal);
-        eligibleAirCombos = removeCombosWithKnownCards(eligibleAirCombos, knownGameCards);
-
-        int numberOfCombosToAdd = (int) (valueAndDrawRange.size() * ((airPercentageToAdd / 100) + 1)) - valueAndDrawRange.size();
-        int numberOfAirCombosAdded = 0;
-
-        while(numberOfAirCombosAdded < numberOfCombosToAdd && !eligibleAirCombos.isEmpty()) {
-            List<Card> randomAirCombo = getRandomComboFromList(eligibleAirCombos);
-            airCombosToAddToRange.add(randomAirCombo);
-            eligibleAirCombos.remove(randomAirCombo);
-            numberOfAirCombosAdded++;
-        }
-
-        return airCombosToAddToRange;
-    }
-
-    private List<List<Card>> convertDrawMapToList(Map<Integer, Set<Card>> drawMap) {
-        return drawMap.values().stream()
-                .map(combo -> combo
-                        .stream()
-                        .collect(Collectors.toList()))
-                .collect(Collectors.toList());
-    }
-
-    private List<Card> getRandomComboFromList(List<List<Card>> input) {
-        int min = 0;
-        int max = input.size() - 1;
-        int random = (int)(Math.random() * ((max - min) + 1)) + min;
-        return input.get(random);
-    }
-
-    private List<List<Card>> retainCombosThatAreInRange(List<List<Card>> range, List<List<Card>> widerList) {
-        List<Set<Card>> widerListWithSets = widerList.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
-        List<Set<Card>> rangeWithSets = range.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
-        widerListWithSets.retainAll(rangeWithSets);
-        return widerListWithSets.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
-    }
-
-    private List<List<Card>> removeCombosThatAreInRange(List<List<Card>> range, List<List<Card>> widerList) {
-        List<Set<Card>> widerListWithSets = widerList.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
-        List<Set<Card>> rangeWithSets = range.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
-        widerListWithSets.removeAll(rangeWithSets);
-        return widerListWithSets.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
-    }
-
-    private List<List<Card>> filterOutDoubleCombos(List<List<Card>> input) {
-        Set<Set<Card>> asSet = input.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toSet());
-        return asSet.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
-    }
-
-    private List<List<Card>> getOppBetRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
-                                  String oppAggroness, String oppBetsize, List<Card> board, List<Card> botHoleCards) {
-        List<List<Card>> oppBetRange;
-        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
-
-        if(oppAggroness.equals(LOW)) {
-            if(oppBetsize.equals(SMALL)) {
-                double valuePercentage = 60;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 5;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals(MEDIUM)) {
-                double valuePercentage = 70;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 4;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals(LARGE)) {
-                double valuePercentage = 83;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
-                double drawPercentageToInclude = 50;
-                double airPercentage = 2;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else {
-                System.out.println("Should not come here Rangeconstructor - betRange - A");
-                oppBetRange = new ArrayList<>();
-            }
-        } else if(oppAggroness.equals(MEDIUM)) {
-            if(oppBetsize.equals(SMALL)) {
-                double valuePercentage = 53;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 20;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals(MEDIUM)) {
-                double valuePercentage = 63;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 17;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals(LARGE)) {
-                double valuePercentage = 77;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 15;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else {
-                System.out.println("Should not come here Rangeconstructor - betRange - B");
-                oppBetRange = new ArrayList<>();
-            }
-        } else if(oppAggroness.equals(HIGH)) {
-            if(oppBetsize.equals(SMALL)) {
-                double valuePercentage = 45;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
-                        MEDIUM_OOSD, MEDIUM_GUTSHOT, WEAK_FD, WEAK_OOSD, WEAK_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 33;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals(MEDIUM)) {
-                double valuePercentage = 55;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
-                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 28;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppBetsize.equals(LARGE)) {
-                double valuePercentage = 68;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
-                        MEDIUM_OOSD);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 25;
-                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else {
-                System.out.println("Should not come here Rangeconstructor - betRange - C");
-                oppBetRange = new ArrayList<>();
-            }
+        if(preCall3betGroup.equals("mediumUnknown") || preCall3betGroup.equals("medium")) {
+            limit = 50;
+        } else if(preCall3betGroup.equals("low")) {
+            limit = 70;
+        } else if(preCall3betGroup.equals("high")) {
+            limit = 35;
         } else {
-            System.out.println("Should not come here Rangeconstructor - betRange - D");
-            oppBetRange = new ArrayList<>();
+            limit = 100;
+            System.out.println("preCall3betGroup is unknown, should not come here");
         }
 
-        return oppBetRange;
+        for(int i = 0; i < allSortedPfEquityCombos.size() * (1.0 - (limit / 100.0)); i++) {
+            preCall3betRange.add(allSortedPfEquityCombos.get(i));
+        }
+
+        if(preCall3betGroup.equals("mediumUnknown") || preCall3betGroup.equals("medium")) {
+            List<List<Card>> extraCombos = allSortedPfEquityCombos.stream()
+                    .filter(combo -> comboIsSuitedConnector(combo, 1) || comboIsSuitedConnector(combo, 2) ||
+                            comboIsSuitedConnector(combo, 3))
+                    .collect(Collectors.toList());
+
+            preCall3betRange.addAll(extraCombos);
+        }
+
+        if(preCall3betGroup.equals("low")) {
+            List<List<Card>> extraCombos = allSortedPfEquityCombos.stream()
+                    .filter(combo -> comboIsSuitedConnector(combo, 1)
+                            && combo.get(0).getRank() >= 5 && combo.get(1).getRank() >= 5)
+                    .collect(Collectors.toList());
+
+            preCall3betRange.addAll(extraCombos);
+        }
+
+        if(preCall3betGroup.equals("high")) {
+            List<List<Card>> suitedCombos = allSortedPfEquityCombos.stream()
+                    .filter(combo -> combo.get(0).getSuit() == combo.get(1).getSuit())
+                    .collect(Collectors.toList());
+
+            preCall3betRange.addAll(suitedCombos);
+        }
+
+        preCall3betRange = filterOutDoubleCombos(preCall3betRange);
+        preCall3betRange = removeCombosWithKnownCards(preCall3betRange, botHoleCards);
+        return preCall3betRange;
     }
 
-    private List<List<Card>> getOppRaiseRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
-                                                String oppAggroness, String oppRaiseSize, List<Card> board, List<Card> botHoleCards) {
-        List<List<Card>> oppRaiseRange;
-        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
+    public List<List<Card>> getOppPre4betUpRange(List<List<Card>> allSortedPfEquityCombos, String pre4betUpGroup, List<Card> botHoleCards) {
+        List<List<Card>> pre4betUpRange = new ArrayList<>();
 
-        if(oppAggroness.equals(LOW)) {
-            if(oppRaiseSize.equals(SMALL)) {
-                double valuePercentage = 80;
-                List<String> drawsToInclude = new ArrayList<>();
-                double drawPercentageToInclude = 100;
-                double airPercentage = 0;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppRaiseSize.equals(MEDIUM)) {
-                double valuePercentage = 87;
-                List<String> drawsToInclude = new ArrayList<>();
-                double drawPercentageToInclude = 100;
-                double airPercentage = 0;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppRaiseSize.equals(LARGE)) {
-                double valuePercentage = 92;
-                List<String> drawsToInclude = new ArrayList<>();
-                double drawPercentageToInclude = 100;
-                double airPercentage = 0;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else {
-                System.out.println("Should not come here Rangeconstructor - raiseRange - A");
-                oppRaiseRange = new ArrayList<>();
-            }
-        } else if(oppAggroness.equals(MEDIUM)) {
-            if(oppRaiseSize.equals(SMALL)) {
-                double valuePercentage = 75;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 12;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppRaiseSize.equals(MEDIUM)) {
-                double valuePercentage = 79;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 10;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppRaiseSize.equals(LARGE)) {
-                double valuePercentage = 83;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 8;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else {
-                System.out.println("Should not come here Rangeconstructor - raiseRange - B");
-                oppRaiseRange = new ArrayList<>();
-            }
-        } else if(oppAggroness.equals(HIGH)) {
-            if(oppRaiseSize.equals(SMALL)) {
-                double valuePercentage = 60;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
-                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 24;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppRaiseSize.equals(MEDIUM)) {
-                double valuePercentage = 70;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
-                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 21;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else if(oppRaiseSize.equals(LARGE)) {
-                double valuePercentage = 78;
-                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
-                double drawPercentageToInclude = 100;
-                double airPercentage = 18;
-                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
-                        airPercentage, drawsToInclude, drawPercentageToInclude);
-            } else {
-                System.out.println("Should not come here Rangeconstructor - raiseRange - C");
-                oppRaiseRange = new ArrayList<>();
-            }
+        double limit;
+
+        if(pre4betUpGroup.equals("mediumUnknown") || pre4betUpGroup.equals("medium")) {
+            limit = 87;
+        } else if(pre4betUpGroup.equals("low")) {
+            limit = 94;
+        } else if(pre4betUpGroup.equals("high")) {
+            limit = 70;
         } else {
-            System.out.println("Should not come here Rangeconstructor - raiseRange - D");
-            oppRaiseRange = new ArrayList<>();
+            limit = 100;
+            System.out.println("pre4betUpGroup is unknown, should not come here");
         }
 
-        return oppRaiseRange;
+        for(int i = 0; i < allSortedPfEquityCombos.size() * (1.0 - (limit / 100.0)); i++) {
+            pre4betUpRange.add(allSortedPfEquityCombos.get(i));
+        }
+
+        if(pre4betUpGroup.equals("mediumUnknown") || pre4betUpGroup.equals("medium")) {
+            List<List<Card>> suitedConnectors = allSortedPfEquityCombos.stream()
+                    .filter(combo -> comboIsSuitedConnector(combo, 1)
+                            && combo.get(0).getRank() >= 8 && combo.get(1).getRank() >= 8)
+                    .collect(Collectors.toList());
+
+            pre4betUpRange.addAll(suitedConnectors);
+            pre4betUpRange = filterOutDoubleCombos(pre4betUpRange);
+        }
+
+        if(pre4betUpGroup.equals("high")) {
+            List<List<Card>> suitedConnectors = allSortedPfEquityCombos.stream()
+                    .filter(combo -> comboIsSuitedConnector(combo, 1)
+                            && combo.get(0).getRank() >= 5 && combo.get(1).getRank() >= 5)
+                    .collect(Collectors.toList());
+
+            pre4betUpRange.addAll(suitedConnectors);
+            pre4betUpRange = filterOutDoubleCombos(pre4betUpRange);
+        }
+
+        pre4betUpRange = removeCombosWithKnownCards(pre4betUpRange, botHoleCards);
+        return pre4betUpRange;
     }
 
-    private List<List<Card>> fillRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
-                                       List<Card> board, List<Card> knownGameCards, double valuePercentage,
-                                       double airPercentage, List<String> drawsToInclude, double drawPercentageToInclude) {
-        List<List<Card>> range = new ArrayList<>();
+    public List<List<Card>> getOppPreCall4betUpRange(List<List<Card>> allSortedPfEquityCombos, String preCall4betUpGroup, List<Card> botHoleCards) {
+        List<List<Card>> preCall4betUpRange = new ArrayList<>();
 
-        //value
-        List<List<Card>> valueCombos = allCombosEquitySorted.subList(0, (int) (allCombosEquitySorted.size() * (1 - (valuePercentage / 100))));
-        List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
-        eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
-        range.addAll(eligibleValueCombos);
-        range = filterOutDoubleCombos(range);
+        double limit;
 
-        //draw
-        List<List<Card>> draws = getDraws(drawsToInclude, board);
-        List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
-        eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
-
-        if((drawPercentageToInclude / 100) < 1) {
-            for(List<Card> draw : eligibleDraws) {
-                if(Math.random() < drawPercentageToInclude) {
-                    range.add(draw);
-                }
-            }
+        if(preCall4betUpGroup.equals("mediumUnknown") || preCall4betUpGroup.equals("medium")) {
+            limit = 85;
+        } else if(preCall4betUpGroup.equals("low")) {
+            limit = 93;
+        } else if(preCall4betUpGroup.equals("high")) {
+            limit = 73;
         } else {
-            range.addAll(eligibleDraws);
+            limit = 100;
+            System.out.println("preCall4betUpGroup is unknown, should not come here");
         }
 
-        range = filterOutDoubleCombos(range);
+        for(int i = 0; i < allSortedPfEquityCombos.size() * (1.0 - (limit / 100.0)); i++) {
+            preCall4betUpRange.add(allSortedPfEquityCombos.get(i));
+        }
 
-        //air
-        List<List<Card>> airCombos = getAirCombos(allCombosEquitySorted, range, airPercentage, knownGameCards);
-        range.addAll(airCombos);
-        range = filterOutDoubleCombos(range);
-
-        return range;
+        preCall4betUpRange = removeCombosWithKnownCards(preCall4betUpRange, botHoleCards);
+        return preCall4betUpRange;
     }
 
-    private List<List<Card>> fillRangeOppActionIsCheck(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
-                                       List<Card> board, List<Card> knownGameCards, double valueVsLowComboBoundry,
-                                       double valueInclusionPercentage, List<String> drawsToInclude, double drawPercentageToInclude) {
-        List<List<Card>> range = new ArrayList<>();
-
-        //value
-        List<List<Card>> valueCombos = allCombosEquitySorted.subList(0,
-                (int) (allCombosEquitySorted.size() * (1 - (valueVsLowComboBoundry / 100))));
-        List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
-        eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
-        List<List<Card>> eligibleValueCombosFilteredForCheck = new ArrayList<>();
-
-        for(List<Card> combo : eligibleValueCombos) {
-            if(Math.random() < (valueInclusionPercentage / 100)) {
-                eligibleValueCombosFilteredForCheck.add(combo);
-            }
-        }
-
-        range.addAll(eligibleValueCombosFilteredForCheck);
-        range = filterOutDoubleCombos(range);
-
-        //draw
-        List<List<Card>> draws = getDraws(drawsToInclude, board);
-        List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
-        eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
-
-        if((drawPercentageToInclude / 100) < 1) {
-            for(List<Card> draw : eligibleDraws) {
-                if(Math.random() < drawPercentageToInclude) {
-                    range.add(draw);
-                }
-            }
-        } else {
-            range.addAll(eligibleDraws);
-        }
-
-        range = filterOutDoubleCombos(range);
-
-        //low combos
-        List<List<Card>> lowCombos = allCombosEquitySorted.subList(
-                (int) (allCombosEquitySorted.size() * (1 - (valueVsLowComboBoundry / 100))), allCombosEquitySorted.size());
-        range.addAll(lowCombos);
-        range = filterOutDoubleCombos(range);
-
-        return range;
-    }
-
-    private List<List<Card>> getOppCheckRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
-                                    String oppAggroness, String potSize, List<Card> board, List<Card> botHoleCards) {
+    public List<List<Card>> getOppPostflopCheckRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                                String oppAggroness, String potSize, List<Card> board, List<Card> botHoleCards) {
         List<List<Card>> oppCheckRange;
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
@@ -763,8 +483,102 @@ public class RangeConstructor {
         return oppCheckRange;
     }
 
-    private List<List<Card>> getOppCallRangeYo(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
-                                   String oppLooseness, String botSizing, List<Card> board, List<Card> botHoleCards) {
+    public List<List<Card>> getOppPostflopBetRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                                    String oppAggroness, String oppBetsize, List<Card> board, List<Card> botHoleCards) {
+        List<List<Card>> oppBetRange;
+        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
+
+        if(oppAggroness.equals(LOW)) {
+            if(oppBetsize.equals(SMALL)) {
+                double valuePercentage = 60;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 5;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(MEDIUM)) {
+                double valuePercentage = 70;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 4;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(LARGE)) {
+                double valuePercentage = 83;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
+                double drawPercentageToInclude = 50;
+                double airPercentage = 2;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - betRange - A");
+                oppBetRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(MEDIUM)) {
+            if(oppBetsize.equals(SMALL)) {
+                double valuePercentage = 53;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 20;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(MEDIUM)) {
+                double valuePercentage = 63;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 17;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(LARGE)) {
+                double valuePercentage = 77;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 15;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - betRange - B");
+                oppBetRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(HIGH)) {
+            if(oppBetsize.equals(SMALL)) {
+                double valuePercentage = 45;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT, WEAK_FD, WEAK_OOSD, WEAK_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 33;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(MEDIUM)) {
+                double valuePercentage = 55;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 28;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppBetsize.equals(LARGE)) {
+                double valuePercentage = 68;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 25;
+                oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - betRange - C");
+                oppBetRange = new ArrayList<>();
+            }
+        } else {
+            System.out.println("Should not come here Rangeconstructor - betRange - D");
+            oppBetRange = new ArrayList<>();
+        }
+
+        return oppBetRange;
+    }
+
+    public List<List<Card>> getOppPostflopCallRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                               String oppLooseness, String botSizing, List<Card> board, List<Card> botHoleCards) {
         List<List<Card>> oppCallRange;
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
@@ -937,24 +751,285 @@ public class RangeConstructor {
         return oppCallRange;
     }
 
-    private void getOppFoldRangeYo() {
+    public List<List<Card>> getOppPostflopRaiseRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                                      String oppAggroness, String oppRaiseSize, List<Card> board, List<Card> botHoleCards) {
+        List<List<Card>> oppRaiseRange;
+        List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
-        //input
+        if(oppAggroness.equals(LOW)) {
+            if(oppRaiseSize.equals(SMALL)) {
+                double valuePercentage = 80;
+                List<String> drawsToInclude = new ArrayList<>();
+                double drawPercentageToInclude = 100;
+                double airPercentage = 0;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(MEDIUM)) {
+                double valuePercentage = 87;
+                List<String> drawsToInclude = new ArrayList<>();
+                double drawPercentageToInclude = 100;
+                double airPercentage = 0;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(LARGE)) {
+                double valuePercentage = 92;
+                List<String> drawsToInclude = new ArrayList<>();
+                double drawPercentageToInclude = 100;
+                double airPercentage = 0;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - raiseRange - A");
+                oppRaiseRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(MEDIUM)) {
+            if(oppRaiseSize.equals(SMALL)) {
+                double valuePercentage = 75;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 12;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(MEDIUM)) {
+                double valuePercentage = 79;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 10;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(LARGE)) {
+                double valuePercentage = 83;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 8;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - raiseRange - B");
+                oppRaiseRange = new ArrayList<>();
+            }
+        } else if(oppAggroness.equals(HIGH)) {
+            if(oppRaiseSize.equals(SMALL)) {
+                double valuePercentage = 60;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 24;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(MEDIUM)) {
+                double valuePercentage = 70;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
+                        MEDIUM_OOSD, MEDIUM_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 21;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else if(oppRaiseSize.equals(LARGE)) {
+                double valuePercentage = 78;
+                List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
+                double drawPercentageToInclude = 100;
+                double airPercentage = 18;
+                oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
+                        airPercentage, drawsToInclude, drawPercentageToInclude);
+            } else {
+                System.out.println("Should not come here Rangeconstructor - raiseRange - C");
+                oppRaiseRange = new ArrayList<>();
+            }
+        } else {
+            System.out.println("Should not come here Rangeconstructor - raiseRange - D");
+            oppRaiseRange = new ArrayList<>();
+        }
 
-            //opp looseness
-                //low
-                //medium
-                //high
+        return oppRaiseRange;
+    }
 
-            //potsize
-                //small
-                //medium
-                //large
+    public static List<List<Card>> removeCombosWithKnownCards(List<List<Card>> listToRemoveCombosFrom, List<Card> knownCards) {
+        return listToRemoveCombosFrom.stream().filter(combo -> Collections.disjoint(combo, knownCards)).collect(Collectors.toList());
+    }
 
-        //------------
+    private List<List<Card>> fillRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                       List<Card> board, List<Card> knownGameCards, double valuePercentage,
+                                       double airPercentage, List<String> drawsToInclude, double drawPercentageToInclude) {
+        List<List<Card>> range = new ArrayList<>();
 
-        //everything that is not in call en raise range...
+        //value
+        List<List<Card>> valueCombos = allCombosEquitySorted.subList(0, (int) (allCombosEquitySorted.size() * (1 - (valuePercentage / 100))));
+        List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
+        eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
+        range.addAll(eligibleValueCombos);
+        range = filterOutDoubleCombos(range);
 
+        //draw
+        List<List<Card>> draws = getDraws(drawsToInclude, board);
+        List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
+        eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
+
+        if((drawPercentageToInclude / 100) < 1) {
+            for(List<Card> draw : eligibleDraws) {
+                if(Math.random() < (drawPercentageToInclude / 100)) {
+                    range.add(draw);
+                }
+            }
+        } else {
+            range.addAll(eligibleDraws);
+        }
+
+        range = filterOutDoubleCombos(range);
+
+        //air
+        List<List<Card>> airCombos = getAirCombos(allCombosEquitySorted, range, airPercentage, knownGameCards);
+        range.addAll(airCombos);
+        range = filterOutDoubleCombos(range);
+
+        return range;
+    }
+
+    private List<List<Card>> fillRangeOppActionIsCheck(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
+                                                       List<Card> board, List<Card> knownGameCards, double valueVsLowComboBoundry,
+                                                       double valueInclusionPercentage, List<String> drawsToInclude, double drawPercentageToInclude) {
+        List<List<Card>> range = new ArrayList<>();
+
+        //value
+        List<List<Card>> valueCombos = allCombosEquitySorted.subList(0,
+                (int) (allCombosEquitySorted.size() * (1 - (valueVsLowComboBoundry / 100))));
+        List<List<Card>> eligibleValueCombos = retainCombosThatAreInRange(oppStartingRange, valueCombos);
+        eligibleValueCombos = removeCombosWithKnownCards(eligibleValueCombos, knownGameCards);
+        List<List<Card>> eligibleValueCombosFilteredForCheck = new ArrayList<>();
+
+        for(List<Card> combo : eligibleValueCombos) {
+            if(Math.random() < (valueInclusionPercentage / 100)) {
+                eligibleValueCombosFilteredForCheck.add(combo);
+            }
+        }
+
+        range.addAll(eligibleValueCombosFilteredForCheck);
+        range = filterOutDoubleCombos(range);
+
+        //draw
+        List<List<Card>> draws = getDraws(drawsToInclude, board);
+        List<List<Card>> eligibleDraws = retainCombosThatAreInRange(oppStartingRange, draws);
+        eligibleDraws = removeCombosWithKnownCards(eligibleDraws, knownGameCards);
+
+        if((drawPercentageToInclude / 100) < 1) {
+            for(List<Card> draw : eligibleDraws) {
+                if(Math.random() < drawPercentageToInclude) {
+                    range.add(draw);
+                }
+            }
+        } else {
+            range.addAll(eligibleDraws);
+        }
+
+        range = filterOutDoubleCombos(range);
+
+        //low combos
+        List<List<Card>> lowCombos = allCombosEquitySorted.subList(
+                (int) (allCombosEquitySorted.size() * (1 - (valueVsLowComboBoundry / 100))), allCombosEquitySorted.size());
+        range.addAll(lowCombos);
+        range = filterOutDoubleCombos(range);
+
+        return range;
+    }
+
+    private List<List<Card>> getDraws(List<String> drawsToInclude, List<Card> board) {
+        StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator(board);
+        FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator(board);
+
+        List<List<Card>> draws = new ArrayList<>();
+
+        if(drawsToInclude.contains(STRONG_OOSD)) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongOosdCombos()));
+        }
+
+        if(drawsToInclude.contains(MEDIUM_OOSD)) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumOosdCombos()));
+        }
+
+        if(drawsToInclude.contains(WEAK_OOSD)) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakOosdCombos()));
+        }
+
+        if(drawsToInclude.contains(STRONG_GUTSHOT)) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getStrongGutshotCombos()));
+        }
+
+        if(drawsToInclude.contains(MEDIUM_GUTSHOT)) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getMediumGutshotCombos()));
+        }
+
+        if(drawsToInclude.contains(WEAK_GUTSHOT)) {
+            draws.addAll(convertDrawMapToList(straightDrawEvaluator.getWeakGutshotCombos()));
+        }
+
+        if(drawsToInclude.contains(STRONG_FD)) {
+            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getStrongFlushDrawCombos()));
+        }
+
+        if(drawsToInclude.contains(MEDIUM_FD)) {
+            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getMediumFlushDrawCombos()));
+        }
+
+        if(drawsToInclude.contains(WEAK_FD)) {
+            draws.addAll(convertDrawMapToList(flushDrawEvaluator.getWeakFlushDrawCombos()));
+        }
+
+        return draws;
+    }
+
+    private List<List<Card>> getAirCombos(List<List<Card>> allCombosEquitySorted, List<List<Card>> valueAndDrawRange,
+                                          double airPercentageToAdd, List<Card> knownGameCards) {
+        List<List<Card>> airCombosToAddToRange = new ArrayList<>();
+
+        List<List<Card>> airCombosTotal = allCombosEquitySorted.subList((int) (allCombosEquitySorted.size() * 0.55), allCombosEquitySorted.size());
+        List<List<Card>> eligibleAirCombos = removeCombosThatAreInRange(valueAndDrawRange, airCombosTotal);
+        eligibleAirCombos = removeCombosWithKnownCards(eligibleAirCombos, knownGameCards);
+
+        int numberOfCombosToAdd = (int) (valueAndDrawRange.size() * ((airPercentageToAdd / 100) + 1)) - valueAndDrawRange.size();
+        int numberOfAirCombosAdded = 0;
+
+        while(numberOfAirCombosAdded < numberOfCombosToAdd && !eligibleAirCombos.isEmpty()) {
+            List<Card> randomAirCombo = getRandomComboFromList(eligibleAirCombos);
+            airCombosToAddToRange.add(randomAirCombo);
+            eligibleAirCombos.remove(randomAirCombo);
+            numberOfAirCombosAdded++;
+        }
+
+        return airCombosToAddToRange;
+    }
+
+    private List<List<Card>> convertDrawMapToList(Map<Integer, Set<Card>> drawMap) {
+        return drawMap.values().stream()
+                .map(combo -> combo
+                        .stream()
+                        .collect(Collectors.toList()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Card> getRandomComboFromList(List<List<Card>> input) {
+        int min = 0;
+        int max = input.size() - 1;
+        int random = (int)(Math.random() * ((max - min) + 1)) + min;
+        return input.get(random);
+    }
+
+    private List<List<Card>> retainCombosThatAreInRange(List<List<Card>> range, List<List<Card>> widerList) {
+        List<Set<Card>> widerListWithSets = widerList.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        List<Set<Card>> rangeWithSets = range.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        widerListWithSets.retainAll(rangeWithSets);
+        return widerListWithSets.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
+    }
+
+    private List<List<Card>> removeCombosThatAreInRange(List<List<Card>> range, List<List<Card>> widerList) {
+        List<Set<Card>> widerListWithSets = widerList.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        List<Set<Card>> rangeWithSets = range.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toList());
+        widerListWithSets.removeAll(rangeWithSets);
+        return widerListWithSets.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
+    }
+
+    private List<List<Card>> filterOutDoubleCombos(List<List<Card>> input) {
+        Set<Set<Card>> asSet = input.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toSet());
+        return asSet.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
     }
 
     private String determineOppSizingGroup(double oppTotalBetsize) {
@@ -1026,5 +1101,19 @@ public class RangeConstructor {
             result.put(entry.getKey(), entry.getValue());
         }
         return result;
+    }
+
+    private List<List<Card>> createStartingOppRange(List<Card> botHoleCards) {
+        List<List<Card>> startingOppRange = ActionBuilderUtil.getAllPossibleStartHandsAsList()
+                .values()
+                .stream()
+                .collect(Collectors.toList());
+
+        startingOppRange = startingOppRange
+                .stream()
+                .filter(combo -> Collections.disjoint(combo, botHoleCards))
+                .collect(Collectors.toList());
+
+        return startingOppRange;
     }
 }
