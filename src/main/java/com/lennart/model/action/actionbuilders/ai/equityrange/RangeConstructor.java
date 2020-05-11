@@ -1103,7 +1103,7 @@ public class RangeConstructor {
         return result;
     }
 
-    private List<List<Card>> createStartingOppRange(List<Card> botHoleCards) {
+    public List<List<Card>> createStartingOppRange(List<Card> botHoleCards) {
         List<List<Card>> startingOppRange = ActionBuilderUtil.getAllPossibleStartHandsAsList()
                 .values()
                 .stream()

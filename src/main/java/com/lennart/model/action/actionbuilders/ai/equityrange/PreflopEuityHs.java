@@ -10,6 +10,11 @@ import java.util.stream.Collectors;
  */
 public class PreflopEuityHs {
 
+    public List<List<Card>> getAllSortedPfEquityCombos() {
+        Map<List<Card>, Double> allSortedPfEquityCombos = getAllPreflopCombosEquitySortedMap();
+        return allSortedPfEquityCombos.keySet().stream().collect(Collectors.toList());
+    }
+
     public Map<List<Card>, Double> getAllPreflopCombosEquitySortedMap() {
         Map<String, Double> allCombosStringMap = getAllComboStringEquityMap();
 
