@@ -88,43 +88,111 @@ public class OpponentRangeSetter {
 
     private void setPostflopNewStreetRange(GameVariables gameVariables, List<Card> previousBoard, DbSaveRaw previousRound) {
         if(previousBoard.isEmpty()) {
-            setPreflopToFlopRange();
+            setPreflopToFlopRange(gameVariables);
         } else {
-            setFlopToTurnOrTurnToRiverRange(gameVariables, previousRound);
+            setFlopToTurnOrTurnToRiverRange(null, gameVariables, previousRound, previousBoard);
         }
     }
 
-    private void setPreflopToFlopRange() {
+    private void setPreflopToFlopRange(GameVariables gameVariables) {
+        if(gameVariables.isBotIsButton()) {
+            setInPositionPreflopToFlopRange();
+        } else {
+            setOopPreflopToFlopRange();
+        }
+    }
+
+    private void setInPositionPreflopToFlopRange() {
 
     }
 
-    private void setFlopToTurnOrTurnToRiverRange(GameVariables gameVariables, DbSaveRaw previousRound) {
-        //het kan zijn dat jij gecalled hebt en nieuwe straat
-        //het kan zijn dat opp gecalled heeft en nieuwe straat
-        //het kan zijn dat jij gecheckt hebt en nieuwe straat
-        //het kan zijn dat opp gecheckt heeft en nieuwe straat
-        if(gameVariables.getOpponentAction().equals("empty")) {
-            //je zit oop en er is nieuwe straat...
-            //als jouw laatste actie call was...
-            if(previousRound.getBotAction().equals("call")) {
-                //range staat al goed ingesteld..
-            } else if(previousRound.getBotAction().equals("check")) {
-                //if()
+    private void setOopPreflopToFlopRange() {
 
+    }
+
+    private void setFlopToTurnOrTurnToRiverRange(ContinuousTable continuousTable, GameVariables gameVariables,
+                                                 DbSaveRaw previousRound, List<Card> previousBoard) {
+        RangeConstructor rangeConstructor = new RangeConstructor();
+        EquityAction2 equityAction2 = new EquityAction2();
+
+        if(gameVariables.isBotIsButton()) {
+            setInPositionFlopToTurnOrTurnToRiverRange(continuousTable, gameVariables, previousRound, previousBoard,
+                    equityAction2, rangeConstructor);
+        } else {
+            if(previousRound.getBotAction().equals("check")) {
+                List<List<Card>> oppCheckRange = rangeConstructor.getOppPostflopCheckRange(
+                        continuousTable.getOppRange(),
+                        equityAction2.getAllCombosPostflopEquitySorted(previousBoard, gameVariables.getBotHoleCards()),
+                        equityAction2.getOppAggroness(gameVariables.getOpponentName()),
+                        equityAction2.getPotSizeGroup(previousRound.getPot()),
+                        previousBoard,
+                        gameVariables.getBotHoleCards());
+                continuousTable.setOppRange(oppCheckRange);
+            } else if(previousRound.getBotAction().equals("bet75pct") || previousRound.getBotAction().equals("raise")) {
+                List<List<Card>> oppCallRange = rangeConstructor.getOppPostflopCallRange(
+                        continuousTable.getOppRange(),
+                        equityAction2.getAllCombosPostflopEquitySorted(previousBoard, gameVariables.getBotHoleCards()),
+                        equityAction2.getOppLooseness(gameVariables.getOpponentName()),
+                        equityAction2.getBotSizingGroup(previousRound.getSizing()),
+                        previousBoard,
+                        gameVariables.getBotHoleCards());
+                continuousTable.setOppRange(oppCallRange);
+            } else {
+                System.out.println("Shouldn't come here, OpponentRangeSetter - B");
             }
-
-
-
-
-            //laatste actie van opp is van vorige straat, ofwel check ofwel call...
-
-        } else {
-            //je zit ip en er is nieuwe straat...
-            //je moet eerst de vorige actie van opp verwerken
-            //daarna de laatste actie..
-
-
         }
     }
 
+    private void setInPositionFlopToTurnOrTurnToRiverRange(ContinuousTable continuousTable, GameVariables gameVariables,
+                                                           DbSaveRaw previousRound, List<Card> previousBoard,
+                                                           EquityAction2 equityAction2, RangeConstructor rangeConstructor) {
+        if(previousRound.getBotAction().equals("check")) {
+            if(gameVariables.getOpponentAction().equals("check") || gameVariables.getOpponentAction().equals("call")) {
+                List<List<Card>> oppCheckRange = rangeConstructor.getOppPostflopCheckRange(
+                        continuousTable.getOppRange(),
+                        equityAction2.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction2.getOppAggroness(gameVariables.getOpponentName()),
+                        equityAction2.getPotSizeGroup(gameVariables.getPot()),
+                        gameVariables.getBoard(),
+                        gameVariables.getBotHoleCards());
+                continuousTable.setOppRange(oppCheckRange);
+            } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
+                List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
+                        continuousTable.getOppRange(),
+                        equityAction2.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction2.getOppAggroness(gameVariables.getOpponentName()),
+                        equityAction2.getOppSizingGroup(gameVariables.getOpponentBetSize()),
+                        gameVariables.getBoard(),
+                        gameVariables.getBotHoleCards());
+                continuousTable.setOppRange(oppBetRange);
+            } else {
+                System.out.println("Shouldn't come here, OpponentRangeSetter - C");
+            }
+        } else if(previousRound.getBotAction().equals("bet75pct") || previousRound.getBotAction().equals("raise")) {
+            List<List<Card>> previousStreetOppCallRange = rangeConstructor.getOppPostflopCallRange(
+                    continuousTable.getOppRange(),
+                    equityAction2.getAllCombosPostflopEquitySorted(previousBoard, gameVariables.getBotHoleCards()),
+                    equityAction2.getOppLooseness(gameVariables.getOpponentName()),
+                    equityAction2.getBotSizingGroup(previousRound.getSizing()),
+                    previousBoard,
+                    gameVariables.getBotHoleCards());
+
+            if(gameVariables.getOpponentAction().equals("check")) {
+                continuousTable.setOppRange(previousStreetOppCallRange);
+            } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
+                List<List<Card>> oppDonkBetRange = rangeConstructor.getOppPostflopBetRange(
+                        previousStreetOppCallRange,
+                        equityAction2.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction2.getOppAggroness(gameVariables.getOpponentName()),
+                        equityAction2.getOppSizingGroup(gameVariables.getOpponentBetSize()),
+                        gameVariables.getBoard(),
+                        gameVariables.getBotHoleCards());
+                continuousTable.setOppRange(oppDonkBetRange);
+            } else {
+                System.out.println("Shouldn't come here, OpponentRangeSetter - E");
+            }
+        } else {
+            System.out.println("Shouldn't come here, OpponentRangeSetter - D");
+        }
+    }
 }
