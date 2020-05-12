@@ -78,7 +78,7 @@ public class EquityAction2 {
         return actionToReturn;
     }
 
-    private List<List<Card>> getAllCombosPostflopEquitySorted(List<Card> board, List<Card> botHoleCards) {
+    public List<List<Card>> getAllCombosPostflopEquitySorted(List<Card> board, List<Card> botHoleCards) {
         List<List<Card>> allCombos = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream()
                 .collect(Collectors.toList());
 
@@ -90,19 +90,47 @@ public class EquityAction2 {
                 .collect(Collectors.toList());
     }
 
-    private String getOppAggroness(String oppName) {
+    public String getOppPreCall2betGroup(String oppName) {
         return null;
     }
 
-    private String getOppLooseness(String oppName) {
+    public String getOppPreCall3betGroup(String oppName) {
         return null;
     }
 
-    private String getBotSizingGroup(double sizing) {
+    public String getOppPreCall4betUpGroup(String oppName) {
         return null;
     }
 
-    private String getOppSizingGroup(double oppTotalBetsize) {
+    public String getOppPre2betGroup(String oppName) {
+        return null;
+    }
+
+    public String getOppPre3betGroup(String oppName) {
+        return null;
+    }
+
+    public String getOppPre4betUpGroup(String oppName) {
+        return null;
+    }
+
+    public String getOppAggroness(String oppName) {
+        return null;
+    }
+
+    public String getOppLooseness(String oppName) {
+        return null;
+    }
+
+    public String getBotSizingGroup(double sizing) {
+        return null;
+    }
+
+    public String getOppSizingGroup(double oppTotalBetsize) {
+        return null;
+    }
+
+    public String getPotSizeGroup(double potSize) {
         return null;
     }
 }
