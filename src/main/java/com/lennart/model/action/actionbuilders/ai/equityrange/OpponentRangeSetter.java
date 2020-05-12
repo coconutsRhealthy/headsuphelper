@@ -16,20 +16,17 @@ import java.util.List;
  */
 public class OpponentRangeSetter {
 
-    private void setOpponentRange(ContinuousTable continuousTable, GameVariables gameVariables) {
-        if(continuousTable.getDbSaveList().isEmpty()) {
-            continuousTable.setOppRange(new RangeConstructor().createStartingOppRange(gameVariables.getBotHoleCards()));
-        } else {
-            if(continuousTable.getOppRange() == null || continuousTable.getOppRange().isEmpty()) {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - A");
-                continuousTable.setOppRange(new RangeConstructor().createStartingOppRange(gameVariables.getBotHoleCards()));
-            }
+    RangeConstructor rangeConstructor;
+    EquityAction2 equityAction2;
+    PreflopEuityHs preflopEuityHs;
 
-            setNonInitialRange(continuousTable, gameVariables);
-        }
+    public OpponentRangeSetter(RangeConstructor rangeConstructor, EquityAction2 equityAction2, PreflopEuityHs preflopEuityHs) {
+        this.rangeConstructor = rangeConstructor;
+        this.equityAction2 = equityAction2;
+        this.preflopEuityHs = preflopEuityHs;
     }
 
-    private void setNonInitialRange(ContinuousTable continuousTable, GameVariables gameVariables) {
+    private void setOpponentRange(ContinuousTable continuousTable, GameVariables gameVariables) {
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
             setPreflopRange(continuousTable, gameVariables);
         } else {
@@ -47,7 +44,7 @@ public class OpponentRangeSetter {
 
     private void setInPositionPreflopRange(ContinuousTable continuousTable, GameVariables gameVariables) {
         if(gameVariables.getOpponentAction().equals("bet")) {
-            continuousTable.setOppRange(new RangeConstructor().createStartingOppRange(gameVariables.getBotHoleCards()));
+            continuousTable.setOppRange(rangeConstructor.createStartingOppRange(gameVariables.getBotHoleCards()));
         } else if(gameVariables.getOpponentAction().equals("raise")) {
             String oppRaiseType = determineOppPreflopRaiseType();
 
@@ -56,58 +53,58 @@ public class OpponentRangeSetter {
                 //todo: limp
 
             } else if(oppRaiseType.equals("3bet")) {
-                List<List<Card>> oppPre3betRange = new RangeConstructor().getOppPre3betRange(
-                        new PreflopEuityHs().getAllSortedPfEquityCombos(),
-                        new EquityAction2().getOppPre3betGroup(gameVariables.getOpponentName()),
+                List<List<Card>> oppPre3betRange = rangeConstructor.getOppPre3betRange(
+                        preflopEuityHs.getAllSortedPfEquityCombos(),
+                        equityAction2.getOppPre3betGroup(gameVariables.getOpponentName()),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppPre3betRange);
             } else if(oppRaiseType.equals("4bet_up")) {
-                List<List<Card>> oppPre4betUpRange = new RangeConstructor().getOppPre4betUpRange(
-                        new PreflopEuityHs().getAllSortedPfEquityCombos(),
-                        new EquityAction2().getOppPre4betUpGroup(gameVariables.getOpponentName()),
+                List<List<Card>> oppPre4betUpRange = rangeConstructor.getOppPre4betUpRange(
+                        preflopEuityHs.getAllSortedPfEquityCombos(),
+                        equityAction2.getOppPre4betUpGroup(gameVariables.getOpponentName()),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppPre4betUpRange);
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - X");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 1");
             }
         } else {
-            System.out.println("Shouldn't come here, OpponentRangeSetter - Y");
+            System.out.println("Shouldn't come here, OpponentRangeSetter - 2");
         }
     }
 
     private void setOopPreflopRange(ContinuousTable continuousTable, GameVariables gameVariables) {
         if(gameVariables.getOpponentAction().equals("call")) {
-            List<List<Card>> oppPreLimpRange = new RangeConstructor().getOppPreLimpRange(
-                    new PreflopEuityHs().getAllSortedPfEquityCombos(),
-                    new EquityAction2().getOppPre2betGroup(gameVariables.getOpponentName()),
+            List<List<Card>> oppPreLimpRange = rangeConstructor.getOppPreLimpRange(
+                    preflopEuityHs.getAllSortedPfEquityCombos(),
+                    equityAction2.getOppPre2betGroup(gameVariables.getOpponentName()),
                     gameVariables.getBotHoleCards());
             continuousTable.setOppRange(oppPreLimpRange);
         } else if(gameVariables.getOpponentAction().equals("raise")) {
             String oppRaiseType = determineOppPreflopRaiseType();
 
             if(oppRaiseType.equals("2bet")) {
-                List<List<Card>> oppPre2betRange = new RangeConstructor().getOppPre2betRange(
-                        new PreflopEuityHs().getAllSortedPfEquityCombos(),
-                        new EquityAction2().getOppPre2betGroup(gameVariables.getOpponentName()),
+                List<List<Card>> oppPre2betRange = rangeConstructor.getOppPre2betRange(
+                        preflopEuityHs.getAllSortedPfEquityCombos(),
+                        equityAction2.getOppPre2betGroup(gameVariables.getOpponentName()),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppPre2betRange);
             } else if(oppRaiseType.equals("3bet")) {
-                List<List<Card>> oppPre3betRange = new RangeConstructor().getOppPre3betRange(
-                        new PreflopEuityHs().getAllSortedPfEquityCombos(),
-                        new EquityAction2().getOppPre3betGroup(gameVariables.getOpponentName()),
+                List<List<Card>> oppPre3betRange = rangeConstructor.getOppPre3betRange(
+                        preflopEuityHs.getAllSortedPfEquityCombos(),
+                        equityAction2.getOppPre3betGroup(gameVariables.getOpponentName()),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppPre3betRange);
             } else if(oppRaiseType.equals("4bet_up")) {
-                List<List<Card>> oppPre4betUpRange = new RangeConstructor().getOppPre4betUpRange(
-                        new PreflopEuityHs().getAllSortedPfEquityCombos(),
-                        new EquityAction2().getOppPre4betUpGroup(gameVariables.getOpponentName()),
+                List<List<Card>> oppPre4betUpRange = rangeConstructor.getOppPre4betUpRange(
+                        preflopEuityHs.getAllSortedPfEquityCombos(),
+                        equityAction2.getOppPre4betUpGroup(gameVariables.getOpponentName()),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppPre4betUpRange);
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - W");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 3");
             }
         } else {
-            System.out.println("Shouldn't come here, OpponentRangeSetter - T");
+            System.out.println("Shouldn't come here, OpponentRangeSetter - 4");
         }
     }
 
@@ -133,9 +130,6 @@ public class OpponentRangeSetter {
     }
 
     private void setPostflopSameStreetRange(ContinuousTable continuousTable, GameVariables gameVariables) {
-        RangeConstructor rangeConstructor = new RangeConstructor();
-        EquityAction2 equityAction2 = new EquityAction2();
-
         if(gameVariables.getOpponentAction().equals("bet75pct")) {
             List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
                     continuousTable.getOppRange(),
@@ -174,12 +168,8 @@ public class OpponentRangeSetter {
     }
 
     private void setInPositionPreflopToFlopRange(ContinuousTable continuousTable, GameVariables gameVariables, DbSaveRaw previousRound) {
-        RangeConstructor rangeConstructor = new RangeConstructor();
-        EquityAction2 equityAction2 = new EquityAction2();
-
         if(previousRound.getBotAction().equals("raise")) {
             String botRaiseType = determinBotPreflopRaiseType();
-            PreflopEuityHs preflopEuityHs = new PreflopEuityHs();
 
             List<List<Card>> oppPreCallRange = null;
 
@@ -199,7 +189,7 @@ public class OpponentRangeSetter {
                     equityAction2.getOppPreCall4betUpGroup(gameVariables.getOpponentName()),
                     gameVariables.getBotHoleCards());
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - G");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 5");
             }
 
             if(gameVariables.getOpponentAction().equals("check")) {
@@ -214,7 +204,7 @@ public class OpponentRangeSetter {
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppFlopBetRange);
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - G");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 6");
             }
         } else if(previousRound.getBotAction().equals("call")) {
             //Todo: bot limp
@@ -222,26 +212,26 @@ public class OpponentRangeSetter {
             if(gameVariables.getOpponentAction().equals("check")) {
                 List<List<Card>> oppFlopCheckRange = rangeConstructor.getOppPostflopCheckRange(
                         continuousTable.getOppRange(),
-                        new EquityAction2().getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
-                        new EquityAction2().getOppAggroness(gameVariables.getOpponentName()),
-                        new EquityAction2().getPotSizeGroup(gameVariables.getPot()),
+                        equityAction2.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction2.getOppAggroness(gameVariables.getOpponentName()),
+                        equityAction2.getPotSizeGroup(gameVariables.getPot()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppFlopCheckRange);
             } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
                 List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
                         continuousTable.getOppRange(),
-                        new EquityAction2().getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
-                        new EquityAction2().getOppAggroness(gameVariables.getOpponentName()),
-                        new EquityAction2().getOppSizingGroup(gameVariables.getOpponentBetSize()),
+                        equityAction2.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction2.getOppAggroness(gameVariables.getOpponentName()),
+                        equityAction2.getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppBetRange);
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - M");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 7");
             }
         } else {
-            System.out.println("Shouldn't come here, OpponentRangeSetter - G");
+            System.out.println("Shouldn't come here, OpponentRangeSetter - 8");
         }
     }
 
@@ -249,10 +239,6 @@ public class OpponentRangeSetter {
         if(previousRound.getBotAction().equals("check")) {
             continuousTable.setOppRange(continuousTable.getOppRange());
         } else if(previousRound.getBotAction().equals("raise")) {
-            RangeConstructor rangeConstructor = new RangeConstructor();
-            EquityAction2 equityAction2 = new EquityAction2();
-            PreflopEuityHs preflopEuityHs = new PreflopEuityHs();
-
             String botRaiseType = determinBotPreflopRaiseType();
 
             List<List<Card>> oppPreCallRange = null;
@@ -273,23 +259,19 @@ public class OpponentRangeSetter {
                         equityAction2.getOppPreCall4betUpGroup(gameVariables.getOpponentName()),
                         gameVariables.getBotHoleCards());
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - I");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 9");
             }
 
             continuousTable.setOppRange(oppPreCallRange);
         } else {
-            System.out.println("Shouldn't come here, OpponentRangeSetter - K");
+            System.out.println("Shouldn't come here, OpponentRangeSetter - 10");
         }
     }
 
     private void setFlopToTurnOrTurnToRiverRange(ContinuousTable continuousTable, GameVariables gameVariables,
                                                  DbSaveRaw previousRound, List<Card> previousBoard) {
-        RangeConstructor rangeConstructor = new RangeConstructor();
-        EquityAction2 equityAction2 = new EquityAction2();
-
         if(gameVariables.isBotIsButton()) {
-            setInPositionFlopToTurnOrTurnToRiverRange(continuousTable, gameVariables, previousRound, previousBoard,
-                    equityAction2, rangeConstructor);
+            setInPositionFlopToTurnOrTurnToRiverRange(continuousTable, gameVariables, previousRound, previousBoard);
         } else {
             if(previousRound.getBotAction().equals("check")) {
                 List<List<Card>> oppCheckRange = rangeConstructor.getOppPostflopCheckRange(
@@ -310,14 +292,13 @@ public class OpponentRangeSetter {
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppCallRange);
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - B");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 11");
             }
         }
     }
 
     private void setInPositionFlopToTurnOrTurnToRiverRange(ContinuousTable continuousTable, GameVariables gameVariables,
-                                                           DbSaveRaw previousRound, List<Card> previousBoard,
-                                                           EquityAction2 equityAction2, RangeConstructor rangeConstructor) {
+                                                           DbSaveRaw previousRound, List<Card> previousBoard) {
         if(previousRound.getBotAction().equals("check")) {
             if(gameVariables.getOpponentAction().equals("check") || gameVariables.getOpponentAction().equals("call")) {
                 List<List<Card>> oppCheckRange = rangeConstructor.getOppPostflopCheckRange(
@@ -338,7 +319,7 @@ public class OpponentRangeSetter {
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppBetRange);
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - C");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 12");
             }
         } else if(previousRound.getBotAction().equals("bet75pct") || previousRound.getBotAction().equals("raise")) {
             List<List<Card>> previousStreetOppCallRange = rangeConstructor.getOppPostflopCallRange(
@@ -361,10 +342,10 @@ public class OpponentRangeSetter {
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppDonkBetRange);
             } else {
-                System.out.println("Shouldn't come here, OpponentRangeSetter - E");
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 13");
             }
         } else {
-            System.out.println("Shouldn't come here, OpponentRangeSetter - D");
+            System.out.println("Shouldn't come here, OpponentRangeSetter - 14");
         }
     }
 
