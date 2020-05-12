@@ -133,7 +133,8 @@ public class OpponentRangeSetter {
         if(gameVariables.getOpponentAction().equals("bet75pct")) {
             List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
                     continuousTable.getOppRange(),
-                    equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                    equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                            gameVariables.getBotHoleCards()),
                     equityAction.getOppAggroness(gameVariables.getOpponentName()),
                     equityAction.getOppSizingGroup(gameVariables.getOpponentBetSize()),
                     gameVariables.getBoard(),
@@ -142,7 +143,8 @@ public class OpponentRangeSetter {
         } else if(gameVariables.getOpponentAction().equals("raise")) {
             List<List<Card>> oppRaiseRange = rangeConstructor.getOppPostflopRaiseRange(
                     continuousTable.getOppRange(),
-                    equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                    equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                            gameVariables.getBotHoleCards()),
                     equityAction.getOppAggroness(gameVariables.getOpponentName()),
                     equityAction.getOppSizingGroup(gameVariables.getOpponentBetSize()),
                     gameVariables.getBoard(),
@@ -197,7 +199,8 @@ public class OpponentRangeSetter {
             } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
                 List<List<Card>> oppFlopBetRange = rangeConstructor.getOppPostflopBetRange(
                         oppPreCallRange,
-                        equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
                         equityAction.getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
@@ -212,7 +215,8 @@ public class OpponentRangeSetter {
             if(gameVariables.getOpponentAction().equals("check")) {
                 List<List<Card>> oppFlopCheckRange = rangeConstructor.getOppPostflopCheckRange(
                         continuousTable.getOppRange(),
-                        equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
                         equityAction.getPotSizeGroup(gameVariables.getPot()),
                         gameVariables.getBoard(),
@@ -221,7 +225,8 @@ public class OpponentRangeSetter {
             } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
                 List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
                         continuousTable.getOppRange(),
-                        equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
                         equityAction.getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
@@ -276,7 +281,8 @@ public class OpponentRangeSetter {
             if(previousRound.getBotAction().equals("check")) {
                 List<List<Card>> oppCheckRange = rangeConstructor.getOppPostflopCheckRange(
                         continuousTable.getOppRange(),
-                        equityAction.getAllCombosPostflopEquitySorted(previousBoard, gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
                         equityAction.getPotSizeGroup(previousRound.getPot()),
                         previousBoard,
@@ -285,7 +291,8 @@ public class OpponentRangeSetter {
             } else if(previousRound.getBotAction().equals("bet75pct") || previousRound.getBotAction().equals("raise")) {
                 List<List<Card>> oppCallRange = rangeConstructor.getOppPostflopCallRange(
                         continuousTable.getOppRange(),
-                        equityAction.getAllCombosPostflopEquitySorted(previousBoard, gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppLooseness(gameVariables.getOpponentName()),
                         equityAction.getBotSizingGroup(previousRound.getSizing()),
                         previousBoard,
@@ -303,7 +310,8 @@ public class OpponentRangeSetter {
             if(gameVariables.getOpponentAction().equals("check") || gameVariables.getOpponentAction().equals("call")) {
                 List<List<Card>> oppCheckRange = rangeConstructor.getOppPostflopCheckRange(
                         continuousTable.getOppRange(),
-                        equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
                         equityAction.getPotSizeGroup(gameVariables.getPot()),
                         gameVariables.getBoard(),
@@ -312,7 +320,8 @@ public class OpponentRangeSetter {
             } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
                 List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
                         continuousTable.getOppRange(),
-                        equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
                         equityAction.getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
@@ -324,7 +333,8 @@ public class OpponentRangeSetter {
         } else if(previousRound.getBotAction().equals("bet75pct") || previousRound.getBotAction().equals("raise")) {
             List<List<Card>> previousStreetOppCallRange = rangeConstructor.getOppPostflopCallRange(
                     continuousTable.getOppRange(),
-                    equityAction.getAllCombosPostflopEquitySorted(previousBoard, gameVariables.getBotHoleCards()),
+                    equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
+                            gameVariables.getBotHoleCards()),
                     equityAction.getOppLooseness(gameVariables.getOpponentName()),
                     equityAction.getBotSizingGroup(previousRound.getSizing()),
                     previousBoard,
@@ -335,7 +345,8 @@ public class OpponentRangeSetter {
             } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
                 List<List<Card>> oppDonkBetRange = rangeConstructor.getOppPostflopBetRange(
                         previousStreetOppCallRange,
-                        equityAction.getAllCombosPostflopEquitySorted(gameVariables.getBoard(), gameVariables.getBotHoleCards()),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                                gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
                         equityAction.getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),

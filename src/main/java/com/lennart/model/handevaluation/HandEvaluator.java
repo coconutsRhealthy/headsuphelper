@@ -61,7 +61,7 @@ public class HandEvaluator {
         if(board.size() == 5) {
             hs = myEquity;
         } else {
-            Map<List<Card>, Double> equities = new EquityAction().getAllStarthandsEquitySorted(board);
+            Map<List<Card>, Double> equities = new EquityAction().getHsNewStyleInput(board);
 
             int counter = 0;
             double tenPctEquity = -1;

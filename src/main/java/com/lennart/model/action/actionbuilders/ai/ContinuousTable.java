@@ -44,6 +44,7 @@ public class ContinuousTable implements ContinuousTableable {
     private int botSittingOutCounter = 0;
 
     List<List<Card>> oppRange = null;
+    Map<List<Card>, List<List<Card>>> allCombosPostflopEquitySorted = null;
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -77,6 +78,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 if(isNewHand) {
                     oppRange = null;
+                    allCombosPostflopEquitySorted = null;
 
                     flopHandstrength = -1;
                     turnHandstrength = -1;
@@ -573,5 +575,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setOppRange(List<List<Card>> oppRange) {
         this.oppRange = oppRange;
+    }
+
+    public Map<List<Card>, List<List<Card>>> getAllCombosPostflopEquitySorted() {
+        return allCombosPostflopEquitySorted;
+    }
+
+    public void setAllCombosPostflopEquitySorted(Map<List<Card>, List<List<Card>>> allCombosPostflopEquitySorted) {
+        this.allCombosPostflopEquitySorted = allCombosPostflopEquitySorted;
     }
 }

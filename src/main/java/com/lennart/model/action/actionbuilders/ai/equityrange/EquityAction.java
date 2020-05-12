@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.card.Card;
 import equitycalc.EquityCalculator;
 
@@ -13,14 +14,14 @@ import java.util.stream.Stream;
  */
 public class EquityAction {
 
-    private String getPostflopCheckOrBetAction(List<List<Card>> currentOppRange, String oppName, double sizing,
-                                               List<Card> board, List<Card> botHoleCards) {
+    private String getPostflopCheckOrBetAction(ContinuousTable continuousTable, List<List<Card>> currentOppRange,
+                                               String oppName, double sizing, List<Card> board, List<Card> botHoleCards) {
         String actionToReturn;
 
         String oppLooseness = getOppLooseness(oppName);
         String botSizingGroup = getBotSizingGroup(sizing);
 
-        List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(board, botHoleCards);
+        List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
         List<List<Card>> oppCallingRange = new RangeConstructor().getOppPostflopCallRange(currentOppRange,
                 allCombosPostflopEquitySorted, oppLooseness, botSizingGroup, board, botHoleCards);
@@ -37,15 +38,16 @@ public class EquityAction {
         return actionToReturn;
     }
 
-    private String getPostflopFoldCallOrRaiseAction(List<List<Card>> currentOppRange, String oppName, double oppTotalBetsize,
-                                                    List<Card> board, List<Card> botHoleCards, List<String> eligibleActions,
+    private String getPostflopFoldCallOrRaiseAction(ContinuousTable continuousTable, List<List<Card>> currentOppRange,
+                                                    String oppName, double oppTotalBetsize, List<Card> board,
+                                                    List<Card> botHoleCards, List<String> eligibleActions,
                                                     double botHypotheticalRaiseSizing) {
         String actionToReturn;
 
         String oppAggroness = getOppAggroness(oppName);
         String oppSizingGroup = getOppSizingGroup(oppTotalBetsize);
 
-        List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(board, botHoleCards);
+        List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
         List<List<Card>> oppBetRange = new RangeConstructor().getOppPostflopBetRange(currentOppRange,
                 allCombosPostflopEquitySorted, oppAggroness, oppSizingGroup, board, botHoleCards);
@@ -78,7 +80,17 @@ public class EquityAction {
         return actionToReturn;
     }
 
-    public List<List<Card>> getAllCombosPostflopEquitySorted(List<Card> board, List<Card> botHoleCards) {
+    public List<List<Card>> getAllCombosPostflopEquitySorted(ContinuousTable continuousTable, List<Card> board,
+                                                             List<Card> botHoleCards) {
+        if(continuousTable.getAllCombosPostflopEquitySorted() != null &&
+                continuousTable.getAllCombosPostflopEquitySorted().get(board) != null) {
+            return continuousTable.getAllCombosPostflopEquitySorted().get(board);
+        }
+
+        if(continuousTable.getAllCombosPostflopEquitySorted() == null) {
+            continuousTable.setAllCombosPostflopEquitySorted(new HashMap<>());
+        }
+
         List<List<Card>> allCombos = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream()
                 .collect(Collectors.toList());
 
@@ -86,8 +98,24 @@ public class EquityAction {
                 allCombos, Stream.concat(board.stream(), botHoleCards.stream())
                         .collect(Collectors.toList()));
 
-        return new EquityCalculator().getRangeEquities(allCombosKnownGameCardsRemoved, board).keySet().stream()
+        List<List<Card>> allCombosPostflopEquitySorted = new EquityCalculator().getRangeEquities(
+                allCombosKnownGameCardsRemoved, board).keySet().stream()
                 .collect(Collectors.toList());
+
+        Map<List<Card>, List<List<Card>>> currentAllCombosPostflopEquitySorted =
+                continuousTable.getAllCombosPostflopEquitySorted();
+
+        currentAllCombosPostflopEquitySorted.put(board, allCombosPostflopEquitySorted);
+        continuousTable.setAllCombosPostflopEquitySorted(currentAllCombosPostflopEquitySorted);
+
+        return allCombosPostflopEquitySorted;
+    }
+
+    public Map<List<Card>, Double> getHsNewStyleInput(List<Card> board) {
+        List<List<Card>> allCombos = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
+        List<Card> knownCards = board.stream().collect(Collectors.toList());
+        allCombos = RangeConstructor.removeCombosWithKnownCards(allCombos, knownCards);
+        return sortByValueHighToLow(new EquityCalculator().getRangeEquities(allCombos, board));
     }
 
     public double getAverageEquityOfOppRangeWithoutEquityMap(List<List<Card>> oppRange, List<Card> board) {
@@ -129,13 +157,6 @@ public class EquityAction {
         }
 
         return average;
-    }
-
-    public Map<List<Card>, Double> getAllStarthandsEquitySorted(List<Card> board) {
-        List<List<Card>> allCombos = ActionBuilderUtil.getAllPossibleStartHandsAsList().values().stream().collect(Collectors.toList());
-        List<Card> knownCards = board.stream().collect(Collectors.toList());
-        allCombos = RangeConstructor.removeCombosWithKnownCards(allCombos, knownCards);
-        return sortByValueHighToLow(new EquityCalculator().getRangeEquities(allCombos, board));
     }
 
     public String getOppPreCall2betGroup(String oppName) {
