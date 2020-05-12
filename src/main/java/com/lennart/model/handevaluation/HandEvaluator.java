@@ -57,11 +57,12 @@ public class HandEvaluator {
         double hs;
 
         double myEquity = new EquityCalculator().getComboEquity(holeCards, board);
-        Map<List<Card>, Double> equities = new EquityAction().getAllStarthandsEquitySorted(board);
 
         if(board.size() == 5) {
             hs = myEquity;
         } else {
+            Map<List<Card>, Double> equities = new EquityAction().getAllStarthandsEquitySorted(board);
+
             int counter = 0;
             double tenPctEquity = -1;
 
