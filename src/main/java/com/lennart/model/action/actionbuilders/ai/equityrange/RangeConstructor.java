@@ -36,7 +36,7 @@ public class RangeConstructor {
     }
 
     private void testMethod() {
-        Map<List<Card>, Double> allSortedPfEquityCombos = new PreflopEuityHs().getAllPreflopCombosEquitySortedMap();
+        Map<List<Card>, Double> allSortedPfEquityCombos = new PreflopEquityHs().getAllPreflopCombosEquitySortedMap();
         List<List<Card>> startingRange = allSortedPfEquityCombos.keySet().stream().collect(Collectors.toList());
 
         List<Card> botHoleCards = Arrays.asList(new Card(3, 's'), new Card(3, 'c'));

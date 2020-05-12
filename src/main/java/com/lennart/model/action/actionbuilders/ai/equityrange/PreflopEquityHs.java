@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 /**
  * Created by LennartMac on 25/04/2020.
  */
-public class PreflopEuityHs {
+public class PreflopEquityHs {
 
     public List<List<Card>> getAllSortedPfEquityCombos() {
         Map<List<Card>, Double> allSortedPfEquityCombos = getAllPreflopCombosEquitySortedMap();
