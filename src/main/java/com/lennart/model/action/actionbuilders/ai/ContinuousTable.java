@@ -43,6 +43,8 @@ public class ContinuousTable implements ContinuousTableable {
 
     private int botSittingOutCounter = 0;
 
+    List<List<Card>> oppRange = null;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -74,6 +76,8 @@ public class ContinuousTable implements ContinuousTableable {
                 boolean isNewHand = isNewHand();
 
                 if(isNewHand) {
+                    oppRange = null;
+
                     flopHandstrength = -1;
                     turnHandstrength = -1;
 
@@ -561,5 +565,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setTurnHandstrength(double turnHandstrength) {
         this.turnHandstrength = turnHandstrength;
+    }
+
+    public List<List<Card>> getOppRange() {
+        return oppRange;
+    }
+
+    public void setOppRange(List<List<Card>> oppRange) {
+        this.oppRange = oppRange;
     }
 }
