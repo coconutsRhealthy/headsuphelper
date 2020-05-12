@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * Created by LennartMac on 08/05/2020.
  */
-public class EquityAction2 {
+public class EquityAction {
 
     private String getPostflopCheckOrBetAction(List<List<Card>> currentOppRange, String oppName, double sizing,
                                                List<Card> board, List<Card> botHoleCards) {
