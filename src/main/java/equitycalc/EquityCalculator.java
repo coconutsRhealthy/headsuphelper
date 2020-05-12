@@ -6,6 +6,7 @@ import equitycalc.simulation.*;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class EquityCalculator implements SimulationNotifiable {
 
@@ -51,8 +52,30 @@ public class EquityCalculator implements SimulationNotifiable {
         return equities.entrySet().iterator().next().getValue();
     }
 
+    public double getAverageRangeEquity(List<List<com.lennart.model.card.Card>> range,
+                                        List<com.lennart.model.card.Card> board) {
+        fillRangeMap(range, board);
+        List<Double> values = equities.values().stream().collect(Collectors.toList());
+
+        double total = 0;
+        double counter = 0;
+
+        for(double d : values) {
+            total = total + d;
+            counter++;
+        }
+
+        return total / counter;
+    }
+
     public Map<List<com.lennart.model.card.Card>, Double> getRangeEquities(List<List<com.lennart.model.card.Card>> range,
                                                                            List<com.lennart.model.card.Card> board) {
+        fillRangeMap(range, board);
+        return sortByValueHighToLow(equities);
+    }
+
+    private void fillRangeMap(List<List<com.lennart.model.card.Card>> range,
+                              List<com.lennart.model.card.Card> board) {
         Map<String, List<com.lennart.model.card.Card>> izoFlopTurnRiver = convertIzoBoardToFlopTurnRiver(board);
 
         Card[] _flopCards = null;
@@ -89,8 +112,6 @@ public class EquityCalculator implements SimulationNotifiable {
         } catch (Exception e) {
 
         }
-
-        return sortByValueHighToLow(equities);
     }
 
     private Map<String, List<com.lennart.model.card.Card>> convertIzoBoardToFlopTurnRiver(List<com.lennart.model.card.Card> board) {
