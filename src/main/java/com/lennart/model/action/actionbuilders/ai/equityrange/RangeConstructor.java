@@ -83,7 +83,7 @@ public class RangeConstructor {
         return oppPre2betRange;
     }
 
-    public List<List<Card>> getOppPreCheckRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+    public List<List<Card>> getOppPreCheckAgainstLimpRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
         List<List<Card>> oppPreCheckRange = new ArrayList<>();
 
         if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
@@ -118,7 +118,60 @@ public class RangeConstructor {
             }
         }
 
+        oppPreCheckRange = removeCombosWithKnownCards(oppPreCheckRange, botHoleCards);
         return oppPreCheckRange;
+    }
+
+    public List<List<Card>> getOppPreRaiseAgainstLimpRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+        List<List<Card>> oppPreRaiseAgainstLimpRange = new ArrayList<>();
+
+        if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.41) {
+                    oppPreRaiseAgainstLimpRange.add(allSortedPfEquityCombos.get(i));
+                } else {
+                    List<List<Card>> extraCombos = allSortedPfEquityCombos.stream().filter(combo -> {
+                        boolean suitedConnector = comboIsSuitedConnector(combo, 1) || comboIsSuitedConnector(combo, 2)
+                                || comboIsSuitedConnector(combo, 3);
+
+                        return suitedConnector;
+                    }).collect(Collectors.toList());
+
+                    oppPreRaiseAgainstLimpRange.addAll(extraCombos);
+                    oppPreRaiseAgainstLimpRange = filterOutDoubleCombos(oppPreRaiseAgainstLimpRange);
+                }
+            }
+        } else if(pre2betGroup.equals("low")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.27) {
+                    oppPreRaiseAgainstLimpRange.add(allSortedPfEquityCombos.get(i));
+                } else {
+                    List<List<Card>> extraCombos = allSortedPfEquityCombos.stream().filter(combo -> {
+                        boolean suitedConnector = comboIsSuitedConnector(combo, 1);
+                        return suitedConnector && combo.get(0).getRank() >= 4 && combo.get(1).getRank() >= 4;
+                    }).collect(Collectors.toList());
+
+                    oppPreRaiseAgainstLimpRange.addAll(extraCombos);
+                    oppPreRaiseAgainstLimpRange = filterOutDoubleCombos(oppPreRaiseAgainstLimpRange);
+                }
+            }
+        } else if(pre2betGroup.equals("high")) {
+            for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
+                if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.56) {
+                    oppPreRaiseAgainstLimpRange.add(allSortedPfEquityCombos.get(i));
+                } else {
+                    List<List<Card>> suitedCombos = allSortedPfEquityCombos.stream()
+                            .filter(combo -> combo.get(0).getSuit() == combo.get(1).getSuit())
+                            .collect(Collectors.toList());
+
+                    oppPreRaiseAgainstLimpRange.addAll(suitedCombos);
+                    oppPreRaiseAgainstLimpRange = filterOutDoubleCombos(oppPreRaiseAgainstLimpRange);
+                }
+            }
+        }
+
+        oppPreRaiseAgainstLimpRange = removeCombosWithKnownCards(oppPreRaiseAgainstLimpRange, botHoleCards);
+        return oppPreRaiseAgainstLimpRange;
     }
 
     public List<List<Card>> getOppPre2betRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {

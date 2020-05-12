@@ -49,9 +49,11 @@ public class OpponentRangeSetter {
             String oppRaiseType = determineOppPreflopRaiseType();
 
             if(oppRaiseType.equals("2bet")) {
-                //dit betekent dat jij als bot gelimped hebt
-                //todo: limp
-
+                List<List<Card>> oppPreRaiseAgainstLimpRange = rangeConstructor.getOppPreRaiseAgainstLimpRange(
+                        preflopEquityHs.getAllSortedPfEquityCombos(),
+                        equityAction.getOppPre2betGroup(gameVariables.getOpponentName()),
+                        gameVariables.getBotHoleCards());
+                continuousTable.setOppRange(oppPreRaiseAgainstLimpRange);
             } else if(oppRaiseType.equals("3bet")) {
                 List<List<Card>> oppPre3betRange = rangeConstructor.getOppPre3betRange(
                         preflopEquityHs.getAllSortedPfEquityCombos(),
@@ -210,11 +212,22 @@ public class OpponentRangeSetter {
                 System.out.println("Shouldn't come here, OpponentRangeSetter - 6");
             }
         } else if(previousRound.getBotAction().equals("call")) {
-            //Todo: bot limp
+            List<List<Card>> rangeToUse;
+
+            if(previousRound.getOppAction().equals("bet")) {
+                List<List<Card>> oppPreCheckAgainstLimpRange = rangeConstructor.getOppPreCheckAgainstLimpRange(
+                        preflopEquityHs.getAllSortedPfEquityCombos(),
+                        equityAction.getOppPre2betGroup(gameVariables.getOpponentName()),
+                        gameVariables.getBotHoleCards());
+
+                rangeToUse = oppPreCheckAgainstLimpRange;
+            } else {
+                rangeToUse = continuousTable.getOppRange();
+            }
 
             if(gameVariables.getOpponentAction().equals("check")) {
                 List<List<Card>> oppFlopCheckRange = rangeConstructor.getOppPostflopCheckRange(
-                        continuousTable.getOppRange(),
+                        rangeToUse,
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
@@ -224,7 +237,7 @@ public class OpponentRangeSetter {
                 continuousTable.setOppRange(oppFlopCheckRange);
             } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
                 List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
-                        continuousTable.getOppRange(),
+                        rangeToUse,
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         equityAction.getOppAggroness(gameVariables.getOpponentName()),
