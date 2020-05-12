@@ -752,6 +752,10 @@ public class Analysis {
     public List<Card> convertCardStringToCardList(String board) {
         List<Card> boardCardList = new ArrayList<>();
 
+        if(board.equals("")) {
+            return boardCardList;
+        }
+
         String boardCopy = board;
         String boardCopy2 = board;
 
