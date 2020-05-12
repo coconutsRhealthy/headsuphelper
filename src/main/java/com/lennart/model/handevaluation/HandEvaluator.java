@@ -1,6 +1,6 @@
 package com.lennart.model.handevaluation;
 
-import com.lennart.model.action.actionbuilders.ai.equityrange.EquityAction;
+import com.lennart.model.action.actionbuilders.ai.equityrange.EquityAction2;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
@@ -61,7 +61,7 @@ public class HandEvaluator {
         if(board.size() == 5) {
             hs = myEquity;
         } else {
-            Map<List<Card>, Double> equities = new EquityAction().getAllStarthandsEquitySorted(board);
+            Map<List<Card>, Double> equities = new EquityAction2().getAllStarthandsEquitySorted(board);
 
             int counter = 0;
             double tenPctEquity = -1;

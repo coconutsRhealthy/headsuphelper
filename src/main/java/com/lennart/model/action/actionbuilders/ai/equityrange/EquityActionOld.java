@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Created by LennartMac on 20/04/2020.
  */
-public class EquityAction {
+public class EquityActionOld {
 
     //ook nog preflop
 

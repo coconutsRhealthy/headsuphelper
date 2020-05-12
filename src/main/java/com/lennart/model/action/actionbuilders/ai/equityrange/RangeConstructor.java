@@ -49,7 +49,7 @@ public class RangeConstructor {
         List<List<Card>> allPostflopCombosEquitySorted = postflopEquityMap.keySet().stream().collect(Collectors.toList());
 
         List<List<Card>> range = getOppPostflopRaiseRange(startingRange, allPostflopCombosEquitySorted, "high", "medium", board, botHoleCards);
-        System.out.println(new EquityAction().getAverageEquityOfRangeWithEquityMap(postflopEquityMap, range));
+        System.out.println(new EquityAction2().getAverageEquityOfRangeWithEquityMap(postflopEquityMap, range));
     }
 
     public List<List<Card>> getOppPreLimpRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
