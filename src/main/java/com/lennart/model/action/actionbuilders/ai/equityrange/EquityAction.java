@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai.equityrange;
 
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.card.Card;
 import equitycalc.EquityCalculator;
 
@@ -9,10 +10,106 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.lennart.model.action.actionbuilders.ai.equityrange.InputProvider.*;
+
 /**
  * Created by LennartMac on 08/05/2020.
  */
 public class EquityAction {
+
+    private RangeConstructor rangeConstructor;
+    private PreflopEquityHs preflopEquityHs;
+
+    public EquityAction(RangeConstructor rangeConstructor, PreflopEquityHs preflopEquityHs) {
+        this.rangeConstructor = rangeConstructor;
+        this.preflopEquityHs = preflopEquityHs;
+    }
+
+    private String getPreflopFoldCallOrRaiseAction(GameVariables gameVariables, List<String> eligibleActions) {
+        String actionToReturn;
+
+        double botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+
+        String oppPfRaiseType = determineOppPreflopRaiseType();
+
+        List<List<Card>> oppPfRaiseRange = null;
+
+        if(oppPfRaiseType.equals("2bet")) {
+            String oppPre2betGroup = getOppPre2betGroup(gameVariables.getOpponentName());
+
+            if(gameVariables.isBotIsButton()) {
+                oppPfRaiseRange = rangeConstructor.getOppPreRaiseAgainstLimpRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                        oppPre2betGroup, gameVariables.getBotHoleCards());
+            } else {
+                oppPfRaiseRange = rangeConstructor.getOppPre2betRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                        oppPre2betGroup, gameVariables.getBotHoleCards());
+            }
+        } else if(oppPfRaiseType.equals("3bet")) {
+            oppPfRaiseRange = rangeConstructor.getOppPre3betRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                    getOppPre3betGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+        } else if(oppPfRaiseType.equals("4bet_up")) {
+            oppPfRaiseRange = rangeConstructor.getOppPre4betUpRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                    getOppPre4betUpGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+        } else {
+            System.out.println("Shouldn't come here, EquityAction - 1");
+        }
+
+        double oppAveragePfRaiseRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPfRaiseRange, null);
+
+        if(botEquity > oppAveragePfRaiseRangeEquity) {
+            if(eligibleActions.contains("raise")) {
+                String botPfRaiseType = determinBotPreflopRaiseType();
+
+                List<List<Card>> oppPfCallingRange = null;
+
+                if(botPfRaiseType.equals("2bet")) {
+                    oppPfCallingRange = rangeConstructor.getOppPreCall2betRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                            getOppPreCall2betGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+                } else if(botPfRaiseType.equals("3bet")) {
+                    oppPfCallingRange = rangeConstructor.getOppPreCall3betRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                            getOppPreCall3betGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+                } else if(botPfRaiseType.equals("4bet_up")) {
+                    oppPfCallingRange = rangeConstructor.getOppPreCall4betUpRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                            getOppPreCall4betUpGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+                } else {
+                    System.out.println("Shouldn't come here, EquityAction - 2");
+                }
+
+                double oppAveragePfRaiseCallingEquity = new EquityCalculator().getAverageRangeEquity(oppPfCallingRange, null);
+
+                if(botEquity > oppAveragePfRaiseCallingEquity) {
+                    actionToReturn = "raise";
+                } else {
+                    actionToReturn = "call";
+                }
+            } else {
+                actionToReturn = "call";
+            }
+        } else {
+            actionToReturn = "fold";
+        }
+
+        return actionToReturn;
+    }
+
+    private String getPreflopCheckOrRaiseAction(GameVariables gameVariables) {
+        String actionToReturn;
+
+        double botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+
+        List<List<Card>> oppPreLimpRange = rangeConstructor.getOppPreLimpRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                getOppPre2betGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+
+        double oppAveragePfRaiseRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPreLimpRange, null);
+
+        if(botEquity > oppAveragePfRaiseRangeEquity) {
+            actionToReturn = "raise";
+        } else {
+            actionToReturn = "check";
+        }
+
+        return actionToReturn;
+    }
 
     private String getPostflopCheckOrBetAction(ContinuousTable continuousTable, List<List<Card>> currentOppRange,
                                                String oppName, double sizing, List<Card> board, List<Card> botHoleCards) {
@@ -23,7 +120,7 @@ public class EquityAction {
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
-        List<List<Card>> oppCallingRange = new RangeConstructor().getOppPostflopCallRange(currentOppRange,
+        List<List<Card>> oppCallingRange = rangeConstructor.getOppPostflopCallRange(currentOppRange,
                 allCombosPostflopEquitySorted, oppLooseness, botSizingGroup, board, botHoleCards);
 
         double botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
@@ -49,7 +146,7 @@ public class EquityAction {
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
-        List<List<Card>> oppBetRange = new RangeConstructor().getOppPostflopBetRange(currentOppRange,
+        List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(currentOppRange,
                 allCombosPostflopEquitySorted, oppAggroness, oppSizingGroup, board, botHoleCards);
 
         double botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
@@ -60,7 +157,7 @@ public class EquityAction {
                 String oppLooseness = getOppLooseness(oppName);
                 String botSizingGroup = getBotSizingGroup(botHypotheticalRaiseSizing);
 
-                List<List<Card>> oppCallingRaiseRange = new RangeConstructor().getOppPostflopCallRange(oppBetRange,
+                List<List<Card>> oppCallingRaiseRange = rangeConstructor.getOppPostflopCallRange(oppBetRange,
                         allCombosPostflopEquitySorted, oppLooseness, botSizingGroup, board, botHoleCards);
 
                 double oppAverageRaiseCallingEquity = new EquityCalculator().getAverageRangeEquity(oppCallingRaiseRange, board);
@@ -157,50 +254,6 @@ public class EquityAction {
         }
 
         return average;
-    }
-
-    public String getOppPreCall2betGroup(String oppName) {
-        return null;
-    }
-
-    public String getOppPreCall3betGroup(String oppName) {
-        return null;
-    }
-
-    public String getOppPreCall4betUpGroup(String oppName) {
-        return null;
-    }
-
-    public String getOppPre2betGroup(String oppName) {
-        return null;
-    }
-
-    public String getOppPre3betGroup(String oppName) {
-        return null;
-    }
-
-    public String getOppPre4betUpGroup(String oppName) {
-        return null;
-    }
-
-    public String getOppAggroness(String oppName) {
-        return null;
-    }
-
-    public String getOppLooseness(String oppName) {
-        return null;
-    }
-
-    public String getBotSizingGroup(double sizing) {
-        return null;
-    }
-
-    public String getOppSizingGroup(double oppTotalBetsize) {
-        return null;
-    }
-
-    public String getPotSizeGroup(double potSize) {
-        return null;
     }
 
     private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
