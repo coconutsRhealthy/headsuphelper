@@ -166,6 +166,111 @@ public class OppIdentifierPreflopStats {
         closeDbConnection();
     }
 
+    private void migrateRawDataToPreflopStatsCall() throws Exception {
+        int counter = 0;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
+
+        while(rs.next()) {
+            String opponentName = rs.getString("playerName");
+
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery("SELECT * FROM dbstats_raw WHERE opponent_name = '" + opponentName + "' ORDER BY entry ASC;");
+
+            while(rs2.next()) {
+                if(rs2.getString("board").equals("") && rs2.getString("bot_action").equals("raise")) {
+                    Statement st3 = con.createStatement();
+
+                    st3.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET preCallTotal = preCallTotal + 1 WHERE playerName = '" + opponentName + "'");
+
+                    double botPfRaiseSize = rs2.getDouble("sizing");
+
+                    if(rs2.next()) {
+                        if(!rs2.getString("board").equals("")) {
+                            double bigBlind = rs2.getDouble("bigblind");
+                            double botPfRaiseSizeBb = botPfRaiseSize / bigBlind;
+
+                            if(botPfRaiseSizeBb > 1 && botPfRaiseSizeBb <= 3) {
+                                st3.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET pre_call2bet = pre_call2bet + 1 WHERE playerName = '" + opponentName + "'");
+                            } else if(botPfRaiseSizeBb > 3 && botPfRaiseSizeBb <= 10) {
+                                st3.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET pre_call3bet = pre_call3bet + 1 WHERE playerName = '" + opponentName + "'");
+                            } else if(botPfRaiseSizeBb > 10) {
+                                st3.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET pre_call4bet_up = pre_call4bet_up + 1 WHERE playerName = '" + opponentName + "'");
+                            }
+
+                            System.out.println(counter++);
+                        }
+
+                        rs2.previous();
+                    }
+
+                    st3.close();
+                }
+            }
+
+            rs2.close();
+            st2.close();
+
+            System.out.println(".");
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
+    private void migrateRawDataToPreflopStatsCall4betUp() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw ORDER BY entry ASC;");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            counter++;
+
+            if(counter == 1000) {
+                System.out.println(rs.getRow());
+                counter = 0;
+            }
+
+            if(rs.getString("board").equals("") && rs.getString("bot_action").equals("raise")) {
+                double botPfRaiseSize = rs.getDouble("sizing");
+                double bigBlind = rs.getDouble("bigblind");
+                double botStack = rs.getDouble("botstack");
+                double oppStack = rs.getDouble("opponentstack");
+
+                double botPfRaiseSizeBb = botPfRaiseSize / bigBlind;
+                double botStackBb = botStack / bigBlind;
+                double oppStackBb = oppStack / bigBlind;
+
+                if(botPfRaiseSizeBb > 10 && botStackBb > 10 && oppStackBb > 10) {
+                    if(rs.getString("showdown_occured").equals("true")) {
+                        String opponentName = rs.getString("opponent_name");
+
+                        Statement st2 = con.createStatement();
+
+                        st2.executeUpdate("UPDATE opponentidentifier_2_0_preflopstats SET pre_call4bet_up = pre_call4bet_up + 1 WHERE playerName = '" + opponentName + "'");
+
+                        st2.close();
+
+                        System.out.println("done: " + rs.getRow());
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+    }
+
     private void printCountsFromDbStatsRaw(String opponentName) throws Exception {
         double oppTotalCount = 0;
         double opp2betCount = 0;
