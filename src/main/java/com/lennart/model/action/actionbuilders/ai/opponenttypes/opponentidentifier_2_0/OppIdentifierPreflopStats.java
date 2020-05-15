@@ -10,12 +10,12 @@ public class OppIdentifierPreflopStats {
 
     private Connection con;
 
-    private static final double PRE_2_BET_33PCT_VALUE = 0.2980769230769231;
-    private static final double PRE_2_BET_66PCT_VALUE = 0.56;
+    private static final double PRE_2_BET_33PCT_VALUE = 0.175;
+    private static final double PRE_2_BET_66PCT_VALUE = 0.4166666666666667;
     private static final double PRE_3_BET_33PCT_VALUE = 0.07692307692307693;
-    private static final double PRE_3_BET_66PCT_VALUE = 0.15789473684210525;
-    private static final double PRE_4_BET_33PCT_VALUE = 0.037037037037037035;
-    private static final double PRE_4_BET_66PCT_VALUE = 0.12903225806451613;
+    private static final double PRE_3_BET_66PCT_VALUE = 0.17307692307692307;
+    private static final double PRE_4_BET_33PCT_VALUE = 0.031496062992125984;
+    private static final double PRE_4_BET_66PCT_VALUE = 0.14814814814814814;
 
     public static void main(String[] args) throws Exception {
         //new OppIdentifierPreflopStats().getOppPreGroupMap("Hentasy");

@@ -115,7 +115,7 @@ public class EquityAction {
                                                String oppName, double sizing, List<Card> board, List<Card> botHoleCards) {
         String actionToReturn;
 
-        String oppLooseness = getOppLooseness(oppName);
+        String oppLooseness = getOppPostLooseness(oppName);
         String botSizingGroup = getBotSizingGroup(sizing);
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
@@ -141,7 +141,7 @@ public class EquityAction {
                                                     double botHypotheticalRaiseSizing) {
         String actionToReturn;
 
-        String oppAggroness = getOppAggroness(oppName);
+        String oppAggroness = getOppPostAggroness(oppName);
         String oppSizingGroup = getOppSizingGroup(oppTotalBetsize);
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
@@ -154,7 +154,7 @@ public class EquityAction {
 
         if(botEquity > oppAverageBettingEquity) {
             if(eligibleActions.contains("raise")) {
-                String oppLooseness = getOppLooseness(oppName);
+                String oppLooseness = getOppPostLooseness(oppName);
                 String botSizingGroup = getBotSizingGroup(botHypotheticalRaiseSizing);
 
                 List<List<Card>> oppCallingRaiseRange = rangeConstructor.getOppPostflopCallRange(oppBetRange,

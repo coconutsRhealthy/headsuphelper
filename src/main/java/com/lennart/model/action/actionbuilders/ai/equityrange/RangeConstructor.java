@@ -1085,20 +1085,6 @@ public class RangeConstructor {
         return asSet.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
     }
 
-    private String determineOppSizingGroup(double oppTotalBetsize) {
-        String oppSizingGroup;
-
-        if(oppTotalBetsize <= 60) {
-            oppSizingGroup = SMALL;
-        } else if(oppTotalBetsize <= 160) {
-            oppSizingGroup = MEDIUM;
-        } else {
-            oppSizingGroup = LARGE;
-        }
-
-        return oppSizingGroup;
-    }
-
     private boolean comboIsSuitedConnector(List<Card> combo, int gapWith) {
         boolean comboIsSuitedConnector = false;
 

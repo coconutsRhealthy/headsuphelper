@@ -139,7 +139,7 @@ public class OpponentRangeSetter {
                     continuousTable.getOppRange(),
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                             gameVariables.getBotHoleCards()),
-                    getOppAggroness(gameVariables.getOpponentName()),
+                    getOppPostAggroness(gameVariables.getOpponentName()),
                     getOppSizingGroup(gameVariables.getOpponentBetSize()),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
@@ -149,7 +149,7 @@ public class OpponentRangeSetter {
                     continuousTable.getOppRange(),
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                             gameVariables.getBotHoleCards()),
-                    getOppAggroness(gameVariables.getOpponentName()),
+                    getOppPostAggroness(gameVariables.getOpponentName()),
                     getOppSizingGroup(gameVariables.getOpponentBetSize()),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
@@ -205,7 +205,7 @@ public class OpponentRangeSetter {
                         oppPreCallRange,
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
-                        getOppAggroness(gameVariables.getOpponentName()),
+                        getOppPostAggroness(gameVariables.getOpponentName()),
                         getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
@@ -232,7 +232,7 @@ public class OpponentRangeSetter {
                         rangeToUse,
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
-                        getOppAggroness(gameVariables.getOpponentName()),
+                        getOppPostAggroness(gameVariables.getOpponentName()),
                         getPotSizeGroup(gameVariables.getPot()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
@@ -242,7 +242,7 @@ public class OpponentRangeSetter {
                         rangeToUse,
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
-                        getOppAggroness(gameVariables.getOpponentName()),
+                        getOppPostAggroness(gameVariables.getOpponentName()),
                         getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
@@ -298,7 +298,7 @@ public class OpponentRangeSetter {
                         continuousTable.getOppRange(),
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
                                 gameVariables.getBotHoleCards()),
-                        getOppAggroness(gameVariables.getOpponentName()),
+                        getOppPostAggroness(gameVariables.getOpponentName()),
                         getPotSizeGroup(previousRound.getPot()),
                         previousBoard,
                         gameVariables.getBotHoleCards());
@@ -308,7 +308,7 @@ public class OpponentRangeSetter {
                         continuousTable.getOppRange(),
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
                                 gameVariables.getBotHoleCards()),
-                        getOppLooseness(gameVariables.getOpponentName()),
+                        getOppPostLooseness(gameVariables.getOpponentName()),
                         getBotSizingGroup(previousRound.getSizing()),
                         previousBoard,
                         gameVariables.getBotHoleCards());
@@ -327,7 +327,7 @@ public class OpponentRangeSetter {
                         continuousTable.getOppRange(),
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
-                        getOppAggroness(gameVariables.getOpponentName()),
+                        getOppPostAggroness(gameVariables.getOpponentName()),
                         getPotSizeGroup(gameVariables.getPot()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
@@ -337,7 +337,7 @@ public class OpponentRangeSetter {
                         continuousTable.getOppRange(),
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
-                        getOppAggroness(gameVariables.getOpponentName()),
+                        getOppPostAggroness(gameVariables.getOpponentName()),
                         getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
@@ -350,7 +350,7 @@ public class OpponentRangeSetter {
                     continuousTable.getOppRange(),
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
                             gameVariables.getBotHoleCards()),
-                    getOppLooseness(gameVariables.getOpponentName()),
+                    getOppPostLooseness(gameVariables.getOpponentName()),
                     getBotSizingGroup(previousRound.getSizing()),
                     previousBoard,
                     gameVariables.getBotHoleCards());
@@ -362,7 +362,7 @@ public class OpponentRangeSetter {
                         previousStreetOppCallRange,
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
-                        getOppAggroness(gameVariables.getOpponentName()),
+                        getOppPostAggroness(gameVariables.getOpponentName()),
                         getOppSizingGroup(gameVariables.getOpponentBetSize()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
