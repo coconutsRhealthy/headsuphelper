@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentif
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by LennartMac on 24/05/2019.
@@ -16,6 +17,14 @@ public class OppIdentifierPreflopStats {
     private static final double PRE_3_BET_66PCT_VALUE = 0.17307692307692307;
     private static final double PRE_4_BET_33PCT_VALUE = 0.031496062992125984;
     private static final double PRE_4_BET_66PCT_VALUE = 0.14814814814814814;
+
+    private static final double PRE_CALL_2_BET_33PCT_VALUE = 0.3333333333333333;
+    private static final double PRE_CALL_2_BET_66PCT_VALUE = 0.5;
+    private static final double PRE_CALL_3_BET_33PCT_VALUE = 0.0;
+    private static final double PRE_CALL_3_BET_66PCT_VALUE = 0.0625;
+    private static final double PRE_CALL_4_BET_33PCT_VALUE = 0.0;
+    private static final double PRE_CALL_4_BET_66PCT_VALUE = 0.041666666666666664;
+
 
     public static void main(String[] args) throws Exception {
         //new OppIdentifierPreflopStats().getOppPreGroupMap("Hentasy");
@@ -100,6 +109,16 @@ public class OppIdentifierPreflopStats {
             oppPreStatsMap.put("pre3bet", pre3betNumber);
             oppPreStatsMap.put("pre4bet_up", pre4bet_up_Number);
             oppPreStatsMap.put("preTotal", preTotal);
+
+            double preCall2betNumber = rs.getDouble("pre2bet");
+            double preCall3betNumber = rs.getDouble("pre3bet");
+            double preCall4bet_up_Number = rs.getDouble("pre4bet_up");
+            double preCallTotal = rs.getDouble("preTotal");
+
+            oppPreStatsMap.put("pre_call2bet", preCall2betNumber);
+            oppPreStatsMap.put("pre_call3bet", preCall3betNumber);
+            oppPreStatsMap.put("pre_call4bet_up", preCall4bet_up_Number);
+            oppPreStatsMap.put("preCallTotal", preCallTotal);
         } else {
             System.out.println("Can't find opponent in opponentidentifier_2_0_preflopstats! Will add to db");
 
@@ -318,6 +337,10 @@ public class OppIdentifierPreflopStats {
         List<Double> allPre3betRatios = new ArrayList<>();
         List<Double> allPre4betRatios = new ArrayList<>();
 
+        List<Double> allPreCall2betRatios = new ArrayList<>();
+        List<Double> allPreCall3betRatios = new ArrayList<>();
+        List<Double> allPreCall4betRatios = new ArrayList<>();
+
         initializeDbConnection();
 
         Statement st = con.createStatement();
@@ -334,6 +357,18 @@ public class OppIdentifierPreflopStats {
                 allPre2betRatios.add(pre2betNumber / preTotal);
                 allPre3betRatios.add(pre3betNumber / preTotal);
                 allPre4betRatios.add(pre4bet_up_Number / preTotal);
+            }
+
+            double preCallTotal = rs.getDouble("preCallTotal");
+
+            if(preCallTotal >= 11) {
+                double preCall2betNumber = rs.getDouble("pre_call2bet");
+                double preCall3betNumber = rs.getDouble("pre_call3bet");
+                double preCall4bet_up_Number = rs.getDouble("pre_call4bet_up");
+
+                allPreCall2betRatios.add(preCall2betNumber / preCallTotal);
+                allPreCall3betRatios.add(preCall3betNumber / preCallTotal);
+                allPreCall4betRatios.add(preCall4bet_up_Number / preCallTotal);
             }
         }
 
@@ -358,6 +393,45 @@ public class OppIdentifierPreflopStats {
         System.out.println("66pct limit 3bet: " + allPre3betRatios.get(twoThirdInt));
         System.out.println("33pct limit 4bet: " + allPre4betRatios.get(oneThirdInt));
         System.out.println("66pct limit 4bet: " + allPre4betRatios.get(twoThirdInt));
+
+        System.out.println();
+
+        Collections.sort(allPreCall2betRatios);
+        Collections.sort(allPreCall3betRatios);
+        Collections.sort(allPreCall4betRatios);
+
+        double oneThirdCall = allPreCall2betRatios.size() * 0.33333;
+        int oneThirdIntCall = (int) oneThirdCall;
+
+        double twoThirdCall = allPreCall2betRatios.size() * 0.66666;
+        int twoThirdIntCall = (int) twoThirdCall;
+
+        if(allPreCall4betRatios.get(twoThirdIntCall) == 0.0) {
+
+
+        }
+
+        System.out.println("33pct limit call_2bet: " + allPreCall2betRatios.get(oneThirdIntCall));
+        System.out.println("66pct limit call_2bet: " + allPreCall2betRatios.get(twoThirdIntCall));
+        System.out.println("33pct limit call_3bet: " + allPreCall3betRatios.get(oneThirdIntCall));
+        System.out.println("66pct limit call_3bet: " + allPreCall3betRatios.get(twoThirdIntCall));
+        System.out.println("33pct limit call_4bet: " + allPreCall4betRatios.get(oneThirdIntCall));
+        System.out.println("66pct limit call_4bet: " + getCall4betTwoThirdLimit(allPreCall4betRatios, twoThirdIntCall));
+    }
+
+    private double getCall4betTwoThirdLimit(List<Double> allPreCall4betRatios, int twoThirdInt) {
+        double valueToReturn;
+
+        double normalTwoThird = allPreCall4betRatios.get(twoThirdInt);
+
+        if(normalTwoThird == 0) {
+            List<Double> preCall4betRatiosAboveZero = allPreCall4betRatios.stream().filter(ratio -> ratio > 0).collect(Collectors.toList());
+            valueToReturn = preCall4betRatiosAboveZero.get((int) (0.4 * preCall4betRatiosAboveZero.size()));
+        } else {
+            valueToReturn = normalTwoThird;
+        }
+
+        return valueToReturn;
     }
 
     private void initializeDbConnection() throws Exception {
