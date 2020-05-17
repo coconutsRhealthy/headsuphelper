@@ -14,22 +14,49 @@ public class InputProvider {
     private static final String LARGE = "large";
 
     public static String getOppPreCall2betGroup(String oppName) {
-        return null;
+        String oppPreCall2betGroup;
+
+        try {
+            oppPreCall2betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("preCall2betGroup");
+        } catch (Exception e) {
+            e.printStackTrace();
+            oppPreCall2betGroup = MEDIUM;
+        }
+
+        return oppPreCall2betGroup;
     }
 
     public static String getOppPreCall3betGroup(String oppName) {
-        return null;
+        String oppPreCall3betGroup;
+
+        try {
+            oppPreCall3betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("preCall3betGroup");
+        } catch (Exception e) {
+            e.printStackTrace();
+            oppPreCall3betGroup = MEDIUM;
+        }
+
+        return oppPreCall3betGroup;
     }
 
     public static String getOppPreCall4betUpGroup(String oppName) {
-        return null;
+        String oppPreCall4betUpGroup;
+
+        try {
+            oppPreCall4betUpGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("preCall4bet_up_group");
+        } catch (Exception e) {
+            e.printStackTrace();
+            oppPreCall4betUpGroup = MEDIUM;
+        }
+
+        return oppPreCall4betUpGroup;
     }
 
     public static String getOppPre2betGroup(String oppName) {
         String oppPre2betGroup;
 
         try {
-            oppPre2betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre2bet");
+            oppPre2betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre2betGroup");
         } catch (Exception e) {
             e.printStackTrace();
             oppPre2betGroup = MEDIUM;
@@ -42,7 +69,7 @@ public class InputProvider {
         String oppPre3betGroup;
 
         try {
-            oppPre3betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre3bet");
+            oppPre3betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre3betGroup");
         } catch (Exception e) {
             e.printStackTrace();
             oppPre3betGroup = MEDIUM;
@@ -55,7 +82,7 @@ public class InputProvider {
         String oppPre4betGroup;
 
         try {
-            oppPre4betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre4bet_up");
+            oppPre4betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre4bet_up_group");
         } catch (Exception e) {
             e.printStackTrace();
             oppPre4betGroup = MEDIUM;

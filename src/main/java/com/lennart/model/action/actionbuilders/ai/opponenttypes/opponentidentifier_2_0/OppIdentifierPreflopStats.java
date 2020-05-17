@@ -42,9 +42,18 @@ public class OppIdentifierPreflopStats {
             double pre4bet_up_Number = oppPreStatsMap.get("pre4bet_up");
             double preTotal = oppPreStatsMap.get("preTotal");
 
+            double preCall2betNumber = oppPreStatsMap.get("pre_call2bet");
+            double preCall3betNumber = oppPreStatsMap.get("pre_call3bet");
+            double preCall4bet_up_Number = oppPreStatsMap.get("pre_call4bet_up");
+            double preCallTotal = oppPreStatsMap.get("preCallTotal");
+
             double pre2betRatio = pre2betNumber / preTotal;
             double pre3betRatio = pre3betNumber / preTotal;
             double pre4bet_up_ratio = pre4bet_up_Number / preTotal;
+
+            double preCall2betRatio = preCall2betNumber / preCallTotal;
+            double preCall3betRatio = preCall3betNumber / preCallTotal;
+            double preCall4betRatio = preCall4bet_up_Number / preCallTotal;
 
             if(preTotal >= 9) {
                 if(pre2betRatio < PRE_2_BET_33PCT_VALUE) {
@@ -70,6 +79,30 @@ public class OppIdentifierPreflopStats {
                 } else {
                     oppPreGroupMap.put("pre4bet_up_group", "high");
                 }
+
+                if(preCall2betRatio < PRE_CALL_2_BET_33PCT_VALUE) {
+                    oppPreGroupMap.put("preCall2betGroup", "low");
+                } else if(preCall2betRatio < PRE_CALL_2_BET_66PCT_VALUE) {
+                    oppPreGroupMap.put("preCall2betGroup", "medium");
+                } else {
+                    oppPreGroupMap.put("preCall2betGroup", "high");
+                }
+
+                if(preCall3betRatio < PRE_CALL_3_BET_33PCT_VALUE) {
+                    oppPreGroupMap.put("preCall3betGroup", "low");
+                } else if(preCall3betRatio < PRE_CALL_3_BET_66PCT_VALUE) {
+                    oppPreGroupMap.put("preCall3betGroup", "medium");
+                } else {
+                    oppPreGroupMap.put("preCall3betGroup", "high");
+                }
+
+                if(preCall4betRatio < PRE_CALL_4_BET_33PCT_VALUE) {
+                    oppPreGroupMap.put("preCall4bet_up_group", "low");
+                } else if(preCall4betRatio < PRE_CALL_4_BET_66PCT_VALUE) {
+                    oppPreGroupMap.put("preCall4bet_up_group", "medium");
+                } else {
+                    oppPreGroupMap.put("preCall4bet_up_group", "high");
+                }
             } else {
                 System.out.println("too few hands preflop for oppPreStatsMap: " + preTotal);
                 System.out.println("put everything as 'medium' because too few hands");
@@ -77,6 +110,10 @@ public class OppIdentifierPreflopStats {
                 oppPreGroupMap.put("pre2betGroup", "medium");
                 oppPreGroupMap.put("pre3betGroup", "mediumUnknown");
                 oppPreGroupMap.put("pre4bet_up_group", "mediumUnknown");
+
+                oppPreGroupMap.put("preCall2betGroup", "medium");
+                oppPreGroupMap.put("preCall3betGroup", "mediumUnknown");
+                oppPreGroupMap.put("preCall4bet_up_group", "mediumUnknown");
             }
 
         } else {
@@ -86,6 +123,10 @@ public class OppIdentifierPreflopStats {
             oppPreGroupMap.put("pre2betGroup", "medium");
             oppPreGroupMap.put("pre3betGroup", "mediumUnknown");
             oppPreGroupMap.put("pre4bet_up_group", "mediumUnknown");
+
+            oppPreGroupMap.put("preCall2betGroup", "medium");
+            oppPreGroupMap.put("preCall3betGroup", "mediumUnknown");
+            oppPreGroupMap.put("preCall4bet_up_group", "mediumUnknown");
         }
 
         return oppPreGroupMap;
