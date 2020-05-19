@@ -35,6 +35,11 @@ public class DbSavePersisterRawData {
 
                 String showdownOccured = showdownOccurred(biglind);
 
+                if(continuousTable.isBotDidPre4bet() && showdownOccured.equals("true")) {
+                    updateOppDidPreCall4betInDb(dbSaveRaw.getOpponentName());
+                    continuousTable.setBotDidPre4bet(false);
+                }
+
                 st.executeUpdate("INSERT INTO dbstats_raw (" +
                     "entry, " +
                     "date, " +
@@ -204,6 +209,16 @@ public class DbSavePersisterRawData {
         java.util.Date date = new java.util.Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return dateFormat.format(date);
+    }
+
+    private void updateOppDidPreCall4betInDb(String opponentName) throws Exception {
+        Statement st = con.createStatement();
+
+        st.executeUpdate(
+                "UPDATE opponentidentifier_2_0_preflopstats SET pre_call4bet_up = pre_call4bet_up + 1" +
+                        " WHERE playerName = '" + opponentName + "'");
+
+        st.close();
     }
 
     private void initializeDbConnection() throws Exception {

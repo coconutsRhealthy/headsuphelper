@@ -12,7 +12,14 @@ public class DbSavePreflopStats extends DbSave {
     private double oppPre2betCount;
     private double oppPre3betCount;
     private double oppPre4bet_up_count;
+
+    private double oppPreCall2betCount;
+    private double oppPreCall3betCount;
+    private double oppPreCall4bet_up_count;
+
     private double oppPreTotalCount;
+    private double oppPreCallTotalCount;
+
     private String opponentName;
 
     public double getPreXbetCountLogic(String opponentAction, List<Card> board, double opponentBetSize, double bigBlind,
@@ -40,6 +47,27 @@ public class DbSavePreflopStats extends DbSave {
         }
 
         return inMethodPreXbetCount;
+    }
+
+    public double getPreXbetCallCountLogic(double previousOppTotalBetsize, double bigBlind, String xBetToCheck) {
+        double inMethodPreCallXbetCount = 0;
+        double botRaiseSizeBb = previousOppTotalBetsize / bigBlind;
+
+        if(xBetToCheck.equals("preCall2bet")) {
+            if(botRaiseSizeBb > 1 && botRaiseSizeBb <= 3) {
+                inMethodPreCallXbetCount = 1;
+            }
+        } else if(xBetToCheck.equals("preCall3bet")) {
+            if(botRaiseSizeBb > 3 && botRaiseSizeBb <= 10) {
+                inMethodPreCallXbetCount = 1;
+            }
+        } else if(xBetToCheck.equals("preCall4bet_up")) {
+            if(botRaiseSizeBb > 10) {
+                inMethodPreCallXbetCount = 1;
+            }
+        }
+
+        return inMethodPreCallXbetCount;
     }
 
     public double getPreTotalCountLogic(String opponentAction, List<Card> board) {
@@ -90,5 +118,37 @@ public class DbSavePreflopStats extends DbSave {
 
     public void setOpponentName(String opponentName) {
         this.opponentName = opponentName;
+    }
+
+    public double getOppPreCall2betCount() {
+        return oppPreCall2betCount;
+    }
+
+    public void setOppPreCall2betCount(double oppPreCall2betCount) {
+        this.oppPreCall2betCount = oppPreCall2betCount;
+    }
+
+    public double getOppPreCall3betCount() {
+        return oppPreCall3betCount;
+    }
+
+    public void setOppPreCall3betCount(double oppPreCall3betCount) {
+        this.oppPreCall3betCount = oppPreCall3betCount;
+    }
+
+    public double getOppPreCall4bet_up_count() {
+        return oppPreCall4bet_up_count;
+    }
+
+    public void setOppPreCall4bet_up_count(double oppPreCall4bet_up_count) {
+        this.oppPreCall4bet_up_count = oppPreCall4bet_up_count;
+    }
+
+    public double getOppPreCallTotalCount() {
+        return oppPreCallTotalCount;
+    }
+
+    public void setOppPreCallTotalCount(double oppPreCallTotalCount) {
+        this.oppPreCallTotalCount = oppPreCallTotalCount;
     }
 }

@@ -688,6 +688,35 @@ public class ActionVariables {
                 dbSavePreflopStats.setOppPreTotalCount(preTotalCount);
 
                 continuousTable.getDbSaveList().add(dbSavePreflopStats);
+
+                if(action.equals("raise")) {
+                    dbSavePreflopStats.setOppPreCallTotalCount(1);
+
+                    if(sizing / gameVariables.getBigBlind() > 10) {
+                        continuousTable.setBotDidPre4bet(true);
+                    }
+                }
+            } else if(boardInMethod.size() == 3) {
+                List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
+                ActionRequest secondLastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
+                PlayerActionRound botLastActionRound = secondLastActionRequest.getMostRecentActionRoundOfPLayer(secondLastActionRequest.getActionsSinceLastRequest(), "bot");
+                List<Card> previousBoard = botLastActionRound.getBoard();
+
+                if(previousBoard.isEmpty() && botLastActionRound.getAction().equals("raise")) {
+                    DbSavePreflopStats dbSavePreflopStats = new DbSavePreflopStats();
+
+                    double preCall2betCount = dbSavePreflopStats.getPreXbetCallCountLogic(
+                            botLastActionRound.getTotalBotBetSize(), gameVariables.getBigBlind(), "preCall2bet");
+                    double preCall3betCount = dbSavePreflopStats.getPreXbetCallCountLogic(
+                            botLastActionRound.getTotalBotBetSize(), gameVariables.getBigBlind(), "preCall3bet");
+                    double preCall4betUpCount = dbSavePreflopStats.getPreXbetCallCountLogic(
+                            botLastActionRound.getTotalBotBetSize(), gameVariables.getBigBlind(), "preCall4bet_up");
+
+                    dbSavePreflopStats.setOpponentName(gameVariables.getOpponentName());
+                    dbSavePreflopStats.setOppPreCall2betCount(preCall2betCount);
+                    dbSavePreflopStats.setOppPreCall3betCount(preCall3betCount);
+                    dbSavePreflopStats.setOppPreCall4bet_up_count(preCall4betUpCount);
+                }
             }
             //DbSavePreflopStats
         }

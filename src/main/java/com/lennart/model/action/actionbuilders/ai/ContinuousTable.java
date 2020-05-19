@@ -43,8 +43,10 @@ public class ContinuousTable implements ContinuousTableable {
 
     private int botSittingOutCounter = 0;
 
-    List<List<Card>> oppRange = null;
-    Map<List<Card>, List<List<Card>>> allCombosPostflopEquitySorted = null;
+    private List<List<Card>> oppRange = null;
+    private Map<List<Card>, List<List<Card>>> allCombosPostflopEquitySorted = null;
+
+    private boolean botDidPre4bet;
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -125,6 +127,8 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
                     //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
+
+                    opponentDidPreflop4betPot = false;
 
                     boolean botWasButtonInLastHand = botWasButtonInLastHand();
                     dbSaveList = new ArrayList<>();
@@ -583,5 +587,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setAllCombosPostflopEquitySorted(Map<List<Card>, List<List<Card>>> allCombosPostflopEquitySorted) {
         this.allCombosPostflopEquitySorted = allCombosPostflopEquitySorted;
+    }
+
+    public boolean isBotDidPre4bet() {
+        return botDidPre4bet;
+    }
+
+    public void setBotDidPre4bet(boolean botDidPre4bet) {
+        this.botDidPre4bet = botDidPre4bet;
     }
 }

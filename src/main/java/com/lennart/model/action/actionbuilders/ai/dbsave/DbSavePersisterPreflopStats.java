@@ -21,6 +21,12 @@ public class DbSavePersisterPreflopStats {
         double totalPre3betCountLastHand = 0;
         double totalPre4bet_up_countLastHand = 0;
         double totalTotalCountLastHand = 0;
+
+        double totalPreCall2betCountLastHand = 0;
+        double totalPreCall3betCountLastHand = 0;
+        double totalPreCall4bet_up_countLastHand = 0;
+        double totalCallTotalCountLastHand = 0;
+
         String opponentName = null;
 
         for(DbSave dbSave : dbSaveList) {
@@ -31,6 +37,11 @@ public class DbSavePersisterPreflopStats {
                 totalPre3betCountLastHand = totalPre3betCountLastHand + dbSavePreflopStats.getOppPre3betCount();
                 totalPre4bet_up_countLastHand = totalPre4bet_up_countLastHand + dbSavePreflopStats.getOppPre4bet_up_count();
                 totalTotalCountLastHand = totalTotalCountLastHand + dbSavePreflopStats.getOppPreTotalCount();
+
+                totalPreCall2betCountLastHand = totalPreCall2betCountLastHand + dbSavePreflopStats.getOppPreCall2betCount();
+                totalPreCall3betCountLastHand = totalPreCall3betCountLastHand + dbSavePreflopStats.getOppPreCall3betCount();
+                totalPreCall4bet_up_countLastHand = totalPreCall4bet_up_countLastHand + dbSavePreflopStats.getOppPreCall4bet_up_count();
+                totalCallTotalCountLastHand = totalCallTotalCountLastHand + dbSavePreflopStats.getOppPreCallTotalCount();
 
                 System.out.println("GGA, lasthand: " + totalTotalCountLastHand);
 
@@ -50,6 +61,10 @@ public class DbSavePersisterPreflopStats {
                             ", pre3bet = pre3bet + " + totalPre3betCountLastHand +
                             ", pre4bet_up = pre4bet_up + " + totalPre4bet_up_countLastHand +
                             ", preTotal = preTotal + " + totalTotalCountLastHand +
+                            ", pre_call2bet = pre_call2bet + " + totalPreCall2betCountLastHand +
+                            ", pre_call3bet = pre_call3bet + " + totalPreCall3betCountLastHand +
+                            ", pre_call4bet_up = pre_call4bet_up + " + totalPreCall4bet_up_countLastHand +
+                            ", preCallTotal = preCallTotal + " + totalCallTotalCountLastHand +
                             " WHERE playerName = '" + opponentName + "'");
 
             st.close();
