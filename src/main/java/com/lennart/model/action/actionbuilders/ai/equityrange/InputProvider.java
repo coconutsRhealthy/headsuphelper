@@ -92,48 +92,58 @@ public class InputProvider {
         return oppPre4betGroup;
     }
 
-    public static String getOppPostAggroness(String oppName) throws Exception {
+    public static String getOppPostAggroness(String oppName) {
         String postAggronessGroup;
 
-        OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
+        try {
+            OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
 
-        if(identifier.getNumberOfHands() >= 10) {
-            double postAggroness = identifier.getOppPostAggroness();
+            if(identifier.getNumberOfHands() >= 10) {
+                double postAggroness = identifier.getOppPostAggroness();
 
-            if(postAggroness < 0) {
-                postAggronessGroup = MEDIUM;
-            } else if(postAggroness < 0.3055555555555556) {
-                postAggronessGroup = LOW;
-            } else if(postAggroness < 0.43902439024390244) {
-                postAggronessGroup = MEDIUM;
+                if(postAggroness < 0) {
+                    postAggronessGroup = MEDIUM;
+                } else if(postAggroness < 0.3055555555555556) {
+                    postAggronessGroup = LOW;
+                } else if(postAggroness < 0.43902439024390244) {
+                    postAggronessGroup = MEDIUM;
+                } else {
+                    postAggronessGroup = HIGH;
+                }
             } else {
-                postAggronessGroup = HIGH;
+                postAggronessGroup = MEDIUM;
             }
-        } else {
+        } catch (Exception e) {
+            e.printStackTrace();
             postAggronessGroup = MEDIUM;
         }
 
         return postAggronessGroup;
     }
 
-    public static String getOppPostLooseness(String oppName) throws Exception {
+    public static String getOppPostLooseness(String oppName) {
         String postLoosenessGroup;
 
-        OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
+        try {
+            OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
 
-        if(identifier.getNumberOfHands() >= 10) {
-            double postLooseness = identifier.getOppPostLooseness();
+            if(identifier.getNumberOfHands() >= 10) {
+                double postLooseness = identifier.getOppPostLooseness();
 
-            if(postLooseness < 0) {
-                postLoosenessGroup = MEDIUM;
-            } else if(postLooseness < 0.4) {
-                postLoosenessGroup = LOW;
-            } else if(postLooseness < 0.5652173913043478) {
-                postLoosenessGroup = MEDIUM;
+                if(postLooseness < 0) {
+                    postLoosenessGroup = MEDIUM;
+                } else if(postLooseness < 0.4) {
+                    postLoosenessGroup = LOW;
+                } else if(postLooseness < 0.5652173913043478) {
+                    postLoosenessGroup = MEDIUM;
+                } else {
+                    postLoosenessGroup = HIGH;
+                }
             } else {
-                postLoosenessGroup = HIGH;
+                postLoosenessGroup = MEDIUM;
             }
-        } else {
+        } catch (Exception e) {
+            e.printStackTrace();
             postLoosenessGroup = MEDIUM;
         }
 
