@@ -143,6 +143,7 @@ public class OpponentIdentifier2_0 {
         List<Double> allOppPostRaiseStats = new ArrayList<>();
         List<Double> allOppPostBetStats = new ArrayList<>();
         List<Double> allOppPostLoosenessStats = new ArrayList<>();
+        List<Double> allOppPostAggressivenessStats = new ArrayList<>();
 
         List<Double> allOppLoosenessStats = new ArrayList<>();
         List<Double> allOppAggressivenessStats = new ArrayList<>();
@@ -166,6 +167,7 @@ public class OpponentIdentifier2_0 {
                     allOppPostRaiseStats.add(getOpponentPostRaise(opponentData));
                     allOppPostBetStats.add(getOpponentPostBet(opponentData));
                     allOppPostLoosenessStats.add(getOpponentPostLooseness(opponentData));
+                    allOppPostAggressivenessStats.add(getOppPostAggressiveness(opponentData));
 
                     allOppLoosenessStats.add(getOppLooseness(opponentData));
                     allOppAggressivenessStats.add(getOppAggressiveness(opponentData));
@@ -180,6 +182,7 @@ public class OpponentIdentifier2_0 {
         Collections.sort(allOppPostRaiseStats);
         Collections.sort(allOppPostBetStats);
         Collections.sort(allOppPostLoosenessStats);
+        Collections.sort(allOppPostAggressivenessStats);
 
         Collections.sort(allOppLoosenessStats);
         Collections.sort(allOppAggressivenessStats);
@@ -192,6 +195,11 @@ public class OpponentIdentifier2_0 {
 
         System.out.println("overallLooseness: " + allOppLoosenessStats.get(allOppLoosenessStats.size() / 2));
         System.out.println("overallAggressiveness: " + allOppAggressivenessStats.get(allOppAggressivenessStats.size() / 2));
+
+        System.out.println("** postAggro 1/3th: " + allOppAggressivenessStats.get((allOppAggressivenessStats.size() / 3)));
+        System.out.println("** postAggro 2/3th: " + allOppAggressivenessStats.get((allOppAggressivenessStats.size() / 3) * 2));
+        System.out.println("** postLooseness 1/3th: " + allOppPostLoosenessStats.get((allOppPostLoosenessStats.size() / 3)));
+        System.out.println("** postLooseness 2/3th: " + allOppPostLoosenessStats.get((allOppPostLoosenessStats.size() / 3) * 2));
     }
 
     public List<Double> getOpponentLoosenessAndAggroness(String opponentName, boolean preflop) throws Exception {

@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OppIdentifierPreflopStats;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 
 /**
  * Created by LennartMac on 13/05/2020.
@@ -91,12 +92,52 @@ public class InputProvider {
         return oppPre4betGroup;
     }
 
-    public static String getOppPostAggroness(String oppName) {
-        return null;
+    public static String getOppPostAggroness(String oppName) throws Exception {
+        String postAggronessGroup;
+
+        OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
+
+        if(identifier.getNumberOfHands() >= 10) {
+            double postAggroness = identifier.getOppPostAggroness();
+
+            if(postAggroness < 0) {
+                postAggronessGroup = MEDIUM;
+            } else if(postAggroness < 0.3055555555555556) {
+                postAggronessGroup = LOW;
+            } else if(postAggroness < 0.43902439024390244) {
+                postAggronessGroup = MEDIUM;
+            } else {
+                postAggronessGroup = HIGH;
+            }
+        } else {
+            postAggronessGroup = MEDIUM;
+        }
+
+        return postAggronessGroup;
     }
 
-    public static String getOppPostLooseness(String oppName) {
-        return null;
+    public static String getOppPostLooseness(String oppName) throws Exception {
+        String postLoosenessGroup;
+
+        OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
+
+        if(identifier.getNumberOfHands() >= 10) {
+            double postLooseness = identifier.getOppPostLooseness();
+
+            if(postLooseness < 0) {
+                postLoosenessGroup = MEDIUM;
+            } else if(postLooseness < 0.4) {
+                postLoosenessGroup = LOW;
+            } else if(postLooseness < 0.5652173913043478) {
+                postLoosenessGroup = MEDIUM;
+            } else {
+                postLoosenessGroup = HIGH;
+            }
+        } else {
+            postLoosenessGroup = MEDIUM;
+        }
+
+        return postLoosenessGroup;
     }
 
     public static String getBotSizingGroup(double sizing) {
