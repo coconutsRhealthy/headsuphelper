@@ -687,8 +687,6 @@ public class ActionVariables {
                 dbSavePreflopStats.setOppPre4bet_up_count(pre4bet_up_count);
                 dbSavePreflopStats.setOppPreTotalCount(preTotalCount);
 
-                continuousTable.getDbSaveList().add(dbSavePreflopStats);
-
                 if(action.equals("raise")) {
                     dbSavePreflopStats.setOppPreCallTotalCount(1);
 
@@ -696,6 +694,8 @@ public class ActionVariables {
                         continuousTable.setBotDidPre4bet(true);
                     }
                 }
+
+                continuousTable.getDbSaveList().add(dbSavePreflopStats);
             } else if(boardInMethod.size() == 3) {
                 List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
                 ActionRequest secondLastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
@@ -716,6 +716,8 @@ public class ActionVariables {
                     dbSavePreflopStats.setOppPreCall2betCount(preCall2betCount);
                     dbSavePreflopStats.setOppPreCall3betCount(preCall3betCount);
                     dbSavePreflopStats.setOppPreCall4bet_up_count(preCall4betUpCount);
+
+                    continuousTable.getDbSaveList().add(dbSavePreflopStats);
                 }
             }
             //DbSavePreflopStats

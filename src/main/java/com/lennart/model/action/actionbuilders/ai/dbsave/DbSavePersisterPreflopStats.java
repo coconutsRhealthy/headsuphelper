@@ -51,7 +51,9 @@ public class DbSavePersisterPreflopStats {
             }
         }
 
-        if(totalTotalCountLastHand > 0 || totalPre2betCountLastHand > 0 || totalPre3betCountLastHand > 0 || totalPre4bet_up_countLastHand > 0) {
+        if(totalTotalCountLastHand > 0 || totalPre2betCountLastHand > 0 || totalPre3betCountLastHand > 0 || totalPre4bet_up_countLastHand > 0
+                || totalCallTotalCountLastHand > 0 || totalPreCall2betCountLastHand > 0
+                || totalPreCall3betCountLastHand > 0 || totalPreCall4bet_up_countLastHand > 0) {
             addOpponentToDbIfNecessary(opponentName);
 
             Statement st = con.createStatement();

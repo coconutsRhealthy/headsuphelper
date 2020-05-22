@@ -212,6 +212,7 @@ public class DbSavePersisterRawData {
     }
 
     private void updateOppDidPreCall4betInDb(String opponentName) throws Exception {
+        initializeDbConnection();
         Statement st = con.createStatement();
 
         st.executeUpdate(
@@ -219,6 +220,7 @@ public class DbSavePersisterRawData {
                         " WHERE playerName = '" + opponentName + "'");
 
         st.close();
+        closeDbConnection();
     }
 
     private void initializeDbConnection() throws Exception {
