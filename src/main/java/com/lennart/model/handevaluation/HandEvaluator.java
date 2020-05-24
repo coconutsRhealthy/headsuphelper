@@ -1,8 +1,7 @@
 package com.lennart.model.handevaluation;
 
 import com.lennart.model.action.actionbuilders.ai.equityrange.EquityAction;
-import com.lennart.model.action.actionbuilders.ai.equityrange.PreflopEquityHs;
-import com.lennart.model.action.actionbuilders.ai.equityrange.RangeConstructor;
+import com.lennart.model.action.actionbuilders.ai.equityrange.InputProvider;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.HighCardDrawEvaluator;
@@ -63,7 +62,7 @@ public class HandEvaluator {
         if(board.size() == 5) {
             hs = myEquity;
         } else {
-            Map<List<Card>, Double> equities = new EquityAction(new RangeConstructor(), new PreflopEquityHs())
+            Map<List<Card>, Double> equities = new EquityAction(new InputProvider())
                     .getHsNewStyleInput(board);
 
             int counter = 0;

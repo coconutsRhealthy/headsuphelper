@@ -3,6 +3,8 @@ package com.lennart.model.action.actionbuilders.ai.equityrange;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OppIdentifierPreflopStats;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 
+import java.util.Map;
+
 /**
  * Created by LennartMac on 13/05/2020.
  */
@@ -14,11 +16,19 @@ public class InputProvider {
     private static final String SMALL = "small";
     private static final String LARGE = "large";
 
-    public static String getOppPreCall2betGroup(String oppName) {
+    private Map<String, String> oppPreGroupMap = null;
+    private OpponentIdentifier2_0 opponentIdentifier2_0;
+
+
+    public String getOppPreCall2betGroup(String oppName) {
         String oppPreCall2betGroup;
 
         try {
-            oppPreCall2betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("preCall2betGroup");
+            if(oppPreGroupMap == null) {
+                oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+            }
+
+            oppPreCall2betGroup = oppPreGroupMap.get("preCall2betGroup");
         } catch (Exception e) {
             e.printStackTrace();
             oppPreCall2betGroup = MEDIUM;
@@ -27,11 +37,15 @@ public class InputProvider {
         return oppPreCall2betGroup;
     }
 
-    public static String getOppPreCall3betGroup(String oppName) {
+    public String getOppPreCall3betGroup(String oppName) {
         String oppPreCall3betGroup;
 
         try {
-            oppPreCall3betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("preCall3betGroup");
+            if(oppPreGroupMap == null) {
+                oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+            }
+
+            oppPreCall3betGroup = oppPreGroupMap.get("preCall3betGroup");
         } catch (Exception e) {
             e.printStackTrace();
             oppPreCall3betGroup = MEDIUM;
@@ -40,11 +54,15 @@ public class InputProvider {
         return oppPreCall3betGroup;
     }
 
-    public static String getOppPreCall4betUpGroup(String oppName) {
+    public String getOppPreCall4betUpGroup(String oppName) {
         String oppPreCall4betUpGroup;
 
         try {
-            oppPreCall4betUpGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("preCall4bet_up_group");
+            if(oppPreGroupMap == null) {
+                oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+            }
+
+            oppPreCall4betUpGroup = oppPreGroupMap.get("preCall4bet_up_group");
         } catch (Exception e) {
             e.printStackTrace();
             oppPreCall4betUpGroup = MEDIUM;
@@ -53,11 +71,15 @@ public class InputProvider {
         return oppPreCall4betUpGroup;
     }
 
-    public static String getOppPre2betGroup(String oppName) {
+    public String getOppPre2betGroup(String oppName) {
         String oppPre2betGroup;
 
         try {
-            oppPre2betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre2betGroup");
+            if(oppPreGroupMap == null) {
+                oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+            }
+
+            oppPre2betGroup = oppPreGroupMap.get("pre2betGroup");
         } catch (Exception e) {
             e.printStackTrace();
             oppPre2betGroup = MEDIUM;
@@ -66,11 +88,15 @@ public class InputProvider {
         return oppPre2betGroup;
     }
 
-    public static String getOppPre3betGroup(String oppName) {
+    public String getOppPre3betGroup(String oppName) {
         String oppPre3betGroup;
 
         try {
-            oppPre3betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre3betGroup");
+            if(oppPreGroupMap == null) {
+                oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+            }
+
+            oppPre3betGroup = oppPreGroupMap.get("pre3betGroup");
         } catch (Exception e) {
             e.printStackTrace();
             oppPre3betGroup = MEDIUM;
@@ -79,11 +105,15 @@ public class InputProvider {
         return oppPre3betGroup;
     }
 
-    public static String getOppPre4betUpGroup(String oppName) {
+    public String getOppPre4betUpGroup(String oppName) {
         String oppPre4betGroup;
 
         try {
-            oppPre4betGroup = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName).get("pre4bet_up_group");
+            if(oppPreGroupMap == null) {
+                oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(oppName);
+            }
+
+            oppPre4betGroup = oppPreGroupMap.get("pre4bet_up_group");
         } catch (Exception e) {
             e.printStackTrace();
             oppPre4betGroup = MEDIUM;
@@ -92,14 +122,16 @@ public class InputProvider {
         return oppPre4betGroup;
     }
 
-    public static String getOppPostAggroness(String oppName) {
+    public String getOppPostAggroness(String oppName) {
         String postAggronessGroup;
 
         try {
-            OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
+            if(opponentIdentifier2_0 == null) {
+                opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
+            }
 
-            if(identifier.getNumberOfHands() >= 10) {
-                double postAggroness = identifier.getOppPostAggroness();
+            if(opponentIdentifier2_0.getNumberOfHands() >= 10) {
+                double postAggroness = opponentIdentifier2_0.getOppPostAggroness();
 
                 if(postAggroness < 0) {
                     postAggronessGroup = MEDIUM;
@@ -121,14 +153,16 @@ public class InputProvider {
         return postAggronessGroup;
     }
 
-    public static String getOppPostLooseness(String oppName) {
+    public String getOppPostLooseness(String oppName) {
         String postLoosenessGroup;
 
         try {
-            OpponentIdentifier2_0 identifier = new OpponentIdentifier2_0(oppName);
+            if(opponentIdentifier2_0 == null) {
+                opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
+            }
 
-            if(identifier.getNumberOfHands() >= 10) {
-                double postLooseness = identifier.getOppPostLooseness();
+            if(opponentIdentifier2_0.getNumberOfHands() >= 10) {
+                double postLooseness = opponentIdentifier2_0.getOppPostLooseness();
 
                 if(postLooseness < 0) {
                     postLoosenessGroup = MEDIUM;
@@ -150,11 +184,11 @@ public class InputProvider {
         return postLoosenessGroup;
     }
 
-    public static String getBotSizingGroup(double sizing) {
+    public String getBotSizingGroup(double sizing) {
         return getOppSizingGroup(sizing);
     }
 
-    public static String getOppSizingGroup(double oppTotalBetsize) {
+    public String getOppSizingGroup(double oppTotalBetsize) {
         String oppSizingGroup;
 
         if(oppTotalBetsize <= 60) {
@@ -168,7 +202,7 @@ public class InputProvider {
         return oppSizingGroup;
     }
 
-    public static String getPotSizeGroup(double potSize) {
+    public String getPotSizeGroup(double potSize) {
         String potSizeGroup;
 
         if(potSize < 90) {
@@ -182,11 +216,11 @@ public class InputProvider {
         return potSizeGroup;
     }
 
-    public static String determinBotPreflopRaiseType() {
+    public String determinBotPreflopRaiseType() {
         return null;
     }
 
-    public static String determineOppPreflopRaiseType() {
+    public String determineOppPreflopRaiseType() {
         return null;
     }
 }
