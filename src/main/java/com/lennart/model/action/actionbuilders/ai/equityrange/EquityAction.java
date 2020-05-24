@@ -177,6 +177,57 @@ public class EquityAction {
         return actionToReturn;
     }
 
+    private String getBluffAction(String currentAction, double botEquity, double oppAvCallRangeEquity,
+                                List<Card> oppCurrentRange, List<Card> oppCallRange, List<Card> oppRaiseRange, List<Card> board) {
+        String actionToReturn;
+
+        if(currentAction.equals("check") || currentAction.equals("fold")) {
+            if(botEquity < oppAvCallRangeEquity) {
+                double oppFoldRangeToTotalRangeRatio =
+                        (oppCurrentRange.size() - oppCallRange.size() - oppRaiseRange.size()) / oppCurrentRange.size();
+
+                if(oppFoldRangeToTotalRangeRatio > 0.5) {
+                    String bluffActionToUse;
+
+                    if(currentAction.equals("check")) {
+                        bluffActionToUse = "bet75pct";
+                    } else {
+                        bluffActionToUse = "raise";
+                    }
+
+                    if(board == null || board.isEmpty()) {
+                        if(botEquity > 0.5) {
+                            actionToReturn = bluffActionToUse;
+                        } else {
+                            actionToReturn = currentAction;
+                        }
+                    } else if(board.size() < 5) {
+                        if(botEquity > 0.4) {
+                            actionToReturn = bluffActionToUse;
+                        } else {
+                            actionToReturn = currentAction;
+                        }
+                    } else {
+                        if(oppFoldRangeToTotalRangeRatio > 0.6) {
+                            actionToReturn = bluffActionToUse;
+                        } else {
+                            actionToReturn = currentAction;
+                        }
+                    }
+                } else {
+                    actionToReturn = currentAction;
+                }
+            } else {
+                actionToReturn = currentAction;
+            }
+        } else {
+            actionToReturn = currentAction;
+        }
+
+        return actionToReturn;
+    }
+
+
     public List<List<Card>> getAllCombosPostflopEquitySorted(ContinuousTable continuousTable, List<Card> board,
                                                              List<Card> botHoleCards) {
         if(continuousTable.getAllCombosPostflopEquitySorted() != null &&
