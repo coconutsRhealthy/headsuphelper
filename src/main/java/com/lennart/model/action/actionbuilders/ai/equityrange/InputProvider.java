@@ -17,7 +17,7 @@ public class InputProvider {
     private static final String LARGE = "large";
 
     private Map<String, String> oppPreGroupMap = null;
-    private OpponentIdentifier2_0 opponentIdentifier2_0;
+    private OpponentIdentifier2_0 opponentIdentifier2_0 = null;
 
 
     public String getOppPreCall2betGroup(String oppName) {

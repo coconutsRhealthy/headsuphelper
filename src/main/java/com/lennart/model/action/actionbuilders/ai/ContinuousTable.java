@@ -1,6 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
+import com.lennart.model.action.actionbuilders.ai.equityrange.InputProvider;
+import com.lennart.model.action.actionbuilders.ai.equityrange.OpponentRangeSetter;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.botgame.MouseKeyboard;
@@ -153,6 +155,9 @@ public class ContinuousTable implements ContinuousTableable {
                 } else {
                     gameVariables.fillFieldsSubsequent(true);
                 }
+
+                //hier gaat het zetten van opp range gebeuren...
+                //new OpponentRangeSetter(new InputProvider()).setOpponentRange(this, gameVariables);
 
                 ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
                 String action = actionVariables.getAction();

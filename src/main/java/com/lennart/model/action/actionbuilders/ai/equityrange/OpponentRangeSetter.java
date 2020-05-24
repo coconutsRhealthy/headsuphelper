@@ -25,10 +25,10 @@ public class OpponentRangeSetter {
         this.rangeConstructor = new RangeConstructor();
         this.equityAction = new EquityAction(inputProvider);
         this.preflopEquityHs = new PreflopEquityHs();
-        this.inputProvider = new InputProvider();
+        this.inputProvider = inputProvider;
     }
 
-    private void setOpponentRange(ContinuousTable continuousTable, GameVariables gameVariables) {
+    public void setOpponentRange(ContinuousTable continuousTable, GameVariables gameVariables) {
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
             setPreflopRange(continuousTable, gameVariables);
         } else {
