@@ -151,14 +151,14 @@ public class InputProvider {
     }
 
     public static String getBotSizingGroup(double sizing) {
-        return null;
+        return getOppSizingGroup(sizing);
     }
 
     public static String getOppSizingGroup(double oppTotalBetsize) {
         String oppSizingGroup;
 
         if(oppTotalBetsize <= 60) {
-            oppSizingGroup = "small";
+            oppSizingGroup = SMALL;
         } else if(oppTotalBetsize <= 160) {
             oppSizingGroup = MEDIUM;
         } else {
@@ -169,7 +169,17 @@ public class InputProvider {
     }
 
     public static String getPotSizeGroup(double potSize) {
-        return null;
+        String potSizeGroup;
+
+        if(potSize < 90) {
+            potSizeGroup = SMALL;
+        } else if(potSize < 180) {
+            potSizeGroup = MEDIUM;
+        } else {
+            potSizeGroup = LARGE;
+        }
+
+        return potSizeGroup;
     }
 
     public static String determinBotPreflopRaiseType() {
