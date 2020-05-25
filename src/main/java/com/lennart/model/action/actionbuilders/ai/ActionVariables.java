@@ -912,7 +912,12 @@ public class ActionVariables {
             }
         } else {
             eligibleActions.add("check");
-            eligibleActions.add("bet75pct");
+
+            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                eligibleActions.add("raise");
+            } else {
+                eligibleActions.add("bet75pct");
+            }
         }
 
         return eligibleActions;
