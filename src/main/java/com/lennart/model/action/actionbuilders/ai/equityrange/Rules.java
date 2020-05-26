@@ -24,27 +24,72 @@ public class Rules {
 
 
     public String getInitialRuleAction(GameVariables gameVariables, boolean opponentHasInitiative, List<String> eligibleActions) {
+        String initialRuleAction = null;
 
+        initialRuleAction = defaultCheckWhenOppHasInitiative();
 
+        if(initialRuleAction == null) {
+            initialRuleAction = preOpen();
+        }
 
-        return null;
+        return initialRuleAction;
     }
 
-    public String getValueTrapAction() {
-        return null;
+    public String getValueTrapAction(String currentAction, GameVariables gameVariables) {
+        String actionToReturn;
+
+        if(currentAction.equals("bet75pct") || currentAction.equals("raise")) {
+            double valueTrapDecimal = 0.065;
+
+            if(Math.random() < valueTrapDecimal) {
+                String valueTrapActionToUse;
+
+                if(currentAction.equals("bet75pct")) {
+                    valueTrapActionToUse = "check";
+                } else {
+                    valueTrapActionToUse = "call";
+                }
+
+                if(gameVariables.getBoard() != null && gameVariables.getBoard().size() == 5) {
+                    if(gameVariables.isBotIsButton()) {
+                        actionToReturn = currentAction;
+                    } else {
+                        actionToReturn = valueTrapActionToUse;
+                    }
+                } else {
+                    actionToReturn = valueTrapActionToUse;
+                }
+            } else {
+                actionToReturn = currentAction;
+            }
+        } else {
+            actionToReturn = currentAction;
+        }
+
+        return actionToReturn;
     }
 
     public String getAfterRuleAction() {
         return null;
     }
 
-    private String getInitialPreflopAction() {
+    public boolean isValueTrap() {
+        return valueTrap;
+    }
 
-
+    private String defaultCheckWhenOppHasInitiative() {
         return null;
     }
 
-    public boolean isValueTrap() {
-        return valueTrap;
+    private String preOpen() {
+        return null;
+    }
+
+    private String callWithStrongDrawAndGoodOdds() {
+        return null;
+    }
+
+    private String callWithFavorableOdds() {
+        return null;
     }
 }
