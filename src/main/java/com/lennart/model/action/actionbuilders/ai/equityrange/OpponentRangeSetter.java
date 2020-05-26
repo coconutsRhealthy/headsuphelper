@@ -48,7 +48,7 @@ public class OpponentRangeSetter {
         if(gameVariables.getOpponentAction().equals("bet")) {
             continuousTable.setOppRange(rangeConstructor.createStartingOppRange(gameVariables.getBotHoleCards()));
         } else if(gameVariables.getOpponentAction().equals("raise")) {
-            String oppRaiseType = inputProvider.determineOppPreflopRaiseType();
+            String oppRaiseType = inputProvider.determineOppPreflopRaiseType(-1);
 
             if(oppRaiseType.equals("2bet")) {
                 List<List<Card>> oppPreRaiseAgainstLimpRange = rangeConstructor.getOppPreRaiseAgainstLimpRange(
@@ -84,7 +84,7 @@ public class OpponentRangeSetter {
                     gameVariables.getBotHoleCards());
             continuousTable.setOppRange(oppPreLimpRange);
         } else if(gameVariables.getOpponentAction().equals("raise")) {
-            String oppRaiseType = inputProvider.determineOppPreflopRaiseType();
+            String oppRaiseType = inputProvider.determineOppPreflopRaiseType(-1);
 
             if(oppRaiseType.equals("2bet")) {
                 List<List<Card>> oppPre2betRange = rangeConstructor.getOppPre2betRange(
@@ -175,7 +175,7 @@ public class OpponentRangeSetter {
 
     private void setInPositionPreflopToFlopRange(ContinuousTable continuousTable, GameVariables gameVariables, DbSaveRaw previousRound) {
         if(previousRound.getBotAction().equals("raise")) {
-            String botRaiseType = inputProvider.determinBotPreflopRaiseType();
+            String botRaiseType = inputProvider.determinBotPreflopRaiseType(-1);
 
             List<List<Card>> oppPreCallRange = null;
 
@@ -259,7 +259,7 @@ public class OpponentRangeSetter {
         if(previousRound.getBotAction().equals("check")) {
             continuousTable.setOppRange(continuousTable.getOppRange());
         } else if(previousRound.getBotAction().equals("raise")) {
-            String botRaiseType = inputProvider.determinBotPreflopRaiseType();
+            String botRaiseType = inputProvider.determinBotPreflopRaiseType(-1);
 
             List<List<Card>> oppPreCallRange = null;
 

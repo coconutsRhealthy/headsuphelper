@@ -216,11 +216,11 @@ public class InputProvider {
         return potSizeGroup;
     }
 
-    public String determinBotPreflopRaiseType() {
+    public String determinBotPreflopRaiseType(double botBetSizing) {
         return null;
     }
 
-    public String determineOppPreflopRaiseType() {
+    public String determineOppPreflopRaiseType(double oppBetSizing) {
         return null;
     }
 }

@@ -19,18 +19,57 @@ public class EquityAction {
     private PreflopEquityHs preflopEquityHs;
     private InputProvider inputProvider;
 
+    private double botEquity;
+
     public EquityAction(InputProvider inputProvider) {
         this.rangeConstructor = new RangeConstructor();
         this.preflopEquityHs = new PreflopEquityHs();
         this.inputProvider = inputProvider;
     }
 
+    public String getValueAction(ContinuousTable continuousTable, GameVariables gameVariables,
+                                 List<String> eligibleActions, double sizing) {
+        String action;
+
+        if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+            if(gameVariables.getOpponentAction().equals("call")) {
+                action = getPreflopCheckOrRaiseAction(gameVariables);
+            } else {
+                action = getPreflopFoldCallOrRaiseAction(gameVariables, eligibleActions);
+            }
+        } else {
+            String oppAction = gameVariables.getOpponentAction();
+
+            if(oppAction.equals("bet75pct") || oppAction.equals("raise")) {
+                action = getPostflopFoldCallOrRaiseAction(
+                        continuousTable,
+                        continuousTable.getOppRange(),
+                        gameVariables.getOpponentName(),
+                        gameVariables.getOpponentBetSize(),
+                        gameVariables.getBoard(),
+                        gameVariables.getBotHoleCards(),
+                        eligibleActions,
+                        sizing);
+            } else {
+                action = getPostflopCheckOrBetAction(
+                        continuousTable,
+                        continuousTable.getOppRange(),
+                        gameVariables.getOpponentName(),
+                        sizing,
+                        gameVariables.getBoard(),
+                        gameVariables.getBotHoleCards());
+            }
+        }
+
+        return action;
+    }
+
     private String getPreflopFoldCallOrRaiseAction(GameVariables gameVariables, List<String> eligibleActions) {
         String actionToReturn;
 
-        double botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+        botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
 
-        String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType();
+        String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType(-1);
 
         List<List<Card>> oppPfRaiseRange = null;
 
@@ -58,7 +97,7 @@ public class EquityAction {
 
         if(botEquity > oppAveragePfRaiseRangeEquity) {
             if(eligibleActions.contains("raise")) {
-                String botPfRaiseType = inputProvider.determinBotPreflopRaiseType();
+                String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(-1);
 
                 List<List<Card>> oppPfCallingRange = null;
 
@@ -95,14 +134,28 @@ public class EquityAction {
     private String getPreflopCheckOrRaiseAction(GameVariables gameVariables) {
         String actionToReturn;
 
-        double botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+        botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
 
-        List<List<Card>> oppPreLimpRange = rangeConstructor.getOppPreLimpRange(preflopEquityHs.getAllSortedPfEquityCombos(),
-                inputProvider.getOppPre2betGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+        String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(-1);
 
-        double oppAveragePfRaiseRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPreLimpRange, null);
+        List<List<Card>> oppPfCallingRange = null;
 
-        if(botEquity > oppAveragePfRaiseRangeEquity) {
+        if(botPfRaiseType.equals("2bet")) {
+            oppPfCallingRange = rangeConstructor.getOppPreCall2betRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                    inputProvider.getOppPreCall2betGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+        } else if(botPfRaiseType.equals("3bet")) {
+            oppPfCallingRange = rangeConstructor.getOppPreCall3betRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                    inputProvider.getOppPreCall3betGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+        } else if(botPfRaiseType.equals("4bet_up")) {
+            oppPfCallingRange = rangeConstructor.getOppPreCall4betUpRange(preflopEquityHs.getAllSortedPfEquityCombos(),
+                    inputProvider.getOppPreCall4betUpGroup(gameVariables.getOpponentName()), gameVariables.getBotHoleCards());
+        } else {
+            System.out.println("Shouldn't come here, EquityAction - 3");
+        }
+
+        double oppAveragePfCallRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPfCallingRange, null);
+
+        if(botEquity > oppAveragePfCallRangeEquity) {
             actionToReturn = "raise";
         } else {
             actionToReturn = "check";
@@ -123,7 +176,7 @@ public class EquityAction {
         List<List<Card>> oppCallingRange = rangeConstructor.getOppPostflopCallRange(currentOppRange,
                 allCombosPostflopEquitySorted, oppLooseness, botSizingGroup, board, botHoleCards);
 
-        double botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
+        botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
         double oppAverageCallingEquity = new EquityCalculator().getAverageRangeEquity(oppCallingRange, board);
 
         if(botEquity > oppAverageCallingEquity) {
@@ -149,7 +202,7 @@ public class EquityAction {
         List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(currentOppRange,
                 allCombosPostflopEquitySorted, oppAggroness, oppSizingGroup, board, botHoleCards);
 
-        double botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
+        botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
         double oppAverageBettingEquity = new EquityCalculator().getAverageRangeEquity(oppBetRange, board);
 
         if(botEquity > oppAverageBettingEquity) {
@@ -176,57 +229,6 @@ public class EquityAction {
 
         return actionToReturn;
     }
-
-    private String getBluffAction(String currentAction, double botEquity, double oppAvCallRangeEquity,
-                                List<Card> oppCurrentRange, List<Card> oppCallRange, List<Card> oppRaiseRange, List<Card> board) {
-        String actionToReturn;
-
-        if(currentAction.equals("check") || currentAction.equals("fold")) {
-            if(botEquity < oppAvCallRangeEquity) {
-                double oppFoldRangeToTotalRangeRatio =
-                        (oppCurrentRange.size() - oppCallRange.size() - oppRaiseRange.size()) / oppCurrentRange.size();
-
-                if(oppFoldRangeToTotalRangeRatio > 0.5) {
-                    String bluffActionToUse;
-
-                    if(currentAction.equals("check")) {
-                        bluffActionToUse = "bet75pct";
-                    } else {
-                        bluffActionToUse = "raise";
-                    }
-
-                    if(board == null || board.isEmpty()) {
-                        if(botEquity > 0.5) {
-                            actionToReturn = bluffActionToUse;
-                        } else {
-                            actionToReturn = currentAction;
-                        }
-                    } else if(board.size() < 5) {
-                        if(botEquity > 0.4) {
-                            actionToReturn = bluffActionToUse;
-                        } else {
-                            actionToReturn = currentAction;
-                        }
-                    } else {
-                        if(oppFoldRangeToTotalRangeRatio > 0.6) {
-                            actionToReturn = bluffActionToUse;
-                        } else {
-                            actionToReturn = currentAction;
-                        }
-                    }
-                } else {
-                    actionToReturn = currentAction;
-                }
-            } else {
-                actionToReturn = currentAction;
-            }
-        } else {
-            actionToReturn = currentAction;
-        }
-
-        return actionToReturn;
-    }
-
 
     public List<List<Card>> getAllCombosPostflopEquitySorted(ContinuousTable continuousTable, List<Card> board,
                                                              List<Card> botHoleCards) {
@@ -321,5 +323,9 @@ public class EquityAction {
             result.put(entry.getKey(), entry.getValue());
         }
         return result;
+    }
+
+    public double getBotEquity() {
+        return botEquity;
     }
 }
