@@ -21,10 +21,10 @@ public class EquityAction {
 
     private double botEquity;
 
-    public EquityAction(InputProvider inputProvider) {
-        this.rangeConstructor = new RangeConstructor();
-        this.preflopEquityHs = new PreflopEquityHs();
+    public EquityAction(InputProvider inputProvider, PreflopEquityHs preflopEquityHs, RangeConstructor rangeConstructor) {
         this.inputProvider = inputProvider;
+        this.preflopEquityHs = preflopEquityHs;
+        this.rangeConstructor = rangeConstructor;
     }
 
     public String getValueAction(ContinuousTable continuousTable, GameVariables gameVariables,

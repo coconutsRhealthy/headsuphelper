@@ -19,14 +19,16 @@ public class BotActionBuilder {
 
         if(action == null) {
             InputProvider inputProvider = new InputProvider();
-            EquityAction equityAction = new EquityAction(inputProvider);
+            PreflopEquityHs preflopEquityHs = new PreflopEquityHs();
+            RangeConstructor rangeConstructor = new RangeConstructor();
+            EquityAction equityAction = new EquityAction(inputProvider, preflopEquityHs, rangeConstructor);
 
             action = equityAction.getValueAction(continuousTable, gameVariables, eligibleActions, sizing);
 
-            action = rules.getValueTrapAction();
+            action = rules.getValueTrapAction(action, gameVariables);
 
             if(action.equals("fold") || action.equals("check")) {
-                action = new BluffAction(equityAction).getBluffAction(
+                action = new BluffAction(equityAction, inputProvider, rangeConstructor, preflopEquityHs).getBluffAction(
                         action,
                         rules.isValueTrap(),
                         eligibleActions,

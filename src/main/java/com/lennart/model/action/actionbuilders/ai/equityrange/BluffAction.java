@@ -14,9 +14,17 @@ import java.util.List;
 public class BluffAction {
 
     private EquityAction equityAction;
+    private InputProvider inputProvider;
+    private RangeConstructor rangeConstructor;
+    private PreflopEquityHs preflopEquityHs;
 
-    public BluffAction(EquityAction equityAction) {
+
+    public BluffAction(EquityAction equityAction, InputProvider inputProvider, RangeConstructor rangeConstructor,
+                       PreflopEquityHs preflopEquityHs) {
         this.equityAction = equityAction;
+        this.inputProvider = inputProvider;
+        this.rangeConstructor = rangeConstructor;
+        this.preflopEquityHs = preflopEquityHs;
     }
 
     public String getBluffAction(String currentAction, boolean valueTrap,
@@ -95,10 +103,6 @@ public class BluffAction {
 
     private List<List<Card>> getOppCallRangeWhenYouBluff(ContinuousTable continuousTable, GameVariables gameVariables, double botSizing) {
         List<List<Card>> oppCallRangeWhenYouBluff;
-
-        InputProvider inputProvider = new InputProvider();
-        RangeConstructor rangeConstructor = new RangeConstructor();
-        PreflopEquityHs preflopEquityHs = new PreflopEquityHs();
 
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
             String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(botSizing);

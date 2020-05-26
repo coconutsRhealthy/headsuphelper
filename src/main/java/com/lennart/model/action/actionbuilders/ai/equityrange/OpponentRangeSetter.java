@@ -23,9 +23,9 @@ public class OpponentRangeSetter {
 
     public OpponentRangeSetter(InputProvider inputProvider) {
         this.rangeConstructor = new RangeConstructor();
-        this.equityAction = new EquityAction(inputProvider);
         this.preflopEquityHs = new PreflopEquityHs();
         this.inputProvider = inputProvider;
+        this.equityAction = new EquityAction(inputProvider, preflopEquityHs, rangeConstructor);
     }
 
     public void setOpponentRange(ContinuousTable continuousTable, GameVariables gameVariables) {
