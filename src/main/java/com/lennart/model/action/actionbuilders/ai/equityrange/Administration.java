@@ -4,6 +4,8 @@ import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopStats;
 import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveRaw;
+import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
@@ -16,7 +18,8 @@ import java.util.List;
  */
 public class Administration {
 
-    public static void doDbSaveStuff(String action, ContinuousTable continuousTable, GameVariables gameVariables, double sizing) {
+    public void doDbSaveStuff(String action, ContinuousTable continuousTable, GameVariables gameVariables,
+                                     double sizing, RangeConstructor rangeConstructor) {
         try {
             //DbSaveRaw
             DbSaveRaw dbSaveRaw = new DbSaveRaw();
@@ -27,14 +30,7 @@ public class Administration {
             String opponentData = dbSaveRaw.getOpponentDataLogic(gameVariables.getOpponentName());
             double recentHandsWon = dbSaveRaw.getRecentHandsWonLogic(gameVariables.getOpponentName());
             String adjustedOppType = dbSaveRaw.getAdjustedOppTypeLogic(gameVariables.getOpponentName());
-            String strongDrawString = null;
-
-            //todo: fix
-//            if(handEvaluator == null) {
-//                strongDrawString = "StrongDrawFalse";
-//            } else {
-//                strongDrawString = dbSaveRaw.getStrongDrawLogic(handEvaluator.hasDrawOfType("strongFlushDraw"), handEvaluator.hasDrawOfType("strongOosd"));
-//            }
+            String strongDrawString = getStrongDrawString(rangeConstructor, gameVariables.getBoard());
 
             dbSaveRaw.setBotAction(action);
             dbSaveRaw.setOppAction(gameVariables.getOpponentAction());
@@ -119,7 +115,7 @@ public class Administration {
         }
     }
 
-    public static void doActionRoundStuff(String action, GameVariables gameVariables, double sizing) {
+    public void doActionRoundStuff(String action, GameVariables gameVariables, double sizing) {
         double totalBotBetSizeForPlayerActionRound;
 
         if(sizing == 0) {
@@ -143,7 +139,7 @@ public class Administration {
         gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
     }
 
-    private static double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {
+    private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {
         double updatedBotStack;
         double botStackBeforeUpdate = gameVariables.getBotStack();
 
@@ -166,7 +162,35 @@ public class Administration {
         return updatedBotStack;
     }
 
-    private static double calculateOldstyleHandStrength() {
+    private String getStrongDrawString(RangeConstructor rangeConstructor, List<Card> board) {
+        String strongDrawString = "StrongDrawFalse";
+
+        StraightDrawEvaluator straightDrawEvaluator = rangeConstructor.getStraightDrawEvaluatorMap().get(board);
+
+        if(straightDrawEvaluator != null) {
+            if(straightDrawEvaluator.getStrongOosdCombos() != null) {
+                if(!straightDrawEvaluator.getStrongOosdCombos().isEmpty()) {
+                    strongDrawString = "StrongDrawTrue";
+                }
+            }
+        }
+
+        if(strongDrawString.equals("StrongDrawFalse")) {
+            FlushDrawEvaluator flushDrawEvaluator = rangeConstructor.getFlushDrawEvaluatorMap().get(board);
+
+            if(flushDrawEvaluator != null) {
+                if(flushDrawEvaluator.getStrongFlushDrawCombos() != null) {
+                    if(!flushDrawEvaluator.getStrongFlushDrawCombos().isEmpty()) {
+                        strongDrawString = "StrongDrawTrue";
+                    }
+                }
+            }
+        }
+
+        return strongDrawString;
+    }
+
+    private double calculateOldstyleHandStrength() {
         return 0.0;
     }
 }

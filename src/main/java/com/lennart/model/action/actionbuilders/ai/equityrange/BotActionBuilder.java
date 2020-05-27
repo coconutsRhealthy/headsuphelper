@@ -24,10 +24,11 @@ public class BotActionBuilder {
 
         action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative(), eligibleActions);
 
+        RangeConstructor rangeConstructor = new RangeConstructor();
+
         if(action == null) {
             InputProvider inputProvider = new InputProvider();
             PreflopEquityHs preflopEquityHs = new PreflopEquityHs();
-            RangeConstructor rangeConstructor = new RangeConstructor();
             EquityAction equityAction = new EquityAction(inputProvider, preflopEquityHs, rangeConstructor);
 
             action = equityAction.getValueAction(continuousTable, gameVariables, eligibleActions, sizing);
@@ -48,8 +49,9 @@ public class BotActionBuilder {
             action = rules.getAfterRuleAction();
         }
 
-        Administration.doDbSaveStuff(action, continuousTable, gameVariables, sizing);
-        Administration.doActionRoundStuff(action, gameVariables, sizing);
+        Administration administration = new Administration();
+        administration.doDbSaveStuff(action, continuousTable, gameVariables, sizing, rangeConstructor);
+        administration.doActionRoundStuff(action, gameVariables, sizing);
 
         return action;
     }

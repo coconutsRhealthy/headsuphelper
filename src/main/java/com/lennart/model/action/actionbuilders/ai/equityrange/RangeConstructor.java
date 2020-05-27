@@ -31,6 +31,10 @@ public class RangeConstructor {
     private static final String SMALL = "small";
     private static final String LARGE = "large";
 
+    //draws
+    private Map<List<Card>, StraightDrawEvaluator> straightDrawEvaluatorMap = new HashMap<>();
+    private Map<List<Card>, FlushDrawEvaluator> flushDrawEvaluatorMap = new HashMap<>();
+
     public static void main(String[] args) {
         new RangeConstructor().testMethod();
     }
@@ -986,8 +990,22 @@ public class RangeConstructor {
     }
 
     private List<List<Card>> getDraws(List<String> drawsToInclude, List<Card> board) {
-        StraightDrawEvaluator straightDrawEvaluator = new StraightDrawEvaluator(board);
-        FlushDrawEvaluator flushDrawEvaluator = new FlushDrawEvaluator(board);
+        StraightDrawEvaluator straightDrawEvaluator;
+        FlushDrawEvaluator flushDrawEvaluator;
+
+        if(straightDrawEvaluatorMap.get(board) != null) {
+            straightDrawEvaluator = straightDrawEvaluatorMap.get(board);
+        } else {
+            straightDrawEvaluator = new StraightDrawEvaluator(board);
+            straightDrawEvaluatorMap.put(board, straightDrawEvaluator);
+        }
+
+        if(flushDrawEvaluatorMap.get(board) != null) {
+            flushDrawEvaluator = flushDrawEvaluatorMap.get(board);
+        } else {
+            flushDrawEvaluator = new FlushDrawEvaluator(board);
+            flushDrawEvaluatorMap.put(board, flushDrawEvaluator);
+        }
 
         List<List<Card>> draws = new ArrayList<>();
 
@@ -1154,5 +1172,13 @@ public class RangeConstructor {
                 .collect(Collectors.toList());
 
         return startingOppRange;
+    }
+
+    public Map<List<Card>, StraightDrawEvaluator> getStraightDrawEvaluatorMap() {
+        return straightDrawEvaluatorMap;
+    }
+
+    public Map<List<Card>, FlushDrawEvaluator> getFlushDrawEvaluatorMap() {
+        return flushDrawEvaluatorMap;
     }
 }
