@@ -135,10 +135,6 @@ public class BluffAction {
                 gameVariables.getOpponentStack(), gameVariables.getBotStack(), gameVariables.getPot(), gameVariables.getBigBlind(),
                 gameVariables.getBoard(), 0.5, false, false);
 
-        InputProvider inputProvider = new InputProvider();
-        RangeConstructor rangeConstructor = new RangeConstructor();
-        PreflopEquityHs preflopEquityHs = new PreflopEquityHs();
-
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
             String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType(fictionalOppRaiseSizing);
 

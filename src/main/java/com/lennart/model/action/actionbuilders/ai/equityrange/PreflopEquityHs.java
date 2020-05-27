@@ -10,35 +10,45 @@ import java.util.stream.Collectors;
  */
 public class PreflopEquityHs {
 
+    List<List<Card>> allSortedPfEquityCombos = null;
+    Map<List<Card>, Double> allPreflopCombosEquitySortedMap = null;
+
     public List<List<Card>> getAllSortedPfEquityCombos() {
-        Map<List<Card>, Double> allSortedPfEquityCombos = getAllPreflopCombosEquitySortedMap();
-        return allSortedPfEquityCombos.keySet().stream().collect(Collectors.toList());
+        if(allSortedPfEquityCombos == null) {
+            Map<List<Card>, Double> allPreflopCombosEquitySortedMap = getAllPreflopCombosEquitySortedMap();
+            allSortedPfEquityCombos = allPreflopCombosEquitySortedMap.keySet().stream().collect(Collectors.toList());
+        }
+
+        return allSortedPfEquityCombos;
     }
 
     public Map<List<Card>, Double> getAllPreflopCombosEquitySortedMap() {
-        Map<String, Double> allCombosStringMap = getAllComboStringEquityMap();
+        if(allPreflopCombosEquitySortedMap == null) {
+            Map<String, Double> allCombosStringMap = getAllComboStringEquityMap();
 
-        Map<List<Card>, Double> allCombosEquityMap = allCombosStringMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(entry -> {
-            String comboString = entry.getKey();
+            allPreflopCombosEquitySortedMap = allCombosStringMap.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(entry -> {
+                        String comboString = entry.getKey();
 
-            String card1String = comboString.substring(0, comboString.indexOf(" "));
-            String card2String = comboString.substring(comboString.indexOf(" ") + 1, comboString.length());
+                        String card1String = comboString.substring(0, comboString.indexOf(" "));
+                        String card2String = comboString.substring(comboString.indexOf(" ") + 1, comboString.length());
 
-            int rankCard1 = Integer.valueOf(card1String.substring(0, card1String.length() - 1));
-            char suitCard1 = card1String.charAt(card1String.length() - 1);
-            Card card1 = new Card(rankCard1, suitCard1);
+                        int rankCard1 = Integer.valueOf(card1String.substring(0, card1String.length() - 1));
+                        char suitCard1 = card1String.charAt(card1String.length() - 1);
+                        Card card1 = new Card(rankCard1, suitCard1);
 
-            int rankCard2 = Integer.valueOf(card2String.substring(0, card2String.length() - 1));
-            char suitCard2 = card2String.charAt(card2String.length() - 1);
-            Card card2 = new Card(rankCard2, suitCard2);
+                        int rankCard2 = Integer.valueOf(card2String.substring(0, card2String.length() - 1));
+                        char suitCard2 = card2String.charAt(card2String.length() - 1);
+                        Card card2 = new Card(rankCard2, suitCard2);
 
-            return Arrays.asList(card1, card2);
-        }, entry -> entry.getValue()));
+                        return Arrays.asList(card1, card2);
+                    }, entry -> entry.getValue()));
 
-        allCombosEquityMap = sortByValueHighToLow(allCombosEquityMap);
-        return allCombosEquityMap;
+            allPreflopCombosEquitySortedMap = sortByValueHighToLow(allPreflopCombosEquitySortedMap);
+        }
+
+        return allPreflopCombosEquitySortedMap;
     }
 
     private Map<String, Double> getAllComboStringEquityMap() {
