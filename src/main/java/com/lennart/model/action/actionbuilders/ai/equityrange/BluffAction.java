@@ -27,63 +27,58 @@ public class BluffAction {
         this.preflopEquityHs = preflopEquityHs;
     }
 
-    public String getBluffAction(String currentAction, boolean valueTrap,
-                                  List<String> eligibleActions, ContinuousTable continuousTable,
+    public String getBluffAction(String currentAction, List<String> eligibleActions, ContinuousTable continuousTable,
                                   GameVariables gameVariables, double botSizing) {
         String actionToReturn;
 
         if(currentAction.equals("check") || currentAction.equals("fold")) {
-            if(!valueTrap) {
-                String bluffActionToUse;
+            String bluffActionToUse;
 
-                if(currentAction.equals("check")) {
-                    if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
-                        bluffActionToUse = "raise";
-                    } else {
-                        bluffActionToUse = "bet75pct";
-                    }
-                } else {
+            if(currentAction.equals("check")) {
+                if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
                     bluffActionToUse = "raise";
+                } else {
+                    bluffActionToUse = "bet75pct";
                 }
+            } else {
+                bluffActionToUse = "raise";
+            }
 
-                if(bluffActionToUse.equals("bet75pct") || eligibleActions.contains("raise")) {
-                    boolean bluffOddsAreOk = new MachineLearning().bluffOddsAreOk(botSizing, gameVariables.getOpponentBetSize(),
-                            gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBotStack(),
-                            gameVariables.getBoard(), gameVariables.getBotBetSize());
+            if(bluffActionToUse.equals("bet75pct") || eligibleActions.contains("raise")) {
+                boolean bluffOddsAreOk = new MachineLearning().bluffOddsAreOk(botSizing, gameVariables.getOpponentBetSize(),
+                        gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBotStack(),
+                        gameVariables.getBoard(), gameVariables.getBotBetSize());
 
-                    if(bluffOddsAreOk) {
-                        List<List<Card>> oppCallRangeWhenYouBluff = getOppCallRangeWhenYouBluff(continuousTable,
-                                gameVariables, botSizing);
-                        List<List<Card>> oppRaiseRangeWhenYouBluff = getOppRaiseRangeWhenYouBluff(continuousTable,
-                                gameVariables, botSizing);
+                if(bluffOddsAreOk) {
+                    List<List<Card>> oppCallRangeWhenYouBluff = getOppCallRangeWhenYouBluff(continuousTable,
+                            gameVariables, botSizing);
+                    List<List<Card>> oppRaiseRangeWhenYouBluff = getOppRaiseRangeWhenYouBluff(continuousTable,
+                            gameVariables, botSizing);
 
-                        double oppFoldRangeToTotalRangeRatio =
-                                (continuousTable.getOppRange().size() -
-                                        oppCallRangeWhenYouBluff.size() - oppRaiseRangeWhenYouBluff.size())
-                                        / continuousTable.getOppRange().size();
+                    double oppFoldRangeToTotalRangeRatio =
+                            (continuousTable.getOppRange().size() -
+                                    oppCallRangeWhenYouBluff.size() - oppRaiseRangeWhenYouBluff.size())
+                                    / continuousTable.getOppRange().size();
 
-                        if(oppFoldRangeToTotalRangeRatio > 0.5) {
-                            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
-                                if(equityAction.getBotEquity() > 0.5) {
-                                    actionToReturn = bluffActionToUse;
-                                } else {
-                                    actionToReturn = currentAction;
-                                }
-                            } else if(gameVariables.getBoard().size() < 5) {
-                                if(equityAction.getBotEquity() > 0.4) {
-                                    actionToReturn = bluffActionToUse;
-                                } else {
-                                    actionToReturn = currentAction;
-                                }
+                    if(oppFoldRangeToTotalRangeRatio > 0.5) {
+                        if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                            if(equityAction.getBotEquity() > 0.5) {
+                                actionToReturn = bluffActionToUse;
                             } else {
-                                if(oppFoldRangeToTotalRangeRatio > 0.6) {
-                                    actionToReturn = bluffActionToUse;
-                                } else {
-                                    actionToReturn = currentAction;
-                                }
+                                actionToReturn = currentAction;
+                            }
+                        } else if(gameVariables.getBoard().size() < 5) {
+                            if(equityAction.getBotEquity() > 0.4) {
+                                actionToReturn = bluffActionToUse;
+                            } else {
+                                actionToReturn = currentAction;
                             }
                         } else {
-                            actionToReturn = currentAction;
+                            if(oppFoldRangeToTotalRangeRatio > 0.6) {
+                                actionToReturn = bluffActionToUse;
+                            } else {
+                                actionToReturn = currentAction;
+                            }
                         }
                     } else {
                         actionToReturn = currentAction;

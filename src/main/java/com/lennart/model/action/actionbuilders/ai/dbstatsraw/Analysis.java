@@ -19,7 +19,70 @@ public class Analysis {
     private Connection con;
 
     public static void main(String[] args) throws Exception {
-        new Analysis().theCheck();
+        new Analysis().potsizeGroupAnalysis2();
+    }
+
+    private void potsizeGroupAnalysis2() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE pot > 0;");
+
+        List<Double> allPots = new ArrayList<>();
+
+        while(rs.next()) {
+//            double botStack = rs.getDouble("botstack");
+//            double oppStack = rs.getDouble("opponentstack");
+//            double botTotalBetsize = rs.getDouble("bot_total_betsize");
+//            double oppTotalBetsize = rs.getDouble("opponent_total_betsize");
+//
+//            double pot = 2000 - botStack - oppStack - botTotalBetsize - oppTotalBetsize;
+//
+//            if(pot >= 40 && pot < 2000)
+//
+//                allPots.add(pot);
+            allPots.add(rs.getDouble("pot"));
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        Collections.sort(allPots);
+
+        System.out.println(allPots.get(allPots.size() / 3) * 2);
+    }
+
+    private void potsizeGroupAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE board != \"\" AND entry > 300000;");
+
+        List<Double> allPots = new ArrayList<>();
+
+        while(rs.next()) {
+            double botStack = rs.getDouble("botstack");
+            double oppStack = rs.getDouble("opponentstack");
+            double botTotalBetsize = rs.getDouble("bot_total_betsize");
+            double oppTotalBetsize = rs.getDouble("opponent_total_betsize");
+
+            double pot = 2000 - botStack - oppStack - botTotalBetsize - oppTotalBetsize;
+
+            if(pot >= 40 && pot < 2000)
+
+            allPots.add(pot);
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        Collections.sort(allPots);
+
+        System.out.println(allPots.get(allPots.size() / 3) * 2);
     }
 
     private void theCheck() throws Exception {

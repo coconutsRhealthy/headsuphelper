@@ -2,6 +2,11 @@ package com.lennart.model.action.actionbuilders.ai.equityrange;
 
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
+import com.lennart.model.action.actionbuilders.ai.Sizing;
+import com.lennart.model.handtracker.ActionRequest;
+import com.lennart.model.handtracker.PlayerActionRound;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,13 +14,15 @@ import java.util.List;
  */
 public class BotActionBuilder {
 
-    public String getAction(ContinuousTable continuousTable, GameVariables gameVariables,
-                               List<String> eligibleActions, double sizing, boolean opponentHasInitiative) {
+    public String getAction(ContinuousTable continuousTable, GameVariables gameVariables) {
         String action = null;
-
         Rules rules = new Rules();
 
-        action = rules.getInitialRuleAction(gameVariables, opponentHasInitiative, eligibleActions);
+        setOpponentHasInitiative(gameVariables.getOpponentAction(), continuousTable, gameVariables);
+        List<String> eligibleActions = getEligibleActions(gameVariables);
+        double sizing = getSizing(gameVariables);
+
+        action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative(), eligibleActions);
 
         if(action == null) {
             InputProvider inputProvider = new InputProvider();
@@ -28,18 +35,79 @@ public class BotActionBuilder {
             action = rules.getValueTrapAction(action, gameVariables);
 
             if(action.equals("fold") || action.equals("check")) {
-                action = new BluffAction(equityAction, inputProvider, rangeConstructor, preflopEquityHs).getBluffAction(
-                        action,
-                        rules.isValueTrap(),
-                        eligibleActions,
-                        continuousTable,
-                        gameVariables,
-                        sizing);
+                if(!rules.isValueTrap()) {
+                    action = new BluffAction(equityAction, inputProvider, rangeConstructor, preflopEquityHs).getBluffAction(
+                            action,
+                            eligibleActions,
+                            continuousTable,
+                            gameVariables,
+                            sizing);
+                }
             }
 
             action = rules.getAfterRuleAction();
         }
 
+        Administration.doDbSaveStuff(action, continuousTable, gameVariables, sizing);
+        Administration.doActionRoundStuff(action, gameVariables, sizing);
+
         return action;
+    }
+
+    private void setOpponentHasInitiative(String opponentAction, ContinuousTable continuousTable, GameVariables gameVariables) {
+        if(continuousTable != null) {
+            if(opponentAction != null) {
+                if(opponentAction.equals("empty")) {
+                    List<ActionRequest> allActionRequestsOfHand = gameVariables.getAllActionRequestsOfHand();
+                    ActionRequest secondLastActionRequest = allActionRequestsOfHand.get(allActionRequestsOfHand.size() - 2);
+                    PlayerActionRound botLastActionRound = secondLastActionRequest.getMostRecentActionRoundOfPLayer(secondLastActionRequest.getActionsSinceLastRequest(), "bot");
+                    String botLastAction = botLastActionRound.getAction();
+
+                    if(botLastAction.equals("call")) {
+                        continuousTable.setOpponentHasInitiative(true);
+                    } else {
+                        continuousTable.setOpponentHasInitiative(false);
+                    }
+                } else {
+                    if(opponentAction.equals("bet75pct") || opponentAction.equals("raise")) {
+                        continuousTable.setOpponentHasInitiative(true);
+                    } else {
+                        continuousTable.setOpponentHasInitiative(false);
+                    }
+                }
+            }
+        }
+    }
+
+    private List<String> getEligibleActions(GameVariables gameVariables) {
+        List<String> eligibleActions = new ArrayList<>();
+
+        if(gameVariables.getOpponentAction().contains("bet") || gameVariables.getOpponentAction().contains("raise")) {
+            if(gameVariables.getOpponentStack() == 0 ||
+                    (gameVariables.getBotStack() + gameVariables.getBotBetSize()) <= gameVariables.getOpponentBetSize()) {
+                eligibleActions.add("fold");
+                eligibleActions.add("call");
+            } else {
+                eligibleActions.add("fold");
+                eligibleActions.add("call");
+                eligibleActions.add("raise");
+            }
+        } else {
+            eligibleActions.add("check");
+
+            if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
+                eligibleActions.add("raise");
+            } else {
+                eligibleActions.add("bet75pct");
+            }
+        }
+
+        return eligibleActions;
+    }
+
+    private double getSizing(GameVariables gameVariables) {
+        return new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(),
+                gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(),
+                gameVariables.getBoard(), -1.0, false, false);
     }
 }
