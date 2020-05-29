@@ -100,7 +100,7 @@ public class BluffAction {
         List<List<Card>> oppCallRangeWhenYouBluff;
 
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
-            String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(botSizing);
+            String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(botSizing, gameVariables.getBigBlind());
 
             if(botPfRaiseType.equals("2bet")) {
                 oppCallRangeWhenYouBluff = rangeConstructor.getOppPreCall2betRange(preflopEquityHs.getAllSortedPfEquityCombos(),
@@ -136,7 +136,7 @@ public class BluffAction {
                 gameVariables.getBoard(), 0.5, false, false);
 
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
-            String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType(fictionalOppRaiseSizing);
+            String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType(fictionalOppRaiseSizing, gameVariables.getBigBlind());
 
             if(oppPfRaiseType.equals("2bet")) {
                 String oppPre2betGroup = inputProvider.getOppPre2betGroup(gameVariables.getOpponentName());

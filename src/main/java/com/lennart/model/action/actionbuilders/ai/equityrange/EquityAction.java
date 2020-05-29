@@ -33,9 +33,9 @@ public class EquityAction {
 
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
             if(gameVariables.getOpponentAction().equals("call")) {
-                action = getPreflopCheckOrRaiseAction(gameVariables);
+                action = getPreflopCheckOrRaiseAction(gameVariables, sizing);
             } else {
-                action = getPreflopFoldCallOrRaiseAction(gameVariables, eligibleActions);
+                action = getPreflopFoldCallOrRaiseAction(gameVariables, eligibleActions, sizing);
             }
         } else {
             String oppAction = gameVariables.getOpponentAction();
@@ -64,12 +64,12 @@ public class EquityAction {
         return action;
     }
 
-    private String getPreflopFoldCallOrRaiseAction(GameVariables gameVariables, List<String> eligibleActions) {
+    private String getPreflopFoldCallOrRaiseAction(GameVariables gameVariables, List<String> eligibleActions, double botSizing) {
         String actionToReturn;
 
         botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
 
-        String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType(-1);
+        String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType(gameVariables.getOpponentBetSize(), gameVariables.getBigBlind());
 
         List<List<Card>> oppPfRaiseRange = null;
 
@@ -97,7 +97,7 @@ public class EquityAction {
 
         if(botEquity > oppAveragePfRaiseRangeEquity) {
             if(eligibleActions.contains("raise")) {
-                String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(-1);
+                String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(botSizing, gameVariables.getBigBlind());
 
                 List<List<Card>> oppPfCallingRange = null;
 
@@ -131,12 +131,12 @@ public class EquityAction {
         return actionToReturn;
     }
 
-    private String getPreflopCheckOrRaiseAction(GameVariables gameVariables) {
+    private String getPreflopCheckOrRaiseAction(GameVariables gameVariables, double botSizing) {
         String actionToReturn;
 
         botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
 
-        String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(-1);
+        String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(botSizing, gameVariables.getBigBlind());
 
         List<List<Card>> oppPfCallingRange = null;
 

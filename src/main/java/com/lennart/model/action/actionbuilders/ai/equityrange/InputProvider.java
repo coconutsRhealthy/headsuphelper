@@ -216,11 +216,23 @@ public class InputProvider {
         return potSizeGroup;
     }
 
-    public String determinBotPreflopRaiseType(double botBetSizing) {
-        return null;
+    public String determinBotPreflopRaiseType(double botPfRaiseSizing, double bigBlind) {
+        return determineOppPreflopRaiseType(botPfRaiseSizing, bigBlind);
     }
 
-    public String determineOppPreflopRaiseType(double oppBetSizing) {
-        return null;
+    public String determineOppPreflopRaiseType(double oppPfRaiseSize, double bigBlind) {
+        String oppPfRaiseType;
+
+        double oppPfRaiseSizeBb = oppPfRaiseSize / bigBlind;
+
+        if(oppPfRaiseSizeBb <= 3) {
+            oppPfRaiseType = "2bet";
+        } else if(oppPfRaiseSizeBb <= 10) {
+            oppPfRaiseType = "3bet";
+        } else {
+            oppPfRaiseType = "4bet_up";
+        }
+
+        return oppPfRaiseType;
     }
 }
