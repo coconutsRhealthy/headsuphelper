@@ -46,7 +46,7 @@ public class BotActionBuilder {
                 }
             }
 
-            action = rules.getAfterRuleAction();
+            action = rules.getAfterRuleAction(action, rangeConstructor, getFacingOdds(gameVariables), gameVariables.getBoard());
         }
 
         Administration administration = new Administration();
@@ -111,5 +111,18 @@ public class BotActionBuilder {
         return new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(),
                 gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(),
                 gameVariables.getBoard(), -1.0, false, false);
+    }
+
+    private double getFacingOdds(GameVariables gameVariables) {
+        double opponentBetSize = gameVariables.getOpponentBetSize();
+        double botBetSize = gameVariables.getBotBetSize();
+        double botStack = gameVariables.getBotStack();
+
+        if((opponentBetSize - botBetSize) > botStack) {
+            opponentBetSize = botStack;
+        }
+
+        double facingOdds = (opponentBetSize - botBetSize) / (gameVariables.getPot() + botBetSize + opponentBetSize);
+        return facingOdds;
     }
 }
