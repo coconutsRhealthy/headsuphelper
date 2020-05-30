@@ -56,13 +56,11 @@ public class HandEvaluator {
         return handStrength;
     }
 
-    public double getHsNewStyle(List<Card> holeCards, List<Card> board) {
+    public double getHsNewStyle(double botEquity, List<Card> board) {
         double hs;
 
-        double myEquity = new EquityCalculator().getComboEquity(holeCards, board);
-
         if(board.size() == 5) {
-            hs = myEquity;
+            hs = botEquity;
         } else {
             Map<List<Card>, Double> equities = new EquityAction(new InputProvider(), new PreflopEquityHs(), new RangeConstructor())
                     .getHsNewStyleInput(board);
@@ -80,7 +78,7 @@ public class HandEvaluator {
             }
 
             double factor = 0.9 / tenPctEquity;
-            hs = myEquity * factor;
+            hs = botEquity * factor;
 
             if(hs > 1) {
                 hs = 1;

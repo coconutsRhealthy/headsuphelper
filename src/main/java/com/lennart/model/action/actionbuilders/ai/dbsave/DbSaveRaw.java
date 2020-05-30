@@ -30,6 +30,7 @@ public class DbSaveRaw extends DbSave {
     private double recentHandsWon;
     private String adjustedOppType;
     private double pot;
+    private double equity;
 
     private Connection con;
 
@@ -272,6 +273,14 @@ public class DbSaveRaw extends DbSave {
 
     public void setPot(double pot) {
         this.pot = pot;
+    }
+
+    public double getEquity() {
+        return equity;
+    }
+
+    public void setEquity(double equity) {
+        this.equity = equity;
     }
 
     private void initializeDbConnection() throws Exception {

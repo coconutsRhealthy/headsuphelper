@@ -11,6 +11,7 @@ import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.handevaluation.PreflopHandStength;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
+import equitycalc.EquityCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,9 @@ public class ActionVariables {
 
     private BoardEvaluator boardEvaluator;
 
-    int numberOfScoresAbove80;
+    private int numberOfScoresAbove80;
+
+    private double botEquity;
 
     public ActionVariables() {
         //default constructor
@@ -662,6 +665,7 @@ public class ActionVariables {
             dbSaveRaw.setRecentHandsWon(recentHandsWon);
             dbSaveRaw.setAdjustedOppType(adjustedOppType);
             dbSaveRaw.setPot(gameVariables.getPot());
+            dbSaveRaw.setEquity(botEquity);
 
             continuousTable.getDbSaveList().add(dbSaveRaw);
             //DbSaveRaw
@@ -828,7 +832,8 @@ public class ActionVariables {
             handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
 
             double hsOld = handEvaluator.getHandStrength(gameVariables.getBotHoleCards());
-            botHandStrength = handEvaluator.getHsNewStyle(gameVariables.getBotHoleCards(), gameVariables.getBoard());
+            botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), gameVariables.getBoard());
+            botHandStrength = handEvaluator.getHsNewStyle(botEquity, gameVariables.getBoard());
 
             System.out.println("O: " + hsOld);
             System.out.println("N: " + botHandStrength);
