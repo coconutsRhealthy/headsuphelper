@@ -9,6 +9,7 @@ import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
+import equitycalc.EquityCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 public class Administration {
 
     public void doDbSaveStuff(String action, ContinuousTable continuousTable, GameVariables gameVariables,
-                                     double sizing, RangeConstructor rangeConstructor) {
+                                     double sizing, RangeConstructor rangeConstructor, double botEquity) {
         try {
             //DbSaveRaw
             DbSaveRaw dbSaveRaw = new DbSaveRaw();
@@ -36,7 +37,7 @@ public class Administration {
             dbSaveRaw.setOppAction(gameVariables.getOpponentAction());
             dbSaveRaw.setBoard(boardString);
             dbSaveRaw.setHoleCards(holeCardsString);
-            dbSaveRaw.setHandStrength(calculateOldstyleHandStrength());
+            dbSaveRaw.setHandStrength(-2);
             dbSaveRaw.setBotStack(gameVariables.getBotStack());
             dbSaveRaw.setOpponentStack(gameVariables.getOpponentStack());
             dbSaveRaw.setBotTotalBetSize(gameVariables.getBotBetSize());
@@ -51,6 +52,7 @@ public class Administration {
             dbSaveRaw.setRecentHandsWon(recentHandsWon);
             dbSaveRaw.setAdjustedOppType(adjustedOppType);
             dbSaveRaw.setPot(gameVariables.getPot());
+            dbSaveRaw.setEquity(calculateBotEquityIfNecessary(botEquity, gameVariables.getBotHoleCards()));
 
             continuousTable.getDbSaveList().add(dbSaveRaw);
             //DbSaveRaw
@@ -190,7 +192,15 @@ public class Administration {
         return strongDrawString;
     }
 
-    private double calculateOldstyleHandStrength() {
-        return 0.0;
+    private double calculateBotEquityIfNecessary(double botEquity, List<Card> botHoleCards) {
+        double botEquityToReturn;
+
+        if(botEquity == -3) {
+            botEquityToReturn = new EquityCalculator().getComboEquity(botHoleCards, null);
+        } else {
+            botEquityToReturn = botEquity;
+        }
+
+        return botEquityToReturn;
     }
 }

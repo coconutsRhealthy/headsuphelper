@@ -25,6 +25,7 @@ public class BotActionBuilder {
         action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative(), eligibleActions);
 
         RangeConstructor rangeConstructor = new RangeConstructor();
+        double botEquity = -3;
 
         if(action == null) {
             InputProvider inputProvider = new InputProvider();
@@ -47,10 +48,11 @@ public class BotActionBuilder {
             }
 
             action = rules.getAfterRuleAction(action, rangeConstructor, getFacingOdds(gameVariables), gameVariables.getBoard());
+            botEquity = equityAction.getBotEquity();
         }
 
         Administration administration = new Administration();
-        administration.doDbSaveStuff(action, continuousTable, gameVariables, sizing, rangeConstructor);
+        administration.doDbSaveStuff(action, continuousTable, gameVariables, sizing, rangeConstructor, botEquity);
         administration.doActionRoundStuff(action, gameVariables, sizing);
 
         return action;
