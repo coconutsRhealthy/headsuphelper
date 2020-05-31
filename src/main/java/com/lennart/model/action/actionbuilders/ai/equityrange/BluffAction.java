@@ -7,6 +7,9 @@ import com.lennart.model.action.actionbuilders.ai.Sizing;
 import com.lennart.model.card.Card;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by LennartMac on 25/05/2020.
@@ -54,15 +57,17 @@ public class BluffAction {
                             gameVariables, botSizing);
                     List<List<Card>> oppRaiseRangeWhenYouBluff = getOppRaiseRangeWhenYouBluff(continuousTable,
                             gameVariables, botSizing);
+                    List<List<Card>> oppCallRaiseRangeCombined = Stream.concat(oppCallRangeWhenYouBluff.stream(), oppRaiseRangeWhenYouBluff.stream())
+                            .collect(Collectors.toList());
+                    oppCallRaiseRangeCombined = filterOutDoubleCombos(oppCallRaiseRangeCombined);
 
                     double oppFoldRangeToTotalRangeRatio =
-                            (continuousTable.getOppRange().size() -
-                                    oppCallRangeWhenYouBluff.size() - oppRaiseRangeWhenYouBluff.size())
-                                    / continuousTable.getOppRange().size();
+                            (continuousTable.getOppRange().size() - oppCallRaiseRangeCombined.size() + 0.0)
+                                    / (continuousTable.getOppRange().size() + 0.0);
 
                     if(oppFoldRangeToTotalRangeRatio > 0.5) {
                         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
-                            if(equityAction.getBotEquity() > 0.5) {
+                            if(equityAction.getBotEquity() > 0.4) {
                                 actionToReturn = bluffActionToUse;
                             } else {
                                 actionToReturn = currentAction;
@@ -170,5 +175,10 @@ public class BluffAction {
         }
 
         return oppRaiseRangeWhenYouBluff;
+    }
+
+    private List<List<Card>> filterOutDoubleCombos(List<List<Card>> input) {
+        Set<Set<Card>> asSet = input.stream().map(combo -> combo.stream().collect(Collectors.toSet())).collect(Collectors.toSet());
+        return asSet.stream().map(comboAsSet -> comboAsSet.stream().collect(Collectors.toList())).collect(Collectors.toList());
     }
 }
