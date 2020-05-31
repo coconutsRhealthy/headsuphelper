@@ -3,16 +3,60 @@ package com.lennart.model.action.actionbuilders.ai.equityrange;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.action.actionbuilders.ai.Sizing;
+import com.lennart.model.card.Card;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by LennartMac on 25/05/2020.
  */
 public class BotActionBuilder {
+
+    public static void main(String[] args) {
+        new BotActionBuilder().testMethod();
+    }
+
+    private void testMethod() {
+        ContinuousTable continuousTable = new ContinuousTable();
+        GameVariables gameVariables = new GameVariables();
+
+        gameVariables.setBotHoleCards(Arrays.asList(new Card(6, 'd'), new Card(7, 'c')));
+        gameVariables.setOpponentAction("raise");
+        gameVariables.setBotIsButton(false);
+        gameVariables.setBotStack(980);
+        gameVariables.setOpponentStack(950);
+        gameVariables.setBotBetSize(20);
+        gameVariables.setOpponentBetSize(50);
+        gameVariables.setBigBlind(20);
+        gameVariables.setPot(0);
+        gameVariables.setOpponentName("TestNewEquityStyle");
+
+        List<PlayerActionRound> actionsSinceLastRequest1 = new ArrayList<>();
+        PlayerActionRound playerActionRound1_1 = new PlayerActionRound("opponent", new ArrayList<>(), gameVariables.getBigBlind(), gameVariables.getBigBlind() / 2, "preflop", "postSB");
+        PlayerActionRound playerActionRound1_2 = new PlayerActionRound("bot", new ArrayList<>(), gameVariables.getBigBlind(), gameVariables.getBigBlind() / 2, "preflop", "bet");
+        PlayerActionRound playerActionRound1_3 = new PlayerActionRound("opponent", new ArrayList<>(), gameVariables.getBigBlind(), 43, "preflop", "raise");
+        actionsSinceLastRequest1.add(playerActionRound1_1);
+        actionsSinceLastRequest1.add(playerActionRound1_2);
+        actionsSinceLastRequest1.add(playerActionRound1_3);
+
+        ActionRequest actionRequest1 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 980, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
+
+        actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_1);
+        actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_2);
+        actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_3);
+
+        gameVariables.getAllActionRequestsOfHand().add(actionRequest1);
+
+        new OpponentRangeSetter(new InputProvider()).setOpponentRange(continuousTable, gameVariables);
+
+        String action = getAction(continuousTable, gameVariables);
+
+        System.out.println(action);
+    }
 
     public String getAction(ContinuousTable continuousTable, GameVariables gameVariables) {
         String action = null;
