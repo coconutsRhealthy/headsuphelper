@@ -3,6 +3,8 @@ package com.lennart.model.action.actionbuilders.ai.equityrange;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.action.actionbuilders.ai.Sizing;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSaveRaw;
 import com.lennart.model.card.Card;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
@@ -24,32 +26,47 @@ public class BotActionBuilder {
         ContinuousTable continuousTable = new ContinuousTable();
         GameVariables gameVariables = new GameVariables();
 
-        gameVariables.setBotHoleCards(Arrays.asList(new Card(6, 'd'), new Card(7, 'c')));
-        gameVariables.setOpponentAction("raise");
+        gameVariables.setBotHoleCards(Arrays.asList(new Card(6, 'd'), new Card(7, 'd')));
+        gameVariables.setBoard(Arrays.asList(new Card(2, 's'), new Card(12, 'h'), new Card(14, 'd')));
+        gameVariables.setOpponentAction("empty");
         gameVariables.setBotIsButton(false);
-        gameVariables.setBotStack(980);
-        gameVariables.setOpponentStack(950);
-        gameVariables.setBotBetSize(20);
-        gameVariables.setOpponentBetSize(50);
+        gameVariables.setBotStack(840);
+        gameVariables.setOpponentStack(840);
+        gameVariables.setBotBetSize(0);
+        gameVariables.setOpponentBetSize(0);
         gameVariables.setBigBlind(20);
-        gameVariables.setPot(0);
+        gameVariables.setPot(320);
         gameVariables.setOpponentName("TestNewEquityStyle");
 
-        List<PlayerActionRound> actionsSinceLastRequest1 = new ArrayList<>();
         PlayerActionRound playerActionRound1_1 = new PlayerActionRound("opponent", new ArrayList<>(), gameVariables.getBigBlind(), gameVariables.getBigBlind() / 2, "preflop", "postSB");
         PlayerActionRound playerActionRound1_2 = new PlayerActionRound("bot", new ArrayList<>(), gameVariables.getBigBlind(), gameVariables.getBigBlind() / 2, "preflop", "bet");
         PlayerActionRound playerActionRound1_3 = new PlayerActionRound("opponent", new ArrayList<>(), gameVariables.getBigBlind(), 43, "preflop", "raise");
-        actionsSinceLastRequest1.add(playerActionRound1_1);
-        actionsSinceLastRequest1.add(playerActionRound1_2);
-        actionsSinceLastRequest1.add(playerActionRound1_3);
 
-        ActionRequest actionRequest1 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 980, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
+        ActionRequest actionRequest1 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 63, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
 
         actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_1);
         actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_2);
         actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_3);
 
         gameVariables.getAllActionRequestsOfHand().add(actionRequest1);
+
+        PlayerActionRound playerActionRound2_1 = new PlayerActionRound("bot", new ArrayList<>(), 160, 43, "preflop", "raise");
+        PlayerActionRound playerActionRound2_2 = new PlayerActionRound("opponent", new ArrayList<>(), 160, 160, "preflop", "call");
+
+        ActionRequest actionRequest2 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 320, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
+
+        actionRequest2.getActionsSinceLastRequest().add(playerActionRound2_1);
+        actionRequest2.getActionsSinceLastRequest().add(playerActionRound2_2);
+
+        gameVariables.getAllActionRequestsOfHand().add(actionRequest2);
+
+        List<DbSave> dbSaveList = new ArrayList<>();
+        DbSaveRaw dbSaveRaw = new DbSaveRaw();
+        dbSaveRaw.setBoard("");
+        dbSaveRaw.setBotAction("raise");
+        dbSaveRaw.setSizing(160);
+        dbSaveList.add(dbSaveRaw);
+        continuousTable.setDbSaveList(dbSaveList);
 
         new OpponentRangeSetter(new InputProvider()).setOpponentRange(continuousTable, gameVariables);
 
