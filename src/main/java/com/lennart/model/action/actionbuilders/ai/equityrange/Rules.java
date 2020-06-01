@@ -112,6 +112,8 @@ public class Rules {
 
         if(oppAction.equals("bet")) {
             if(bigBlind < 50) {
+                //todo: add handstrength
+
                 if(botStack > bigBlind) {
                     actionToReturn = "raise";
                 } else {

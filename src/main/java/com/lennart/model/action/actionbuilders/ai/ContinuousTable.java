@@ -1,8 +1,10 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
+import com.lennart.model.action.actionbuilders.ai.equityrange.BotActionBuilder;
 import com.lennart.model.action.actionbuilders.ai.equityrange.InputProvider;
 import com.lennart.model.action.actionbuilders.ai.equityrange.OpponentRangeSetter;
+import com.lennart.model.action.actionbuilders.ai.equityrange.RangeConstructor;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.botgame.MouseKeyboard;
@@ -97,12 +99,12 @@ public class ContinuousTable implements ContinuousTableable {
                         }
                     }
 
-                    int numberOfHsAbove85 = getNumberOfHsAbove85();
-                    int allHs = allHandStrenghts.size();
+                    //int numberOfHsAbove85 = getNumberOfHsAbove85();
+                    //int allHs = allHandStrenghts.size();
 
-                    System.out.println("^^^^a " + numberOfHsAbove85 + " ^^^^");
-                    System.out.println("^^^^b " + allHs + " ^^^^");
-                    System.out.println("^ratio: " + (double) numberOfHsAbove85 / (double) allHs + " ^^^^");
+                    //System.out.println("^^^^a " + numberOfHsAbove85 + " ^^^^");
+                    //System.out.println("^^^^b " + allHs + " ^^^^");
+                    //System.out.println("^ratio: " + (double) numberOfHsAbove85 / (double) allHs + " ^^^^");
 
                     if(!game.equals("sng")) {
                         long currentTime = new Date().getTime();
@@ -157,18 +159,22 @@ public class ContinuousTable implements ContinuousTableable {
                 }
 
                 //hier gaat het zetten van opp range gebeuren...
-                //new OpponentRangeSetter(new InputProvider()).setOpponentRange(this, gameVariables);
+                RangeConstructor rangeConstructor = new RangeConstructor();
+                new OpponentRangeSetter(rangeConstructor, new InputProvider()).setOpponentRange(this, gameVariables);
 
-                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
-                String action = actionVariables.getAction();
+                BotActionBuilder botActionBuilder = new BotActionBuilder();
+                String action = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
+
+                //ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
+                //String action = actionVariables.getAction();
 
                 if(action.equals("bet75pct") || action.equals("raise")) {
                     opponentHasInitiative = false;
                 }
 
-                double sizing = actionVariables.getSizing();
+                double sizing = botActionBuilder.getSizing();
 
-                doLogging(gameVariables, actionVariables, numberOfActionRequests);
+                //doLogging(gameVariables, actionVariables, numberOfActionRequests);
 
                 System.out.println();
                 System.out.println("********************");
@@ -176,15 +182,15 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Opponent Name: " + gameVariables.getOpponentName());
                 System.out.println("Suggested action: "+ action);
                 System.out.println("Sizing: " + sizing);
-                System.out.println("Route: " + actionVariables.getRoute());
-                System.out.println("Table: " + actionVariables.getTable());
-                System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
+                //System.out.println("Route: " + actionVariables.getRoute());
+                //System.out.println("Table: " + actionVariables.getTable());
+                //System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
                 System.out.println("********************");
                 System.out.println();
 
-                if(gameVariables.getBoard() != null && gameVariables.getBoard().size() >= 3) {
-                    allHandStrenghts.add(actionVariables.getBotHandStrength());
-                }
+                //if(gameVariables.getBoard() != null && gameVariables.getBoard().size() >= 3) {
+                //    allHandStrenghts.add(actionVariables.getBotHandStrength());
+                //}
 
                 StarsTableReader.performActionOnSite(action, sizing);
 

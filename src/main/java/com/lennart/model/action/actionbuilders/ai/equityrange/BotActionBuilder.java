@@ -18,6 +18,8 @@ import java.util.List;
  */
 public class BotActionBuilder {
 
+    double sizing;
+
     public static void main(String[] args) {
         new BotActionBuilder().testMethod();
     }
@@ -83,7 +85,7 @@ public class BotActionBuilder {
 
         setOpponentHasInitiative(gameVariables.getOpponentAction(), continuousTable, gameVariables);
         List<String> eligibleActions = getEligibleActions(gameVariables);
-        double sizing = getSizing(gameVariables);
+        sizing = getSizing(gameVariables);
 
         action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative(), eligibleActions);
 
@@ -188,5 +190,9 @@ public class BotActionBuilder {
 
         double facingOdds = (opponentBetSize - botBetSize) / (gameVariables.getPot() + botBetSize + opponentBetSize);
         return facingOdds;
+    }
+
+    public double getSizing() {
+        return sizing;
     }
 }

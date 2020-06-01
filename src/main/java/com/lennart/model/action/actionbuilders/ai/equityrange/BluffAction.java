@@ -65,7 +65,21 @@ public class BluffAction {
                             (continuousTable.getOppRange().size() - oppCallRaiseRangeCombined.size() + 0.0)
                                     / (continuousTable.getOppRange().size() + 0.0);
 
-                    if(oppFoldRangeToTotalRangeRatio > 0.5) {
+                    //todo: kan negatief zijn?
+
+                    System.out.println("RATIO: " + oppFoldRangeToTotalRangeRatio);
+
+                    //todo: was op river een keer superhoog.. 0.98...
+
+                    double limit;
+
+                    if(bluffActionToUse.equals("bet75pct")) {
+                        limit = 0.5;
+                    } else {
+                        limit = 0.6;
+                    }
+
+                    if(oppFoldRangeToTotalRangeRatio > limit) {
                         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
                             if(equityAction.getBotEquity() > 0.4) {
                                 actionToReturn = bluffActionToUse;

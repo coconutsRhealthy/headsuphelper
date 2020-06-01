@@ -189,7 +189,7 @@ public class OpponentRangeSetter {
                     preflopEquityHs.getAllSortedPfEquityCombos(),
                     inputProvider.getOppPreCall3betGroup(gameVariables.getOpponentName()),
                     gameVariables.getBotHoleCards());
-            } else if(botRaiseType.equals("4bet")) {
+            } else if(botRaiseType.equals("4bet_up")) {
                 oppPreCallRange = rangeConstructor.getOppPreCall4betUpRange(
                     preflopEquityHs.getAllSortedPfEquityCombos(),
                     inputProvider.getOppPreCall4betUpGroup(gameVariables.getOpponentName()),
@@ -273,7 +273,7 @@ public class OpponentRangeSetter {
                         preflopEquityHs.getAllSortedPfEquityCombos(),
                         inputProvider.getOppPreCall3betGroup(gameVariables.getOpponentName()),
                         gameVariables.getBotHoleCards());
-            } else if(botRaiseType.equals("4bet")) {
+            } else if(botRaiseType.equals("4bet_up")) {
                 oppPreCallRange = rangeConstructor.getOppPreCall4betUpRange(
                         preflopEquityHs.getAllSortedPfEquityCombos(),
                         inputProvider.getOppPreCall4betUpGroup(gameVariables.getOpponentName()),
