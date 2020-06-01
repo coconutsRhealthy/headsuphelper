@@ -68,14 +68,16 @@ public class BotActionBuilder {
         dbSaveList.add(dbSaveRaw);
         continuousTable.setDbSaveList(dbSaveList);
 
-        new OpponentRangeSetter(new InputProvider()).setOpponentRange(continuousTable, gameVariables);
+        RangeConstructor rangeConstructor = new RangeConstructor();
 
-        String action = getAction(continuousTable, gameVariables);
+        new OpponentRangeSetter(rangeConstructor, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
+
+        String action = getAction(continuousTable, gameVariables, rangeConstructor);
 
         System.out.println(action);
     }
 
-    public String getAction(ContinuousTable continuousTable, GameVariables gameVariables) {
+    public String getAction(ContinuousTable continuousTable, GameVariables gameVariables, RangeConstructor rangeConstructor) {
         String action = null;
         Rules rules = new Rules();
 
@@ -85,7 +87,6 @@ public class BotActionBuilder {
 
         action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative(), eligibleActions);
 
-        RangeConstructor rangeConstructor = new RangeConstructor();
         double botEquity = -3;
 
         if(action == null) {

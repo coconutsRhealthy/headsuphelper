@@ -21,8 +21,8 @@ public class OpponentRangeSetter {
     private PreflopEquityHs preflopEquityHs;
     private InputProvider inputProvider;
 
-    public OpponentRangeSetter(InputProvider inputProvider) {
-        this.rangeConstructor = new RangeConstructor();
+    public OpponentRangeSetter(RangeConstructor rangeConstructor, InputProvider inputProvider) {
+        this.rangeConstructor = rangeConstructor;
         this.preflopEquityHs = new PreflopEquityHs();
         this.inputProvider = inputProvider;
         this.equityAction = new EquityAction(inputProvider, preflopEquityHs, rangeConstructor);
