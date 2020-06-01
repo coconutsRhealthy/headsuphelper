@@ -283,6 +283,9 @@ public class OpponentRangeSetter {
             }
 
             continuousTable.setOppRange(oppPreCallRange);
+        } else if(previousRound.getBotAction().equals("call")) {
+            System.out.println("OOP CALL PREFLOP DONE");
+            continuousTable.setOppRange(continuousTable.getOppRange());
         } else {
             System.out.println("Shouldn't come here, OpponentRangeSetter - 10");
         }
@@ -313,6 +316,9 @@ public class OpponentRangeSetter {
                         previousBoard,
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppCallRange);
+            } else if(previousRound.getBotAction().equals("call")) {
+                System.out.println("OOP CALL Pe Pe POSTFLOP DONE");
+                continuousTable.setOppRange(continuousTable.getOppRange());
             } else {
                 System.out.println("Shouldn't come here, OpponentRangeSetter - 11");
             }
@@ -323,6 +329,9 @@ public class OpponentRangeSetter {
                                                            DbSaveRaw previousRound, List<Card> previousBoard) {
         if(previousRound.getBotAction().equals("check")) {
             if(gameVariables.getOpponentAction().equals("check") || gameVariables.getOpponentAction().equals("call")) {
+                //gaat hier iets mis?
+                System.out.println("NU IS HET: " + continuousTable.getOppRange().size());
+
                 List<List<Card>> oppCheckRange = rangeConstructor.getOppPostflopCheckRange(
                         continuousTable.getOppRange(),
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
@@ -332,6 +341,8 @@ public class OpponentRangeSetter {
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppCheckRange);
+
+                System.out.println("EN NU: " + continuousTable.getOppRange().size());
             } else if(gameVariables.getOpponentAction().equals("bet75pct")) {
                 List<List<Card>> oppBetRange = rangeConstructor.getOppPostflopBetRange(
                         continuousTable.getOppRange(),
