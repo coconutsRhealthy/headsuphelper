@@ -31,6 +31,8 @@ public class RangeConstructor {
     private static final String SMALL = "small";
     private static final String LARGE = "large";
 
+    private Map<String, List<List<Card>>> rangeMap;
+
     //draws
     private Map<List<Card>, StraightDrawEvaluator> straightDrawEvaluatorMap = new HashMap<>();
     private Map<List<Card>, FlushDrawEvaluator> flushDrawEvaluatorMap = new HashMap<>();
@@ -56,38 +58,51 @@ public class RangeConstructor {
         System.out.println(new EquityAction(new InputProvider(), new PreflopEquityHs(), new RangeConstructor()).getAverageEquityOfRangeWithEquityMap(postflopEquityMap, range));
     }
 
+    public RangeConstructor() {
+        initializeRangeMap();
+    }
+
     public List<List<Card>> getOppPreLimpRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
-        List<List<Card>> oppPre2betRange = new ArrayList<>();
+        if(!rangeMap.get("oppPreLimpRange").isEmpty()) {
+            return rangeMap.get("oppPreLimpRange");
+        }
+
+        List<List<Card>> oppPreLimpRange = new ArrayList<>();
 
         if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
             for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
                 if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.3) {
                     if(Math.random() < 0.35) {
-                        oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                        oppPreLimpRange.add(allSortedPfEquityCombos.get(i));
                     }
                 } else {
-                    oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                    oppPreLimpRange.add(allSortedPfEquityCombos.get(i));
                 }
             }
         } else if(pre2betGroup.equals("low")) {
-            oppPre2betRange.addAll(allSortedPfEquityCombos);
+            oppPreLimpRange.addAll(allSortedPfEquityCombos);
         } else if(pre2betGroup.equals("high")) {
             for(int i = 0; i < allSortedPfEquityCombos.size(); i++) {
                 if((i + 0.0) / (allSortedPfEquityCombos.size() + 0.0) <= 0.5) {
                     if(Math.random() < 0.3) {
-                        oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                        oppPreLimpRange.add(allSortedPfEquityCombos.get(i));
                     }
                 } else {
-                    oppPre2betRange.add(allSortedPfEquityCombos.get(i));
+                    oppPreLimpRange.add(allSortedPfEquityCombos.get(i));
                 }
             }
         }
 
-        oppPre2betRange = removeCombosWithKnownCards(oppPre2betRange, botHoleCards);
-        return oppPre2betRange;
+        oppPreLimpRange = removeCombosWithKnownCards(oppPreLimpRange, botHoleCards);
+        rangeMap.put("oppPreLimpRange", oppPreLimpRange);
+        return oppPreLimpRange;
     }
 
     public List<List<Card>> getOppPreCheckAgainstLimpRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPreCheckAgainstLimpRange").isEmpty()) {
+            return rangeMap.get("oppPreCheckAgainstLimpRange");
+        }
+
         List<List<Card>> oppPreCheckRange = new ArrayList<>();
 
         if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
@@ -123,10 +138,15 @@ public class RangeConstructor {
         }
 
         oppPreCheckRange = removeCombosWithKnownCards(oppPreCheckRange, botHoleCards);
+        rangeMap.put("oppPreCheckAgainstLimpRange", oppPreCheckRange);
         return oppPreCheckRange;
     }
 
     public List<List<Card>> getOppPreRaiseAgainstLimpRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPreRaiseAgainstLimpRange").isEmpty()) {
+            return rangeMap.get("oppPreRaiseAgainstLimpRange");
+        }
+
         List<List<Card>> oppPreRaiseAgainstLimpRange = new ArrayList<>();
 
         if(pre2betGroup.equals("mediumUnknown") || pre2betGroup.equals("medium")) {
@@ -175,10 +195,15 @@ public class RangeConstructor {
         }
 
         oppPreRaiseAgainstLimpRange = removeCombosWithKnownCards(oppPreRaiseAgainstLimpRange, botHoleCards);
+        rangeMap.put("oppPreRaiseAgainstLimpRange", oppPreRaiseAgainstLimpRange);
         return oppPreRaiseAgainstLimpRange;
     }
 
     public List<List<Card>> getOppPre2betRange(List<List<Card>> allSortedPfEquityCombos, String pre2betGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPre2betRange").isEmpty()) {
+            return rangeMap.get("oppPre2betRange");
+        }
+
         List<List<Card>> oppPre2betRange = new ArrayList<>();
 
         double limit;
@@ -208,10 +233,15 @@ public class RangeConstructor {
         }
 
         oppPre2betRange = removeCombosWithKnownCards(oppPre2betRange, botHoleCards);
+        rangeMap.put("oppPre2betRange", oppPre2betRange);
         return oppPre2betRange;
     }
 
     public List<List<Card>> getOppPreCall2betRange(List<List<Card>> allSortedPfEquityCombos, String preCall2betGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPreCall2betRange").isEmpty()) {
+            return rangeMap.get("oppPreCall2betRange");
+        }
+
         List<List<Card>> oppPreCall2betRange = new ArrayList<>();
 
         double limit;
@@ -249,10 +279,15 @@ public class RangeConstructor {
         }
 
         oppPreCall2betRange = removeCombosWithKnownCards(oppPreCall2betRange, botHoleCards);
+        rangeMap.put("oppPreCall2betRange", oppPreCall2betRange);
         return oppPreCall2betRange;
     }
 
     public List<List<Card>> getOppPre3betRange(List<List<Card>> allSortedPfEquityCombos, String pre3betGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPre3betRange").isEmpty()) {
+            return rangeMap.get("oppPre3betRange");
+        }
+
         List<List<Card>> oppPre3betRange = new ArrayList<>();
 
         double limit;
@@ -308,10 +343,15 @@ public class RangeConstructor {
         }
 
         oppPre3betRange = removeCombosWithKnownCards(oppPre3betRange, botHoleCards);
+        rangeMap.put("oppPre3betRange", oppPre3betRange);
         return oppPre3betRange;
     }
 
     public List<List<Card>> getOppPreCall3betRange(List<List<Card>> allSortedPfEquityCombos, String preCall3betGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPreCall3betRange").isEmpty()) {
+            return rangeMap.get("oppPreCall3betRange");
+        }
+
         List<List<Card>> preCall3betRange = new ArrayList<>();
 
         double limit;
@@ -359,10 +399,15 @@ public class RangeConstructor {
 
         preCall3betRange = filterOutDoubleCombos(preCall3betRange);
         preCall3betRange = removeCombosWithKnownCards(preCall3betRange, botHoleCards);
+        rangeMap.put("oppPreCall3betRange", preCall3betRange);
         return preCall3betRange;
     }
 
     public List<List<Card>> getOppPre4betUpRange(List<List<Card>> allSortedPfEquityCombos, String pre4betUpGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPre4betUpRange").isEmpty()) {
+            return rangeMap.get("oppPre4betUpRange");
+        }
+
         List<List<Card>> pre4betUpRange = new ArrayList<>();
 
         double limit;
@@ -403,10 +448,15 @@ public class RangeConstructor {
         }
 
         pre4betUpRange = removeCombosWithKnownCards(pre4betUpRange, botHoleCards);
+        rangeMap.put("oppPre4betUpRange", pre4betUpRange);
         return pre4betUpRange;
     }
 
     public List<List<Card>> getOppPreCall4betUpRange(List<List<Card>> allSortedPfEquityCombos, String preCall4betUpGroup, List<Card> botHoleCards) {
+        if(!rangeMap.get("oppPreCall4betUpRange").isEmpty()) {
+            return rangeMap.get("oppPreCall4betUpRange");
+        }
+
         List<List<Card>> preCall4betUpRange = new ArrayList<>();
 
         double limit;
@@ -427,11 +477,17 @@ public class RangeConstructor {
         }
 
         preCall4betUpRange = removeCombosWithKnownCards(preCall4betUpRange, botHoleCards);
+        rangeMap.put("oppPreCall4betUpRange", preCall4betUpRange);
         return preCall4betUpRange;
     }
 
     public List<List<Card>> getOppPostflopCheckRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
                                                 String oppAggroness, String potSize, List<Card> board, List<Card> botHoleCards) {
+        String postFlopRangeTypeString = getPostflopRangeTypeString(board, "check");
+        if(!rangeMap.get(postFlopRangeTypeString).isEmpty()) {
+            return rangeMap.get(postFlopRangeTypeString);
+        }
+
         List<List<Card>> oppCheckRange;
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
@@ -537,11 +593,17 @@ public class RangeConstructor {
             oppCheckRange = new ArrayList<>();
         }
 
+        rangeMap.put(postFlopRangeTypeString, oppCheckRange);
         return oppCheckRange;
     }
 
     public List<List<Card>> getOppPostflopBetRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
                                                     String oppAggroness, String oppBetsize, List<Card> board, List<Card> botHoleCards) {
+        String postFlopRangeTypeString = getPostflopRangeTypeString(board, "bet75pct");
+        if(!rangeMap.get(postFlopRangeTypeString).isEmpty()) {
+            return rangeMap.get(postFlopRangeTypeString);
+        }
+
         List<List<Card>> oppBetRange;
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
@@ -631,11 +693,17 @@ public class RangeConstructor {
             oppBetRange = new ArrayList<>();
         }
 
+        rangeMap.put(postFlopRangeTypeString, oppBetRange);
         return oppBetRange;
     }
 
     public List<List<Card>> getOppPostflopCallRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
                                                String oppLooseness, String botSizing, List<Card> board, List<Card> botHoleCards) {
+        String postFlopRangeTypeString = getPostflopRangeTypeString(board, "call");
+        if(!rangeMap.get(postFlopRangeTypeString).isEmpty()) {
+            return rangeMap.get(postFlopRangeTypeString);
+        }
+
         List<List<Card>> oppCallRange;
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
@@ -805,11 +873,17 @@ public class RangeConstructor {
             oppCallRange = new ArrayList<>();
         }
 
+        rangeMap.put(postFlopRangeTypeString, oppCallRange);
         return oppCallRange;
     }
 
     public List<List<Card>> getOppPostflopRaiseRange(List<List<Card>> oppStartingRange, List<List<Card>> allCombosEquitySorted,
                                                       String oppAggroness, String oppRaiseSize, List<Card> board, List<Card> botHoleCards) {
+        String postFlopRangeTypeString = getPostflopRangeTypeString(board, "raise");
+        if(!rangeMap.get(postFlopRangeTypeString).isEmpty()) {
+            return rangeMap.get(postFlopRangeTypeString);
+        }
+
         List<List<Card>> oppRaiseRange;
         List<Card> knownGameCards = Stream.concat(board.stream(), botHoleCards.stream()).collect(Collectors.toList());
 
@@ -898,6 +972,7 @@ public class RangeConstructor {
             oppRaiseRange = new ArrayList<>();
         }
 
+        rangeMap.put(postFlopRangeTypeString, oppRaiseRange);
         return oppRaiseRange;
     }
 
@@ -1173,6 +1248,72 @@ public class RangeConstructor {
                 .collect(Collectors.toList());
 
         return startingOppRange;
+    }
+
+    private void initializeRangeMap() {
+        rangeMap = new HashMap<>();
+
+        rangeMap.put("oppPreLimpRange", new ArrayList<>());
+        rangeMap.put("oppPreCheckAgainstLimpRange", new ArrayList<>());
+        rangeMap.put("oppPreRaiseAgainstLimpRange", new ArrayList<>());
+        rangeMap.put("oppPre2betRange", new ArrayList<>());
+        rangeMap.put("oppPreCall2betRange", new ArrayList<>());
+        rangeMap.put("oppPre3betRange", new ArrayList<>());
+        rangeMap.put("oppPreCall3betRange", new ArrayList<>());
+        rangeMap.put("oppPre4betUpRange", new ArrayList<>());
+        rangeMap.put("oppPreCall4betUpRange", new ArrayList<>());
+        rangeMap.put("oppFlopCheckRange", new ArrayList<>());
+        rangeMap.put("oppFlopBetRange", new ArrayList<>());
+        rangeMap.put("oppFlopCallRange", new ArrayList<>());
+        rangeMap.put("oppFlopRaiseRange", new ArrayList<>());
+        rangeMap.put("oppTurnCheckRange", new ArrayList<>());
+        rangeMap.put("oppTurnBetRange", new ArrayList<>());
+        rangeMap.put("oppTurnCallRange", new ArrayList<>());
+        rangeMap.put("oppTurnRaiseRange", new ArrayList<>());
+        rangeMap.put("oppRiverCheckRange", new ArrayList<>());
+        rangeMap.put("oppRiverBetRange", new ArrayList<>());
+        rangeMap.put("oppRiverCallRange", new ArrayList<>());
+        rangeMap.put("oppRiverRaiseRange", new ArrayList<>());
+    }
+
+    private String getPostflopRangeTypeString(List<Card> board, String action) {
+        String postFlopRangeTypeString;
+
+        if(action.equals("check")) {
+            if(board.size() == 3) {
+                postFlopRangeTypeString = "oppFlopCheckRange";
+            } else if(board.size() == 4) {
+                postFlopRangeTypeString = "oppTurnCheckRange";
+            } else {
+                postFlopRangeTypeString = "oppRiverCheckRange";
+            }
+        } else if(action.equals("bet75pct")) {
+            if(board.size() == 3) {
+                postFlopRangeTypeString = "oppFlopBetRange";
+            } else if(board.size() == 4) {
+                postFlopRangeTypeString = "oppTurnBetRange";
+            } else {
+                postFlopRangeTypeString = "oppRiverBetRange";
+            }
+        } else if(action.equals("call")) {
+            if(board.size() == 3) {
+                postFlopRangeTypeString = "oppFlopCallRange";
+            } else if(board.size() == 4) {
+                postFlopRangeTypeString = "oppTurnCallRange";
+            } else {
+                postFlopRangeTypeString = "oppRiverCallRange";
+            }
+        } else {
+            if(board.size() == 3) {
+                postFlopRangeTypeString = "oppFlopRaiseRange";
+            } else if(board.size() == 4) {
+                postFlopRangeTypeString = "oppTurnRaiseRange";
+            } else {
+                postFlopRangeTypeString = "oppRiverRaiseRange";
+            }
+        }
+
+        return postFlopRangeTypeString;
     }
 
     public Map<List<Card>, StraightDrawEvaluator> getStraightDrawEvaluatorMap() {
