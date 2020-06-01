@@ -494,7 +494,7 @@ public class RangeConstructor {
         if(oppAggroness.equals(LOW)) {
             if(potSize.equals(SMALL)) {
                 double valueVsLowComboBoundry = 60;
-                double valueInclusionPercentage = 37;
+                double valueInclusionPercentage = 85;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 70;
@@ -502,7 +502,7 @@ public class RangeConstructor {
                         valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(potSize.equals(MEDIUM)) {
                 double valueVsLowComboBoundry = 70;
-                double valueInclusionPercentage = 50;
+                double valueInclusionPercentage = 85;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 85;
@@ -511,7 +511,7 @@ public class RangeConstructor {
                         valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(potSize.equals(LARGE)) {
                 double valueVsLowComboBoundry = 80;
-                double valueInclusionPercentage = 50;
+                double valueInclusionPercentage = 85;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 95;
@@ -525,7 +525,7 @@ public class RangeConstructor {
         } else if(oppAggroness.equals(MEDIUM)) {
             if(potSize.equals(SMALL)) {
                 double valueVsLowComboBoundry = 60;
-                double valueInclusionPercentage = 25;
+                double valueInclusionPercentage = 67;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 35;
@@ -534,7 +534,7 @@ public class RangeConstructor {
                         valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(potSize.equals(MEDIUM)) {
                 double valueVsLowComboBoundry = 70;
-                double valueInclusionPercentage = 25;
+                double valueInclusionPercentage = 67;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 50;
@@ -543,7 +543,7 @@ public class RangeConstructor {
                         valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(potSize.equals(LARGE)) {
                 double valueVsLowComboBoundry = 80;
-                double valueInclusionPercentage = 25;
+                double valueInclusionPercentage = 67;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 75;
@@ -557,7 +557,7 @@ public class RangeConstructor {
         } else if(oppAggroness.equals(HIGH)) {
             if(potSize.equals(SMALL)) {
                 double valueVsLowComboBoundry = 60;
-                double valueInclusionPercentage = 15;
+                double valueInclusionPercentage = 35;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 15;
@@ -568,7 +568,7 @@ public class RangeConstructor {
 
             } else if(potSize.equals(MEDIUM)) {
                 double valueVsLowComboBoundry = 70;
-                double valueInclusionPercentage = 15;
+                double valueInclusionPercentage = 35;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 20;
@@ -577,7 +577,7 @@ public class RangeConstructor {
                         valueVsLowComboBoundry, valueInclusionPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(potSize.equals(LARGE)) {
                 double valueVsLowComboBoundry = 75;
-                double valueInclusionPercentage = 15;
+                double valueInclusionPercentage = 35;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT,
                         MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 35;
@@ -1045,7 +1045,7 @@ public class RangeConstructor {
 
         if((drawPercentageToInclude / 100) < 1) {
             for(List<Card> draw : eligibleDraws) {
-                if(Math.random() < drawPercentageToInclude) {
+                if(Math.random() < (drawPercentageToInclude / 100)) {
                     range.add(draw);
                 }
             }
