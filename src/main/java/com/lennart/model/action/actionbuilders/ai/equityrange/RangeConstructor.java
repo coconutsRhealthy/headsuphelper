@@ -935,7 +935,7 @@ public class RangeConstructor {
         range = filterOutDoubleCombos(range);
 
         //air
-        List<List<Card>> airCombos = getAirCombos(allCombosEquitySorted, range, airPercentage, knownGameCards);
+        List<List<Card>> airCombos = getAirCombos(allCombosEquitySorted, oppStartingRange, range, airPercentage, knownGameCards);
         range.addAll(airCombos);
         range = filterOutDoubleCombos(range);
 
@@ -1048,12 +1048,13 @@ public class RangeConstructor {
         return draws;
     }
 
-    private List<List<Card>> getAirCombos(List<List<Card>> allCombosEquitySorted, List<List<Card>> valueAndDrawRange,
+    private List<List<Card>> getAirCombos(List<List<Card>> allCombosEquitySorted, List<List<Card>> currentRange, List<List<Card>> valueAndDrawRange,
                                           double airPercentageToAdd, List<Card> knownGameCards) {
         List<List<Card>> airCombosToAddToRange = new ArrayList<>();
 
         List<List<Card>> airCombosTotal = allCombosEquitySorted.subList((int) (allCombosEquitySorted.size() * 0.55), allCombosEquitySorted.size());
-        List<List<Card>> eligibleAirCombos = removeCombosThatAreInRange(valueAndDrawRange, airCombosTotal);
+        List<List<Card>> airCombosNotInValueAndDrawRange = removeCombosThatAreInRange(valueAndDrawRange, airCombosTotal);
+        List<List<Card>> eligibleAirCombos = retainCombosThatAreInRange(currentRange, airCombosNotInValueAndDrawRange);
         eligibleAirCombos = removeCombosWithKnownCards(eligibleAirCombos, knownGameCards);
 
         int numberOfCombosToAdd = (int) (valueAndDrawRange.size() * ((airPercentageToAdd / 100) + 1)) - valueAndDrawRange.size();
