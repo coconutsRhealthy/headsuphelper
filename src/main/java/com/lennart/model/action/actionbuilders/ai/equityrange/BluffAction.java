@@ -67,6 +67,8 @@ public class BluffAction {
 
                     //todo: kan negatief zijn?
 
+                    System.out.println("CURR: " + continuousTable.getOppRange().size());
+                    System.out.println("COMBINED: " + oppCallRaiseRangeCombined.size());
                     System.out.println("RATIO: " + oppFoldRangeToTotalRangeRatio);
 
                     //todo: was op river een keer superhoog.. 0.98...

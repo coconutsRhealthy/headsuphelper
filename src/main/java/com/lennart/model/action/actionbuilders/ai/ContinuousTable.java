@@ -162,6 +162,12 @@ public class ContinuousTable implements ContinuousTableable {
                 RangeConstructor rangeConstructor = new RangeConstructor();
                 new OpponentRangeSetter(rangeConstructor, new InputProvider()).setOpponentRange(this, gameVariables);
 
+                if(oppRange == null) {
+                    System.out.println("OPPRANGE = NULL");
+                } else {
+                    System.out.println("OPPRANGE SIZE: " + oppRange.size());
+                }
+
                 BotActionBuilder botActionBuilder = new BotActionBuilder();
                 String action = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
 

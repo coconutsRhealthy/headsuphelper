@@ -115,6 +115,7 @@ public class Rules {
                 //todo: add handstrength
 
                 if(botStack > bigBlind) {
+                    System.out.println("pre open 2bet rule");
                     actionToReturn = "raise";
                 } else {
                     actionToReturn = "call";
