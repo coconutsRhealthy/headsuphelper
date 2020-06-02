@@ -95,6 +95,9 @@ public class EquityAction {
 
         double oppAveragePfRaiseRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPfRaiseRange, null);
 
+        System.out.println("botEquity: " + botEquity);
+        System.out.println("oppEquity: " + oppAveragePfRaiseRangeEquity);
+
         if(botEquity > oppAveragePfRaiseRangeEquity) {
             if(eligibleActions.contains("raise")) {
                 String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(botSizing, gameVariables.getBigBlind());
@@ -155,6 +158,9 @@ public class EquityAction {
 
         double oppAveragePfCallRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPfCallingRange, null);
 
+        System.out.println("botEquity: " + botEquity);
+        System.out.println("oppEquity: " + oppAveragePfCallRangeEquity);
+
         if(botEquity > oppAveragePfCallRangeEquity) {
             actionToReturn = "raise";
         } else {
@@ -178,6 +184,9 @@ public class EquityAction {
 
         botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
         double oppAverageCallingEquity = new EquityCalculator().getAverageRangeEquity(oppCallingRange, board);
+
+        System.out.println("botEquity: " + botEquity);
+        System.out.println("oppEquity: " + oppAverageCallingEquity);
 
         if(botEquity > oppAverageCallingEquity) {
             actionToReturn = "bet75pct";
@@ -204,6 +213,9 @@ public class EquityAction {
 
         botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
         double oppAverageBettingEquity = new EquityCalculator().getAverageRangeEquity(oppBetRange, board);
+
+        System.out.println("botEquity: " + botEquity);
+        System.out.println("oppEquity: " + oppAverageBettingEquity);
 
         if(botEquity > oppAverageBettingEquity) {
             if(eligibleActions.contains("raise")) {

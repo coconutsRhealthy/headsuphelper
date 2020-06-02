@@ -43,8 +43,6 @@ public class DbSavePersisterPreflopStats {
                 totalPreCall4bet_up_countLastHand = totalPreCall4bet_up_countLastHand + dbSavePreflopStats.getOppPreCall4bet_up_count();
                 totalCallTotalCountLastHand = totalCallTotalCountLastHand + dbSavePreflopStats.getOppPreCallTotalCount();
 
-                System.out.println("GGA, lasthand: " + totalTotalCountLastHand);
-
                 if(opponentName == null) {
                     opponentName = dbSavePreflopStats.getOpponentName();
                 }

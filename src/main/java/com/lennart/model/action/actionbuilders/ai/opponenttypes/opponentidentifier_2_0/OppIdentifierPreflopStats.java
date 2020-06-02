@@ -104,9 +104,6 @@ public class OppIdentifierPreflopStats {
                     oppPreGroupMap.put("preCall4bet_up_group", "high");
                 }
             } else {
-                System.out.println("too few hands preflop for oppPreStatsMap: " + preTotal);
-                System.out.println("put everything as 'medium' because too few hands");
-
                 oppPreGroupMap.put("pre2betGroup", "medium");
                 oppPreGroupMap.put("pre3betGroup", "mediumUnknown");
                 oppPreGroupMap.put("pre4bet_up_group", "mediumUnknown");

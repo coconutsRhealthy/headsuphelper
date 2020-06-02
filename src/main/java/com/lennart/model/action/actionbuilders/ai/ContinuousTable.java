@@ -311,8 +311,6 @@ public class ContinuousTable implements ContinuousTableable {
         List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
         double bigBlindInMethod = handHistoryReaderStars.getBigBlindFromLastHandHh(lastHandNonRecursive);
 
-        System.out.println("Bb from HH: " + bigBlindInMethod);
-
         List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlindInMethod);
 
         String lastHandNumber;

@@ -241,9 +241,6 @@ public class Sizing {
 
         if(myStackToPotAfterCall < 0.75 || facingStackToPotAfterCall < 0.75) {
             sizingToReturn = 5000 * bigBlind;
-            System.out.println("Adjusted preflop sizing because of pot commitance");
-            System.out.println("myStackToPotAfterCall: " + myStackToPotAfterCall);
-            System.out.println("facingStackToPotAfterCall: " + facingStackToPotAfterCall);
         }
 
         return sizingToReturn;

@@ -188,6 +188,8 @@ public class BotActionBuilder {
 
         action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative(), eligibleActions);
 
+        System.out.println("initial: " + action);
+
         double botEquity = -3;
 
         if(action == null) {
@@ -197,7 +199,11 @@ public class BotActionBuilder {
 
             action = equityAction.getValueAction(continuousTable, gameVariables, eligibleActions, sizing);
 
+            System.out.println("value: " + action);
+
             action = rules.getValueTrapAction(action, gameVariables);
+
+            System.out.println("valuetrap: " + action);
 
             if(action.equals("fold") || action.equals("check")) {
                 if(!rules.isValueTrap()) {
@@ -207,10 +213,14 @@ public class BotActionBuilder {
                             continuousTable,
                             gameVariables,
                             sizing);
+                    System.out.println("bluffaction: " + action);
                 }
             }
 
             action = rules.getAfterRuleAction(action, rangeConstructor, getFacingOdds(gameVariables), gameVariables.getBoard());
+
+            System.out.println("afterrules: " + action);
+
             botEquity = equityAction.getBotEquity();
         }
 

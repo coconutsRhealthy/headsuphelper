@@ -174,7 +174,9 @@ public class Rules {
         String actionToReturn;
 
         if(action.equals("fold")) {
-            if(facingOdds < 0.2) {
+            System.out.println("facingodds: " + facingOdds);
+
+            if(facingOdds <= 0.2) {
                 actionToReturn = "call";
             } else {
                 actionToReturn = action;
