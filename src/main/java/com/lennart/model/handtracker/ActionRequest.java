@@ -216,7 +216,11 @@ public class ActionRequest {
                         double previousTotalBotBetSize = botLastActionRound.getTotalBotBetSize();
                         double previousTotalOpponentBetSize = botLastActionRound.getTotalOpponentBetSize();
 
-                        if(equalsRake(topTotalPotSize, previousTotalPotSize + (previousTotalOpponentBetSize - previousTotalBotBetSize))) {
+                        if(topTotalPotSize == (2 * bigBlind)) {
+                            System.out.println("*** Must be limped pot with only checks... ***");
+                            PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "check");
+                            actionsSinceLastRequest.add(playerActionRound);
+                        } else if(equalsRake(topTotalPotSize, previousTotalPotSize + (previousTotalOpponentBetSize - previousTotalBotBetSize))) {
                             PlayerActionRound playerActionRound = new PlayerActionRound("opponent", board, 0, 0, "thecorrectstreet", "check");
                             actionsSinceLastRequest.add(playerActionRound);
                         } else {
