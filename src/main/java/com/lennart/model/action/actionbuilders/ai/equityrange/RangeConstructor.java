@@ -1058,7 +1058,8 @@ public class RangeConstructor {
         //low combos
         List<List<Card>> lowCombos = allCombosEquitySorted.subList(
                 (int) (allCombosEquitySorted.size() * (1 - (valueVsLowComboBoundry / 100))), allCombosEquitySorted.size());
-        range.addAll(lowCombos);
+        List<List<Card>> eligibleLowCombos = retainCombosThatAreInRange(oppStartingRange, lowCombos);
+        range.addAll(eligibleLowCombos);
         range = filterOutDoubleCombos(range);
 
         return range;
