@@ -1,10 +1,11 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
+import com.lennart.model.action.actionbuilders.ai.ActionVariables;
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
-import equitycalc.simulation.Range;
 
 import java.util.List;
 
@@ -75,8 +76,9 @@ public class Rules {
         return actionToReturn;
     }
 
-    public String getAfterRuleAction(String action, RangeConstructor rangeConstructor, double facingOdds, List<Card> board) {
-        String actionToReturn;
+    public String getAfterRuleAction(String action, RangeConstructor rangeConstructor, double facingOdds, List<Card> board,
+                                     GameVariables gameVariables, ContinuousTable continuousTable) {
+        String actionToReturn = null;
 
         if(action.equals("fold")) {
             actionToReturn = callWithFavorableOdds(action, facingOdds);
@@ -88,6 +90,33 @@ public class Rules {
             }
         } else {
             actionToReturn = action;
+        }
+
+        if(actionToReturn.equals("fold")) {
+            checkFoldOldStyle(action, gameVariables, continuousTable);
+        }
+
+        return actionToReturn;
+    }
+
+    private String checkFoldOldStyle(String currentAction, GameVariables gameVariables, ContinuousTable continuousTable) {
+        String actionToReturn;
+
+        try {
+            ContinuousTable continuousTableCopy = ContinuousTable.newInstance(continuousTable);
+            GameVariables gameVariablesCopy = GameVariables.newInstance(gameVariables);
+            String actionOldStyle = new ActionVariables().getDummyActionOppAllIn(continuousTableCopy, gameVariablesCopy);
+
+            if(actionOldStyle.equals("call")) {
+                actionToReturn = actionOldStyle;
+                System.out.println("oldstyle call done");
+            } else {
+                actionToReturn = currentAction;
+            }
+        } catch (Exception e) {
+            actionToReturn = currentAction;
+            System.out.println("error in oldstyle action");
+            e.printStackTrace();
         }
 
         return actionToReturn;
@@ -187,4 +216,33 @@ public class Rules {
 
         return actionToReturn;
     }
+
+
+
+
+
+    //////
+    public static void main(String[] args) {
+        new Rules().method1();
+    }
+
+    private void method1() {
+        GameVariables gameVariables = new GameVariables();
+        gameVariables.setPot(50);
+
+        method2(gameVariables);
+
+        System.out.println(gameVariables.getPot());
+    }
+
+    private void method2(GameVariables gameVariables) {
+        GameVariables gameVariablesCopy = gameVariables;
+        method3(gameVariablesCopy);
+    }
+
+    private void method3(GameVariables gameVariables) {
+        gameVariables.setPot(80);
+    }
+
+
 }

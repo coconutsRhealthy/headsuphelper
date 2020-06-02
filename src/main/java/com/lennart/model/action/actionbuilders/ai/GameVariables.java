@@ -47,6 +47,37 @@ public class GameVariables implements GameVariable {
         //default constructor
     }
 
+    public static GameVariables newInstance(GameVariables gameVariables) {
+        GameVariables newInstance = new GameVariables();
+
+        newInstance.setBigBlind(gameVariables.getBigBlind());
+        newInstance.setOpponentName(gameVariables.getOpponentName());
+        newInstance.setOpponentStack(gameVariables.getOpponentStack());
+        newInstance.setOpponentBetSize(gameVariables.getOpponentBetSize());
+        newInstance.setFlopCard1(gameVariables.getFlopCard1());
+        newInstance.setFlopCard2(gameVariables.getFlopCard2());
+        newInstance.setFlopCard3(gameVariables.getFlopCard3());
+        newInstance.setTurnCard(gameVariables.getTurnCard());
+        newInstance.setRiverCard(gameVariables.getRiverCard());
+        newInstance.setBoard(gameVariables.getBoard());
+        newInstance.setBoardAsString(gameVariables.getBoardAsString());
+        newInstance.setPot(gameVariables.getPot());
+        newInstance.setBotBetSize(gameVariables.getBotBetSize());
+        newInstance.setBotStack(gameVariables.getBotStack());
+        newInstance.setBotHoleCard1(gameVariables.getBotHoleCard1());
+        newInstance.setBotHoleCard2(gameVariables.getBotHoleCard2());
+        newInstance.setBotHoleCards(gameVariables.getBotHoleCards());
+        newInstance.setBotHoleCardsAsString(gameVariables.getBotHoleCardsAsString());
+        newInstance.setBotIsButton(gameVariables.isBotIsButton());
+        newInstance.setOpponentAction(gameVariables.getOpponentAction());
+        newInstance.setActionVariables(gameVariables.getActionVariables());
+        newInstance.setDrawBettingActionDone(gameVariables.isDrawBettingActionDone());
+        newInstance.setPreviousBluffAction(gameVariables.isPreviousBluffAction());
+        newInstance.setAllActionRequestsOfHand(gameVariables.getAllActionRequestsOfHand());
+
+        return newInstance;
+    }
+
     public GameVariables(double givenBigBlind, boolean sng) throws Exception {
         StarsTableReader starsTableReader = new StarsTableReader();
 
@@ -617,5 +648,9 @@ public class GameVariables implements GameVariable {
 
     public List<ActionRequest> getAllActionRequestsOfHand() {
         return allActionRequestsOfHand;
+    }
+
+    public void setAllActionRequestsOfHand(List<ActionRequest> allActionRequestsOfHand) {
+        this.allActionRequestsOfHand = allActionRequestsOfHand;
     }
 }

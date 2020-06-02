@@ -52,6 +52,32 @@ public class ContinuousTable implements ContinuousTableable {
 
     private boolean botDidPre4bet;
 
+    public static ContinuousTable newInstance(ContinuousTable continuousTable) {
+        ContinuousTable newInstance = new ContinuousTable();
+
+        newInstance.setOpponentHasInitiative(continuousTable.isOpponentHasInitiative());
+        newInstance.setPre3betOrPostRaisedPot(continuousTable.isPre3betOrPostRaisedPot());
+        newInstance.setOpponentDidPreflop4betPot(continuousTable.isOpponentDidPreflop4betPot());
+        newInstance.setAllHandsPlayedAndPlayerNames(continuousTable.getAllHandsPlayedAndPlayerNames());
+        newInstance.setStarsLastHandNumber(continuousTable.getStarsLastHandNumber());
+        newInstance.setTop10percentFlopCombos(continuousTable.getTop10percentFlopCombos());
+        newInstance.setTop10percentTurnCombos(continuousTable.getTop10percentTurnCombos());
+        newInstance.setTop10percentRiverCombos(continuousTable.getTop10percentRiverCombos());
+        newInstance.setAllHandStrenghts(continuousTable.getAllHandStrenghts());
+        newInstance.setBotBluffActionDone(continuousTable.isBotBluffActionDone());
+        newInstance.setDbSaveList(continuousTable.getDbSaveList());
+        newInstance.setBigBlind(continuousTable.getBigBlind());
+        newInstance.setGame(continuousTable.getGame());
+        newInstance.setFlopHandstrength(continuousTable.getFlopHandstrength());
+        newInstance.setTurnHandstrength(continuousTable.getTurnHandstrength());
+        newInstance.setBotSittingOutCounter(continuousTable.getBotSittingOutCounter());
+        newInstance.setOppRange(continuousTable.getOppRange());
+        newInstance.setAllCombosPostflopEquitySorted(continuousTable.getAllCombosPostflopEquitySorted());
+        newInstance.setBotDidPre4bet(continuousTable.isBotDidPre4bet());
+
+        return newInstance;
+    }
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -610,5 +636,33 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setBotDidPre4bet(boolean botDidPre4bet) {
         this.botDidPre4bet = botDidPre4bet;
+    }
+
+    public void setAllHandsPlayedAndPlayerNames(List<String> allHandsPlayedAndPlayerNames) {
+        this.allHandsPlayedAndPlayerNames = allHandsPlayedAndPlayerNames;
+    }
+
+    public void setAllHandStrenghts(List<Double> allHandStrenghts) {
+        this.allHandStrenghts = allHandStrenghts;
+    }
+
+    public void setBotSittingOutCounter(int botSittingOutCounter) {
+        this.botSittingOutCounter = botSittingOutCounter;
+    }
+
+    public List<String> getAllHandsPlayedAndPlayerNames() {
+        return allHandsPlayedAndPlayerNames;
+    }
+
+    public String getStarsLastHandNumber() {
+        return starsLastHandNumber;
+    }
+
+    public List<Double> getAllHandStrenghts() {
+        return allHandStrenghts;
+    }
+
+    public int getBotSittingOutCounter() {
+        return botSittingOutCounter;
     }
 }

@@ -217,7 +217,8 @@ public class BotActionBuilder {
                 }
             }
 
-            action = rules.getAfterRuleAction(action, rangeConstructor, getFacingOdds(gameVariables), gameVariables.getBoard());
+            action = rules.getAfterRuleAction(action, rangeConstructor, getFacingOdds(gameVariables),
+                    gameVariables.getBoard(), gameVariables, continuousTable);
 
             System.out.println("afterrules: " + action);
 
