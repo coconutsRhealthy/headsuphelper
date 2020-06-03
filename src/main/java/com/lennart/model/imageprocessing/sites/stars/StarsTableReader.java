@@ -352,7 +352,7 @@ public class StarsTableReader {
             clickTopSngInList();
             TimeUnit.MILLISECONDS.sleep(250);
             System.out.println("registering new sng");
-            MouseKeyboard.click(782, 603);
+            MouseKeyboard.click(782, 566);
 
             TimeUnit.MILLISECONDS.sleep(950);
 
@@ -633,8 +633,6 @@ public class StarsTableReader {
         String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         bottomPlayerStack = ImageProcessor.removeEmptySpacesFromString(bottomPlayerStack);
 
-        System.out.println("read opp stack: " + bottomPlayerStack);
-
         if(bottomPlayerStack.contains("s")) {
             bottomPlayerStack = bottomPlayerStack.replace("s", "8");
             System.out.println("opp stack contains 's', new value: " + bottomPlayerStack);
@@ -658,8 +656,6 @@ public class StarsTableReader {
 
     private String readTopPlayerStack() {
         String topPlayerStack = readTopPlayerStackBase();
-
-        System.out.println("read botstack: " + topPlayerStack);
 
         if(topPlayerStack.contains("s")) {
             topPlayerStack = topPlayerStack.replace("s", "8");
