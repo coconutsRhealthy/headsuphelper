@@ -84,7 +84,7 @@ public class Rules {
             actionToReturn = callWithFavorableOdds(action, facingOdds);
 
             if(actionToReturn.equals("fold")) {
-                actionToReturn = callWithStrongDrawAndGoodOdds(action, rangeConstructor, facingOdds, board);
+                //actionToReturn = callWithStrongDrawAndGoodOdds(action, rangeConstructor, facingOdds, board);
             } else {
                 actionToReturn = action;
             }
@@ -93,7 +93,7 @@ public class Rules {
         }
 
         if(actionToReturn.equals("fold")) {
-            checkFoldOldStyle(action, gameVariables, continuousTable);
+            //checkFoldOldStyle(action, gameVariables, continuousTable);
         }
 
         return actionToReturn;
@@ -112,6 +112,8 @@ public class Rules {
                 System.out.println("oldstyle call done");
             } else {
                 actionToReturn = currentAction;
+                System.out.println("current: " + currentAction);
+                System.out.println("oldstyle: " + actionOldStyle);
             }
         } catch (Exception e) {
             actionToReturn = currentAction;
@@ -163,6 +165,7 @@ public class Rules {
         if(action.equals("fold")) {
             if(board != null && (board.size() == 3  || board.size() == 4)) {
                 if(facingOdds < 0.43) {
+                    //hier is volgens mij wat vaags aan de hand...
                     FlushDrawEvaluator flushDrawEvaluator = rangeConstructor.getFlushDrawEvaluatorMap().get(board);
                     StraightDrawEvaluator straightDrawEvaluator = rangeConstructor.getStraightDrawEvaluatorMap().get(board);
 
