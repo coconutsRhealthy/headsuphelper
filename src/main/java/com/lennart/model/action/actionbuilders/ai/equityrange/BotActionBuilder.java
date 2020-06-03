@@ -211,14 +211,18 @@ public class BotActionBuilder {
 
             if(action.equals("fold") || action.equals("check")) {
                 if(!rules.isValueTrap()) {
-                    action = new BluffAction(equityAction, inputProvider, rangeConstructor, preflopEquityHs).getBluffAction(
-                            action,
-                            eligibleActions,
-                            continuousTable,
-                            gameVariables,
-                            sizing,
-                            equityAction.getBotEquity());
-                    System.out.println("bluffaction: " + action);
+                    List<Card> board = gameVariables.getBoard();
+
+                    if(board != null && !board.isEmpty()) {
+                        action = new BluffAction(equityAction, inputProvider, rangeConstructor, preflopEquityHs).getBluffAction(
+                                action,
+                                eligibleActions,
+                                continuousTable,
+                                gameVariables,
+                                sizing,
+                                equityAction.getBotEquity());
+                        System.out.println("bluffaction: " + action);
+                    }
                 }
             }
 

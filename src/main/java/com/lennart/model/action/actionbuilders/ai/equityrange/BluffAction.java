@@ -66,13 +66,9 @@ public class BluffAction {
                             (continuousTable.getOppRange().size() - oppCallRaiseRangeCombined.size() + 0.0)
                                     / (continuousTable.getOppRange().size() + 0.0);
 
-                    //todo: kan negatief zijn?
-
                     System.out.println("CURR: " + continuousTable.getOppRange().size());
                     System.out.println("COMBINED: " + oppCallRaiseRangeCombined.size());
                     System.out.println("RATIO: " + oppFoldRangeToTotalRangeRatio);
-
-                    //todo: was op river een keer superhoog.. 0.98...
 
                     double limit;
 
@@ -84,10 +80,7 @@ public class BluffAction {
 
                     if(oppFoldRangeToTotalRangeRatio > limit) {
                         if(currentAction.equals("check")) {
-                            //todo: should be with correct board
-                            double oppCurrentRangeEquity = new EquityCalculator().getAverageRangeEquity(continuousTable.getOppRange(), gameVariables.getBoard());
-
-                            if(botEquity > oppCurrentRangeEquity) {
+                            if(botEquity > 0.565) {
                                 System.out.println("No bluff cause showdown value");
                                 return currentAction;
                             }
