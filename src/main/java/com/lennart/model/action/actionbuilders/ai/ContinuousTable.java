@@ -52,6 +52,13 @@ public class ContinuousTable implements ContinuousTableable {
 
     private boolean botDidPre4bet;
 
+    public static void main(String[] args) throws Exception {
+        ContinuousTable continuousTable = new ContinuousTable();
+        continuousTable.setBigBlind(100);
+        continuousTable.setGame("sng");
+        continuousTable.runTableContinously();
+    }
+
     public static ContinuousTable newInstance(ContinuousTable continuousTable) {
         ContinuousTable newInstance = new ContinuousTable();
 
@@ -76,13 +83,6 @@ public class ContinuousTable implements ContinuousTableable {
         newInstance.setBotDidPre4bet(continuousTable.isBotDidPre4bet());
 
         return newInstance;
-    }
-
-    public static void main(String[] args) throws Exception {
-        ContinuousTable continuousTable = new ContinuousTable();
-        continuousTable.setBigBlind(100);
-        continuousTable.setGame("sng");
-        continuousTable.runTableContinously();
     }
 
     public void runTableContinously() throws Exception {
@@ -186,11 +186,15 @@ public class ContinuousTable implements ContinuousTableable {
 
                 //hier gaat het zetten van opp range gebeuren...
                 RangeConstructor rangeConstructor = new RangeConstructor();
-                new OpponentRangeSetter(rangeConstructor, new InputProvider()).setOpponentRange(this, gameVariables);
+                InputProvider inputProvider = new InputProvider();
+                new OpponentRangeSetter(rangeConstructor, inputProvider).setOpponentRange(this, gameVariables);
 
                 if(oppRange == null) {
                     System.out.println("OPPRANGE = NULL");
                 } else {
+                    System.out.println("A pre3bet: " + inputProvider.getOppPre3betGroup(gameVariables.getOpponentName()));
+                    System.out.println("A aggro: " + inputProvider.getOppPostAggroness(gameVariables.getOpponentName()));
+                    System.out.println("A loose: " + inputProvider.getOppPostLooseness(gameVariables.getOpponentName()));
                     System.out.println("OPPRANGE SIZE: " + oppRange.size());
                 }
 
@@ -206,7 +210,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 double sizing = botActionBuilder.getSizing();
 
-                //doLogging(gameVariables, actionVariables, numberOfActionRequests);
+                doLogging(gameVariables, action, sizing, numberOfActionRequests);
 
                 System.out.println();
                 System.out.println("********************");
@@ -265,7 +269,7 @@ public class ContinuousTable implements ContinuousTableable {
         }
     }
 
-    private void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
+    private void doLogging(GameVariables gameVariables, String suggestedAction, double sizing, int numberOfActionRequests) throws Exception {
         StarsTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
 
         String opponentStack = String.valueOf(gameVariables.getOpponentStack());
@@ -276,10 +280,7 @@ public class ContinuousTable implements ContinuousTableable {
         String botStack = String.valueOf(gameVariables.getBotStack());
         String botHoleCards = getCardListAsString(gameVariables.getBotHoleCards());
         String opponentAction = gameVariables.getOpponentAction();
-        String route = actionVariables.getRoute();
-        String table = actionVariables.getTable();
-        String suggestedAction = actionVariables.getAction();
-        String sizing = String.valueOf(actionVariables.getSizing());
+        String sizingString = String.valueOf(sizing);
 
         PrintWriter writer = new PrintWriter("/Users/LennartMac/Documents/logging/" + numberOfActionRequests + ".txt", "UTF-8");
 
@@ -296,10 +297,8 @@ public class ContinuousTable implements ContinuousTableable {
         writer.println("------------------------");
         writer.println();
 
-        writer.println("Route: " + route);
-        writer.println("Table: " + table);
         writer.println("Action: " + suggestedAction);
-        writer.println("Sizing: " + sizing);
+        writer.println("Sizing: " + sizingString);
 
         writer.close();
     }
