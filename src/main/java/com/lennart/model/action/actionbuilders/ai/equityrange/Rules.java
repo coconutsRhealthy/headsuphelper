@@ -1,34 +1,16 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
-import com.lennart.model.action.actionbuilders.ai.ActionVariables;
-import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
-import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
-import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
-import com.lennart.model.card.Card;
 
-import java.util.List;
 
 /**
  * Created by LennartMac on 25/05/2020.
  */
 public class Rules {
 
-
-    //sizing blijft zoals ie is
-
-    //altijd pre2betten bij blinds lager dan 50
-
-    //altijd pre limpen bij blinds vanaf 50
-
-    //callen met draws en goede odds
-
-    //altijd callen met super goede odds
-
     private boolean valueTrap = false;
 
-
-    public String getInitialRuleAction(GameVariables gameVariables, boolean opponentHasInitiative, List<String> eligibleActions) {
+    public String getInitialRuleAction(GameVariables gameVariables, boolean opponentHasInitiative) {
         String initialRuleAction = null;
 
         initialRuleAction = defaultCheckWhenOppHasInitiative(opponentHasInitiative, gameVariables.getOpponentAction());
@@ -76,24 +58,13 @@ public class Rules {
         return actionToReturn;
     }
 
-    public String getAfterRuleAction(String action, RangeConstructor rangeConstructor, double facingOdds, List<Card> board,
-                                     GameVariables gameVariables, ContinuousTable continuousTable) {
-        String actionToReturn = null;
+    public String getAfterRuleAction(String action, double facingOdds) {
+        String actionToReturn;
 
         if(action.equals("fold")) {
             actionToReturn = callWithFavorableOdds(action, facingOdds);
-
-            if(actionToReturn.equals("fold")) {
-                //actionToReturn = callWithStrongDrawAndGoodOdds(action, rangeConstructor, facingOdds, board);
-            } else {
-                actionToReturn = action;
-            }
         } else {
             actionToReturn = action;
-        }
-
-        if(actionToReturn.equals("fold")) {
-            //checkFoldOldStyle(action, gameVariables, continuousTable);
         }
 
         return actionToReturn;
@@ -134,49 +105,6 @@ public class Rules {
         return actionToReturn;
     }
 
-    private String callWithStrongDrawAndGoodOdds(String action, RangeConstructor rangeConstructor, double facingOdds, List<Card> board) {
-        String actionToReturn;
-
-        if(action.equals("fold")) {
-            if(board != null && (board.size() == 3  || board.size() == 4)) {
-                if(facingOdds < 0.43) {
-                    //hier is volgens mij wat vaags aan de hand...
-                    FlushDrawEvaluator flushDrawEvaluator = rangeConstructor.getFlushDrawEvaluatorMap().get(board);
-                    StraightDrawEvaluator straightDrawEvaluator = rangeConstructor.getStraightDrawEvaluatorMap().get(board);
-
-                    if(board.size() == 3) {
-                        if((flushDrawEvaluator.getStrongFlushDrawCombos() != null && !flushDrawEvaluator.getStrongFlushDrawCombos().isEmpty())
-                                || (straightDrawEvaluator.getStrongOosdCombos() != null && !straightDrawEvaluator.getStrongOosdCombos().isEmpty())
-                                || (straightDrawEvaluator.getStrongGutshotCombos() != null && !straightDrawEvaluator.getStrongGutshotCombos().isEmpty())) {
-                            actionToReturn = "call";
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        if(facingOdds < 0.35) {
-                            if((flushDrawEvaluator.getStrongFlushDrawCombos() != null && !flushDrawEvaluator.getStrongFlushDrawCombos().isEmpty())
-                                    || (straightDrawEvaluator.getStrongOosdCombos() != null && !straightDrawEvaluator.getStrongOosdCombos().isEmpty())) {
-                                actionToReturn = "call";
-                            } else {
-                                actionToReturn = action;
-                            }
-                        } else {
-                            actionToReturn = action;
-                        }
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
     private String callWithFavorableOdds(String action, double facingOdds) {
         String actionToReturn;
 
@@ -194,33 +122,4 @@ public class Rules {
 
         return actionToReturn;
     }
-
-
-
-
-
-    //////
-    public static void main(String[] args) {
-        new Rules().method1();
-    }
-
-    private void method1() {
-        GameVariables gameVariables = new GameVariables();
-        gameVariables.setPot(50);
-
-        method2(gameVariables);
-
-        System.out.println(gameVariables.getPot());
-    }
-
-    private void method2(GameVariables gameVariables) {
-        GameVariables gameVariablesCopy = gameVariables;
-        method3(gameVariablesCopy);
-    }
-
-    private void method3(GameVariables gameVariables) {
-        gameVariables.setPot(80);
-    }
-
-
 }

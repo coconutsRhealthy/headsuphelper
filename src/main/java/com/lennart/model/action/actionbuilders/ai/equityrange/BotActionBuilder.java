@@ -187,7 +187,7 @@ public class BotActionBuilder {
         List<String> eligibleActions = getEligibleActions(gameVariables);
         sizing = getSizing(gameVariables);
 
-        action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative(), eligibleActions);
+        action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative());
 
         System.out.println("initial: " + action);
 
@@ -227,8 +227,7 @@ public class BotActionBuilder {
                 }
             }
 
-            action = rules.getAfterRuleAction(action, rangeConstructor, getFacingOdds(gameVariables),
-                    gameVariables.getBoard(), gameVariables, continuousTable);
+            action = rules.getAfterRuleAction(action, getFacingOdds(gameVariables));
 
             System.out.println("afterrules: " + action);
 
