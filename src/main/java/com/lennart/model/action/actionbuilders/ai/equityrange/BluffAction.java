@@ -5,6 +5,7 @@ import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.action.actionbuilders.ai.MachineLearning;
 import com.lennart.model.action.actionbuilders.ai.Sizing;
 import com.lennart.model.card.Card;
+import equitycalc.EquityCalculator;
 
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,7 @@ public class BluffAction {
     }
 
     public String getBluffAction(String currentAction, List<String> eligibleActions, ContinuousTable continuousTable,
-                                  GameVariables gameVariables, double botSizing) {
+                                  GameVariables gameVariables, double botSizing, double botEquity) {
         String actionToReturn;
 
         if(currentAction.equals("check") || currentAction.equals("fold")) {
@@ -76,31 +77,24 @@ public class BluffAction {
                     double limit;
 
                     if(bluffActionToUse.equals("bet75pct")) {
-                        limit = 0.5;
+                        limit = 0.4;
                     } else {
                         limit = 0.6;
                     }
 
                     if(oppFoldRangeToTotalRangeRatio > limit) {
-                        if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
-                            if(equityAction.getBotEquity() > 0.4) {
-                                actionToReturn = bluffActionToUse;
-                            } else {
-                                actionToReturn = currentAction;
-                            }
-                        } else if(gameVariables.getBoard().size() < 5) {
-                            if(equityAction.getBotEquity() > 0.4) {
-                                actionToReturn = bluffActionToUse;
-                            } else {
-                                actionToReturn = currentAction;
-                            }
-                        } else {
-                            if(oppFoldRangeToTotalRangeRatio > 0.6) {
-                                actionToReturn = bluffActionToUse;
-                            } else {
-                                actionToReturn = currentAction;
+                        if(currentAction.equals("check")) {
+                            //todo: should be with correct board
+                            double oppCurrentRangeEquity = new EquityCalculator().getAverageRangeEquity(continuousTable.getOppRange(), gameVariables.getBoard());
+
+                            if(botEquity > oppCurrentRangeEquity) {
+                                System.out.println("No bluff cause showdown value");
+                                return currentAction;
                             }
                         }
+
+                        actionToReturn = bluffActionToUse;
+                        System.out.println("bluffje: " + actionToReturn);
                     } else {
                         actionToReturn = currentAction;
                     }
