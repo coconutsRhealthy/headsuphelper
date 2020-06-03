@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class BotActionBuilder {
 
+    double botEquity;
     double sizing;
 
     public static void main(String[] args) {
@@ -190,7 +191,7 @@ public class BotActionBuilder {
 
         System.out.println("initial: " + action);
 
-        double botEquity = -3;
+        botEquity = -3;
 
         if(action == null) {
             InputProvider inputProvider = new InputProvider();
@@ -313,5 +314,9 @@ public class BotActionBuilder {
 
     public double getSizing() {
         return sizing;
+    }
+
+    public double getBotEquity() {
+        return botEquity;
     }
 }

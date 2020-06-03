@@ -99,31 +99,6 @@ public class Rules {
         return actionToReturn;
     }
 
-    private String checkFoldOldStyle(String currentAction, GameVariables gameVariables, ContinuousTable continuousTable) {
-        String actionToReturn;
-
-        try {
-            ContinuousTable continuousTableCopy = ContinuousTable.newInstance(continuousTable);
-            GameVariables gameVariablesCopy = GameVariables.newInstance(gameVariables);
-            String actionOldStyle = new ActionVariables().getDummyActionOppAllIn(continuousTableCopy, gameVariablesCopy);
-
-            if(actionOldStyle.equals("call")) {
-                actionToReturn = actionOldStyle;
-                System.out.println("oldstyle call done");
-            } else {
-                actionToReturn = currentAction;
-                System.out.println("current: " + currentAction);
-                System.out.println("oldstyle: " + actionOldStyle);
-            }
-        } catch (Exception e) {
-            actionToReturn = currentAction;
-            System.out.println("error in oldstyle action");
-            e.printStackTrace();
-        }
-
-        return actionToReturn;
-    }
-
     public boolean isValueTrap() {
         return valueTrap;
     }

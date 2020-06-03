@@ -32,7 +32,7 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Set<Card>> top10percentTurnCombos;
     private List<Set<Card>> top10percentRiverCombos;
 
-    private List<Double> allHandStrenghts = new ArrayList<>();
+    private List<Double> allBotEquities = new ArrayList<>();
 
     private boolean botBluffActionDone;
 
@@ -57,32 +57,6 @@ public class ContinuousTable implements ContinuousTableable {
         continuousTable.setBigBlind(100);
         continuousTable.setGame("sng");
         continuousTable.runTableContinously();
-    }
-
-    public static ContinuousTable newInstance(ContinuousTable continuousTable) {
-        ContinuousTable newInstance = new ContinuousTable();
-
-        newInstance.setOpponentHasInitiative(continuousTable.isOpponentHasInitiative());
-        newInstance.setPre3betOrPostRaisedPot(continuousTable.isPre3betOrPostRaisedPot());
-        newInstance.setOpponentDidPreflop4betPot(continuousTable.isOpponentDidPreflop4betPot());
-        newInstance.setAllHandsPlayedAndPlayerNames(continuousTable.getAllHandsPlayedAndPlayerNames());
-        newInstance.setStarsLastHandNumber(continuousTable.getStarsLastHandNumber());
-        newInstance.setTop10percentFlopCombos(continuousTable.getTop10percentFlopCombos());
-        newInstance.setTop10percentTurnCombos(continuousTable.getTop10percentTurnCombos());
-        newInstance.setTop10percentRiverCombos(continuousTable.getTop10percentRiverCombos());
-        newInstance.setAllHandStrenghts(continuousTable.getAllHandStrenghts());
-        newInstance.setBotBluffActionDone(continuousTable.isBotBluffActionDone());
-        newInstance.setDbSaveList(continuousTable.getDbSaveList());
-        newInstance.setBigBlind(continuousTable.getBigBlind());
-        newInstance.setGame(continuousTable.getGame());
-        newInstance.setFlopHandstrength(continuousTable.getFlopHandstrength());
-        newInstance.setTurnHandstrength(continuousTable.getTurnHandstrength());
-        newInstance.setBotSittingOutCounter(continuousTable.getBotSittingOutCounter());
-        newInstance.setOppRange(continuousTable.getOppRange());
-        newInstance.setAllCombosPostflopEquitySorted(continuousTable.getAllCombosPostflopEquitySorted());
-        newInstance.setBotDidPre4bet(continuousTable.isBotDidPre4bet());
-
-        return newInstance;
     }
 
     public void runTableContinously() throws Exception {
@@ -125,12 +99,12 @@ public class ContinuousTable implements ContinuousTableable {
                         }
                     }
 
-                    //int numberOfHsAbove85 = getNumberOfHsAbove85();
-                    //int allHs = allHandStrenghts.size();
+                    int numberOfEquitiesAbove65 = getNumberOfEquitiesAbove65();
+                    int allEquitiesSize = allBotEquities.size();
 
-                    //System.out.println("^^^^a " + numberOfHsAbove85 + " ^^^^");
-                    //System.out.println("^^^^b " + allHs + " ^^^^");
-                    //System.out.println("^ratio: " + (double) numberOfHsAbove85 / (double) allHs + " ^^^^");
+                    System.out.println("^^^^a " + numberOfEquitiesAbove65 + " ^^^^");
+                    System.out.println("^^^^b " + allEquitiesSize + " ^^^^");
+                    System.out.println("^ratio: " + (double) numberOfEquitiesAbove65 / (double) allEquitiesSize + " ^^^^");
 
                     if(!game.equals("sng")) {
                         long currentTime = new Date().getTime();
@@ -156,7 +130,6 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
-                    //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
 
                     opponentDidPreflop4betPot = false;
 
@@ -184,7 +157,6 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
-                //hier gaat het zetten van opp range gebeuren...
                 RangeConstructor rangeConstructor = new RangeConstructor();
                 InputProvider inputProvider = new InputProvider();
                 new OpponentRangeSetter(rangeConstructor, inputProvider).setOpponentRange(this, gameVariables);
@@ -201,9 +173,6 @@ public class ContinuousTable implements ContinuousTableable {
                 BotActionBuilder botActionBuilder = new BotActionBuilder();
                 String action = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
 
-                //ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
-                //String action = actionVariables.getAction();
-
                 if(action.equals("bet75pct") || action.equals("raise")) {
                     opponentHasInitiative = false;
                 }
@@ -218,15 +187,12 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Opponent Name: " + gameVariables.getOpponentName());
                 System.out.println("Suggested action: "+ action);
                 System.out.println("Sizing: " + sizing);
-                //System.out.println("Route: " + actionVariables.getRoute());
-                //System.out.println("Table: " + actionVariables.getTable());
-                //System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
                 System.out.println("********************");
                 System.out.println();
 
-                //if(gameVariables.getBoard() != null && gameVariables.getBoard().size() >= 3) {
-                //    allHandStrenghts.add(actionVariables.getBotHandStrength());
-                //}
+                if(gameVariables.getBoard() != null && gameVariables.getBoard().size() >= 3) {
+                    allBotEquities.add(botActionBuilder.getBotEquity());
+                }
 
                 StarsTableReader.performActionOnSite(action, sizing);
 
@@ -303,11 +269,11 @@ public class ContinuousTable implements ContinuousTableable {
         writer.close();
     }
 
-    private int getNumberOfHsAbove85() {
+    private int getNumberOfEquitiesAbove65() {
         int counter = 0;
 
-        for(double d : allHandStrenghts) {
-            if(d >= 0.85) {
+        for(double d : allBotEquities) {
+            if(d >= 0.65) {
                 counter++;
             }
         }
@@ -427,26 +393,6 @@ public class ContinuousTable implements ContinuousTableable {
                 }
 
                 System.out.println(",");
-
-//                if(counter2 == 100 || counter2 == 200) {
-////                    System.out.println("Attempting to close chest shit");
-////                    MouseKeyboard.click(222, 44);
-////                    TimeUnit.MILLISECONDS.sleep(300);
-////                    MouseKeyboard.click(226, 79);
-////                    TimeUnit.MILLISECONDS.sleep(600);
-////                    MouseKeyboard.click(838, 605);
-////
-////                    TimeUnit.MILLISECONDS.sleep(600);
-//
-//                    System.out.println("Attempting to close 'registration closed' shit");
-//                    MouseKeyboard.click(489, 432);
-//                    TimeUnit.MILLISECONDS.sleep(300);
-//                }
-//
-//                if(counter2 == 150 || counter2 == 300) {
-//                    System.out.println("Trying to register again");
-//                    MouseKeyboard.click(782, 603);
-//                }
 
                 if(counter2 >= 1350) {
                     System.out.println("Something is wrong in registering sng part, close session.");
@@ -635,33 +581,5 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setBotDidPre4bet(boolean botDidPre4bet) {
         this.botDidPre4bet = botDidPre4bet;
-    }
-
-    public void setAllHandsPlayedAndPlayerNames(List<String> allHandsPlayedAndPlayerNames) {
-        this.allHandsPlayedAndPlayerNames = allHandsPlayedAndPlayerNames;
-    }
-
-    public void setAllHandStrenghts(List<Double> allHandStrenghts) {
-        this.allHandStrenghts = allHandStrenghts;
-    }
-
-    public void setBotSittingOutCounter(int botSittingOutCounter) {
-        this.botSittingOutCounter = botSittingOutCounter;
-    }
-
-    public List<String> getAllHandsPlayedAndPlayerNames() {
-        return allHandsPlayedAndPlayerNames;
-    }
-
-    public String getStarsLastHandNumber() {
-        return starsLastHandNumber;
-    }
-
-    public List<Double> getAllHandStrenghts() {
-        return allHandStrenghts;
-    }
-
-    public int getBotSittingOutCounter() {
-        return botSittingOutCounter;
     }
 }
