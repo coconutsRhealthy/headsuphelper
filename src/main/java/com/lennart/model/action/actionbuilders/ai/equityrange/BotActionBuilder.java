@@ -197,7 +197,11 @@ public class BotActionBuilder {
             PreflopEquityHs preflopEquityHs = new PreflopEquityHs();
             EquityAction equityAction = new EquityAction(inputProvider, preflopEquityHs, rangeConstructor);
 
-            action = equityAction.getValueAction(continuousTable, gameVariables, eligibleActions, sizing);
+            System.out.println("B pre3bet: " + inputProvider.getOppPre3betGroup(gameVariables.getOpponentName()));
+            System.out.println("B aggro: " + inputProvider.getOppPostAggroness(gameVariables.getOpponentName()));
+            System.out.println("B loose: " + inputProvider.getOppPostLooseness(gameVariables.getOpponentName()));
+
+            action = equityAction.getValueAction(continuousTable, gameVariables, eligibleActions, sizing, getFacingOdds(gameVariables));
 
             System.out.println("value: " + action);
 
@@ -212,7 +216,8 @@ public class BotActionBuilder {
                             eligibleActions,
                             continuousTable,
                             gameVariables,
-                            sizing);
+                            sizing,
+                            equityAction.getBotEquity());
                     System.out.println("bluffaction: " + action);
                 }
             }
