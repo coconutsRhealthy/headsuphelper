@@ -88,7 +88,7 @@ public class Rules {
         String actionToReturn = null;
 
         if(oppAction.equals("bet")) {
-            if(bigBlind < 50) {
+            if(bigBlind < 40) {
                 //todo: add handstrength
 
                 if(botStack > bigBlind) {
