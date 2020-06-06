@@ -86,8 +86,12 @@ public class BluffAction {
                             }
                         }
 
-                        actionToReturn = bluffActionToUse;
-                        System.out.println("bluffje: " + actionToReturn);
+                        if(Math.random() < 0.35) {
+                            actionToReturn = bluffActionToUse;
+                            System.out.println("bluffje: " + actionToReturn);
+                        } else {
+                            actionToReturn = currentAction;
+                        }
                     } else {
                         actionToReturn = currentAction;
                     }
@@ -128,7 +132,7 @@ public class BluffAction {
                     continuousTable.getOppRange(),
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(), gameVariables.getBotHoleCards()),
                     inputProvider.getOppPostLooseness(gameVariables.getOpponentName()),
-                    inputProvider.getBotSizingGroup(botSizing),
+                    inputProvider.getBotSizingGroup(botSizing, gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize()),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
         }
@@ -172,7 +176,7 @@ public class BluffAction {
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                             gameVariables.getBotHoleCards()),
                     inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                    inputProvider.getOppSizingGroup(fictionalOppRaiseSizing),
+                    inputProvider.getOppSizingGroup(fictionalOppRaiseSizing, gameVariables.getBotStack(), botSizing),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
         }
