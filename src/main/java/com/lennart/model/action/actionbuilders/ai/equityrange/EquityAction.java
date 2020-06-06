@@ -3,6 +3,8 @@ package com.lennart.model.action.actionbuilders.ai.equityrange;
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
+import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.card.Card;
 import equitycalc.EquityCalculator;
 
@@ -51,7 +53,10 @@ public class EquityAction {
                         eligibleActions,
                         sizing,
                         facingOdds,
-                        gameVariables.getOpponentAction());
+                        gameVariables.getOpponentAction(),
+                        gameVariables.getBotStack(),
+                        gameVariables.getBotBetSize(),
+                        gameVariables.getOpponentStack());
             } else {
                 action = getPostflopCheckOrBetAction(
                         continuousTable,
@@ -59,7 +64,9 @@ public class EquityAction {
                         gameVariables.getOpponentName(),
                         sizing,
                         gameVariables.getBoard(),
-                        gameVariables.getBotHoleCards());
+                        gameVariables.getBotHoleCards(),
+                        gameVariables.getOpponentStack(),
+                        gameVariables.getOpponentBetSize());
             }
         }
 
@@ -97,8 +104,8 @@ public class EquityAction {
 
         double oppAveragePfRaiseRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPfRaiseRange, null);
 
-        System.out.println("botEquity: " + botEquity);
-        System.out.println("oppEquity: " + oppAveragePfRaiseRangeEquity);
+        System.out.println("1)botEquity: " + botEquity);
+        System.out.println("1)oppEquity: " + oppAveragePfRaiseRangeEquity);
 
         if(botEquity > oppAveragePfRaiseRangeEquity) {
             if(eligibleActions.contains("raise")) {
@@ -130,13 +137,13 @@ public class EquityAction {
                 actionToReturn = "call";
             }
         } else {
-            actionToReturn = callWithCorrectOdds(botEquity - oppAveragePfRaiseRangeEquity, facingOdds);
+            actionToReturn = callWithCorrectOdds(botEquity - oppAveragePfRaiseRangeEquity, facingOdds, gameVariables.getBoard());
         }
 
         return actionToReturn;
     }
 
-    private String callWithCorrectOdds(double botOppEquityDiff, double facingOdds) {
+    private String callWithCorrectOdds(double botOppEquityDiff, double facingOdds, List<Card> board) {
         System.out.println("eqdiff: " + botOppEquityDiff);
         System.out.println("fcnodds: " + facingOdds);
 
@@ -147,34 +154,65 @@ public class EquityAction {
         } else {
             if(facingOdds >= 0.5) {
                 actionToReturn = "fold";
-            } else if(facingOdds > 0.4) {
-                if(botOppEquityDiff > -0.05) {
-                    actionToReturn = "call";
-                } else {
-                    actionToReturn = "fold";
-                }
-            } else if(facingOdds > 0.3) {
-                if(botOppEquityDiff > -0.10) {
-                    actionToReturn = "call";
-                } else {
-                    actionToReturn = "fold";
-                }
-            } else if(facingOdds > 0.2) {
-                if(botOppEquityDiff > -0.15) {
-                    actionToReturn = "call";
-                } else {
-                    actionToReturn = "fold";
-                }
             } else {
-                if(botOppEquityDiff > -0.2) {
+                boolean strongFlopFdOrOosd = botHasStrongFdOrStrongOosd(board);
+
+                if(strongFlopFdOrOosd) {
                     actionToReturn = "call";
+                } else if(facingOdds > 0.4) {
+                    if(botOppEquityDiff > -0.05) {
+                        actionToReturn = "call";
+                    } else {
+                        actionToReturn = "fold";
+                    }
+                } else if(facingOdds > 0.3) {
+                    if(botOppEquityDiff > -0.10) {
+                        actionToReturn = "call";
+                    } else {
+                        actionToReturn = "fold";
+                    }
+                } else if(facingOdds > 0.2) {
+                    if(botOppEquityDiff > -0.15) {
+                        actionToReturn = "call";
+                    } else {
+                        actionToReturn = "fold";
+                    }
                 } else {
-                    actionToReturn = "fold";
+                    if(botOppEquityDiff > -0.2) {
+                        actionToReturn = "call";
+                    } else {
+                        actionToReturn = "fold";
+                    }
                 }
             }
         }
 
         return actionToReturn;
+    }
+
+    private boolean botHasStrongFdOrStrongOosd(List<Card> board) {
+        boolean hasStrongFdOrStrongOosd = false;
+
+        if(board != null && board.size() == 3) {
+            FlushDrawEvaluator flushDrawEvaluator = rangeConstructor.getFlushDrawEvaluatorMap().get(board);
+            StraightDrawEvaluator straightDrawEvaluator = rangeConstructor.getStraightDrawEvaluatorMap().get(board);
+
+            if(flushDrawEvaluator != null) {
+                if(!flushDrawEvaluator.getStrongFlushDrawCombos().isEmpty()) {
+                    System.out.println("Strong flushdraw flop here");
+                    hasStrongFdOrStrongOosd = true;
+                }
+            }
+
+            if(straightDrawEvaluator != null) {
+                if(!straightDrawEvaluator.getStrongOosdCombos().isEmpty()) {
+                    System.out.println("Strong oosd flop here");
+                    hasStrongFdOrStrongOosd = true;
+                }
+            }
+        }
+
+        return hasStrongFdOrStrongOosd;
     }
 
     private String getPreflopCheckOrRaiseAction(GameVariables gameVariables, double botSizing) {
@@ -201,8 +239,8 @@ public class EquityAction {
 
         double oppAveragePfCallRangeEquity = new EquityCalculator().getAverageRangeEquity(oppPfCallingRange, null);
 
-        System.out.println("botEquity: " + botEquity);
-        System.out.println("oppEquity: " + oppAveragePfCallRangeEquity);
+        System.out.println("2)botEquity: " + botEquity);
+        System.out.println("2)oppEquity: " + oppAveragePfCallRangeEquity);
 
         if(botEquity > oppAveragePfCallRangeEquity) {
             actionToReturn = "raise";
@@ -214,11 +252,12 @@ public class EquityAction {
     }
 
     private String getPostflopCheckOrBetAction(ContinuousTable continuousTable, List<List<Card>> currentOppRange,
-                                               String oppName, double sizing, List<Card> board, List<Card> botHoleCards) {
+                                               String oppName, double sizing, List<Card> board, List<Card> botHoleCards,
+                                               double oppStack, double oppTotalBetsize) {
         String actionToReturn;
 
         String oppLooseness = inputProvider.getOppPostLooseness(oppName);
-        String botSizingGroup = inputProvider.getBotSizingGroup(sizing);
+        String botSizingGroup = inputProvider.getBotSizingGroup(sizing, oppStack, oppTotalBetsize);
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
@@ -228,8 +267,8 @@ public class EquityAction {
         botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
         double oppAverageCallingEquity = new EquityCalculator().getAverageRangeEquity(oppCallingRange, board);
 
-        System.out.println("botEquity: " + botEquity);
-        System.out.println("oppEquity: " + oppAverageCallingEquity);
+        System.out.println("3)botEquity: " + botEquity);
+        System.out.println("3)oppEquity: " + oppAverageCallingEquity);
 
         if(botEquity > oppAverageCallingEquity) {
             actionToReturn = "bet75pct";
@@ -243,11 +282,12 @@ public class EquityAction {
     private String getPostflopFoldCallOrRaiseAction(ContinuousTable continuousTable, List<List<Card>> currentOppRange,
                                                     String oppName, double oppTotalBetsize, List<Card> board,
                                                     List<Card> botHoleCards, List<String> eligibleActions,
-                                                    double botHypotheticalRaiseSizing, double facingOdds, String oppAction) {
+                                                    double botHypotheticalRaiseSizing, double facingOdds, String oppAction,
+                                                    double botStack, double botTotalBetsize, double oppStack) {
         String actionToReturn;
 
         String oppAggroness = inputProvider.getOppPostAggroness(oppName);
-        String oppSizingGroup = inputProvider.getOppSizingGroup(oppTotalBetsize);
+        String oppSizingGroup = inputProvider.getOppSizingGroup(oppTotalBetsize, botStack, botTotalBetsize);
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
@@ -264,13 +304,13 @@ public class EquityAction {
         botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
         double oppAverageBetOrRaiseEquity = new EquityCalculator().getAverageRangeEquity(oppBetOrRaiseRange, board);
 
-        System.out.println("botEquity: " + botEquity);
-        System.out.println("oppEquity: " + oppAverageBetOrRaiseEquity);
+        System.out.println("4)botEquity: " + botEquity);
+        System.out.println("4)oppEquity: " + oppAverageBetOrRaiseEquity);
 
         if(botEquity > oppAverageBetOrRaiseEquity) {
             if(eligibleActions.contains("raise")) {
                 String oppLooseness = inputProvider.getOppPostLooseness(oppName);
-                String botSizingGroup = inputProvider.getBotSizingGroup(botHypotheticalRaiseSizing);
+                String botSizingGroup = inputProvider.getBotSizingGroup(botHypotheticalRaiseSizing, oppStack, oppTotalBetsize);
 
                 List<List<Card>> oppCallingRaiseRange = rangeConstructor.getOppPostflopCallRange(oppBetOrRaiseRange,
                         allCombosPostflopEquitySorted, oppLooseness, botSizingGroup, board, botHoleCards);
@@ -286,7 +326,7 @@ public class EquityAction {
                 actionToReturn = "call";
             }
         } else {
-            actionToReturn = callWithCorrectOdds(botEquity - oppAverageBetOrRaiseEquity, facingOdds);
+            actionToReturn = callWithCorrectOdds(botEquity - oppAverageBetOrRaiseEquity, facingOdds, board);
         }
 
         return actionToReturn;

@@ -184,16 +184,38 @@ public class InputProvider {
         return postLoosenessGroup;
     }
 
-    public String getBotSizingGroup(double sizing) {
-        return getOppSizingGroup(sizing);
+    public String getBotSizingGroup(double botSizing, double oppStack, double oppTotalBetsize) {
+        String botSizingGroup;
+
+        double oppAmountToCall = botSizing - oppTotalBetsize;
+
+        if(oppAmountToCall > oppStack) {
+            oppAmountToCall = oppStack;
+        }
+
+        if(oppAmountToCall <= 60) {
+            botSizingGroup = SMALL;
+        } else if(oppAmountToCall <= 160) {
+            botSizingGroup = MEDIUM;
+        } else {
+            botSizingGroup = LARGE;
+        }
+
+        return botSizingGroup;
     }
 
-    public String getOppSizingGroup(double oppTotalBetsize) {
+    public String getOppSizingGroup(double oppTotalBetsize, double botStack, double botTotalBetsize) {
         String oppSizingGroup;
 
-        if(oppTotalBetsize <= 60) {
+        double amountToCall = oppTotalBetsize - botTotalBetsize;
+
+        if(amountToCall > botStack) {
+            amountToCall = botStack;
+        }
+
+        if(amountToCall <= 60) {
             oppSizingGroup = SMALL;
-        } else if(oppTotalBetsize <= 160) {
+        } else if(amountToCall <= 160) {
             oppSizingGroup = MEDIUM;
         } else {
             oppSizingGroup = LARGE;
