@@ -25,6 +25,7 @@ public class BotActionBuilder {
         setOpponentHasInitiative(gameVariables.getOpponentAction(), continuousTable, gameVariables);
         List<String> eligibleActions = getEligibleActions(gameVariables);
         sizing = getSizing(gameVariables);
+        double correctedSizing = getSizingCorrectedForHighShoveAmount(sizing, gameVariables.getBotStack(), gameVariables.getOpponentStack());
 
         action = rules.getInitialRuleAction(gameVariables, continuousTable.isOpponentHasInitiative());
 
@@ -37,11 +38,7 @@ public class BotActionBuilder {
             PreflopEquityHs preflopEquityHs = new PreflopEquityHs();
             EquityAction equityAction = new EquityAction(inputProvider, preflopEquityHs, rangeConstructor);
 
-            System.out.println("B pre3bet: " + inputProvider.getOppPre3betGroup(gameVariables.getOpponentName()));
-            System.out.println("B aggro: " + inputProvider.getOppPostAggroness(gameVariables.getOpponentName()));
-            System.out.println("B loose: " + inputProvider.getOppPostLooseness(gameVariables.getOpponentName()));
-
-            action = equityAction.getValueAction(continuousTable, gameVariables, eligibleActions, sizing, getFacingOdds(gameVariables));
+            action = equityAction.getValueAction(continuousTable, gameVariables, eligibleActions, correctedSizing, getFacingOdds(gameVariables));
 
             System.out.println("value: " + action);
 
@@ -59,7 +56,7 @@ public class BotActionBuilder {
                                 eligibleActions,
                                 continuousTable,
                                 gameVariables,
-                                sizing,
+                                correctedSizing,
                                 equityAction.getBotEquity());
                         System.out.println("bluffaction: " + action);
                     }
@@ -71,6 +68,10 @@ public class BotActionBuilder {
             System.out.println("afterrules: " + action);
 
             botEquity = equityAction.getBotEquity();
+        }
+
+        if(!action.equals("bet75pct") && !action.equals("raise")) {
+            sizing = 0;
         }
 
         Administration administration = new Administration();
@@ -135,6 +136,26 @@ public class BotActionBuilder {
         return new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(),
                 gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(),
                 gameVariables.getBoard(), -1.0, false, false);
+    }
+
+    private double getSizingCorrectedForHighShoveAmount(double initialSizing, double botStack, double oppStack) {
+        double correctSizing;
+
+        double effectiveStack;
+
+        if(botStack > oppStack) {
+            effectiveStack = oppStack;
+        } else {
+            effectiveStack = botStack;
+        }
+
+        if(initialSizing > effectiveStack) {
+            correctSizing = effectiveStack;
+        } else {
+            correctSizing = initialSizing;
+        }
+
+        return correctSizing;
     }
 
     private double getFacingOdds(GameVariables gameVariables) {
