@@ -137,13 +137,14 @@ public class EquityAction {
                 actionToReturn = "call";
             }
         } else {
-            actionToReturn = callWithCorrectOdds(botEquity - oppAveragePfRaiseRangeEquity, facingOdds, gameVariables.getBoard());
+            actionToReturn = callWithCorrectOdds(botEquity - oppAveragePfRaiseRangeEquity, facingOdds,
+                    gameVariables.getBoard(), gameVariables.getBotHoleCards());
         }
 
         return actionToReturn;
     }
 
-    private String callWithCorrectOdds(double botOppEquityDiff, double facingOdds, List<Card> board) {
+    private String callWithCorrectOdds(double botOppEquityDiff, double facingOdds, List<Card> board, List<Card> botHoleCards) {
         System.out.println("eqdiff: " + botOppEquityDiff);
         System.out.println("fcnodds: " + facingOdds);
 
@@ -155,7 +156,7 @@ public class EquityAction {
             if(facingOdds >= 0.5) {
                 actionToReturn = "fold";
             } else {
-                boolean strongFlopFdOrOosd = botHasStrongFdOrStrongOosd(board);
+                boolean strongFlopFdOrOosd = botHasStrongFdOrStrongOosd(board, botHoleCards);
 
                 if(strongFlopFdOrOosd) {
                     actionToReturn = "call";
@@ -190,7 +191,7 @@ public class EquityAction {
         return actionToReturn;
     }
 
-    private boolean botHasStrongFdOrStrongOosd(List<Card> board) {
+    private boolean botHasStrongFdOrStrongOosd(List<Card> board, List<Card> botHoleCards) {
         boolean hasStrongFdOrStrongOosd = false;
 
         if(board != null && board.size() == 3) {
@@ -199,15 +200,25 @@ public class EquityAction {
 
             if(flushDrawEvaluator != null) {
                 if(!flushDrawEvaluator.getStrongFlushDrawCombos().isEmpty()) {
-                    System.out.println("Strong flushdraw flop here");
-                    hasStrongFdOrStrongOosd = true;
+                    Set<Card> botHoleCardsAsSet = new HashSet<>();
+                    botHoleCardsAsSet.addAll(botHoleCards);
+
+                    if(flushDrawEvaluator.getStrongFlushDrawCombos().values().contains(botHoleCardsAsSet)) {
+                        System.out.println("Strong flushdraw flop here");
+                        hasStrongFdOrStrongOosd = true;
+                    }
                 }
             }
 
             if(straightDrawEvaluator != null) {
                 if(!straightDrawEvaluator.getStrongOosdCombos().isEmpty()) {
-                    System.out.println("Strong oosd flop here");
-                    hasStrongFdOrStrongOosd = true;
+                    Set<Card> botHoleCardsAsSet = new HashSet<>();
+                    botHoleCardsAsSet.addAll(botHoleCards);
+
+                    if(straightDrawEvaluator.getStrongOosdCombos().values().contains(botHoleCardsAsSet)) {
+                        System.out.println("Strong oosd flop here");
+                        hasStrongFdOrStrongOosd = true;
+                    }
                 }
             }
         }
@@ -326,7 +337,7 @@ public class EquityAction {
                 actionToReturn = "call";
             }
         } else {
-            actionToReturn = callWithCorrectOdds(botEquity - oppAverageBetOrRaiseEquity, facingOdds, board);
+            actionToReturn = callWithCorrectOdds(botEquity - oppAverageBetOrRaiseEquity, facingOdds, board, botHoleCards);
         }
 
         return actionToReturn;

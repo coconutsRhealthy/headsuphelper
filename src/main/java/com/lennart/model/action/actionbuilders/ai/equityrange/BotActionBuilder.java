@@ -63,7 +63,8 @@ public class BotActionBuilder {
                 }
             }
 
-            action = rules.getAfterRuleAction(action, getFacingOdds(gameVariables));
+            action = rules.getAfterRuleAction(action, getFacingOdds(gameVariables), continuousTable.isOpponentHasInitiative(),
+                    gameVariables, rangeConstructor, correctedSizing);
 
             System.out.println("afterrules: " + action);
 

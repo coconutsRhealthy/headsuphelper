@@ -1,6 +1,13 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
+import com.lennart.model.action.actionbuilders.ai.MachineLearning;
+import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
+import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
+import com.lennart.model.card.Card;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -58,13 +65,14 @@ public class Rules {
         return actionToReturn;
     }
 
-    public String getAfterRuleAction(String action, double facingOdds) {
+    public String getAfterRuleAction(String action, double facingOdds, boolean oppHasInitiative, GameVariables gameVariables,
+                                     RangeConstructor rangeConstructor, double botSizing) {
         String actionToReturn;
 
         if(action.equals("fold")) {
             actionToReturn = callWithFavorableOdds(action, facingOdds);
         } else {
-            actionToReturn = action;
+            actionToReturn = betWithStrongDraws(action, oppHasInitiative, gameVariables, rangeConstructor, botSizing);
         }
 
         return actionToReturn;
@@ -118,6 +126,52 @@ public class Rules {
             }
         } else {
             actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String betWithStrongDraws(String action, boolean oppHasInitiative, GameVariables gameVariables,
+                                      RangeConstructor rangeConstructor, double botSizing) {
+        String actionToReturn = action;
+
+        if(action.equals("check")) {
+            boolean bluffOddsAreOk = new MachineLearning().bluffOddsAreOk(botSizing, gameVariables.getOpponentBetSize(),
+                    gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBotStack(),
+                    gameVariables.getBoard(), gameVariables.getBotBetSize());
+
+            if(bluffOddsAreOk && !oppHasInitiative) {
+                FlushDrawEvaluator flushDrawEvaluator = rangeConstructor.getFlushDrawEvaluatorMap().get(gameVariables.getBoard());
+                StraightDrawEvaluator straightDrawEvaluator = rangeConstructor.getStraightDrawEvaluatorMap().get(gameVariables.getBoard());
+
+                if(flushDrawEvaluator != null) {
+                    if(!flushDrawEvaluator.getStrongFlushDrawCombos().isEmpty()) {
+                        Set<Card> botHoleCardsAsSet = new HashSet<>();
+                        botHoleCardsAsSet.addAll(gameVariables.getBotHoleCards());
+
+                        if(flushDrawEvaluator.getStrongFlushDrawCombos().values().contains(botHoleCardsAsSet)) {
+                            if(Math.random() < 0.65) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("Bet with strong fd");
+                            }
+                        }
+                    }
+                }
+
+                if(straightDrawEvaluator != null) {
+                    if(!straightDrawEvaluator.getStrongOosdCombos().isEmpty()) {
+                        Set<Card> botHoleCardsAsSet = new HashSet<>();
+                        botHoleCardsAsSet.addAll(gameVariables.getBotHoleCards());
+
+                        if(straightDrawEvaluator.getStrongOosdCombos().values().contains(botHoleCardsAsSet)) {
+                            if(Math.random() < 0.65) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("Bet with strong oosd");
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return actionToReturn;
