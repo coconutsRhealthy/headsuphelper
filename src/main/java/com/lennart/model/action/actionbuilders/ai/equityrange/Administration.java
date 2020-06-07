@@ -12,7 +12,9 @@ import com.lennart.model.handtracker.PlayerActionRound;
 import equitycalc.EquityCalculator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by LennartMac on 26/05/2020.
@@ -31,7 +33,7 @@ public class Administration {
             String opponentData = dbSaveRaw.getOpponentDataLogic(gameVariables.getOpponentName());
             double recentHandsWon = dbSaveRaw.getRecentHandsWonLogic(gameVariables.getOpponentName());
             String adjustedOppType = dbSaveRaw.getAdjustedOppTypeLogic(gameVariables.getOpponentName());
-            String strongDrawString = getStrongDrawString(rangeConstructor, gameVariables.getBoard());
+            String strongDrawString = getStrongDrawString(rangeConstructor, gameVariables.getBoard(), gameVariables.getBotHoleCards());
 
             dbSaveRaw.setBotAction(action);
             dbSaveRaw.setOppAction(gameVariables.getOpponentAction());
@@ -164,7 +166,7 @@ public class Administration {
         return updatedBotStack;
     }
 
-    private String getStrongDrawString(RangeConstructor rangeConstructor, List<Card> board) {
+    private String getStrongDrawString(RangeConstructor rangeConstructor, List<Card> board, List<Card> botHoleCards) {
         String strongDrawString = "StrongDrawFalse";
 
         StraightDrawEvaluator straightDrawEvaluator = rangeConstructor.getStraightDrawEvaluatorMap().get(board);
@@ -172,7 +174,12 @@ public class Administration {
         if(straightDrawEvaluator != null) {
             if(straightDrawEvaluator.getStrongOosdCombos() != null) {
                 if(!straightDrawEvaluator.getStrongOosdCombos().isEmpty()) {
-                    strongDrawString = "StrongDrawTrue";
+                    Set<Card> botHoleCardsAsSet = new HashSet<>();
+                    botHoleCardsAsSet.addAll(botHoleCards);
+
+                    if(straightDrawEvaluator.getStrongOosdCombos().values().contains(botHoleCardsAsSet)) {
+                        strongDrawString = "StrongDrawTrue";
+                    }
                 }
             }
         }
@@ -183,7 +190,12 @@ public class Administration {
             if(flushDrawEvaluator != null) {
                 if(flushDrawEvaluator.getStrongFlushDrawCombos() != null) {
                     if(!flushDrawEvaluator.getStrongFlushDrawCombos().isEmpty()) {
-                        strongDrawString = "StrongDrawTrue";
+                        Set<Card> botHoleCardsAsSet = new HashSet<>();
+                        botHoleCardsAsSet.addAll(botHoleCards);
+
+                        if(flushDrawEvaluator.getStrongFlushDrawCombos().values().contains(botHoleCardsAsSet)) {
+                            strongDrawString = "StrongDrawTrue";
+                        }
                     }
                 }
             }
