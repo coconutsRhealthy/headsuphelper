@@ -51,14 +51,14 @@ public class BotActionBuilder {
                     List<Card> board = gameVariables.getBoard();
 
                     if(board != null && !board.isEmpty()) {
-                        action = new BluffAction(equityAction, inputProvider, rangeConstructor, preflopEquityHs).getBluffAction(
-                                action,
-                                eligibleActions,
-                                continuousTable,
-                                gameVariables,
-                                correctedSizing,
-                                equityAction.getBotEquity());
-                        System.out.println("bluffaction: " + action);
+                        //action = new BluffAction(equityAction, inputProvider, rangeConstructor, preflopEquityHs).getBluffAction(
+                        //        action,
+                        //        eligibleActions,
+                        //        continuousTable,
+                        //        gameVariables,
+                        //        correctedSizing,
+                        //        equityAction.getBotEquity());
+                        //System.out.println("bluffaction: " + action);
                     }
                 }
             }
@@ -75,9 +75,9 @@ public class BotActionBuilder {
             sizing = 0;
         }
 
-        Administration administration = new Administration();
-        administration.doDbSaveStuff(action, continuousTable, gameVariables, sizing, rangeConstructor, botEquity);
-        administration.doActionRoundStuff(action, gameVariables, sizing);
+//        Administration administration = new Administration();
+//        administration.doDbSaveStuff(action, continuousTable, gameVariables, sizing, rangeConstructor, botEquity);
+//        administration.doActionRoundStuff(action, gameVariables, sizing);
 
         return action;
     }

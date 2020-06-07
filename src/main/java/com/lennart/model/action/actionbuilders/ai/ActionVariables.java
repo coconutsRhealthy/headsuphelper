@@ -958,8 +958,7 @@ public class ActionVariables {
             botHoleCardsCopy.addAll(botHoleCards);
             boardCopy.addAll(board);
 
-            //List<Double> handStrengthAtRiverList = equity.getHandstrengthAtRiverList(boardCopy, botHoleCardsCopy, 25);
-            List<Double> handStrengthAtRiverList = new ArrayList<>();
+            List<Double> handStrengthAtRiverList = equity.getHandstrengthAtRiverList(boardCopy, botHoleCardsCopy, 25);
 
             int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
             numberOfScoresAbove80 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.80);

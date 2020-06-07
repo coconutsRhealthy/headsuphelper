@@ -157,6 +157,9 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
+                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
+                String action = actionVariables.getAction();
+
                 RangeConstructor rangeConstructor = new RangeConstructor();
                 InputProvider inputProvider = new InputProvider();
                 new OpponentRangeSetter(rangeConstructor, inputProvider).setOpponentRange(this, gameVariables);
@@ -170,14 +173,23 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println("OPPRANGE SIZE: " + oppRange.size());
                 }
 
-                BotActionBuilder botActionBuilder = new BotActionBuilder();
-                String action = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
+                if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                    if(action.equals("fold")) {
+                        BotActionBuilder botActionBuilder = new BotActionBuilder();
+                        String actionNewStyle = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
+
+                        if(actionNewStyle.equals("call") || actionNewStyle.equals("raise")) {
+                            action = actionNewStyle;
+                            System.out.println("Change fold to call new style!");
+                        }
+                    }
+                }
 
                 if(action.equals("bet75pct") || action.equals("raise")) {
                     opponentHasInitiative = false;
                 }
 
-                double sizing = botActionBuilder.getSizing();
+                double sizing = actionVariables.getSizing();
 
                 doLogging(gameVariables, action, sizing, numberOfActionRequests);
 
@@ -191,7 +203,7 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println();
 
                 if(gameVariables.getBoard() != null && gameVariables.getBoard().size() >= 3) {
-                    allBotEquities.add(botActionBuilder.getBotEquity());
+                    allBotEquities.add(actionVariables.getBotHandStrength());
                 }
 
                 StarsTableReader.performActionOnSite(action, sizing);

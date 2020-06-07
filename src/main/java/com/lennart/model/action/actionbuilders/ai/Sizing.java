@@ -33,11 +33,10 @@ public class Sizing {
         if(handstrength >= 0.85) {
             double random = Math.random();
 
-            //0.35
-            if(random < 0.57) {
-                sizingPercentage = 1.57;
+            if(random < 0.25) {
+                sizingPercentage = 1.48;
                 raiseOddsToUseClassVar = 1.86;
-            } else if(random < 0.88) {
+            } else if(random < 0.7) {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {
@@ -49,8 +48,8 @@ public class Sizing {
         if(sizingPercentage == -1 && (strongFd || strongOosd)) {
             double random = Math.random();
 
-            if(random < 0.17) {
-                sizingPercentage = 1.57;
+            if(random < 0.25) {
+                sizingPercentage = 1.48;
                 raiseOddsToUseClassVar = 1.86;
             } else if(random < 0.5) {
                 sizingPercentage = 0.97;
@@ -70,8 +69,11 @@ public class Sizing {
             double random = Math.random();
 
             if(random < 0.1) {
-                sizingPercentage = 0.97;
+                sizingPercentage = 1.48;
                 raiseOddsToUseClassVar = 1.86;
+            } else if(random < 0.22) {
+                sizingPercentage = 0.97;
+                raiseOddsToUseClassVar = 2.14;
             } else {
                 sizingPercentage = 0.54;
                 raiseOddsToUseClassVar = 2.85;
@@ -84,8 +86,7 @@ public class Sizing {
             System.out.println("sizing weird percentage default should not come here");
         }
 
-        sizingPercentage = 0.63;
-        raiseOddsToUseClassVar = 2.2;
+        raiseOddsToUseClassVar = 2.85;
     }
 
     public double getRuleBotSizing(double handStrength, double facingBetSize, double myBetSize, double facingStack,
