@@ -26,24 +26,25 @@ public class BotActionBuilderTest {
         GameVariables gameVariables = new GameVariables();
 
         //////1
-        gameVariables.setBotHoleCards(Arrays.asList(new Card(5, 's'), new Card(6, 'h')));
+        gameVariables.setBotHoleCards(Arrays.asList(new Card(13, 'd'), new Card(8, 'c')));
         gameVariables.setBoard(new ArrayList<>());
-        gameVariables.setOpponentAction("bet");
+        gameVariables.setOpponentAction("raise");
         gameVariables.setBotIsButton(true);
-        gameVariables.setBotStack(990);
-        gameVariables.setOpponentStack(980);
-        gameVariables.setBotBetSize(10);
-        gameVariables.setOpponentBetSize(20);
-        gameVariables.setBigBlind(20);
+        gameVariables.setBotStack(403);
+        gameVariables.setOpponentStack(417);
+        gameVariables.setBotBetSize(60);
+        gameVariables.setOpponentBetSize(120);
+        gameVariables.setBigBlind(60);
         gameVariables.setPot(0);
-        gameVariables.setOpponentName("TestNewEquityStyle");
+        gameVariables.setOpponentName("PRESS618");
 
         PlayerActionRound playerActionRound1_1 = new PlayerActionRound("bot", new ArrayList<>(), gameVariables.getBigBlind() / 2, gameVariables.getBigBlind(), "preflop", "postSB");
         PlayerActionRound playerActionRound1_2 = new PlayerActionRound("opponent", new ArrayList<>(), gameVariables.getBigBlind() / 2, gameVariables.getBigBlind(), "preflop", "bet");
-        PlayerActionRound playerActionRound1_3 = new PlayerActionRound("bot", new ArrayList<>(), 42, gameVariables.getBigBlind(), "preflop", "raise");
-        PlayerActionRound playerActionRound1_4 = new PlayerActionRound("opponent", new ArrayList<>(), 42, gameVariables.getBigBlind(), "preflop", "call");
+        //PlayerActionRound playerActionRound1_3 = new PlayerActionRound("bot", new ArrayList<>(), 42, gameVariables.getBigBlind(), "preflop", "raise");
+        PlayerActionRound playerActionRound1_4 = new PlayerActionRound("bot", new ArrayList<>(), gameVariables.getBigBlind(), gameVariables.getBigBlind(), "preflop", "call");
+        PlayerActionRound playerActionRound1_3 = new PlayerActionRound("opponent", new ArrayList<>(), gameVariables.getBigBlind(), 120, "preflop", "raise");
 
-        ActionRequest actionRequest1 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 10, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
+        ActionRequest actionRequest1 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 100, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
 
         actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_1);
         actionRequest1.getActionsSinceLastRequest().add(playerActionRound1_2);
@@ -58,90 +59,90 @@ public class BotActionBuilderTest {
 
 
 
-        //////2
-        gameVariables.setBoard(Arrays.asList(new Card(8, 'd'), new Card(12, 'd'), new Card(11, 'c')));
-        gameVariables.setOpponentAction("check");
-        gameVariables.setBotStack(958);
-        gameVariables.setOpponentStack(958);
-        gameVariables.setBotBetSize(0);
-        gameVariables.setOpponentBetSize(0);
-        gameVariables.setPot(84);
+//        //////2
+//        gameVariables.setBoard(Arrays.asList(new Card(8, 'd'), new Card(12, 'd'), new Card(11, 'c')));
+//        gameVariables.setOpponentAction("check");
+//        gameVariables.setBotStack(958);
+//        gameVariables.setOpponentStack(958);
+//        gameVariables.setBotBetSize(0);
+//        gameVariables.setOpponentBetSize(0);
+//        gameVariables.setPot(84);
+//
+//        PlayerActionRound playerActionRound2_1 = new PlayerActionRound("bot", gameVariables.getBoard(), 0, 0, "flop", "check");
+//        PlayerActionRound playerActionRound2_2 = new PlayerActionRound("opponent", gameVariables.getBoard(), 0, 0, "flop", "check");
+//
+//        ActionRequest actionRequest2 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 84, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
+//
+//        actionRequest2.getActionsSinceLastRequest().add(playerActionRound2_1);
+//        actionRequest2.getActionsSinceLastRequest().add(playerActionRound2_2);
+//
+//        gameVariables.getAllActionRequestsOfHand().add(actionRequest2);
+//
+//        List<DbSave> dbSaveList = new ArrayList<>();
+//        DbSaveRaw dbSaveRaw = new DbSaveRaw();
+//        dbSaveRaw.setBoard("");
+//        dbSaveRaw.setBotAction("raise");
+//        dbSaveRaw.setSizing(42);
+//        dbSaveList.add(dbSaveRaw);
+//        continuousTable.setDbSaveList(dbSaveList);
+//
+//        RangeConstructor rangeConstructor2 = new RangeConstructor();
+//        new OpponentRangeSetter(rangeConstructor2, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
+//
+//
+//
+//
+//
+//        //////3
+//        gameVariables.setBoard(Arrays.asList(new Card(8, 'd'), new Card(12, 'd'), new Card(11, 'c'), new Card(8, 'c')));
+//        gameVariables.setOpponentAction("check");
+//        gameVariables.setBotStack(958);
+//        gameVariables.setOpponentStack(958);
+//        gameVariables.setBotBetSize(0);
+//        gameVariables.setOpponentBetSize(0);
+//        gameVariables.setPot(84);
+//
+//        PlayerActionRound playerActionRound3_1 = new PlayerActionRound("bot", gameVariables.getBoard(), 0, 0, "turn", "check");
+//        PlayerActionRound playerActionRound3_2 = new PlayerActionRound("opponent", gameVariables.getBoard(), 0, 0, "turn", "check");
+//
+//        ActionRequest actionRequest3 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 84, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
+//
+//        actionRequest3.getActionsSinceLastRequest().add(playerActionRound3_1);
+//        actionRequest3.getActionsSinceLastRequest().add(playerActionRound3_2);
+//
+//        gameVariables.getAllActionRequestsOfHand().add(actionRequest3);
+//
+//        DbSaveRaw dbSaveRaw2 = new DbSaveRaw();
+//        dbSaveRaw2.setBoard("8d12d11c");
+//        dbSaveRaw2.setBotAction("check");
+//        dbSaveRaw2.setSizing(0);
+//        continuousTable.getDbSaveList().add(dbSaveRaw2);
+//
+//        RangeConstructor rangeConstructor3 = new RangeConstructor();
+//        new OpponentRangeSetter(rangeConstructor3, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
+//
+//
+//
+//
+//        ////////4
+//        gameVariables.setBoard(Arrays.asList(new Card(8, 'd'), new Card(12, 'd'), new Card(11, 'c'), new Card(8, 'c'), new Card(2, 's')));
+//        gameVariables.setOpponentAction("check");
+//        gameVariables.setBotStack(958);
+//        gameVariables.setOpponentStack(958);
+//        gameVariables.setBotBetSize(0);
+//        gameVariables.setOpponentBetSize(0);
+//        gameVariables.setPot(84);
+//
+//        DbSaveRaw dbSaveRaw3 = new DbSaveRaw();
+//        dbSaveRaw3.setBoard("8d12d11c8c");
+//        dbSaveRaw3.setBotAction("check");
+//        dbSaveRaw3.setSizing(0);
+//        continuousTable.getDbSaveList().add(dbSaveRaw3);
+//
+//        RangeConstructor rangeConstructor4 = new RangeConstructor();
+//        new OpponentRangeSetter(rangeConstructor4, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
 
-        PlayerActionRound playerActionRound2_1 = new PlayerActionRound("bot", gameVariables.getBoard(), 0, 0, "flop", "check");
-        PlayerActionRound playerActionRound2_2 = new PlayerActionRound("opponent", gameVariables.getBoard(), 0, 0, "flop", "check");
-
-        ActionRequest actionRequest2 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 84, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
-
-        actionRequest2.getActionsSinceLastRequest().add(playerActionRound2_1);
-        actionRequest2.getActionsSinceLastRequest().add(playerActionRound2_2);
-
-        gameVariables.getAllActionRequestsOfHand().add(actionRequest2);
-
-        List<DbSave> dbSaveList = new ArrayList<>();
-        DbSaveRaw dbSaveRaw = new DbSaveRaw();
-        dbSaveRaw.setBoard("");
-        dbSaveRaw.setBotAction("raise");
-        dbSaveRaw.setSizing(42);
-        dbSaveList.add(dbSaveRaw);
-        continuousTable.setDbSaveList(dbSaveList);
-
-        RangeConstructor rangeConstructor2 = new RangeConstructor();
-        new OpponentRangeSetter(rangeConstructor2, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
-
-
-
-
-
-        //////3
-        gameVariables.setBoard(Arrays.asList(new Card(8, 'd'), new Card(12, 'd'), new Card(11, 'c'), new Card(8, 'c')));
-        gameVariables.setOpponentAction("check");
-        gameVariables.setBotStack(958);
-        gameVariables.setOpponentStack(958);
-        gameVariables.setBotBetSize(0);
-        gameVariables.setOpponentBetSize(0);
-        gameVariables.setPot(84);
-
-        PlayerActionRound playerActionRound3_1 = new PlayerActionRound("bot", gameVariables.getBoard(), 0, 0, "turn", "check");
-        PlayerActionRound playerActionRound3_2 = new PlayerActionRound("opponent", gameVariables.getBoard(), 0, 0, "turn", "check");
-
-        ActionRequest actionRequest3 = new ActionRequest(gameVariables.getAllActionRequestsOfHand(), 84, gameVariables.getBoard(), gameVariables.isBotIsButton(), gameVariables.getBigBlind());
-
-        actionRequest3.getActionsSinceLastRequest().add(playerActionRound3_1);
-        actionRequest3.getActionsSinceLastRequest().add(playerActionRound3_2);
-
-        gameVariables.getAllActionRequestsOfHand().add(actionRequest3);
-
-        DbSaveRaw dbSaveRaw2 = new DbSaveRaw();
-        dbSaveRaw2.setBoard("8d12d11c");
-        dbSaveRaw2.setBotAction("check");
-        dbSaveRaw2.setSizing(0);
-        continuousTable.getDbSaveList().add(dbSaveRaw2);
-
-        RangeConstructor rangeConstructor3 = new RangeConstructor();
-        new OpponentRangeSetter(rangeConstructor3, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
-
-
-
-
-        ////////4
-        gameVariables.setBoard(Arrays.asList(new Card(8, 'd'), new Card(12, 'd'), new Card(11, 'c'), new Card(8, 'c'), new Card(2, 's')));
-        gameVariables.setOpponentAction("check");
-        gameVariables.setBotStack(958);
-        gameVariables.setOpponentStack(958);
-        gameVariables.setBotBetSize(0);
-        gameVariables.setOpponentBetSize(0);
-        gameVariables.setPot(84);
-
-        DbSaveRaw dbSaveRaw3 = new DbSaveRaw();
-        dbSaveRaw3.setBoard("8d12d11c8c");
-        dbSaveRaw3.setBotAction("check");
-        dbSaveRaw3.setSizing(0);
-        continuousTable.getDbSaveList().add(dbSaveRaw3);
-
-        RangeConstructor rangeConstructor4 = new RangeConstructor();
-        new OpponentRangeSetter(rangeConstructor4, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
-
-        String action = new BotActionBuilder().getAction(continuousTable, gameVariables, rangeConstructor4);
+        String action = new BotActionBuilder().getAction(continuousTable, gameVariables, rangeConstructor);
 
         System.out.println("ACTION: " + action);
 
