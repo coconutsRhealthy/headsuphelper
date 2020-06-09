@@ -70,10 +70,12 @@ public class Rules {
         String actionToReturn;
 
         if(action.equals("fold")) {
-            actionToReturn = callWithFavorableOdds(action, facingOdds);
+            //actionToReturn = callWithFavorableOdds(action, facingOdds);
         } else {
-            actionToReturn = betWithStrongDraws(action, oppHasInitiative, gameVariables, rangeConstructor, botSizing);
+            //actionToReturn = betWithStrongDraws(action, oppHasInitiative, gameVariables, rangeConstructor, botSizing);
         }
+
+        actionToReturn = action;
 
         return actionToReturn;
     }

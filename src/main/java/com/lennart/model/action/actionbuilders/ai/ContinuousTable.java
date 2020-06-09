@@ -157,12 +157,34 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
-                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
-                String action = actionVariables.getAction();
-
                 RangeConstructor rangeConstructor = new RangeConstructor();
                 InputProvider inputProvider = new InputProvider();
                 new OpponentRangeSetter(rangeConstructor, inputProvider).setOpponentRange(this, gameVariables);
+
+                String action;
+                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
+
+                if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
+                    BotActionBuilder botActionBuilder = new BotActionBuilder();
+                    String actionNewstyle = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
+                    String actionOldstyle = actionVariables.getAction();
+
+                    System.out.println("*N: " + actionNewstyle + " *O: " + actionOldstyle);
+
+                    //ook raise?
+                    if(actionNewstyle.equals("fold") || actionNewstyle.equals("check") || actionNewstyle.equals("raise")) {
+                        action = actionOldstyle;
+                        System.out.println("Action newstyle: " + actionNewstyle + ". Use oldstyle: " + actionOldstyle);
+                    } else if(actionNewstyle.equals("call") && actionOldstyle.equals("raise")) {
+                        action = actionOldstyle;
+                        System.out.println("Prefer oldstyle raise over newstyle call");
+                    } else {
+                        action = actionNewstyle;
+                        System.out.println("Use action newstyle: " + actionNewstyle);
+                    }
+                } else {
+                    action = actionVariables.getAction();
+                }
 
                 if(oppRange == null) {
                     System.out.println("OPPRANGE = NULL");
