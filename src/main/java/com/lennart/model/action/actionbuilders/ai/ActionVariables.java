@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
+import com.lennart.model.action.actionbuilders.ai.equityrange.BotActionBuilder;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
@@ -475,6 +476,63 @@ public class ActionVariables {
         action = preventBadPostCalls(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, facingOdds);
         action = adjustPostFoldsToAggroness(action, boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, facingOdds, gameVariables.getOpponentName());
 
+        ///////
+
+
+        if(boardInMethod == null || boardInMethod.isEmpty()) {
+            if(action.equals("raise")) {
+                if(gameVariables.getBotBetSize() == gameVariables.getBigBlind() &&
+                        gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
+                    System.out.println("raise > check pf");
+                    action = "check";
+                } else {
+                    System.out.println("raise > call pf");
+                    action = "call";
+                }
+            } else {
+                //nothing
+            }
+        } else {
+            if(continuousTable.getRangeConstructor() == null) {
+                System.out.println("WTF! RangeConstructor is null");
+            } else {
+                String olldStyleAction = action;
+                String newwStyleAction = new BotActionBuilder().getAction(continuousTable, gameVariables,
+                        continuousTable.getRangeConstructor());
+
+                if(olldStyleAction.equals("raise")) {
+                    if(boardInMethod.size() == 5 && botIsButtonInMethod) {
+                        //keep it raise
+                    } else {
+                        olldStyleAction = "call";
+                    }
+                }
+
+                if(newwStyleAction.equals("raise")) {
+                    if(boardInMethod.size() == 5 && botIsButtonInMethod) {
+                        //keep it raise
+                    } else {
+                        newwStyleAction = "call";
+                    }
+                }
+
+                if(newwStyleAction.equals("fold")) {
+                    action = olldStyleAction;
+                } else if(newwStyleAction.equals("raise")) {
+                    if(olldStyleAction.equals("raise")) {
+                        action = newwStyleAction;
+                    } else {
+                        action = olldStyleAction;
+                    }
+                } else {
+                    action = newwStyleAction;
+                }
+            }
+        }
+
+        ////
+
+
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
                 sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
@@ -482,6 +540,20 @@ public class ActionVariables {
 
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
+
+
+        //sizing shit
+        if(sizing == 0 && action.equals("bet75pct") || sizing > 0.37 * gameVariables.getPot() && action.equals("bet75pct")) {
+            System.out.println("xx reset sizing to 0.37");
+            sizing = 0.37 * gameVariables.getPot();
+        }
+
+        if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
+            System.out.println("xx reset sizing to 1 bigblind");
+            sizing = gameVariables.getBigBlind();
+        }
+        //
+
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
@@ -958,10 +1030,14 @@ public class ActionVariables {
             botHoleCardsCopy.addAll(botHoleCards);
             boardCopy.addAll(board);
 
-            List<Double> handStrengthAtRiverList = equity.getHandstrengthAtRiverList(boardCopy, botHoleCardsCopy, 25);
+            //List<Double> handStrengthAtRiverList = equity.getHandstrengthAtRiverList(boardCopy, botHoleCardsCopy, 25);
+            //List<Double> handStrengthAtRiverList = new ArrayList<>();
 
-            int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
-            numberOfScoresAbove80 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.80);
+            //int numberOfScoresAbove90 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.90);
+            //numberOfScoresAbove80 = equity.getNumberOfScoresAboveLimit(handStrengthAtRiverList, 0.80);
+
+            int numberOfScoresAbove90 = 0;
+            numberOfScoresAbove80 = 0;
 
             if(board.size() == 3) {
                 if(numberOfScoresAbove90 >= 8) {

@@ -1,7 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
-import com.lennart.model.action.actionbuilders.ai.equityrange.BotActionBuilder;
 import com.lennart.model.action.actionbuilders.ai.equityrange.InputProvider;
 import com.lennart.model.action.actionbuilders.ai.equityrange.OpponentRangeSetter;
 import com.lennart.model.action.actionbuilders.ai.equityrange.RangeConstructor;
@@ -32,7 +31,7 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Set<Card>> top10percentTurnCombos;
     private List<Set<Card>> top10percentRiverCombos;
 
-    private List<Double> allBotEquities = new ArrayList<>();
+    private List<Double> allHandStrenghts = new ArrayList<>();
 
     private boolean botBluffActionDone;
 
@@ -51,6 +50,8 @@ public class ContinuousTable implements ContinuousTableable {
     private Map<List<Card>, List<List<Card>>> allCombosPostflopEquitySorted = null;
 
     private boolean botDidPre4bet;
+
+    private RangeConstructor rangeConstructor;
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -99,12 +100,12 @@ public class ContinuousTable implements ContinuousTableable {
                         }
                     }
 
-                    int numberOfEquitiesAbove65 = getNumberOfEquitiesAbove65();
-                    int allEquitiesSize = allBotEquities.size();
+                    int numberOfHsAbove85 = getNumberOfHsAbove85();
+                    int allHs = allHandStrenghts.size();
 
-                    System.out.println("^^^^a " + numberOfEquitiesAbove65 + " ^^^^");
-                    System.out.println("^^^^b " + allEquitiesSize + " ^^^^");
-                    System.out.println("^ratio: " + (double) numberOfEquitiesAbove65 / (double) allEquitiesSize + " ^^^^");
+                    System.out.println("^^^^a " + numberOfHsAbove85 + " ^^^^");
+                    System.out.println("^^^^b " + allHs + " ^^^^");
+                    System.out.println("^ratio: " + (double) numberOfHsAbove85 / (double) allHs + " ^^^^");
 
                     if(!game.equals("sng")) {
                         long currentTime = new Date().getTime();
@@ -130,6 +131,7 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
+                    //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
 
                     opponentDidPreflop4betPot = false;
 
@@ -157,55 +159,13 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
-                RangeConstructor rangeConstructor = new RangeConstructor();
-                InputProvider inputProvider = new InputProvider();
-                new OpponentRangeSetter(rangeConstructor, inputProvider).setOpponentRange(this, gameVariables);
+                rangeConstructor = new RangeConstructor();
+                new OpponentRangeSetter(rangeConstructor, new InputProvider()).setOpponentRange(this, gameVariables);
 
-                String action;
+                System.out.println("AAGG: size: " + oppRange.size());
+
                 ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
-
-                if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
-                    BotActionBuilder botActionBuilder = new BotActionBuilder();
-                    String actionNewstyle = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
-                    String actionOldstyle = actionVariables.getAction();
-
-                    System.out.println("*N: " + actionNewstyle + " *O: " + actionOldstyle);
-
-                    //ook raise?
-                    if(actionNewstyle.equals("fold") || actionNewstyle.equals("check") || actionNewstyle.equals("raise")) {
-                        action = actionOldstyle;
-                        System.out.println("Action newstyle: " + actionNewstyle + ". Use oldstyle: " + actionOldstyle);
-                    } else if(actionNewstyle.equals("call") && actionOldstyle.equals("raise")) {
-                        action = actionOldstyle;
-                        System.out.println("Prefer oldstyle raise over newstyle call");
-                    } else {
-                        action = actionNewstyle;
-                        System.out.println("Use action newstyle: " + actionNewstyle);
-                    }
-                } else {
-                    action = actionVariables.getAction();
-                }
-
-                if(oppRange == null) {
-                    System.out.println("OPPRANGE = NULL");
-                } else {
-                    System.out.println("A pre3bet: " + inputProvider.getOppPre3betGroup(gameVariables.getOpponentName()));
-                    System.out.println("A aggro: " + inputProvider.getOppPostAggroness(gameVariables.getOpponentName()));
-                    System.out.println("A loose: " + inputProvider.getOppPostLooseness(gameVariables.getOpponentName()));
-                    System.out.println("OPPRANGE SIZE: " + oppRange.size());
-                }
-
-                if(gameVariables.getBoard() != null && !gameVariables.getBoard().isEmpty()) {
-                    if(action.equals("fold")) {
-                        BotActionBuilder botActionBuilder = new BotActionBuilder();
-                        String actionNewStyle = botActionBuilder.getAction(this, gameVariables, rangeConstructor);
-
-                        if(actionNewStyle.equals("call") || actionNewStyle.equals("raise")) {
-                            action = actionNewStyle;
-                            System.out.println("Change fold to call new style!");
-                        }
-                    }
-                }
+                String action = actionVariables.getAction();
 
                 if(action.equals("bet75pct") || action.equals("raise")) {
                     opponentHasInitiative = false;
@@ -213,7 +173,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 double sizing = actionVariables.getSizing();
 
-                doLogging(gameVariables, action, sizing, numberOfActionRequests);
+                doLogging(gameVariables, actionVariables, numberOfActionRequests);
 
                 System.out.println();
                 System.out.println("********************");
@@ -221,11 +181,14 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Opponent Name: " + gameVariables.getOpponentName());
                 System.out.println("Suggested action: "+ action);
                 System.out.println("Sizing: " + sizing);
+                System.out.println("Route: " + actionVariables.getRoute());
+                System.out.println("Table: " + actionVariables.getTable());
+                System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
                 System.out.println("********************");
                 System.out.println();
 
                 if(gameVariables.getBoard() != null && gameVariables.getBoard().size() >= 3) {
-                    allBotEquities.add(actionVariables.getBotHandStrength());
+                    allHandStrenghts.add(actionVariables.getBotHandStrength());
                 }
 
                 StarsTableReader.performActionOnSite(action, sizing);
@@ -269,7 +232,7 @@ public class ContinuousTable implements ContinuousTableable {
         }
     }
 
-    private void doLogging(GameVariables gameVariables, String suggestedAction, double sizing, int numberOfActionRequests) throws Exception {
+    private void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
         StarsTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
 
         String opponentStack = String.valueOf(gameVariables.getOpponentStack());
@@ -280,7 +243,10 @@ public class ContinuousTable implements ContinuousTableable {
         String botStack = String.valueOf(gameVariables.getBotStack());
         String botHoleCards = getCardListAsString(gameVariables.getBotHoleCards());
         String opponentAction = gameVariables.getOpponentAction();
-        String sizingString = String.valueOf(sizing);
+        String route = actionVariables.getRoute();
+        String table = actionVariables.getTable();
+        String suggestedAction = actionVariables.getAction();
+        String sizing = String.valueOf(actionVariables.getSizing());
 
         PrintWriter writer = new PrintWriter("/Users/LennartMac/Documents/logging/" + numberOfActionRequests + ".txt", "UTF-8");
 
@@ -297,17 +263,41 @@ public class ContinuousTable implements ContinuousTableable {
         writer.println("------------------------");
         writer.println();
 
+        writer.println("Route: " + route);
+        writer.println("Table: " + table);
         writer.println("Action: " + suggestedAction);
-        writer.println("Sizing: " + sizingString);
+        writer.println("Sizing: " + sizing);
+
+        writer.close();
+
+        doRangeLogging(numberOfActionRequests);
+    }
+
+    private void doRangeLogging(int numberOfActionRequests) throws Exception {
+        PrintWriter writer = new PrintWriter("/Users/LennartMac/Documents/logging/" + numberOfActionRequests + "-range.txt", "UTF-8");
+
+        int counter = 1;
+
+        if(oppRange != null) {
+            for(List<Card> combo : oppRange) {
+                Card card1 = combo.get(0);
+                Card card2 = combo.get(1);
+
+                writer.println("" + counter + ")  " + card1.getRank() + card1.getSuit() + " " + card2.getRank() + card2.getSuit() + "");
+                counter++;
+            }
+        } else {
+            System.out.println("oppRange is null!");
+        }
 
         writer.close();
     }
 
-    private int getNumberOfEquitiesAbove65() {
+    private int getNumberOfHsAbove85() {
         int counter = 0;
 
-        for(double d : allBotEquities) {
-            if(d >= 0.65) {
+        for(double d : allHandStrenghts) {
+            if(d >= 0.85) {
                 counter++;
             }
         }
@@ -335,6 +325,8 @@ public class ContinuousTable implements ContinuousTableable {
         List<String> total = handHistoryReaderStars.readTextFile();
         List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
         double bigBlindInMethod = handHistoryReaderStars.getBigBlindFromLastHandHh(lastHandNonRecursive);
+
+        System.out.println("Bb from HH: " + bigBlindInMethod);
 
         List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlindInMethod);
 
@@ -427,6 +419,26 @@ public class ContinuousTable implements ContinuousTableable {
                 }
 
                 System.out.println(",");
+
+//                if(counter2 == 100 || counter2 == 200) {
+////                    System.out.println("Attempting to close chest shit");
+////                    MouseKeyboard.click(222, 44);
+////                    TimeUnit.MILLISECONDS.sleep(300);
+////                    MouseKeyboard.click(226, 79);
+////                    TimeUnit.MILLISECONDS.sleep(600);
+////                    MouseKeyboard.click(838, 605);
+////
+////                    TimeUnit.MILLISECONDS.sleep(600);
+//
+//                    System.out.println("Attempting to close 'registration closed' shit");
+//                    MouseKeyboard.click(489, 432);
+//                    TimeUnit.MILLISECONDS.sleep(300);
+//                }
+//
+//                if(counter2 == 150 || counter2 == 300) {
+//                    System.out.println("Trying to register again");
+//                    MouseKeyboard.click(782, 603);
+//                }
 
                 if(counter2 >= 1350) {
                     System.out.println("Something is wrong in registering sng part, close session.");
@@ -615,5 +627,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setBotDidPre4bet(boolean botDidPre4bet) {
         this.botDidPre4bet = botDidPre4bet;
+    }
+
+    public RangeConstructor getRangeConstructor() {
+        return rangeConstructor;
     }
 }

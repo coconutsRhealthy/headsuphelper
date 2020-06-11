@@ -70,12 +70,10 @@ public class Rules {
         String actionToReturn;
 
         if(action.equals("fold")) {
-            //actionToReturn = callWithFavorableOdds(action, facingOdds);
+            actionToReturn = callWithFavorableOdds(action, facingOdds);
         } else {
-            //actionToReturn = betWithStrongDraws(action, oppHasInitiative, gameVariables, rangeConstructor, botSizing);
+            actionToReturn = betWithStrongDraws(action, oppHasInitiative, gameVariables, rangeConstructor, botSizing);
         }
-
-        actionToReturn = action;
 
         return actionToReturn;
     }
@@ -121,7 +119,10 @@ public class Rules {
         if(action.equals("fold")) {
             System.out.println("facingodds: " + facingOdds);
 
-            if(facingOdds <= 0.2) {
+            if(facingOdds < 0) {
+                System.out.println("negative facing odds...");
+                actionToReturn = action;
+            } else if(facingOdds <= 0.2) {
                 actionToReturn = "call";
             } else {
                 actionToReturn = action;

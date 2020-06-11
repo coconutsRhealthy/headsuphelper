@@ -106,6 +106,7 @@ public class EquityAction {
 
         System.out.println("1)botEquity: " + botEquity);
         System.out.println("1)oppEquity: " + oppAveragePfRaiseRangeEquity);
+        System.out.println("1)size: " + oppPfRaiseRange.size());
 
         if(botEquity > oppAveragePfRaiseRangeEquity) {
             if(eligibleActions.contains("raise")) {
@@ -156,33 +157,38 @@ public class EquityAction {
             if(facingOdds >= 0.5) {
                 actionToReturn = "fold";
             } else {
-                boolean strongFlopFdOrOosd = botHasStrongFdOrStrongOosd(board, botHoleCards);
-
-                if(strongFlopFdOrOosd) {
-                    actionToReturn = "call";
-                } else if(facingOdds > 0.4) {
-                    if(botOppEquityDiff > -0.05) {
-                        actionToReturn = "call";
-                    } else {
-                        actionToReturn = "fold";
-                    }
-                } else if(facingOdds > 0.3) {
-                    if(botOppEquityDiff > -0.10) {
-                        actionToReturn = "call";
-                    } else {
-                        actionToReturn = "fold";
-                    }
-                } else if(facingOdds > 0.2) {
-                    if(botOppEquityDiff > -0.15) {
-                        actionToReturn = "call";
-                    } else {
-                        actionToReturn = "fold";
-                    }
+                if(facingOdds < 0) {
+                    actionToReturn = "fold";
+                    System.out.println("fold cause negative facing odds...");
                 } else {
-                    if(botOppEquityDiff > -0.2) {
+                    boolean strongFlopFdOrOosd = botHasStrongFdOrStrongOosd(board, botHoleCards);
+
+                    if(strongFlopFdOrOosd) {
                         actionToReturn = "call";
+                    } else if(facingOdds > 0.4) {
+                        if(botOppEquityDiff > -0.05) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = "fold";
+                        }
+                    } else if(facingOdds > 0.3) {
+                        if(botOppEquityDiff > -0.10) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = "fold";
+                        }
+                    } else if(facingOdds > 0.2) {
+                        if(botOppEquityDiff > -0.15) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = "fold";
+                        }
                     } else {
-                        actionToReturn = "fold";
+                        if(botOppEquityDiff > -0.2) {
+                            actionToReturn = "call";
+                        } else {
+                            actionToReturn = "fold";
+                        }
                     }
                 }
             }
@@ -252,6 +258,7 @@ public class EquityAction {
 
         System.out.println("2)botEquity: " + botEquity);
         System.out.println("2)oppEquity: " + oppAveragePfCallRangeEquity);
+        System.out.println("2)size: " + oppPfCallingRange.size());
 
         if(botEquity > oppAveragePfCallRangeEquity) {
             actionToReturn = "raise";
@@ -280,6 +287,7 @@ public class EquityAction {
 
         System.out.println("3)botEquity: " + botEquity);
         System.out.println("3)oppEquity: " + oppAverageCallingEquity);
+        System.out.println("3)size: " + oppCallingRange.size());
 
         if(botEquity > oppAverageCallingEquity) {
             actionToReturn = "bet75pct";
@@ -317,6 +325,7 @@ public class EquityAction {
 
         System.out.println("4)botEquity: " + botEquity);
         System.out.println("4)oppEquity: " + oppAverageBetOrRaiseEquity);
+        System.out.println("4)size: " + oppBetOrRaiseRange.size());
 
         if(botEquity > oppAverageBetOrRaiseEquity) {
             if(eligibleActions.contains("raise")) {
