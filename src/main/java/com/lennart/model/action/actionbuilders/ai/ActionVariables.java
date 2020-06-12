@@ -477,20 +477,34 @@ public class ActionVariables {
         action = adjustPostFoldsToAggroness(action, boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, facingOdds, gameVariables.getOpponentName());
 
         ///////
-
-
         if(boardInMethod == null || boardInMethod.isEmpty()) {
-            if(action.equals("raise")) {
-                if(gameVariables.getBotBetSize() == gameVariables.getBigBlind() &&
-                        gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
-                    System.out.println("raise > check pf");
-                    action = "check";
+            if(effectiveStack >= 5 && effectiveStack * gameVariables.getBigBlind() > 150) {
+                if(action.equals("raise")) {
+                    if(gameVariables.getBotBetSize() == gameVariables.getBigBlind() &&
+                            gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
+                        if(botHandStrength > 0.75) {
+                            if(Math.random() > 0.1) {
+                                System.out.println("keep raise vs limp cause strong hand");
+                                //no change action
+                            } else {
+                                System.out.println("strong hand raise > check vs limp pf");
+                                action = "check";
+                            }
+                        } else {
+                            System.out.println("raise > check vs limp pf");
+                            action = "check";
+                        }
+                    } else if(gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
+                        System.out.println("raise > limp pf");
+                        action = "call";
+                    } else {
+                        //nothing, keep 3betting etc
+                    }
                 } else {
-                    System.out.println("raise > call pf");
-                    action = "call";
+                    //nothing
                 }
             } else {
-                //nothing
+                //keep oldstyle
             }
         } else {
             if(continuousTable.getRangeConstructor() == null) {
@@ -501,37 +515,24 @@ public class ActionVariables {
                         continuousTable.getRangeConstructor());
 
                 if(olldStyleAction.equals("raise")) {
-                    if(boardInMethod.size() == 5 && botIsButtonInMethod) {
-                        //keep it raise
-                    } else {
-                        olldStyleAction = "call";
-                    }
+                    //always keep it raise postflop
                 }
 
                 if(newwStyleAction.equals("raise")) {
-                    if(boardInMethod.size() == 5 && botIsButtonInMethod) {
-                        //keep it raise
-                    } else {
-                        newwStyleAction = "call";
-                    }
+                    //use oldstyle action
+                    newwStyleAction = olldStyleAction;
                 }
 
                 if(newwStyleAction.equals("fold")) {
                     action = olldStyleAction;
-                } else if(newwStyleAction.equals("raise")) {
-                    if(olldStyleAction.equals("raise")) {
-                        action = newwStyleAction;
-                    } else {
-                        action = olldStyleAction;
-                    }
+                } else if(newwStyleAction.equals("check")) {
+                    action = olldStyleAction;
                 } else {
                     action = newwStyleAction;
                 }
             }
         }
-
         ////
-
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
