@@ -511,7 +511,8 @@ public class ActionVariables {
                 System.out.println("WTF! RangeConstructor is null");
             } else {
                 String olldStyleAction = action;
-                String newwStyleAction = new BotActionBuilder().getAction(continuousTable, gameVariables,
+                BotActionBuilder botActionBuilder = new BotActionBuilder();
+                String newwStyleAction = botActionBuilder.getAction(continuousTable, gameVariables,
                         continuousTable.getRangeConstructor());
 
                 if(olldStyleAction.equals("raise")) {
@@ -530,6 +531,9 @@ public class ActionVariables {
                 } else {
                     action = newwStyleAction;
                 }
+
+                action = callRules(action, botActionBuilder.getBotEquity(), boardInMethod, facingOdds,
+                        (strongFdInMethod || strongOosdInMethod || strongGutshotInMethod));
             }
         }
         ////
@@ -1807,6 +1811,41 @@ public class ActionVariables {
                     }
                 } else {
                     actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String callRules(String action, double botEquity, List<Card> board, double facingOdds, boolean strongDraw) {
+        String actionToReturn;
+
+        if(action.equals("call")) {
+            if(board != null && !board.isEmpty()) {
+                if(botEquity < 0.34 && !strongDraw) {
+                    if(facingOdds > 0.1) {
+                        System.out.println("Overrule change call to fold. Equity: " + botEquity + " Facingodds: " + facingOdds);
+                        actionToReturn = "fold";
+                    } else {
+                        if(botEquity < 0.1) {
+                            System.out.println("Nut low: do fold despite amazing odds. Equity: " + botEquity + " Facingodds: " + facingOdds);
+                            actionToReturn = "fold";
+                        } else {
+                            System.out.println("Kept call cause of incredibly good odds. Equity: " + botEquity + " Facingodds: " + facingOdds);
+                            actionToReturn = action;
+                        }
+                    }
+                } else {
+                    actionToReturn = action;
+
+                    if(botEquity < 0.53 && !strongDraw) {
+                        System.out.println("No overrule call to fold. Equity: " + botEquity + " Facingodds: " + facingOdds);
+                    }
                 }
             } else {
                 actionToReturn = action;

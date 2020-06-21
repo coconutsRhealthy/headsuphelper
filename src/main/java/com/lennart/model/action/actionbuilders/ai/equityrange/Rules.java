@@ -66,11 +66,11 @@ public class Rules {
     }
 
     public String getAfterRuleAction(String action, double facingOdds, boolean oppHasInitiative, GameVariables gameVariables,
-                                     RangeConstructor rangeConstructor, double botSizing) {
+                                     RangeConstructor rangeConstructor, double botSizing, double botEquity) {
         String actionToReturn;
 
         if(action.equals("fold")) {
-            actionToReturn = callWithFavorableOdds(action, facingOdds);
+            actionToReturn = callWithFavorableOdds(action, facingOdds, botEquity);
         } else {
             actionToReturn = betWithStrongDraws(action, oppHasInitiative, gameVariables, rangeConstructor, botSizing);
         }
@@ -113,7 +113,7 @@ public class Rules {
         return actionToReturn;
     }
 
-    private String callWithFavorableOdds(String action, double facingOdds) {
+    private String callWithFavorableOdds(String action, double facingOdds, double botEquity) {
         String actionToReturn;
 
         if(action.equals("fold")) {
@@ -123,7 +123,23 @@ public class Rules {
                 System.out.println("negative facing odds...");
                 actionToReturn = action;
             } else if(facingOdds <= 0.2) {
-                actionToReturn = "call";
+                if(facingOdds > 0.1) {
+                    if(botEquity < 0.24) {
+                        System.out.println("super bad equity, so fold even though good odds");
+                        actionToReturn = action;
+                    } else {
+                        System.out.println("rules odds call a. Facing odds: " + facingOdds + " botequity: " + botEquity);
+                        actionToReturn = "call";
+                    }
+                } else {
+                    if(botEquity < 0.19) {
+                        System.out.println("very super bad equity, so fold even though very good odds");
+                        actionToReturn = action;
+                    } else {
+                        System.out.println("rules odds call b. Facing odds: " + facingOdds + " botequity: " + botEquity);
+                        actionToReturn = "call";
+                    }
+                }
             } else {
                 actionToReturn = action;
             }
