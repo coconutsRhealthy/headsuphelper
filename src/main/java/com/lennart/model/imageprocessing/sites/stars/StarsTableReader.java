@@ -726,6 +726,11 @@ public class StarsTableReader {
             bigBlindString = "75";
         }
 
+        if(bigBlindString.equals("4O")) {
+            System.out.println("bb 80 reading...");
+            bigBlindString = "40";
+        }
+
         try {
             bigBlind = Double.valueOf(bigBlindString);
         } catch (Exception e) {
