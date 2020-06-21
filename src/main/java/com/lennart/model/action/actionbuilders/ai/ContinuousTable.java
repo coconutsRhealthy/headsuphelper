@@ -409,7 +409,20 @@ public class ContinuousTable implements ContinuousTableable {
             int counter2 = 0;
 
             boolean newTableNotYetOpened = true;
+            boolean weirdBotSittingOut = false;
+
             while(newTableNotYetOpened) {
+                if(counter % 5 == 0) {
+                    if(StarsTableReader.botIsSittingOut()) {
+                        System.out.println("Weird bot sitting out! sitting back in...");
+                        TimeUnit.MILLISECONDS.sleep(300);
+                        StarsTableReader.endBotIsSittingOut();
+                        TimeUnit.MILLISECONDS.sleep(500);
+                        weirdBotSittingOut = true;
+                        break;
+                    }
+                }
+
                 if(counter == 30) {
                     MouseKeyboard.moveMouseToLocation(7, 100);
                     MouseKeyboard.click(7, 100);
@@ -458,10 +471,12 @@ public class ContinuousTable implements ContinuousTableable {
                 }
             }
 
-            TimeUnit.MILLISECONDS.sleep(100);
-            starsTableReader.maximizeNewSngTable();
+            if(!weirdBotSittingOut) {
+                TimeUnit.MILLISECONDS.sleep(100);
+                starsTableReader.maximizeNewSngTable();
 
-            TimeUnit.SECONDS.sleep(6);
+                TimeUnit.SECONDS.sleep(6);
+            }
         }
     }
 
