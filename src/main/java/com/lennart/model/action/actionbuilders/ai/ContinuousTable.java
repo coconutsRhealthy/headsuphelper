@@ -342,7 +342,35 @@ public class ContinuousTable implements ContinuousTableable {
         isNewHand = !starsLastHandNumber.equals(lastHandNumber);
         starsLastHandNumber = lastHandNumber;
 
+        if(isNewHand) {
+            for(String line : lastHand) {
+                if(line.contains("Total pot")) {
+                    printBigPotValue(line);
+                    break;
+                }
+            }
+        }
+
         return isNewHand;
+    }
+
+    private void printBigPotValue(String line) {
+        try {
+            String potPartOfLine = line.substring(line.indexOf("pot") + 4);
+            potPartOfLine = potPartOfLine.substring(0, potPartOfLine.indexOf(" "));
+            Double pot = Double.valueOf(potPartOfLine);
+
+            if(pot >= 200) {
+                System.out.println("big pot: " + pot);
+            }
+
+            if(pot >= 800) {
+                System.out.println("really big pot: " + pot);
+            }
+        } catch (Exception e) {
+            System.out.println("Pot value printing error");
+            e.printStackTrace();
+        }
     }
 
     private boolean wasBluffSuccessful(double bigBlind) throws Exception {
