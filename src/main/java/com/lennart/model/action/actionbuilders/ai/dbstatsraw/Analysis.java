@@ -8,6 +8,10 @@ import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 import java.sql.*;
 import java.util.*;
 
@@ -1023,5 +1027,77 @@ public class Analysis {
 
     private void closeDbConnection() throws SQLException {
         con.close();
+    }
+
+    ////
+    private List<File> getAllFilesFromDir(String dirPath) {
+        //"/Users/LennartMac/Documents/tourney_hist_analysis"
+
+        File dir = new File(dirPath);
+        File[] files = dir.listFiles();
+
+        List<File> allFiles = Arrays.asList(files);
+
+        return allFiles;
+    }
+
+    private void doAnalysis(List<File> allFiles) throws Exception {
+        double totalCounter = 0;
+        double winCounter = 0;
+
+        int diff = 0;
+
+        for(File file : allFiles) {
+            List<String> linesOfFile = readTheFile(file);
+
+            for(String line : linesOfFile) {
+                if(line.contains("You finished in 1st place")) {
+                    winCounter++;
+                    diff++;
+                    break;
+                }
+
+                if(line.contains("You finished in 2nd place")) {
+                    diff--;
+                    break;
+                }
+            }
+
+            //System.out.println(diff);
+
+            totalCounter++;
+
+            double ratio = winCounter / totalCounter;
+
+            String ratioString = String.valueOf(ratio);
+            ratioString = ratioString.replace(".", ",");
+
+            //System.out.println(ratioString);
+        }
+
+        System.out.println(winCounter);
+        System.out.println(totalCounter);
+        System.out.println(winCounter / totalCounter);
+    }
+
+    private List<String> readTheFile(File file) throws Exception {
+        List<String> textLines;
+        try (Reader fileReader = new FileReader(file)) {
+            BufferedReader bufReader = new BufferedReader(fileReader);
+
+            String line = bufReader.readLine();
+
+            textLines = new ArrayList<>();
+
+            while (line != null) {
+                textLines.add(line);
+                line = bufReader.readLine();
+            }
+
+            bufReader.close();
+            fileReader.close();
+        }
+
+        return textLines;
     }
 }
