@@ -22,9 +22,9 @@ public class Analysis {
 
     private Connection con;
 
-    public static void main(String[] args) throws Exception {
-        new Analysis().potsizeGroupAnalysis2();
-    }
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().potsizeGroupAnalysis2();
+//    }
 
     private void potsizeGroupAnalysis2() throws Exception {
         initializeDbConnection();
@@ -1029,6 +1029,16 @@ public class Analysis {
         con.close();
     }
 
+
+
+
+    public static void main(String[] args) throws Exception {
+        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis"));
+        new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/eije"));
+    }
+
+
+
     ////
     private List<File> getAllFilesFromDir(String dirPath) {
         //"/Users/LennartMac/Documents/tourney_hist_analysis"
@@ -1050,34 +1060,37 @@ public class Analysis {
         for(File file : allFiles) {
             List<String> linesOfFile = readTheFile(file);
 
-            for(String line : linesOfFile) {
-                if(line.contains("You finished in 1st place")) {
-                    winCounter++;
-                    diff++;
-                    break;
+            if(linesOfFile != null && linesOfFile.size() > 1) {
+                for(String line : linesOfFile) {
+                    if(line.contains("You finished in 1st place")) {
+                        winCounter++;
+                        diff++;
+                        break;
+                    }
+
+                    if(line.contains("You finished in 2nd place")) {
+                        diff--;
+                        break;
+                    }
                 }
 
-                if(line.contains("You finished in 2nd place")) {
-                    diff--;
-                    break;
-                }
+                //System.out.println(diff);
+
+                totalCounter++;
+
+                double ratio = winCounter / totalCounter;
+
+                String ratioString = String.valueOf(ratio);
+                ratioString = ratioString.replace(".", ",");
+
+                //System.out.println(ratioString);
             }
 
-            //System.out.println(diff);
-
-            totalCounter++;
-
-            double ratio = winCounter / totalCounter;
-
-            String ratioString = String.valueOf(ratio);
-            ratioString = ratioString.replace(".", ",");
-
-            //System.out.println(ratioString);
         }
 
-        System.out.println(winCounter);
-        System.out.println(totalCounter);
-        System.out.println(winCounter / totalCounter);
+//        System.out.println(winCounter);
+//        System.out.println(totalCounter);
+//        System.out.println(winCounter / totalCounter);
     }
 
     private List<String> readTheFile(File file) throws Exception {
