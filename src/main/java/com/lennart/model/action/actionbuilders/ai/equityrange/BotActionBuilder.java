@@ -164,8 +164,8 @@ public class BotActionBuilder {
         double botBetSize = gameVariables.getBotBetSize();
         double botStack = gameVariables.getBotStack();
 
-        if((opponentBetSize - botBetSize) > botStack) {
-            opponentBetSize = botStack;
+        if(opponentBetSize > (botStack + botBetSize)) {
+            opponentBetSize = botStack + botBetSize;
         }
 
         double facingOdds = (opponentBetSize - botBetSize) / (gameVariables.getPot() + botBetSize + opponentBetSize);
