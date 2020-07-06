@@ -182,7 +182,7 @@ public class ActionVariables {
         boolean defaultCheck = false;
 
         if(preflop) {
-            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName(), numberOfHandsIsBluffable(numberOfHands));
+            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName());
 
             if(action.equals("raise")) {
                 sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
