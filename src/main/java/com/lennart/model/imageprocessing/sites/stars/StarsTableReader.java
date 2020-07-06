@@ -1,5 +1,6 @@
 package com.lennart.model.imageprocessing.sites.stars;
 
+import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
@@ -7,6 +8,7 @@ import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -235,57 +237,17 @@ public class StarsTableReader {
     public static boolean sngIsFinished() throws Exception {
         boolean sngIsFinished = false;
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(623, 371, 1, 1);
-        int pixelRgb = bufferedImage.getRGB(0, 0);
+        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+        List<String> total = handHistoryReaderStars.readTextFile();
+        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
 
-        if(pixelRgb / 100 == -96715) {
-            //expected rgb: -9.671.572
-
-            System.out.println("sng is finished A1");
-            sngIsFinished = true;
-        }
-
-        if(!sngIsFinished) {
-            BufferedImage bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(403, 584, 1, 1);
-            int pixelRgb2 = bufferedImage2.getRGB(0, 0);
-
-            if(pixelRgb2 == -1) {
-                //expected rgb: -1
-
-                System.out.println("sng is finished A2");
+        for(String line : lastHand) {
+            if(line.contains("the tournament")) {
                 sngIsFinished = true;
+                System.out.println("sng is finished, starting new game");
+                break;
             }
         }
-
-        //temp for spin of the day
-//        if(sngIsFinished) {
-//            sngIsFinished = false;
-//
-//            TimeUnit.MILLISECONDS.sleep(5590);
-//
-//            BufferedImage bufferedImage3 = ImageProcessor.getBufferedImageScreenShot(383, 640, 1, 1);
-//            int pixelRgb3 = bufferedImage3.getRGB(0, 0);
-//
-//            if(pixelRgb3 / 100 == -15790) {
-//                //expected rgb: -1.579.033
-//
-//                System.out.println("sng is finished B1");
-//                sngIsFinished = true;
-//            }
-//
-//            if(!sngIsFinished) {
-//                BufferedImage bufferedImage4 = ImageProcessor.getBufferedImageScreenShot(74, 167, 1, 1);
-//                int pixelRgb4 = bufferedImage4.getRGB(0, 0);
-//
-//                if(pixelRgb4 / 100 == -31580) {
-//                    //expected rgb: -3.158.065
-//
-//                    System.out.println("sng is finished B2");
-//                    sngIsFinished = true;
-//                }
-//            }
-//
-//        }
 
         return sngIsFinished;
     }
@@ -305,10 +267,10 @@ public class StarsTableReader {
 
     public void closeRematchScreen() {
         System.out.println("closing rematch screen");
-        MouseKeyboard.click(510, 619);
+        //MouseKeyboard.click(510, 643);
 
         //playMoney
-        //MouseKeyboard.click(480, 637);
+        MouseKeyboard.click(510, 619);
     }
 
     public void closeSpinOfTheDayScreenIfNecessary() {

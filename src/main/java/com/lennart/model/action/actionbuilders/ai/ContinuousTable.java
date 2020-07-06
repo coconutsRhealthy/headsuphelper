@@ -53,6 +53,8 @@ public class ContinuousTable implements ContinuousTableable {
 
     private RangeConstructor rangeConstructor;
 
+    private String starsHandNumberOfLastFinishedSng = "initial";
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -74,7 +76,7 @@ public class ContinuousTable implements ContinuousTableable {
             TimeUnit.MILLISECONDS.sleep(100);
             milliSecondsTotal = milliSecondsTotal + 100;
 
-            if(game.equals("sng")) {
+            if(game.equals("sng") && milliSecondsTotal >= 4900) {
                 doSngContinuousLogic(startTime);
             }
 
@@ -410,7 +412,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doSngContinuousLogic(long startTime) throws Exception {
-        if(StarsTableReader.sngIsFinished()) {
+        if(isSngFinishedCheckNeeded() && StarsTableReader.sngIsFinished()) {
             long currentTime = new Date().getTime();
 
             if(currentTime - startTime > 13_920_000) {
@@ -419,6 +421,11 @@ public class ContinuousTable implements ContinuousTableable {
             }
 
             System.out.println("SNG is finished, staring new game");
+
+            HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+            List<String> total = handHistoryReaderStars.readTextFile();
+            List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
+            starsHandNumberOfLastFinishedSng = handHistoryReaderStars.getHandNumber(lastHandNonRecursive.get(0));
 
             TimeUnit.SECONDS.sleep(14);
 
@@ -506,6 +513,32 @@ public class ContinuousTable implements ContinuousTableable {
                 TimeUnit.SECONDS.sleep(6);
             }
         }
+    }
+
+    private boolean isSngFinishedCheckNeeded() throws Exception {
+        boolean sngFinishedCheckNeeded = false;
+
+        if(starsHandNumberOfLastFinishedSng.equals("initial")) {
+            initialFillOfStarsHandNumberOfLastFinishedSng();
+        }
+
+        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+        List<String> total = handHistoryReaderStars.readTextFile();
+        List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
+        String lastHandNumberInHandhistory = handHistoryReaderStars.getHandNumber(lastHandNonRecursive.get(0));
+
+        if(!starsHandNumberOfLastFinishedSng.equals(lastHandNumberInHandhistory)) {
+            sngFinishedCheckNeeded = true;
+        }
+
+        return sngFinishedCheckNeeded;
+    }
+
+    private void initialFillOfStarsHandNumberOfLastFinishedSng() throws Exception {
+        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+        List<String> total = handHistoryReaderStars.readTextFile();
+        List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
+        starsHandNumberOfLastFinishedSng = handHistoryReaderStars.getHandNumber(lastHandNonRecursive.get(0));
     }
 
     private void doSngStartSessionLogic() throws Exception {
