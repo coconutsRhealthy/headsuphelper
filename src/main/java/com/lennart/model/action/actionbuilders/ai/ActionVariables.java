@@ -389,31 +389,6 @@ public class ActionVariables {
             sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
         }
 
-        String actionBeforeNash = action;
-        double sizingBeforeNash = sizing;
-
-        try {
-            Nash nash = new Nash();
-            boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb, boardInMethod, gameVariables.getOpponentAction(), opponentStackBb, amountToCallBb, gameVariables.getBigBlind());
-
-            if(nashActionIsPossible) {
-                action = nash.doNashAction(gameVariables.getBotHoleCards(), botIsButtonInMethod, effectiveStack, amountToCallBb);
-
-                if(action.equals("raise")) {
-                    sizing = 5000 * gameVariables.getBigBlind();
-                    System.out.println("Set Nash action raise sizing to shove: " + sizing);
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Nash error!");
-            System.out.println();
-            e.printStackTrace();
-            System.out.println();
-
-            action = actionBeforeNash;
-            sizing = sizingBeforeNash;
-        }
-
         action = raiseFlopAndTurnWithStrongHand(action, botHandStrengthInMethod, boardInMethod, amountToCallBb, botStackBb, opponentStackBb);
         action = doValueBet(action, continuousTable.isOpponentHasInitiative(), botHandStrength, boardInMethod, gameVariables.isBotIsButton());
 
@@ -451,8 +426,6 @@ public class ActionVariables {
 
         action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
         action = adjustPfShortstackCalls(action, effectiveStack, eligibleActions, boardInMethod, botHandStrengthInMethod, botIsButtonInMethod);
-        action = adjustPfShortstackFolds(action, effectiveStack, boardInMethod, eligibleActions, gameVariables.getBotHoleCards(), amountToCallBb);
-
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -478,33 +451,29 @@ public class ActionVariables {
 
         ///////
         if(boardInMethod == null || boardInMethod.isEmpty()) {
-            if(effectiveStack >= 5 && effectiveStack * gameVariables.getBigBlind() > 150) {
-                if(action.equals("raise")) {
-                    if(gameVariables.getBotBetSize() == gameVariables.getBigBlind() &&
-                            gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
-                        if(botHandStrength > 0.75) {
-                            if(Math.random() > 0.1) {
-                                System.out.println("keep raise vs limp cause strong hand");
-                                //no change action
-                            } else {
-                                System.out.println("strong hand raise > check vs limp pf");
-                                action = "check";
-                            }
+            if(action.equals("raise")) {
+                if(gameVariables.getBotBetSize() == gameVariables.getBigBlind() &&
+                        gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
+                    if(botHandStrength > 0.75) {
+                        if(Math.random() > 0.1) {
+                            System.out.println("keep raise vs limp cause strong hand");
+                            //no change action
                         } else {
-                            System.out.println("raise > check vs limp pf");
+                            System.out.println("strong hand raise > check vs limp pf");
                             action = "check";
                         }
-                    } else if(gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
-                        System.out.println("raise > limp pf");
-                        action = "call";
                     } else {
-                        //nothing, keep 3betting etc
+                        System.out.println("raise > check vs limp pf");
+                        action = "check";
                     }
+                } else if(gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
+                    System.out.println("raise > limp pf");
+                    action = "call";
                 } else {
-                    //nothing
+                    //nothing, keep 3betting etc
                 }
             } else {
-                //keep oldstyle
+                //nothing
             }
         } else {
             if(continuousTable.getRangeConstructor() == null) {
@@ -1586,43 +1555,6 @@ public class ActionVariables {
                             System.out.println("Change pf shortstack call to shove");
                         } else {
                             actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String adjustPfShortstackFolds(String action, double effStackBb, List<Card> board, List<String> eligibleActions,
-                                           List<Card> holeCards, double amountToCallBb) {
-        String actionToReturn;
-
-        if(action.equals("fold")) {
-            if(board == null || board.isEmpty()) {
-                if(effStackBb + amountToCallBb < 11) {
-                    System.out.println("effstackBB + amountToCallBb < 11. effStackBb: " + effStackBb + " amountToCallBb: " + amountToCallBb);
-
-                    Nash nash = new Nash();
-
-                    String nashAction = nash.doNashAction(holeCards, false, amountToCallBb + effStackBb, amountToCallBb + effStackBb);
-
-                    if(nashAction.equals("call") || nashAction.equals("raise")) {
-                        if(eligibleActions.contains("raise")) {
-                            actionToReturn = "raise";
-                            System.out.println("Change action via Nash from fold to raise");
-                        } else {
-                            actionToReturn = "call";
-                            System.out.println("Change action via Nash from fold to call");
                         }
                     } else {
                         actionToReturn = action;
