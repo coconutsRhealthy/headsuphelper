@@ -511,6 +511,7 @@ public class PreflopActionBuilder {
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
             continuousTableable.setPre3betOrPostRaisedPot(true);
             actionToReturn = "raise";
+            System.out.println("bot pre3bet");
         } else if(preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
             actionToReturn = "call";
         } else {

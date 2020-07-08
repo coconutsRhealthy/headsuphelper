@@ -467,8 +467,17 @@ public class ActionVariables {
                         action = "check";
                     }
                 } else if(gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
-                    System.out.println("raise > limp pf");
-                    action = "call";
+                    if(botHandStrength > 0.85) {
+                        if(Math.random() < 0.3) {
+                            System.out.println("strong hand raise > limp pf");
+                            action = "call";
+                        } else {
+                            System.out.println("kept pf 2bet openraise with strong hand");
+                        }
+                    } else {
+                        System.out.println("raise > limp pf");
+                        action = "call";
+                    }
                 } else {
                     //nothing, keep 3betting etc
                 }
@@ -518,13 +527,23 @@ public class ActionVariables {
 
         //sizing shit
         if(sizing == 0 && action.equals("bet75pct") || sizing > 0.37 * gameVariables.getPot() && action.equals("bet75pct")) {
-            System.out.println("xx reset sizing to 0.37");
-            sizing = 0.37 * gameVariables.getPot();
+            if(botHandStrength > 0.9 && Math.random() > 0.7) {
+                System.out.println("xx strong hand sizing 0.75");
+                sizing = 0.75 * gameVariables.getPot();
+            } else {
+                System.out.println("xx reset sizing to 0.37");
+                sizing = 0.37 * gameVariables.getPot();
+            }
         }
 
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
-            System.out.println("xx reset sizing to 1 bigblind");
-            sizing = gameVariables.getBigBlind();
+            if(botHandStrength > 0.9 && Math.random() > 0.7) {
+                System.out.println("xx 2bb-pot strong hand sizing 0.75");
+                sizing = 0.75 * gameVariables.getPot();
+            } else {
+                System.out.println("xx reset sizing to 1 bigblind");
+                sizing = gameVariables.getBigBlind();
+            }
         }
         //
 
@@ -1287,7 +1306,16 @@ public class ActionVariables {
                             System.out.println("Change pre4bet sizing to shove in adjustRaiseSizingToSng(). Q");
                         }
                     } else {
-                        sngSizingToReturn = currentSizing;
+                        if(gameVariables.getOpponentAction().equals("bet")) {
+                            if(effectiveStackBb < 10) {
+                                sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                                System.out.println("Change to openshove preflop, must be strong hand");
+                            } else {
+                                sngSizingToReturn = currentSizing;
+                            }
+                        } else {
+                            sngSizingToReturn = currentSizing;
+                        }
                     }
                 }
             } else {
