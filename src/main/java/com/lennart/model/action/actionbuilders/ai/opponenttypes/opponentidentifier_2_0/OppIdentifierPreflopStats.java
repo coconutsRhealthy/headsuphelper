@@ -104,11 +104,11 @@ public class OppIdentifierPreflopStats {
                     oppPreGroupMap.put("preCall4bet_up_group", "high");
                 }
             } else {
-                oppPreGroupMap.put("pre2betGroup", "medium");
+                oppPreGroupMap.put("pre2betGroup", "mediumUnknown");
                 oppPreGroupMap.put("pre3betGroup", "mediumUnknown");
                 oppPreGroupMap.put("pre4bet_up_group", "mediumUnknown");
 
-                oppPreGroupMap.put("preCall2betGroup", "medium");
+                oppPreGroupMap.put("preCall2betGroup", "mediumUnknown");
                 oppPreGroupMap.put("preCall3betGroup", "mediumUnknown");
                 oppPreGroupMap.put("preCall4bet_up_group", "mediumUnknown");
             }
@@ -117,11 +117,11 @@ public class OppIdentifierPreflopStats {
             System.out.println("oppPreStatsMap empty for opponent: " + opponentName);
             System.out.println("put everyting as 'medium' as default");
 
-            oppPreGroupMap.put("pre2betGroup", "medium");
+            oppPreGroupMap.put("pre2betGroup", "mediumUnknown");
             oppPreGroupMap.put("pre3betGroup", "mediumUnknown");
             oppPreGroupMap.put("pre4bet_up_group", "mediumUnknown");
 
-            oppPreGroupMap.put("preCall2betGroup", "medium");
+            oppPreGroupMap.put("preCall2betGroup", "mediumUnknown");
             oppPreGroupMap.put("preCall3betGroup", "mediumUnknown");
             oppPreGroupMap.put("preCall4bet_up_group", "mediumUnknown");
         }
