@@ -7,6 +7,8 @@ import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifi
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.boardevaluation.FlushEvaluator;
+import com.lennart.model.boardevaluation.StraightEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
 import com.lennart.model.handevaluation.PreflopHandStength;
@@ -15,6 +17,7 @@ import com.lennart.model.handtracker.PlayerActionRound;
 import equitycalc.EquityCalculator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -466,12 +469,12 @@ public class ActionVariables {
                         action = "check";
                     }
                 } else if(gameVariables.getOpponentBetSize() == gameVariables.getBigBlind()) {
-                    if(botHandStrength > 0.85) {
-                        if(Math.random() < 0.3) {
+                    if(botHandStrength > 0.85 || botHasSuitedConnectorTo2betOpenWith(gameVariables.getBotHoleCards())) {
+                        if(Math.random() < 0.34) {
                             System.out.println("strong hand raise > limp pf");
                             action = "call";
                         } else {
-                            System.out.println("kept pf 2bet openraise with strong hand");
+                            System.out.println("OO kept pf 2bet openraise with strong hand");
                         }
                     } else {
                         System.out.println("raise > limp pf");
@@ -511,6 +514,13 @@ public class ActionVariables {
 
                 action = callRules(action, botActionBuilder.getBotEquity(), boardInMethod, facingOdds,
                         (strongFdInMethod || strongOosdInMethod || strongGutshotInMethod));
+
+                //fucking value raise
+                if(action.equals("call") && botHandStrength >= 0.9 &&
+                        gameVariables.getOpponentAction().equals("bet75pct") && gameVariables.getOpponentStack() > 0) {
+                    System.out.println("fucking value raise. Hs: " + botHandStrength);
+                    action = "raise";
+                }
             }
         }
         ////
@@ -526,8 +536,8 @@ public class ActionVariables {
 
         //sizing shit
         if(sizing == 0 && action.equals("bet75pct") || sizing > 0.37 * gameVariables.getPot() && action.equals("bet75pct")) {
-            if(botHandStrength > 0.9 && Math.random() > 0.7) {
-                System.out.println("xx strong hand sizing 0.75");
+            if((botHandStrength > 0.9 || botHasUniqueStrongDraw(boardInMethod)) && Math.random() < 0.66) {
+                System.out.println("OO xx strong hand sizing 0.75");
                 sizing = 0.75 * gameVariables.getPot();
             } else {
                 System.out.println("xx reset sizing to 0.37");
@@ -536,16 +546,39 @@ public class ActionVariables {
         }
 
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
-            if(botHandStrength > 0.9 && Math.random() > 0.7) {
-                System.out.println("xx 2bb-pot strong hand sizing 0.75");
+            if((botHandStrength > 0.9 || botHasUniqueStrongDraw(boardInMethod)) && Math.random() < 0.66) {
+                System.out.println("OO xx 2bb-pot strong hand sizing 0.75");
                 sizing = 0.75 * gameVariables.getPot();
             } else {
                 System.out.println("xx reset sizing to 1 bigblind");
                 sizing = gameVariables.getBigBlind();
             }
         }
-        //
 
+        if(action.equals("bet75pct") && boardInMethod != null &&
+                (boardInMethod.size() == 3 || boardInMethod.size() == 4) && botHandStrength >= 0.9) {
+            if(Math.random() > 0.08) {
+                System.out.println("big flop / turn value sizing");
+                sizing = 1.5 * gameVariables.getPot();
+            }
+        }
+
+        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 3) &&
+                (strongOosdInMethod || strongFdInMethod || strongGutshotInMethod) && botHandStrength < 0.6) {
+            if(Math.random() > 0.3) {
+                System.out.println("big flop draw value sizing");
+                sizing = 1.5 * gameVariables.getPot();
+            }
+        }
+
+        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 4) &&
+                (strongOosdInMethod || strongFdInMethod) && botHandStrength < 0.6) {
+            if(Math.random() > 0.2) {
+                System.out.println("big turn draw value sizing");
+                sizing = 1.5 * gameVariables.getPot();
+            }
+        }
+        //
 
         if(!action.equals("bet75pct") && !action.equals("raise")) {
             sizing = 0;
@@ -814,6 +847,47 @@ public class ActionVariables {
             gameVariables.setBotStack(updatedBotStack);
             gameVariables.setBotBetSize(totalBotBetSizeForPlayerActionRound);
         }
+    }
+
+    private boolean botHasUniqueStrongDraw(List<Card> board) {
+        boolean botHasUniqueStrongDraw = false;
+
+        if(board != null && !board.isEmpty() && boardEvaluator != null) {
+            StraightEvaluator straightEvaluator = boardEvaluator.getStraightEvaluator();
+            FlushEvaluator flushEvaluator = boardEvaluator.getFlushEvaluator();
+
+            if(strongOosd || (strongGutshot && boardEvaluator.getNumberOfPairsOnBoard(board) == 0)) {
+                if(straightEvaluator.getMapOfStraightCombos().isEmpty()) {
+                    System.out.println("really strong straight draw for bot!");
+                    botHasUniqueStrongDraw = true;
+                }
+            }
+
+            if(strongFlushDraw) {
+                if(flushEvaluator.getFlushCombos().isEmpty()) {
+                    System.out.println("really strong flush draw for bot!");
+                    botHasUniqueStrongDraw = true;
+                }
+            }
+        }
+
+        return botHasUniqueStrongDraw;
+    }
+
+    private boolean botHasSuitedConnectorTo2betOpenWith(List<Card> botHoleCards) {
+        String combo = new DbSave().getComboLogic(botHoleCards);
+
+        List<String> suitedConnectorsTo2betOpenWith = Arrays.asList(
+                "87s",
+                "98s",
+                "T9s",
+                "JTs",
+                "97s",
+                "T8s",
+                "J9s",
+                "QTs");
+
+        return suitedConnectorsTo2betOpenWith.contains(combo);
     }
 
     private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {

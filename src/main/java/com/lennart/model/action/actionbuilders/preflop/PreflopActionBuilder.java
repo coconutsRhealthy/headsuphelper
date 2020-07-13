@@ -180,12 +180,12 @@ public class PreflopActionBuilder {
 
         double limit;
 
-        if(oppPre2betGroup.equals("low")) {
+        if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
             limit = 0.65;
         } else if(oppPre2betGroup.equals("facingLimp")) {
             limit = 0.5;
         } else {
-            limit = 0.4;
+            limit = 0.5;
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
@@ -199,10 +199,6 @@ public class PreflopActionBuilder {
                     }
                 }
             }
-        }
-
-        if(limit == 0.4) {
-            preCall2betPoule = addMoreCombosToPreCall2betPoule(preCall2betPoule);
         }
 
         return preCall2betPoule;

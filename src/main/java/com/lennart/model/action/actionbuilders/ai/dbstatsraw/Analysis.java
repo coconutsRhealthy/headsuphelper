@@ -3,6 +3,9 @@ package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
 import com.lennart.model.boardevaluation.BoardEvaluator;
+import com.lennart.model.boardevaluation.FlushEvaluator;
+import com.lennart.model.boardevaluation.FullHouseEvaluator;
+import com.lennart.model.boardevaluation.StraightEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
@@ -1032,9 +1035,380 @@ public class Analysis {
 
 
 
-    public static void main(String[] args) throws Exception {
-        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis"));
-        new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/eije"));
+
+
+    private void eenTest() throws Exception {
+        List<Double> allRatios = new ArrayList<>();
+
+        List<File> allPmFiles = getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis_playmoney_hyper");
+
+        int counter = 0;
+
+
+
+        while(counter < 900) {
+            double winCounter = 0;
+            double totalCounter = 0;
+            double ratio;
+
+            for(int i = counter; i < counter + 100; i++) {
+                List<String> linesOfFile = readTheFile(allPmFiles.get(i));
+
+                if(linesOfFile != null && linesOfFile.size() > 1) {
+                    for(String line : linesOfFile) {
+                        if(line.contains("You finished in 1st place")) {
+                            winCounter++;
+                            break;
+                        }
+
+                        if(line.contains("You finished in 2nd place")) {
+                            break;
+                        }
+                    }
+
+                    totalCounter++;
+                }
+            }
+
+            ratio = winCounter / totalCounter;
+            allRatios.add(ratio);
+
+            counter++;
+        }
+
+        Collections.sort(allRatios);
+
+        System.out.println("wacht");
+    }
+
+//
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().anotherCheck();
+//        //427454
+//    }
+
+
+
+    private void anotherCheck() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 427454;");
+        //ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry < 427454 AND entry > 420000;");
+
+        double totalCounter = 0;
+        double winCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("board").equals("")) {
+                if(rs.getString("position").equals("Ip")) {
+                    if(rs.getDouble("sizing") > 500) {
+                        if(rs.getString("opponent_action").equals("bet")) {
+                            totalCounter++;
+
+                            if(rs.getString("showdown_occured").equals("true")) {
+                                if(rs.getString("bot_won_hand").equals("true")) {
+                                    winCounter++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+//            if(!rs.getString("board").equals("")) {
+//                if(rs.getString("bot_won_hand").equals("true")) {
+//                    totalCounter++;
+//                }
+//            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(winCounter);
+        System.out.println(totalCounter);
+
+        //System.out.println(totalCounter / eijeCounter);
+    }
+
+
+
+
+
+
+
+//    public static void main(String[] args) throws Exception {
+//        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis_1.5USD_hyper"));
+//        new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/eije"));
+//        //new Analysis().ziekeAnalysisOosdFdFlop();
+//    }
+
+
+
+    private void ziekeAnalysisValueFlop() throws Exception {
+        //wat wil je weten
+
+        //flop, aantal keer value bet boven 85% hs
+        //flop, aantal keer bluff bet onder 57% hs
+        //flop, aantal keer bluff bet onder 57% met truly strong draw...
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 424000;");
+
+        double totalCounter = 0;
+        double betCounter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                if(board.size() == 4) {
+                    String oppAction = rs.getString("opponent_action");
+
+                    if(oppAction.equals("check") || oppAction.equals("empty")) {
+                        totalCounter++;
+
+                        if(rs.getDouble("handstrength") >= 0.9) {
+                            if(rs.getString("bot_action").equals("bet75pct")) {
+                                betCounter++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(betCounter);
+        System.out.println(totalCounter);
+        System.out.println(betCounter / totalCounter);
+    }
+
+    private void ziekeAnalysisOosdFdFlop() throws Exception {
+        //wat wil je weten
+
+        //flop, aantal keer value bet boven 85% hs
+        //flop, aantal keer bluff bet onder 57% hs
+        //flop, aantal keer bluff bet onder 57% met truly strong draw...
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 424000;");
+
+        double totalCounter = 0;
+        double betCounter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                if(board.size() == 4) {
+                    String oppAction = rs.getString("opponent_action");
+
+                    if(oppAction.equals("check") || oppAction.equals("empty")) {
+                        totalCounter++;
+
+                        if(rs.getDouble("handstrength") < 0.6) {
+                            if(rs.getString("bot_action").equals("bet75pct")) {
+                                List<Card> botHoleCards = convertCardStringToCardList(rs.getString("holecards"));
+
+                                BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+                                HandEvaluator handEvaluator = new HandEvaluator(botHoleCards, boardEvaluator);
+
+                                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+                                //boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+
+                                if(strongOosd || strongFd) {
+                                    betCounter++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(betCounter);
+        System.out.println(totalCounter);
+        System.out.println(betCounter / totalCounter);
+    }
+
+
+
+    private void ziekeAnalysisTrueStrongDrawsFlop() throws Exception {
+        //wat wil je weten
+
+        //flop, aantal keer value bet boven 85% hs
+        //flop, aantal keer bluff bet onder 57% hs
+        //flop, aantal keer bluff bet onder 57% met truly strong draw...
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 434000;");
+
+        double totalCounter = 0;
+        double betCounter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                if(board.size() == 3) {
+                    String oppAction = rs.getString("opponent_action");
+
+                    if(oppAction.equals("check") || oppAction.equals("empty")) {
+                        totalCounter++;
+
+                        if(rs.getDouble("handstrength") < 0.6) {
+                            if(rs.getString("bot_action").equals("bet75pct")) {
+                                List<Card> botHoleCards = convertCardStringToCardList(rs.getString("holecards"));
+
+                                BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+                                HandEvaluator handEvaluator = new HandEvaluator(botHoleCards, boardEvaluator);
+
+                                boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                                boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                                boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+
+                                if(strongGutshot || strongOosd || strongFd) {
+                                    boolean reallyStrongDraw = false;
+
+                                    StraightEvaluator straightEvaluator = boardEvaluator.getStraightEvaluator();
+                                    FlushEvaluator flushEvaluator = boardEvaluator.getFlushEvaluator();
+
+                                    if(strongOosd || (strongGutshot && boardEvaluator.getNumberOfPairsOnBoard(board) == 0)) {
+                                        if(straightEvaluator.getMapOfStraightCombos().isEmpty()) {
+                                            reallyStrongDraw = true;
+                                        }
+                                    }
+
+                                    if(strongFd) {
+                                        if(flushEvaluator.getFlushCombos().isEmpty()) {
+                                            reallyStrongDraw = true;
+                                        }
+                                    }
+
+                                    if(reallyStrongDraw == true) {
+                                        betCounter++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(betCounter);
+        System.out.println(totalCounter);
+        System.out.println(betCounter / totalCounter);
+    }
+
+
+
+
+
+
+    private void raiseAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 425000;");
+
+        double raiseCounter = 0;
+        double callCounter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                if(rs.getDouble("handstrength") >= 0.9) {
+                    if(rs.getString("opponent_action").equals("bet75pct")) {
+                        if(rs.getDouble("opponentstack") > 0) {
+                            if(rs.getString("bot_action").equals("raise")) {
+                                raiseCounter++;
+                            }
+
+                            if(rs.getString("bot_action").equals("call")) {
+                                callCounter++;
+
+                                String botHolecards = rs.getString("holecards");
+                                String board = rs.getString("board");
+
+                                System.out.println(board + "      " + botHolecards);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        st.close();
+        rs.close();
+
+        closeDbConnection();
+
+        System.out.println("raise: " + raiseCounter);
+        System.out.println("call: " + callCounter);
+    }
+
+
+
+
+    private void eije() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 425000;");
+
+        double totalCounter = 0;
+        double winCounter = 0;
+
+        while(rs.next()) {
+            if(!rs.getString("board").equals("")) {
+                if(rs.getString("bot_action").equals("bet75pct")) {
+                    if(rs.getString("strongdraw").equals("StrongDrawFalse")) {
+                        if(rs.getDouble("equity") > 0 && rs.getDouble("equity") < 0.3) {
+                            totalCounter++;
+
+                            if(rs.getString("bot_won_hand").equals("true")) {
+                                winCounter++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(winCounter);
+        System.out.println(totalCounter);
+        System.out.println(winCounter / totalCounter);
     }
 
 
@@ -1074,7 +1448,7 @@ public class Analysis {
                     }
                 }
 
-                //System.out.println(diff);
+                System.out.println(diff);
 
                 totalCounter++;
 
@@ -1112,5 +1486,425 @@ public class Analysis {
         }
 
         return textLines;
+    }
+
+
+
+
+
+    ///ultra sizing analysis
+
+    public static void main(String[] args) throws Exception {
+        new Analysis().riverValueAnalysis();
+        //new Analysis().turnAnalysis();
+    }
+
+
+    private void flopDrawAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        double flopGutshotCounter = 0;
+        double flopOosdCounter = 0;
+        double flopFdounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") < 0.6) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 3) {
+                        List<Card> botHoleCards = convertCardStringToCardList(rs.getString("holecards"));
+
+                        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+                        HandEvaluator handEvaluator = new HandEvaluator(botHoleCards, boardEvaluator);
+
+                        boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                        boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                        boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+
+                        if(strongGutshot) {
+                            flopGutshotCounter++;
+                        }
+
+                        if(strongOosd) {
+                            flopOosdCounter++;
+                        }
+
+                        if(strongFd) {
+                            flopFdounter++;
+                        }
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("gutshot flop: " + flopGutshotCounter);
+        System.out.println("oosd flop: " + flopOosdCounter);
+        System.out.println("fd flop: " + flopFdounter);
+    }
+
+    private void turnDrawAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        double flopGutshotCounter = 0;
+        double flopOosdCounter = 0;
+        double flopFdounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") < 0.6) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 4) {
+                        List<Card> botHoleCards = convertCardStringToCardList(rs.getString("holecards"));
+
+                        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+                        HandEvaluator handEvaluator = new HandEvaluator(botHoleCards, boardEvaluator);
+
+                        boolean strongGutshot = handEvaluator.hasDrawOfType("strongGutshot");
+                        boolean strongOosd = handEvaluator.hasDrawOfType("strongOosd");
+                        boolean strongFd = handEvaluator.hasDrawOfType("strongFlushDraw");
+
+                        if(strongGutshot) {
+                            flopGutshotCounter++;
+                        }
+
+                        if(strongOosd) {
+                            flopOosdCounter++;
+                        }
+
+                        if(strongFd) {
+                            flopFdounter++;
+                        }
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("gutshot turn: " + flopGutshotCounter);
+        System.out.println("oosd turn: " + flopOosdCounter);
+        System.out.println("fd turn: " + flopFdounter);
+    }
+
+    private void flopBottomMidPairAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        double bottomMidPairCounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") >= 0.6 && rs.getDouble("handstrength") <= 0.77) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 3) {
+                        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+
+                        StraightEvaluator straightEvaluator = boardEvaluator.getStraightEvaluator();
+                        FlushEvaluator flushEvaluator = boardEvaluator.getFlushEvaluator();
+                        FullHouseEvaluator fullHouseEvaluator = boardEvaluator.getFullHouseEvaluator();
+
+                        if(straightEvaluator.getMapOfStraightCombos().isEmpty() &&
+                                flushEvaluator.getFlushCombos().isEmpty() && fullHouseEvaluator.getFullHouseCombos().isEmpty()) {
+                            bottomMidPairCounter++;
+                        }
+
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("flop bottom-midpair counter: " + bottomMidPairCounter);
+    }
+
+    private void turnBottomMidPairAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        double bottomMidPairCounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") >= 0.6 && rs.getDouble("handstrength") <= 0.77) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 4) {
+                        BoardEvaluator boardEvaluator = new BoardEvaluator(board);
+
+                        StraightEvaluator straightEvaluator = boardEvaluator.getStraightEvaluator();
+                        FlushEvaluator flushEvaluator = boardEvaluator.getFlushEvaluator();
+                        FullHouseEvaluator fullHouseEvaluator = boardEvaluator.getFullHouseEvaluator();
+
+                        if(straightEvaluator.getMapOfStraightCombos().isEmpty() &&
+                                flushEvaluator.getFlushCombos().isEmpty() && fullHouseEvaluator.getFullHouseCombos().isEmpty()) {
+                            bottomMidPairCounter++;
+
+                            System.out.println(rs.getString("board") + "     " + rs.getString("holecards"));
+                        }
+
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("turn bottom-midpair counter: " + bottomMidPairCounter);
+    }
+
+    private void flopValueAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        double valueCounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") >= 0.825) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 3) {
+                        valueCounter++;
+
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("flop value counter: " + valueCounter);
+    }
+
+    private void turnValueAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        double valueCounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") >= 0.825) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 4) {
+                        valueCounter++;
+
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("flop value counter: " + valueCounter);
+    }
+
+    private void riverValueAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        double valueCounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") >= 0.825) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 5) {
+                        valueCounter++;
+
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("flop value counter: " + valueCounter);
+    }
+
+    private void riverBluffAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 420000 AND board != '';");
+
+        double bluffCounter = 0;
+
+        int overallCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") > 0.85) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if(board.size() == 5) {
+                        bluffCounter++;
+
+
+                        System.out.println(overallCounter++);
+
+                        if(overallCounter % 200 == 0) {
+                            MouseKeyboard.moveMouseToLocation(7, 100);
+                            MouseKeyboard.click(7, 100);
+                            MouseKeyboard.moveMouseToLocation(80, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println();
+        System.out.println();
+        System.out.println();
+
+        System.out.println("river bluff counter: " + bluffCounter);
     }
 }

@@ -86,7 +86,7 @@ public class BluffAction {
                             }
                         }
 
-                        if(Math.random() < 0.5) {
+                        if(Math.random() < 0.999) {
                             actionToReturn = bluffActionToUse;
                             System.out.println("bluffje: " + actionToReturn);
                         } else {

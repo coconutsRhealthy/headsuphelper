@@ -1012,4 +1012,8 @@ public class BoardEvaluator {
     public List<Card> getBoard() {
         return board;
     }
+
+    public FullHouseEvaluator getFullHouseEvaluator() {
+        return fullHouseEvaluator;
+    }
 }
