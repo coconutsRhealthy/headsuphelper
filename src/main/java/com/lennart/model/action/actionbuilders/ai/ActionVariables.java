@@ -425,7 +425,6 @@ public class ActionVariables {
         }
 
         action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
-        action = adjustPfShortstackCalls(action, effectiveStack, eligibleActions, boardInMethod, botHandStrengthInMethod, botIsButtonInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -1109,7 +1108,7 @@ public class ActionVariables {
                     if(botStackBbAfterCall > 0) {
                         double potSizeBbAfterCall = potSizeBb + (2 * botTotalBetSizeBb) + (2 * amountToCallBb);
 
-                        if((botStackBbAfterCall / potSizeBbAfterCall < 0.5) || (opponentStackBb / potSizeBbAfterCall < 0.5)) {
+                        if((botStackBbAfterCall / potSizeBbAfterCall < 0.4) || (opponentStackBb / potSizeBbAfterCall < 0.4)) {
                             actionToReturn = "raise";
                             System.out.println("abc-- change action to raise in preventCallIfOpponentOrBotAlmostAllInAfterCall()");
                         } else {
@@ -1529,35 +1528,6 @@ public class ActionVariables {
                     } else {
                         actionToReturn = "call";
                         System.out.println("Change fold to call in alwaysCallFlopWithStrongOosdOrFd()");
-                    }
-                } else {
-                    actionToReturn = action;
-                }
-            } else {
-                actionToReturn = action;
-            }
-        } else {
-            actionToReturn = action;
-        }
-
-        return actionToReturn;
-    }
-
-    private String adjustPfShortstackCalls(String action, double effStackBb, List<String> eligibleActions, List<Card> board, double handstrength, boolean position) {
-        String actionToReturn;
-
-        if(action.equals("call") && !position) {
-            if(board == null || board.isEmpty()) {
-                if(effStackBb < 11) {
-                    if(eligibleActions.contains("raise")) {
-                        if(handstrength > 0.75) {
-                            actionToReturn = "raise";
-                            System.out.println("Change pf shortstack call to shove");
-                        } else {
-                            actionToReturn = action;
-                        }
-                    } else {
-                        actionToReturn = action;
                     }
                 } else {
                     actionToReturn = action;
