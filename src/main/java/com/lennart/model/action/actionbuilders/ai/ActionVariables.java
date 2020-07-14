@@ -8,6 +8,7 @@ import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifi
 import com.lennart.model.action.actionbuilders.preflop.PreflopActionBuilder;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.FlushEvaluator;
+import com.lennart.model.boardevaluation.FullHouseEvaluator;
 import com.lennart.model.boardevaluation.StraightEvaluator;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
@@ -521,6 +522,9 @@ public class ActionVariables {
                     System.out.println("fucking value raise. Hs: " + botHandStrength);
                     action = "raise";
                 }
+
+                //fucking bluff river
+                action = bluffMoreOnRiver(action, botHandStrengthInMethod, boardInMethod, bluffOddsAreOk, botIsButtonInMethod);
             }
         }
         ////
@@ -536,46 +540,53 @@ public class ActionVariables {
 
         //sizing shit
         if(sizing == 0 && action.equals("bet75pct") || sizing > 0.37 * gameVariables.getPot() && action.equals("bet75pct")) {
-            if((botHandStrength > 0.9 || botHasUniqueStrongDraw(boardInMethod)) && Math.random() < 0.66) {
-                System.out.println("OO xx strong hand sizing 0.75");
-                sizing = 0.75 * gameVariables.getPot();
-            } else {
-                System.out.println("xx reset sizing to 0.37");
-                sizing = 0.37 * gameVariables.getPot();
-            }
+            System.out.println("xx reset sizing to 0.37");
+            sizing = 0.37 * gameVariables.getPot();
         }
 
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
-            if((botHandStrength > 0.9 || botHasUniqueStrongDraw(boardInMethod)) && Math.random() < 0.66) {
-                System.out.println("OO xx 2bb-pot strong hand sizing 0.75");
-                sizing = 0.75 * gameVariables.getPot();
-            } else {
-                System.out.println("xx reset sizing to 1 bigblind");
-                sizing = gameVariables.getBigBlind();
-            }
+            System.out.println("xx reset sizing to 1 bigblind");
+            sizing = gameVariables.getBigBlind();
         }
 
-        if(action.equals("bet75pct") && boardInMethod != null &&
-                (boardInMethod.size() == 3 || boardInMethod.size() == 4) && botHandStrength >= 0.9) {
-            if(Math.random() > 0.08) {
-                System.out.println("big flop / turn value sizing");
-                sizing = 1.5 * gameVariables.getPot();
-            }
-        }
+        if(action.equals("bet75pct")) {
+            if(boardInMethod != null && (boardInMethod.size() == 3 || boardInMethod.size() == 4)) {
+                if(botHandStrengthInMethod >= 0.825 && Math.random() >= 0.5) {
+                    sizing = 1.5 * gameVariables.getPot();
+                    System.out.println("flop / turn big value sizing: " + boardInMethod.size());
+                }
 
-        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 3) &&
-                (strongOosdInMethod || strongFdInMethod || strongGutshotInMethod) && botHandStrength < 0.6) {
-            if(Math.random() > 0.3) {
-                System.out.println("big flop draw value sizing");
-                sizing = 1.5 * gameVariables.getPot();
-            }
-        }
+                if(strongGutshotInMethod && botHandStrengthInMethod < 0.6 && Math.random() >= 0.5) {
+                    sizing = 1.5 * gameVariables.getPot();
+                    System.out.println("flop / turn big bluff gutshot sizing: " + boardInMethod.size());
+                }
 
-        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 4) &&
-                (strongOosdInMethod || strongFdInMethod) && botHandStrength < 0.6) {
-            if(Math.random() > 0.2) {
-                System.out.println("big turn draw value sizing");
-                sizing = 1.5 * gameVariables.getPot();
+                if(strongOosdInMethod && botHandStrengthInMethod < 0.6 && Math.random() >= 0.5) {
+                    sizing = 1.5 * gameVariables.getPot();
+                    System.out.println("flop / turn big bluff oosd sizing: " + boardInMethod.size());
+                }
+
+                if(strongFdInMethod && botHandStrengthInMethod < 0.6 && Math.random() >= 0.5) {
+                    sizing = 1.5 * gameVariables.getPot();
+                    System.out.println("flop / turn big bluff fd sizing: " + boardInMethod.size());
+                }
+
+                if(Math.random() >= 0.5 && botHasBottomMidPairToBluffFlopOrTurnWith(botHandStrengthInMethod)) {
+                    sizing = 1.5 * gameVariables.getPot();
+                    System.out.println("flop / turn big bluff bottom-midpair sizing: " + boardInMethod.size());
+                }
+            }
+
+            if(boardInMethod != null && boardInMethod.size() == 5) {
+                if(botHandStrengthInMethod >= 0.825 && Math.random() >= 0.5) {
+                    sizing = 1.5 * gameVariables.getPot();
+                    System.out.println("big river value sizing");
+                }
+
+                if(botHandStrengthInMethod < 0.5 && Math.random() >= 0.5) {
+                    sizing = 1.5 * gameVariables.getPot();
+                    System.out.println("big river bluff sizing");
+                }
             }
         }
         //
@@ -888,6 +899,57 @@ public class ActionVariables {
                 "QTs");
 
         return suitedConnectorsTo2betOpenWith.contains(combo);
+    }
+
+    private boolean botHasBottomMidPairToBluffFlopOrTurnWith(double botHandStrength) {
+        boolean botHasBottomMidPairToBluffWith = false;
+
+        if(botHandStrength >= 0.6 && botHandStrength <= 0.77) {
+            StraightEvaluator straightEvaluator = boardEvaluator.getStraightEvaluator();
+            FlushEvaluator flushEvaluator = boardEvaluator.getFlushEvaluator();
+            FullHouseEvaluator fullHouseEvaluator = boardEvaluator.getFullHouseEvaluator();
+
+            if(straightEvaluator.getMapOfStraightCombos().isEmpty() &&
+                    flushEvaluator.getFlushCombos().isEmpty() && fullHouseEvaluator.getFullHouseCombos().isEmpty()) {
+                botHasBottomMidPairToBluffWith = true;
+            }
+        }
+
+        return botHasBottomMidPairToBluffWith;
+    }
+
+    private String bluffMoreOnRiver(String action, double botHandStrength, List<Card> board, boolean bluffOddsAreOk,
+                                    boolean position) {
+        String actionToReturn;
+
+        if(action.equals("check")) {
+            if(position) {
+                if(bluffOddsAreOk) {
+                    if(board != null && board.size() == 5) {
+                        if(botHandStrength < 0.5) {
+                            if(Math.random() >= 0.75) {
+                                actionToReturn = "bet75pct";
+                                System.out.println("extra bluffing on river");
+                            } else {
+                                actionToReturn = action;
+                            }
+                        } else {
+                            actionToReturn = action;
+                        }
+                    } else {
+                        actionToReturn = action;
+                    }
+                } else {
+                    actionToReturn = action;
+                }
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
     }
 
     private double getUpdatedBotStack(String action, GameVariables gameVariables, double newBotBetSize) {

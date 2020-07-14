@@ -86,7 +86,15 @@ public class BluffAction {
                             }
                         }
 
-                        if(Math.random() < 0.999) {
+                        double extraLimit;
+
+                        if(gameVariables.getBoard() != null && gameVariables.getBoard().size() == 3) {
+                            extraLimit = 0.65;
+                        } else {
+                            extraLimit = 0.999;
+                        }
+
+                        if(Math.random() < extraLimit) {
                             actionToReturn = bluffActionToUse;
                             System.out.println("bluffje: " + actionToReturn);
                         } else {

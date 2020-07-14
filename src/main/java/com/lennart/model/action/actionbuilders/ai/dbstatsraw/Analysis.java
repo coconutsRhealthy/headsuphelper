@@ -1141,11 +1141,11 @@ public class Analysis {
 
 
 
-//    public static void main(String[] args) throws Exception {
-//        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis_1.5USD_hyper"));
-//        new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/eije"));
-//        //new Analysis().ziekeAnalysisOosdFdFlop();
-//    }
+    public static void main(String[] args) throws Exception {
+        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis_1.5USD_hyper"));
+        new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/eije2"));
+        //new Analysis().ziekeAnalysisOosdFdFlop();
+    }
 
 
 
@@ -1494,10 +1494,56 @@ public class Analysis {
 
     ///ultra sizing analysis
 
-    public static void main(String[] args) throws Exception {
-        new Analysis().riverValueAnalysis();
-        //new Analysis().turnAnalysis();
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().flopBluffAnalysis();
+//        //new Analysis().turnAnalysis();
+//    }
+
+
+    private void flopBluffAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        int betCounter = 0;
+
+        while(rs.next()) {
+            if (rs.getString("bot_action").equals("check")) {
+                if (rs.getDouble("handstrength") < 0.5) {
+                    List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                    if (board.size() == 5) {
+                        betCounter++;
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(betCounter);
     }
+
+
+    //flop
+    //592 bet
+    //315 check
+
+
+    //turn
+    //218 bet
+    //273 check
+
+
+    //river
+    //27 bet
+    //276 check
+
+
 
 
     private void flopDrawAnalysis() throws Exception {
@@ -1869,7 +1915,7 @@ public class Analysis {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 420000 AND board != '';");
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
 
         double bluffCounter = 0;
 
@@ -1877,12 +1923,11 @@ public class Analysis {
 
         while(rs.next()) {
             if(rs.getString("bot_action").equals("bet75pct")) {
-                if(rs.getDouble("handstrength") > 0.85) {
+                if(rs.getDouble("handstrength") >= 0.825) {
                     List<Card> board = convertCardStringToCardList(rs.getString("board"));
 
                     if(board.size() == 5) {
                         bluffCounter++;
-
 
                         System.out.println(overallCounter++);
 
@@ -1906,5 +1951,44 @@ public class Analysis {
         System.out.println();
 
         System.out.println("river bluff counter: " + bluffCounter);
+    }
+
+    private void furtherRiverBluffOpportunityAnalysis() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw WHERE entry > 429900 AND board != '';");
+
+        int counter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("bet75pct")) {
+                if(rs.getDouble("handstrength") >= 0.825) {
+                    if(rs.getString("opponent_action").equals("check")) {
+                        if(rs.getString("position").equals("Oop")) {
+                            System.out.println("wtf");
+                        }
+
+                        List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                        if(board.size() == 5) {
+                            System.out.println(counter++);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(counter);
+
+        //er moeten er 55 bij... en je hebt er de kans voor gehad: 89 keer..
+        //dus... 0,612%
+        //maar begin conservatief
     }
 }
