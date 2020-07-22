@@ -10,37 +10,41 @@ import java.util.Map;
 public class Nash {
 
     public boolean nashActionIsPossible(double effectiveStackBb, boolean position, double botBetSizeBb, List<Card> board,
-                                        String opponentAction, double opponentStackBb, double amountToCallBb, double bigBlind) {
-        double nashPositionBbLimit;
-
-        if(bigBlind <= 30) {
-            nashPositionBbLimit = 10;
-        } else if(bigBlind == 40) {
-            nashPositionBbLimit = 7;
-        } else if(bigBlind == 50) {
-            nashPositionBbLimit = 5;
-        } else {
-            nashPositionBbLimit = 3;
-        }
-
+                                        String opponentAction) {
         boolean nashActionIsPossible = false;
 
         if(board == null || board.isEmpty()) {
             if(effectiveStackBb <= 20) {
                 if(position) {
                     if(botBetSizeBb == 0.5) {
-                        if(effectiveStackBb <= nashPositionBbLimit) {
-                            if(opponentAction.equals("bet")) {
+                        if(opponentAction.equals("bet")) {
+                            if(effectiveStackBb > 15) {
+                                if(Math.random() >= 0.7) {
+                                    nashActionIsPossible = true;
+                                }
+                            } else if(effectiveStackBb > 10) {
+                                if(Math.random() >= 0.55) {
+                                    nashActionIsPossible = true;
+                                }
+                            } else if(effectiveStackBb > 5) {
+                                if(Math.random() >= 0.4) {
+                                    nashActionIsPossible = true;
+                                }
+                            } else if(effectiveStackBb >= 3) {
+                                if(Math.random() >= 0.25) {
+                                    nashActionIsPossible = true;
+                                }
+                            } else {
                                 nashActionIsPossible = true;
+                            }
+
+                            if(nashActionIsPossible) {
                                 System.out.println("IP Nash action is possible!");
                             }
                         }
                     }
                 } else {
-                    if(botBetSizeBb == 1 && opponentAction.equals("raise") && opponentStackBb == 0 && amountToCallBb <= 20) {
-                        nashActionIsPossible = true;
-                        System.out.println("OOP Nash action is possible!");
-                    }
+                    nashActionIsPossible = false;
                 }
             }
         }
