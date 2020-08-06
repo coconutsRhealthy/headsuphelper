@@ -10,29 +10,24 @@ import java.util.Map;
 public class Nash {
 
     public boolean nashActionIsPossible(double effectiveStackBb, boolean position, double botBetSizeBb, List<Card> board,
-                                        String opponentAction) {
+                                        String opponentAction, List<Card> holeCards) {
         boolean nashActionIsPossible = false;
 
         if(board == null || board.isEmpty()) {
-            if(effectiveStackBb <= 20) {
+            if(effectiveStackBb <= 10) {
                 if(position) {
                     if(botBetSizeBb == 0.5) {
                         if(opponentAction.equals("bet")) {
-                            if(effectiveStackBb > 15) {
-                                if(Math.random() >= 0.7) {
-                                    nashActionIsPossible = true;
-                                }
-                            } else if(effectiveStackBb > 10) {
-                                if(Math.random() >= 0.55) {
-                                    nashActionIsPossible = true;
-                                }
-                            } else if(effectiveStackBb > 5) {
-                                if(Math.random() >= 0.4) {
-                                    nashActionIsPossible = true;
-                                }
-                            } else if(effectiveStackBb >= 3) {
-                                if(Math.random() >= 0.25) {
-                                    nashActionIsPossible = true;
+                            if(effectiveStackBb > 3) {
+                                String holeCardsAsString = new DbSave().getComboLogic(holeCards);
+                                Map<String, Double> pushPremiumMap = getCallMap();
+                                double valueForYourCombo = pushPremiumMap.get(holeCardsAsString);
+
+                                if(valueForYourCombo == 20.0) {
+                                    if(Math.random() >= 0.5) {
+                                        System.out.println("premium IP Nash action is possible!");
+                                        nashActionIsPossible = true;
+                                    }
                                 }
                             } else {
                                 nashActionIsPossible = true;
@@ -43,8 +38,6 @@ public class Nash {
                             }
                         }
                     }
-                } else {
-                    nashActionIsPossible = false;
                 }
             }
         }

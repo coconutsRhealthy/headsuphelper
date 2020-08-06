@@ -397,7 +397,7 @@ public class ActionVariables {
         try {
             Nash nash = new Nash();
             boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb,
-                    boardInMethod, gameVariables.getOpponentAction());
+                    boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBotHoleCards());
 
             if(nashActionIsPossible) {
                 action = nash.doNashAction(gameVariables.getBotHoleCards(), botIsButtonInMethod, effectiveStack, amountToCallBb);
@@ -558,59 +558,6 @@ public class ActionVariables {
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
             System.out.println("xx reset sizing to 1 bigblind");
             sizing = gameVariables.getBigBlind();
-        }
-
-        if(action.equals("bet75pct") && boardInMethod != null &&
-                (boardInMethod.size() == 3 || boardInMethod.size() == 4) && botHandStrength >= 0.9) {
-            if(Math.random() <= 0.5) {
-                if(boardInMethod.size() == 3) {
-                    System.out.println("big sizing flop value sizing");
-                } else {
-                    System.out.println("big turn value sizing");
-                }
-
-                sizing = 0.75 * gameVariables.getPot();
-            }
-        }
-
-        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 3) &&
-                (strongFdInMethod && botHandStrength < 0.6)) {
-            if(Math.random() <= 0.75) {
-                System.out.println("big flop draw fd value sizing");
-                sizing = 0.75 * gameVariables.getPot();
-            }
-        }
-
-        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 3) &&
-                (strongOosdInMethod && botHandStrength < 0.6)) {
-            if(Math.random() <= 0.75) {
-                System.out.println("big flop draw oosd value sizing");
-                sizing = 0.75 * gameVariables.getPot();
-            }
-        }
-
-        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 3) &&
-                (strongGutshotInMethod && botHandStrength < 0.6)) {
-            if(Math.random() <= 0.35) {
-                System.out.println("big flop draw gutshot value sizing");
-                sizing = 0.75 * gameVariables.getPot();
-            }
-        }
-
-        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 4) &&
-                (strongFdInMethod && botHandStrength < 0.6)) {
-            if(Math.random() <= 0.6) {
-                System.out.println("big turn draw fd value sizing");
-                sizing = 0.75 * gameVariables.getPot();
-            }
-        }
-
-        if(action.equals("bet75pct") && boardInMethod != null && (boardInMethod.size() == 4) &&
-                (strongOosdInMethod && botHandStrength < 0.6)) {
-            if(Math.random() <= 0.5) {
-                System.out.println("big turn draw oosd value sizing");
-                sizing = 0.75 * gameVariables.getPot();
-            }
         }
         //
 

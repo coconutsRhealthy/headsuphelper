@@ -70,8 +70,21 @@ public class EquityCalculator implements SimulationNotifiable {
 
     public Map<List<com.lennart.model.card.Card>, Double> getRangeEquities(List<List<com.lennart.model.card.Card>> range,
                                                                            List<com.lennart.model.card.Card> board) {
-        fillRangeMap(range, board);
-        return sortByValueHighToLow(equities);
+        try {
+            fillRangeMap(range, board);
+        } catch(Exception e) {
+            System.out.println("fill rangemap error / exception!");
+            e.printStackTrace();
+        }
+
+
+        try {
+            return sortByValueHighToLow(equities);
+        } catch (Exception e) {
+            System.out.println("sort values error / exception!");
+            e.printStackTrace();
+            return getRangeEquities(range, board);
+        }
     }
 
     private void fillRangeMap(List<List<com.lennart.model.card.Card>> range,
