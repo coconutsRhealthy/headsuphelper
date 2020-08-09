@@ -73,7 +73,11 @@ public class BluffAction {
                     double limit;
 
                     if(bluffActionToUse.equals("bet75pct")) {
-                        limit = 0.4;
+                        if(gameVariables.getBoard().size() == 5) {
+                            limit = 0.25;
+                        } else {
+                            limit = 0.4;
+                        }
                     } else {
                         limit = 0.6;
                     }
@@ -86,11 +90,16 @@ public class BluffAction {
                             }
                         }
 
-                        if(Math.random() < 0.5) {
+                        if(gameVariables.getBoard().size() == 5) {
                             actionToReturn = bluffActionToUse;
-                            System.out.println("bluffje: " + actionToReturn);
+                            System.out.println("river bluffje: " + actionToReturn);
                         } else {
-                            actionToReturn = currentAction;
+                            if(Math.random() < 0.8) {
+                                actionToReturn = bluffActionToUse;
+                                System.out.println("flop/turn bluffje: " + actionToReturn);
+                            } else {
+                                actionToReturn = currentAction;
+                            }
                         }
                     } else {
                         actionToReturn = currentAction;

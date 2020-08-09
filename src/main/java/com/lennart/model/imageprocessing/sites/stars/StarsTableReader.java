@@ -267,10 +267,10 @@ public class StarsTableReader {
 
     public void closeRematchScreen() {
         System.out.println("closing rematch screen");
-        MouseKeyboard.click(510, 643);
+        //MouseKeyboard.click(510, 643);
 
         //playMoney
-        //MouseKeyboard.click(510, 619);
+        MouseKeyboard.click(510, 619);
     }
 
     public void closeSpinOfTheDayScreenIfNecessary() {

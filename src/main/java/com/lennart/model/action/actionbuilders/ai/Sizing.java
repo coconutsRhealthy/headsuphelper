@@ -40,7 +40,7 @@ public class Sizing {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {
-                sizingPercentage = 0.54;
+                sizingPercentage = 0.37;
                 raiseOddsToUseClassVar = 2.85;
             }
         }
@@ -55,13 +55,13 @@ public class Sizing {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {
-                sizingPercentage = 0.54;
+                sizingPercentage = 0.37;
                 raiseOddsToUseClassVar = 2.85;
             }
         }
 
         if(sizingPercentage == -1 && (handstrength >= 0.6 && handstrength < 0.85)) {
-            sizingPercentage = 0.54;
+            sizingPercentage = 0.37;
             raiseOddsToUseClassVar = 2.85;
         }
 
@@ -75,18 +75,18 @@ public class Sizing {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {
-                sizingPercentage = 0.54;
+                sizingPercentage = 0.37;
                 raiseOddsToUseClassVar = 2.85;
             }
         }
 
         if(sizingPercentage == -1) {
-            sizingPercentage = 0.54;
+            sizingPercentage = 0.37;
             raiseOddsToUseClassVar = 2.85;
             System.out.println("sizing weird percentage default should not come here");
         }
 
-        sizingPercentage = 0.37;
+        //sizingPercentage = 0.37;
         raiseOddsToUseClassVar = 2.85;
     }
 
@@ -211,7 +211,7 @@ public class Sizing {
         double potSizePlusAllBetsInBb =  computerTotalBetSizeInBb + opponentTotalBetSizeInBb;
 
         if(potSizePlusAllBetsInBb == 1.5) {
-            size = 2.1 * bigBlind;
+            size = 2 * bigBlind;
         } else if(potSizePlusAllBetsInBb == 2) {
             size = 2.89 * bigBlind;
         } else if(opponentTotalBetSizeInBb >= 2 && opponentTotalBetSizeInBb <= 4) {
@@ -253,12 +253,16 @@ public class Sizing {
 
         setTheSizingPercentage(handstrength, strongFd, strongOosd);
 
-        if(board.size() == 3) {
-            sizing = getFlopSizing(facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
-        } else if(board.size() == 4) {
-            sizing = getTurnSizing(facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
-        } else if(board.size() == 5) {
-            sizing = getRiverSizing(facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
+        if(facingBetSize == 0) {
+            sizing = pot * sizingPercentage;
+        } else {
+            if(board.size() == 3) {
+                sizing = getFlopSizing(facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
+            } else if(board.size() == 4) {
+                sizing = getTurnSizing(facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
+            } else if(board.size() == 5) {
+                sizing = getRiverSizing(facingBetSize, pot, myStack, facingStack, bigBlind, myBetSize);
+            }
         }
 
         return sizing;

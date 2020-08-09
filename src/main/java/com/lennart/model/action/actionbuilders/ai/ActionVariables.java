@@ -477,6 +477,10 @@ public class ActionVariables {
         action = preventBadPostCalls(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, facingOdds);
         action = adjustPostFoldsToAggroness(action, boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, facingOdds, gameVariables.getOpponentName());
 
+        if(action.equals("bet75pct")) {
+            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+        }
+
         ///////
         if(boardInMethod == null || boardInMethod.isEmpty()) {
             if(action.equals("raise")) {
@@ -499,8 +503,18 @@ public class ActionVariables {
                         //nothing, keep nash raise shove
                         System.out.println("raise > nashraise");
                     } else {
-                        System.out.println("raise > limp pf");
-                        action = "call";
+                        if(botHandStrength > 0.55) {
+                            if(Math.random() > 0.5) {
+                                //nothing, strong hand so keep pf raise
+                                System.out.println("keep pf raise, strong hand");
+                            } else {
+                                System.out.println("raise > limp strong hand pf");
+                                action = "call";
+                            }
+                        } else {
+                            System.out.println("raise > limp pf");
+                            action = "call";
+                        }
                     }
                 } else {
                     //nothing, keep 3betting etc
@@ -550,15 +564,7 @@ public class ActionVariables {
 
 
         //sizing shit
-        if(sizing == 0 && action.equals("bet75pct") || sizing > 0.37 * gameVariables.getPot() && action.equals("bet75pct")) {
-            System.out.println("xx reset sizing to 0.37");
-            sizing = 0.37 * gameVariables.getPot();
-        }
 
-        if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
-            System.out.println("xx reset sizing to 1 bigblind");
-            sizing = gameVariables.getBigBlind();
-        }
         //
 
 
