@@ -468,7 +468,7 @@ public class ActionVariables {
         }
 
         adjustPfSizingAfterOppLimp(action, effectiveStack, boardInMethod, gameVariables.getOpponentAction(), botIsButtonInMethod, gameVariables.getBigBlind());
-        adjustPostflopSizingIfSmallbet(action, boardInMethod, gameVariables.getPot(), gameVariables.getBigBlind());
+        //adjustPostflopSizingIfSmallbet(action, boardInMethod, gameVariables.getPot(), gameVariables.getBigBlind());
 
         if(!numberOfHandsIsBluffable(numberOfHands)) {
             action = preventAllBluffs(action, botHandStrengthInMethod, boardInMethod, sizing, continuousTable, gameVariables, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod);
@@ -504,7 +504,7 @@ public class ActionVariables {
                         System.out.println("raise > nashraise");
                     } else {
                         if(botHandStrength > 0.55) {
-                            if(Math.random() > 0.5) {
+                            if(Math.random() > 0.42) {
                                 //nothing, strong hand so keep pf raise
                                 System.out.println("keep pf raise, strong hand");
                             } else {

@@ -66,6 +66,18 @@ public class BluffAction {
                             (continuousTable.getOppRange().size() - oppCallRaiseRangeCombined.size() + 0.0)
                                     / (continuousTable.getOppRange().size() + 0.0);
 
+                    if(gameVariables.getBoard() != null && bluffActionToUse.equals("bet75pct")) {
+                        int boardSize = gameVariables.getBoard().size();
+
+                        if(boardSize == 3) {
+                            System.out.println("flop bluffbet opportunity");
+                        } else if(boardSize == 4) {
+                            System.out.println("turn bluffbet opportunity");
+                        } else if(boardSize == 5) {
+                            System.out.println("river bluffbet opportunity");
+                        }
+                    }
+
                     System.out.println("CURR: " + continuousTable.getOppRange().size());
                     System.out.println("COMBINED: " + oppCallRaiseRangeCombined.size());
                     System.out.println("RATIO: " + oppFoldRangeToTotalRangeRatio);
@@ -94,7 +106,7 @@ public class BluffAction {
                             actionToReturn = bluffActionToUse;
                             System.out.println("river bluffje: " + actionToReturn);
                         } else {
-                            if(Math.random() < 0.8) {
+                            if(Math.random() < 0.99) {
                                 actionToReturn = bluffActionToUse;
                                 System.out.println("flop/turn bluffje: " + actionToReturn);
                             } else {

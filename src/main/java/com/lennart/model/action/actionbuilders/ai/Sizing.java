@@ -29,14 +29,14 @@ public class Sizing {
         return sizing;
     }
 
-    private void setTheSizingPercentage(double handstrength, boolean strongFd, boolean strongOosd) {
+    private void setTheSizingPercentage(double handstrength, boolean strongFd, boolean strongOosd, double pot) {
         if(handstrength >= 0.85) {
             double random = Math.random();
 
-            if(random < 0.25) {
+            if(random < 0.42) {
                 sizingPercentage = 1.48;
                 raiseOddsToUseClassVar = 1.86;
-            } else if(random < 0.7) {
+            } else if(random < 0.8) {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {
@@ -66,17 +66,21 @@ public class Sizing {
         }
 
         if(sizingPercentage == -1 && handstrength < 0.6) {
-            double random = Math.random();
+            if(pot <= 100) {
+                double random = Math.random();
 
-            if(random < 0.1) {
-                sizingPercentage = 1.48;
-                raiseOddsToUseClassVar = 1.86;
-            } else if(random < 0.22) {
-                sizingPercentage = 0.97;
-                raiseOddsToUseClassVar = 2.14;
+                if(random < 0.2) {
+                    sizingPercentage = 1.48;
+                    raiseOddsToUseClassVar = 1.86;
+                } else if(random < 0.45) {
+                    sizingPercentage = 0.97;
+                    raiseOddsToUseClassVar = 2.14;
+                } else {
+                    sizingPercentage = 0.37;
+                    raiseOddsToUseClassVar = 2.85;
+                }
             } else {
                 sizingPercentage = 0.37;
-                raiseOddsToUseClassVar = 2.85;
             }
         }
 
@@ -251,7 +255,7 @@ public class Sizing {
     private double getAiBotPostFlopSizing(List<Card> board, double facingBetSize, double pot, double myStack, double facingStack, double bigBlind, double myBetSize, double handstrength, boolean strongFd, boolean strongOosd) {
         double sizing = 0;
 
-        setTheSizingPercentage(handstrength, strongFd, strongOosd);
+        setTheSizingPercentage(handstrength, strongFd, strongOosd, pot);
 
         if(facingBetSize == 0) {
             sizing = pot * sizingPercentage;
