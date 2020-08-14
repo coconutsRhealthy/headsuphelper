@@ -518,7 +518,7 @@ public class MachineLearning {
                     bluffOddsAreOk = odds > 0.29;
                 }
             } else {
-                bluffOddsAreOk = odds > 0.29;
+                bluffOddsAreOk = odds > 0.23;
             }
         } else {
             bluffOddsAreOk = odds > 0.29;

@@ -85,10 +85,21 @@ public class BluffAction {
                     double limit;
 
                     if(bluffActionToUse.equals("bet75pct")) {
-                        if(gameVariables.getBoard().size() == 5) {
-                            limit = 0.25;
+                        if(gameVariables.getBoard().size() == 3) {
+                            limit = 0.41;
+                            //0.425 was
+                            ///0.44 was
+                        } else if(gameVariables.getBoard().size() == 4) {
+                            limit = 0.115;
+                            //0.11 was
+                            ///0.127 was
+                        } else if(gameVariables.getBoard().size() == 5) {
+                            limit = 0.3;
+                            //0.37 was
+                            ///0.45 was
                         } else {
-                            limit = 0.4;
+                            System.out.println("Shouldn't come here, BluffAction limit");
+                            limit = 1;
                         }
                     } else {
                         limit = 0.6;
@@ -102,16 +113,14 @@ public class BluffAction {
                             }
                         }
 
-                        if(gameVariables.getBoard().size() == 5) {
-                            actionToReturn = bluffActionToUse;
+                        actionToReturn = bluffActionToUse;
+
+                        if(gameVariables.getBoard().size() == 3) {
+                            System.out.println("flop bluffje: " + actionToReturn);
+                        } else if(gameVariables.getBoard().size() == 4) {
+                            System.out.println("turn bluffje: " + actionToReturn);
+                        } else if(gameVariables.getBoard().size() == 5) {
                             System.out.println("river bluffje: " + actionToReturn);
-                        } else {
-                            if(Math.random() < 0.99) {
-                                actionToReturn = bluffActionToUse;
-                                System.out.println("flop/turn bluffje: " + actionToReturn);
-                            } else {
-                                actionToReturn = currentAction;
-                            }
                         }
                     } else {
                         actionToReturn = currentAction;

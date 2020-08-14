@@ -40,7 +40,7 @@ public class Sizing {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {
-                sizingPercentage = 0.37;
+                sizingPercentage = 0.41;
                 raiseOddsToUseClassVar = 2.85;
             }
         }
@@ -55,18 +55,18 @@ public class Sizing {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {
-                sizingPercentage = 0.37;
+                sizingPercentage = 0.41;
                 raiseOddsToUseClassVar = 2.85;
             }
         }
 
         if(sizingPercentage == -1 && (handstrength >= 0.6 && handstrength < 0.85)) {
-            sizingPercentage = 0.37;
+            sizingPercentage = 0.41;
             raiseOddsToUseClassVar = 2.85;
         }
 
         if(sizingPercentage == -1 && handstrength < 0.6) {
-            if(pot <= 100) {
+            if(pot <= 100 || (pot > 100 && Math.random() < 0.14)) {
                 double random = Math.random();
 
                 if(random < 0.2) {
@@ -76,16 +76,16 @@ public class Sizing {
                     sizingPercentage = 0.97;
                     raiseOddsToUseClassVar = 2.14;
                 } else {
-                    sizingPercentage = 0.37;
+                    sizingPercentage = 0.41;
                     raiseOddsToUseClassVar = 2.85;
                 }
             } else {
-                sizingPercentage = 0.37;
+                sizingPercentage = 0.41;
             }
         }
 
         if(sizingPercentage == -1) {
-            sizingPercentage = 0.37;
+            sizingPercentage = 0.41;
             raiseOddsToUseClassVar = 2.85;
             System.out.println("sizing weird percentage default should not come here");
         }
@@ -291,7 +291,7 @@ public class Sizing {
                 } else if(potSizeBb > 8 && potSizeBb <= 24) {
                     double flopBetPercentage = getFlopBetPercentage(effectiveStack, potSize, 0.7, 0.75);
 
-                    if(flopBetPercentage < 0.37) {
+                    if(flopBetPercentage < 0.41) {
                         flopBetPercentage = 0.5;
                     }
                     if(flopBetPercentage > sizingPercentage) {

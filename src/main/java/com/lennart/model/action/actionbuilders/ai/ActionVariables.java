@@ -584,6 +584,16 @@ public class ActionVariables {
             System.out.println("bluff raise here");
         }
 
+        if(action.equals("bet75pct") && sizing > 150 && sizing > 0.8 * gameVariables.getPot()) {
+            if(botHandStrengthInMethod < 0.55 && !strongFdInMethod && !strongOosdInMethod) {
+                System.out.println("big bluff bet sizing!");
+            } else if(botHandStrengthInMethod > 0.85) {
+                System.out.println("big value sizing!");
+            } else {
+                System.out.println("big value draw sizing!");
+            }
+        }
+
         if(realGame) {
             //fill dbsave
             if(boardInMethod != null && boardInMethod.size() >= 3) {
