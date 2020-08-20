@@ -16,6 +16,7 @@ import equitycalc.EquityCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by LennartMac on 05/03/2018.
@@ -322,10 +323,15 @@ public class ActionVariables {
             action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable, sizingForMachineLearning);
 
             if(!actionBeforeMachineLearning.equals(action)) {
-                if(actionBeforeMachineLearning.equals("call") && action.equals("fold")) {
+                if(actionBeforeMachineLearning.equals("call") || actionBeforeMachineLearning.equals("raise") && action.equals("fold")) {
                     if(facingOdds <= 0.2) {
                         action = "call";
                         System.out.println("Facing tiny bet, revert Machinelearning adjust to fold");
+                    }
+
+                    if(botHandStrengthInMethod > 0.7) {
+                        action = "call";
+                        System.out.println("Revert bad Machinelearning fold");
                     }
                 }
 
@@ -564,7 +570,27 @@ public class ActionVariables {
 
 
         //sizing shit
+//        if(sizing == 0 && action.equals("bet75pct") || sizing > 0.37 * gameVariables.getPot() && action.equals("bet75pct")) {
+//            System.out.println("xx reset sizing to 0.37");
+//            sizing = 0.37 * gameVariables.getPot();
+//        }
 
+        if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
+            if(sizing < (0.5 * gameVariables.getPot())) {
+                System.out.println("xx reset sizing to 1 bigblind");
+                sizing = gameVariables.getBigBlind() + (ThreadLocalRandom.current().nextInt(1, 4 + 1) + 0.0);
+            }
+        }
+
+//        if(action.equals("bet75pct") && botHandStrengthInMethod > 0.5) {
+//            if(Math.random() > 0.5) {
+//                sizing = 0.74 * gameVariables.getPot();
+//                System.out.println("big value sizing yo!");
+//            } else {
+//                sizing = 0.37 * gameVariables.getPot();
+//                System.out.println("small value sizing yo!");
+//            }
+//        }
         //
 
 
@@ -584,13 +610,13 @@ public class ActionVariables {
             System.out.println("bluff raise here");
         }
 
-        if(action.equals("bet75pct") && sizing > 150 && sizing > 0.8 * gameVariables.getPot()) {
+        if(action.equals("bet75pct") && (sizing > 0.85 * gameVariables.getPot())) {
             if(botHandStrengthInMethod < 0.55 && !strongFdInMethod && !strongOosdInMethod) {
-                System.out.println("big bluff bet sizing!");
+                System.out.println("big bluff bet sizing! " + sizing);
             } else if(botHandStrengthInMethod > 0.85) {
-                System.out.println("big value sizing!");
+                System.out.println("big value sizing! " + sizing);
             } else {
-                System.out.println("big value draw sizing!");
+                System.out.println("big value draw sizing! " + sizing);
             }
         }
 
