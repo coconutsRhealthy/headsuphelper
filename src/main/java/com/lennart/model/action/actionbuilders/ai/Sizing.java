@@ -76,14 +76,16 @@ public class Sizing {
 
             //0.1
             //0.07
-            if(random < 0.065) {
+            //0.65
+            if(random < 0.06) {
                 sizingPercentage = 1.48;
                 raiseOddsToUseClassVar = 1.86;
             }
 
             //0.22
             //0.18
-            else if(random < 0.17) {
+            //0.17
+            else if(random < 0.16) {
                 sizingPercentage = 0.97;
                 raiseOddsToUseClassVar = 2.14;
             } else {

@@ -570,27 +570,12 @@ public class ActionVariables {
 
 
         //sizing shit
-//        if(sizing == 0 && action.equals("bet75pct") || sizing > 0.37 * gameVariables.getPot() && action.equals("bet75pct")) {
-//            System.out.println("xx reset sizing to 0.37");
-//            sizing = 0.37 * gameVariables.getPot();
-//        }
-
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
             if(sizing < (0.5 * gameVariables.getPot())) {
                 System.out.println("xx reset sizing to 1 bigblind");
                 sizing = gameVariables.getBigBlind() + (ThreadLocalRandom.current().nextInt(1, 4 + 1) + 0.0);
             }
         }
-
-//        if(action.equals("bet75pct") && botHandStrengthInMethod > 0.5) {
-//            if(Math.random() > 0.5) {
-//                sizing = 0.74 * gameVariables.getPot();
-//                System.out.println("big value sizing yo!");
-//            } else {
-//                sizing = 0.37 * gameVariables.getPot();
-//                System.out.println("small value sizing yo!");
-//            }
-//        }
         //
 
 
@@ -611,12 +596,20 @@ public class ActionVariables {
         }
 
         if(action.equals("bet75pct") && (sizing > 0.85 * gameVariables.getPot())) {
-            if(botHandStrengthInMethod < 0.55 && !strongFdInMethod && !strongOosdInMethod) {
-                System.out.println("big bluff bet sizing! " + sizing);
-            } else if(botHandStrengthInMethod > 0.85) {
-                System.out.println("big value sizing! " + sizing);
+            String bigBetPercentageOfPot;
+
+            if(sizing > (gameVariables.getPot() * 1.06)) {
+                bigBetPercentageOfPot = "150%";
             } else {
-                System.out.println("big value draw sizing! " + sizing);
+                bigBetPercentageOfPot = "100%";
+            }
+
+            if(botHandStrengthInMethod < 0.55 && !strongFdInMethod && !strongOosdInMethod) {
+                System.out.println(bigBetPercentageOfPot + " big bluff bet sizing! " + sizing);
+            } else if(botHandStrengthInMethod > 0.85) {
+                System.out.println(bigBetPercentageOfPot + " big value sizing! " + sizing);
+            } else {
+                System.out.println(bigBetPercentageOfPot + " big value draw sizing! " + sizing);
             }
         }
 

@@ -359,28 +359,36 @@ public class PreflopActionBuilder {
 
         //for Hypers
         if(amountToCallBb <= 25 && (oppPre3betGroup.contains("high") || oppPre4bet_up_Group.contains("high"))) {
-            double limit;
+            double limit = -1;
 
-            if(amountToCallBb >= 20) {
-                limit = 0.8;
-            } else if(amountToCallBb >= 15) {
-                limit = 0.75;
-            } else if(amountToCallBb >= 10) {
-                limit = 0.7;
-            } else if(amountToCallBb >= 7) {
-                limit = 0.6;
-            } else if(amountToCallBb >= 5) {
-                limit = 0.5;
-            } else if(amountToCallBb >= 3) {
-                limit = 0.3;
-            } else if(amountToCallBb >= 2) {
-                limit = 0.15;
+            if(amountToCallBb > 10) {
+                if(oppPre4bet_up_Group.contains("high")) {
+                    if(amountToCallBb >= 20) {
+                        limit = 0.8;
+                    } else if(amountToCallBb >= 15) {
+                        limit = 0.75;
+                    } else if(amountToCallBb >= 10) {
+                        limit = 0.7;
+                    }
+                }
             } else {
-                limit = 0.0;
+                if(amountToCallBb >= 7) {
+                    limit = 0.6;
+                } else if(amountToCallBb >= 5) {
+                    limit = 0.5;
+                } else if(amountToCallBb >= 3) {
+                    limit = 0.3;
+                } else if(amountToCallBb >= 2) {
+                    limit = 0.15;
+                } else {
+                    limit = 0.0;
+                }
             }
 
-            System.out.println("Call loose against opp pf shove. oppPre3betGroup: " + oppPre3betGroup + " oppPre4betGroup: " + oppPre4bet_up_Group + " limit: " + limit);
-            return getActionFacingAllIn(botHoleCards, limit);
+            if(limit != -1) {
+                System.out.println("Call loose against opp pf shove. oppPre3betGroup: " + oppPre3betGroup + " oppPre4betGroup: " + oppPre4bet_up_Group + " limit: " + limit);
+                return getActionFacingAllIn(botHoleCards, limit);
+            }
         }
 
         if(amountToCallBb <= 4) {

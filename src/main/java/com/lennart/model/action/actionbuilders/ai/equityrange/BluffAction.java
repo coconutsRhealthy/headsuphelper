@@ -87,22 +87,10 @@ public class BluffAction {
                     if(bluffActionToUse.equals("bet75pct")) {
                         if(gameVariables.getBoard().size() == 3) {
                             limit = 0.43;
-                            //0.41
-                            //0.425 was
-                            ///0.44 was
                         } else if(gameVariables.getBoard().size() == 4) {
                             limit = 0.2;
-                            //0.1125
-                            //0.115 was
-                            //0.11 was
-                            ///0.127 was
                         } else if(gameVariables.getBoard().size() == 5) {
                             limit = 0.43;
-                            //0.38
-                            //0.33
-                            //0.3 was
-                            ///0.37 was
-                            ////0.45 was
                         } else {
                             System.out.println("Shouldn't come here, BluffAction limit");
                             limit = 1;
