@@ -595,7 +595,7 @@ public class ActionVariables {
             System.out.println("bluff raise here");
         }
 
-        if(action.equals("bet75pct") && (sizing > 0.85 * gameVariables.getPot())) {
+        if(action.equals("bet75pct") && (sizing > 0.85 * gameVariables.getPot()) && boardInMethod != null) {
             String bigBetPercentageOfPot;
 
             if(sizing > (gameVariables.getPot() * 1.06)) {
@@ -605,11 +605,11 @@ public class ActionVariables {
             }
 
             if(botHandStrengthInMethod < 0.55 && !strongFdInMethod && !strongOosdInMethod) {
-                System.out.println(bigBetPercentageOfPot + " big bluff bet sizing! " + sizing);
+                System.out.println(bigBetPercentageOfPot + " big bluff bet sizing! board size: " + boardInMethod.size() + " sizing: " + sizing);
             } else if(botHandStrengthInMethod > 0.85) {
-                System.out.println(bigBetPercentageOfPot + " big value sizing! " + sizing);
+                System.out.println(bigBetPercentageOfPot + " big value sizing! board size: " + boardInMethod.size() + " sizing: " + sizing);
             } else {
-                System.out.println(bigBetPercentageOfPot + " big value draw sizing! " + sizing);
+                System.out.println(bigBetPercentageOfPot + " big value draw sizing! board size: " + boardInMethod.size() + " sizing: " + sizing);
             }
         }
 
@@ -946,7 +946,15 @@ public class ActionVariables {
             handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
 
             double hsOld = handEvaluator.getHandStrength(gameVariables.getBotHoleCards());
-            botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), gameVariables.getBoard());
+
+            try {
+                botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), gameVariables.getBoard());
+            } catch (Exception e) {
+                System.out.println("botEquity calculation error!");
+                e.printStackTrace();
+                botEquity = hsOld;
+            }
+
             botHandStrength = handEvaluator.getHsNewStyle(botEquity, gameVariables.getBoard());
 
             System.out.println("O: " + hsOld);
