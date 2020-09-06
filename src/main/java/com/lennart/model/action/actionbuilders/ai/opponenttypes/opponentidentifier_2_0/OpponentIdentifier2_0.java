@@ -252,7 +252,7 @@ public class OpponentIdentifier2_0 {
         double oppPre2bet;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double oopIpRaiseNumber = opponentData.get("preIpRaiseCount");
             double totalNumberOfHands = opponentData.get("preNumberOfHands");
             oppPre2bet = oopIpRaiseNumber / totalNumberOfHands;
@@ -269,7 +269,7 @@ public class OpponentIdentifier2_0 {
         double oppPre3bet;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double oopRaiseNumber = opponentData.get("preOopRaiseCount");
             double totalNumberOfHands = opponentData.get("preNumberOfHands");
             oppPre3bet = oopRaiseNumber / totalNumberOfHands;
@@ -286,7 +286,7 @@ public class OpponentIdentifier2_0 {
         double oppPreLooseness;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double callCount = opponentData.get("preCallCount");
             double foldCount = opponentData.get("preFoldCount");
             oppPreLooseness = callCount / (callCount + foldCount);
@@ -303,7 +303,7 @@ public class OpponentIdentifier2_0 {
         double oppPostRaise;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double postRaiseCount = opponentData.get("postRaiseCount");
             double postFoldCount = opponentData.get("postFoldCount");
             double postCallCount = opponentData.get("postCallCount");
@@ -321,7 +321,7 @@ public class OpponentIdentifier2_0 {
         double oppPostBet;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double postBetCount = opponentData.get("postBetCount");
             double postCheckCount = opponentData.get("postCheckCount");
             oppPostBet = postBetCount / (postBetCount + postCheckCount);
@@ -338,7 +338,7 @@ public class OpponentIdentifier2_0 {
         double oppPostLooseness;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 10) {
+        if(numberOfHands >= 5) {
             double postCallCount = opponentData.get("postCallCount");
             double postFoldCount = opponentData.get("postFoldCount");
             oppPostLooseness = postCallCount / (postCallCount + postFoldCount);
@@ -355,7 +355,7 @@ public class OpponentIdentifier2_0 {
         double oppPostBetToCheckRatio;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double postCheckCount = opponentData.get("postCheckCount");
             double postBetCount = opponentData.get("postBetCount");
             oppPostBetToCheckRatio = postBetCount / (postCheckCount + postBetCount);
@@ -372,7 +372,7 @@ public class OpponentIdentifier2_0 {
         double oppPostFoldToCallRaiseRatio;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double postFoldCount = opponentData.get("postFoldCount");
             double postCallCount = opponentData.get("postCallCount");
             double postRaiseCount = opponentData.get("postRaiseCount");
@@ -391,7 +391,7 @@ public class OpponentIdentifier2_0 {
         double oppLooseness;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double preCallCount = opponentData.get("preCallCount");
             double postCallCount = opponentData.get("postCallCount");
             double preFoldCount = opponentData.get("preFoldCount");
@@ -412,7 +412,7 @@ public class OpponentIdentifier2_0 {
         double oppAggressiveness;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 14) {
+        if(numberOfHands >= 5) {
             double preRaiseCount = opponentData.get("preIpRaiseCount") + opponentData.get("preOopRaiseCount");
             double postBetCount = opponentData.get("postBetCount");
             double postRaiseCount = opponentData.get("postRaiseCount");
@@ -434,7 +434,7 @@ public class OpponentIdentifier2_0 {
         double oppAggressiveness;
         double numberOfHands = opponentData.get("preNumberOfHands");
 
-        if(numberOfHands >= 10) {
+        if(numberOfHands >= 5) {
             double postBetCount = opponentData.get("postBetCount");
             double postRaiseCount = opponentData.get("postRaiseCount");
 

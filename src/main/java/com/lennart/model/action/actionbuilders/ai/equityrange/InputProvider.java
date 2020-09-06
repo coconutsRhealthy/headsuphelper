@@ -130,7 +130,7 @@ public class InputProvider {
                 opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
             }
 
-            if(opponentIdentifier2_0.getNumberOfHands() >= 10) {
+            if(opponentIdentifier2_0.getNumberOfHands() >= 5) {
                 double postAggroness = opponentIdentifier2_0.getOppPostAggroness();
 
                 if(postAggroness < 0) {
@@ -161,7 +161,7 @@ public class InputProvider {
                 opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
             }
 
-            if(opponentIdentifier2_0.getNumberOfHands() >= 10) {
+            if(opponentIdentifier2_0.getNumberOfHands() >= 5) {
                 double postLooseness = opponentIdentifier2_0.getOppPostLooseness();
 
                 if(postLooseness < 0) {
