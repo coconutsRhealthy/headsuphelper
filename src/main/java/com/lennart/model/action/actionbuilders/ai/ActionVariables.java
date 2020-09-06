@@ -542,8 +542,44 @@ public class ActionVariables {
                 }
 
                 if(newwStyleAction.equals("raise")) {
-                    //use oldstyle action
-                    newwStyleAction = olldStyleAction;
+                    if(gameVariables.getPot() < 80) {
+                        //newwStyleAction = olldStyleAction;
+
+                        if((gameVariables.getPot() == 40 && gameVariables.getBigBlind() == 20) ||
+                                (gameVariables.getPot() == 60 && gameVariables.getBigBlind() == 30)) {
+                            System.out.println("herbo!");
+
+                            if(Math.random() < 0.5) {
+                                System.out.println("no small limped pot raise");
+                                newwStyleAction = olldStyleAction;
+                            } else {
+                                System.out.println("jep, small limped pot raise!");
+                                System.out.println("Newstyle raise!");
+
+                                if(botHandStrength < 0.65) {
+                                    System.out.println("Newstyle bluffraise: " + botHandStrength + " bb below 50: " + (gameVariables.getBigBlind() < 50));
+                                } else {
+                                    System.out.println("Newstyle valueraise: " + botHandStrength);
+                                }
+                            }
+                        } else {
+                            System.out.println("Newstyle raise!");
+
+                            if(botHandStrength < 0.65) {
+                                System.out.println("Newstyle bluffraise: " + botHandStrength + " bb below 50: " + (gameVariables.getBigBlind() < 50));
+                            } else {
+                                System.out.println("Newstyle valueraise: " + botHandStrength);
+                            }
+                        }
+                    } else {
+                        System.out.println("Newstyle raise!");
+
+                        if(botHandStrength < 0.65) {
+                            System.out.println("Newstyle bluffraise: " + botHandStrength + " bb below 50: " + (gameVariables.getBigBlind() < 50));
+                        } else {
+                            System.out.println("Newstyle valueraise: " + botHandStrength);
+                        }
+                    }
                 }
 
                 if(newwStyleAction.equals("fold")) {
@@ -559,6 +595,21 @@ public class ActionVariables {
             }
         }
         ////
+
+        //attack big pot shit
+        action = attackBigPots(action, boardInMethod, botIsButtonInMethod, gameVariables, continuousTable.isOpponentHasInitiative(), bluffOddsAreOk);
+        //
+
+
+        //
+        //oop value trap shit
+        if(action.equals("bet75pct") && botHandStrength > 0.8 && !botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
+            if(Math.random() < 0.2) {
+                action = "check";
+                System.out.println("Oop value trap yo");
+            }
+        }
+        //
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -1831,6 +1882,60 @@ public class ActionVariables {
             }
         } else {
             actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String attackBigPots(String action, List<Card> board, boolean position, GameVariables gameVariables,
+                                 boolean oppHasInitiative, boolean bluffoddsAreOk) {
+        String actionToReturn = action;
+
+        if(bluffoddsAreOk) {
+            if(action.equals("check") || action.equals("call")) {
+                if(board == null || board.isEmpty()) {
+                    if(position) {
+                        if(gameVariables.getBigBlind() >= 80) {
+                            if(botHandStrength > 0.5 && action.equals("call")) {
+                                if(Math.random() > 0.5) {
+                                    System.out.println("Attack big pot pf openshove");
+                                    actionToReturn = "raise";
+                                    sizing = 5000 * gameVariables.getBigBlind();
+                                    System.out.println("Big pot openshove set shove sizing: " + sizing);
+                                }
+                            }
+                        }
+                    } else {
+                        if(gameVariables.getOpponentBetSize() == gameVariables.getBigBlind() &&
+                                gameVariables.getOpponentAction().equals("call")) {
+                            if(gameVariables.getBigBlind() >= 60) {
+                                if(botHandStrength > 0.5 && action.equals("check")) {
+                                    if(Math.random() > 0.5) {
+                                        System.out.println("Attack big pot pf shove facing limp");
+                                        actionToReturn = "raise";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    if(action.equals("check")) {
+                        if(!oppHasInitiative) {
+                            if(gameVariables.getPot() >= 170) {
+                                if(gameVariables.getBigBlind() >= 50) {
+                                    if(botHandStrength < 0.5) {
+                                        if(Math.random() > 0.5) {
+                                            System.out.println("Attack big pot postflop bluffbet");
+                                            actionToReturn = "bet75pct";
+                                            sizing = 0.37 * gameVariables.getPot();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return actionToReturn;

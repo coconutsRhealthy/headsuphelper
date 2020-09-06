@@ -78,6 +78,18 @@ public class BluffAction {
                         }
                     }
 
+                    if(gameVariables.getBoard() != null && bluffActionToUse.equals("raise") && !gameVariables.getOpponentAction().equals("raise")) {
+                        int boardSize = gameVariables.getBoard().size();
+
+                        if(boardSize == 3) {
+                            System.out.println("flop bluffraise opportunity " + (gameVariables.getBigBlind() >= 50));
+                        } else if(boardSize == 4) {
+                            System.out.println("turn bluffraise opportunity " + (gameVariables.getBigBlind() >= 50));
+                        } else if(boardSize == 5) {
+                            System.out.println("river bluffraise opportunity " + (gameVariables.getBigBlind() >= 50));
+                        }
+                    }
+
                     System.out.println("CURR: " + continuousTable.getOppRange().size());
                     System.out.println("COMBINED: " + oppCallRaiseRangeCombined.size());
                     System.out.println("RATIO: " + oppFoldRangeToTotalRangeRatio);
@@ -96,7 +108,20 @@ public class BluffAction {
                             limit = 1;
                         }
                     } else {
-                        limit = 0.6;
+                        if(gameVariables.getOpponentBetSize() > 0.93 * gameVariables.getPot() ||
+                                gameVariables.getOpponentAction().equals("raise")) {
+                            limit = 0.6;
+                        } else {
+                            if(gameVariables.getBigBlind() >= 50) {
+                                limit = 0.07;
+                            } else {
+                                //limit = 0.6;
+                                //limit = 0.44;
+                                //limit = 0.195;
+                                //limit = 0.15;
+                                limit = 0.135;
+                            }
+                        }
                     }
 
                     if(oppFoldRangeToTotalRangeRatio > limit) {
