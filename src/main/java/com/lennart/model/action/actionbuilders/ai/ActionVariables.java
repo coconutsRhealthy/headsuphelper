@@ -542,35 +542,11 @@ public class ActionVariables {
                 }
 
                 if(newwStyleAction.equals("raise")) {
-                    if(gameVariables.getPot() < 80) {
-                        //newwStyleAction = olldStyleAction;
-
-                        if((gameVariables.getPot() == 40 && gameVariables.getBigBlind() == 20) ||
-                                (gameVariables.getPot() == 60 && gameVariables.getBigBlind() == 30)) {
-                            System.out.println("herbo!");
-
-                            if(Math.random() < 0.5) {
-                                System.out.println("no small limped pot raise");
-                                newwStyleAction = olldStyleAction;
-                            } else {
-                                System.out.println("jep, small limped pot raise!");
-                                System.out.println("Newstyle raise!");
-
-                                if(botHandStrength < 0.65) {
-                                    System.out.println("Newstyle bluffraise: " + botHandStrength + " bb below 50: " + (gameVariables.getBigBlind() < 50));
-                                } else {
-                                    System.out.println("Newstyle valueraise: " + botHandStrength);
-                                }
-                            }
-                        } else {
-                            System.out.println("Newstyle raise!");
-
-                            if(botHandStrength < 0.65) {
-                                System.out.println("Newstyle bluffraise: " + botHandStrength + " bb below 50: " + (gameVariables.getBigBlind() < 50));
-                            } else {
-                                System.out.println("Newstyle valueraise: " + botHandStrength);
-                            }
-                        }
+                    if(gameVariables.getPot() < 80 &&
+                            ((gameVariables.getPot() == 40 && gameVariables.getBigBlind() == 20) ||
+                                (gameVariables.getPot() == 60 && gameVariables.getBigBlind() == 30)) && Math.random() < 0.5) {
+                        System.out.println("no small limped pot raise");
+                        newwStyleAction = olldStyleAction;
                     } else {
                         System.out.println("Newstyle raise!");
 

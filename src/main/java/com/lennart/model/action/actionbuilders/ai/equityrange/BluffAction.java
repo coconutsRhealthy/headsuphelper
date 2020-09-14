@@ -119,7 +119,9 @@ public class BluffAction {
                                 //limit = 0.44;
                                 //limit = 0.195;
                                 //limit = 0.15;
-                                limit = 0.135;
+                                //limit = 0.135;
+                                //limit = 0.0;
+                                limit = 0.1;
                             }
                         }
                     }
