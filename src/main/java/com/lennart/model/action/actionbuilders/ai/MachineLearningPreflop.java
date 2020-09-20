@@ -139,46 +139,49 @@ public class MachineLearningPreflop {
 
         ResultSet rs = st.executeQuery("SELECT * FROM dbstats_pf_raise_sng_compact_2_0 WHERE route = '" + route + "';");
 
-        rs.next();
+        if(rs.next()) {
+            if(rs.getDouble("total") >= 13) {
+                double success = rs.getDouble("success");
+                double total = rs.getDouble("total");
 
-        if(rs.getDouble("total") >= 13) {
-            double success = rs.getDouble("success");
-            double total = rs.getDouble("total");
+                if(success / total < 0.5) {
+                    double random = Math.random();
 
-            if(success / total < 0.5) {
-                double random = Math.random();
+                    System.out.println("Preflop raise action success below 0,5. Route: " + route);
+                    System.out.println("Opponentaction equals: " + gameVariables.getOpponentAction());
 
-                System.out.println("Preflop raise action success below 0,5. Route: " + route);
-                System.out.println("Opponentaction equals: " + gameVariables.getOpponentAction());
-
-                if(random < 0.75) {
-                    if(gameVariables.getOpponentAction().equals("call")) {
-                        actionToReturn = "check";
-                        System.out.println("MachineLearning preflop Raise change to check. Route: " + route);
-                    } else {
-                        System.out.println("MachineLearning preflop Raise change to fold or call. Route: " + route);
-
-                        if(gameVariables.getBotBetSize() < gameVariables.getBigBlind()) {
-                            actionToReturn = "raise";
-                            System.out.println("gvbgbv Changed to fold because was IP open from SB");
+                    if(random < 0.75) {
+                        if(gameVariables.getOpponentAction().equals("call")) {
+                            actionToReturn = "check";
+                            System.out.println("MachineLearning preflop Raise change to check. Route: " + route);
                         } else {
-                            System.out.println("gvbgbv Call adjustCallAction() because it concerns call other than IP open from SB");
-                            //actionToReturn = adjustCallAction("call", gameVariables, actionVariables);
-                            actionToReturn = "raise";
+                            System.out.println("MachineLearning preflop Raise change to fold or call. Route: " + route);
+
+                            if(gameVariables.getBotBetSize() < gameVariables.getBigBlind()) {
+                                actionToReturn = "raise";
+                                System.out.println("gvbgbv Changed to fold because was IP open from SB");
+                            } else {
+                                System.out.println("gvbgbv Call adjustCallAction() because it concerns call other than IP open from SB");
+                                //actionToReturn = adjustCallAction("call", gameVariables, actionVariables);
+                                actionToReturn = "raise";
+                            }
                         }
+                    } else {
+                        actionToReturn = action;
+                        System.out.println("zzz preflop raise adjuster");
                     }
                 } else {
                     actionToReturn = action;
-                    System.out.println("zzz preflop raise adjuster");
+                    System.out.println("Preflop raise success above 0,5. Route: " + route);
                 }
             } else {
-                actionToReturn = action;
-                System.out.println("Preflop raise success above 0,5. Route: " + route);
+                actionToReturn = null;
+
+                System.out.println("Less than 10 hands preflop for route: " + route);
             }
         } else {
+            System.out.println("wtf, exception error empty pf Machine Learning result set");
             actionToReturn = null;
-
-            System.out.println("Less than 10 hands preflop for route: " + route);
         }
 
         rs.close();

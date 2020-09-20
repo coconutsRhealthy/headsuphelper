@@ -316,14 +316,14 @@ public class StarsTableReader {
             System.out.println("registering new sng");
             MouseKeyboard.click(782, 566);
 
-            TimeUnit.MILLISECONDS.sleep(950);
+            TimeUnit.MILLISECONDS.sleep(1050);
 
-            BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(441, 426, 1, 1);
+            BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(428, 354, 1, 1);
             int pixelRgb = bufferedImage.getRGB(0, 0);
 
-            if(pixelRgb / 100 == -13158 ) {
+            if(pixelRgb / 100 == -156_429 ) {
                 System.out.println("registration was already closed. Click OK and call method again");
-                MouseKeyboard.click(489, 449);
+                MouseKeyboard.click(494, 408);
 
                 TimeUnit.MILLISECONDS.sleep(200);
                 registerNewSng();
