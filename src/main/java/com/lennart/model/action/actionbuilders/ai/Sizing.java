@@ -100,7 +100,7 @@ public class Sizing {
             System.out.println("sizing weird percentage default should not come here");
         }
 
-        //sizingPercentage = 0.37;
+        sizingPercentage = 0.5;
         //raiseOddsToUseClassVar = 2.85;
         raiseOddsToUseClassVar = 2.25;
     }

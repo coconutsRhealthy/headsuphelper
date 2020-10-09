@@ -375,13 +375,13 @@ public class MachineLearning {
             Statement st_2_0 = con_2_0.createStatement();
             ResultSet rs_2_0 = st_2_0.executeQuery("SELECT * FROM " + table_2_0 + " WHERE route = '" + compactRoute_2_0 + "';");
 
-            rs_2_0.next();
-
-            if(rs_2_0.getDouble("total") >= 20) {
-                routeWinnings = rs_2_0.getDouble("amount_won");
-                System.out.println("Use compact_2_0 data! " + compactRoute_2_0);
-            } else {
-                System.out.println("Comapct_2_0 data too small: " + compactRoute_2_0);
+            if(rs_2_0.next()) {
+                if(rs_2_0.getDouble("total") >= 20) {
+                    routeWinnings = rs_2_0.getDouble("amount_won");
+                    System.out.println("Use compact_2_0 data! " + compactRoute_2_0);
+                } else {
+                    System.out.println("Comapct_2_0 data too small: " + compactRoute_2_0);
+                }
             }
 
             rs_2_0.close();

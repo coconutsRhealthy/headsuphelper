@@ -195,7 +195,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 StarsTableReader.performActionOnSite(action, sizing);
 
-                TimeUnit.MILLISECONDS.sleep(100);
+                TimeUnit.MILLISECONDS.sleep(1000);
             }
 
             if(milliSecondsTotal == 5000) {

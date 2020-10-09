@@ -155,20 +155,22 @@ public class RangeTracker {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM rangetracker WHERE route = '" + rangeRoute + "';");
 
-            rs.next();
+            if(rs.next()) {
+                bluffAmount = rs.getDouble("bluff_amount");
+                nonBluffAmount = rs.getDouble("non_bluff_amount");
+                valueAmount = rs.getDouble("value_amount");
 
-            bluffAmount = rs.getDouble("bluff_amount");
-            nonBluffAmount = rs.getDouble("non_bluff_amount");
-            valueAmount = rs.getDouble("value_amount");
+                if(valueAmount != 0) {
+                    bluffAmount = bluffAmount + plusAmount;
+                    rangeRouteBluffValueRatio = bluffAmount / valueAmount;
+                }
 
-            if(valueAmount != 0) {
-                bluffAmount = bluffAmount + plusAmount;
-                rangeRouteBluffValueRatio = bluffAmount / valueAmount;
+                rs.close();
+                st.close();
+                closeDbConnection();
+            } else {
+                System.out.println("Error 2) occured in getRangeRouteBluffValueRatio()");
             }
-
-            rs.close();
-            st.close();
-            closeDbConnection();
         } catch (Exception e) {
             System.out.println("Error occured in getRangeRouteBluffValueRatio()");
             e.printStackTrace();

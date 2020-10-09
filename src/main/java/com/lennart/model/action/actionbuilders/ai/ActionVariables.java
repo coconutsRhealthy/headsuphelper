@@ -403,7 +403,8 @@ public class ActionVariables {
         try {
             Nash nash = new Nash();
             boolean nashActionIsPossible = nash.nashActionIsPossible(effectiveStack, botIsButtonInMethod, botBetsizeBb,
-                    boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBotHoleCards());
+                    boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBotHoleCards(), opponentStackBb,
+                    amountToCallBb);
 
             if(nashActionIsPossible) {
                 action = nash.doNashAction(gameVariables.getBotHoleCards(), botIsButtonInMethod, effectiveStack, amountToCallBb);
@@ -412,6 +413,8 @@ public class ActionVariables {
                     gonnaDoNashAction = true;
                     sizing = 5000 * gameVariables.getBigBlind();
                     System.out.println("Set Nash action raise sizing to shove: " + sizing);
+                } else if(action.equals("call")) {
+                    System.out.println("Gonna do Nash call!");
                 }
             }
         } catch (Exception e) {
@@ -453,13 +456,13 @@ public class ActionVariables {
         action = preventManyBluffsJudgeByBoard(action, botHandStrengthInMethod, boardWetness, boardInMethod, strongOosdInMethod, strongFdInMethod, strongGutshotInMethod,
                 continuousTable, gameVariables);
 
-        if(numberOfHandsIsBluffable(numberOfHands)) {
-            if(sizingForBluffOdds < 400 || numberOfHands >= 50 && Math.random() < 0.25) {
-                action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds, facingOdds);
-            }
-        }
+        //if(numberOfHandsIsBluffable(numberOfHands)) {
+        //    if(sizingForBluffOdds < 400 || numberOfHands >= 50 && Math.random() < 0.25) {
+        //        action = doPowerPlay(action, bluffOddsAreOk, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod, boardWetness, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), sizingForBluffOdds, facingOdds);
+        //    }
+        //}
 
-        action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
+        //action = alwaysCallFlopWithStrongOosdOrFd(action, strongFdInMethod, strongOosdInMethod, boardInMethod, eligibleActions);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -509,7 +512,7 @@ public class ActionVariables {
                         //nothing, keep nash raise shove
                         System.out.println("raise > nashraise");
                     } else {
-                        if(botHandStrength > 0.55) {
+                        if(botHandStrength > 0.7) {
                             if(Math.random() > 0.42) {
                                 //nothing, strong hand so keep pf raise
                                 System.out.println("keep pf raise, strong hand");
@@ -573,19 +576,21 @@ public class ActionVariables {
         ////
 
         //attack big pot shit
-        action = attackBigPots(action, boardInMethod, botIsButtonInMethod, gameVariables, continuousTable.isOpponentHasInitiative(), bluffOddsAreOk);
+        //action = attackBigPots(action, boardInMethod, botIsButtonInMethod, gameVariables, continuousTable.isOpponentHasInitiative(), bluffOddsAreOk);
         //
 
 
         //
         //oop value trap shit
-        if(action.equals("bet75pct") && botHandStrength > 0.8 && !botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
-            if(Math.random() < 0.2) {
-                action = "check";
-                System.out.println("Oop value trap yo");
-            }
-        }
+        //if(action.equals("bet75pct") && botHandStrength > 0.8 && !botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
+        //    if(Math.random() < 0.2) {
+        //        action = "check";
+        //        System.out.println("Oop value trap yo");
+        //    }
+        //}
         //
+
+        action = potControl(action, boardInMethod, botHandStrengthInMethod, continuousTable, gameVariables);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -598,10 +603,12 @@ public class ActionVariables {
 
         //sizing shit
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
-            if(sizing < (0.5 * gameVariables.getPot())) {
+            //if(sizing < (0.5 * gameVariables.getPot())) {
                 System.out.println("xx reset sizing to 1 bigblind");
                 sizing = gameVariables.getBigBlind() + (ThreadLocalRandom.current().nextInt(1, 4 + 1) + 0.0);
-            }
+            //}
+        } else if(action.equals("bet75pct")) {
+            sizing = 0.5 * gameVariables.getPot();
         }
         //
 
@@ -1672,6 +1679,41 @@ public class ActionVariables {
                 }
             }
         }
+    }
+
+    private String potControl(String action, List<Card> board, double handstrength, ContinuousTable continuousTable,
+                            GameVariables gameVariables) throws Exception {
+        String actionToReturn = action;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("bet75pct")) {
+                if(handstrength < 0.85) {
+                    if(Math.random() > 0.05) {
+                        if(board.size() != 5) {
+                            actionToReturn = "check";
+                            System.out.println("pot control revert bet to check flop/turn");
+                        } else {
+                            if(handstrength > 0.7 && Math.random() < 0.5) {
+                                actionToReturn = action;
+                                System.out.println("thin valuebet river");
+                            } else {
+                                actionToReturn = "check";
+                                System.out.println("pot control revert bet to check river");
+                            }
+                        }
+                    } else {
+                        System.out.println("ignore potcontr!");
+                    }
+                }
+            } else if(action.equals("raise")) {
+                if(handstrength < 0.9) {
+                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
+                    System.out.println("pot control revert raise to call or fold");
+                }
+            }
+        }
+
+        return actionToReturn;
     }
 
     private int getBoardWetness(ContinuousTable continuousTable, List<Card> board) {

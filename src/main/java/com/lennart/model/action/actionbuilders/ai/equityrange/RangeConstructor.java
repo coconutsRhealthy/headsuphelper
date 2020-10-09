@@ -612,21 +612,21 @@ public class RangeConstructor {
                 double valuePercentage = 60;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 5;
+                double airPercentage = 15;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(MEDIUM)) {
                 double valuePercentage = 70;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 4;
+                double airPercentage = 14;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(LARGE)) {
                 double valuePercentage = 83;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
                 double drawPercentageToInclude = 50;
-                double airPercentage = 2;
+                double airPercentage = 12;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -638,21 +638,21 @@ public class RangeConstructor {
                 double valuePercentage = 53;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 20;
+                double airPercentage = 30;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(MEDIUM)) {
                 double valuePercentage = 63;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 17;
+                double airPercentage = 27;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(LARGE)) {
                 double valuePercentage = 77;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 15;
+                double airPercentage = 25;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -665,7 +665,7 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
                         MEDIUM_OOSD, MEDIUM_GUTSHOT, WEAK_FD, WEAK_OOSD, WEAK_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 33;
+                double airPercentage = 43;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(MEDIUM)) {
@@ -673,7 +673,7 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
                         MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 28;
+                double airPercentage = 38;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(LARGE)) {
@@ -681,7 +681,7 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
                         MEDIUM_OOSD);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 25;
+                double airPercentage = 35;
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -892,21 +892,21 @@ public class RangeConstructor {
                 double valuePercentage = 80;
                 List<String> drawsToInclude = new ArrayList<>();
                 double drawPercentageToInclude = 100;
-                double airPercentage = 0;
+                double airPercentage = 10;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(MEDIUM)) {
                 double valuePercentage = 87;
                 List<String> drawsToInclude = new ArrayList<>();
                 double drawPercentageToInclude = 100;
-                double airPercentage = 0;
+                double airPercentage = 10;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(LARGE)) {
                 double valuePercentage = 92;
                 List<String> drawsToInclude = new ArrayList<>();
                 double drawPercentageToInclude = 100;
-                double airPercentage = 0;
+                double airPercentage = 10;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -918,21 +918,21 @@ public class RangeConstructor {
                 double valuePercentage = 75;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 12;
+                double airPercentage = 22;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(MEDIUM)) {
                 double valuePercentage = 79;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 10;
+                double airPercentage = 20;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(LARGE)) {
                 double valuePercentage = 83;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 8;
+                double airPercentage = 18;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -945,7 +945,7 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
                         MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 24;
+                double airPercentage = 34;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(MEDIUM)) {
@@ -953,14 +953,14 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD,
                         MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 21;
+                double airPercentage = 31;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(LARGE)) {
                 double valuePercentage = 78;
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
-                double airPercentage = 18;
+                double airPercentage = 28;
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
