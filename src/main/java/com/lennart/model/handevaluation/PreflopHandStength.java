@@ -445,4 +445,38 @@ public class PreflopHandStength {
         }
         return pocketPairCombosOfGivenRanks;
     }
+
+    public List<Set<Card>> getSpecificPreflopShovableHands() {
+        List<Set<Card>> shovable = new ArrayList<>();
+
+        shovable.addAll(getOffSuitCombosOfGivenRanks(14, 8).values());
+        shovable.addAll(getOffSuitCombosOfGivenRanks(14, 9).values());
+        shovable.addAll(getOffSuitCombosOfGivenRanks(14, 10).values());
+        shovable.addAll(getOffSuitCombosOfGivenRanks(14, 11).values());
+        shovable.addAll(getOffSuitCombosOfGivenRanks(14, 12).values());
+        shovable.addAll(getOffSuitCombosOfGivenRanks(14, 13).values());
+
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 2).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 3).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 4).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 5).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 6).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 7).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 8).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 9).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 10).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 11).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 12).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(14, 13).values());
+
+        shovable.addAll(getPocketPairCombosOfGivenRank(8).values());
+        shovable.addAll(getPocketPairCombosOfGivenRank(9).values());
+        shovable.addAll(getPocketPairCombosOfGivenRank(10).values());
+        shovable.addAll(getPocketPairCombosOfGivenRank(11).values());
+        shovable.addAll(getPocketPairCombosOfGivenRank(12).values());
+        shovable.addAll(getPocketPairCombosOfGivenRank(13).values());
+        shovable.addAll(getPocketPairCombosOfGivenRank(14).values());
+
+        return shovable;
+    }
 }

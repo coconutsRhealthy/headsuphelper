@@ -16,7 +16,9 @@ import equitycalc.EquityCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * Created by LennartMac on 05/03/2018.
@@ -289,25 +291,25 @@ public class ActionVariables {
                 }
             }
 
-            action = new FoldStatBluffAdjuster().doBluffAccordingToFoldStat(action, bigBlind, botIsButtonInMethod,
-                    botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(),
-                    opponentBetsizeBb * bigBlind, botBetsizeBb * bigBlind, botStackBb * bigBlind,
-                    opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot(),
-                    gameVariables.getOpponentName());
-
-            action = new FoldStatBluffAdjuster().preventBluffAccordingToFoldStat(action, this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod,
-                    facingOdds, effectiveStack * bigBlind, botHasStrongDraw, botHandStrength, opponentType, opponentBetsizeBb, botBetsizeBb,
-                    opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, bigBlind, continuousTable.isOpponentDidPreflop4betPot(),
-                    continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative(), gameVariables.getOpponentName());
-
-            action = new FoldStatBluffAdjuster().preventBigBluffsAgainstLowFoldstat(action, this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod,
-                    facingOdds, effectiveStack * bigBlind, botHasStrongDraw, botHandStrength, opponentType, opponentBetsizeBb, botBetsizeBb,
-                    opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, bigBlind, continuousTable.isOpponentDidPreflop4betPot(),
-                    continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative(), gameVariables.getOpponentName());
-
-            action = new PlayerBluffer().doOpponentBluffSuccessAction(action, gameVariables.getOpponentName(), bigBlind,
-                    botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
-                    botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
+//            action = new FoldStatBluffAdjuster().doBluffAccordingToFoldStat(action, bigBlind, botIsButtonInMethod,
+//                    botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(),
+//                    opponentBetsizeBb * bigBlind, botBetsizeBb * bigBlind, botStackBb * bigBlind,
+//                    opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot(),
+//                    gameVariables.getOpponentName());
+//
+//            action = new FoldStatBluffAdjuster().preventBluffAccordingToFoldStat(action, this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod,
+//                    facingOdds, effectiveStack * bigBlind, botHasStrongDraw, botHandStrength, opponentType, opponentBetsizeBb, botBetsizeBb,
+//                    opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, bigBlind, continuousTable.isOpponentDidPreflop4betPot(),
+//                    continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative(), gameVariables.getOpponentName());
+//
+//            action = new FoldStatBluffAdjuster().preventBigBluffsAgainstLowFoldstat(action, this, eligibleActions, streetInMethod, botIsButtonInMethod, potSizeBb, opponentActionInMethod,
+//                    facingOdds, effectiveStack * bigBlind, botHasStrongDraw, botHandStrength, opponentType, opponentBetsizeBb, botBetsizeBb,
+//                    opponentStackBb, botStackBb, preflop, boardInMethod, strongFlushDraw, strongOosd, strongGutshot, bigBlind, continuousTable.isOpponentDidPreflop4betPot(),
+//                    continuousTable.isPre3betOrPostRaisedPot(), strongOvercards, strongBackdoorFd, strongBackdoorSd, boardWetness, continuousTable.isOpponentHasInitiative(), gameVariables.getOpponentName());
+//
+//            action = new PlayerBluffer().doOpponentBluffSuccessAction(action, gameVariables.getOpponentName(), bigBlind,
+//                    botHandStrength, boardInMethod, continuousTable.isOpponentHasInitiative(), opponentBetsizeBb * bigBlind,
+//                    botBetsizeBb * bigBlind, botStackBb * bigBlind, opponentStackBb * bigBlind, potSizeBb * bigBlind, continuousTable.isPre3betOrPostRaisedPot());
 
             if((action.equals("bet75pct") || action.equals("raise")) && sizing == 0) {
                 sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
@@ -317,26 +319,26 @@ public class ActionVariables {
             action = solidifyPostflopRaises(action, boardInMethod, botHandStrength, strongFlushDraw, strongOosd, continuousTable, gameVariables, sizing);
 
             //machine learning
-            String actionBeforeMachineLearning = action;
-
-            double sizingForMachineLearning = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
-            action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable, sizingForMachineLearning);
-
-            if(!actionBeforeMachineLearning.equals(action)) {
-                if(actionBeforeMachineLearning.equals("call") || actionBeforeMachineLearning.equals("raise") && action.equals("fold")) {
-                    if(facingOdds <= 0.2) {
-                        action = "call";
-                        System.out.println("Facing tiny bet, revert Machinelearning adjust to fold");
-                    }
-
-                    if(botHandStrengthInMethod > 0.7) {
-                        action = "call";
-                        System.out.println("Revert bad Machinelearning fold");
-                    }
-                }
-
-                System.out.println("---Action changed in Machinelearning from: " + actionBeforeMachineLearning + " to: " + action);
-            }
+//            String actionBeforeMachineLearning = action;
+//
+//            double sizingForMachineLearning = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+//            action = new MachineLearning().adjustActionToDbSaveData(this, gameVariables, continuousTable, sizingForMachineLearning);
+//
+//            if(!actionBeforeMachineLearning.equals(action)) {
+//                if(actionBeforeMachineLearning.equals("call") || actionBeforeMachineLearning.equals("raise") && action.equals("fold")) {
+//                    if(facingOdds <= 0.2) {
+//                        action = "call";
+//                        System.out.println("Facing tiny bet, revert Machinelearning adjust to fold");
+//                    }
+//
+//                    if(botHandStrengthInMethod > 0.7) {
+//                        action = "call";
+//                        System.out.println("Revert bad Machinelearning fold");
+//                    }
+//                }
+//
+//                System.out.println("---Action changed in Machinelearning from: " + actionBeforeMachineLearning + " to: " + action);
+//            }
             //machine learning
 
             if((action.equals("bet75pct") || action.equals("raise"))) {
@@ -344,8 +346,9 @@ public class ActionVariables {
                 sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
             }
         } else {
-            double sizingForMachineLearning = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
-            action = new MachineLearningPreflop().adjustActionToDbSaveData(this, gameVariables, sizingForMachineLearning);
+            //hier iets...
+            //double sizingForMachineLearning = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+            //action = new MachineLearningPreflop().adjustActionToDbSaveData(this, gameVariables, sizingForMachineLearning);
         }
 
         action = preventCallIfOpponentOrBotAlmostAllInAfterCall(action, opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, boardInMethod);
@@ -512,7 +515,7 @@ public class ActionVariables {
                         //nothing, keep nash raise shove
                         System.out.println("raise > nashraise");
                     } else {
-                        if(botHandStrength > 0.7) {
+                        if(botHandStrength > 0.55) {
                             if(Math.random() > 0.42) {
                                 //nothing, strong hand so keep pf raise
                                 System.out.println("keep pf raise, strong hand");
@@ -551,12 +554,24 @@ public class ActionVariables {
                         System.out.println("no small limped pot raise");
                         newwStyleAction = olldStyleAction;
                     } else {
-                        System.out.println("Newstyle raise!");
-
-                        if(botHandStrength < 0.65) {
-                            System.out.println("Newstyle bluffraise: " + botHandStrength + " bb below 50: " + (gameVariables.getBigBlind() < 50));
+                        if(botHandStrength >= 0.85) {
+                            System.out.println("do postflop newstyle real valueraise!");
                         } else {
-                            System.out.println("Newstyle valueraise: " + botHandStrength);
+                            if(botIsButtonInMethod) {
+                                if(boardInMethod.size() == 3) {
+                                    System.out.println("flop float!");
+                                    newwStyleAction = "call";
+                                } else if(boardInMethod.size() == 4) {
+                                    System.out.println("turn float!");
+                                    newwStyleAction = "call";
+                                } else {
+                                    System.out.println("change river newstyle raise to oldstyle action");
+                                    newwStyleAction = olldStyleAction;
+                                }
+                            } else {
+                                newwStyleAction = olldStyleAction;
+                                System.out.println("oop newstyle raise set to oldstyle action");
+                            }
                         }
                     }
                 }
@@ -570,7 +585,7 @@ public class ActionVariables {
                 }
 
                 action = callRules(action, botActionBuilder.getBotEquity(), boardInMethod, facingOdds,
-                        (strongFdInMethod || strongOosdInMethod || strongGutshotInMethod));
+                        (strongFdInMethod || strongOosdInMethod || strongGutshotInMethod), botIsButtonInMethod, bluffOddsAreOk);
             }
         }
         ////
@@ -580,17 +595,21 @@ public class ActionVariables {
         //
 
 
-        //
-        //oop value trap shit
-        //if(action.equals("bet75pct") && botHandStrength > 0.8 && !botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
-        //    if(Math.random() < 0.2) {
-        //        action = "check";
-        //        System.out.println("Oop value trap yo");
-        //    }
-        //}
-        //
 
-        action = potControl(action, boardInMethod, botHandStrengthInMethod, continuousTable, gameVariables);
+        //oop value trap shit
+        if(action.equals("bet75pct") && botHandStrength > 0.8 && !botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
+            if(Math.random() < 0.2) {
+                action = "check";
+                System.out.println("Oop value trap yo");
+            }
+        }
+
+        //action = potControl(action, boardInMethod, botHandStrengthInMethod, continuousTable, gameVariables);
+        action = shovePreflopWithAceHands(action, boardInMethod, gameVariables.getBotHoleCards(), effectiveStack,
+                eligibleActions, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
+        action = shoveVersusLimpsWithStrongerHands(action, boardInMethod, gameVariables.getOpponentAction(),
+                gameVariables.getBigBlind(), botHandStrengthInMethod);
+        action = funkyPreflopExtraShoves(action, boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind(), botHandStrengthInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -1716,6 +1735,90 @@ public class ActionVariables {
         return actionToReturn;
     }
 
+    private String shovePreflopWithAceHands(String action, List<Card> board, List<Card> botHolecards, double effectiveStackBb,
+                                          List<String> eligibleActions, String opponentAction, double bigBlind) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!opponentAction.equals("raise")) {
+                if(eligibleActions.contains("raise")) {
+                    if(effectiveStackBb <= 20) {
+                        List<Set<Card>> shovableHands = new PreflopHandStength().getSpecificPreflopShovableHands();
+                        Set<Card> botHolecardsAsSet = botHolecards.stream().collect(Collectors.toSet());
+
+                        if(shovableHands.contains(botHolecardsAsSet)) {
+                            if(Math.random() < 0.5) {
+                                String variable;
+
+                                if(action.equals("raise")) {
+                                    if(sizing > 500) {
+                                        variable = "a";
+                                    } else {
+                                        variable = "b";
+                                    }
+                                } else {
+                                    variable = "c";
+                                }
+
+                                System.out.println(variable + " gonna do shove with shovable hands!");
+                                actionToReturn = "raise";
+                                sizing = 5000 * bigBlind;
+                                System.out.println("shovablehands set shove sizing: " + sizing);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String shoveVersusLimpsWithStrongerHands(String action, List<Card> board, String opponentAction,
+                                                     double bigBlind, double handstrength) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(opponentAction.equals("call")) {
+                if(action.equals("check")) {
+                    if(bigBlind >= 40) {
+                        if(handstrength >= 0.6) {
+                            if(Math.random() < 0.7) {
+                                actionToReturn = "raise";
+                                sizing = 5000 * bigBlind;
+                                System.out.println("shove more versus limps");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String funkyPreflopExtraShoves(String action, List<Card> board, String opponentAction, double bigBlind, double handstrength) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!action.equals("raise")) {
+                if(!opponentAction.equals("raise")) {
+                    if(bigBlind >= 50) {
+                        if(handstrength >= 0.5) {
+                            if(Math.random() < 0.65) {
+                                actionToReturn = "raise";
+                                System.out.println("Funky extra preflop shove!");
+                                sizing = 5000 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
     private int getBoardWetness(ContinuousTable continuousTable, List<Card> board) {
         int boardWetness = 200;
 
@@ -1870,22 +1973,28 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String callRules(String action, double botEquity, List<Card> board, double facingOdds, boolean strongDraw) {
+    private String callRules(String action, double botEquity, List<Card> board, double facingOdds, boolean strongDraw,
+                             boolean position, boolean bluffOddsAreOk) {
         String actionToReturn;
 
         if(action.equals("call")) {
             if(board != null && !board.isEmpty()) {
                 if(botEquity < 0.34 && !strongDraw) {
-                    if(facingOdds > 0.1) {
-                        System.out.println("Overrule change call to fold. Equity: " + botEquity + " Facingodds: " + facingOdds);
-                        actionToReturn = "fold";
+                    if(position && bluffOddsAreOk && (board.size() == 3 || board.size() == 4)) {
+                        System.out.println("Keep floating, no overrule change call to fold");
+                        actionToReturn = action;
                     } else {
-                        if(botEquity < 0.1) {
-                            System.out.println("Nut low: do fold despite amazing odds. Equity: " + botEquity + " Facingodds: " + facingOdds);
+                        if(facingOdds > 0.1) {
+                            System.out.println("Overrule change call to fold. Equity: " + botEquity + " Facingodds: " + facingOdds);
                             actionToReturn = "fold";
                         } else {
-                            System.out.println("Kept call cause of incredibly good odds. Equity: " + botEquity + " Facingodds: " + facingOdds);
-                            actionToReturn = action;
+                            if(botEquity < 0.1) {
+                                System.out.println("Nut low: do fold despite amazing odds. Equity: " + botEquity + " Facingodds: " + facingOdds);
+                                actionToReturn = "fold";
+                            } else {
+                                System.out.println("Kept call cause of incredibly good odds. Equity: " + botEquity + " Facingodds: " + facingOdds);
+                                actionToReturn = action;
+                            }
                         }
                     }
                 } else {
