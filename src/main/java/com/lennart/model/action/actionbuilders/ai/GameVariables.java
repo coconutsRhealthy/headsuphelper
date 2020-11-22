@@ -316,6 +316,12 @@ public class GameVariables implements GameVariable {
                 board.add(riverCard);
             }
         }
+
+        System.out.println("BOARD: ");
+
+        for(Card card : board) {
+            System.out.println("-> " + card.getRank() + card.getSuit());
+        }
     }
 
     private boolean botMadeBetOnCurrentStreet(List<Card> oldBoard) {
