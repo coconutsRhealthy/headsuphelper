@@ -250,7 +250,8 @@ public class StarsTableReader {
     }
 
     public static void endBotIsSittingOut() {
-        MouseKeyboard.click(926, 710);
+        //MouseKeyboard.click(926, 710);
+        MouseKeyboard.click(944, 748);
     }
 
     public void closeRematchScreen() {
@@ -354,8 +355,6 @@ public class StarsTableReader {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1179, 256, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
-        System.out.println(pixelRgb);
-
         if(pixelRgb / 1000 == -14670) {
             //expected rgb: -14.670.548
             System.out.println("new sng table is opened a");
@@ -367,6 +366,8 @@ public class StarsTableReader {
     public void maximizeNewSngTable() throws Exception {
         MouseKeyboard.click(238, 15);
         TimeUnit.SECONDS.sleep(1);
+        MouseKeyboard.click(259, 76);
+        TimeUnit.MILLISECONDS.sleep(50);
         MouseKeyboard.click(259, 76);
         TimeUnit.MILLISECONDS.sleep(50);
         MouseKeyboard.click(259, 76);
@@ -435,67 +436,46 @@ public class StarsTableReader {
 
     //helper methods
     private static void clickFoldActionButton() throws Exception {
-        //MouseKeyboard.moveMouseToLocation(414, 345);
         MouseKeyboard.click(779, 764);
         TimeUnit.MILLISECONDS.sleep(100);
         MouseKeyboard.click(779, 764);
-        //TimeUnit.MILLISECONDS.sleep(100);
-        //MouseKeyboard.click(779, 764);
-        //TimeUnit.MILLISECONDS.sleep(100);
-        //MouseKeyboard.click(779, 764);
     }
 
     private static void clickCheckActionButton() throws Exception {
         MouseKeyboard.click(1002, 747);
         TimeUnit.MILLISECONDS.sleep(100);
+        //hier iets
         MouseKeyboard.click(1002, 747);
-        //TimeUnit.MILLISECONDS.sleep(100);
-        //MouseKeyboard.click(1002, 747);
-        //TimeUnit.MILLISECONDS.sleep(100);
-        //MouseKeyboard.click(1002, 747);
     }
 
     private static void clickCallActionButton() throws Exception {
         if(readMiddleActionButton().toLowerCase().contains("call")) {
             MouseKeyboard.click(1009, 752);
             TimeUnit.MILLISECONDS.sleep(100);
-            MouseKeyboard.click(1009, 752);
-            //TimeUnit.MILLISECONDS.sleep(100);
-            //MouseKeyboard.click(1009, 752);
-            //TimeUnit.MILLISECONDS.sleep(100);
-            //MouseKeyboard.click(1009, 752);
+
+            if(readMiddleActionButton().toLowerCase().contains("call")) {
+                MouseKeyboard.click(1009, 752);
+            } else {
+                System.out.println("One call button click was enough!");
+            }
         } else {
             System.out.println("Could not read 'call' in middle action button. So click right action button to call");
-            //MouseKeyboard.click(414, 345);
             MouseKeyboard.click(1157, 750);
             TimeUnit.MILLISECONDS.sleep(100);
             MouseKeyboard.click(1157, 750);
-            //TimeUnit.MILLISECONDS.sleep(100);
-            //MouseKeyboard.click(1157, 750);
-            //TimeUnit.MILLISECONDS.sleep(100);
-            //MouseKeyboard.click(1157, 750);
         }
     }
 
     private static void clickBetActionButton() throws Exception {
-        //MouseKeyboard.click(414, 345);
         MouseKeyboard.click(1157, 761);
         TimeUnit.MILLISECONDS.sleep(100);
         MouseKeyboard.click(1157, 761);
-        //TimeUnit.MILLISECONDS.sleep(100);
-        //MouseKeyboard.click(1157, 761);
-        //TimeUnit.MILLISECONDS.sl-3333.33
-        //MouseKeyboard.click(1157, 761);
     }
 
     private static void clickRaiseActionButton() throws Exception {
         MouseKeyboard.click(1143, 768);
         TimeUnit.MILLISECONDS.sleep(100);
         MouseKeyboard.click(1143, 768);
-        //TimeUnit.MILLISECONDS.sleep(100);
-        //MouseKeyboard.click(1143, 768);
-        //TimeUnit.MILLISECONDS.sleep(100);
-        //MouseKeyboard.click(1143, 768);
     }
 
     private static String readLeftActionButton() {
@@ -525,7 +505,9 @@ public class StarsTableReader {
     }
 
     private String readFirstHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(669, 64, 25, 32);
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(669, 64, 25, 32);
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(669, 64, 25, 24);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(669, 64, 25, 26);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -598,7 +580,8 @@ public class StarsTableReader {
         //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(715, 325, 48, 59);
         //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(715, 323, 48, 64);
         //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(699, 323, 71, 64);
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(715, 319, 48, 64);
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(715, 323, 71, 58);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(715, 323, 71, 50);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
