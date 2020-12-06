@@ -187,6 +187,10 @@ public class PreflopHandStength {
         group_60_65.addAll(getSuitedCombosOfGivenRanks(12, 6).values());
         group_60_65.addAll(getOffSuitCombosOfGivenRanks(12, 8).values());
 
+        group_60_65.addAll(getSuitedCombosOfGivenRanks(9, 8).values());
+        group_60_65.addAll(getSuitedCombosOfGivenRanks(8, 7).values());
+        group_60_65.addAll(getSuitedCombosOfGivenRanks(7, 6).values());
+
         return group_60_65;
     }
 
@@ -201,7 +205,6 @@ public class PreflopHandStength {
         group_55_60.addAll(getOffSuitCombosOfGivenRanks(13, 3).values());
         group_55_60.addAll(getSuitedCombosOfGivenRanks(12, 4).values());
         group_55_60.addAll(getOffSuitCombosOfGivenRanks(10, 9).values());
-        group_55_60.addAll(getSuitedCombosOfGivenRanks(9, 8).values());
 
         return group_55_60;
     }
@@ -219,9 +222,7 @@ public class PreflopHandStength {
         group_50_55.addAll(getSuitedCombosOfGivenRanks(11, 6).values());
         group_50_55.addAll(getSuitedCombosOfGivenRanks(9, 7).values());
 
-        group_50_55.addAll(getSuitedCombosOfGivenRanks(8, 7).values());
         group_50_55.addAll(getSuitedCombosOfGivenRanks(8, 6).values());
-        group_50_55.addAll(getSuitedCombosOfGivenRanks(7, 6).values());
         group_50_55.addAll(getSuitedCombosOfGivenRanks(7, 5).values());
         group_50_55.addAll(getSuitedCombosOfGivenRanks(6, 5).values());
 
@@ -268,6 +269,8 @@ public class PreflopHandStength {
         group_35_40.addAll(getSuitedCombosOfGivenRanks(10, 3).values());
         group_35_40.addAll(getSuitedCombosOfGivenRanks(8, 5).values());
 
+        group_35_40.addAll(getOffSuitCombosOfGivenRanks(8, 7).values());
+
         return group_35_40;
     }
 
@@ -275,7 +278,6 @@ public class PreflopHandStength {
         List<Set<Card>> group_30_35 = new ArrayList<>();
 
         group_30_35.addAll(getOffSuitCombosOfGivenRanks(11, 4).values());
-        group_30_35.addAll(getOffSuitCombosOfGivenRanks(8, 7).values());
         group_30_35.addAll(getOffSuitCombosOfGivenRanks(10, 6).values());
         group_30_35.addAll(getSuitedCombosOfGivenRanks(5, 4).values());
         group_30_35.addAll(getOffSuitCombosOfGivenRanks(11, 3).values());
@@ -476,6 +478,11 @@ public class PreflopHandStength {
         shovable.addAll(getPocketPairCombosOfGivenRank(12).values());
         shovable.addAll(getPocketPairCombosOfGivenRank(13).values());
         shovable.addAll(getPocketPairCombosOfGivenRank(14).values());
+
+        shovable.addAll(getSuitedCombosOfGivenRanks(11, 10).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(10, 9).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(9, 8).values());
+        shovable.addAll(getSuitedCombosOfGivenRanks(8, 7).values());
 
         return shovable;
     }

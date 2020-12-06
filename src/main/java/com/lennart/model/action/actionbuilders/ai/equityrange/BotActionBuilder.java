@@ -46,7 +46,9 @@ public class BotActionBuilder {
 
             System.out.println("valuetrap: " + action);
 
-            if(action.equals("fold") || action.equals("check")) {
+            //hier alleen check van maken? zodat je geen newstyle bluffraises popt maar enkel newstyle bluffbets...
+            //if(action.equals("fold") || action.equals("check")) {
+            if(action.equals("check") || action.equals("call") || action.equals("fold")) {
                 if(!rules.isValueTrap()) {
                     List<Card> board = gameVariables.getBoard();
 

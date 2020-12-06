@@ -550,28 +550,16 @@ public class ActionVariables {
                 if(newwStyleAction.equals("raise")) {
                     if(gameVariables.getPot() < 80 &&
                             ((gameVariables.getPot() == 40 && gameVariables.getBigBlind() == 20) ||
-                                (gameVariables.getPot() == 60 && gameVariables.getBigBlind() == 30)) && Math.random() < 0.5) {
+                                    (gameVariables.getPot() == 60 && gameVariables.getBigBlind() == 30)) && Math.random() < 0.5) {
                         System.out.println("no small limped pot raise");
                         newwStyleAction = olldStyleAction;
                     } else {
-                        if(botHandStrength >= 0.85) {
-                            System.out.println("do postflop newstyle real valueraise!");
+                        System.out.println("Newstyle raise!");
+
+                        if(botHandStrength < 0.65) {
+                            System.out.println("Newstyle bluffraise: " + botHandStrength + " bb below 50: " + (gameVariables.getBigBlind() < 50));
                         } else {
-                            if(botIsButtonInMethod) {
-                                if(boardInMethod.size() == 3) {
-                                    System.out.println("flop float!");
-                                    newwStyleAction = "call";
-                                } else if(boardInMethod.size() == 4) {
-                                    System.out.println("turn float!");
-                                    newwStyleAction = "call";
-                                } else {
-                                    System.out.println("change river newstyle raise to oldstyle action");
-                                    newwStyleAction = olldStyleAction;
-                                }
-                            } else {
-                                newwStyleAction = olldStyleAction;
-                                System.out.println("oop newstyle raise set to oldstyle action");
-                            }
+                            System.out.println("Newstyle valueraise: " + botHandStrength);
                         }
                     }
                 }
@@ -604,12 +592,31 @@ public class ActionVariables {
             }
         }
 
+        //ip value trap shit
+        if(action.equals("bet75pct") && botHandStrength > 0.8 && botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
+            if(boardInMethod.size() == 3 || boardInMethod.size() == 4) {
+                if(Math.random() < 0.1) {
+                    action = "check";
+                    System.out.println("Ip value trap yo");
+                }
+            }
+        }
+
         //action = potControl(action, boardInMethod, botHandStrengthInMethod, continuousTable, gameVariables);
         action = shovePreflopWithAceHands(action, boardInMethod, gameVariables.getBotHoleCards(), effectiveStack,
                 eligibleActions, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
-        action = shoveVersusLimpsWithStrongerHands(action, boardInMethod, gameVariables.getOpponentAction(),
+        action = shoveVersusLimpsWithStrongerHands(action, boardInMethod, gameVariables.getOpponentAction(), effectiveStack,
                 gameVariables.getBigBlind(), botHandStrengthInMethod);
-        action = funkyPreflopExtraShoves(action, boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind(), botHandStrengthInMethod);
+        action = funkyPreflopExtraShoves(action, boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind(), botHandStrengthInMethod, effectiveStack);
+
+        //action = playerDependentPreflopShoves(action, boardInMethod, gameVariables.getOpponentAction(), bluffOddsAreOk,
+        //        gameVariables.getOpponentName(), gameVariables.getBigBlind(), effectiveStack, botHandStrengthInMethod);
+        //action = playerDependentPreflop3betShoves(action, boardInMethod, gameVariables.getOpponentAction(),
+        //        bluffOddsAreOk, gameVariables.getOpponentName(), gameVariables.getBigBlind(), effectiveStack,
+        //        botHandStrengthInMethod, gameVariables.getBotBetSize(), gameVariables.getOpponentBetSize());
+
+        //action = moreBluffShovesPreflop(action, boardInMethod, gameVariables.getOpponentAction(), effectiveStack, botHandStrengthInMethod, gameVariables.getBigBlind());
+
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -624,10 +631,21 @@ public class ActionVariables {
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
             //if(sizing < (0.5 * gameVariables.getPot())) {
                 System.out.println("xx reset sizing to 1 bigblind");
-                sizing = gameVariables.getBigBlind() + (ThreadLocalRandom.current().nextInt(1, 4 + 1) + 0.0);
+                sizing = gameVariables.getBigBlind() + (ThreadLocalRandom.current().nextInt(1, 3 + 1) + 0.0);
             //}
         } else if(action.equals("bet75pct")) {
-            sizing = 0.5 * gameVariables.getPot();
+            //sizing = 0.5 * gameVariables.getPot();
+            sizing = 0.35 * gameVariables.getPot();
+        } else if(action.equals("raise") && boardInMethod != null && !boardInMethod.isEmpty()) {
+            sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+
+            //sizing = 2.06 * gameVariables.getOpponentBetSize();
+
+            //if(sizing < 0.5 * gameVariables.getPot()) {
+            //    sizing = 0.51 * gameVariables.getPot();
+            //}
+
+            System.out.println("post raisesizing eije!");
         }
         //
 
@@ -663,6 +681,20 @@ public class ActionVariables {
                 System.out.println(bigBetPercentageOfPot + " big value sizing! board size: " + boardInMethod.size() + " sizing: " + sizing);
             } else {
                 System.out.println(bigBetPercentageOfPot + " big value draw sizing! board size: " + boardInMethod.size() + " sizing: " + sizing);
+            }
+        }
+
+        if(strongGutshot || strongOosd || strongFlushDraw) {
+            if(bluffOddsAreOk) {
+                if(action.equals("fold") || action.equals("call")) {
+                    if(botHandStrengthInMethod < 0.5) {
+                        System.out.println("HARBOZ: draw bluffraise opp, now " + action + ". harboz-gs: "
+                                + strongGutshot + ", harboz-fd: " + strongFlushDraw + ", harboz-oosd: " + strongOosd);
+                    } else {
+                        System.out.println("HARBOZ: draw valueraise opp, now " + action + ". harboz-gs: "
+                                + strongGutshot + ", harboz-fd: " + strongFlushDraw + ", harboz-oosd: " + strongOosd);
+                    }
+                }
             }
         }
 
@@ -1775,14 +1807,14 @@ public class ActionVariables {
     }
 
     private String shoveVersusLimpsWithStrongerHands(String action, List<Card> board, String opponentAction,
-                                                     double bigBlind, double handstrength) {
+                                                     double effectiveStackBb, double bigBlind, double handstrength) {
         String actionToReturn = action;
 
         if(board == null || board.isEmpty()) {
             if(opponentAction.equals("call")) {
                 if(action.equals("check")) {
-                    if(bigBlind >= 40) {
-                        if(handstrength >= 0.6) {
+                    if(effectiveStackBb < 13) {
+                        if(handstrength >= 0.5) {
                             if(Math.random() < 0.7) {
                                 actionToReturn = "raise";
                                 sizing = 5000 * bigBlind;
@@ -1797,18 +1829,135 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String funkyPreflopExtraShoves(String action, List<Card> board, String opponentAction, double bigBlind, double handstrength) {
+    private String funkyPreflopExtraShoves(String action, List<Card> board, String opponentAction, double bigBlind,
+                                           double handstrength, double effectiveStackBb) {
         String actionToReturn = action;
 
         if(board == null || board.isEmpty()) {
             if(!action.equals("raise")) {
                 if(!opponentAction.equals("raise")) {
-                    if(bigBlind >= 50) {
+                    if(effectiveStackBb < 13) {
                         if(handstrength >= 0.5) {
-                            if(Math.random() < 0.65) {
+                            if(Math.random() < 0.5) {
                                 actionToReturn = "raise";
                                 System.out.println("Funky extra preflop shove!");
                                 sizing = 5000 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String playerDependentPreflopShoves(String action, List<Card> board, String opponentAction, boolean bluffOddsAreOk,
+                                                String opponentName, double bigBlind, double effectiveStackBb, double botHandstrength) throws Exception {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!action.equals("raise") || sizing < 500) {
+                if(!opponentAction.equals("raise")) {
+                    if(bluffOddsAreOk) {
+                        if(botHandstrength < 0.5 || Math.random() < 0.5) {
+                            PreflopShoveAssistant preflopShoveAssistant = new PreflopShoveAssistant();
+
+                            double oppFoldVsPfShoveRatio = preflopShoveAssistant.getRecentFoldVsPfShoveRatioForPlayer(opponentName);
+
+                            if(oppFoldVsPfShoveRatio > 0) {
+                                double expectedChipProfitOfShove = preflopShoveAssistant.getExpectedChipProfitOfPfShove(
+                                        bigBlind,
+                                        oppFoldVsPfShoveRatio,
+                                        opponentAction.equals("call"),
+                                        effectiveStackBb * bigBlind,
+                                        botHandstrength);
+
+                                if(expectedChipProfitOfShove > 0) {
+                                    System.out.println("Change to player dependent preflop shove yo! Ratio: "
+                                            + oppFoldVsPfShoveRatio + " Expected profit: " + expectedChipProfitOfShove);
+                                    actionToReturn = "raise";
+                                    sizing = 5000 * bigBlind;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String playerDependentPreflop3betShoves(String action, List<Card> board, String opponentAction, boolean bluffOddsAreOk,
+                                                    String opponentName, double bigBlind, double effectiveStackBb, double botHandstrength,
+                                                    double botTotalBetsize, double oppTotalBetsize) throws Exception {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!action.equals("raise") || sizing < 500) {
+                if(opponentAction.equals("raise")) {
+                    if(bluffOddsAreOk) {
+                        PreflopShoveAssistant preflopShoveAssistant = new PreflopShoveAssistant();
+
+                        double oppFoldVsPf3betsRatio = preflopShoveAssistant.getRecentFoldVsPf3betShoveRatioForPlayer(opponentName);
+
+                        if(oppFoldVsPf3betsRatio > 0) {
+                            double expectedChipProfitOf3betShove = preflopShoveAssistant.getExpectedChipProfitOfPf3betShove(
+                                    oppFoldVsPf3betsRatio,
+                                    botTotalBetsize,
+                                    oppTotalBetsize,
+                                    botHandstrength,
+                                    effectiveStackBb * bigBlind
+                            );
+
+                            if(expectedChipProfitOf3betShove > 0) {
+                                System.out.println("Pre 3bet shove yo! Player dependent. Ratio: "
+                                        + oppFoldVsPf3betsRatio + " Expected profit: " + expectedChipProfitOf3betShove);
+                                actionToReturn = "raise";
+                                sizing = 5000 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String moreBluffShovesPreflop(String action, List<Card> board, String opponentAction, double effectiveStackBb,
+                                          double botHandstrength, double bigBlind) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!action.equals("raise")) {
+                if(!opponentAction.equals("raise")) {
+                    if(botHandstrength > 0.35 && botHandstrength < 0.5) {
+                        if(effectiveStackBb < 13) {
+                            if(effectiveStackBb <= 10 ||
+                                    (effectiveStackBb > 10 && opponentAction.equals("call"))) {
+                                //hier check op player type?
+
+                                if(botHandstrength < 0.4) {
+                                    if(Math.random() < 0.65) {
+                                        actionToReturn = "raise";
+                                        System.out.println("Bluffshove preflop! 1HS: " + botHandstrength);
+                                        sizing = 5000 * bigBlind;
+                                    }
+                                } else if(botHandstrength < 0.45) {
+                                    if(Math.random() < 0.75) {
+                                        actionToReturn = "raise";
+                                        System.out.println("Bluffshove preflop! 2HS: " + botHandstrength);
+                                        sizing = 5000 * bigBlind;
+                                    }
+                                } else {
+                                    if(Math.random() < 0.80) {
+                                        actionToReturn = "raise";
+                                        System.out.println("Bluffshove preflop! 3HS: " + botHandstrength);
+                                        sizing = 5000 * bigBlind;
+                                    }
+                                }
                             }
                         }
                     }

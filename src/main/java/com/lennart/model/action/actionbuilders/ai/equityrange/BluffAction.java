@@ -35,7 +35,7 @@ public class BluffAction {
                                   GameVariables gameVariables, double botSizing, double botEquity) {
         String actionToReturn;
 
-        if(currentAction.equals("check") || currentAction.equals("fold")) {
+        if(currentAction.equals("check") || currentAction.equals("fold") || currentAction.equals("call")) {
             String bluffActionToUse;
 
             if(currentAction.equals("check")) {
@@ -97,12 +97,20 @@ public class BluffAction {
                     double limit;
 
                     if(bluffActionToUse.equals("bet75pct")) {
+                        //hier kun je varieren
+
                         if(gameVariables.getBoard().size() == 3) {
-                            limit = 0.43;
+                            //limit = 0.43;
+                            //mag worden: 0.398
+                            limit = 0.398;
                         } else if(gameVariables.getBoard().size() == 4) {
-                            limit = 0.2;
+                            //limit = 0.2;
+                            //mag worden: 0.12386
+                            limit =  0.12386;
                         } else if(gameVariables.getBoard().size() == 5) {
-                            limit = 0.43;
+                            //limit = 0.43;
+                            //mag worden: 0.405895
+                            limit = 0.405895;
                         } else {
                             System.out.println("Shouldn't come here, BluffAction limit");
                             limit = 1;
@@ -126,7 +134,7 @@ public class BluffAction {
                         }
                     }
 
-                    if(oppFoldRangeToTotalRangeRatio > limit) {
+                    if(oppFoldRangeToTotalRangeRatio > limit && bluffActionToUse.equals("bet75pct")) {
                         if(currentAction.equals("check")) {
                             if(botEquity > 0.565) {
                                 System.out.println("No bluff cause showdown value");

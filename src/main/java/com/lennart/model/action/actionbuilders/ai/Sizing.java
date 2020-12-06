@@ -100,9 +100,12 @@ public class Sizing {
             System.out.println("sizing weird percentage default should not come here");
         }
 
-        sizingPercentage = 0.5;
+        //sizingPercentage = 0.5;
+        //sizingPercentage = 0.3875;
+        sizingPercentage = 0.35;
         //raiseOddsToUseClassVar = 2.85;
-        raiseOddsToUseClassVar = 2.25;
+        //raiseOddsToUseClassVar = 2.25;
+        raiseOddsToUseClassVar = 2.85;
     }
 
     public double getRuleBotSizing(double handStrength, double facingBetSize, double myBetSize, double facingStack,
