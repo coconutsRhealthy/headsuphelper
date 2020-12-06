@@ -350,7 +350,7 @@ public class StarsTableReader {
         return noPlayerIsRegged;
     }
 
-    public boolean newSngTableIsOpened() {
+    public boolean newSngTableIsOpened() throws Exception {
         //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(197, 489, 1, 1);
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1179, 256, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
@@ -358,6 +358,14 @@ public class StarsTableReader {
         if(pixelRgb / 1000 == -14670) {
             //expected rgb: -14.670.548
             System.out.println("new sng table is opened a");
+
+            //bring sng table to front:
+            TimeUnit.MILLISECONDS.sleep(100);
+            MouseKeyboard.click(1179, 256);
+            TimeUnit.MILLISECONDS.sleep(200);
+            MouseKeyboard.click(1179, 256);
+            TimeUnit.MILLISECONDS.sleep(100);
+
             return true;
         }
         return false;
@@ -394,7 +402,7 @@ public class StarsTableReader {
         return fullPlayerName;
     }
 
-    public static void performActionOnSite(String botAction, double sizing) throws Exception {
+    public static void performActionOnSite(String botAction, double sizing, List<Card> boardBeforePerfomingAction) throws Exception {
         if(botAction != null && sizing != 0) {
             try {
                 MouseKeyboard.click(975, 701);
@@ -418,11 +426,11 @@ public class StarsTableReader {
         }
 
         if(botAction == null) {
-            clickCheckActionButton();
+            clickCheckActionButton(boardBeforePerfomingAction);
         } else if(botAction.contains("fold")) {
             clickFoldActionButton();
         } else if(botAction.contains("check")) {
-            clickCheckActionButton();
+            clickCheckActionButton(boardBeforePerfomingAction);
         } else if(botAction.contains("call")) {
             clickCallActionButton();
         } else if(botAction.contains("bet")) {
@@ -441,11 +449,20 @@ public class StarsTableReader {
         MouseKeyboard.click(779, 764);
     }
 
-    private static void clickCheckActionButton() throws Exception {
+    private static void clickCheckActionButton(List<Card> boardBeforePerformingAction) throws Exception {
         MouseKeyboard.click(1002, 747);
         TimeUnit.MILLISECONDS.sleep(100);
-        //hier iets
-        MouseKeyboard.click(1002, 747);
+
+        if(boardBeforePerformingAction == null || boardBeforePerformingAction.isEmpty()) {
+            if(new StarsTableReader().readFirstFlopCardSuitFromBoard() == ('x')) {
+                MouseKeyboard.click(1002, 747);
+                System.out.println("Check after facing limp, second click check button needed");
+            } else {
+                System.out.println("Check after facing limp, nope, second click check button is not needed!");
+            }
+        } else {
+            MouseKeyboard.click(1002, 747);
+        }
     }
 
     private static void clickCallActionButton() throws Exception {
@@ -455,6 +472,7 @@ public class StarsTableReader {
 
             if(readMiddleActionButton().toLowerCase().contains("call")) {
                 MouseKeyboard.click(1009, 752);
+                System.out.println("Second call button click needed!");
             } else {
                 System.out.println("One call button click was enough!");
             }

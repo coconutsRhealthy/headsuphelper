@@ -140,12 +140,12 @@ public class ContinuousTable implements ContinuousTableable {
                     boolean botWasButtonInLastHand = botWasButtonInLastHand();
                     dbSaveList = new ArrayList<>();
 
-                    if(botBluffActionDone) {
-                        boolean bluffActionWasSuccessful = wasBluffSuccessful(bigBlind);
-                        String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
-                        new PlayerBluffer().updateBluffDb(opponentPlayerNameOfLastHand, bluffActionWasSuccessful);
-                        botBluffActionDone = false;
-                    }
+                    //if(botBluffActionDone) {
+                    //    boolean bluffActionWasSuccessful = wasBluffSuccessful(bigBlind);
+                    //    String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
+                    //    new PlayerBluffer().updateBluffDb(opponentPlayerNameOfLastHand, bluffActionWasSuccessful);
+                    //    botBluffActionDone = false;
+                    //}
 
                     if(!allHandsPlayedAndPlayerNames.isEmpty()) {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
@@ -193,7 +193,7 @@ public class ContinuousTable implements ContinuousTableable {
                     allHandStrenghts.add(actionVariables.getBotHandStrength());
                 }
 
-                StarsTableReader.performActionOnSite(action, sizing);
+                StarsTableReader.performActionOnSite(action, sizing, gameVariables.getBoard());
 
                 TimeUnit.MILLISECONDS.sleep(1000);
             }
