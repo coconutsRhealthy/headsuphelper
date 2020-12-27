@@ -81,6 +81,8 @@ public class ContinuousTable implements ContinuousTableable {
             }
 
             if(StarsTableReader.botIsToAct()) {
+                long botActStarttime = new Date().getTime();
+
                 numberOfActionRequests++;
 
                 boolean isNewHand = isNewHand();
@@ -185,7 +187,7 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Sizing: " + sizing);
                 System.out.println("Route: " + actionVariables.getRoute());
                 System.out.println("Table: " + actionVariables.getTable());
-                System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
+                //System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
                 System.out.println("********************");
                 System.out.println();
 
@@ -194,6 +196,10 @@ public class ContinuousTable implements ContinuousTableable {
                 }
 
                 StarsTableReader.performActionOnSite(action, sizing, gameVariables.getBoard());
+
+                long botActEndtime = new Date().getTime();
+                long botActDuration = botActEndtime - botActStarttime;
+                System.out.println("**BOT ACTION DURATION: " + botActDuration + " **");
 
                 TimeUnit.MILLISECONDS.sleep(1000);
             }
@@ -349,6 +355,11 @@ public class ContinuousTable implements ContinuousTableable {
                 if(line.contains("Total pot")) {
                     printBigPotValue(line);
                     break;
+                }
+
+                if(line.contains("is sitting out") && line.contains("vegeta11223")) {
+                    System.out.println("bot sitting out from handhistory!");
+                    System.out.println("line: " + line);
                 }
             }
         }

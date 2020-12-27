@@ -42,6 +42,9 @@ public class Nash {
                     if(botBetSizeBb == 1 && opponentAction.equals("raise") && opponentStackBb == 0 && amountToCallBb <= 8) {
                         nashActionIsPossible = true;
                         System.out.println("OOP Nash action is possible!");
+                    } else if(botBetSizeBb == 1 && opponentAction.equals("raise") && amountToCallBb >= effectiveStackBb && amountToCallBb <= 8) {
+                        nashActionIsPossible = true;
+                        System.out.println("OOP Nash action opp-not-all-in is possible!");
                     }
                 }
             }

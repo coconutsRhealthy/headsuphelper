@@ -1,6 +1,5 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
-import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.card.Card;
 
 import java.sql.*;
@@ -115,11 +114,13 @@ public class DbSaveRaw extends DbSave {
     }
 
     public double getRecentHandsWonLogic(String opponentName) throws Exception {
-        return new GameFlow().getNumberOfHandsWonAgainstOppInLast20Hands(opponentName, -1);
+        return -1.0;
+        //return new GameFlow().getNumberOfHandsWonAgainstOppInLast20Hands(opponentName, -1);
     }
 
     public String getAdjustedOppTypeLogic(String opponentName) throws Exception {
-        return new GameFlow().getAdjustedOppTypeForRecentBigPots(opponentName, -1, null);
+        return "OppTypeZ";
+        //return new GameFlow().getAdjustedOppTypeForRecentBigPots(opponentName, -1, null);
     }
 
     //regular getters and setters

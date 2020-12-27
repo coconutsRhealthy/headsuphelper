@@ -256,10 +256,10 @@ public class StarsTableReader {
 
     public void closeRematchScreen() {
         System.out.println("closing rematch screen");
-        //MouseKeyboard.click(510, 643);
+        MouseKeyboard.click(510, 643);
 
         //playMoney
-        MouseKeyboard.click(510, 619);
+        //MouseKeyboard.click(510, 619);
     }
 
     public void closeSpinOfTheDayScreenIfNecessary() {
@@ -372,13 +372,53 @@ public class StarsTableReader {
     }
 
     public void maximizeNewSngTable() throws Exception {
-        MouseKeyboard.click(238, 15);
-        TimeUnit.SECONDS.sleep(1);
-        MouseKeyboard.click(259, 76);
-        TimeUnit.MILLISECONDS.sleep(50);
-        MouseKeyboard.click(259, 76);
-        TimeUnit.MILLISECONDS.sleep(50);
-        MouseKeyboard.click(259, 76);
+        int counter = 0;
+
+        while(!sngTableIsMaximized()) {
+            counter++;
+            System.out.println("sng table NOT yet maximized");
+
+            //bring sng table to the front
+            MouseKeyboard.click(1224, 478);
+            TimeUnit.MILLISECONDS.sleep(40);
+            MouseKeyboard.click(1224, 478);
+            TimeUnit.MILLISECONDS.sleep(200);
+
+            MouseKeyboard.click(238, 15);
+            TimeUnit.SECONDS.sleep(1);
+            MouseKeyboard.click(259, 76);
+            TimeUnit.MILLISECONDS.sleep(50);
+            MouseKeyboard.click(259, 76);
+            TimeUnit.MILLISECONDS.sleep(50);
+            MouseKeyboard.click(259, 76);
+
+            TimeUnit.MILLISECONDS.sleep(1500);
+
+            if(counter >= 10) {
+                saveScreenshotOfEntireScreen(new Date().getTime());
+                counter = 0;
+                break;
+            }
+        }
+    }
+
+    public boolean sngTableIsMaximized() {
+        boolean tableIsMaximized = false;
+
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1142, 66, 1, 1);
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1128, 61, 1, 1);
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1248, 266, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1081, 97, 1, 1);
+        int rgb = bufferedImage.getRGB(0, 0);
+        rgb = rgb / 1000;
+
+        if(rgb == -14_670) {
+            //expected when open: -14_670_548
+            tableIsMaximized = true;
+            System.out.println("sng table maximized!");
+        }
+
+        return tableIsMaximized;
     }
 
     public String getOpponentPlayerNameFromImage() {
@@ -698,17 +738,40 @@ public class StarsTableReader {
             System.out.println("opp stack contains '?', new value: " + bottomPlayerStack);
         }
 
+        if(bottomPlayerStack.contains("‘I")) {
+            bottomPlayerStack = bottomPlayerStack.replace("‘I", "1");
+            System.out.println("opp stack contains '‘I', new value: " + bottomPlayerStack);
+        }
+
+        if(bottomPlayerStack.contains("O")) {
+            bottomPlayerStack = bottomPlayerStack.replace("O", "0");
+            System.out.println("opp stack contains 'O', new value: " + bottomPlayerStack);
+        }
+
+        if(bottomPlayerStack.contains("a")) {
+            bottomPlayerStack = bottomPlayerStack.replace("a", "8");
+            System.out.println("opp stack contains 'a', new value: " + bottomPlayerStack);
+        }
+
         if(bottomPlayerStack.toLowerCase().contains("all")) {
             System.out.println("oppstack: opp allin!");
             bottomPlayerStack = "0";
         }
 
-        if(bottomPlayerStack.toLowerCase().contains("sitting") || bottomPlayerStack.toLowerCase().contains("isconnect")) {
+        if(bottomPlayerStack.toLowerCase().contains("sitting") || bottomPlayerStack.toLowerCase().contains("isconnect") || bottomPlayerStack.toLowerCase().contains("connecte")) {
             System.out.println("oppstack: opp sitting out!");
             bottomPlayerStack = "1500";
         }
 
-        return ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
+        String bottomPlayerStackNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
+
+        if(!bottomPlayerStack.equals(bottomPlayerStackNonNumericRemoved)) {
+            System.out.println("oppstack non numeric values removed!");
+            System.out.println("oppstack before remove: " + bottomPlayerStack);
+            System.out.println("oppstack after remove: " + bottomPlayerStackNonNumericRemoved);
+        }
+
+        return bottomPlayerStackNonNumericRemoved;
     }
 
     private String readTopPlayerStack() {
@@ -724,7 +787,24 @@ public class StarsTableReader {
             System.out.println("botstack contains '?', new value: " + topPlayerStack);
         }
 
-        return ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
+        if(topPlayerStack.contains("G")) {
+            topPlayerStack = topPlayerStack.replace("G", "0");
+            System.out.println("botstack contains 'G', new value: " + topPlayerStack);
+        }
+
+        if(topPlayerStack.contains("o") || topPlayerStack.contains("O")) {
+            System.out.println("botstack contained o or O!");
+        }
+
+        String topPlayerStackNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
+
+        if(!topPlayerStack.equals(topPlayerStackNonNumericRemoved)) {
+            System.out.println("botstack non numeric values removed!");
+            System.out.println("botstack before remove: "+ topPlayerStack);
+            System.out.println("botstack after remove: " + topPlayerStackNonNumericRemoved);
+        }
+
+        return topPlayerStackNonNumericRemoved;
     }
 
     private static String readTopPlayerStackBase() {
@@ -744,7 +824,16 @@ public class StarsTableReader {
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String totalPotSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         totalPotSize = ImageProcessor.removeEmptySpacesFromString(totalPotSize);
-        return ImageProcessor.removeAllNonNumericCharacters(totalPotSize);
+
+        String totalPotSizeNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(totalPotSize);
+
+        if(!totalPotSize.equals("Pot:" + totalPotSizeNonNumericRemoved)) {
+            System.out.println("potsize non numeric values removed!");
+            System.out.println("potsize before remove: " + totalPotSize);
+            System.out.println("potsize after remove: " + totalPotSizeNonNumericRemoved);
+        }
+
+        return totalPotSizeNonNumericRemoved;
     }
 
 //    public static void main(String[] args) throws Exception {
