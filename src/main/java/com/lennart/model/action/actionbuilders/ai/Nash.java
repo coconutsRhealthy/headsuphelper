@@ -14,7 +14,7 @@ public class Nash {
         boolean nashActionIsPossible = false;
 
         if(board == null || board.isEmpty()) {
-            if(effectiveStackBb <= 10) {
+            if(effectiveStackBb <= 11) {
                 if(position) {
                     if(botBetSizeBb == 0.5) {
                         if(opponentAction.equals("bet")) {
@@ -50,6 +50,10 @@ public class Nash {
             }
         }
 
+        if(nashActionIsPossible && effectiveStackBb > 10) {
+            System.out.println("yupz 11bb Nash action!");
+        }
+
         return nashActionIsPossible;
     }
 
@@ -60,10 +64,19 @@ public class Nash {
         if(position) {
             Map<String, Double> pushMap = getPushMap();
             double stackLimitToPushBb = pushMap.get(holeCardsAsString);
+            double oldLimit = stackLimitToPushBb;
+
+            if(Math.random() > 0.25) {
+                stackLimitToPushBb = stackLimitToPushBb * 1.92;
+            }
 
             if(effectiveStack <= stackLimitToPushBb) {
                 nashAction = "raise";
                 System.out.println("Set IP Nash action to raise for: " + holeCardsAsString);
+
+                if(effectiveStack > oldLimit) {
+                    System.out.println("yupz, extra nash shove");
+                }
             } else {
                 nashAction = "fold";
                 System.out.println("Set IP Nash action to fold for: " + holeCardsAsString);

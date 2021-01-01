@@ -32,7 +32,7 @@ public class BluffAction {
     }
 
     public String getBluffAction(String currentAction, List<String> eligibleActions, ContinuousTable continuousTable,
-                                  GameVariables gameVariables, double botSizing, double botEquity) {
+                                  GameVariables gameVariables, double botSizing, double botEquity, boolean postRaiseBluffable) {
         String actionToReturn;
 
         if(currentAction.equals("check") || currentAction.equals("fold") || currentAction.equals("call")) {
@@ -95,6 +95,7 @@ public class BluffAction {
                     System.out.println("RATIO: " + oppFoldRangeToTotalRangeRatio);
 
                     double limit;
+                    double oldLimit = -1;
 
                     if(bluffActionToUse.equals("bet75pct")) {
                         //hier kun je varieren
@@ -102,39 +103,71 @@ public class BluffAction {
                         if(gameVariables.getBoard().size() == 3) {
                             //limit = 0.43;
                             //mag worden: 0.398
-                            limit = 0.398;
+
+                            if(gameVariables.isBotIsButton()) {
+                                //limit = 0.307;
+                                limit = 0.2204;
+                                oldLimit = 0.398;
+                            } else {
+                                limit = 0.398;
+                            }
                         } else if(gameVariables.getBoard().size() == 4) {
                             //limit = 0.2;
                             //mag worden: 0.12386
-                            limit =  0.12386;
+
+                            if(gameVariables.isBotIsButton()) {
+                                //limit = 0.09487;
+                                limit = 0.0641;
+                                oldLimit = 0.12386;
+                            } else {
+                                limit = 0.12386;
+                            }
                         } else if(gameVariables.getBoard().size() == 5) {
                             //limit = 0.43;
                             //mag worden: 0.405895
-                            limit = 0.405895;
+
+                            if(gameVariables.isBotIsButton()) {
+                                //limit = 0.37621;
+                                limit = 0.325;
+                                oldLimit = 0.405895;
+                            } else {
+                                limit = 0.405895;
+                            }
                         } else {
                             System.out.println("Shouldn't come here, BluffAction limit");
                             limit = 1;
                         }
                     } else {
-                        if(gameVariables.getOpponentBetSize() > 0.93 * gameVariables.getPot() ||
-                                gameVariables.getOpponentAction().equals("raise")) {
-                            limit = 0.6;
-                        } else {
-                            if(gameVariables.getBigBlind() >= 50) {
-                                limit = 0.07;
+                        if(postRaiseBluffable) {
+                            if(gameVariables.getBoard() != null && gameVariables.getBoard().size() != 5) {
+                                if(gameVariables.getOpponentBetSize() > 0.93 * gameVariables.getPot() ||
+                                        gameVariables.getOpponentAction().equals("raise")) {
+                                    limit = 0.6;
+                                } else {
+                                    if(gameVariables.getBigBlind() >= 50) {
+                                        limit = 0.07;
+                                    } else {
+                                        //limit = 0.6;
+                                        //limit = 0.44;
+                                        //limit = 0.195;
+                                        //limit = 0.15;
+                                        //limit = 0.135;
+                                        //limit = 0.0;
+                                        //limit = 0.1;
+                                        limit = 0.07;
+                                    }
+                                }
                             } else {
-                                //limit = 0.6;
-                                //limit = 0.44;
-                                //limit = 0.195;
-                                //limit = 0.15;
-                                //limit = 0.135;
-                                //limit = 0.0;
-                                limit = 0.1;
+                                //no river bluffraises
+                                limit = 20;
                             }
+                        } else {
+                            //no spew postflop bluffraises
+                            limit = 20;
                         }
                     }
 
-                    if(oppFoldRangeToTotalRangeRatio > limit && bluffActionToUse.equals("bet75pct")) {
+                    if(oppFoldRangeToTotalRangeRatio > limit) {
                         if(currentAction.equals("check")) {
                             if(botEquity > 0.565) {
                                 System.out.println("No bluff cause showdown value");
@@ -150,6 +183,14 @@ public class BluffAction {
                             System.out.println("turn bluffje: " + actionToReturn);
                         } else if(gameVariables.getBoard().size() == 5) {
                             System.out.println("river bluffje: " + actionToReturn);
+                        }
+
+                        if(oppFoldRangeToTotalRangeRatio < oldLimit && oldLimit != -1) {
+                                System.out.println("yupz exxxtra bluffbet. Boardsize: " + gameVariables.getBoard().size());
+                        }
+
+                        if(actionToReturn.equals("raise")) {
+                            System.out.println("yupz post bluff raise");
                         }
                     } else {
                         actionToReturn = currentAction;

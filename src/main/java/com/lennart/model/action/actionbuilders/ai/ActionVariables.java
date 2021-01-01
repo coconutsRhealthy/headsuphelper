@@ -541,7 +541,8 @@ public class ActionVariables {
                 String olldStyleAction = action;
                 BotActionBuilder botActionBuilder = new BotActionBuilder();
                 String newwStyleAction = botActionBuilder.getAction(continuousTable, gameVariables,
-                        continuousTable.getRangeConstructor());
+                        continuousTable.getRangeConstructor(), strongFlushDraw || strongOosd || strongGutshot || strongBackdoorFd || strongOvercards ||
+                                (botEquity > 0.4 && boardInMethod.size() == 3) || (botEquity > 0.44 && boardInMethod.size() == 4));
 
                 if(olldStyleAction.equals("raise")) {
                     //always keep it raise postflop
@@ -1779,7 +1780,8 @@ public class ActionVariables {
                         Set<Card> botHolecardsAsSet = botHolecards.stream().collect(Collectors.toSet());
 
                         if(shovableHands.contains(botHolecardsAsSet)) {
-                            if(Math.random() < 0.5) {
+                            double random = Math.random();
+                            if(random < 0.65) {
                                 String variable;
 
                                 if(action.equals("raise")) {
@@ -1796,6 +1798,10 @@ public class ActionVariables {
                                 actionToReturn = "raise";
                                 sizing = 5000 * bigBlind;
                                 System.out.println("shovablehands set shove sizing: " + sizing);
+
+                                if(random >= 0.5) {
+                                    System.out.println("yupz extra shovable shove");
+                                }
                             }
                         }
                     }
@@ -1837,11 +1843,16 @@ public class ActionVariables {
             if(!action.equals("raise")) {
                 if(!opponentAction.equals("raise")) {
                     if(effectiveStackBb < 13) {
-                        if(handstrength >= 0.5) {
-                            if(Math.random() < 0.5) {
+                        if(handstrength >= 0.45) {
+                            double random = Math.random();
+                            if(random < 0.6) {
                                 actionToReturn = "raise";
                                 System.out.println("Funky extra preflop shove!");
                                 sizing = 5000 * bigBlind;
+
+                                if(handstrength < 0.5 || random >= 0.5) {
+                                    System.out.println("yupz extra funky shove. HS: " + handstrength + " random: " + random);
+                                }
                             }
                         }
                     }

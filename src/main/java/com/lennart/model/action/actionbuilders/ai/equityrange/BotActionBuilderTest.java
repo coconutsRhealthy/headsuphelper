@@ -142,7 +142,7 @@ public class BotActionBuilderTest {
 //        RangeConstructor rangeConstructor4 = new RangeConstructor();
 //        new OpponentRangeSetter(rangeConstructor4, new InputProvider()).setOpponentRange(continuousTable, gameVariables);
 
-        String action = new BotActionBuilder().getAction(continuousTable, gameVariables, rangeConstructor);
+        String action = new BotActionBuilder().getAction(continuousTable, gameVariables, rangeConstructor, false);
 
         System.out.println("ACTION: " + action);
 
