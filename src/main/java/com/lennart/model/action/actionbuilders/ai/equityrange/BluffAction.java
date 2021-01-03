@@ -109,7 +109,8 @@ public class BluffAction {
                                 limit = 0.2204;
                                 oldLimit = 0.398;
                             } else {
-                                limit = 0.398;
+                                //limit = 0.398;
+                                limit = 0.56;
                             }
                         } else if(gameVariables.getBoard().size() == 4) {
                             //limit = 0.2;
@@ -120,7 +121,8 @@ public class BluffAction {
                                 limit = 0.0641;
                                 oldLimit = 0.12386;
                             } else {
-                                limit = 0.12386;
+                                //limit = 0.12386;
+                                limit = 0.225;
                             }
                         } else if(gameVariables.getBoard().size() == 5) {
                             //limit = 0.43;
@@ -131,7 +133,8 @@ public class BluffAction {
                                 limit = 0.325;
                                 oldLimit = 0.405895;
                             } else {
-                                limit = 0.405895;
+                                //limit = 0.405895;
+                                limit = 0.56;
                             }
                         } else {
                             System.out.println("Shouldn't come here, BluffAction limit");
@@ -139,7 +142,7 @@ public class BluffAction {
                         }
                     } else {
                         if(postRaiseBluffable) {
-                            if(gameVariables.getBoard() != null && gameVariables.getBoard().size() != 5) {
+                            if(gameVariables.getBoard() != null && gameVariables.getBoard().size() == 3) {
                                 if(gameVariables.getOpponentBetSize() > 0.93 * gameVariables.getPot() ||
                                         gameVariables.getOpponentAction().equals("raise")) {
                                     limit = 0.6;
@@ -153,8 +156,7 @@ public class BluffAction {
                                         //limit = 0.15;
                                         //limit = 0.135;
                                         //limit = 0.0;
-                                        //limit = 0.1;
-                                        limit = 0.07;
+                                        limit = 0.1;
                                     }
                                 }
                             } else {
@@ -178,11 +180,11 @@ public class BluffAction {
                         actionToReturn = bluffActionToUse;
 
                         if(gameVariables.getBoard().size() == 3) {
-                            System.out.println("flop bluffje: " + actionToReturn);
+                            System.out.println("flop bluffje: " + actionToReturn + " botbutton: " + gameVariables.isBotIsButton());
                         } else if(gameVariables.getBoard().size() == 4) {
-                            System.out.println("turn bluffje: " + actionToReturn);
+                            System.out.println("turn bluffje: " + actionToReturn + " botbutton: " + gameVariables.isBotIsButton());
                         } else if(gameVariables.getBoard().size() == 5) {
-                            System.out.println("river bluffje: " + actionToReturn);
+                            System.out.println("river bluffje: " + actionToReturn + " botbutton: " + gameVariables.isBotIsButton());
                         }
 
                         if(oppFoldRangeToTotalRangeRatio < oldLimit && oldLimit != -1) {
