@@ -608,7 +608,7 @@ public class ActionVariables {
                 eligibleActions, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
         action = shoveVersusLimpsWithStrongerHands(action, boardInMethod, gameVariables.getOpponentAction(), effectiveStack,
                 gameVariables.getBigBlind(), botHandStrengthInMethod);
-        action = funkyPreflopExtraShoves(action, boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
+        action = funkyPreflopExtraShoves(action, boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind(), botHandStrengthInMethod, effectiveStack);
 
         //action = playerDependentPreflopShoves(action, boardInMethod, gameVariables.getOpponentAction(), bluffOddsAreOk,
         //        gameVariables.getOpponentName(), gameVariables.getBigBlind(), effectiveStack, botHandStrengthInMethod);
@@ -1820,8 +1820,7 @@ public class ActionVariables {
             if(opponentAction.equals("call")) {
                 if(action.equals("check")) {
                     if(effectiveStackBb < 13) {
-                        //if(handstrength >= 0.5) {
-                        if(handstrength >= 0.4) {
+                        if(handstrength >= 0.5) {
                             if(Math.random() < 0.7) {
                                 actionToReturn = "raise";
                                 sizing = 5000 * bigBlind;
@@ -1837,23 +1836,23 @@ public class ActionVariables {
     }
 
     private String funkyPreflopExtraShoves(String action, List<Card> board, String opponentAction, double bigBlind,
-                                           double handstrength, double effectiveStackBb, boolean botIsButton) {
+                                           double handstrength, double effectiveStackBb) {
         String actionToReturn = action;
 
         if(board == null || board.isEmpty()) {
             if(!action.equals("raise")) {
                 if(!opponentAction.equals("raise")) {
                     if(effectiveStackBb < 13) {
-                        if(handstrength >= 0.20) {
+                        if(handstrength >= 0.45) {
                             double random = Math.random();
-                            //if(random < 0.55) {
-                            if(random < 0.55 || (botIsButton && random < 0.6)) {
+                            if(random < 0.6) {
                                 actionToReturn = "raise";
                                 System.out.println("Funky extra preflop shove!");
                                 sizing = 5000 * bigBlind;
 
                                 if(handstrength < 0.5 || random >= 0.5) {
-                                    System.out.println("yupz extra funky shove. botIsButton: " + botIsButton + " HS: " + handstrength + " random: " + random);
+                                    boolean shoveAgainstLimp = opponentAction.equals("call");
+                                    System.out.println("yupz extra funky shove. Against limp: " + shoveAgainstLimp + " HS: " + handstrength + " random: " + random);
                                 }
                             }
                         }

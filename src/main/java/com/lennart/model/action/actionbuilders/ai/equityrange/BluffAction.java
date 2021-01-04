@@ -106,7 +106,8 @@ public class BluffAction {
 
                             if(gameVariables.isBotIsButton()) {
                                 //limit = 0.307;
-                                limit = 0.2204;
+                                //limit = 0.2204;
+                                limit = 0.205;
                                 oldLimit = 0.398;
                             } else {
                                 //limit = 0.398;
@@ -118,7 +119,8 @@ public class BluffAction {
 
                             if(gameVariables.isBotIsButton()) {
                                 //limit = 0.09487;
-                                limit = 0.0641;
+                                //limit = 0.0641;
+                                limit = 0.0562;
                                 oldLimit = 0.12386;
                             } else {
                                 //limit = 0.12386;
@@ -130,7 +132,8 @@ public class BluffAction {
 
                             if(gameVariables.isBotIsButton()) {
                                 //limit = 0.37621;
-                                limit = 0.325;
+                                //limit = 0.325;
+                                limit = 0.3;
                                 oldLimit = 0.405895;
                             } else {
                                 //limit = 0.405895;
