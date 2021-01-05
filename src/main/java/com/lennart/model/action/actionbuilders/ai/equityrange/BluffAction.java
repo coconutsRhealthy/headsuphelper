@@ -120,7 +120,8 @@ public class BluffAction {
                             if(gameVariables.isBotIsButton()) {
                                 //limit = 0.09487;
                                 //limit = 0.0641;
-                                limit = 0.0562;
+                                //limit = 0.0562;
+                                limit = 0.05;
                                 oldLimit = 0.12386;
                             } else {
                                 //limit = 0.12386;
@@ -145,7 +146,7 @@ public class BluffAction {
                         }
                     } else {
                         if(postRaiseBluffable) {
-                            if(gameVariables.getBoard() != null && gameVariables.getBoard().size() == 3) {
+                            if(gameVariables.getBoard() != null && (gameVariables.getBoard().size() == 3 || gameVariables.getBoard().size() == 4)) {
                                 if(gameVariables.getOpponentBetSize() > 0.93 * gameVariables.getPot() ||
                                         gameVariables.getOpponentAction().equals("raise")) {
                                     limit = 0.6;
@@ -159,7 +160,8 @@ public class BluffAction {
                                         //limit = 0.15;
                                         //limit = 0.135;
                                         //limit = 0.0;
-                                        limit = 0.1;
+                                        //limit = 0.1;
+                                        limit = 0.25;
                                     }
                                 }
                             } else {
