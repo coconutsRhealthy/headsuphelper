@@ -18,7 +18,7 @@ public class BotActionBuilder {
     double botEquity;
     double sizing;
 
-    public String getAction(ContinuousTable continuousTable, GameVariables gameVariables, RangeConstructor rangeConstructor, boolean postRaiseBluffable) {
+    public String getAction(ContinuousTable continuousTable, GameVariables gameVariables, RangeConstructor rangeConstructor) {
         String action = null;
         Rules rules = new Rules();
 
@@ -59,8 +59,7 @@ public class BotActionBuilder {
                                 continuousTable,
                                 gameVariables,
                                 correctedSizing,
-                                equityAction.getBotEquity(),
-                                postRaiseBluffable);
+                                equityAction.getBotEquity());
                         System.out.println("bluffaction: " + action);
                     }
                 }

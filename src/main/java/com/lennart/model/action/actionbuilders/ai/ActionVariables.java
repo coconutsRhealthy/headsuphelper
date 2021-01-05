@@ -541,8 +541,7 @@ public class ActionVariables {
                 String olldStyleAction = action;
                 BotActionBuilder botActionBuilder = new BotActionBuilder();
                 String newwStyleAction = botActionBuilder.getAction(continuousTable, gameVariables,
-                        continuousTable.getRangeConstructor(), (boardInMethod.size() == 3 && (strongFdInMethod || strongOosdInMethod || strongGutshotInMethod)) ||
-                                (boardInMethod.size() == 4 && (strongFdInMethod || strongOosdInMethod)));
+                        continuousTable.getRangeConstructor());
 
                 if(olldStyleAction.equals("raise")) {
                     //always keep it raise postflop
@@ -1780,8 +1779,7 @@ public class ActionVariables {
                         Set<Card> botHolecardsAsSet = botHolecards.stream().collect(Collectors.toSet());
 
                         if(shovableHands.contains(botHolecardsAsSet)) {
-                            double random = Math.random();
-                            if(random < 0.65) {
+                            if(Math.random() < 0.5) {
                                 String variable;
 
                                 if(action.equals("raise")) {
@@ -1798,10 +1796,6 @@ public class ActionVariables {
                                 actionToReturn = "raise";
                                 sizing = 5000 * bigBlind;
                                 System.out.println("shovablehands set shove sizing: " + sizing);
-
-                                if(random >= 0.5) {
-                                    System.out.println("yupz extra shovable shove");
-                                }
                             }
                         }
                     }
@@ -1843,27 +1837,11 @@ public class ActionVariables {
             if(!action.equals("raise")) {
                 if(!opponentAction.equals("raise")) {
                     if(effectiveStackBb < 13) {
-                        boolean shoveAgainstLimp = opponentAction.equals("call");
-                        double handstrengthLimit = 0.45;
-
-                        if(!shoveAgainstLimp && effectiveStackBb <= 10 && Math.random() > 0.47) {
-                            handstrengthLimit = 0.3;
-                        }
-
-                        if(handstrength >= handstrengthLimit) {
-                            double random = Math.random();
-                            if(random < 0.6) {
+                        if(handstrength >= 0.5) {
+                            if(Math.random() < 0.5) {
                                 actionToReturn = "raise";
                                 System.out.println("Funky extra preflop shove!");
                                 sizing = 5000 * bigBlind;
-
-                                if(handstrength < 0.5 || random >= 0.5) {
-                                    System.out.println("yupz extra funky shove. Against limp: " + shoveAgainstLimp + " HS: " + handstrength + " random: " + random);
-
-                                    if(handstrength < 0.45) {
-                                        System.out.println("yupz loose extra openshove. HS: " + handstrength);
-                                    }
-                                }
                             }
                         }
                     }
