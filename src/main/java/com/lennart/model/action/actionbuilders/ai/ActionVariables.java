@@ -16,6 +16,7 @@ import equitycalc.EquityCalculator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -48,6 +49,8 @@ public class ActionVariables {
     private int numberOfScoresAbove80;
 
     private double botEquity;
+
+    Map<String, String> oppPreGroupMap = null;
 
     public ActionVariables() {
         //default constructor
@@ -185,10 +188,20 @@ public class ActionVariables {
         boolean defaultCheck = false;
 
         if(preflop) {
-            action = new PreflopActionBuilder().getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName(), numberOfHandsIsBluffable(numberOfHands));
+            PreflopActionBuilder pfActionBuilder = new PreflopActionBuilder();
+            action = pfActionBuilder.getAction(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getOpponentStack(), gameVariables.getBigBlind(), gameVariables.getBotHoleCards(), gameVariables.isBotIsButton(), continuousTable, amountToCallBb, gameVariables.getOpponentName(), numberOfHandsIsBluffable(numberOfHands), effectiveStack);
+            oppPreGroupMap = pfActionBuilder.getOppPreGroupMapClassVariable();
 
             if(action.equals("raise")) {
                 sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+            }
+
+            if(action.equals("raise") && !botIsButtonInMethod && gameVariables.getOpponentAction().equals("raise") && gameVariables.getBotBetSize() == gameVariables.getBigBlind()) {
+                if(effectiveStack > 12) {
+                    System.out.println("deepz pre 3bet. HS: " + botHandStrengthInMethod);
+                } else {
+                    System.out.println("shallow pre 3bet. HS: " + botHandStrengthInMethod);
+                }
             }
         } else {
             //hier de equity logic
@@ -515,17 +528,53 @@ public class ActionVariables {
                         //nothing, keep nash raise shove
                         System.out.println("raise > nashraise");
                     } else {
-                        if(botHandStrength > 0.55) {
-                            if(Math.random() > 0.42) {
-                                //nothing, strong hand so keep pf raise
-                                System.out.println("keep pf raise, strong hand");
+                        String oppPre3betGroup = "initial";
+                        String oppPre4betGroup = "initial";
+
+                        if(oppPreGroupMap != null && oppPreGroupMap.get("pre3betGroup") != null && oppPreGroupMap.get("pre4bet_up_group") != null) {
+                            oppPre3betGroup = oppPreGroupMap.get("pre3betGroup");
+                            oppPre4betGroup = oppPreGroupMap.get("pre4bet_up_group");
+                        }
+
+                        if(false && effectiveStack > 12 && !oppPre3betGroup.equals("high") && !oppPre4betGroup.equals("high")) {
+                            if(botHandStrength > 0.55) {
+                                //if(Math.random() > 0.25) {
+                                if(Math.random() > 0.38) {
+                                    System.out.println("deep raise pf strong hand. HS: " + botHandStrength + " groups: " + oppPre3betGroup + " " + oppPre4betGroup);
+                                } else {
+                                    System.out.println("deep limp pf strong hand. HS: " + botHandStrength + " groups: " + oppPre3betGroup + " " + oppPre4betGroup);
+                                    action = "call";
+                                }
                             } else {
-                                System.out.println("raise > limp strong hand pf");
+                                //if(Math.random() > 0.50) {
+                                if(Math.random() > 0.90) {
+                                    System.out.println("deep raise pf weak hand. HS: " + botHandStrength + " groups: " + oppPre3betGroup + " " + oppPre4betGroup);
+                                } else {
+                                    System.out.println("deep limp pf weak hand. HS: " + botHandStrength + " groups: " + oppPre3betGroup + " " + oppPre4betGroup);
+                                    action = "call";
+                                }
+                            }
+                            //
+                            //if(Math.random() > 0.25) {
+                            //    System.out.println("deep raise pf. HS: " + botHandStrength);
+                            //} else {
+                            //    System.out.println("deep limp pf. HS: " + botHandStrength);
+                            //    action = "call";
+                            //}
+                            //
+                        } else {
+                            if(botHandStrength > 0.55) {
+                                if(Math.random() > 0.42) {
+                                    //nothing, strong hand so keep pf raise
+                                    System.out.println("keep pf raise, strong hand");
+                                } else {
+                                    System.out.println("raise > limp strong hand pf");
+                                    action = "call";
+                                }
+                            } else {
+                                System.out.println("raise > limp pf");
                                 action = "call";
                             }
-                        } else {
-                            System.out.println("raise > limp pf");
-                            action = "call";
                         }
                     }
                 } else {
@@ -586,7 +635,7 @@ public class ActionVariables {
 
         //oop value trap shit
         if(action.equals("bet75pct") && botHandStrength > 0.8 && !botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
-            if(Math.random() < 0.2) {
+            if(Math.random() < 0.1) {
                 action = "check";
                 System.out.println("Oop value trap yo");
             }
@@ -595,7 +644,7 @@ public class ActionVariables {
         //ip value trap shit
         if(action.equals("bet75pct") && botHandStrength > 0.8 && botIsButtonInMethod && (boardInMethod != null && !boardInMethod.isEmpty())) {
             if(boardInMethod.size() == 3 || boardInMethod.size() == 4) {
-                if(Math.random() < 0.1) {
+                if(Math.random() < 0.05) {
                     action = "check";
                     System.out.println("Ip value trap yo");
                 }
@@ -693,6 +742,20 @@ public class ActionVariables {
                     } else {
                         System.out.println("HARBOZ: draw valueraise opp, now " + action + ". harboz-gs: "
                                 + strongGutshot + ", harboz-fd: " + strongFlushDraw + ", harboz-oosd: " + strongOosd);
+                    }
+                }
+            }
+        }
+
+        if(boardInMethod == null || boardInMethod.isEmpty()) {
+            if(!botIsButtonInMethod) {
+                if(action != null && action.equals("call")) {
+                    if(effectiveStack > 12) {
+                        if(botHandStrengthInMethod < 0.5) {
+                            if(botBetsizeBb == 1) {
+                                System.out.println("pjotr extra pf call - HS: " + botHandStrengthInMethod);
+                            }
+                        }
                     }
                 }
             }

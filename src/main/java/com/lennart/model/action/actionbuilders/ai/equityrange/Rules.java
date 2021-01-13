@@ -33,7 +33,7 @@ public class Rules {
         String actionToReturn;
 
         if(currentAction.equals("bet75pct") || currentAction.equals("raise")) {
-            double valueTrapDecimal = 0.065;
+            double valueTrapDecimal = 0.045;
 
             if(Math.random() < valueTrapDecimal) {
                 String valueTrapActionToUse;

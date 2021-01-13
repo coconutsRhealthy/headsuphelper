@@ -16,6 +16,7 @@ import java.util.*;
 public class PreflopActionBuilder {
 
     private ActionBuilderUtil actionBuilderUtil;
+    Map<String, String> oppPreGroupMapClassVariable = null;
 
     public PreflopActionBuilder() {
         actionBuilderUtil = new ActionBuilderUtil();
@@ -23,7 +24,7 @@ public class PreflopActionBuilder {
 
     public String getAction(double opponentBetSize, double botBetSize, double opponentStack, double bigBlind,
                             List<Card> botHoleCards, boolean botIsButton, ContinuousTableable continuousTableable,
-                            double amountToCallBb, String opponentName, boolean noOfHandIsBluffable) throws Exception {
+                            double amountToCallBb, String opponentName, boolean noOfHandIsBluffable, double effectiveStackBb) throws Exception {
         String action;
         double bbOpponentTotalBetSize = opponentBetSize / bigBlind;
 
@@ -34,6 +35,7 @@ public class PreflopActionBuilder {
         }
 
         Map<String, String> oppPreGroupMap = new OppIdentifierPreflopStats().getOppPreGroupMap(opponentName);
+        oppPreGroupMapClassVariable = oppPreGroupMap;
 
         String oppPre2betGroup = oppPreGroupMap.get("pre2betGroup");
         String oppPre3betGroup = oppPreGroupMap.get("pre3betGroup");
@@ -53,7 +55,7 @@ public class PreflopActionBuilder {
                     action = get1betFcheck(botHoleCards);
                 }
             } else if(bbOpponentTotalBetSize > 1 && bbOpponentTotalBetSize <= 3) {
-                action = get1betF2bet(botHoleCards, continuousTableable, oppPre2betGroup, noOfHandIsBluffable, botIsButton, bbOpponentTotalBetSize);
+                action = get1betF2bet(botHoleCards, continuousTableable, oppPre2betGroup, noOfHandIsBluffable, botIsButton, bbOpponentTotalBetSize, effectiveStackBb);
             } else if(bbOpponentTotalBetSize > 3 && bbOpponentTotalBetSize <= 10) {
                 action = get2betF3bet(botHoleCards, continuousTableable, oppPre3betGroup);
             } else if(bbOpponentTotalBetSize > 10 && bbOpponentTotalBetSize <= 25) {
@@ -70,20 +72,38 @@ public class PreflopActionBuilder {
         return action;
     }
 
-    private List<List<Card>> getPre3betPoule(String oppPre2betGroup, boolean noOfHandIsBluffable) {
+    private List<List<Card>> getPre3betPoule(String oppPre2betGroup, boolean noOfHandIsBluffable, double effectiveStackBb) {
         List<List<Card>> pre3betPoule = new ArrayList<>();
 
         Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         double limit;
 
-        if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
-            limit = 0.9;
-        } else {
-            if(noOfHandIsBluffable) {
-                limit = 0.75;
-            } else {
+        //if(effectiveStackBb > 12) {
+        if(effectiveStackBb > -1) {
+            if(oppPre2betGroup.equals("low")) {
                 limit = 0.9;
+            } else {
+                double random = Math.random();
+
+                //if(random < 0.10) {
+                if(random < 0.41) {
+                    limit = 0.5;
+                } else if(random < 0.67) {
+                    limit = 0.75;
+                } else {
+                    limit = 0.9;
+                }
+            }
+        } else {
+            if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
+                limit = 0.9;
+            } else {
+                if(noOfHandIsBluffable) {
+                    limit = 0.75;
+                } else {
+                    limit = 0.9;
+                }
             }
         }
 
@@ -173,19 +193,28 @@ public class PreflopActionBuilder {
         return pre4or5betpoule;
     }
 
-    private List<List<Card>> getPreCall2betPoule(List<List<Card>> pre3betPoule, String oppPre2betGroup) {
+    private List<List<Card>> getPreCall2betPoule(List<List<Card>> pre3betPoule, String oppPre2betGroup, double effectiveStackBb) {
         List<List<Card>> preCall2betPoule = new ArrayList<>();
 
         Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         double limit;
 
-        if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
-            limit = 0.65;
-        } else if(oppPre2betGroup.equals("facingLimp")) {
-            limit = 0.5;
+        //if(effectiveStackBb > 12) {
+        if(effectiveStackBb > -1) {
+            if(oppPre2betGroup.equals("low")) {
+                limit = 0.4;
+            } else {
+                limit = 0.25;
+            }
         } else {
-            limit = 0.5;
+            if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
+                limit = 0.65;
+            } else if(oppPre2betGroup.equals("facingLimp")) {
+                limit = 0.5;
+            } else {
+                limit = 0.5;
+            }
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
@@ -538,15 +567,15 @@ public class PreflopActionBuilder {
     }
 
     private String get1betF2bet(List<Card> botHoleCards, ContinuousTableable continuousTableable, String oppPre2betGroup, boolean noOfHandIsBluffable,
-                                boolean position, double oppBetsizeBb) {
+                                boolean position, double oppBetsizeBb, double effectiveStackBb) {
         String actionToReturn;
 
         List<Card> botHoleCardsReverseOrder = new ArrayList<>();
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule = getPre3betPoule(oppPre2betGroup, noOfHandIsBluffable);
-        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, oppPre2betGroup);
+        List<List<Card>> pre3betPoule = getPre3betPoule(oppPre2betGroup, noOfHandIsBluffable, effectiveStackBb);
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, oppPre2betGroup, effectiveStackBb);
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
             continuousTableable.setPre3betOrPostRaisedPot(true);
@@ -572,8 +601,8 @@ public class PreflopActionBuilder {
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule = getPre3betPoule("high", Math.random() < 0.2);
-        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "facingLimp");
+        List<List<Card>> pre3betPoule = getPre3betPoule("high", Math.random() < 0.2, -3);
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "facingLimp", -3);
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)
                 || preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {
@@ -614,5 +643,9 @@ public class PreflopActionBuilder {
         } else {
             return "fold";
         }
+    }
+
+    public Map<String, String> getOppPreGroupMapClassVariable() {
+        return oppPreGroupMapClassVariable;
     }
 }
