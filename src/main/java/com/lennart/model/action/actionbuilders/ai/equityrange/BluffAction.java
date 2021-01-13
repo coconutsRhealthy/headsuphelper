@@ -102,21 +102,15 @@ public class BluffAction {
                         if(gameVariables.getBoard().size() == 3) {
                             //limit = 0.43;
                             //mag worden: 0.398
-                            //limit = 0.398;
-                            //limit = 0.205;
-                            limit = 0.2204;
+                            limit = 0.398;
                         } else if(gameVariables.getBoard().size() == 4) {
                             //limit = 0.2;
                             //mag worden: 0.12386
-                            //limit =  0.12386;
-                            //limit = 0.0562;
-                            limit = 0.0641;
+                            limit =  0.12386;
                         } else if(gameVariables.getBoard().size() == 5) {
                             //limit = 0.43;
                             //mag worden: 0.405895
-                            //limit = 0.405895;
-                            //limit = 0.3;
-                            limit = 0.325;
+                            limit = 0.405895;
                         } else {
                             System.out.println("Shouldn't come here, BluffAction limit");
                             limit = 1;
