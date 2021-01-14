@@ -70,20 +70,34 @@ public class PreflopActionBuilder {
         return action;
     }
 
-    private List<List<Card>> getPre3betPoule(String oppPre2betGroup, boolean noOfHandIsBluffable) {
+    private List<List<Card>> getPre3betPoule(String oppPre2betGroup, boolean noOfHandIsBluffable, boolean fromLimpMethod) {
         List<List<Card>> pre3betPoule = new ArrayList<>();
 
         Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         double limit;
 
-        if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
-            limit = 0.9;
-        } else {
-            if(noOfHandIsBluffable) {
-                limit = 0.75;
-            } else {
+        if(fromLimpMethod) {
+            if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
                 limit = 0.9;
+            } else {
+                if(noOfHandIsBluffable) {
+                    limit = 0.75;
+                } else {
+                    limit = 0.9;
+                }
+            }
+        } else {
+            if(oppPre2betGroup.equals("low")) {
+                limit = 0.9;
+            } else {
+                double random = Math.random();
+
+                if(random < 0.75) {
+                    limit = 0.8;
+                } else {
+                    limit = 0.9;
+                }
             }
         }
 
@@ -98,7 +112,7 @@ public class PreflopActionBuilder {
                 for(Set<Card> combo : entry.getValue()) {
                     double random = Math.random();
 
-                    if(random <= 0.92) {
+                    if(random <= 0.96) {
                         List<Card> comboToAdd = new ArrayList<>();
                         comboToAdd.addAll(combo);
                         pre3betPoule.add(comboToAdd);
@@ -173,19 +187,28 @@ public class PreflopActionBuilder {
         return pre4or5betpoule;
     }
 
-    private List<List<Card>> getPreCall2betPoule(List<List<Card>> pre3betPoule, String oppPre2betGroup) {
+    private List<List<Card>> getPreCall2betPoule(List<List<Card>> pre3betPoule, String oppPre2betGroup, boolean fromLimpMethod) {
         List<List<Card>> preCall2betPoule = new ArrayList<>();
 
         Map<Double, List<Set<Card>>> allHands = new PreflopHandStength().getMapWithAllPreflopHandstrengthGroups();
 
         double limit;
 
-        if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
-            limit = 0.65;
-        } else if(oppPre2betGroup.equals("facingLimp")) {
-            limit = 0.5;
+        if(fromLimpMethod) {
+            if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
+                limit = 0.65;
+            } else if(oppPre2betGroup.equals("facingLimp")) {
+                limit = 0.5;
+            } else {
+                limit = 0.5;
+            }
         } else {
-            limit = 0.5;
+            if(oppPre2betGroup.equals("low")) {
+                limit = 0.4;
+            } else {
+                //limit = 0.25;
+                limit = 0.35;
+            }
         }
 
         for (Map.Entry<Double, List<Set<Card>>> entry : allHands.entrySet()) {
@@ -545,8 +568,8 @@ public class PreflopActionBuilder {
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule = getPre3betPoule(oppPre2betGroup, noOfHandIsBluffable);
-        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, oppPre2betGroup);
+        List<List<Card>> pre3betPoule = getPre3betPoule(oppPre2betGroup, noOfHandIsBluffable, false);
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, oppPre2betGroup, false);
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)) {
             continuousTableable.setPre3betOrPostRaisedPot(true);
@@ -572,8 +595,8 @@ public class PreflopActionBuilder {
         botHoleCardsReverseOrder.add(botHoleCards.get(1));
         botHoleCardsReverseOrder.add(botHoleCards.get(0));
 
-        List<List<Card>> pre3betPoule = getPre3betPoule("high", Math.random() < 0.2);
-        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "facingLimp");
+        List<List<Card>> pre3betPoule = getPre3betPoule("high", Math.random() < 0.2, true);
+        List<List<Card>> preCall2betPoule = getPreCall2betPoule(pre3betPoule, "facingLimp", true);
 
         if(pre3betPoule.contains(botHoleCards) || pre3betPoule.contains(botHoleCardsReverseOrder)
                 || preCall2betPoule.contains(botHoleCards) || preCall2betPoule.contains(botHoleCardsReverseOrder)) {

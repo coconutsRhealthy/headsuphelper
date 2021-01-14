@@ -617,6 +617,8 @@ public class ActionVariables {
 
         //action = moreBluffShovesPreflop(action, boardInMethod, gameVariables.getOpponentAction(), effectiveStack, botHandStrengthInMethod, gameVariables.getBigBlind());
 
+        action = preventManyPostflopBets(action, boardInMethod, botIsButtonInMethod, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+        action = preventManyPostflopRaises(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, botIsButtonInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -631,11 +633,11 @@ public class ActionVariables {
         if(gameVariables.getPot() == 2 * gameVariables.getBigBlind() && action.equals("bet75pct")) {
             //if(sizing < (0.5 * gameVariables.getPot())) {
             System.out.println("xx reset sizing to 1 bigblind");
-            sizing = gameVariables.getBigBlind() + (ThreadLocalRandom.current().nextInt(1, 3 + 1) + 0.0);
+            sizing = gameVariables.getBigBlind();
             //}
         } else if(action.equals("bet75pct")) {
             //sizing = 0.5 * gameVariables.getPot();
-            sizing = 0.35 * gameVariables.getPot();
+            sizing = 0.5 * gameVariables.getPot();
         } else if(action.equals("raise") && boardInMethod != null && !boardInMethod.isEmpty()) {
             sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
 
@@ -1422,14 +1424,18 @@ public class ActionVariables {
             if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
                 if(!gameVariables.isBotIsButton()) {
                     if(gameVariables.getOpponentAction().equals("raise")) {
-                        if(effectiveStackBb <= 15) {
+                        if(effectiveStackBb <= 50) {
                             sngSizingToReturn = 5000 * gameVariables.getBigBlind();
                             System.out.println("Change pre3bet sizing to shove in adjustRaiseSizingToSng(). P");
                         } else {
                             sngSizingToReturn = currentSizing;
                         }
                     } else {
-                        sngSizingToReturn = currentSizing;
+                        //shove versus limp!
+                        sngSizingToReturn = 5000 * gameVariables.getBigBlind();
+                        System.out.println("Change to shove versus opp limp!");
+
+                        //sngSizingToReturn = currentSizing;
                     }
                 } else {
                     if(gameVariables.getOpponentAction().equals("raise")) {
@@ -1959,6 +1965,76 @@ public class ActionVariables {
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventManyPostflopBets(String action, List<Card> board, boolean position, double handstrength, boolean strongFd, boolean strongSd) {
+        String actionToReturn = action;
+
+        if(action.equals("bet75pct")) {
+            if(board != null && !board.isEmpty()) {
+                if(position) {
+                    if(board.size() == 3) {
+                        if(handstrength < 0.7 && !strongFd && !strongSd) {
+                            if(Math.random() < 0.1) {
+                                actionToReturn = "check";
+                            }
+                        }
+                    } else if(board.size() == 4) {
+                        if(handstrength < 0.7 && !strongFd && !strongSd) {
+                            if(Math.random() < 0.39) {
+                                actionToReturn = "check";
+                            }
+                        }
+                    } else {
+                        if(handstrength < 0.7) {
+                            if(Math.random() < 0.51) {
+                                actionToReturn = "check";
+                            }
+                        }
+                    }
+                } else {
+                    if(board.size() == 3) {
+                        actionToReturn = "check";
+                    } else if(board.size() == 4) {
+                        if(handstrength < 0.8) {
+                            actionToReturn = "check";
+                        }
+                    } else {
+                        if(handstrength < 0.7) {
+                            actionToReturn = "check";
+                        }
+                    }
+                }
+            }
+        }
+
+        if(action.equals("bet75pct") && actionToReturn.equals("check")) {
+            System.out.println("prevent postbet. position: " + position + " Board size: " + board.size());
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventManyPostflopRaises(String action, double handstrength, boolean strongFlushDraw, boolean strongOosd, List<Card> board, boolean position) {
+        String actionToReturn = action;
+
+        if(action.equals("raise")) {
+            if(board != null && !board.isEmpty()) {
+                if(handstrength < 0.88 && !strongFlushDraw && !strongOosd) {
+                    actionToReturn = "call";
+                    System.out.println("prevent funky postflop raise");
+                } else {
+                    if(!(board.size() == 5 && position)) {
+                        if(Math.random() < 0.15) {
+                            actionToReturn = "call";
+                            System.out.println("prevent true value postflop raise");
                         }
                     }
                 }
