@@ -1988,13 +1988,13 @@ public class ActionVariables {
                         }
                     } else if(board.size() == 4) {
                         if(handstrength < 0.7 && !strongFd && !strongSd) {
-                            if(Math.random() < 0.39) {
+                            if(Math.random() < 0.48) {
                                 actionToReturn = "check";
                             }
                         }
                     } else {
                         if(handstrength < 0.7) {
-                            if(Math.random() < 0.51) {
+                            if(Math.random() < 0.76) {
                                 actionToReturn = "check";
                             }
                         }
@@ -2003,12 +2003,14 @@ public class ActionVariables {
                     if(board.size() == 3) {
                         actionToReturn = "check";
                     } else if(board.size() == 4) {
-                        if(handstrength < 0.8) {
+                        if(handstrength < 0.7) {
                             actionToReturn = "check";
                         }
                     } else {
                         if(handstrength < 0.7) {
-                            actionToReturn = "check";
+                            if(Math.random() < 0.65) {
+                                actionToReturn = "check";
+                            }
                         }
                     }
                 }

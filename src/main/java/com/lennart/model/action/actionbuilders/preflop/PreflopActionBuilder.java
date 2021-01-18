@@ -93,8 +93,8 @@ public class PreflopActionBuilder {
             } else {
                 double random = Math.random();
 
-                if(random < 0.75) {
-                    limit = 0.8;
+                if(random < 0.8) {
+                    limit = 0.75;
                 } else {
                     limit = 0.9;
                 }
@@ -198,16 +198,15 @@ public class PreflopActionBuilder {
             if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
                 limit = 0.65;
             } else if(oppPre2betGroup.equals("facingLimp")) {
-                limit = 0.5;
+                limit = 0.6;
             } else {
                 limit = 0.5;
             }
         } else {
             if(oppPre2betGroup.equals("low")) {
-                limit = 0.4;
+                limit = 0.6;
             } else {
-                //limit = 0.25;
-                limit = 0.35;
+                limit = 0.45;
             }
         }
 
