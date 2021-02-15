@@ -303,7 +303,8 @@ public class StarsTableReader {
             clickTopSngInList();
             TimeUnit.MILLISECONDS.sleep(250);
             System.out.println("registering new sng");
-            MouseKeyboard.click(782, 566);
+            //MouseKeyboard.click(782, 566);
+            MouseKeyboard.click(787, 631);
 
             TimeUnit.MILLISECONDS.sleep(1050);
 

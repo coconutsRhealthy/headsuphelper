@@ -55,7 +55,16 @@ public class EquityCalculator implements SimulationNotifiable {
     public double getAverageRangeEquity(List<List<com.lennart.model.card.Card>> range,
                                         List<com.lennart.model.card.Card> board) {
         fillRangeMap(range, board);
-        List<Double> values = equities.values().stream().collect(Collectors.toList());
+        List<Double> values;
+
+        try {
+            values = equities.values().stream().collect(Collectors.toList());
+        } catch (Exception e) {
+            System.out.println("getAverageRangeEquity() error / exception!");
+            e.printStackTrace();
+            double zeroDummyValue = 0.0;
+            values = Arrays.asList(zeroDummyValue);
+        }
 
         double total = 0;
         double counter = 0;

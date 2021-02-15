@@ -617,7 +617,12 @@ public class ActionVariables {
 
         //action = moreBluffShovesPreflop(action, boardInMethod, gameVariables.getOpponentAction(), effectiveStack, botHandStrengthInMethod, gameVariables.getBigBlind());
 
-        action = preventManyPostflopBets(action, boardInMethod, botIsButtonInMethod, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+        if(boardInMethod != null && !boardInMethod.isEmpty()) {
+            if((boardInMethod.size() == 3 && botIsButtonInMethod) || boardInMethod.size() == 4 || boardInMethod.size() == 5) {
+                action = preventManyPostflopBets(action, boardInMethod, botIsButtonInMethod, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+            }
+        }
+
         action = preventManyPostflopRaises(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, botIsButtonInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
@@ -637,7 +642,11 @@ public class ActionVariables {
             //}
         } else if(action.equals("bet75pct")) {
             //sizing = 0.5 * gameVariables.getPot();
-            sizing = 0.5 * gameVariables.getPot();
+            if(boardInMethod != null && !boardInMethod.isEmpty() && boardInMethod.size() == 3 && !botIsButtonInMethod) {
+                sizing = 0.35 * gameVariables.getPot();
+            } else {
+                sizing = 0.5 * gameVariables.getPot();
+            }
         } else if(action.equals("raise") && boardInMethod != null && !boardInMethod.isEmpty()) {
             sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
 
@@ -1424,18 +1433,14 @@ public class ActionVariables {
             if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
                 if(!gameVariables.isBotIsButton()) {
                     if(gameVariables.getOpponentAction().equals("raise")) {
-                        if(effectiveStackBb <= 50) {
+                        if(effectiveStackBb <= 65) {
                             sngSizingToReturn = 5000 * gameVariables.getBigBlind();
                             System.out.println("Change pre3bet sizing to shove in adjustRaiseSizingToSng(). P");
                         } else {
                             sngSizingToReturn = currentSizing;
                         }
                     } else {
-                        //shove versus limp!
-                        sngSizingToReturn = 5000 * gameVariables.getBigBlind();
-                        System.out.println("Change to shove versus opp limp!");
-
-                        //sngSizingToReturn = currentSizing;
+                        sngSizingToReturn = currentSizing;
                     }
                 } else {
                     if(gameVariables.getOpponentAction().equals("raise")) {
@@ -2029,16 +2034,17 @@ public class ActionVariables {
 
         if(action.equals("raise")) {
             if(board != null && !board.isEmpty()) {
-                if(handstrength < 0.88 && !strongFlushDraw && !strongOosd) {
-                    actionToReturn = "call";
-                    System.out.println("prevent funky postflop raise");
+                double limit;
+
+                if(board.size() == 3 && !position) {
+                    limit = 0.792;
                 } else {
-                    if(!(board.size() == 5 && position)) {
-                        if(Math.random() < 0.15) {
-                            actionToReturn = "call";
-                            System.out.println("prevent true value postflop raise");
-                        }
-                    }
+                    limit = 0.88;
+                }
+
+                if(handstrength < limit && !strongFlushDraw && !strongOosd) {
+                    actionToReturn = "call";
+                    System.out.println("prevent funky postflop raise. Board size: " + board.size() + " Position: " + position);
                 }
             }
         }
