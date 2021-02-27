@@ -308,12 +308,12 @@ public class StarsTableReader {
 
             TimeUnit.MILLISECONDS.sleep(1050);
 
-            BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(428, 354, 1, 1);
+            BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(412, 350, 1, 1);
             int pixelRgb = bufferedImage.getRGB(0, 0);
 
-            if(pixelRgb / 100 == -156_429 ) {
-                System.out.println("registration was already closed. Click OK and call method again");
-                MouseKeyboard.click(494, 408);
+            if(pixelRgb / 100 == -2_697_514 ) {
+                System.out.println("lezker registration was already closed. Click OK and call method again");
+                MouseKeyboard.click(527, 431);
 
                 TimeUnit.MILLISECONDS.sleep(200);
                 registerNewSng();
@@ -509,7 +509,7 @@ public class StarsTableReader {
     private static void clickCallActionButton() throws Exception {
         if(readMiddleActionButton().toLowerCase().contains("call")) {
             MouseKeyboard.click(1009, 752);
-            TimeUnit.MILLISECONDS.sleep(100);
+            TimeUnit.MILLISECONDS.sleep(350);
 
             if(readMiddleActionButton().toLowerCase().contains("call")) {
                 MouseKeyboard.click(1009, 752);
