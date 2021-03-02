@@ -1,7 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
+import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -104,9 +104,9 @@ public class DbSavePersisterRawData {
         boolean botWonHand = false;
 
         if(lastHand == null) {
-            HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-            List<String> total = handHistoryReaderStars.readTextFile();
-            lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+            HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+            List<String> total = handHistoryReaderParty.readTextFile();
+            lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
         }
 
         Collections.reverse(lastHand);
@@ -128,9 +128,9 @@ public class DbSavePersisterRawData {
             System.out.println("showDownOccured true, we are logging opp holecards :)");
 
             if(lastHand == null) {
-                HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-                List<String> total = handHistoryReaderStars.readTextFile();
-                lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+                HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+                List<String> total = handHistoryReaderParty.readTextFile();
+                lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
             }
 
             Collections.reverse(lastHand);
@@ -170,9 +170,9 @@ public class DbSavePersisterRawData {
         boolean showdownOccurred = false;
 
         if(lastHand == null) {
-            HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-            List<String> total = handHistoryReaderStars.readTextFile();
-            lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+            HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+            List<String> total = handHistoryReaderParty.readTextFile();
+            lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
         }
 
         Collections.reverse(lastHand);

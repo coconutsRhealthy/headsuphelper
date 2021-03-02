@@ -8,7 +8,7 @@ import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifi
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
-import com.lennart.model.imageprocessing.sites.stars.StarsTableReader;
+import com.lennart.model.imageprocessing.sites.party.PartyTableReader;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -80,12 +80,12 @@ public class ContinuousTable implements ContinuousTableable {
                 doSngContinuousLogic(startTime);
             }
 
-            if(StarsTableReader.botIsToAct()) {
+            if(PartyTableReader.botIsToAct()) {
                 long botActStarttime = new Date().getTime();
 
                 numberOfActionRequests++;
 
-                boolean isNewHand = isNewHand();
+                boolean isNewHand = isNewHandStars();
 
                 if(isNewHand) {
                     oppRange = null;
@@ -96,7 +96,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
-                        bigBlind = new StarsTableReader().readBigBlindFromSngScreen();
+                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen();
 
                         if(bigBlind < 0) {
                             System.out.println("Error in reading bb. Set it to previous value: " + previousBigBlind);
@@ -195,7 +195,7 @@ public class ContinuousTable implements ContinuousTableable {
                     allHandStrenghts.add(actionVariables.getBotHandStrength());
                 }
 
-                StarsTableReader.performActionOnSite(action, sizing, gameVariables.getBoard());
+                PartyTableReader.performActionOnSite(action, sizing, gameVariables.getBoard());
 
                 long botActEndtime = new Date().getTime();
                 long botActDuration = botActEndtime - botActStarttime;
@@ -210,7 +210,7 @@ public class ContinuousTable implements ContinuousTableable {
                 printDotTotal++;
 
                 if(printDotTotal == 30) {
-                    StarsTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                    PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
 
                     MouseKeyboard.moveMouseToLocation(1565, 909);
                     TimeUnit.MILLISECONDS.sleep(300);
@@ -222,9 +222,8 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println();
                 }
 
-                if(StarsTableReader.botIsSittingOut()) {
+                if(PartyTableReader.botIsSittingOut()) {
                     botSittingOutCounter++;
-                    StarsTableReader.closeAbnAmroUpdateScreenIfNecessary();
 
                     if(botSittingOutCounter >= 15) {
                         System.out.println("too many bot sitting outs. Something wrong. Quit program.");
@@ -233,7 +232,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     System.out.println("bot is SittingOut!");
                     TimeUnit.MILLISECONDS.sleep(300);
-                    StarsTableReader.endBotIsSittingOut();
+                    PartyTableReader.endBotIsSittingOut();
                     TimeUnit.MILLISECONDS.sleep(500);
                 }
             }
@@ -241,7 +240,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
-        StarsTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
+        PartyTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
 
         String opponentStack = String.valueOf(gameVariables.getOpponentStack());
         String opponentBetSize = String.valueOf(gameVariables.getOpponentBetSize());
@@ -326,22 +325,22 @@ public class ContinuousTable implements ContinuousTableable {
         return cardListAsString;
     }
 
-    private boolean isNewHand() throws Exception {
+    private boolean isNewHandStars() throws Exception {
         boolean isNewHand;
 
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
-        double bigBlindInMethod = handHistoryReaderStars.getBigBlindFromLastHandHh(lastHandNonRecursive);
+        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+        List<String> total = handHistoryReaderParty.readTextFile();
+        List<String> lastHandNonRecursive = handHistoryReaderParty.getLinesOfLastGameNonRecursive(total);
+        double bigBlindInMethod = handHistoryReaderParty.getBigBlindFromLastHandHh(lastHandNonRecursive);
 
         System.out.println("Bb from HH: " + bigBlindInMethod);
 
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlindInMethod);
+        List<String> lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlindInMethod);
 
         String lastHandNumber;
 
         if(!lastHand.isEmpty()) {
-            lastHandNumber = handHistoryReaderStars.getHandNumber(lastHand.get(0));
+            lastHandNumber = handHistoryReaderParty.getHandNumber(lastHand.get(0));
         } else {
             System.out.println("lasthand was empty in isNewHand()");
             lastHandNumber = "-2";
@@ -367,6 +366,10 @@ public class ContinuousTable implements ContinuousTableable {
         return isNewHand;
     }
 
+    private boolean isNewHandParty() {
+        return false;
+    }
+
     private void printBigPotValue(String line) {
         try {
             String potPartOfLine = line.substring(line.indexOf("pot") + 4);
@@ -384,24 +387,6 @@ public class ContinuousTable implements ContinuousTableable {
             System.out.println("Pot value printing error");
             e.printStackTrace();
         }
-    }
-
-    private boolean wasBluffSuccessful(double bigBlind) throws Exception {
-        boolean bluffSuccessful = false;
-
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("folds") && !line.contains("vegeta11223")) {
-                bluffSuccessful = true;
-                break;
-            }
-        }
-
-        return bluffSuccessful;
     }
 
     private boolean botWasButtonInLastHand() {
@@ -423,7 +408,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doSngContinuousLogic(long startTime) throws Exception {
-        if(isSngFinishedCheckNeeded() && StarsTableReader.sngIsFinished()) {
+        if(isSngFinishedCheckNeeded() && PartyTableReader.sngIsFinished()) {
             long currentTime = new Date().getTime();
 
             if(currentTime - startTime > 13_920_000) {
@@ -433,23 +418,21 @@ public class ContinuousTable implements ContinuousTableable {
 
             System.out.println("SNG is finished, staring new game");
 
-            HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-            List<String> total = handHistoryReaderStars.readTextFile();
-            List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
-            starsHandNumberOfLastFinishedSng = handHistoryReaderStars.getHandNumber(lastHandNonRecursive.get(0));
+            HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+            List<String> total = handHistoryReaderParty.readTextFile();
+            List<String> lastHandNonRecursive = handHistoryReaderParty.getLinesOfLastGameNonRecursive(total);
+            starsHandNumberOfLastFinishedSng = handHistoryReaderParty.getHandNumber(lastHandNonRecursive.get(0));
 
             TimeUnit.SECONDS.sleep(14);
 
-            StarsTableReader starsTableReader = new StarsTableReader();
+            PartyTableReader partyTableReader = new PartyTableReader();
 
             TimeUnit.MILLISECONDS.sleep(100);
-            starsTableReader.closeRematchScreen();
-            TimeUnit.MILLISECONDS.sleep(500);
-            starsTableReader.closeSpinOfTheDayScreenIfNecessary();
+            partyTableReader.closeRematchScreen();
             TimeUnit.MILLISECONDS.sleep(1200);
-            starsTableReader.clickTopSngInList();
+            partyTableReader.clickTopSngInList();
             TimeUnit.MILLISECONDS.sleep(100);
-            starsTableReader.registerNewSng();
+            partyTableReader.registerNewSng();
 
             int counter = 0;
             int counter2 = 0;
@@ -459,10 +442,10 @@ public class ContinuousTable implements ContinuousTableable {
 
             while(newTableNotYetOpened) {
                 if(counter % 5 == 0) {
-                    if(StarsTableReader.botIsSittingOut()) {
+                    if(PartyTableReader.botIsSittingOut()) {
                         System.out.println("Weird bot sitting out! sitting back in...");
                         TimeUnit.MILLISECONDS.sleep(300);
-                        StarsTableReader.endBotIsSittingOut();
+                        PartyTableReader.endBotIsSittingOut();
                         TimeUnit.MILLISECONDS.sleep(500);
                         weirdBotSittingOut = true;
                         break;
@@ -474,7 +457,7 @@ public class ContinuousTable implements ContinuousTableable {
                     MouseKeyboard.click(7, 100);
                     System.out.println();
                     counter = 0;
-                    StarsTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                    PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
                 }
 
                 System.out.println(",");
@@ -501,13 +484,13 @@ public class ContinuousTable implements ContinuousTableable {
 
                 if(counter2 >= 1350) {
                     System.out.println("Something is wrong in registering sng part, close session.");
-                    StarsTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                    PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
                     throw new RuntimeException();
                 }
 
                 TimeUnit.MILLISECONDS.sleep(1100);
 
-                if(starsTableReader.newSngTableIsOpened()) {
+                if(partyTableReader.newSngTableIsOpened()) {
                     newTableNotYetOpened = false;
                     System.out.println("New sng table is opened b");
                 } else {
@@ -519,7 +502,7 @@ public class ContinuousTable implements ContinuousTableable {
 
             if(!weirdBotSittingOut) {
                 TimeUnit.MILLISECONDS.sleep(100);
-                starsTableReader.maximizeNewSngTable();
+                partyTableReader.maximizeNewSngTable();
 
                 TimeUnit.SECONDS.sleep(6);
             }
@@ -533,10 +516,10 @@ public class ContinuousTable implements ContinuousTableable {
             initialFillOfStarsHandNumberOfLastFinishedSng();
         }
 
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
-        String lastHandNumberInHandhistory = handHistoryReaderStars.getHandNumber(lastHandNonRecursive.get(0));
+        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+        List<String> total = handHistoryReaderParty.readTextFile();
+        List<String> lastHandNonRecursive = handHistoryReaderParty.getLinesOfLastGameNonRecursive(total);
+        String lastHandNumberInHandhistory = handHistoryReaderParty.getHandNumber(lastHandNonRecursive.get(0));
 
         if(!starsHandNumberOfLastFinishedSng.equals(lastHandNumberInHandhistory)) {
             sngFinishedCheckNeeded = true;
@@ -546,15 +529,15 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void initialFillOfStarsHandNumberOfLastFinishedSng() throws Exception {
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHandNonRecursive = handHistoryReaderStars.getLinesOfLastGameNonRecursive(total);
-        starsHandNumberOfLastFinishedSng = handHistoryReaderStars.getHandNumber(lastHandNonRecursive.get(0));
+        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+        List<String> total = handHistoryReaderParty.readTextFile();
+        List<String> lastHandNonRecursive = handHistoryReaderParty.getLinesOfLastGameNonRecursive(total);
+        starsHandNumberOfLastFinishedSng = handHistoryReaderParty.getHandNumber(lastHandNonRecursive.get(0));
     }
 
     private void doSngStartSessionLogic() throws Exception {
-        StarsTableReader starsTableReader = new StarsTableReader();
-        starsTableReader.registerNewSng();
+        PartyTableReader partyTableReader = new PartyTableReader();
+        partyTableReader.registerNewSng();
 
         int counter = 0;
 
@@ -571,7 +554,7 @@ public class ContinuousTable implements ContinuousTableable {
 
             TimeUnit.MILLISECONDS.sleep(1100);
 
-            if(starsTableReader.newSngTableIsOpened()) {
+            if(partyTableReader.newSngTableIsOpened()) {
                 newTableNotYetOpened = false;
                 System.out.println("New sng table is opened b");
             } else {
@@ -581,7 +564,7 @@ public class ContinuousTable implements ContinuousTableable {
         }
 
         TimeUnit.MILLISECONDS.sleep(100);
-        starsTableReader.maximizeNewSngTable();
+        partyTableReader.maximizeNewSngTable();
 
         TimeUnit.SECONDS.sleep(6);
     }

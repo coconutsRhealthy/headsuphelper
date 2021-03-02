@@ -1,7 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
+import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
 
 import java.sql.*;
 import java.util.Collections;
@@ -211,9 +211,9 @@ public class DbSavePersister {
     public boolean actionWasSuccessfull(double bigBlind) throws Exception {
         boolean botWonHand = false;
 
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> total = handHistoryReaderStars.readTextFile();
-        List<String> lastHand = handHistoryReaderStars.getLinesOfLastGame(total, 1, bigBlind);
+        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+        List<String> total = handHistoryReaderParty.readTextFile();
+        List<String> lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
         Collections.reverse(lastHand);
 
         for(String line : lastHand) {

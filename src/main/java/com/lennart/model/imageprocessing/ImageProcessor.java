@@ -62,6 +62,13 @@ public class ImageProcessor {
         return screenCapture;
     }
 
+    public static BufferedImage getBufferedImageScreenShotCoordinates(int xLeftTop, int yLeftTop, int xRightBottom, int yRightBottom) {
+        int width = xRightBottom - xLeftTop;
+        int heigth = yRightBottom - yLeftTop;
+
+        return getBufferedImageScreenShot(xLeftTop, yLeftTop, width, heigth);
+    }
+
     public static String getStringFromBufferedImageWithTesseract(BufferedImage bufferedImage) {
         BytePointer outText;
 

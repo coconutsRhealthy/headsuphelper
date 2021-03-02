@@ -1,6 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0;
 
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
+import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
 
 import java.sql.*;
 import java.util.*;
@@ -503,15 +503,15 @@ public class OpponentIdentifier2_0 {
     }
 
     public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, double bigBlind, boolean botWasButton) throws Exception {
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
+        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
 
-        List<String> opponentPreflopActions = handHistoryReaderStars.getOpponentActionsOfLastHand(false, bigBlind);
+        List<String> opponentPreflopActions = handHistoryReaderParty.getOpponentActionsOfLastHand(false, bigBlind);
 
         for(String action : opponentPreflopActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_preflop", botWasButton);
         }
 
-        List<String> opponentPostflopActions = handHistoryReaderStars.getOpponentActionsOfLastHand(true, bigBlind);
+        List<String> opponentPostflopActions = handHistoryReaderParty.getOpponentActionsOfLastHand(true, bigBlind);
 
         for(String action : opponentPostflopActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_postflop", botWasButton);

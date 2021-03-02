@@ -1,6 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderStars;
+import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 
 import java.sql.*;
@@ -230,8 +230,8 @@ public class OpponentIdentifier {
     }
 
     public void updateCountsFromHandhistoryDbLogic(String opponentPlayerNameOfLastHand, double bigBlind) throws Exception {
-        HandHistoryReaderStars handHistoryReaderStars = new HandHistoryReaderStars();
-        List<String> opponentActions = handHistoryReaderStars.getOpponentActionsOfLastHand(opponentPlayerNameOfLastHand, bigBlind);
+        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+        List<String> opponentActions = handHistoryReaderParty.getOpponentActionsOfLastHand(opponentPlayerNameOfLastHand, bigBlind);
         updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
 
         for(String action : opponentActions) {
