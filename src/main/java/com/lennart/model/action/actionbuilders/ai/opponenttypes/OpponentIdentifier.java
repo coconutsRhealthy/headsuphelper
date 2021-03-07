@@ -1,7 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes;
 
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
+import com.lennart.model.handtracker.ActionRequest;
+import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -229,9 +230,21 @@ public class OpponentIdentifier {
         closeDbConnection();
     }
 
-    public void updateCountsFromHandhistoryDbLogic(String opponentPlayerNameOfLastHand, double bigBlind) throws Exception {
-        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
-        List<String> opponentActions = handHistoryReaderParty.getOpponentActionsOfLastHand(opponentPlayerNameOfLastHand, bigBlind);
+    public void updateCountsFromHandhistoryDbLogic(String opponentPlayerNameOfLastHand, List<ActionRequest> allActionRequestsOfHand) throws Exception {
+        List<String> opponentActions = new ArrayList<>();
+
+        for(ActionRequest actionRequest : allActionRequestsOfHand) {
+            List<PlayerActionRound> actionsSinceLastRequest = actionRequest.getActionsSinceLastRequest();
+
+            for(PlayerActionRound playerActionRound : actionsSinceLastRequest) {
+                if(playerActionRound.getPlayerName().equals("opponent")) {
+                    if(playerActionRound.getBoard() != null && !playerActionRound.getBoard().isEmpty()) {
+                        opponentActions.add(playerActionRound.getAction());
+                    }
+                }
+            }
+        }
+
         updateNumberOfHandsPerOpponentMapInDb(opponentPlayerNameOfLastHand);
 
         for(String action : opponentActions) {

@@ -1,14 +1,11 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
 
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by LennartMac on 13/01/2019.
@@ -16,9 +13,8 @@ import java.util.stream.Collectors;
 public class DbSavePersisterRawData {
 
     private Connection con;
-    List<String> lastHand = null;
 
-    public void doBigDbSaveUpdate(ContinuousTable continuousTable, double biglind) throws Exception {
+    public void doBigDbSaveUpdate(ContinuousTable continuousTable) throws Exception {
         List<DbSave> dbSaveList = continuousTable.getDbSaveList();
 
         initializeDbConnection();
@@ -33,7 +29,7 @@ public class DbSavePersisterRawData {
 
                 DbSaveRaw dbSaveRaw = (DbSaveRaw) dbSave;
 
-                String showdownOccured = showdownOccurred(biglind);
+                String showdownOccured = showdownOccurred();
 
                 if(continuousTable.isBotDidPre4bet() && showdownOccured.equals("true")) {
                     updateOppDidPreCall4betInDb(dbSaveRaw.getOpponentName());
@@ -84,12 +80,12 @@ public class DbSavePersisterRawData {
                     dbSaveRaw.getOpponentName() + "', '" +
                     dbSaveRaw.getOpponentData() + "', '" +
                     showdownOccured + "', '" +
-                    botWonHand(biglind) + "', '" +
+                    botWonHand() + "', '" +
                     dbSaveRaw.getBigBlind() + "', '" +
                     dbSaveRaw.getStrongDraw() + "', '" +
                     dbSaveRaw.getRecentHandsWon() + "', '" +
                     dbSaveRaw.getAdjustedOppType() + "', '" +
-                    getOpponentHolecards(showdownOccured, biglind) + "', '" +
+                    getOpponentHolecards() + "', '" +
                     dbSaveRaw.getPot() + "', '" +
                     dbSaveRaw.getEquity() + "'" +
                     ")");
@@ -100,91 +96,19 @@ public class DbSavePersisterRawData {
         closeDbConnection();
     }
 
-    private String botWonHand(double bigBlind) throws Exception {
-        boolean botWonHand = false;
-
-        if(lastHand == null) {
-            HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
-            List<String> total = handHistoryReaderParty.readTextFile();
-            lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
-        }
-
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("vegeta11223 collected")) {
-                botWonHand = true;
-                break;
-            }
-        }
-
-        return String.valueOf(botWonHand);
+    private String botWonHand() throws Exception {
+        //Default false on Party
+        return "false";
     }
 
-    private String getOpponentHolecards(String showDownOccured, double bigBlind) throws Exception {
-        String opponentHolecards = "";
-
-        if(showDownOccured.equals("true")) {
-            System.out.println("showDownOccured true, we are logging opp holecards :)");
-
-            if(lastHand == null) {
-                HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
-                List<String> total = handHistoryReaderParty.readTextFile();
-                lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
-            }
-
-            Collections.reverse(lastHand);
-
-            List<String> relevantLines = lastHand.stream()
-                    .filter(line -> ((line.contains("showed") || line.contains("mucked")) && !line.contains("vegeta11223")))
-                    .collect(Collectors.toList());
-
-            if(relevantLines.size() == 1) {
-                String workingString = relevantLines.get(0);
-
-                if(workingString.contains("showed")) {
-                    workingString = workingString.substring(workingString.indexOf("showed"));
-                    workingString = workingString.replace("showed", "");
-                } else {
-                    workingString = workingString.substring(workingString.indexOf("mucked"));
-                    workingString = workingString.replace("mucked", "");
-                }
-
-                workingString = workingString.substring(0, workingString.indexOf("]"));
-                workingString = workingString.replace("[", "");
-                workingString = workingString.replace("]", "");
-                workingString = workingString.replace(" ", "");
-
-                opponentHolecards = workingString;
-            } else {
-                System.out.println("wtf, relevant opp showdownlines bigger than 1? " + relevantLines.size());
-                System.out.println("line 1: " + relevantLines.get(0));
-                System.out.println("line 2: " + relevantLines.get(1));
-            }
-        }
-
-        return opponentHolecards;
+    private String getOpponentHolecards() throws Exception {
+        //Default 2d3d on Party
+        return "2d3d";
     }
 
-    private String showdownOccurred(double bigBlind) throws Exception {
-        boolean showdownOccurred = false;
-
-        if(lastHand == null) {
-            HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
-            List<String> total = handHistoryReaderParty.readTextFile();
-            lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
-        }
-
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("*** SHOW DOWN ***")) {
-                showdownOccurred = true;
-                break;
-            }
-        }
-
-        return String.valueOf(showdownOccurred);
+    private String showdownOccurred() throws Exception {
+        //Default false on Party
+        return "false";
     }
 
     private int getHighestIntEntry(String table) throws Exception {

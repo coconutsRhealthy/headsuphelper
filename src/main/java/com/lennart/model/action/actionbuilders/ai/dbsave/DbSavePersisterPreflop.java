@@ -53,7 +53,7 @@ public class DbSavePersisterPreflop {
                         dbSavePreflopRaise.getPosition() + dbSavePreflopRaise.getSizing() +
                         dbSavePreflopRaise.getFoldStatGroup() + dbSavePreflopRaise.getEffectiveStack();
 
-                if(new DbSavePersister().actionWasSuccessfull(bigBlind)) {
+                if(new DbSavePersister().actionWasSuccessfull()) {
                     st.executeUpdate("UPDATE " + raiseTable + " SET success = success + 1 WHERE route = '" + route + "'");
                     st.executeUpdate("UPDATE " + raiseTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
@@ -71,7 +71,7 @@ public class DbSavePersisterPreflop {
                         dbSavePreflopCall.getPosition() + dbSavePreflopCall.getAmountToCallBb() +
                         dbSavePreflopCall.getOppAggroGroup() + dbSavePreflopCall.getEffectiveStack();
 
-                if(new DbSavePersister().actionWasSuccessfull(bigBlind)) {
+                if(new DbSavePersister().actionWasSuccessfull()) {
                     st.executeUpdate("UPDATE " + callTable + " SET success = success + 1 WHERE route = '" + route + "'");
                     st.executeUpdate("UPDATE " + callTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }

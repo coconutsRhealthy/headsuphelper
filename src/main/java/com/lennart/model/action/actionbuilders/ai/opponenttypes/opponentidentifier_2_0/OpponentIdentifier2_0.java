@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0;
 
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
+import com.lennart.model.handtracker.ActionRequest;
+import com.lennart.model.handtracker.PlayerActionRound;
 
 import java.sql.*;
 import java.util.*;
@@ -502,16 +503,28 @@ public class OpponentIdentifier2_0 {
         return opponentData;
     }
 
-    public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, double bigBlind, boolean botWasButton) throws Exception {
-        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
+    public void updateOpponentIdentifier2_0_db(String opponentPlayerNameOfLastHand, boolean botWasButton,
+                                               List<ActionRequest> allActionRequestsOfHand) throws Exception {
+        List<String> opponentPreflopActions = new ArrayList<>();
+        List<String> opponentPostflopActions = new ArrayList<>();
 
-        List<String> opponentPreflopActions = handHistoryReaderParty.getOpponentActionsOfLastHand(false, bigBlind);
+        for(ActionRequest actionRequest : allActionRequestsOfHand) {
+            List<PlayerActionRound> actionsSinceLastRequest = actionRequest.getActionsSinceLastRequest();
+
+            for(PlayerActionRound playerActionRound : actionsSinceLastRequest) {
+                if(playerActionRound.getPlayerName().equals("opponent")) {
+                    if(playerActionRound.getBoard() != null && !playerActionRound.getBoard().isEmpty()) {
+                        opponentPostflopActions.add(playerActionRound.getAction());
+                    } else {
+                        opponentPreflopActions.add(playerActionRound.getAction());
+                    }
+                }
+            }
+        }
 
         for(String action : opponentPreflopActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_preflop", botWasButton);
         }
-
-        List<String> opponentPostflopActions = handHistoryReaderParty.getOpponentActionsOfLastHand(true, bigBlind);
 
         for(String action : opponentPostflopActions) {
             updateCountsInDb(opponentPlayerNameOfLastHand, action, "opponentidentifier_2_0_postflop", botWasButton);

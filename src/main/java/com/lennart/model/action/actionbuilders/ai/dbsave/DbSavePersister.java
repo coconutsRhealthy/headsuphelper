@@ -1,10 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai.dbsave;
 
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
-import com.lennart.model.action.actionbuilders.ai.HandHistoryReaderParty;
 
 import java.sql.*;
-import java.util.Collections;
 import java.util.List;
 
 public class DbSavePersister {
@@ -115,7 +113,7 @@ public class DbSavePersister {
                         dbSaveBluff.getFoldStatGroup() + dbSaveBluff.getStrongDraw() +
                         convertEffectiveStackToCompact(dbSaveBluff.getEffectiveStack());
 
-                if(actionWasSuccessfull(bigBlind)) {
+                if(actionWasSuccessfull()) {
                     st.executeUpdate("UPDATE " + bluffTable + " SET success = success + 1 WHERE route = '" + route + "'");
                     st.executeUpdate("UPDATE " + bluffTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
@@ -135,7 +133,7 @@ public class DbSavePersister {
                         dbSaveCall.getHandStrength() + dbSaveCall.getStrongDraw() +
                         convertEffectiveStackToCompact(dbSaveCall.getEffectiveStack());
 
-                if(actionWasSuccessfull(bigBlind)) {
+                if(actionWasSuccessfull()) {
                     st.executeUpdate("UPDATE " + callTable + " SET success = success + 1 WHERE route = '" + route + "'");
                     st.executeUpdate("UPDATE " + callTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
@@ -154,7 +152,7 @@ public class DbSavePersister {
                         convertBluffOrValueSizingToCompact(dbSaveValue.getSizingGroup()) + dbSaveValue.getOppLoosenessGroup() +
                         dbSaveValue.getHandStrength() + convertEffectiveStackToCompact(dbSaveValue.getEffectiveStack());
 
-                if(actionWasSuccessfull(bigBlind)) {
+                if(actionWasSuccessfull()) {
                     st.executeUpdate("UPDATE " + valueTable + " SET success = success + 1 WHERE route = '" + route + "'");
                     st.executeUpdate("UPDATE " + valueTableCompact + " SET success = success + 1 WHERE route = '" + routeCompact + "'");
                 }
@@ -208,22 +206,9 @@ public class DbSavePersister {
         return compactSizing;
     }
 
-    public boolean actionWasSuccessfull(double bigBlind) throws Exception {
-        boolean botWonHand = false;
-
-        HandHistoryReaderParty handHistoryReaderParty = new HandHistoryReaderParty();
-        List<String> total = handHistoryReaderParty.readTextFile();
-        List<String> lastHand = handHistoryReaderParty.getLinesOfLastGame(total, 1, bigBlind);
-        Collections.reverse(lastHand);
-
-        for(String line : lastHand) {
-            if(line.contains("vegeta11223 collected")) {
-                botWonHand = true;
-                break;
-            }
-        }
-
-        return botWonHand;
+    public boolean actionWasSuccessfull() throws Exception {
+        //default false on Party
+        return false;
     }
 
     private void initializeDbConnection() throws Exception {
