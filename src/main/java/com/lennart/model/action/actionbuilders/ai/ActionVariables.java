@@ -489,6 +489,8 @@ public class ActionVariables {
         action = preventBadPostCalls(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, facingOdds);
         action = adjustPostFoldsToAggroness(action, boardInMethod, botHandStrengthInMethod, continuousTable.getFlopHandstrength(), continuousTable.getTurnHandstrength(), opponentStackBb, botStackBb, botBetsizeBb, potSizeBb, amountToCallBb, facingOdds, gameVariables.getOpponentName());
 
+        action = preventPreRaiseIfBotStackBelow1bb(action, gameVariables.getBigBlind(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), boardInMethod);
+
         if(action.equals("bet75pct")) {
             sizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
         }
@@ -634,7 +636,7 @@ public class ActionVariables {
             }
         }
 
-        action = preventManyPostflopRaises(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, botIsButtonInMethod);
+        action = preventManyPostflopRaises(action, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, boardInMethod, botIsButtonInMethod, continuousTable, gameVariables);
 
         action = callLooseAfterLimpVersusShoveUndeep(action, effectiveStack, botIsButtonInMethod, botBetsizeBb, gameVariables.getOpponentAction(),
                 opponentStackBb, amountToCallBb, gameVariables.getBotHoleCards(), botHandStrengthInMethod, boardInMethod);
@@ -2050,7 +2052,8 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String preventManyPostflopRaises(String action, double handstrength, boolean strongFlushDraw, boolean strongOosd, List<Card> board, boolean position) {
+    private String preventManyPostflopRaises(String action, double handstrength, boolean strongFlushDraw, boolean strongOosd,
+                                             List<Card> board, boolean position, ContinuousTable continuousTable, GameVariables gameVariables) throws Exception {
         String actionToReturn = action;
 
         if(action.equals("raise")) {
@@ -2064,7 +2067,7 @@ public class ActionVariables {
                 }
 
                 if(handstrength < limit && !strongFlushDraw && !strongOosd) {
-                    actionToReturn = "call";
+                    actionToReturn = getDummyActionOppAllIn(continuousTable, gameVariables);
                     System.out.println("prevent funky postflop raise. Board size: " + board.size() + " Position: " + position);
                 }
             }
@@ -2351,6 +2354,21 @@ public class ActionVariables {
                             }
                         }
                     }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventPreRaiseIfBotStackBelow1bb(String action, double bigBlind, double botBetSize, double botStack, List<Card> board) {
+        String actionToReturn = action;
+
+        if(action.equals("raise")) {
+            if(board == null || board.isEmpty()) {
+                if(bigBlind > (botBetSize + botStack)) {
+                    System.out.println("preflop raise impossible because super low stack below 1bb, change to call");
+                    actionToReturn = "call";
                 }
             }
         }

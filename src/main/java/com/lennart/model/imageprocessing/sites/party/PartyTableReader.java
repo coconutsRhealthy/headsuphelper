@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.util.Precision;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,8 +15,31 @@ import java.util.concurrent.TimeUnit;
  */
 public class PartyTableReader {
 
-    public double getBotStackFromImage() {
+    private void testMethod() {
+        String test = "hallo " + System.lineSeparator() + "hoe is het?";
+        //System.out.println(test);
+
+        //String eije = test.substring(test.indexOf(System.lineSeparator()) + 1, test.length());
+
+        String eije = test.substring(test.indexOf("Q") + 1, test.length());
+
+        System.out.println(eije);
+    }
+
+//    public static void main(String[] args) {
+//        new PartyTableReader().testMethod();
+//    }
+
+    public double getBotStackFromImage() throws Exception {
         String botStackAsString = readTopPlayerStack();
+
+        if(botStackAsString.contains(".")) {
+            botStackAsString = botStackAsString.replace(".", "");
+        }
+
+        if(botStackAsString.contains(",")) {
+            botStackAsString = botStackAsString.replace(",", "");
+        }
 
         System.out.println("BOTSTACK: " + botStackAsString);
 
@@ -24,18 +48,34 @@ public class PartyTableReader {
         if(botStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
             botStack = Double.parseDouble(botStackAsString);
         } else {
-            botStack = -1;
+            System.out.println("BOTSTACK WRONG! It is: " + botStackAsString + "     ...try again...");
+            TimeUnit.MILLISECONDS.sleep(500);
+            return getBotStackFromImage();
         }
 
         return botStack;
     }
 
     public double getOpponentStackFromImage() throws Exception {
-        return 0;
+        String opponentStackAsString = readBottomPlayerStack();
+
+        System.out.println("OPPSTACK: " + opponentStackAsString);
+
+        if(opponentStackAsString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            return Double.parseDouble(opponentStackAsString);
+        } else {
+            return -1;
+        }
     }
 
     public double getTopPotsizeFromImage() throws Exception {
-        return 0;
+        String topPotsize = readTotalPotSize();
+
+        if(topPotsize.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            return Double.parseDouble(topPotsize);
+        } else {
+            return -1;
+        }
     }
 
     public Card getBotHoleCard1FromImage() {
@@ -114,7 +154,17 @@ public class PartyTableReader {
         return null;
     }
 
-    public static boolean botIsToAct() throws Exception {
+    public static boolean botIsToAct() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(595, 114, 1, 1);
+        int suitRgb = bufferedImage.getRGB(0, 0);
+
+        if(suitRgb / 1000 == -14_211) {
+            //expected: -14_211_289
+            System.out.println();
+            System.out.println("Bot is to act");
+            return true;
+        }
+
         return false;
     }
 
@@ -135,11 +185,23 @@ public class PartyTableReader {
     }
 
     public void clickTopSngInList() {
-
+        MouseKeyboard.click(208, 403);
     }
 
     public void registerNewSng() throws Exception {
+        clickTopSngInList();
 
+        //click register button
+        TimeUnit.MILLISECONDS.sleep(1994);
+        MouseKeyboard.click(1095, 653);
+
+        //click dollar buy-in option
+        TimeUnit.MILLISECONDS.sleep(1997);
+        MouseKeyboard.click(706, 354);
+
+        //click OK button on registration confirm pop-up
+        TimeUnit.MILLISECONDS.sleep(2002);
+        MouseKeyboard.click(734, 162);
     }
 
     private boolean noPlayerIsReggedYet() throws Exception {
@@ -147,14 +209,16 @@ public class PartyTableReader {
     }
 
     public boolean newSngTableIsOpened() throws Exception {
-        return false;
-    }
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(157, 284, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
 
-    public void maximizeNewSngTable() throws Exception {
+        if(pixelRgb / 1_000_000 == -15) {
+            //expected rgb when table opened: -15.395.563
+            //expected when not opened: -1
+            System.out.println("new sng table is opened a");
+            return true;
+        }
 
-    }
-
-    public boolean sngTableIsMaximized() {
         return false;
     }
 
@@ -219,6 +283,62 @@ public class PartyTableReader {
         MouseKeyboard.moveMouseToLocation(20, 20);
     }
 
+    public boolean isNewHand(List<Card> previousBotHoleCards, List<Card> previousBoard) {
+        boolean isNewHand;
+
+        if(previousBotHoleCards == null || previousBotHoleCards.size() < 2) {
+            isNewHand = true;
+        } else {
+            Card holeCard1 = getBotHoleCard1FromImage();
+            Card holeCard2 = getBotHoleCard2FromImage();
+
+            if(previousBotHoleCards.get(0).equals(holeCard1) && previousBotHoleCards.get(1).equals(holeCard2)) {
+                if(previousBoard == null || previousBoard.size() < 3) {
+                    //er was in de vorige actieronde nog geen flop, maar je holecards zijn hetzelfde als vorige actieronde. Je gokt dus op same hand
+                    isNewHand = false;
+                } else {
+                    Card flopCard1 = getFlopCard1FromImage();
+                    Card flopCard2 = getFlopCard2FromImage();
+                    Card flopCard3 = getFlopCard3FromImage();
+
+                    if(previousBoard.get(0).equals(flopCard1) && previousBoard.get(1).equals(flopCard2) && previousBoard.get(2).equals(flopCard3)) {
+                        //je holecards zijn hetzelfde en de flop is hetzelfde als vorige actieronde. Je kunt dus zeggen, niet een nieuwe hand!
+                        isNewHand = false;
+                    } else {
+                        //je holecards zijn hetzelfde, maar de huidige flop is anders dan de vorige flop. Bijv nu geen flop terwijl hiervoor wel. Nieuwe hand dus..
+                        isNewHand = true;
+                    }
+                }
+            } else {
+                //je holecards zijn anders dan vorige actieronde, dus nieuwe hand
+                isNewHand = true;
+            }
+        }
+
+        return isNewHand;
+
+
+
+        //to implement
+
+        //dit is zo als:
+        //je holecards anders zijn
+
+        //dit is zo als:
+        //jouw betsize een halve of een hele bigblind is...
+
+        //PartyTableReader partyTableReader = new PartyTableReader();
+
+
+
+        //if(previousBoard != null && !previousBoard.isEmpty()) {
+
+        //}
+
+
+        //return false;
+    }
+
     //helper methods
     private static void clickFoldActionButton() throws Exception {
         MouseKeyboard.click(579, 725);
@@ -238,77 +358,6 @@ public class PartyTableReader {
 
     private static void clickRaiseActionButton() throws Exception {
         MouseKeyboard.click(909, 727);
-    }
-
-    public static void main(String[] args) {
-//        System.out.println("LEFT: " + new PartyTableReader().readLeftActionButton());
-//        System.out.println("MIDDLE: " + new PartyTableReader().readMiddleActionButton());
-//        System.out.println("RIGHT: " + new PartyTableReader().readRightActionButton());
-
-        //PartyTableReader partyTableReader = new PartyTableReader();
-
-
-        //System.out.println("" + partyTableReader.readFirstHoleCardRank() + partyTableReader.readFirstHoleCardSuit() + " " + partyTableReader.readSecondHoleCardRank() + partyTableReader.readSecondHoleCardSuit());
-        //System.out.println(new PartyTableReader().readSecondHoleCardRank());
-
-        new PartyTableReader().readBigBlindFromSngScreen(false);
-    }
-
-    private void efkesTest() {
-        System.out.println(topPlayerIsButton());
-        System.out.println(getBotStackFromImage());
-
-//        Card holeCard1 = getBotHoleCard1FromImage();
-//        Card holeCard2 = getBotHoleCard2FromImage();
-//
-//        Card flopCard1 = getFlopCard1FromImage();
-//        Card flopCard2 = getFlopCard2FromImage();
-//        Card flopCard3 = getFlopCard3FromImage();
-//        Card turnCard = getTurnCardFromImage();
-//        Card riverCard = getRiverCardFromImage();
-//
-//
-//        System.out.println("holecards: " + holeCard1.getRank() + holeCard1.getSuit() + " " + holeCard2.getRank() + holeCard2.getSuit());
-//
-//        System.out.print("board: " + flopCard1.getRank() + flopCard1.getSuit() + " " + flopCard2.getRank() + flopCard2.getSuit() + " " + flopCard3.getRank() + flopCard3.getSuit());
-//
-//        if(turnCard != null) {
-//            System.out.print(" " + turnCard.getRank() + turnCard.getSuit());
-//        }
-//
-//        if(riverCard != null) {
-//            System.out.print(" " + riverCard.getRank() + riverCard.getSuit());
-//        }
-    }
-
-    private static String readLeftActionButton() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(547, 707, 682, 745);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
-    }
-
-    private static String readMiddleActionButton() {
-        //711, 699
-        //849, 754
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(711, 699, 849, 754);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
-    }
-
-    private static String readRightActionButton() {
-        //879, 700
-        //1015, 750
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(879, 700, 1015, 750);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        return ImageProcessor.removeEmptySpacesFromString(opponentPlayerName);
     }
 
     private String readFirstHoleCardRank() {
@@ -331,73 +380,6 @@ public class PartyTableReader {
         System.out.println("HC2rnk: " + secondHoleCardRank);
 
         return secondHoleCardRank;
-    }
-
-//    public static void main(String[] args) {
-//        PartyTableReader partyTableReader = new PartyTableReader();
-//
-//        System.out.println(partyTableReader.readTotalPotSize());
-//        //System.out.println(partyTableReader.getOpponentPlayerNameFromImage());
-//
-////        char suit1 = partyTableReader.readFirstFlopCardSuitFromBoard();
-////        char suit2 = partyTableReader.readSecondFlopCardSuitFromBoard();
-////        char suit3 = partyTableReader.readThirdFlopCardSuitFromBoard();
-////        char suit4 = partyTableReader.readTurnCardSuitFromBoard();
-////        char suit5 = partyTableReader.readRiverCardSuitFromBoard();
-//
-//        //clubs
-//        //suit1: -15500223
-//
-//        //spades
-//        //suit2: -13356237
-//
-//        //hearts
-//        //suit2: -7861227
-//        //suit3: -7533546
-//        //suit3: -7468010
-//
-//        //diamonds:
-//        //suit4: -14728023
-//        //suit3: -15255135
-//
-//        //suit3: -14662487
-//
-//
-////        int flopCard1rank = partyTableReader.getIntCardRank(partyTableReader.readFirstFlopCardRankFromBoard());
-////        int flopCard2rank = partyTableReader.getIntCardRank(partyTableReader.readSecondFlopCardRankFromBoard());
-////        int flopCard3rank = partyTableReader.getIntCardRank(partyTableReader.readThirdFlopCardRankFromBoard());
-////
-////        int turnCardRank = partyTableReader.getIntCardRank(partyTableReader.readTurnCardRankFromBoard());
-////        int riverCardRank = partyTableReader.getIntCardRank(partyTableReader.readRiverCardRankFromBoard());
-////
-////
-////        System.out.println("Board: " + flopCard1rank + " " + flopCard2rank + " " + flopCard3rank + " " + turnCardRank + " " + riverCardRank);
-//    }
-
-    private void testMethodje() {
-        Card flopCard1 = getFlopCard1FromImage();
-        Card flopCard2 = getFlopCard2FromImage();
-        Card flopCard3 = getFlopCard3FromImage();
-        Card turnCard = getTurnCardFromImage();
-        Card riverCard = getRiverCardFromImage();
-
-        System.out.println();
-        System.out.println();
-        System.out.println();
-
-        System.out.print("" + flopCard1.getRank() + flopCard1.getSuit() + " " + flopCard2.getRank() + flopCard2.getSuit() + " " + flopCard3.getRank() + flopCard3.getSuit());
-
-        if(turnCard != null) {
-            System.out.print(" " + turnCard.getRank() + turnCard.getSuit());
-        } else {
-            System.out.print(" null");
-        }
-
-        if(riverCard != null) {
-            System.out.print(" " + riverCard.getRank() + riverCard.getSuit());
-        } else {
-            System.out.print(" null");
-        }
     }
 
     private String readFirstFlopCardRankFromBoard() {
@@ -495,7 +477,6 @@ public class PartyTableReader {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(481, 280, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
         return getSuitFromIntRgb(suitRgb);
-
     }
 
     private char readTurnCardSuitFromBoard() {
@@ -517,6 +498,16 @@ public class PartyTableReader {
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         bottomPlayerStack = ImageProcessor.removeEmptySpacesFromString(bottomPlayerStack);
+
+        if(bottomPlayerStack.contains("o")) {
+            bottomPlayerStack = bottomPlayerStack.replace("o", "0");
+            System.out.println("opp stack contains 'O', new value: " + bottomPlayerStack);
+        }
+
+        if(bottomPlayerStack.contains("O")) {
+            bottomPlayerStack = bottomPlayerStack.replace("O", "0");
+            System.out.println("opp stack contains 'O', new value: " + bottomPlayerStack);
+        }
 
         if(bottomPlayerStack.toLowerCase().contains("all")) {
             System.out.println("oppstack: opp allin!");
@@ -543,11 +534,24 @@ public class PartyTableReader {
         return bottomPlayerStackNonNumericRemoved;
     }
 
+//    public static void main(String[] args) {
+////        PartyTableReader partyTableReader = new PartyTableReader();
+////        System.out.println(partyTableReader.readTopPlayerStack());
+////        System.out.println(partyTableReader.readBigBlindFromSngScreen(false));
+//
+//        PartyTableReader.botIsToAct();
+//
+//    }
 
+//    public static void main(String[] args) throws Exception {
+//       for(int i = 0; i < 3000; i++) {
+//           System.out.println(new PartyTableReader().readTopPlayerStack());
+//           TimeUnit.SECONDS.sleep(1);
+//       }
+//    }
 
     private String readTopPlayerStack() {
         String topPlayerStack = readTopPlayerStackBase();
-
         String topPlayerStackNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
 
         if(!topPlayerStack.equals(topPlayerStackNonNumericRemoved)) {
@@ -560,17 +564,28 @@ public class PartyTableReader {
     }
 
     private static String readTopPlayerStackBase() {
-        //still needs to be verified
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(421, 136, 548, 164);
 
-        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(477, 136, 595, 164);
-
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(421, 136, 548, 164);
-
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(443, 135, 511, 162);
 
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         topPlayerStack = ImageProcessor.removeEmptySpacesFromString(topPlayerStack);
+        topPlayerStack = topPlayerStack.replace("B", "8");
+        topPlayerStack = topPlayerStack.replace("D", "0");
+
+        if(topPlayerStack.contains("B")) {
+            topPlayerStack = topPlayerStack.replace("B", "8");
+            System.out.println("botstack contains 'B', new value: " + topPlayerStack);
+        }
+
+        if(topPlayerStack.contains("D")) {
+            topPlayerStack = topPlayerStack.replace("D", "0");
+            System.out.println("botstack contains 'D', new value: " + topPlayerStack);
+        }
+
+        //topPlayerStack = topPlayerStack.replace("E", "9");
         return topPlayerStack;
     }
 
@@ -594,36 +609,57 @@ public class PartyTableReader {
     }
 
     public double readBigBlindFromSngScreen(boolean botIsButton) {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(490, 184, 617, 218);
+        //nog ff checken:
+            //als je alleen nog maar kan callen en niet raisen pre, bijv omdat je minder dan 1bb hebt, dan niet rechts klikken
 
+
+        //level check
+        //829, 46
+        //920, 66
+
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(490, 184, 617, 218);
+
+
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(515, 174, 600, 223);
+
+        //BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(829, 46, 920, 66);
+
+
+        //correct:
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(508, 169, 630, 225);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String bigBlindString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-        //return ImageProcessor.removeEmptySpacesFromString(bigBlindString);
 
-        System.out.println("BBB: " + bigBlindString);
+        System.out.println("bb ff: " + bigBlindString);
 
-        return 0;
+        bigBlindString = bigBlindString.substring(bigBlindString.indexOf(System.lineSeparator()) + 1, bigBlindString.length());
 
+        bigBlindString = bigBlindString.replaceAll("o", "0");
+        bigBlindString = bigBlindString.replaceAll("O", "0");
 
+        System.out.println("bb ff2: " + bigBlindString);
 
+        bigBlindString = ImageProcessor.removeAllNonNumericCharacters(bigBlindString);
 
-        //825, 45
-        //908, 67
+        System.out.println("bb string: " + bigBlindString);
 
-        //kan ook via getal in call button...
-        //of via 'Level xx in 4 min, bovenin
+        double bigBlind;
 
+        if(bigBlindString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            bigBlind = Double.parseDouble(bigBlindString);
+        } else {
+            bigBlind = -1;
+        }
 
-//        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(825, 45, 908, 67);
-//
-//        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-//        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-//        String bigBlindString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-//        //return ImageProcessor.removeEmptySpacesFromString(bigBlindString);
-//
-//        return 0;
+        if(botIsButton) {
+            bigBlind = bigBlind * 2;
+        }
 
+        System.out.println("BIGBLIND: " + bigBlind);
+
+        return bigBlind;
     }
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
@@ -637,17 +673,18 @@ public class PartyTableReader {
     }
 
     public boolean topPlayerIsButton() {
-        //396, 177
+        //to implement verify to check
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(396, 177, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(515, 178, 1, 1);
         int suitRgb = bufferedImage.getRGB(0, 0);
-
-        System.out.println("BUTTON PIXEL: " + suitRgb);
 
         if(suitRgb / 10_000 == -105) {
             //expected rgb: -1.052.689
+            System.out.println("SUITRGB: " + suitRgb);
+            System.out.println("botIsButton true");
             return true;
         }
+        System.out.println("botIsButton false");
         return false;
     }
 
@@ -655,51 +692,17 @@ public class PartyTableReader {
         char suit = 'x';
         rgb = rgb / 1_000_000;
 
-        //clubs
-        //suit1: -15_500_223
-        //suit5: -15_699_401
-        //suit5: -131331
-
-        //spades
-        //suit2: -13_356_237
-
-        //hearts
-        //suit2: -7_861_227
-        //suit3: -7_533_546
-        //suit3: -7_468_010
-        //suit1: -10023918
-        //suit5: -7_731_951
-        //suit5: -7_928_303
-
-        //diamonds:
-        //suit4: -14_728_023
-        //suit3: -15_255_135
-
-        //suit3: -14_662_487
-
-
         if(rgb == -15) {
-            //-15499967
-            //-15500223
             suit = 'c';
         } else if(rgb == -7) {
             suit = 'h';
-            //-7664106
-            //-7661025
-            //-7599852
-            //-7598570
         } else if(rgb == -13) {
-            //-13356237
-            //-13027272
-            //-13290701
             suit = 's';
         } else if(rgb == -14) {
-            //-14662232
             suit = 'd';
         }
         return suit;
     }
-
 
     private int getIntCardRank(String stringCardRank) {
         int cardRank = -1;
@@ -720,7 +723,7 @@ public class PartyTableReader {
             cardRank = 8;
         } else if(stringCardRank.equals("9")) {
             cardRank = 9;
-        } else if(stringCardRank.equals("l0") || stringCardRank.equals("I0")) {
+        } else if(stringCardRank.equals("l0") || stringCardRank.equals("I0") || stringCardRank.equals("ll]")) {
             cardRank = 10;
         } else if(stringCardRank.equals("I") || stringCardRank.equals("l")) {
             cardRank = 11;

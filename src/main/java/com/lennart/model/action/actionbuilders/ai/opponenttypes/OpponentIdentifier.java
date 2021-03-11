@@ -239,6 +239,7 @@ public class OpponentIdentifier {
             for(PlayerActionRound playerActionRound : actionsSinceLastRequest) {
                 if(playerActionRound.getPlayerName().equals("opponent")) {
                     if(playerActionRound.getBoard() != null && !playerActionRound.getBoard().isEmpty()) {
+                        System.out.println("pipapostflop opp action: " + playerActionRound.getAction());
                         opponentActions.add(playerActionRound.getAction());
                     }
                 }

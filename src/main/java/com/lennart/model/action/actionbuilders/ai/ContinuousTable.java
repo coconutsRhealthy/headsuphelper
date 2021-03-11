@@ -82,7 +82,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 numberOfActionRequests++;
 
-                boolean isNewHand = isNewHand();
+                boolean isNewHand = isNewHand(gameVariables.getBotHoleCards(), gameVariables.getBoard());
 
                 if(isNewHand) {
                     oppRange = null;
@@ -93,7 +93,9 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
-                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen(false);
+                        PartyTableReader partyTableReader = new PartyTableReader();
+                        boolean botIsButton = partyTableReader.topPlayerIsButton();
+                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen(botIsButton);
 
                         if(bigBlind < 0) {
                             System.out.println("Error in reading bb. Set it to previous value: " + previousBigBlind);
@@ -322,9 +324,8 @@ public class ContinuousTable implements ContinuousTableable {
         return cardListAsString;
     }
 
-    private boolean isNewHand() throws Exception {
-        //to implement
-        return false;
+    private boolean isNewHand(List<Card> previousBotHoleCards, List<Card> previousBoard) {
+        return new PartyTableReader().isNewHand(previousBotHoleCards, previousBoard);
     }
 
     private void printBigPotValue(String line) {
@@ -453,9 +454,6 @@ public class ContinuousTable implements ContinuousTableable {
             }
 
             if(!weirdBotSittingOut) {
-                TimeUnit.MILLISECONDS.sleep(100);
-                partyTableReader.maximizeNewSngTable();
-
                 TimeUnit.SECONDS.sleep(6);
             }
         }
@@ -488,9 +486,6 @@ public class ContinuousTable implements ContinuousTableable {
                 newTableNotYetOpened = true;
             }
         }
-
-        TimeUnit.MILLISECONDS.sleep(100);
-        partyTableReader.maximizeNewSngTable();
 
         TimeUnit.SECONDS.sleep(6);
     }

@@ -513,10 +513,12 @@ public class OpponentIdentifier2_0 {
 
             for(PlayerActionRound playerActionRound : actionsSinceLastRequest) {
                 if(playerActionRound.getPlayerName().equals("opponent")) {
-                    if(playerActionRound.getBoard() != null && !playerActionRound.getBoard().isEmpty()) {
-                        opponentPostflopActions.add(playerActionRound.getAction());
-                    } else {
+                    if(playerActionRound.getBoard() == null || playerActionRound.getBoard().isEmpty()) {
+                        System.out.println("z-opp pre-action: " + playerActionRound.getAction());
                         opponentPreflopActions.add(playerActionRound.getAction());
+                    } else {
+                        System.out.println("z-opp post-action: " + playerActionRound.getAction());
+                        opponentPostflopActions.add(playerActionRound.getAction());
                     }
                 }
             }
