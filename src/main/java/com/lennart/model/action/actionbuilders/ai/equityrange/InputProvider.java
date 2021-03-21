@@ -184,6 +184,37 @@ public class InputProvider {
         return postLoosenessGroup;
     }
 
+    public String getOppPostLoosenessNewStyle(String oppName) {
+        String postLoosenessGroup;
+
+        try {
+            if(opponentIdentifier2_0 == null) {
+                opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
+            }
+
+            if(opponentIdentifier2_0.getNumberOfHands() >= 5) {
+                double postLooseness = opponentIdentifier2_0.getOppPostLoosenessNewStyle();
+
+                if(postLooseness < 0) {
+                    postLoosenessGroup = MEDIUM;
+                } else if(postLooseness < 0.13114754098360656) {
+                    postLoosenessGroup = LOW;
+                } else if(postLooseness < 0.29411764705882354) {
+                    postLoosenessGroup = MEDIUM;
+                } else {
+                    postLoosenessGroup = HIGH;
+                }
+            } else {
+                postLoosenessGroup = MEDIUM;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            postLoosenessGroup = MEDIUM;
+        }
+
+        return postLoosenessGroup;
+    }
+
     public String getBotSizingGroup(double botSizing, double oppStack, double oppTotalBetsize) {
         String botSizingGroup;
 
