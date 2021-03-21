@@ -1,6 +1,5 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0;
 
-import com.lennart.model.action.actionbuilders.ai.equityrange.InputProvider;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
 
@@ -39,152 +38,9 @@ public class OpponentIdentifier2_0 {
 
     private double oppPostAggroness;
 
-    private double oppPostLoosenessNewStyle;
-
     public OpponentIdentifier2_0() {
         //default constructor
     }
-
-
-
-    public static void main(String[] args) throws Exception {
-        new OpponentIdentifier2_0().testMethod2();
-    }
-
-    private void testMethod2() throws Exception {
-        initializeDbConnection();
-
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop;");
-
-        List<Double> oppPostLooseness = new ArrayList<>();
-
-        double counter = 0;
-
-        double sameCounter = 0;
-        double sickCounter = 0;
-
-        while(rs.next()) {
-            if(rs.getDouble("numberOfHands") > 50) {
-                counter++;
-
-                String oppName = rs.getString("playerName");
-                //OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
-                //oppPostLooseness.add(opponentIdentifier2_0.getOppPostLooseness());
-
-                InputProvider inputProvider = new InputProvider();
-                String oldGroup = inputProvider.getOppPostLooseness(oppName);
-                String newGroup = inputProvider.getOppPostLoosenessNewStyle(oppName);
-
-                if(oldGroup.equals(newGroup)) {
-                    sameCounter++;
-                }
-
-                if((oldGroup.equals("low") && newGroup.equals("high")) || (oldGroup.equals("high") && newGroup.equals("low"))) {
-                    sickCounter++;
-                }
-
-                double ratio = sameCounter / counter;
-                System.out.println(counter + "    " + sameCounter + "    " + ratio + "   sicknessratio: " + sickCounter);
-                //System.out.println(counter + ") " + oppName + " oldgroup: " + oldGroup + " newgroup: " + newGroup);
-
-            }
-            //String oppName = rs.getString("playerName");
-            //OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
-            //oppPostLooseness.add(opponentIdentifier2_0.getOppPostLooseness());
-
-            //double total = rs.getDouble("numberOfHands");
-            //double callAmount = rs.getDouble("callCount");
-            //double ratio = callAmount / total;
-            //oppPostLooseness.add(ratio);
-        }
-
-        rs.close();
-        st.close();
-
-        closeDbConnection();
-
-        Collections.sort(oppPostLooseness);
-
-        System.out.println("wacht");
-    }
-
-
-
-    private void testMethod() throws Exception {
-        initializeDbConnection();
-
-        Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop;");
-
-        //List<String> allOppNames = new ArrayList<>();
-
-        Map<String, Double> oppLoosenessOldStyle = new HashMap<>();
-        Map<String, Double> oppLoosenessNewStyle = new HashMap<>();
-
-        while(rs.next()) {
-            if(rs.getDouble("numberOfHands") > 200) {
-                String oppName = rs.getString("playerName");
-                OpponentIdentifier2_0 opponentIdentifier2_0 = new OpponentIdentifier2_0(oppName);
-                oppLoosenessOldStyle.put(oppName, opponentIdentifier2_0.getOppPostLooseness());
-
-                double postCallCount = rs.getDouble("callCount");
-                double numberOfHands = rs.getDouble("numberOfHands");
-                double callToTotalHandsRatio = postCallCount / numberOfHands;
-
-                oppLoosenessNewStyle.put(oppName, callToTotalHandsRatio);
-            }
-        }
-
-        rs.close();
-        st.close();
-
-        closeDbConnection();
-
-        oppLoosenessOldStyle = sortByValueHighToLow(oppLoosenessOldStyle);
-        oppLoosenessNewStyle = sortByValueHighToLow(oppLoosenessNewStyle);
-
-        Map<String, Double> diffOldNewStyleMap = new HashMap<>();
-
-        for(Map.Entry<String, Double> entry : oppLoosenessOldStyle.entrySet()) {
-            double oldStyleValue = entry.getValue();
-            double newStyleValue = oppLoosenessNewStyle.get(entry.getKey());
-            double diff = oldStyleValue - newStyleValue;
-
-            diffOldNewStyleMap.put(entry.getKey(), diff);
-        }
-
-//        diffOldNewStyleMap = sortByValueHighToLow(diffOldNewStyleMap);
-//        int counter = 1;
-//
-//        for(Map.Entry<String, Double> entry : diffOldNewStyleMap.entrySet()) {
-//            System.out.println(counter + ") " + entry.getKey() + "      " + entry.getValue());
-//            counter++;
-//        }
-
-        int countertje2 = 0;
-
-        for(Map.Entry<String, Double> entry : oppLoosenessOldStyle.entrySet()) {
-            if(countertje2 < 10) {
-                System.out.println(countertje2 + " -old- " + entry.getKey());
-                countertje2++;
-            }
-        }
-
-        int countertje3 = 0;
-
-        for(Map.Entry<String, Double> entry : oppLoosenessNewStyle.entrySet()) {
-            if(countertje3 < 10) {
-                System.out.println(countertje2 + " -new- " + entry.getKey());
-                countertje3++;
-            }
-        }
-
-        System.out.println("wacht");
-    }
-
-
-
 
     public OpponentIdentifier2_0(String opponentName) throws Exception {
         Map<String, Double> opponentData = getAllDataOfOpponent(opponentName);
@@ -196,7 +52,6 @@ public class OpponentIdentifier2_0 {
         oppPostRaise = getOpponentPostRaise(opponentData);
         oppPostBet = getOpponentPostBet(opponentData);
         oppPostLooseness = getOpponentPostLooseness(opponentData);
-        oppPostLoosenessNewStyle = getOpponentPostLoosenessNewStyle(opponentData);
 
         oppPostBetToCheckRatio = getOppPostBetToCheckRatio(opponentData);
         oppPostFoldToCallRaiseRatio = getOppPostFoldToCallRaiseRatio(opponentData);
@@ -479,25 +334,6 @@ public class OpponentIdentifier2_0 {
     }
 
     public double getOpponentPostLooseness(Map<String, Double> opponentData) {
-        //call count tov call + fold count
-
-        //dit moet worden op basis van postCallCount t.o.v. total number of hands...
-
-        double oppPostLooseness;
-        double numberOfHands = opponentData.get("preNumberOfHands");
-
-        if(numberOfHands >= 5) {
-            double postCallCount = opponentData.get("postCallCount");
-            double postFoldCount = opponentData.get("postFoldCount");
-            oppPostLooseness = postCallCount / (postCallCount + postFoldCount);
-        } else {
-            oppPostLooseness = -1;
-        }
-
-        return oppPostLooseness;
-    }
-
-    public double getOpponentPostLoosenessNewStyle(Map<String, Double> opponentData) {
         //call count tov total number of hands
 
         double oppPostLooseness;
@@ -818,25 +654,5 @@ public class OpponentIdentifier2_0 {
 
     public double getOppPostAggroness() {
         return oppPostAggroness;
-    }
-
-    public double getOppPostLoosenessNewStyle() {
-        return oppPostLoosenessNewStyle;
-    }
-
-    private <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
-        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
-        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o2.getValue() ).compareTo( o1.getValue());
-            }
-        });
-
-        Map<K, V> result = new LinkedHashMap<>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
     }
 }
