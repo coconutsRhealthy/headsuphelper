@@ -52,6 +52,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     private RangeConstructor rangeConstructor;
 
+    private long timeOfLastDoneAction = -1;
+    private boolean gonnaDoFirstActionOfNewSng = false;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -74,10 +77,10 @@ public class ContinuousTable implements ContinuousTableable {
             milliSecondsTotal = milliSecondsTotal + 100;
 
             if(game.equals("sng") && milliSecondsTotal >= 4900) {
-                doSngContinuousLogic(startTime);
+                doSngContinuousLogic(startTime, gameVariables);
             }
 
-            if(PartyTableReader.botIsToAct()) {
+            if(PartyTableReader.botIsToAct(gonnaDoFirstActionOfNewSng)) {
                 long botActStarttime = new Date().getTime();
 
                 numberOfActionRequests++;
@@ -195,6 +198,9 @@ public class ContinuousTable implements ContinuousTableable {
                 }
 
                 PartyTableReader.performActionOnSite(action, sizing);
+
+                timeOfLastDoneAction = new Date().getTime();
+                gonnaDoFirstActionOfNewSng = false;
 
                 long botActEndtime = new Date().getTime();
                 long botActDuration = botActEndtime - botActStarttime;
@@ -365,8 +371,8 @@ public class ContinuousTable implements ContinuousTableable {
         return botWasButtonInLastHand;
     }
 
-    private void doSngContinuousLogic(long startTime) throws Exception {
-        if(PartyTableReader.sngIsFinished()) {
+    private void doSngContinuousLogic(long startTime, GameVariables gameVariables) throws Exception {
+        if(PartyTableReader.sngIsFinished(timeOfLastDoneAction, gameVariables.getBotHoleCards(), gameVariables.getBoard())) {
             long currentTime = new Date().getTime();
 
             if(currentTime - startTime > 13_920_000) {
@@ -376,16 +382,20 @@ public class ContinuousTable implements ContinuousTableable {
 
             System.out.println("SNG is finished, staring new game");
 
-            TimeUnit.SECONDS.sleep(14);
-
             PartyTableReader partyTableReader = new PartyTableReader();
 
             TimeUnit.MILLISECONDS.sleep(100);
-            partyTableReader.closeRematchScreen();
+            partyTableReader.closeSorryNoRematchPopUp();
             TimeUnit.MILLISECONDS.sleep(1200);
-            partyTableReader.clickTopSngInList();
-            TimeUnit.MILLISECONDS.sleep(100);
+            partyTableReader.closeTableOfEndedSng();
+            TimeUnit.MILLISECONDS.sleep(1200);
+            partyTableReader.selectAndUnselect6PlayerPerTableFilter();
+
+            TimeUnit.MILLISECONDS.sleep(1500);
             partyTableReader.registerNewSng();
+
+            gonnaDoFirstActionOfNewSng = true;
+            timeOfLastDoneAction = -1;
 
             int counter = 0;
             int counter2 = 0;
@@ -415,26 +425,6 @@ public class ContinuousTable implements ContinuousTableable {
 
                 System.out.println(",");
 
-//                if(counter2 == 100 || counter2 == 200) {
-////                    System.out.println("Attempting to close chest shit");
-////                    MouseKeyboard.click(222, 44);
-////                    TimeUnit.MILLISECONDS.sleep(300);
-////                    MouseKeyboard.click(226, 79);
-////                    TimeUnit.MILLISECONDS.sleep(600);
-////                    MouseKeyboard.click(838, 605);
-////
-////                    TimeUnit.MILLISECONDS.sleep(600);
-//
-//                    System.out.println("Attempting to close 'registration closed' shit");
-//                    MouseKeyboard.click(489, 432);
-//                    TimeUnit.MILLISECONDS.sleep(300);
-//                }
-//
-//                if(counter2 == 150 || counter2 == 300) {
-//                    System.out.println("Trying to register again");
-//                    MouseKeyboard.click(782, 603);
-//                }
-
                 if(counter2 >= 1350) {
                     System.out.println("Something is wrong in registering sng part, close session.");
                     PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
@@ -462,6 +452,7 @@ public class ContinuousTable implements ContinuousTableable {
     private void doSngStartSessionLogic() throws Exception {
         PartyTableReader partyTableReader = new PartyTableReader();
         partyTableReader.registerNewSng();
+        gonnaDoFirstActionOfNewSng = true;
 
         int counter = 0;
 

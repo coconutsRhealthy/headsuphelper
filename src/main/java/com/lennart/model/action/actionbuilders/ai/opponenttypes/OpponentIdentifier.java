@@ -21,13 +21,13 @@ public class OpponentIdentifier {
 
     private static Map<String, Map<Integer, Map<String, List<Double>>>> countMapForAllOpponents = new HashMap<>();
 
-    private static final double LP_LOOSENESS_POSTFLOP = 0.71;
+    private static final double LP_LOOSENESS_POSTFLOP = 0.42;
     private static final double LP_AGGRO_POSTFLOP = 0.1;
-    private static final double LA_LOOSENESS_POSTFLOP = 0.71;
+    private static final double LA_LOOSENESS_POSTFLOP = 0.42;
     private static final double LA_AGGRO_POSTFLOP = 0.61;
-    private static final double TP_LOOSENESS_POSTFLOP = 0.47;
+    private static final double TP_LOOSENESS_POSTFLOP = 0.18;
     private static final double TP_AGGRO_POSTFLOP = 0.11;
-    private static final double TA_LOOSENESS_POSTFLOP = 0.53;
+    private static final double TA_LOOSENESS_POSTFLOP = 0.24;
     private static final double TA_AGGRO_POSTFLOP = 0.43;
 
     private Connection con;
@@ -98,11 +98,10 @@ public class OpponentIdentifier {
                 opponentType = "tp";
             } else {
                 double callRaiseCount = rs.getDouble("callRaiseCount");
-                double foldCount = rs.getDouble("foldCount");
                 double betRaiseCount = rs.getDouble("betRaiseCount");
                 double checkCallCount = rs.getDouble("checkCallCount");
 
-                double looseness = callRaiseCount / (foldCount + callRaiseCount);
+                double looseness = callRaiseCount / numberOfHands;
                 double aggressiveness = betRaiseCount / (checkCallCount + betRaiseCount);
 
                 System.out.println("Looseness: " + looseness);
@@ -112,6 +111,8 @@ public class OpponentIdentifier {
                 Map<String, Double> aggroMatchMap = getAggroMatchMap(aggressiveness);
 
                 opponentType = getMatch(loosenessMatchMap, aggroMatchMap);
+
+                System.out.println("OppType: " + opponentType);
             }
         }
 
