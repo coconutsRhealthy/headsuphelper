@@ -85,7 +85,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 numberOfActionRequests++;
 
-                boolean isNewHand = isNewHand(gameVariables.getBotHoleCards(), gameVariables.getBoard());
+                boolean isNewHand = isNewHand(gameVariables.getBotHoleCards(), gameVariables.getBoard()) || gonnaDoFirstActionOfNewSng;
 
                 if(isNewHand) {
                     oppRange = null;

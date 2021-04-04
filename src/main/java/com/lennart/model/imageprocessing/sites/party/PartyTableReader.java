@@ -250,6 +250,7 @@ public class PartyTableReader {
 
                         MouseKeyboard.click(1095, 653);
 
+                        saveScreenshotOfEntireScreen(new Date().getTime());
                         System.out.println("Pressing register again because dollar buy in popup did not open");
                         TimeUnit.MILLISECONDS.sleep(1200);
                     } else {
@@ -289,6 +290,17 @@ public class PartyTableReader {
         }
     }
 
+    private void alternativeRegisterAttempt() throws Exception {
+        //click game lobby button
+        TimeUnit.SECONDS.sleep(3);
+        MouseKeyboard.click(965, 651);
+
+        //click register in lobby
+        TimeUnit.SECONDS.sleep(5);
+        MouseKeyboard.click(878, 280);
+        TimeUnit.SECONDS.sleep(3);
+    }
+
     private boolean dollarBuyInPopUpIsOpen() {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(641, 358, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
@@ -306,13 +318,13 @@ public class PartyTableReader {
     private void switchToSupportTabAndBack() throws Exception {
         TimeUnit.MILLISECONDS.sleep(600);
         MouseKeyboard.click(396, 128);
-        TimeUnit.SECONDS.sleep(50);
+        TimeUnit.SECONDS.sleep(100);
 
         long time = new Date().getTime();
         System.out.println("Switched to support screen. Saving screenshot at time: " + time);
         saveScreenshotOfEntireScreen(time);
 
-        TimeUnit.SECONDS.sleep(10);
+        TimeUnit.SECONDS.sleep(20);
         MouseKeyboard.click(47, 134);
         TimeUnit.SECONDS.sleep(7);
     }
@@ -372,18 +384,6 @@ public class PartyTableReader {
     }
 
     public static void performActionOnSite(String botAction, double sizing) throws Exception {
-        String leftActionButton = readLeftActionButton();
-        String middleActionButton = readMiddleActionButton();
-        String rightActionButton = readRightActionButton();
-
-        System.out.println();
-        System.out.println("**");
-        System.out.println("Left action button: " + leftActionButton);
-        System.out.println("Middle action button: " + middleActionButton);
-        System.out.println("Right action button: " + rightActionButton);
-        System.out.println("**");
-        System.out.println();
-
         if(botAction != null && sizing != 0) {
             try {
                 MouseKeyboard.click(998, 680);
@@ -409,38 +409,23 @@ public class PartyTableReader {
         if(botAction == null) {
             clickCheckActionButton();
         } else if(botAction.contains("fold")) {
-            if(!StringUtils.containsIgnoreCase(leftActionButton, "fold")) {
-               System.out.println("WTFzxz! Fold and left button does not contain fold!");
-            }
-
             clickFoldActionButton();
         } else if(botAction.contains("check")) {
-            if(!StringUtils.containsIgnoreCase(middleActionButton, "check")) {
-                System.out.println("WTFzxz! Check and middle button does not contain check!");
-            }
-
             clickCheckActionButton();
         } else if(botAction.contains("call")) {
-            if(!StringUtils.containsIgnoreCase(middleActionButton, "call")) {
-                System.out.println("WTFzxz! Call and middle button does not contain call!");
-            }
-
             clickCallActionButton();
         } else if(botAction.contains("bet")) {
-            if(!StringUtils.containsIgnoreCase(rightActionButton, "bet")) {
-                System.out.println("WTFzxz! Bet and right button does not contain bet!");
-                System.out.println("Right action button: " + rightActionButton);
-            }
-
             clickBetActionButton();
         } else if(botAction.contains("raise")) {
-            if(!StringUtils.containsIgnoreCase(rightActionButton, "raise")) {
+            String rightActionButton = readRightActionButton();
+
+            if(StringUtils.containsIgnoreCase(rightActionButton, "raise")) {
+                clickRaiseActionButton();
+            } else {
                 System.out.println("WTFzxz! Raise and right button does not contain raise!");
                 System.out.println("Right action button: " + rightActionButton);
                 System.out.println("So you want to raise but button is not there, so you should press call... Gonna press call");
                 clickCallActionButton();
-            } else {
-                clickRaiseActionButton();
             }
         }
 
