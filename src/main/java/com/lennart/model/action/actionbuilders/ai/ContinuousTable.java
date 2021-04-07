@@ -77,7 +77,7 @@ public class ContinuousTable implements ContinuousTableable {
             milliSecondsTotal = milliSecondsTotal + 100;
 
             if(game.equals("sng") && milliSecondsTotal >= 4900) {
-                doSngContinuousLogic(startTime, gameVariables);
+                doSngContinuousLogic(startTime);
             }
 
             if(PartyTableReader.botIsToAct(gonnaDoFirstActionOfNewSng)) {
@@ -116,7 +116,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!game.equals("sng")) {
                         long currentTime = new Date().getTime();
 
-                        if(currentTime - startTime > 13_920_000) {
+                        if(currentTime - startTime > 19_920_000) {
                             new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this);
@@ -371,11 +371,11 @@ public class ContinuousTable implements ContinuousTableable {
         return botWasButtonInLastHand;
     }
 
-    private void doSngContinuousLogic(long startTime, GameVariables gameVariables) throws Exception {
-        if(PartyTableReader.sngIsFinished(timeOfLastDoneAction, gameVariables.getBotHoleCards(), gameVariables.getBoard())) {
+    private void doSngContinuousLogic(long startTime) throws Exception {
+        if(PartyTableReader.sngIsFinished(timeOfLastDoneAction)) {
             long currentTime = new Date().getTime();
 
-            if(currentTime - startTime > 13_920_000) {
+            if(currentTime - startTime > 19_920_000) {
                 System.out.println("3.4 hours have passed, force quit");
                 throw new RuntimeException();
             }

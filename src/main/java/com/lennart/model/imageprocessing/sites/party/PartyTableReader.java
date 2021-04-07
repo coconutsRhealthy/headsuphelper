@@ -166,14 +166,19 @@ public class PartyTableReader {
         return false;
     }
 
-    public static boolean sngIsFinished(long timeOfLastAction, List<Card> previousBotHoleCards,  List<Card> previousBoard) throws Exception {
+    public static boolean sngIsFinished(long timeOfLastAction) throws Exception {
         long currentTime = new Date().getTime();
 
         if(timeOfLastAction != -1 && currentTime - timeOfLastAction > 35_000) {
             System.out.println("sng could be finished, 35 sec passed since action");
 
-            if(new PartyTableReader().isNewHand(previousBotHoleCards, previousBoard)) {
-                System.out.println("sng indeed finished, new hand");
+            PartyTableReader partyTableReader = new PartyTableReader();
+
+            int hc1Rank = partyTableReader.getIntCardRank(partyTableReader.readFirstHoleCardRank());
+            char hc1Suit = partyTableReader.readFirstHoleCardSuit();
+
+            if(hc1Rank == -1 || hc1Suit == 'x') {
+                System.out.println("sng indeed finished, you have no first holecard");
                 return true;
             } else {
                 System.out.println("same hand, sng not finished.. probably opp sitting out..");
@@ -240,38 +245,24 @@ public class PartyTableReader {
             MouseKeyboard.click(1095, 653);
             TimeUnit.MILLISECONDS.sleep(2000);
 
-            if(!dollarBuyInPopUpIsOpen()) {
-                for(int i = 0; i < 10; i++) {
-                    if(!dollarBuyInPopUpIsOpen()) {
-                        switchToSupportTabAndBack();
-                        TimeUnit.MILLISECONDS.sleep(2000);
-                        selectAndUnselect6PlayerPerTableFilter();
-                        TimeUnit.MILLISECONDS.sleep(2000);
+            if(dollarBuyInPopUpIsOpen()) {
+                System.out.println("Normal registration attempt pop up OK");
 
-                        MouseKeyboard.click(1095, 653);
+                //click dollar buy-in option
+                TimeUnit.MILLISECONDS.sleep(2157);
+                MouseKeyboard.click(706, 354);
+                TimeUnit.MILLISECONDS.sleep(600);
+                MouseKeyboard.click(706, 354);
 
-                        saveScreenshotOfEntireScreen(new Date().getTime());
-                        System.out.println("Pressing register again because dollar buy in popup did not open");
-                        TimeUnit.MILLISECONDS.sleep(1200);
-                    } else {
-                        break;
-                    }
-                }
+                //click OK button on registration confirm pop-up
+                TimeUnit.MILLISECONDS.sleep(2002);
+                MouseKeyboard.click(744, 153);
+                TimeUnit.MILLISECONDS.sleep(600);
+                MouseKeyboard.click(744, 153);
+            } else {
+                System.out.println("Trying alternative registration attempt, because pop up did not open...");
+                alternativeRegisterAttempt();
             }
-
-            //click dollar buy-in option
-            TimeUnit.MILLISECONDS.sleep(2157);
-            MouseKeyboard.click(706, 354);
-            TimeUnit.MILLISECONDS.sleep(600);
-            MouseKeyboard.click(706, 354);
-
-            //click OK button on registration confirm pop-up
-            TimeUnit.MILLISECONDS.sleep(2002);
-
-            MouseKeyboard.click(744, 153);
-
-            TimeUnit.MILLISECONDS.sleep(600);
-            MouseKeyboard.click(744, 153);
         } else {
             regNewSngWaitCouner++;
 
@@ -291,25 +282,76 @@ public class PartyTableReader {
     }
 
     private void alternativeRegisterAttempt() throws Exception {
-        //click game lobby button
+        //click gamelobby button
         TimeUnit.SECONDS.sleep(3);
         MouseKeyboard.click(965, 651);
-
-        //click register in lobby
         TimeUnit.SECONDS.sleep(5);
-        MouseKeyboard.click(878, 280);
-        TimeUnit.SECONDS.sleep(3);
+
+        if(ImageProcessor.getBufferedImageScreenShot(730, 282, 1, 1).getRGB(0, 0) == -3_854_332) {
+            System.out.println("Alternative reg variant 1. Time: " + new Date().getTime());
+            PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+
+            //click register in gamelobby
+            MouseKeyboard.click(730, 282);
+            TimeUnit.SECONDS.sleep(4);
+
+            //click dollar buy-in option
+            MouseKeyboard.click(593, 319);
+            TimeUnit.MILLISECONDS.sleep(600);
+            MouseKeyboard.click(593, 319);
+
+            //click OK button on registration confirm pop-up
+            TimeUnit.MILLISECONDS.sleep(2002);
+            MouseKeyboard.click(682, 189);
+            TimeUnit.MILLISECONDS.sleep(600);
+            MouseKeyboard.click(682, 189);
+
+            //close the gamelobby screen...
+            TimeUnit.MILLISECONDS.sleep(1000);
+            MouseKeyboard.click(880, 89);
+
+        } else {
+            System.out.println("Alternative reg variant 2. Time: " + new Date().getTime());
+            PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+
+            //click register in gamelobby
+            MouseKeyboard.click(767, 303);
+            TimeUnit.SECONDS.sleep(4);
+
+            //click dollar buy-in option
+            MouseKeyboard.click(611, 341);
+            TimeUnit.MILLISECONDS.sleep(600);
+            MouseKeyboard.click(611, 341);
+
+            //click OK button on registration confirm pop-up
+            TimeUnit.MILLISECONDS.sleep(2002);
+            MouseKeyboard.click(703, 212);
+            TimeUnit.MILLISECONDS.sleep(600);
+            MouseKeyboard.click(703, 212);
+
+            //close the gamelobby screen...
+            TimeUnit.MILLISECONDS.sleep(1000);
+            MouseKeyboard.click(907, 111);
+        }
     }
 
-    private boolean dollarBuyInPopUpIsOpen() {
+    private boolean dollarBuyInPopUpIsOpen() throws Exception {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(641, 358, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        System.out.println("popup pixel: " + pixelRgb);
+        long currentTime = new Date().getTime();
 
         if(pixelRgb / 1_000_000 == -5) {
             //expected rgb when popup opened: -5.232.375
             //expected when not opened: -15.263.973
-            System.out.println("dollarBuyInPopup opened");
+
+            System.out.println("dollarBuyInPopup opened. Time: " + currentTime);
+            saveScreenshotOfEntireScreen(currentTime);
             return true;
+        } else {
+            System.out.println("dollarBuyInPopup dit not open!. Time: " + currentTime);
+            saveScreenshotOfEntireScreen(currentTime);
         }
 
         return false;
