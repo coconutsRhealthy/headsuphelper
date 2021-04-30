@@ -181,7 +181,8 @@ public class PartyTableReader {
                 System.out.println("sng indeed finished, you have no first holecard");
                 return true;
             } else {
-                System.out.println("same hand, sng not finished.. probably opp sitting out..");
+                PartyTableReader.saveScreenshotOfEntireScreen(currentTime);
+                System.out.println("same hand, sng not finished.. probably opp sitting out.. Time: " + currentTime);
             }
         }
 
@@ -215,8 +216,12 @@ public class PartyTableReader {
         MouseKeyboard.click(13, 33);
     }
 
-    public void clickTopSngInList() {
-        MouseKeyboard.click(208, 403);
+    public void clickTopSngInList(String positionOnTop) {
+        if(positionOnTop.equals("first")) {
+            MouseKeyboard.click(208, 403);
+        } else if(positionOnTop.equals("second")) {
+            MouseKeyboard.click(275, 422);
+        }
     }
 
     public void selectAndUnselect6PlayerPerTableFilter() throws Exception {
@@ -231,12 +236,12 @@ public class PartyTableReader {
         MouseKeyboard.click(308, 293);
     }
 
-    public void registerNewSng() throws Exception {
-        clickTopSngInList();
+    public void registerNewSng(String positionOfSngInListOfClient) throws Exception {
+        clickTopSngInList(positionOfSngInListOfClient);
         TimeUnit.MILLISECONDS.sleep(500);
 
         if(noPlayerIsReggedYet()) {
-            clickTopSngInList();
+            clickTopSngInList(positionOfSngInListOfClient);
 
             //click register button
             TimeUnit.MILLISECONDS.sleep(250);
@@ -260,8 +265,8 @@ public class PartyTableReader {
                 TimeUnit.MILLISECONDS.sleep(600);
                 MouseKeyboard.click(744, 153);
             } else {
-                System.out.println("Trying alternative registration attempt, because pop up did not open...");
-                alternativeRegisterAttempt();
+                System.out.println("Trying second top sng registration attempt, because pop up did not open...");
+                registerNewSng("second");
             }
         } else {
             regNewSngWaitCouner++;
@@ -276,8 +281,8 @@ public class PartyTableReader {
             System.out.println("Already one regged player, wait...");
 
             TimeUnit.SECONDS.sleep(5);
-            clickTopSngInList();
-            registerNewSng();
+            clickTopSngInList("first");
+            registerNewSng("first");
         }
     }
 
@@ -355,6 +360,45 @@ public class PartyTableReader {
         }
 
         return false;
+    }
+
+    public void checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt() throws Exception {
+        TimeUnit.SECONDS.sleep(1);
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(452, 149, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        long currTime = new Date().getTime();
+
+        if(pixelRgb / 100_000 == -167 || pixelRgb / 100_000 == -38) {
+            saveScreenshotOfEntireScreen(currTime);
+            System.out.println("register confirm popup still open, gonna close it... RGB: " + pixelRgb + " currtime: " + currTime);
+
+            TimeUnit.MILLISECONDS.sleep(2002);
+            MouseKeyboard.click(744, 153);
+            TimeUnit.MILLISECONDS.sleep(600);
+            MouseKeyboard.click(744, 153);
+            TimeUnit.SECONDS.sleep(1);
+        } else {
+            saveScreenshotOfEntireScreen(currTime);
+            System.out.println("register confirm popup is not there. RGB: " + pixelRgb + " currtime: " + currTime);
+        }
+
+    }
+
+    public static boolean notRegisteredForAnyTournament() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(964, 170, 1, 1);
+        int pixelRgb = bufferedImage.getRGB(0, 0);
+
+        if(pixelRgb == -394_758) {
+            //expected: -394.758
+            System.out.println("Not registered for any tournament... Pixel: " + pixelRgb);
+            return true;
+        } else {
+            //expected: -2.096.121
+            System.out.println("Still registered for one tournament... Pixel: " + pixelRgb);
+            return false;
+        }
     }
 
     private void switchToSupportTabAndBack() throws Exception {
@@ -714,6 +758,11 @@ public class PartyTableReader {
             System.out.println("opp stack contains 'D', new value: " + bottomPlayerStack);
         }
 
+        if(bottomPlayerStack.contains("s")) {
+            bottomPlayerStack = bottomPlayerStack.replace("s", "6");
+            System.out.println("error opp stack contains 's', new value: " + bottomPlayerStack);
+        }
+
         if(bottomPlayerStack.toLowerCase().contains("all")) {
             System.out.println("oppstack: opp allin!");
             bottomPlayerStack = "0";
@@ -786,6 +835,11 @@ public class PartyTableReader {
             System.out.println("botstack contains 'O', new value: " + topPlayerStack);
         }
 
+        if(topPlayerStack.contains("s")) {
+            topPlayerStack = topPlayerStack.replace("s", "8");
+            System.out.println("error botstack contains 's', new value: " + topPlayerStack);
+        }
+
         return topPlayerStack;
     }
 
@@ -796,6 +850,21 @@ public class PartyTableReader {
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String totalPotSize = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         totalPotSize = ImageProcessor.removeEmptySpacesFromString(totalPotSize);
+
+        if(totalPotSize.contains("Z")) {
+            totalPotSize = totalPotSize.replace("Z", "2");
+            System.out.println("potsize contains 'Z', new value: " + totalPotSize);
+        }
+
+        if(totalPotSize.contains("O")) {
+            totalPotSize = totalPotSize.replace("O", "0");
+            System.out.println("potsize contains 'O' instead of zero, new value: " + totalPotSize);
+        }
+
+        if(totalPotSize.contains("B")) {
+            totalPotSize = totalPotSize.replace("B", "8");
+            System.out.println("error exception Yo potsize contains B, what is it!?");
+        }
 
         String totalPotSizeNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(totalPotSize);
 
@@ -816,7 +885,12 @@ public class PartyTableReader {
 
         System.out.println("bb ff: " + bigBlindString);
 
-        bigBlindString = bigBlindString.substring(bigBlindString.indexOf(System.lineSeparator()) + 1, bigBlindString.length());
+        if(bigBlindString.startsWith("30")) {
+            System.out.println("Yo the bb string starts with 30, so this should be 30/60.");
+            bigBlindString = "30";
+        } else {
+            bigBlindString = bigBlindString.substring(bigBlindString.indexOf(System.lineSeparator()) + 1, bigBlindString.length());
+        }
 
         bigBlindString = bigBlindString.replaceAll("o", "0");
         bigBlindString = bigBlindString.replaceAll("O", "0");

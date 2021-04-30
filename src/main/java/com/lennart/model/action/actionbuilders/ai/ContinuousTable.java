@@ -388,11 +388,13 @@ public class ContinuousTable implements ContinuousTableable {
             partyTableReader.closeSorryNoRematchPopUp();
             TimeUnit.MILLISECONDS.sleep(1200);
             partyTableReader.closeTableOfEndedSng();
+            TimeUnit.MILLISECONDS.sleep(2800);
+            partyTableReader.checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt();
             TimeUnit.MILLISECONDS.sleep(1200);
             partyTableReader.selectAndUnselect6PlayerPerTableFilter();
 
             TimeUnit.MILLISECONDS.sleep(1500);
-            partyTableReader.registerNewSng();
+            partyTableReader.registerNewSng("first");
 
             gonnaDoFirstActionOfNewSng = true;
             timeOfLastDoneAction = -1;
@@ -425,7 +427,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 System.out.println(",");
 
-                if(counter2 >= 1350) {
+                if(counter2 >= 1350 && PartyTableReader.notRegisteredForAnyTournament()) {
                     System.out.println("Something is wrong in registering sng part, close session.");
                     PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
                     throw new RuntimeException();
@@ -451,7 +453,7 @@ public class ContinuousTable implements ContinuousTableable {
 
     private void doSngStartSessionLogic() throws Exception {
         PartyTableReader partyTableReader = new PartyTableReader();
-        partyTableReader.registerNewSng();
+        partyTableReader.registerNewSng("first");
         gonnaDoFirstActionOfNewSng = true;
 
         int counter = 0;
