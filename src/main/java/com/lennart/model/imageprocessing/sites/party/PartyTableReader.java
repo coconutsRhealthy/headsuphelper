@@ -238,51 +238,68 @@ public class PartyTableReader {
 
     public void registerNewSng(String positionOfSngInListOfClient) throws Exception {
         clickTopSngInList(positionOfSngInListOfClient);
-        TimeUnit.MILLISECONDS.sleep(500);
+        TimeUnit.MILLISECONDS.sleep(2000);
 
-        if(noPlayerIsReggedYet()) {
-            clickTopSngInList(positionOfSngInListOfClient);
+        int extraClickUnclickCounter = 0;
 
-            //click register button
-            TimeUnit.MILLISECONDS.sleep(250);
-            System.out.println("registering new sng");
-            TimeUnit.MILLISECONDS.sleep(1744);
-            MouseKeyboard.click(1095, 653);
-            TimeUnit.MILLISECONDS.sleep(2000);
-
-            if(dollarBuyInPopUpIsOpen()) {
-                System.out.println("Normal registration attempt pop up OK");
-
-                //click dollar buy-in option
-                TimeUnit.MILLISECONDS.sleep(2157);
-                MouseKeyboard.click(706, 354);
-                TimeUnit.MILLISECONDS.sleep(600);
-                MouseKeyboard.click(706, 354);
-
-                //click OK button on registration confirm pop-up
-                TimeUnit.MILLISECONDS.sleep(2002);
-                MouseKeyboard.click(744, 153);
-                TimeUnit.MILLISECONDS.sleep(600);
-                MouseKeyboard.click(744, 153);
-            } else {
-                System.out.println("Trying second top sng registration attempt, because pop up did not open...");
-                registerNewSng("second");
-            }
-        } else {
+        while(!noPlayerIsReggedYet()) {
             regNewSngWaitCouner++;
+            extraClickUnclickCounter++;
 
             if(regNewSngWaitCouner == 12) {
+                saveScreenshotOfEntireScreen("noEmptyTable" + regNewSngWaitCouner, new Date().getTime());
                 MouseKeyboard.moveMouseToLocation(7, 100);
                 MouseKeyboard.click(7, 100);
                 System.out.println("click action in waiting for sng registration");
                 regNewSngWaitCouner = 0;
+
+                if(extraClickUnclickCounter > 36) {
+                    TimeUnit.MILLISECONDS.sleep(1200);
+                    selectAndUnselect6PlayerPerTableFilter();
+                    System.out.println("select unselect action in waiting for sng registration");
+                    extraClickUnclickCounter = 0;
+                }
             }
 
             System.out.println("Already one regged player, wait...");
-
             TimeUnit.SECONDS.sleep(5);
-            clickTopSngInList("first");
-            registerNewSng("first");
+        }
+
+        clickTopSngInList(positionOfSngInListOfClient);
+
+        //click register button
+        TimeUnit.MILLISECONDS.sleep(250);
+        System.out.println("registering new sng");
+        saveScreenshotOfEntireScreen("registerEmptySng", new Date().getTime());
+        TimeUnit.MILLISECONDS.sleep(1744);
+        MouseKeyboard.click(1095, 653);
+        TimeUnit.MILLISECONDS.sleep(2000);
+
+        if(dollarBuyInPopUpIsOpen()) {
+            System.out.println("Normal registration attempt pop up OK");
+
+            //click dollar buy-in option
+            TimeUnit.MILLISECONDS.sleep(2157);
+            MouseKeyboard.click(706, 354);
+            TimeUnit.MILLISECONDS.sleep(600);
+            MouseKeyboard.click(706, 354);
+
+            //click OK button on registration confirm pop-up
+            TimeUnit.MILLISECONDS.sleep(2002);
+            MouseKeyboard.click(744, 153);
+            TimeUnit.MILLISECONDS.sleep(600);
+            MouseKeyboard.click(744, 153);
+
+            //hier nog een check dat je daadwerkelijk geregged bent.. anders opnieuw deze methode callen..
+            TimeUnit.SECONDS.sleep(2);
+            if(notRegisteredForAnyTournament()) {
+                System.out.println("You thought you successfully registered, but not. Call registersng() again");
+                saveScreenshotOfEntireScreen("retryRegisterBecauseNotRegistered", new Date().getTime());
+                registerNewSng(positionOfSngInListOfClient);
+            }
+        } else {
+            System.out.println("Trying second top sng registration attempt, because pop up did not open...");
+            registerNewSng("second");
         }
     }
 
@@ -387,16 +404,18 @@ public class PartyTableReader {
     }
 
     public static boolean notRegisteredForAnyTournament() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(964, 170, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(877, 161, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
-        if(pixelRgb == -394_758) {
+        if(pixelRgb == -15_263_973) {
             //expected: -394.758
+            //expected new: -15.263.973
             System.out.println("Not registered for any tournament... Pixel: " + pixelRgb);
             return true;
         } else {
             //expected: -2.096.121
-            System.out.println("Still registered for one tournament... Pixel: " + pixelRgb);
+            //expected new:
+            System.out.println("Registered for at least one tournament... Pixel: " + pixelRgb);
             return false;
         }
     }
@@ -931,6 +950,11 @@ public class PartyTableReader {
     public static void saveScreenshotOfEntireScreen(long time) throws Exception {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
         ImageProcessor.saveBufferedImage(bufferedImage, "/Users/LennartMac/Documents/logging/" + time + ".png");
+    }
+
+    public static void saveScreenshotOfEntireScreen(String prefix, long time) throws Exception {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
+        ImageProcessor.saveBufferedImage(bufferedImage, "/Users/LennartMac/Documents/logging/" + prefix + "__" + time + ".png");
     }
 
     public boolean topPlayerIsButton() {

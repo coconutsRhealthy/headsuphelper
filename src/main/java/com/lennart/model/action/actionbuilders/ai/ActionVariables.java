@@ -641,6 +641,13 @@ public class ActionVariables {
         action = callLooseAfterLimpVersusShoveUndeep(action, effectiveStack, botIsButtonInMethod, botBetsizeBb, gameVariables.getOpponentAction(),
                 opponentStackBb, amountToCallBb, gameVariables.getBotHoleCards(), botHandStrengthInMethod, boardInMethod);
 
+        action = preventTooLooseCallsVersusShovesPre(action, boardInMethod, gameVariables.getOpponentStack(), gameVariables.getBotBetSize(),
+                gameVariables.getBigBlind(), botHandStrengthInMethod, gameVariables.getOpponentAction(), amountToCallBb);
+
+        action = shoveWithWeaks(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod, gameVariables.getBigBlind());
+        action = limpWithPremiums(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
+        action = adjustOpenFoldPlay(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
+
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
                 sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
@@ -1886,6 +1893,122 @@ public class ActionVariables {
         return actionToReturn;
     }
 
+    private String limpWithPremiums(String action, List<Card> board, String opponentAction, double handstrength,
+                                    double effectiveStackBb, boolean position) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(action.equals("raise")) {
+                if(position) {
+                    if(opponentAction.equals("bet")) {
+                        if(effectiveStackBb <= 10) {
+                            if(handstrength >= 0.80) {
+                                if(Math.random() < 0.45) {
+                                    actionToReturn = "call";
+                                    System.out.println("rrrt limp with premium! HS: " + handstrength);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String shoveWithWeaks(String action, List<Card> board, String opponentAction, double handstrength,
+                                  double effectiveStackBb, boolean position, double bigBlind) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(action.equals("call")) {
+                if(position) {
+                    if(opponentAction.equals("bet")) {
+                        if(effectiveStackBb <= 10) {
+                            if(handstrength >= 0.45) {
+                                actionToReturn = "raise";
+                                System.out.println("rrrt shove with weak! HS: " + handstrength);
+                                sizing = 5000 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String adjustOpenFoldPlay(String action, List<Card> board, String opponentAction, double handstrength,
+                                    double effectiveStackBb, boolean position) {
+        String actionToReturn = null;
+        String openFoldAction = null;
+
+        if(board == null || board.isEmpty()) {
+            if(position) {
+                if(opponentAction.equals("bet")) {
+                    if(effectiveStackBb <= 10) {
+                        if(handstrength < 0.20) {
+                            if(Math.random() < 0.78) {
+                                openFoldAction = "fold";
+                                System.out.println("sars1 set openfold action to fold");
+                            } else {
+                                openFoldAction = "call";
+                                System.out.println("sars2 set openfold action to call");
+                            }
+                        }
+                    } else {
+                        if(handstrength < 0.10) {
+                            if(Math.random() < 0.60) {
+                                openFoldAction = "fold";
+                                System.out.println("sars3 set openfold action to fold");
+                            } else {
+                                openFoldAction = "call";
+                                System.out.println("sars4 set openfold action to call");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(openFoldAction != null) {
+            if(action.equals("fold") || action.equals("call")) {
+                actionToReturn = openFoldAction;
+            } else {
+                actionToReturn = action;
+            }
+        } else {
+            if(board == null || board.isEmpty()) {
+                if(position) {
+                    if(opponentAction.equals("bet")) {
+                        if(action.equals("fold")) {
+                            if(effectiveStackBb <= 10) {
+                                if(handstrength > 0.2) {
+                                    actionToReturn = "call";
+                                    System.out.println("sars5");
+                                }
+                            } else {
+                                if(handstrength > 0.1) {
+                                    actionToReturn = "call";
+                                    System.out.println("sars6");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if(actionToReturn == null) {
+            actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+
     private String playerDependentPreflopShoves(String action, List<Card> board, String opponentAction, boolean bluffOddsAreOk,
                                                 String opponentName, double bigBlind, double effectiveStackBb, double botHandstrength) throws Exception {
         String actionToReturn = action;
@@ -2369,6 +2492,35 @@ public class ActionVariables {
                 if(bigBlind > (botBetSize + botStack)) {
                     System.out.println("preflop raise impossible because super low stack below 1bb, change to call");
                     actionToReturn = "call";
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventTooLooseCallsVersusShovesPre(String action, List<Card> board, double oppStack, double botBetSize,
+                                                       double bigBlind, double handstrength, String opponentAction, double amountToCallBb) {
+        String actionToReturn = action;
+
+        if(action.equals("call")) {
+            if(amountToCallBb > 3) {
+                if(board == null || board.isEmpty()) {
+                    if(opponentAction != null && opponentAction.equals("raise")) {
+                        if(oppStack == 0) {
+                            System.out.println("zerker1");
+
+                            double botBetSizeBb = botBetSize / bigBlind;
+
+                            if(botBetSizeBb <= 1) {
+                                System.out.println("zerker2");
+                                if(handstrength < 0.45) {
+                                    actionToReturn = "fold";
+                                    System.out.println("zerker3 change pre call vs shove to fold, because too weak hand and above 3bb to call");
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
