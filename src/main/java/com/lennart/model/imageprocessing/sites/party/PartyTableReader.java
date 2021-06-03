@@ -358,6 +358,8 @@ public class PartyTableReader {
     }
 
     private boolean dollarBuyInPopUpIsOpen() throws Exception {
+        boolean buyInPopUpOpen = false;
+
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(641, 358, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
@@ -369,14 +371,27 @@ public class PartyTableReader {
             //expected when not opened: -15.263.973
 
             System.out.println("dollarBuyInPopup opened. Time: " + currentTime);
-            saveScreenshotOfEntireScreen(currentTime);
-            return true;
+            saveScreenshotOfEntireScreen("dollarBuyInPopupOpen_", currentTime);
+            buyInPopUpOpen = true;
         } else {
-            System.out.println("dollarBuyInPopup dit not open!. Time: " + currentTime);
-            saveScreenshotOfEntireScreen(currentTime);
+            for(int i = 0; i < 3; i++) {
+                TimeUnit.SECONDS.sleep(5);
+                System.out.println("another dollarBuyInPopup attempt: " + i);
+                bufferedImage = ImageProcessor.getBufferedImageScreenShot(641, 358, 1, 1);
+                pixelRgb = bufferedImage.getRGB(0, 0);
+                if(pixelRgb / 1_000_000 == -5) {
+                    buyInPopUpOpen = true;
+                    break;
+                }
+            }
         }
 
-        return false;
+        if(!buyInPopUpOpen) {
+            System.out.println("dollarBuyInPopup dit not open!. Time: " + currentTime);
+            saveScreenshotOfEntireScreen("dollarBuyInPopupDidNotOpen_",currentTime);
+        }
+
+        return buyInPopUpOpen;
     }
 
     public void checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt() throws Exception {

@@ -647,6 +647,7 @@ public class ActionVariables {
         action = shoveWithWeaks(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod, gameVariables.getBigBlind());
         action = limpWithPremiums(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
         action = adjustOpenFoldPlay(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
+        action = preventFlopDonkBetsAfterCheckingVersusLimp(action, boardInMethod, botIsButtonInMethod, potSizeBb);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -1902,8 +1903,13 @@ public class ActionVariables {
                 if(position) {
                     if(opponentAction.equals("bet")) {
                         if(effectiveStackBb <= 10) {
-                            if(handstrength >= 0.80) {
-                                if(Math.random() < 0.45) {
+                            if(handstrength >= 0.95) {
+                                if(Math.random() < 0.7) {
+                                    actionToReturn = "call";
+                                    System.out.println("rrrt limp with superpremium! HS: " + handstrength);
+                                }
+                            } else if(handstrength >= 0.80) {
+                                if(Math.random() < 0.37) {
                                     actionToReturn = "call";
                                     System.out.println("rrrt limp with premium! HS: " + handstrength);
                                 }
@@ -2003,6 +2009,25 @@ public class ActionVariables {
 
         if(actionToReturn == null) {
             actionToReturn = action;
+        }
+
+        return actionToReturn;
+    }
+
+    private String preventFlopDonkBetsAfterCheckingVersusLimp(String action, List<Card> board, boolean position, double potSizeBb) {
+        String actionToReturn = action;
+
+        if(action.equals("bet75pct")) {
+            if(!position) {
+                if(board != null && !board.isEmpty()) {
+                    if(board.size() == 3) {
+                        if(potSizeBb == 2) {
+                            actionToReturn = "check";
+                            System.out.println("vxd Prevent flop donkbet after check versus limp pre");
+                        }
+                    }
+                }
+            }
         }
 
         return actionToReturn;
