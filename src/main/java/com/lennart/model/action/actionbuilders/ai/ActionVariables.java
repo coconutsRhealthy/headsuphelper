@@ -649,6 +649,9 @@ public class ActionVariables {
         action = adjustOpenFoldPlay(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
         action = preventFlopDonkBetsAfterCheckingVersusLimp(action, boardInMethod, botIsButtonInMethod, potSizeBb);
 
+        action = raiseWithWeakVersusLimps(action, boardInMethod, botIsButtonInMethod, effectiveStack, botHandStrengthInMethod, gameVariables.getBigBlind());
+        action = checkWithPremiumsVersusLimps(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack);
+
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
                 sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
@@ -1935,6 +1938,72 @@ public class ActionVariables {
                             if(handstrength >= 0.45) {
                                 actionToReturn = "raise";
                                 System.out.println("rrrt shove with weak! HS: " + handstrength);
+                                sizing = 5000 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String checkWithPremiumsVersusLimps(String action, List<Card> board, boolean position, String opponentAction,
+                                                double handstrength, double effectiveStackBb) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!position) {
+                if(action.equals("raise")) {
+                    if(opponentAction.equals("call")) {
+                        if(effectiveStackBb >= 13) {
+                            if(handstrength > 0.8) {
+                                if(Math.random() < 0.3) {
+                                    actionToReturn = "check";
+                                    System.out.println("nnbb check with premium versus limp deep");
+                                }
+                            }
+                        } else {
+                            if(handstrength > 0.95) {
+                                if(Math.random() < 0.57) {
+                                    actionToReturn = "check";
+                                    System.out.println("nnbb check with superpremium versus limp shallow");
+                                }
+                            } else if(handstrength > 0.8) {
+                                if(Math.random() < 0.31) {
+                                    actionToReturn = "check";
+                                    System.out.println("nnbb check with premium versus limp shallow");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String raiseWithWeakVersusLimps(String action, List<Card> board, boolean position, double effectiveStackBb,
+                                            double handstrength, double bigBlind) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!position) {
+                if(action.equals("check")) {
+                    if(effectiveStackBb >= 13) {
+                        if(handstrength > 0.5) {
+                            if(Math.random() < 0.42) {
+                                actionToReturn = "raise";
+                                System.out.println("nnbb raise with weak versus limp deep");
+                            }
+                        }
+                    } else {
+                        if(handstrength > 0.45) {
+                            if(Math.random() < 0.8) {
+                                actionToReturn = "raise";
+                                System.out.println("nnbb raise with weak versus limp shallow");
                                 sizing = 5000 * bigBlind;
                             }
                         }

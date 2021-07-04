@@ -179,6 +179,7 @@ public class PartyTableReader {
 
             if(hc1Rank == -1 || hc1Suit == 'x') {
                 System.out.println("sng indeed finished, you have no first holecard");
+                saveScreenshotOfEntireScreen("sngFinished", new Date().getTime());
                 return true;
             } else {
                 PartyTableReader.saveScreenshotOfEntireScreen(currentTime);
@@ -295,7 +296,8 @@ public class PartyTableReader {
             if(notRegisteredForAnyTournament()) {
                 System.out.println("You thought you successfully registered, but not. Call registersng() again");
                 saveScreenshotOfEntireScreen("retryRegisterBecauseNotRegistered", new Date().getTime());
-                registerNewSng(positionOfSngInListOfClient);
+                //heel ff niet...
+                //registerNewSng(positionOfSngInListOfClient);
             }
         } else {
             System.out.println("Trying second top sng registration attempt, because pop up did not open...");
@@ -419,7 +421,7 @@ public class PartyTableReader {
     }
 
     public static boolean notRegisteredForAnyTournament() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(877, 161, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(968, 161, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
         if(pixelRgb == -15_263_973) {
