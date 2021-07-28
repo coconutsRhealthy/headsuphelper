@@ -77,14 +77,26 @@ public class PreflopActionBuilder {
 
         if(effectiveStackBb > 12) {
             //23%
+            //hsLimit1 = 0.95;
+            //hsLimit2 = 0.8;
+            //hsLimit3 = 0.75;
+
+            //26.5%
             hsLimit1 = 0.95;
-            hsLimit2 = 0.8;
-            hsLimit3 = 0.75;
+            hsLimit2 = 0.80;
+            //hsLimit3 = 0.65;
+            hsLimit3 = 0.60;
         } else {
             //32%
+            //hsLimit1 = 0.95;
+            //hsLimit2 = 0.75;
+            //hsLimit3 = 0.65;
+
+            //35%
             hsLimit1 = 0.95;
             hsLimit2 = 0.75;
-            hsLimit3 = 0.65;
+            //hsLimit3 = 0.60;
+            hsLimit3 = 0.55;
         }
 
         List<List<Card>> pre3betPoule = new ArrayList<>();
@@ -102,6 +114,7 @@ public class PreflopActionBuilder {
                     double random = Math.random();
 
                     if(random <= 0.92) {
+                    //if(random <= 0.8) {
                         List<Card> comboToAdd = new ArrayList<>();
                         comboToAdd.addAll(combo);
                         pre3betPoule.add(comboToAdd);
@@ -109,9 +122,18 @@ public class PreflopActionBuilder {
                 }
             } else if(entry.getKey() > hsLimit3) {
                 for(Set<Card> combo : entry.getValue()) {
+                    double randomLimit;
+
+                    if(effectiveStackBb > 12) {
+                        randomLimit = 0.42;
+                    } else {
+                        randomLimit = 0.65;
+                    }
+
                     double random = Math.random();
 
-                    if(random <= 0.90) {
+                    //if(random <= 0.90) {
+                    if(random <= randomLimit) {
                         List<Card> comboToAdd = new ArrayList<>();
                         comboToAdd.addAll(combo);
                         pre3betPoule.add(comboToAdd);
@@ -131,12 +153,17 @@ public class PreflopActionBuilder {
         double limit;
 
         if(oppPre2betGroup.equals("low") || oppPre2betGroup.equals("mediumUnknown")) {
-            limit = 0.9;
+            //limit = 0.9;
+            //limit = 0.75;
+            limit = 0.7;
         } else {
             if(noOfHandIsBluffable) {
-                limit = 0.75;
+                //limit = 0.75;
+                limit = 0.7;
             } else {
-                limit = 0.9;
+                //limit = 0.9;
+                //limit = 0.75;
+                limit = 0.7;
             }
         }
 

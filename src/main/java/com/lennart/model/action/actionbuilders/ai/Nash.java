@@ -20,7 +20,7 @@ public class Nash {
                         if(opponentAction.equals("bet")) {
                             if(effectiveStackBb > 3) {
                                 String holeCardsAsString = new DbSave().getComboLogic(holeCards);
-                                Map<String, Double> pushPremiumMap = getCallMap();
+                                Map<String, Double> pushPremiumMap = getPushMap();
                                 double valueForYourCombo = pushPremiumMap.get(holeCardsAsString);
 
                                 if(valueForYourCombo > 10.0) {

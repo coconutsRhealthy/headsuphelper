@@ -648,9 +648,11 @@ public class ActionVariables {
         action = limpWithPremiums(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
         action = adjustOpenFoldPlay(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
         action = preventFlopDonkBetsAfterCheckingVersusLimp(action, boardInMethod, botIsButtonInMethod, potSizeBb);
+        action = raiseFlopsAndTurnsAndRivers(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, strongFdInMethod || strongFlushDraw, strongOosdInMethod || strongOosd, strongGutshotInMethod || strongGutshot, bluffOddsAreOk, botIsButtonInMethod);
 
         action = raiseWithWeakVersusLimps(action, boardInMethod, botIsButtonInMethod, effectiveStack, botHandStrengthInMethod, gameVariables.getBigBlind());
         action = checkWithPremiumsVersusLimps(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack);
+        action = call2betWithPremiumsPreOop(action, boardInMethod, gameVariables.getOpponentAction(), botIsButtonInMethod, botHandStrengthInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -735,6 +737,8 @@ public class ActionVariables {
                 }
             }
         }
+
+        setShoveSizingForCertainPre3betsAndPostCheckRaises(action, botIsButtonInMethod, gameVariables.getOpponentAction(), boardInMethod, gameVariables.getBigBlind());
 
         if(realGame) {
             //fill dbsave
@@ -1852,8 +1856,8 @@ public class ActionVariables {
             if(opponentAction.equals("call")) {
                 if(action.equals("check")) {
                     if(effectiveStackBb < 13) {
-                        if(handstrength >= 0.5) {
-                            if(Math.random() < 0.7) {
+                        if(handstrength >= 0.4) {
+                            if(Math.random() < 0.73) {
                                 actionToReturn = "raise";
                                 sizing = 5000 * bigBlind;
                                 System.out.println("shove more versus limps");
@@ -1861,11 +1865,9 @@ public class ActionVariables {
                         }
                     }
                 } else if(action.equals("raise")) {
-                    if(effectiveStackBb * bigBlind < 400) {
-                        if(sizing < 500) {
-                            System.out.println("extra shove vs limp. Old sizing: " + sizing + " bigblind: " + bigBlind);
-                            sizing = 5000 * bigBlind;
-                        }
+                    if(sizing < 500) {
+                        System.out.println("extra shove vs limp. Old sizing: " + sizing + " bigblind: " + bigBlind);
+                        sizing = 5000 * bigBlind;
                     }
                 }
             }
@@ -1883,7 +1885,7 @@ public class ActionVariables {
                 if(!opponentAction.equals("raise")) {
                     if(effectiveStackBb < 13) {
                         if(handstrength >= 0.5) {
-                            if(Math.random() < 0.5) {
+                            if(Math.random() < 0.62) {
                                 actionToReturn = "raise";
                                 System.out.println("Funky extra preflop shove!");
                                 sizing = 5000 * bigBlind;
@@ -1997,6 +1999,7 @@ public class ActionVariables {
                             if(Math.random() < 0.42) {
                                 actionToReturn = "raise";
                                 System.out.println("nnbb raise with weak versus limp deep");
+                                sizing = 5000 * bigBlind;
                             }
                         }
                     } else {
@@ -2005,6 +2008,28 @@ public class ActionVariables {
                                 actionToReturn = "raise";
                                 System.out.println("nnbb raise with weak versus limp shallow");
                                 sizing = 5000 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String call2betWithPremiumsPreOop(String action, List<Card> board, String opponentAction, boolean position,
+                                              double handstrength) {
+        String actionToReturn = action;
+
+        if(board == null || board.isEmpty()) {
+            if(!position) {
+                if(action.equals("raise")) {
+                    if(opponentAction.equals("raise")) {
+                        if(handstrength > 0.95) {
+                            if(Math.random() < 0.35) {
+                                actionToReturn = "call";
+                                System.out.println("Call with superpremium versus 2bet pre");
                             }
                         }
                     }
@@ -2102,6 +2127,68 @@ public class ActionVariables {
         return actionToReturn;
     }
 
+    private String raiseFlopsAndTurnsAndRivers(String action, List<Card> board, String opponentAction, double handstrength,
+                                      boolean strongFd, boolean strongOosd, boolean strongGutshot, boolean bluffOddsAreOk, boolean position) {
+        String actionToReturn = action;
+
+        if(action.equals("call") || action.equals("fold")) {
+            if(board != null && !board.isEmpty()) {
+                if(opponentAction.equals("bet75pct")) {
+                    if(bluffOddsAreOk) {
+                        if(board.size() == 3 || board.size() == 4) {
+                            if(handstrength > 0.82 || strongFd || strongOosd || (strongGutshot && board.size() == 3)) {
+                                if(Math.random() > 0.2) {
+                                    actionToReturn = "raise";
+                                    System.out.println("" + board.size() + "Doing kinky postflop raise! Action was: " + action + " HS: " + handstrength +
+                                            " strongFd: " + strongFd + " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot);
+                                }
+                            } else if(handstrength > 0.6) {
+                                if(board.size() == 3) {
+                                    if(Math.random() > 0.66) {
+                                        //actionToReturn = "raise";
+                                        //System.out.println("" + board.size() + "Doing bluffy kinky flop postflop raise! Action was: " + action + " HS: " + handstrength +
+                                        //        " strongFd: " + strongFd + " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot);
+                                        System.out.println("Skip bluffy kinky flop postflop raise");
+                                    }
+                                }
+                            }
+                        } else {
+                            if(position) {
+                                if(handstrength > 0.8) {
+                                    if(Math.random() > 0.2) {
+                                        //actionToReturn = "raise";
+                                        //System.out.println("Doing kinky river raise! Handstrength: " + handstrength);
+                                        System.out.println("Skip kinky river postflop raise");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private void setShoveSizingForCertainPre3betsAndPostCheckRaises(String action, boolean position, String opponentAction,
+                                                                    List<Card> board, double bigBlind) {
+        if(sizing < 500) {
+            if(action.equals("raise")) {
+                if(board == null || board.isEmpty()) {
+                    if(opponentAction.equals("raise")) {
+                        if(position) {
+                            System.out.println("mm Shove IP pre 3bet! Old sizing: " + sizing);
+                            sizing = 5000 * bigBlind;
+                        }
+                    }
+                } else {
+                    System.out.println("mm Shove postflop raise! Old sizing: " + sizing);
+                    sizing = 5000 * bigBlind;
+                }
+            }
+        }
+    }
 
     private String playerDependentPreflopShoves(String action, List<Card> board, String opponentAction, boolean bluffOddsAreOk,
                                                 String opponentName, double bigBlind, double effectiveStackBb, double botHandstrength) throws Exception {
@@ -2233,13 +2320,13 @@ public class ActionVariables {
                         }
                     } else if(board.size() == 4) {
                         if(handstrength < 0.7 && !strongFd && !strongSd) {
-                            if(Math.random() < 0.48) {
+                            if(Math.random() < 0.45) {
                                 actionToReturn = "check";
                             }
                         }
                     } else {
-                        if(handstrength < 0.7) {
-                            if(Math.random() < 0.76) {
+                        if(handstrength < 0.65) {
+                            if(Math.random() < 0.65) {
                                 actionToReturn = "check";
                             }
                         }

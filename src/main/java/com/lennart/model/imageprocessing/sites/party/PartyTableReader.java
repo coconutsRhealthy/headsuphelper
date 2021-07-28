@@ -170,6 +170,12 @@ public class PartyTableReader {
         long currentTime = new Date().getTime();
 
         if(timeOfLastAction != -1 && currentTime - timeOfLastAction > 35_000) {
+            if(currentTime - timeOfLastAction > 360_000) {
+                System.out.println("assume sng finished, 6 minutes passed since action");
+                saveScreenshotOfEntireScreen("sngFinishedAssumedForced", new Date().getTime());
+                return true;
+            }
+
             System.out.println("sng could be finished, 35 sec passed since action");
 
             PartyTableReader partyTableReader = new PartyTableReader();
@@ -178,9 +184,18 @@ public class PartyTableReader {
             char hc1Suit = partyTableReader.readFirstHoleCardSuit();
 
             if(hc1Rank == -1 || hc1Suit == 'x') {
-                System.out.println("sng indeed finished, you have no first holecard");
-                saveScreenshotOfEntireScreen("sngFinished", new Date().getTime());
-                return true;
+                String extraCheckHc1RankString = partyTableReader.readFirstHoleCardRank();
+
+                if(extraCheckHc1RankString.equals("rm’")) {
+                    System.out.println("sng indeed finished, you have no first holecard");
+                    saveScreenshotOfEntireScreen("sngFinished", new Date().getTime());
+                    return true;
+                } else {
+                    System.out.println("not sure if sng finished, weird shit. hc1rank: " + extraCheckHc1RankString);
+                    saveScreenshotOfEntireScreen("sngFinishedExtraCheckNeeded", new Date().getTime());
+                    TimeUnit.SECONDS.sleep(5);
+                    return sngIsFinished(timeOfLastAction);
+                }
             } else {
                 PartyTableReader.saveScreenshotOfEntireScreen(currentTime);
                 System.out.println("same hand, sng not finished.. probably opp sitting out.. Time: " + currentTime);
