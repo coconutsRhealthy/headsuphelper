@@ -1855,12 +1855,16 @@ public class ActionVariables {
         if(board == null || board.isEmpty()) {
             if(opponentAction.equals("call")) {
                 if(action.equals("check")) {
-                    if(effectiveStackBb < 13) {
+                    if(effectiveStackBb < 16.7) {
                         if(handstrength >= 0.4) {
                             if(Math.random() < 0.73) {
                                 actionToReturn = "raise";
                                 sizing = 5000 * bigBlind;
                                 System.out.println("shove more versus limps");
+
+                                if(effectiveStackBb >= 13) {
+                                    System.out.println("kmk vs limp 13 - 16.7 bb shove");
+                                }
                             }
                         }
                     }
@@ -1883,12 +1887,16 @@ public class ActionVariables {
         if(board == null || board.isEmpty()) {
             if(!action.equals("raise")) {
                 if(!opponentAction.equals("raise")) {
-                    if(effectiveStackBb < 13) {
+                    if(effectiveStackBb < 16.7) {
                         if(handstrength >= 0.5) {
                             if(Math.random() < 0.62) {
                                 actionToReturn = "raise";
                                 System.out.println("Funky extra preflop shove!");
                                 sizing = 5000 * bigBlind;
+
+                                if(effectiveStackBb >= 13) {
+                                    System.out.println("kmk 13 - 16.7 bb shove");
+                                }
                             }
                         }
                     }
@@ -2133,15 +2141,20 @@ public class ActionVariables {
 
         if(action.equals("call") || action.equals("fold")) {
             if(board != null && !board.isEmpty()) {
-                if(opponentAction.equals("bet75pct")) {
+                if(opponentAction.equals("bet75pct") || opponentAction.equals("raise")) {
                     if(bluffOddsAreOk) {
                         if(board.size() == 3 || board.size() == 4) {
-                            if(handstrength > 0.82 || strongFd || strongOosd || (strongGutshot && board.size() == 3)) {
+                            if((handstrength > 0.82 && opponentAction.equals("bet75pct") || handstrength > 0.86 && opponentAction.equals("raise"))
+                                    || strongFd || strongOosd || (strongGutshot && board.size() == 3)) {
                                 if(Math.random() > 0.2) {
                                     actionToReturn = "raise";
                                     System.out.println("" + board.size() + "Doing kinky postflop raise! Action was: " + action + " HS: " + handstrength +
                                             " strongFd: " + strongFd + " strongOosd: " + strongOosd + " strongGutshot: " + strongGutshot);
-                                }
+
+                                    if(opponentAction.equals("raise")) {
+                                        System.out.println("kinky raise versus opp raise!");
+                                    }
+                                 }
                             } else if(handstrength > 0.6) {
                                 if(board.size() == 3) {
                                     if(Math.random() > 0.66) {
@@ -2326,7 +2339,7 @@ public class ActionVariables {
                         }
                     } else {
                         if(handstrength < 0.65) {
-                            if(Math.random() < 0.65) {
+                            if(Math.random() < 0.4875) {
                                 actionToReturn = "check";
                             }
                         }

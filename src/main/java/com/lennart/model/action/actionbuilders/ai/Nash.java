@@ -14,7 +14,8 @@ public class Nash {
         boolean nashActionIsPossible = false;
 
         if(board == null || board.isEmpty()) {
-            if(effectiveStackBb <= 10) {
+            if(effectiveStackBb <= 10 || (effectiveStackBb <= 16.7 && Math.random() < 0.75)
+                    || (effectiveStackBb <= 20 && Math.random() < 0.4)) {
                 if(position) {
                     if(botBetSizeBb == 0.5) {
                         if(opponentAction.equals("bet")) {
@@ -35,6 +36,14 @@ public class Nash {
 
                             if(nashActionIsPossible) {
                                 System.out.println("IP Nash action is possible!");
+
+                                if(effectiveStackBb > 10) {
+                                    if(effectiveStackBb <= 16.7) {
+                                        System.out.println("a-More deep IP Nash action possible!");
+                                    } else {
+                                        System.out.println("b-More deep IP Nash action possible!");
+                                    }
+                                }
                             }
                         }
                     }
