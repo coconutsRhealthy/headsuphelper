@@ -57,7 +57,7 @@ public class ContinuousTable implements ContinuousTableable {
 
     private double lastBuyIn = 10;
     private double newBuyInToSelect = 10;
-    private double bankroll = 222.66;
+    private double bankroll = 265.66;
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
