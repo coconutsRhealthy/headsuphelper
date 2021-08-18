@@ -1,5 +1,6 @@
 package com.lennart.model.imageprocessing.sites.party;
 
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.ImageProcessor;
@@ -252,7 +253,14 @@ public class PartyTableReader {
         MouseKeyboard.click(308, 293);
     }
 
-    public void registerNewSng(String positionOfSngInListOfClient) throws Exception {
+    public void registerNewSng(String positionOfSngInListOfClient, ContinuousTable continuousTable) throws Exception {
+        if(continuousTable.getLastBuyIn() != continuousTable.getNewBuyInToSelect()) {
+            System.out.println("gonna go for new buyin: " + continuousTable.getNewBuyInToSelect() + " prev was: " + continuousTable.getLastBuyIn());
+            selectBuyIn(continuousTable);
+        } else {
+            System.out.println("keep same buyin, both previous and new one are: " + continuousTable.getNewBuyInToSelect());
+        }
+
         clickTopSngInList(positionOfSngInListOfClient);
         TimeUnit.MILLISECONDS.sleep(2000);
 
@@ -316,7 +324,7 @@ public class PartyTableReader {
             }
         } else {
             System.out.println("Trying second top sng registration attempt, because pop up did not open...");
-            registerNewSng("second");
+            registerNewSng("second", continuousTable);
         }
     }
 
@@ -972,6 +980,84 @@ public class PartyTableReader {
         System.out.println("BIGBLIND: " + bigBlind);
 
         return bigBlind;
+    }
+
+    public static double readBankroll() throws Exception {
+        double bankroll = -1;
+
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(1118, 126, 1202, 151);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        String bankrollString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        System.out.println("Read base bankrollstring: " + bankrollString);
+        bankrollString = bankrollString.replace("?", "7");
+        bankrollString = ImageProcessor.removeAllNonNumericCharacters(bankrollString);
+
+        if(bankrollString.matches("^[0-9]+(\\.[0-9]{1,2})?$")) {
+            bankroll = Double.parseDouble(bankrollString);
+        } else {
+            System.out.println("Weird bankroll string: " + bankrollString);
+        }
+
+        System.out.println("Read bankroll digit: " + bankroll);
+        saveScreenshotOfEntireScreen("bankroll_" + bankroll + "_", new Date().getTime());
+
+        return bankroll;
+    }
+
+    private void selectBuyIn(ContinuousTable continuousTable) throws Exception {
+        double previousBuyIn = continuousTable.getLastBuyIn();
+        double buyInToSelect = continuousTable.getNewBuyInToSelect();
+
+        System.out.println("BUYIN SHIZZLE. Prev was: " + previousBuyIn + " New buy in will be: " + buyInToSelect);
+
+        TimeUnit.SECONDS.sleep(2);
+        pressCategoryCollapseButton();
+
+        TimeUnit.SECONDS.sleep(2);
+        pressBuyinDropdownButton();
+
+        TimeUnit.SECONDS.sleep(2);
+        pressBuyInCheckBox(buyInToSelect);
+
+        TimeUnit.SECONDS.sleep(2);
+        pressBuyInCheckBox(previousBuyIn);
+
+        TimeUnit.SECONDS.sleep(2);
+        pressCategoryExpandButton();
+
+        TimeUnit.SECONDS.sleep(2);
+
+        selectAndUnselect6PlayerPerTableFilter();
+
+        saveScreenshotOfEntireScreen("buyin_" + buyInToSelect + "__", new Date().getTime());
+
+        continuousTable.setLastBuyIn(buyInToSelect);
+    }
+
+    private void pressBuyInCheckBox(double buyInToSelect) {
+        if(buyInToSelect == 1 || buyInToSelect == -1) {
+            MouseKeyboard.click(226, 408);
+        } else if(buyInToSelect == 2) {
+            MouseKeyboard.click(227, 438);
+        } else if(buyInToSelect == 5) {
+            MouseKeyboard.click(224, 468);
+        } else if(buyInToSelect == 10) {
+            MouseKeyboard.click(225, 497);
+        } else if(buyInToSelect == 20) {
+            MouseKeyboard.click(225, 526);
+        }
+    }
+
+    private void pressCategoryExpandButton() {
+        MouseKeyboard.click(597, 264);
+    }
+
+    private void pressCategoryCollapseButton() {
+        MouseKeyboard.click(592, 330);
+    }
+
+    private void pressBuyinDropdownButton() {
+        MouseKeyboard.click(565, 245);
     }
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {

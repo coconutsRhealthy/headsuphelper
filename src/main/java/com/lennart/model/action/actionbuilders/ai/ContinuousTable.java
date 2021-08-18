@@ -55,6 +55,10 @@ public class ContinuousTable implements ContinuousTableable {
     private long timeOfLastDoneAction = -1;
     private boolean gonnaDoFirstActionOfNewSng = false;
 
+    private double lastBuyIn = 10;
+    private double newBuyInToSelect = 10;
+    private double bankroll = 222.66;
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -394,7 +398,8 @@ public class ContinuousTable implements ContinuousTableable {
             partyTableReader.selectAndUnselect6PlayerPerTableFilter();
 
             TimeUnit.MILLISECONDS.sleep(1500);
-            partyTableReader.registerNewSng("first");
+            decideBuyIn();
+            partyTableReader.registerNewSng("first", this);
 
             gonnaDoFirstActionOfNewSng = true;
             timeOfLastDoneAction = -1;
@@ -453,7 +458,7 @@ public class ContinuousTable implements ContinuousTableable {
 
     private void doSngStartSessionLogic() throws Exception {
         PartyTableReader partyTableReader = new PartyTableReader();
-        partyTableReader.registerNewSng("first");
+        partyTableReader.registerNewSng("first", this);
         gonnaDoFirstActionOfNewSng = true;
 
         int counter = 0;
@@ -481,6 +486,30 @@ public class ContinuousTable implements ContinuousTableable {
         }
 
         TimeUnit.SECONDS.sleep(6);
+    }
+
+    private void decideBuyIn() throws Exception {
+        double bankrollReadFromScreen = PartyTableReader.readBankroll();
+
+        if((bankrollReadFromScreen < 0.88 * this.bankroll) || (bankrollReadFromScreen > 1.12 * this.bankroll)) {
+            System.out.println("read bankroll can't be right, too big diff with previous. Newly read: " + bankrollReadFromScreen + " previous: " + this.bankroll);
+        } else {
+            bankroll = bankrollReadFromScreen;
+        }
+
+        if(bankroll > 800) {
+            newBuyInToSelect = 20;
+        } else if(bankroll > 300) {
+            newBuyInToSelect = 20;
+        } else if(bankroll > 100) {
+            newBuyInToSelect = 10;
+        } else if(bankroll > 60) {
+            newBuyInToSelect = 5;
+        } else if(bankroll > 30) {
+            newBuyInToSelect = 2;
+        } else {
+            newBuyInToSelect = 1;
+        }
     }
 
     @Override
@@ -611,5 +640,29 @@ public class ContinuousTable implements ContinuousTableable {
 
     public RangeConstructor getRangeConstructor() {
         return rangeConstructor;
+    }
+
+    public double getLastBuyIn() {
+        return lastBuyIn;
+    }
+
+    public void setLastBuyIn(double lastBuyIn) {
+        this.lastBuyIn = lastBuyIn;
+    }
+
+    public double getNewBuyInToSelect() {
+        return newBuyInToSelect;
+    }
+
+    public void setNewBuyInToSelect(double newBuyInToSelect) {
+        this.newBuyInToSelect = newBuyInToSelect;
+    }
+
+    public double getBankroll() {
+        return bankroll;
+    }
+
+    public void setBankroll(double bankroll) {
+        this.bankroll = bankroll;
     }
 }
