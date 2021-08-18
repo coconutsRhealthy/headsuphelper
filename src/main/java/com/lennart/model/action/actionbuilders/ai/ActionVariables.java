@@ -2327,20 +2327,38 @@ public class ActionVariables {
                 if(position) {
                     if(board.size() == 3) {
                         if(handstrength < 0.7 && !strongFd && !strongSd) {
-                            if(Math.random() < 0.1) {
+                            double random = Math.random();
+
+                            if(random < 0.275) {
                                 actionToReturn = "check";
+
+                                if(random >= 0.1) {
+                                    System.out.println("eije extra flop IP check");
+                                }
                             }
                         }
                     } else if(board.size() == 4) {
                         if(handstrength < 0.7 && !strongFd && !strongSd) {
-                            if(Math.random() < 0.45) {
+                            double random = Math.random();
+
+                            if(random < 0.39) {
                                 actionToReturn = "check";
+                            }
+
+                            if(random > 0.39 && random < 0.45) {
+                                System.out.println("eije extra turn IP bet");
                             }
                         }
                     } else {
                         if(handstrength < 0.65) {
-                            if(Math.random() < 0.4875) {
+                            double random = Math.random();
+
+                            if(random < 0.44) {
                                 actionToReturn = "check";
+                            }
+
+                            if(random > 0.44 && random < 0.4875) {
+                                System.out.println("eije extra river IP bet");
                             }
                         }
                     }
@@ -2349,12 +2367,20 @@ public class ActionVariables {
                         actionToReturn = "check";
                     } else if(board.size() == 4) {
                         if(handstrength < 0.7) {
-                            actionToReturn = "check";
+                            if(Math.random() < 0.86) {
+                                actionToReturn = "check";
+                            } else {
+                                System.out.println("eije extra turn oop bluffbet");
+                            }
                         }
                     } else {
                         if(handstrength < 0.7) {
-                            if(Math.random() < 0.65) {
+                            double random = Math.random();
+
+                            if(random < 0.52) {
                                 actionToReturn = "check";
+                            } else if(random < 0.65) {
+                                System.out.println("eije extra river oop bluffbet");
                             }
                         }
                     }

@@ -14,8 +14,8 @@ public class Nash {
         boolean nashActionIsPossible = false;
 
         if(board == null || board.isEmpty()) {
-            if(effectiveStackBb <= 10 || (effectiveStackBb <= 16.7 && Math.random() < 0.75)
-                    || (effectiveStackBb <= 20 && Math.random() < 0.4)) {
+            if(effectiveStackBb <= 10 || (effectiveStackBb <= 16.7 && Math.random() < 0.8)
+                    || (effectiveStackBb <= 20 && Math.random() < 0.45)) {
                 if(position) {
                     if(botBetSizeBb == 0.5) {
                         if(opponentAction.equals("bet")) {
