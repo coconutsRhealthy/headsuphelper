@@ -147,7 +147,8 @@ public class OpponentRangeSetter {
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                             gameVariables.getBotHoleCards()),
                     inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                    inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize()),
+                    inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(),
+                            gameVariables.getBotBetSize(), gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
             System.out.println("rnge: smstr oppBetRange");
@@ -158,7 +159,8 @@ public class OpponentRangeSetter {
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                             gameVariables.getBotHoleCards()),
                     inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                    inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize()),
+                    inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize(),
+                            gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
             System.out.println("rnge: smstr oppRaiseRange");
@@ -215,7 +217,8 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize()),
+                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize(),
+                                gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 System.out.println("rnge: pf2f oppFlopBetRange");
@@ -243,7 +246,7 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                        inputProvider.getPotSizeGroup(gameVariables.getPot()),
+                        inputProvider.getPotSizeGroup(gameVariables.getPot(), gameVariables.getBigBlind()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 System.out.println("rnge: pf2f oppFlopCheckRange");
@@ -254,7 +257,8 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize()),
+                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize(),
+                                gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 System.out.println("rnge: pf2f oppBetRange");
@@ -316,7 +320,7 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                        inputProvider.getPotSizeGroup(previousRound.getPot()),
+                        inputProvider.getPotSizeGroup(previousRound.getPot(), gameVariables.getBigBlind()),
                         previousBoard,
                         gameVariables.getBotHoleCards());
                 System.out.println("rnge: trnrvr oppCheckRange");
@@ -327,7 +331,8 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostLooseness(gameVariables.getOpponentName()),
-                        inputProvider.getBotSizingGroup(previousRound.getSizing(), gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize()),
+                        inputProvider.getBotSizingGroup(previousRound.getSizing(), gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize(),
+                                gameVariables.getBigBlind(), previousRound.getBotAction()),
                         previousBoard,
                         gameVariables.getBotHoleCards());
                 continuousTable.setOppRange(oppCallRange);
@@ -350,7 +355,7 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                        inputProvider.getPotSizeGroup(gameVariables.getPot()),
+                        inputProvider.getPotSizeGroup(gameVariables.getPot(), gameVariables.getBigBlind()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 System.out.println("rnge: trnrvr oppCheckRange");
@@ -362,7 +367,8 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize()),
+                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize(),
+                                gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 System.out.println("rnge: trnrvr oppBetRange");
@@ -376,7 +382,8 @@ public class OpponentRangeSetter {
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, previousBoard,
                             gameVariables.getBotHoleCards()),
                     inputProvider.getOppPostLooseness(gameVariables.getOpponentName()),
-                    inputProvider.getBotSizingGroup(previousRound.getSizing(), gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize()),
+                    inputProvider.getBotSizingGroup(previousRound.getSizing(), gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize(),
+                            gameVariables.getBigBlind(), previousRound.getBotAction()),
                     previousBoard,
                     gameVariables.getBotHoleCards());
 
@@ -389,7 +396,8 @@ public class OpponentRangeSetter {
                         equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                                 gameVariables.getBotHoleCards()),
                         inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize()),
+                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize(),
+                                gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards());
                 System.out.println("rnge: trnrvr oppDonkBetRange");
@@ -398,11 +406,27 @@ public class OpponentRangeSetter {
                 System.out.println("Shouldn't come here, OpponentRangeSetter - 13");
             }
         } else if(previousRound.getBotAction().equals("call")) {
-            System.out.println("OOP CALL Ze Ze POSTFLOP DONE");
-            System.out.println("rnge: trnrvr samerange");
-            continuousTable.setOppRange(continuousTable.getOppRange());
+            if(gameVariables.getOpponentAction().equals("bet75pct")) {
+                List<List<Card>> oppBetAfterBetOrRaiseOnPrevStreetRange = rangeConstructor.getOppPostflopBetRange(
+                        continuousTable.getOppRange(),
+                        equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
+                                gameVariables.getBotHoleCards()),
+                        inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
+                        inputProvider.getOppSizingGroup(gameVariables.getOpponentBetSize(), gameVariables.getBotStack(), gameVariables.getBotBetSize(),
+                                gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
+                        gameVariables.getBoard(),
+                        gameVariables.getBotHoleCards());
+                System.out.println("HIERO, de opp OOP bet after OOP bet or raise on prev street range!");
+                continuousTable.setOppRange(oppBetAfterBetOrRaiseOnPrevStreetRange);
+            } else if(gameVariables.getOpponentAction().equals("check")) {
+                System.out.println("IP CALL Ze Ze POSTFLOP DONE, afterwards opp checks to you");
+                System.out.println("rnge: trnrvr samerange");
+                continuousTable.setOppRange(continuousTable.getOppRange());
+            } else {
+                System.out.println("Shouldn't come here, OpponentRangeSetter - 14");
+            }
         } else {
-            System.out.println("Shouldn't come here, OpponentRangeSetter - 14");
+            System.out.println("Shouldn't come here, OpponentRangeSetter - 15");
         }
     }
 }

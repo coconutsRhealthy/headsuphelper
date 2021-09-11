@@ -2154,7 +2154,9 @@ public class ActionVariables {
                                     if(opponentAction.equals("raise")) {
                                         System.out.println("kinky raise versus opp raise!");
                                     }
-                                 }
+                                } else {
+                                    System.out.println("20% shizzle no kinky raise versus " + opponentAction);
+                                }
                             } else if(handstrength > 0.6) {
                                 if(board.size() == 3) {
                                     if(Math.random() > 0.66) {

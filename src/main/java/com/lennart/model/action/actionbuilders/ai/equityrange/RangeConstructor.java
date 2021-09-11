@@ -613,6 +613,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 5;
+
+                if(board.size() == 5) {
+                    airPercentage = 38;
+                    System.out.println("hesker1");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(MEDIUM)) {
@@ -620,6 +626,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 4;
+
+                if(board.size() == 5) {
+                    airPercentage = 30;
+                    System.out.println("hesker2");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(LARGE)) {
@@ -627,6 +639,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD);
                 double drawPercentageToInclude = 50;
                 double airPercentage = 2;
+
+                if(board.size() == 5) {
+                    airPercentage = 15;
+                    System.out.println("hesker3");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -639,6 +657,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 20;
+
+                if(board.size() == 5) {
+                    airPercentage = 60;
+                    System.out.println("hesker4");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(MEDIUM)) {
@@ -646,6 +670,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD, MEDIUM_OOSD);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 17;
+
+                if(board.size() == 5) {
+                    airPercentage = 50;
+                    System.out.println("hesker5");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(LARGE)) {
@@ -653,6 +683,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT, MEDIUM_FD);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 15;
+
+                if(board.size() == 5) {
+                    airPercentage = 44;
+                    System.out.println("hesker6");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -666,6 +702,12 @@ public class RangeConstructor {
                         MEDIUM_OOSD, MEDIUM_GUTSHOT, WEAK_FD, WEAK_OOSD, WEAK_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 33;
+
+                if(board.size() == 5) {
+                    airPercentage = 83;
+                    System.out.println("hesker7");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(MEDIUM)) {
@@ -674,6 +716,12 @@ public class RangeConstructor {
                         MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 28;
+
+                if(board.size() == 5) {
+                    airPercentage = 70;
+                    System.out.println("hesker8");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppBetsize.equals(LARGE)) {
@@ -682,6 +730,12 @@ public class RangeConstructor {
                         MEDIUM_OOSD);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 25;
+
+                if(board.size() == 5) {
+                    airPercentage = 62;
+                    System.out.println("hesker9");
+                }
+
                 oppBetRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -919,6 +973,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 12;
+
+                if(board.size() == 5) {
+                    airPercentage = 0;
+                    System.out.println("heskor1");
+                }
+
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(MEDIUM)) {
@@ -926,6 +986,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 10;
+
+                if(board.size() == 5) {
+                    airPercentage = 0;
+                    System.out.println("heskor2");
+                }
+
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(LARGE)) {
@@ -933,6 +999,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 8;
+
+                if(board.size() == 5) {
+                    airPercentage = 0;
+                    System.out.println("heskor3");
+                }
+
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {
@@ -946,6 +1018,12 @@ public class RangeConstructor {
                         MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 24;
+
+                if(board.size() == 5) {
+                    airPercentage = 5;
+                    System.out.println("heskor4");
+                }
+
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(MEDIUM)) {
@@ -954,6 +1032,12 @@ public class RangeConstructor {
                         MEDIUM_OOSD, MEDIUM_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 21;
+
+                if(board.size() == 5) {
+                    airPercentage = 4;
+                    System.out.println("heskor5");
+                }
+
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else if(oppRaiseSize.equals(LARGE)) {
@@ -961,6 +1045,12 @@ public class RangeConstructor {
                 List<String> drawsToInclude = Arrays.asList(STRONG_FD, STRONG_OOSD, STRONG_GUTSHOT);
                 double drawPercentageToInclude = 100;
                 double airPercentage = 18;
+
+                if(board.size() == 5) {
+                    airPercentage = 3;
+                    System.out.println("heskor6");
+                }
+
                 oppRaiseRange = fillRange(oppStartingRange, allCombosEquitySorted, board, knownGameCards, valuePercentage,
                         airPercentage, drawsToInclude, drawPercentageToInclude);
             } else {

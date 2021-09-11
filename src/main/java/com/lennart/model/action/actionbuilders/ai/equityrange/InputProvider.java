@@ -184,7 +184,18 @@ public class InputProvider {
         return postLoosenessGroup;
     }
 
-    public String getBotSizingGroup(double botSizing, double oppStack, double oppTotalBetsize) {
+    public String getBotSizingGroup(double botSizing, double oppStack, double oppTotalBetsize, double bigBlind, String botAction) {
+        double smallLimitBb;
+        double mediumLimitBb;
+
+        if(botAction.equals("bet75pct")) {
+            smallLimitBb = 1;
+            mediumLimitBb = 2.5;
+        } else {
+            smallLimitBb = 3;
+            mediumLimitBb = 6;
+        }
+
         String botSizingGroup;
 
         double oppAmountToCall = botSizing - oppTotalBetsize;
@@ -193,9 +204,11 @@ public class InputProvider {
             oppAmountToCall = oppStack;
         }
 
-        if(oppAmountToCall <= 60) {
+        double oppAmountToCallBb = oppAmountToCall / bigBlind;
+
+        if(oppAmountToCallBb <= smallLimitBb) {
             botSizingGroup = SMALL;
-        } else if(oppAmountToCall <= 160) {
+        } else if(oppAmountToCallBb <= mediumLimitBb) {
             botSizingGroup = MEDIUM;
         } else {
             botSizingGroup = LARGE;
@@ -204,7 +217,18 @@ public class InputProvider {
         return botSizingGroup;
     }
 
-    public String getOppSizingGroup(double oppTotalBetsize, double botStack, double botTotalBetsize) {
+    public String getOppSizingGroup(double oppTotalBetsize, double botStack, double botTotalBetsize, double bigBlind, String oppAction) {
+        double smallLimitBb;
+        double mediumLimitBb;
+
+        if(oppAction.equals("bet75pct")) {
+            smallLimitBb = 1;
+            mediumLimitBb = 2.5;
+        } else {
+            smallLimitBb = 3;
+            mediumLimitBb = 6;
+        }
+
         String oppSizingGroup;
 
         double amountToCall = oppTotalBetsize - botTotalBetsize;
@@ -213,9 +237,11 @@ public class InputProvider {
             amountToCall = botStack;
         }
 
-        if(amountToCall <= 60) {
+        double amountToCallBb = amountToCall / bigBlind;
+
+        if(amountToCallBb <= smallLimitBb) {
             oppSizingGroup = SMALL;
-        } else if(amountToCall <= 160) {
+        } else if(amountToCallBb <= mediumLimitBb) {
             oppSizingGroup = MEDIUM;
         } else {
             oppSizingGroup = LARGE;
@@ -224,12 +250,14 @@ public class InputProvider {
         return oppSizingGroup;
     }
 
-    public String getPotSizeGroup(double potSize) {
+    public String getPotSizeGroup(double potSize, double bigBlind) {
+        double potSizeBb = potSize / bigBlind;
+
         String potSizeGroup;
 
-        if(potSize < 90) {
+        if(potSizeBb <= 2) {
             potSizeGroup = SMALL;
-        } else if(potSize < 180) {
+        } else if(potSizeBb <= 4) {
             potSizeGroup = MEDIUM;
         } else {
             potSizeGroup = LARGE;

@@ -56,7 +56,9 @@ public class EquityAction {
                         gameVariables.getOpponentAction(),
                         gameVariables.getBotStack(),
                         gameVariables.getBotBetSize(),
-                        gameVariables.getOpponentStack());
+                        gameVariables.getOpponentStack(),
+                        gameVariables.getBigBlind(),
+                        gameVariables.getOpponentAction());
             } else {
                 action = getPostflopCheckOrBetAction(
                         continuousTable,
@@ -66,7 +68,8 @@ public class EquityAction {
                         gameVariables.getBoard(),
                         gameVariables.getBotHoleCards(),
                         gameVariables.getOpponentStack(),
-                        gameVariables.getOpponentBetSize());
+                        gameVariables.getOpponentBetSize(),
+                        gameVariables.getBigBlind());
             }
         }
 
@@ -271,11 +274,11 @@ public class EquityAction {
 
     private String getPostflopCheckOrBetAction(ContinuousTable continuousTable, List<List<Card>> currentOppRange,
                                                String oppName, double sizing, List<Card> board, List<Card> botHoleCards,
-                                               double oppStack, double oppTotalBetsize) {
+                                               double oppStack, double oppTotalBetsize, double bigBlind) {
         String actionToReturn;
 
         String oppLooseness = inputProvider.getOppPostLooseness(oppName);
-        String botSizingGroup = inputProvider.getBotSizingGroup(sizing, oppStack, oppTotalBetsize);
+        String botSizingGroup = inputProvider.getBotSizingGroup(sizing, oppStack, oppTotalBetsize, bigBlind, "bet75pct");
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
@@ -302,11 +305,12 @@ public class EquityAction {
                                                     String oppName, double oppTotalBetsize, List<Card> board,
                                                     List<Card> botHoleCards, List<String> eligibleActions,
                                                     double botHypotheticalRaiseSizing, double facingOdds, String oppAction,
-                                                    double botStack, double botTotalBetsize, double oppStack) {
+                                                    double botStack, double botTotalBetsize, double oppStack,
+                                                    double bigBlind, String opponentAction) {
         String actionToReturn;
 
         String oppAggroness = inputProvider.getOppPostAggroness(oppName);
-        String oppSizingGroup = inputProvider.getOppSizingGroup(oppTotalBetsize, botStack, botTotalBetsize);
+        String oppSizingGroup = inputProvider.getOppSizingGroup(oppTotalBetsize, botStack, botTotalBetsize, bigBlind, opponentAction);
 
         List<List<Card>> allCombosPostflopEquitySorted = getAllCombosPostflopEquitySorted(continuousTable, board, botHoleCards);
 
@@ -330,7 +334,7 @@ public class EquityAction {
         if(botEquity > oppAverageBetOrRaiseEquity) {
             if(eligibleActions.contains("raise")) {
                 String oppLooseness = inputProvider.getOppPostLooseness(oppName);
-                String botSizingGroup = inputProvider.getBotSizingGroup(botHypotheticalRaiseSizing, oppStack, oppTotalBetsize);
+                String botSizingGroup = inputProvider.getBotSizingGroup(botHypotheticalRaiseSizing, oppStack, oppTotalBetsize, bigBlind, "raise");
 
                 List<List<Card>> oppCallingRaiseRange = rangeConstructor.getOppPostflopCallRange(oppBetOrRaiseRange,
                         allCombosPostflopEquitySorted, oppLooseness, botSizingGroup, board, botHoleCards);

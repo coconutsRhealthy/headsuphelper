@@ -55,7 +55,7 @@ public class BluffAction {
 
                 if(bluffOddsAreOk) {
                     List<List<Card>> oppCallRangeWhenYouBluff = getOppCallRangeWhenYouBluff(continuousTable,
-                            gameVariables, botSizing);
+                            gameVariables, botSizing, bluffActionToUse);
                     List<List<Card>> oppRaiseRangeWhenYouBluff = getOppRaiseRangeWhenYouBluff(continuousTable,
                             gameVariables, botSizing);
                     List<List<Card>> oppCallRaiseRangeCombined = Stream.concat(oppCallRangeWhenYouBluff.stream(), oppRaiseRangeWhenYouBluff.stream())
@@ -168,7 +168,7 @@ public class BluffAction {
         return actionToReturn;
     }
 
-    private List<List<Card>> getOppCallRangeWhenYouBluff(ContinuousTable continuousTable, GameVariables gameVariables, double botSizing) {
+    private List<List<Card>> getOppCallRangeWhenYouBluff(ContinuousTable continuousTable, GameVariables gameVariables, double botSizing, String botAction) {
         List<List<Card>> oppCallRangeWhenYouBluff;
 
         if(gameVariables.getBoard() == null || gameVariables.getBoard().isEmpty()) {
@@ -192,7 +192,7 @@ public class BluffAction {
                     continuousTable.getOppRange(),
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(), gameVariables.getBotHoleCards()),
                     inputProvider.getOppPostLooseness(gameVariables.getOpponentName()),
-                    inputProvider.getBotSizingGroup(botSizing, gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize()),
+                    inputProvider.getBotSizingGroup(botSizing, gameVariables.getOpponentStack(), gameVariables.getOpponentBetSize(), gameVariables.getBigBlind(), botAction),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
         }
@@ -236,7 +236,8 @@ public class BluffAction {
                     equityAction.getAllCombosPostflopEquitySorted(continuousTable, gameVariables.getBoard(),
                             gameVariables.getBotHoleCards()),
                     inputProvider.getOppPostAggroness(gameVariables.getOpponentName()),
-                    inputProvider.getOppSizingGroup(fictionalOppRaiseSizing, gameVariables.getBotStack(), botSizing),
+                    inputProvider.getOppSizingGroup(fictionalOppRaiseSizing, gameVariables.getBotStack(), botSizing,
+                            gameVariables.getBigBlind(), gameVariables.getOpponentAction()),
                     gameVariables.getBoard(),
                     gameVariables.getBotHoleCards());
         }
