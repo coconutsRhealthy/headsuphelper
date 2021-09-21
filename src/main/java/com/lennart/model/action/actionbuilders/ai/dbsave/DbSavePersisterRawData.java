@@ -21,7 +21,7 @@ public class DbSavePersisterRawData {
 
         Statement st = con.createStatement();
 
-        int highestIntEntry = getHighestIntEntry("dbstats_raw_9");
+        int highestIntEntry = getHighestIntEntry("dbstats_raw_10");
 
         for(DbSave dbSave : dbSaveList) {
             if(dbSave instanceof DbSaveRaw) {
@@ -36,7 +36,7 @@ public class DbSavePersisterRawData {
                     continuousTable.setBotDidPre4bet(false);
                 }
 
-                st.executeUpdate("INSERT INTO dbstats_raw_9 (" +
+                st.executeUpdate("INSERT INTO dbstats_raw_10 (" +
                     "entry, " +
                     "date, " +
                     "bot_action, " +

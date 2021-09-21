@@ -37,6 +37,8 @@ public class RangeConstructor {
     private Map<List<Card>, StraightDrawEvaluator> straightDrawEvaluatorMap = new HashMap<>();
     private Map<List<Card>, FlushDrawEvaluator> flushDrawEvaluatorMap = new HashMap<>();
 
+    private double riverOppAverageBetOrRaiseEquity = -1;
+
     public static void main(String[] args) {
         new RangeConstructor().testMethod();
     }
@@ -1413,5 +1415,13 @@ public class RangeConstructor {
 
     public Map<List<Card>, FlushDrawEvaluator> getFlushDrawEvaluatorMap() {
         return flushDrawEvaluatorMap;
+    }
+
+    public double getRiverOppAverageBetOrRaiseEquity() {
+        return riverOppAverageBetOrRaiseEquity;
+    }
+
+    public void setRiverOppAverageBetOrRaiseEquity(double riverOppBetRangeAverageHs) {
+        this.riverOppAverageBetOrRaiseEquity = riverOppBetRangeAverageHs;
     }
 }

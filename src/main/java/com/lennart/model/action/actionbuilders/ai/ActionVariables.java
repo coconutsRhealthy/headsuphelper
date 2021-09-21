@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai;
 
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.equityrange.BotActionBuilder;
+import com.lennart.model.action.actionbuilders.ai.equityrange.RangeConstructor;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
@@ -648,11 +649,14 @@ public class ActionVariables {
         action = limpWithPremiums(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
         action = adjustOpenFoldPlay(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack, botIsButtonInMethod);
         action = preventFlopDonkBetsAfterCheckingVersusLimp(action, boardInMethod, botIsButtonInMethod, potSizeBb);
-        action = raiseFlopsAndTurnsAndRivers(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, strongFdInMethod || strongFlushDraw, strongOosdInMethod || strongOosd, strongGutshotInMethod || strongGutshot, bluffOddsAreOk, botIsButtonInMethod);
+        action = raiseFlopsAndTurnsAndRivers(action, boardInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, strongFdInMethod || strongFlushDraw, strongOosdInMethod || strongOosd, strongGutshotInMethod || strongGutshot, bluffOddsAreOk, continuousTable.getRangeConstructor(), botIsButtonInMethod);
 
         action = raiseWithWeakVersusLimps(action, boardInMethod, botIsButtonInMethod, effectiveStack, botHandStrengthInMethod, gameVariables.getBigBlind());
         action = checkWithPremiumsVersusLimps(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack);
         action = call2betWithPremiumsPreOop(action, boardInMethod, gameVariables.getOpponentAction(), botIsButtonInMethod, botHandStrengthInMethod);
+
+        action = barrel(continuousTable.getHandLine(), action, bluffOddsAreOk, continuousTable.isOpponentHasInitiative(), boardInMethod, botIsButtonInMethod, botHandStrengthInMethod);
+        action = floatBet(continuousTable.getHandLine(), action, bluffOddsAreOk, continuousTable.isOpponentHasInitiative(), boardInMethod, botIsButtonInMethod, botHandStrengthInMethod, potSizeBb);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -672,7 +676,7 @@ public class ActionVariables {
         } else if(action.equals("bet75pct")) {
             //sizing = 0.5 * gameVariables.getPot();
             if(boardInMethod != null && !boardInMethod.isEmpty() && boardInMethod.size() == 3 && !botIsButtonInMethod) {
-                sizing = 0.35 * gameVariables.getPot();
+                sizing = 0.4 * gameVariables.getPot();
             } else {
                 sizing = 0.5 * gameVariables.getPot();
             }
@@ -739,6 +743,8 @@ public class ActionVariables {
         }
 
         setShoveSizingForCertainPre3betsAndPostCheckRaises(action, botIsButtonInMethod, gameVariables.getOpponentAction(), boardInMethod, gameVariables.getBigBlind());
+        raiseSmallerVersusLimpsDeep(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), effectiveStack, gameVariables.getBigBlind());
+        updateHandLine(action, boardInMethod, continuousTable.getHandLine(), botIsButtonInMethod, continuousTable);
 
         if(realGame) {
             //fill dbsave
@@ -2136,7 +2142,8 @@ public class ActionVariables {
     }
 
     private String raiseFlopsAndTurnsAndRivers(String action, List<Card> board, String opponentAction, double handstrength,
-                                      boolean strongFd, boolean strongOosd, boolean strongGutshot, boolean bluffOddsAreOk, boolean position) {
+                                               boolean strongFd, boolean strongOosd, boolean strongGutshot, boolean bluffOddsAreOk,
+                                               RangeConstructor rangeConstructor, boolean position) {
         String actionToReturn = action;
 
         if(action.equals("call") || action.equals("fold")) {
@@ -2168,12 +2175,18 @@ public class ActionVariables {
                                 }
                             }
                         } else {
-                            if(position) {
-                                if(handstrength > 0.8) {
-                                    if(Math.random() > 0.2) {
-                                        //actionToReturn = "raise";
-                                        //System.out.println("Doing kinky river raise! Handstrength: " + handstrength);
-                                        System.out.println("Skip kinky river postflop raise");
+                            double oppAverageBetOrRaiseEquity = rangeConstructor.getRiverOppAverageBetOrRaiseEquity();
+
+                            if(oppAverageBetOrRaiseEquity > 0) {
+                                if(oppAverageBetOrRaiseEquity < 0.7) {
+                                    if(handstrength > 0.82) {
+                                        actionToReturn = "raise";
+                                        System.out.println("River catchy value raise, position " + position +
+                                                ", prev action: " + action + ", vs low opp equity: " + oppAverageBetOrRaiseEquity);
+                                    } else if(handstrength > 0.5) {
+                                        actionToReturn = "raise";
+                                        System.out.println("River catchy bluff raise, position " + position +
+                                                ", prev action: " + action + ", vs low opp equity: " + oppAverageBetOrRaiseEquity);
                                     }
                                 }
                             }
@@ -2203,6 +2216,138 @@ public class ActionVariables {
                 }
             }
         }
+    }
+
+    private void raiseSmallerVersusLimpsDeep(String action, List<Card> board, boolean position, String opponentAction,
+                                             double effectiveStackBb, double bigBlind) {
+        if(action.equals("raise")) {
+            if(board == null || board.isEmpty()) {
+                if(opponentAction.equals("call")) {
+                    if(!position) {
+                        if(effectiveStackBb > 13.5) {
+                            if(sizing > 500) {
+                                if(Math.random() < 0.65) {
+                                    sizing = 3 * bigBlind;
+                                    System.out.println("non shove but normal raise versus limp!");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private String barrel(String handLine, String action, boolean bluffOddsAreOk, boolean opponentHasInitiative, List<Card> board,
+                        boolean position, double handStrength) {
+        String actionToReturn = action;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("check")) {
+                if(bluffOddsAreOk) {
+                    if(!opponentHasInitiative) {
+                        if(handStrength < 0.55) {
+                            if(handLine.endsWith("Bet75pct")) {
+                                if(board.size() == 4) {
+                                    if(Math.random() < 0.2) {
+                                        actionToReturn = "bet75pct";
+                                        System.out.println("Turn barrel! " + position);
+                                    }
+                                } else if(board.size() == 5) {
+                                    if(Math.random() < 0.6) {
+                                        actionToReturn = "bet75pct";
+                                        System.out.println("River barrel! " + position);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String floatBet(String handLine, String action, boolean bluffOddsAreOk, boolean opponentHasInitiative, List<Card> board,
+                          boolean position, double handStrength, double potsizeBb) {
+        String actionToReturn = action;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("check")) {
+                if(bluffOddsAreOk) {
+                    if(!opponentHasInitiative) {
+                        if(handStrength < 0.55) {
+                            if(position) {
+                                if(handLine.endsWith("Call")) {
+                                    if(potsizeBb > 2) {
+                                        if(Math.random() < 0.6) {
+                                            actionToReturn = "bet75pct";
+                                            System.out.println("IP Floatbet! Boardsize: " + board.size());
+                                        }
+                                    }
+                                }
+                            } else {
+                                if(board.size() == 4) {
+                                    if(handLine.contains("FlopCheck") && !handLine.contains("FlopCall")) {
+                                        if(handLine.contains("PfCall")) {
+                                            if(Math.random() < 0.6) {
+                                                actionToReturn = "bet75pct";
+                                                System.out.println("OOP turn oppRaised pot Floatbet!");
+                                            }
+                                        } else if(handLine.contains("PfCheck")) {
+                                            if(Math.random() < 0.4) {
+                                                actionToReturn = "bet75pct";
+                                                System.out.println("OOP turn oppLimped pot Floatbet!");
+                                            }
+                                        }
+                                    }
+                                } else if(board.size() == 5) {
+                                    if(handLine.contains("FlopCall")) {
+                                        if(handLine.contains("TurnCheck") && !handLine.contains("TurnCall")) {
+                                            if(Math.random() < 0.6) {
+                                                actionToReturn = "bet75pct";
+                                                System.out.println("OOP river Floatbet!");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private void updateHandLine(String action, List<Card> board, String currentHandline, boolean position,
+                                ContinuousTable continuousTable) {
+        if(currentHandline.equals("")) {
+            if(position) {
+                currentHandline = "Ip";
+            } else {
+                currentHandline = "Oop";
+            }
+        }
+
+        String street;
+
+        if(board == null || board.isEmpty()) {
+            street = "Pf";
+        } else if(board.size() == 3) {
+            street = "Flop";
+        } else if(board.size() == 4) {
+            street = "Turn";
+        } else {
+            street = "River";
+        }
+
+        String actionWithCapitalLetter = action.substring(0, 1).toUpperCase() + action.substring(1);
+        String updatedHandline = currentHandline + "_" + street + actionWithCapitalLetter;
+        System.out.println("Handline: " + updatedHandline);
+        continuousTable.setHandLine(updatedHandline);
     }
 
     private String playerDependentPreflopShoves(String action, List<Card> board, String opponentAction, boolean bluffOddsAreOk,

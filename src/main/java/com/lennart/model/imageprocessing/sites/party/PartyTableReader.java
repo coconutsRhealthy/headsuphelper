@@ -444,7 +444,7 @@ public class PartyTableReader {
     }
 
     public static boolean notRegisteredForAnyTournament() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(968, 161, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1134, 161, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
         if(pixelRgb == -15_263_973) {
