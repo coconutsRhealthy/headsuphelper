@@ -55,11 +55,9 @@ public class ContinuousTable implements ContinuousTableable {
     private long timeOfLastDoneAction = -1;
     private boolean gonnaDoFirstActionOfNewSng = false;
 
-    private double lastBuyIn = 20;
-    private double newBuyInToSelect = 20;
-    private double bankroll = 426.66;
-
-    private String handLine = "";
+    private double lastBuyIn = 10;
+    private double newBuyInToSelect = 10;
+    private double bankroll = 265.66;
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -100,8 +98,6 @@ public class ContinuousTable implements ContinuousTableable {
                     flopHandstrength = -1;
                     turnHandstrength = -1;
 
-                    handLine = "";
-
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
                         PartyTableReader partyTableReader = new PartyTableReader();
@@ -124,7 +120,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!game.equals("sng")) {
                         long currentTime = new Date().getTime();
 
-                        if(currentTime - startTime > 25_920_000) {
+                        if(currentTime - startTime > 19_920_000) {
                             new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this);
@@ -383,7 +379,7 @@ public class ContinuousTable implements ContinuousTableable {
         if(PartyTableReader.sngIsFinished(timeOfLastDoneAction)) {
             long currentTime = new Date().getTime();
 
-            if(currentTime - startTime > 25_920_000) {
+            if(currentTime - startTime > 19_920_000) {
                 System.out.println("3.4 hours have passed, force quit");
                 throw new RuntimeException();
             }
@@ -668,13 +664,5 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setBankroll(double bankroll) {
         this.bankroll = bankroll;
-    }
-
-    public String getHandLine() {
-        return handLine;
-    }
-
-    public void setHandLine(String handLine) {
-        this.handLine = handLine;
     }
 }

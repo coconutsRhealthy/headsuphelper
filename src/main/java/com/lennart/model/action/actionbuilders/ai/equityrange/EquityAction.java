@@ -331,13 +331,6 @@ public class EquityAction {
         System.out.println("4)oppEquity: " + oppAverageBetOrRaiseEquity);
         System.out.println("4)size: " + oppBetOrRaiseRange.size());
 
-        if(board.size() == 5) {
-            System.out.println("river botEquity: " + botEquity);
-            System.out.println("river oppEquity: " + oppAverageBetOrRaiseEquity);
-            System.out.println("river oppRangeSize: " + oppBetOrRaiseRange.size());
-            rangeConstructor.setRiverOppAverageBetOrRaiseEquity(oppAverageBetOrRaiseEquity);
-        }
-
         if(botEquity > oppAverageBetOrRaiseEquity) {
             if(eligibleActions.contains("raise")) {
                 String oppLooseness = inputProvider.getOppPostLooseness(oppName);
