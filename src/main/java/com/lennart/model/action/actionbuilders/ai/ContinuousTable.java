@@ -406,6 +406,7 @@ public class ContinuousTable implements ContinuousTableable {
 
             int counter = 0;
             int counter2 = 0;
+            int counterToQuit = 0;
 
             boolean newTableNotYetOpened = true;
             boolean weirdBotSittingOut = false;
@@ -433,9 +434,14 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println(",");
 
                 if(counter2 >= 1350 && PartyTableReader.notRegisteredForAnyTournament()) {
-                    System.out.println("Something is wrong in registering sng part, close session.");
-                    PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
-                    throw new RuntimeException();
+                    counterToQuit++;
+                    System.out.println("Something is wrong in registering sng part, might close session. Counter: " + counterToQuit);
+
+                    if(counterToQuit >= 5) {
+                        System.out.println("Something is wrong in registering sng part, close session.");
+                        PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                        throw new RuntimeException();
+                    }
                 }
 
                 TimeUnit.MILLISECONDS.sleep(1100);
