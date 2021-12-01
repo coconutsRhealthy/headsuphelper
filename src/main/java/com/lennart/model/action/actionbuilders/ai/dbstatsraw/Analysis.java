@@ -8,12 +8,11 @@ import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.handevaluation.HandEvaluator;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * Created by LennartMac on 26/01/2019.
@@ -1052,11 +1051,11 @@ public class Analysis {
 
 
 
-    public static void main(String[] args) throws Exception {
-        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis"));
-        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/historyanalysis/new_aggr_sizing_play_2"));
-        new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/historyanalysis/aurora_real26_perf"));
-    }
+//    public static void main(String[] args) throws Exception {
+//        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/tourney_hist_analysis"));
+//        //new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/historyanalysis/new_aggr_sizing_play_2"));
+//        new Analysis().doAnalysis(new Analysis().getAllFilesFromDir("/Users/LennartMac/Documents/historyanalysis/aurora_aggr_1"));
+//    }
 
 
 
@@ -1095,7 +1094,7 @@ public class Analysis {
                     }
                 }
 
-                //System.out.println(diff);
+                System.out.println(diff);
 
                 totalCounter++;
 
@@ -1109,9 +1108,9 @@ public class Analysis {
 
         }
 
-        System.out.println(winCounter);
-        System.out.println(totalCounter);
-        System.out.println(winCounter / totalCounter);
+//        System.out.println(winCounter);
+//        System.out.println(totalCounter);
+//        System.out.println(winCounter / totalCounter);
     }
 
     private List<String> readTheFile(File file) throws Exception {
@@ -1774,7 +1773,7 @@ public class Analysis {
 //    }
 
     private void analyseBotActionDuration() throws Exception {
-        File file = new File("/Users/LennartMac/Documents/loglines/bot_action_duration/today+prrt.txt");
+        File file = new File("/Users/LennartMac/Documents/loglines/bot_action_duration/today+prrt+new.txt");
 
         List<String> lines = readTheFile(file);
         List<Double> durations = new ArrayList<>();
@@ -1796,4 +1795,720 @@ public class Analysis {
 
         System.out.println(total / durations.size());
     }
+
+
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().ffShallowAnalysis2();
+//    }
+
+    private void ffShallowAnalysis() throws Exception {
+        int counter = 0;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_6;");
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("raise")) {
+                if(rs.getString("board").equals("")) {
+                    if(rs.getString("position").equals("Ip")) {
+                        if(rs.getDouble("handstrength") > 0.95 && rs.getDouble("handstrength") < 1) {
+                            if(rs.getString("opponent_action").equals("bet")) {
+                                double botStack = rs.getDouble("botstack");
+                                double oppStack = rs.getDouble("opponentstack");
+                                double bigBlind = rs.getDouble("bigblind");
+                                double effStack;
+
+                                if(botStack > oppStack) {
+                                    effStack = oppStack;
+                                } else {
+                                    effStack = botStack;
+                                }
+
+                                double effStackBb = effStack / bigBlind;
+
+                                if(effStackBb <= 10) {
+                                    counter++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(counter);
+    }
+
+    private void ffShallowAnalysis2() throws Exception {
+        int counter = 0;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_6;");
+
+        while(rs.next()) {
+            if(rs.getString("bot_action").equals("call")) {
+                if(rs.getString("board").equals("")) {
+                    if(rs.getString("position").equals("Ip")) {
+                        if(rs.getDouble("handstrength") > 0.45) {
+                            if(rs.getString("opponent_action").equals("bet")) {
+                                double botStack = rs.getDouble("botstack");
+                                double oppStack = rs.getDouble("opponentstack");
+                                double bigBlind = rs.getDouble("bigblind");
+                                double effStack;
+
+                                if(botStack > oppStack) {
+                                    effStack = oppStack;
+                                } else {
+                                    effStack = botStack;
+                                }
+
+                                double effStackBb = effStack / bigBlind;
+
+                                if(effStackBb <= 10) {
+                                    counter++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(counter);
+    }
+
+
+
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().ffGenerateLines();
+//    }
+
+    private void ffGenerateLines() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM funda3 ORDER BY plaats ASC;");
+
+        for(int z = 1; z < 144; z++) {
+            int counter = 0;
+
+            //
+            //2019_apostrof-A_1.html
+
+            String plaatsOuter = rs.getString("plaats");
+
+            PrintWriter writer = new PrintWriter("/Users/LennartMac/Documents/korting-tabellen/eije" + z + ".html", "UTF-8");
+
+            writer.print("<table>");
+            writer.print("<thead>");
+            writer.print("<tr>");
+            writer.print("<th>");
+            writer.print("adres");
+            writer.print("</th>");
+            writer.print("<th>");
+            writer.print("postcode");
+            writer.print("</th>");
+            writer.print("<th>");
+            writer.print("plaats");
+            writer.print("</th>");
+            writer.print("<th>");
+            writer.print("oppervlakte");
+            writer.print("</th>");
+            writer.print("<th>");
+            writer.print("kamers");
+            writer.print("</th>");
+            writer.print("<th>");
+            writer.print("vraagprijs");
+            writer.print("</th>");
+            writer.print("<th>");
+            writer.print("makelaar");
+            writer.print("</th>");
+            writer.print("</tr>");
+            writer.print("</thead>");
+            writer.print("<tbody>");
+
+
+            while(rs.next() && counter < 2000) {
+                counter++;
+
+                if(counter % 100 == 0) {
+                    System.out.println(counter);
+                }
+
+                String adres = rs.getString("adres");
+                String postcode = rs.getString("postcode");
+                String plaats = rs.getString("plaats");
+                double oppervlakte = rs.getDouble("oppervlakte");
+                double kamers = rs.getDouble("kamers");
+                double prijs = rs.getDouble("prijs");
+                String makelaar = rs.getString("makelaar");
+
+                writer.print("<tr>");
+                writer.print("<td>");
+                writer.print(adres);
+                writer.print("</td>");
+                writer.print("<td>");
+                writer.print(postcode);
+                writer.print("</td>");
+                writer.print("<td>");
+                writer.print(plaats);
+                writer.print("</td>");
+                writer.print("<td>");
+                writer.print(oppervlakte);
+                writer.print("</td>");
+                writer.print("<td>");
+                writer.print(kamers);
+                writer.print("</td>");
+                writer.print("<td>");
+                writer.print(prijs);
+                writer.print("</td>");
+                writer.print("<td>");
+                writer.print(makelaar);
+                writer.print("</td>");
+                writer.print("</tr>");
+            }
+
+            writer.print("</tbody>");
+            writer.print("</table>");
+
+            writer.close();
+        }
+    }
+
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().binance2();
+//    }
+
+
+
+
+
+
+    //wat willen we
+
+        //OOP range mixup...
+            //meer checken vs limps met premiums..
+            //meer shoven vs limps met non premiums..
+                //dus: hoe vaak check je vs limps met handen boven 50%...
+                    //hoeveel premium handen boven 0.8 heb je beschikbaar?
+                            //522
+                                //super: 146
+                            //671
+                                //super: 172
+                            //150
+                                //super: 36
+                    //hoeveel check handen boven 0.5 heb je beschikbaar?
+                        //311
+                        //244
+                        //76
+
+
+                    //below 13bb
+                        //check handen boven 0.5
+                            //56 / 696
+                            //62 / 849
+                            //17 / 207
+                        //raise handen boven 0.8
+                            //255 / 260
+                            //319 / 323
+                            //74 / 75
+
+
+
+
+    //above 13bb
+        //checks boven 50% hs
+            //6 188 / 719
+            //7 249 / 949
+            //8 59 / 216
+        //raises boven 80% hs
+            //6 267 / 278
+            //7 352 / 366
+            //8 76 / 79
+
+    //below 13bb
+        //checks boven 45% hs
+            //6 113 / 753
+            //7 154 / 941
+            //8 36 / 226
+        //raise boven 80% hs
+            //6 255 / 260
+            //7 319 / 323
+            //8 74 / 75
+        //raise boven 95% hs
+            //6 62 / 64
+            //7 93 / 94
+            //8 18 / 19
+        //raise between 80% and 95% hs
+            //6 193 / 196
+            //7 226 / 229
+            //8 56 / 56
+
+
+
+    private void howOftenCheckVsLimpWithHandAbove50() throws Exception {
+        double counter = 0;
+        double totalCounter = 0;
+
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_xx;");
+
+        while(rs.next()) {
+            if(rs.getString("opponent_action").equals("call")) {
+                if(rs.getString("board").equals("")) {
+                    if(rs.getString("position").equals("Oop")) {
+                        if(rs.getDouble("handstrength") > 0.80 && rs.getDouble("handstrength") < 0.95) {
+                            double botStack = rs.getDouble("botstack");
+                            double oppStack = rs.getDouble("opponentstack");
+                            double bigblind = rs.getDouble("bigblind");
+
+                            if(botStack / bigblind < 13 || oppStack / bigblind < 13) {
+                                if(rs.getString("bot_action").equals("raise")) {
+                                    counter++;
+                                }
+
+                                totalCounter++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(counter);
+        System.out.println(totalCounter);
+        //System.out.println(counter / totalCounter);
+    }
+
+    private void callOopPreCheck() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_xx;");
+
+        while(rs.next()) {
+            if(rs.getString("opponent_action").equals("raise")) {
+                if(rs.getString("board").equals("")) {
+                    if(rs.getString("position").equals("Oop")) {
+                        if(rs.getString("board").equals("")) {
+
+                        }
+                    }
+
+                }
+
+            }
+        }
+    }
+
+
+    //je call2bet vanaf +25% handen en je 3bet vanaf +65% handen
+
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().preflopCall2betHandstrengthCheck();
+//    }
+
+    private void preflopCall2betHandstrengthCheck() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_7;");
+
+        double totalCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("opponent_action").equals("raise")) {
+                if(rs.getString("board").equals("")) {
+                    if(rs.getString("position").equals("Oop")) {
+                        if(rs.getString("bot_action").equals("call")) {
+                            //if(rs.next()) {
+                                //rs.previous();
+                                String currBotHolecards = rs.getString("holecards");
+                                rs.next();
+                                String nextBotHolecards = rs.getString("holecards");
+                                rs.previous();
+
+                                if(currBotHolecards.equals(nextBotHolecards)) {
+                                    double botStack = rs.getDouble("botstack");
+                                    double oppStack = rs.getDouble("opponentstack");
+                                    double bigblind = rs.getDouble("bigblind");
+
+                                    if(botStack / bigblind <= 12 || oppStack / bigblind <= 12) {
+                                        //totalCounter++;
+
+                                        if(rs.getDouble("handstrength") > 0.6 && rs.getDouble("handstrength") > 0.6) {
+                                            totalCounter++;
+                                        }
+                                    }
+                                }
+                            //}
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        System.out.println(totalCounter);
+    }
+
+    private void preflop3betHandstrengthCheck() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_6;");
+
+        double totalCounter = 0;
+        double premiumCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("opponent_action").equals("raise")) {
+                if(rs.getString("board").equals("")) {
+                    if(rs.getString("position").equals("Oop")) {
+                        if(rs.getString("bot_action").equals("raise")) {
+                            double botStack = rs.getDouble("botstack");
+                            double oppStack = rs.getDouble("opponentstack");
+                            double bigblind = rs.getDouble("bigblind");
+
+                            if(botStack / bigblind > 12 && oppStack / bigblind > 12) {
+                                //totalCounter++;
+
+                                if(rs.getDouble("handstrength") > 0.90 && rs.getDouble("handstrength") < 0.95) {
+                                    totalCounter++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        //System.out.println(premiumCounter);
+        System.out.println(totalCounter);
+        //System.out.println(premiumCounter / totalCounter);
+    }
+
+    private void binance() throws Exception {
+        File file = new File("/Users/LennartMac/Documents/testbinance.txt");
+        List<String> lines = readTheFile(file);
+        List<String> busdLinesRaw = lines.stream().filter(line -> line.contains("BUSD")).collect(Collectors.toList());
+
+        List<String> busdLines = busdLinesRaw.stream().map(line -> {
+            String usableLine = line.substring(line.indexOf("\">") + 2, line.indexOf("/<"));
+            return usableLine;
+        }).collect(Collectors.toList());
+
+        Collections.sort(busdLines);
+
+        busdLines.forEach(line -> System.out.println("busdTradingPairs.add(\"" + line + "\");"));
+    }
+
+    private void binance2() throws Exception {
+        File file = new File("/Users/LennartMac/Documents/bidaskspread.txt");
+        List<String> lines = readTheFile(file);
+
+        for(String line : lines) {
+            String pair = line.substring(0, line.indexOf(" "));
+            String spread = line.substring(line.lastIndexOf(" ") + 1, line.length());
+
+            System.out.println("bidAskSpreadMap.put(\"" + pair + "\", " + spread + ");");
+        }
+
+    }
+
+
+
+//    public static void main(String[] args) throws Exception {
+//        new Analysis().efkesRangesRiver();
+//    }
+
+
+    private void diskiConvert() throws Exception {
+        File file = new File("/Users/LennartMac/Desktop/toconvert.txt");
+        List<String> lines = readTheFile(file);
+
+        for(int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i).replaceAll("\\s","");
+
+            if(line.startsWith("\"company")) {
+                String company = line.substring(line.indexOf("@"), line.length() - 2);
+
+                String code = lines.get(i + 1).replaceAll("\\s","");
+                code = code.substring(code.indexOf(":") + 2, code.length() - 2);
+
+                String influencer = lines.get(i + 2).replaceAll("\\s","");
+                influencer = influencer.substring(influencer.indexOf(":") + 2, influencer.length() - 2);
+
+                String date = lines.get(i + 3).replaceAll("\\s","");
+                date = date.substring(date.indexOf(":") + 2, date.length() - 2);
+
+                System.out.println("\"" + company + ", " + code + ", " + influencer + ", " + date + "\",");
+            }
+        }
+    }
+
+
+
+
+    private void hyperSizingAnalysis() throws Exception {
+        initializeDbConnection();
+
+        for(int i = 2; i < 10; i++) {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_" + i + ";");
+
+            List<Double> allOppSizing = new ArrayList<>();
+
+            while(rs.next()) {
+                String board = rs.getString("board");
+
+                if(!board.equals("")) {
+                    if(rs.getString("opponent_action").equals("raise")) {
+                        double oppSizing = rs.getDouble("opponent_total_betsize");
+                        double bigBlind = rs.getDouble("bigblind");
+                        double oppSizingBb = oppSizing / bigBlind;
+
+                        if(oppSizingBb > 0) {
+                            allOppSizing.add(oppSizingBb);
+                        }
+                    }
+                }
+            }
+
+            Collections.sort(allOppSizing);
+
+            int oneThird = allOppSizing.size() / 3;
+
+            System.out.println("" + i + ") small bb: " + allOppSizing.get(oneThird));
+            System.out.println("" + i + ") medium bb: " + allOppSizing.get(oneThird * 2));
+            System.out.println();
+
+            if(i == 9) {
+                System.out.println("wachff");
+            }
+        }
+    }
+
+    private void hyperPostflopPotsizeAnalysis() throws Exception {
+        initializeDbConnection();
+
+        for(int i = 2; i < 10; i++) {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_" + i + ";");
+
+            List<Double> allPotsizes = new ArrayList<>();
+
+            while(rs.next()) {
+                String board = rs.getString("board");
+
+                if(!board.equals("")) {
+                    if(rs.getDouble("pot") > 0) {
+                        double potsizeBb = rs.getDouble("pot") / rs.getDouble("bigblind");
+                        allPotsizes.add(potsizeBb);
+                    }
+                }
+            }
+
+            Collections.sort(allPotsizes);
+
+            int oneThird = allPotsizes.size() / 3;
+
+            System.out.println("" + i + ") small " + allPotsizes.get(oneThird));
+            System.out.println("" + i + ") medium " + allPotsizes.get(oneThird * 2));
+            System.out.println();
+        }
+    }
+
+    private void efkesRangesRiver() {
+        List<Double> allOppHs = Arrays.asList(0.6805714285714282, 0.6593333333333329,
+                0.5106885245901642, 0.8470303030303028, 0.8746788990825687, 0.7038064516129025,
+                0.8873170731707316, 0.6862601626016261, 0.662073170731707, 0.6868141592920354,
+                0.6975238095238094, 0.648283582089552, 0.6544578313253012, 0.6022222222222221,
+                0.686359832635983, 0.6922826086956517, 0.9118681318681326, 0.5546059544658491,
+                0.5586227544910175, 0.8408264462809915, 0.6970434782608697, 0.8390909090909091,
+                0.6997468354430376, 0.6638297872340424, 0.6737614678899085, 0.657793103448276,
+                0.7057731958762884, 0.745338983050847, 0.5140632603406328, 0.7590666666666667,
+                0.8300000000000001);
+
+        Collections.sort(allOppHs);
+
+        System.out.println("wachff");
+    }
+
+    public static void main(String[] args) throws Exception {
+        new Analysis().handstrengthsAtFlopOop();
+    }
+
+    private void flopHsShizzle() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_9;");
+
+        List<Double> allHs = new ArrayList<>();
+
+        while(rs.next()) {
+            List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+            if(board.size() == 4) {
+                double hs = rs.getDouble("handstrength");
+
+                if(hs > 0.94 && hs < 0.95) {
+                    System.out.println(rs.getString("holecards") + "   " + rs.getString("board"));
+                }
+
+                //allHs.add(rs.getDouble("handstrength"));
+            }
+        }
+
+        //Collections.sort(allHs, Collections.reverseOrder());
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        //System.out.println("prt");
+    }
+
+    private void versusPostflopRaises() throws Exception {
+        initializeDbConnection();
+
+        List<Double> allRaiseCallHs = new ArrayList<>();
+
+        for(int i = 2; i <= 10; i++) {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_" + i + ";");
+
+            while(rs.next()) {
+                if(!rs.getString("board").equals("")) {
+                    if(rs.getString("opponent_action").equals("raise")) {
+                        if(rs.getString("bot_action").equals("call")) {
+                            allRaiseCallHs.add(rs.getDouble("handstrength"));
+                        }
+                    }
+                }
+            }
+
+            rs.close();
+            st.close();
+        }
+
+        closeDbConnection();
+
+        Collections.sort(allRaiseCallHs);
+
+        System.out.println("wacht");
+    }
+
+    private void handstrengthsAtFlopOop() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw;");
+
+        List<Double> allHs = new ArrayList<>();
+
+        while(rs.next()) {
+            if(rs.getString("position").equals("Oop")) {
+                if(!rs.getString("board").equals("")) {
+                    if(rs.getString("opponent_action").equals("empty")) {
+                        List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                        if(board.size() == 3) {
+                            allHs.add(rs.getDouble("handstrength"));
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        Collections.sort(allHs);
+
+        double size = allHs.size();
+        size = size * 0.35;
+        int eije = (int) size;
+
+        System.out.println(allHs.get(eije));
+
+        System.out.println("wacht");
+
+    }
+
+    private void strongDrawFlopCheck() throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_9;");
+
+        double total = 0;
+        double strongDrawCounter = 0;
+
+        while(rs.next()) {
+            if(rs.getString("position").equals("Oop")) {
+                if(!rs.getString("board").equals("")) {
+                    if(rs.getString("opponent_action").equals("empty")) {
+                        List<Card> board = convertCardStringToCardList(rs.getString("board"));
+
+                        if(board.size() == 3) {
+                            total++;
+
+                            if(rs.getString("strongdraw").equals("StrongDrawTrue")) {
+                                if(rs.getDouble("handstrength") < 0.5)  {
+                                    strongDrawCounter++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+
+
+        System.out.println("total: " + total);
+        System.out.println("strong draw: " + strongDrawCounter);
+        System.out.println("ratio: " + strongDrawCounter / total);
+    }
+
 }

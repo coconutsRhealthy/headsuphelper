@@ -17,7 +17,6 @@ import equitycalc.EquityCalculator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -653,8 +652,10 @@ public class ActionVariables {
         action = raiseWithWeakVersusLimps(action, boardInMethod, botIsButtonInMethod, effectiveStack, botHandStrengthInMethod, gameVariables.getBigBlind());
         action = checkWithPremiumsVersusLimps(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), botHandStrengthInMethod, effectiveStack);
         action = call2betWithPremiumsPreOop(action, boardInMethod, gameVariables.getOpponentAction(), botIsButtonInMethod, botHandStrengthInMethod);
-        action = dontLimpAtBlinds30(action, gameVariables.getBigBlind(), botIsButtonInMethod, gameVariables.getOpponentAction(), effectiveStack);
-        action = changeOpenFoldsToLimpOrRaise(action, gameVariables.getOpponentAction(), botIsButtonInMethod, boardInMethod, gameVariables.getBigBlind(), effectiveStack);
+        //action = dontLimpAtBlinds30Shallow(action, gameVariables.getBigBlind(), botIsButtonInMethod, gameVariables.getOpponentAction(), effectiveStack);
+        action = changeOpenFoldsToLimp(action, gameVariables.getOpponentAction(), botIsButtonInMethod, boardInMethod, gameVariables.getBigBlind());
+
+        action = trickyCallWithMonstersOnFlopAndTurn(action, bluffOddsAreOk, boardInMethod, botHandStrengthInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -741,9 +742,12 @@ public class ActionVariables {
         }
 
         setShoveSizingForCertainPre3betsAndPostCheckRaises(action, botIsButtonInMethod, gameVariables.getOpponentAction(), boardInMethod, gameVariables.getBigBlind());
-        betBiggerWithMonstersAndStrongDraws(action, botHandStrengthInMethod, gameVariables.getPot(), strongFdInMethod || strongFlushDraw, strongOosdInMethod || strongOosd);
-        logCertainPostflopCalls(action, boardInMethod, botHandStrengthInMethod,
-                (strongFdInMethod || strongFlushDraw), (strongOosdInMethod || strongOosd), (strongGutshotInMethod || strongGutshot));
+        //betBiggerWithMonstersAndStrongDraws(action, botHandStrengthInMethod, gameVariables.getPot(), strongFdInMethod || strongFlushDraw, strongOosdInMethod || strongOosd);
+        //logCertainPostflopCalls(action, boardInMethod, botHandStrengthInMethod,
+        //        (strongFdInMethod || strongFlushDraw), (strongOosdInMethod || strongOosd), (strongGutshotInMethod || strongGutshot));
+        adjustPreflop12_17bbPlay(action, effectiveStack, botIsButtonInMethod, boardInMethod, gameVariables.getOpponentAction(),
+                botHandStrengthInMethod, gameVariables.getBigBlind());
+        betBiggerOnTurnsAndRiversIp(action, boardInMethod, botIsButtonInMethod, potSizeBb, gameVariables.getPot(), effectiveStack);
 
 
         if(realGame) {
@@ -1409,6 +1413,27 @@ public class ActionVariables {
         return actionToReturn;
     }
 
+    private String trickyCallWithMonstersOnFlopAndTurn(String action, boolean bluffOddsAreOk, List<Card> board, double handstrength) {
+        String actionToReturn = action;
+
+        if(board != null && !board.isEmpty()) {
+            if(action.equals("raise")) {
+                if(bluffOddsAreOk) {
+                    if(handstrength > 0.94) {
+                        if(board.size() == 3 || board.size() == 4) {
+                            if(Math.random() > 0.65) {
+                                actionToReturn = "call";
+                                System.out.println("Postflop monster call instead of raise. Board size: " + board.size());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
     private String solidifyPostflopRaises(String action, List<Card> board, double handStrength,
                                           boolean strongFd, boolean strongOosd, ContinuousTable continuousTable,
                                           GameVariables gameVariables, double sizing) throws Exception {
@@ -2054,19 +2079,16 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String dontLimpAtBlinds30(String action, double bigBlind, boolean position, String opponentAction, double effectiveStackBb) {
+    private String dontLimpAtBlinds30Shallow(String action, double bigBlind, boolean position, String opponentAction, double effectiveStackBb) {
         String actionToReturn = action;
 
         if(opponentAction.equals("bet")) {
             if(bigBlind == 30) {
                 if(position) {
                     if(action.equals("call")) {
-                        System.out.println("CHANGE BB 30 LIMP TO RAISE!!");
-                        actionToReturn = "raise";
-
-                        if(effectiveStackBb > 10) {
-                            sizing = 2 * bigBlind;
-                        } else {
+                        if(effectiveStackBb <= 10) {
+                            System.out.println("CHANGE BB 30 LIMP TO RAISE!!");
+                            actionToReturn = "raise";
                             sizing = 5000 * bigBlind;
                         }
                     }
@@ -2077,8 +2099,8 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String changeOpenFoldsToLimpOrRaise(String action, String opponentAction, boolean position, List<Card> board,
-                                                double bigBlind, double effectiveStackBb) {
+    private String changeOpenFoldsToLimp(String action, String opponentAction, boolean position, List<Card> board,
+                                         double bigBlind) {
         String actionToReturn = action;
 
         if(action.equals("fold")) {
@@ -2087,36 +2109,11 @@ public class ActionVariables {
                     if(board == null || board.isEmpty()) {
                         double random = Math.random();
 
-                        if(bigBlind == 30) {
-                            if(random <= 0.5) {
-                                actionToReturn = "raise";
-                                System.out.println("Change pre openfold to raise. BB: " + bigBlind);
-                            }
-                        } else {
-                            if(random <= 0.5) {
-                                if(effectiveStackBb >= 19) {
-                                    if(random < 0.25) {
-                                        actionToReturn = "raise";
-                                        System.out.println("Change pre openfold to raise. BB: " + bigBlind);
-                                    } else {
-                                        actionToReturn = "call";
-                                        System.out.println("Change pre openfold to limp. BB: " + bigBlind);
-                                    }
-                                } else {
-                                    actionToReturn = "call";
-                                    System.out.println("Change pre openfold to limp. BB: " + bigBlind);
-                                }
-                            }
+                        if(random <= 0.57) {
+                            actionToReturn = "call";
+                            System.out.println("Change pre openfold to limp. BB: " + bigBlind);
                         }
                     }
-                }
-            }
-
-            if(actionToReturn.equals("raise")) {
-                if(effectiveStackBb > 10) {
-                    sizing = 2 * bigBlind;
-                } else {
-                    sizing = 5000 * bigBlind;
                 }
             }
         }
@@ -2304,6 +2301,80 @@ public class ActionVariables {
                     if(!strongFd && !strongOosd && !strongGutshot) {
                         System.out.println("Postflop weak call, board size: " + board.size());
                     }
+                }
+            }
+        }
+    }
+
+    private String adjustPreflop12_17bbPlay(String action, double effStackBb, boolean position, List<Card> board, String opponentAction,
+                                          double handstrength, double bigBlind) {
+        String actionToReturn = action;
+
+        if(effStackBb >= 12 && effStackBb < 18) {
+//            if(board == null || board.isEmpty()) {
+//                if(position) {
+//                    if(opponentAction.equals("bet")) {
+//                        if(action.equals("raise")) {
+//                            if(handstrength >= 0.55) {
+//                                if(Math.random() > 0.6) {
+//                                    System.out.println("12_17bb IP keep open value raise, sizing to 2bb");
+//                                    sizing = 2 * bigBlind;
+//                                } else {
+//                                    actionToReturn = "call";
+//                                }
+//                            } else {
+//                                if(Math.random() < 0.04 || handstrength <= 0.2) {
+//                                    System.out.println("12_17bb IP keep open bluff raise, sizing to 2bb");
+//                                    sizing = 2 * bigBlind;
+//                                } else {
+//                                    actionToReturn = "call";
+//                                }
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    //dit moet niet meer
+//                    if(opponentAction.equals("call")) {
+//                        if(action.equals("raise")) {
+//                            if(Math.random() > 0.33) {
+//                                System.out.println("12_17bb OOP raise vs limp, but non shove");
+//                                sizing = 3 * bigBlind;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+        } else if(effStackBb >= 18) {
+            if(board == null || board.isEmpty()) {
+                if(!position) {
+                    if(opponentAction.equals("call")) {
+                        if(action.equals("raise")) {
+                            if(Math.random() > 0.22) {
+                                System.out.println("18_25bb OOP raise vs limp, but non shove");
+                                sizing = 3 * bigBlind;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private void betBiggerOnTurnsAndRiversIp(String action, List<Card> board, boolean postion, double potsizeBb, double pot, double effectiveStackBb) {
+        if(action.equals("bet75pct")) {
+            if(board != null && !board.isEmpty()) {
+                if(board.size() == 4 || board.size() == 5) {
+                    //ook oop?
+                    //if(postion) {
+                        if(effectiveStackBb <= 17) {
+                            if(potsizeBb > 2) {
+                                sizing = 0.75 * pot;
+                                System.out.println(postion + " Bigger turn / river sizing below 17bb effstack");
+                            }
+                        }
+                    //}
                 }
             }
         }
