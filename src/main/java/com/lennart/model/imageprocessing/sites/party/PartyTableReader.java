@@ -20,7 +20,7 @@ public class PartyTableReader {
     private int regNewSngWaitCouner = 0;
 
     public double getBotStackFromImage() throws Exception {
-        String botStackAsString = readTopPlayerStack();
+        String botStackAsString = readBottomPlayerStack();
 
         if(botStackAsString.contains(".")) {
             botStackAsString = botStackAsString.replace(".", "");
@@ -46,7 +46,7 @@ public class PartyTableReader {
     }
 
     public double getOpponentStackFromImage() throws Exception {
-        String opponentStackAsString = readBottomPlayerStack();
+        String opponentStackAsString = readTopPlayerStack();
 
         System.out.println("OPPSTACK: " + opponentStackAsString);
 
@@ -508,7 +508,7 @@ public class PartyTableReader {
     }
 
     public String getOpponentPlayerNameFromImage() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(473, 516, 604, 543);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(453, 174, 565, 194);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String opponentPlayerName = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -654,7 +654,7 @@ public class PartyTableReader {
     }
 
     private String readFirstHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(427, 56, 455, 85);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(436, 566, 462, 593);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String secondHoleCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         secondHoleCardRank = ImageProcessor.removeEmptySpacesFromString(secondHoleCardRank);
@@ -665,7 +665,7 @@ public class PartyTableReader {
     }
 
     private String readSecondHoleCardRank() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(498, 56, 525, 85);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(520, 562, 550, 589);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String secondHoleCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         secondHoleCardRank = ImageProcessor.removeEmptySpacesFromString(secondHoleCardRank);
@@ -676,8 +676,7 @@ public class PartyTableReader {
     }
 
     private String readFirstFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(346, 321, 392, 367);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(308, 339, 334, 366);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
 
@@ -689,8 +688,7 @@ public class PartyTableReader {
     }
 
     private String readSecondFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(425, 321, 467, 367);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(393, 339, 416, 366);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
 
@@ -702,8 +700,7 @@ public class PartyTableReader {
     }
 
     private String readThirdFlopCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(501, 321, 545, 367);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(478, 339, 501, 366);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
 
@@ -715,8 +712,7 @@ public class PartyTableReader {
     }
 
     private String readTurnCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(576, 321, 618, 367);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(563, 339, 587, 366);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
 
@@ -728,8 +724,7 @@ public class PartyTableReader {
     }
 
     private String readRiverCardRankFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(652, 321, 698, 367);
-        bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(647, 339, 672, 366);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String firstFlopCardRank = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
 
@@ -741,52 +736,147 @@ public class PartyTableReader {
     }
 
     private char readFirstHoleCardSuit() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(490, 62, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(452, 606, 1, 1);
+        int suitRgb1 = bufferedImage.getRGB(0, 0);
+
+        BufferedImage bufferedImage2;
+        int suitRgb2;
+
+        if(suitRgb1 / 1_000_000 == -3) {
+            //diamonds or hearts
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(476, 570, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        } else {
+            //spades or clubs
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(480, 575, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        }
+
+        return getHolecardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
     private char readSecondHoleCardSuit() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(562, 62, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(529, 601, 1, 1);
+        int suitRgb1 = bufferedImage.getRGB(0, 0);
+
+        BufferedImage bufferedImage2;
+        int suitRgb2;
+
+        if(suitRgb1 / 1_000_000 == -3) {
+            //diamonds or hearts
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(560, 573, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        } else {
+            //spades or clubs
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(562, 576, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        }
+
+        return getHolecardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
     private char readFirstFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(329, 280, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        BufferedImage bufferedImage1 = ImageProcessor.getBufferedImageScreenShot(320, 377, 1, 1);
+        int suitRgb1 = bufferedImage1.getRGB(0, 0);
 
+        BufferedImage bufferedImage2;
+        int suitRgb2;
+
+        if(suitRgb1 / 1_000_000 == -3) {
+            //diamonds or hearts
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(349, 348, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        } else {
+            //spades or clubs
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(353, 352, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        }
+
+        return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
     private char readSecondFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(405, 280, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        BufferedImage bufferedImage1 = ImageProcessor.getBufferedImageScreenShot(407, 377, 1, 1);
+        int suitRgb1 = bufferedImage1.getRGB(0, 0);
 
+        BufferedImage bufferedImage2;
+        int suitRgb2;
+
+        if(suitRgb1 / 1_000_000 == -3) {
+            //diamonds or hearts
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(432, 348, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        } else {
+            //spades or clubs
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(436, 352, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        }
+
+        return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
     private char readThirdFlopCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(481, 280, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        BufferedImage bufferedImage1 = ImageProcessor.getBufferedImageScreenShot(490, 377, 1, 1);
+        int suitRgb1 = bufferedImage1.getRGB(0, 0);
+
+        BufferedImage bufferedImage2;
+        int suitRgb2;
+
+        if(suitRgb1 / 1_000_000 == -3) {
+            //diamonds or hearts
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(518, 348, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        } else {
+            //spades or clubs
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(522, 352, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        }
+
+        return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
     private char readTurnCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(556, 280, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        BufferedImage bufferedImage1 = ImageProcessor.getBufferedImageScreenShot(575, 377, 1, 1);
+        int suitRgb1 = bufferedImage1.getRGB(0, 0);
 
+        BufferedImage bufferedImage2;
+        int suitRgb2;
+
+        if(suitRgb1 / 1_000_000 == -3) {
+            //diamonds or hearts
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(601, 348, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        } else {
+            //spades or clubs
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(605, 352, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        }
+
+        return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
     private char readRiverCardSuitFromBoard() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(633, 280, 1, 1);
-        int suitRgb = bufferedImage.getRGB(0, 0);
-        return getSuitFromIntRgb(suitRgb);
+        BufferedImage bufferedImage1 = ImageProcessor.getBufferedImageScreenShot(660, 377, 1, 1);
+        int suitRgb1 = bufferedImage1.getRGB(0, 0);
+
+        BufferedImage bufferedImage2;
+        int suitRgb2;
+
+        if(suitRgb1 / 1_000_000 == -3) {
+            //diamonds or hearts
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(688, 348, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        } else {
+            //spades or clubs
+            bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(692, 352, 1, 1);
+            suitRgb2 = bufferedImage2.getRGB(0, 0);
+        }
+
+        return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
     private String readBottomPlayerStack() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(477, 548, 595, 573);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(493, 708, 542, 730);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String bottomPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -794,42 +884,32 @@ public class PartyTableReader {
 
         if(bottomPlayerStack.contains("o")) {
             bottomPlayerStack = bottomPlayerStack.replace("o", "0");
-            System.out.println("opp stack contains 'o', new value: " + bottomPlayerStack);
+            System.out.println("bottom stack contains 'o', new value: " + bottomPlayerStack);
         }
 
         if(bottomPlayerStack.contains("O")) {
             bottomPlayerStack = bottomPlayerStack.replace("O", "0");
-            System.out.println("opp stack contains 'O', new value: " + bottomPlayerStack);
+            System.out.println("bottom stack contains 'O', new value: " + bottomPlayerStack);
         }
 
         if(bottomPlayerStack.contains("B")) {
             bottomPlayerStack = bottomPlayerStack.replace("B", "8");
-            System.out.println("opp stack contains 'B', new value: " + bottomPlayerStack);
+            System.out.println("bottom stack contains 'B', new value: " + bottomPlayerStack);
         }
 
         if(bottomPlayerStack.contains("a")) {
             bottomPlayerStack = bottomPlayerStack.replace("a", "8");
-            System.out.println("opp stack contains 'a', new value: " + bottomPlayerStack);
+            System.out.println("bottom stack contains 'a', new value: " + bottomPlayerStack);
         }
 
         if(bottomPlayerStack.contains("D")) {
             bottomPlayerStack = bottomPlayerStack.replace("D", "0");
-            System.out.println("opp stack contains 'D', new value: " + bottomPlayerStack);
+            System.out.println("bottom stack contains 'D', new value: " + bottomPlayerStack);
         }
 
         if(bottomPlayerStack.contains("s")) {
             bottomPlayerStack = bottomPlayerStack.replace("s", "6");
-            System.out.println("error opp stack contains 's', new value: " + bottomPlayerStack);
-        }
-
-        if(bottomPlayerStack.toLowerCase().contains("all")) {
-            System.out.println("oppstack: opp allin!");
-            bottomPlayerStack = "0";
-        }
-
-        if(bottomPlayerStack.toLowerCase().contains("sitting") || bottomPlayerStack.toLowerCase().contains("isconnect") || bottomPlayerStack.toLowerCase().contains("connecte")) {
-            System.out.println("oppstack: opp sitting out!");
-            bottomPlayerStack = "1500";
+            System.out.println("error bottom stack contains 's', new value: " + bottomPlayerStack);
         }
 
         String bottomPlayerStackNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(bottomPlayerStack);
@@ -861,7 +941,7 @@ public class PartyTableReader {
     }
 
     private static String readTopPlayerStackBase() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(443, 135, 511, 162);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(481, 204, 535, 224);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String topPlayerStack = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
@@ -899,11 +979,21 @@ public class PartyTableReader {
             System.out.println("error botstack contains 's', new value: " + topPlayerStack);
         }
 
+        if(topPlayerStack.toLowerCase().contains("all")) {
+            System.out.println("bottom: player allin!");
+            topPlayerStack = "0";
+        }
+
+        if(topPlayerStack.toLowerCase().contains("sitting") || topPlayerStack.toLowerCase().contains("isconnect") || topPlayerStack.toLowerCase().contains("connecte")) {
+            System.out.println("bottom: bottom player sitting out!");
+            topPlayerStack = "1500";
+        }
+
         return topPlayerStack;
     }
 
     private String readTotalPotSize() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(416, 227, 603, 271);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(538, 311, 579, 335);
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.invertBufferedImageColours(bufferedImage);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -1105,10 +1195,63 @@ public class PartyTableReader {
         return suit;
     }
 
+    private char getBoardcardSuitFromIntRgbs(int rgb1, int rgb2) {
+        char suit = 'x';
+
+        rgb1 = rgb1 / 1_000_000;
+
+        if(rgb1 == -15 || rgb1 == -16) {
+            int rgb2_100k = rgb2 / 100_000;
+            int rgb2_mio = rgb2 / 1_000_000;
+
+            if(rgb2_100k == -3) {
+                suit = 'c';
+            } else if(rgb2_mio == -2 || rgb2_100k == -5) {
+                suit = 's';
+            }
+        } else if(rgb1 == -3) {
+            rgb2 = rgb2 / 100_000;
+
+            if(rgb2 == -7) {
+                suit = 'h';
+            } else if(rgb2 == -3 || rgb2 == -2) {
+                suit = 'd';
+            }
+        }
+
+        return suit;
+    }
+
+    private char getHolecardSuitFromIntRgbs(int rgb1, int rgb2) {
+        char suit = 'x';
+
+        rgb1 = rgb1 / 1_000_000;
+
+        if(rgb1 == -15 || rgb1 == -16) {
+            int rgb2_100k = rgb2 / 100_000;
+
+            if(rgb2_100k == -3) {
+                suit = 'c';
+            } else if(rgb2_100k == -25 || rgb2_100k == -24 || rgb2_100k == -7) {
+                suit = 's';
+            }
+        } else if(rgb1 == -3) {
+            int rgb2_100k = rgb2 / 100_000;
+
+            if(rgb2_100k == -7 || rgb2_100k == -6) {
+                suit = 'h';
+            } else if(rgb2_100k == -2) {
+                suit = 'd';
+            }
+        }
+
+        return suit;
+    }
+
     private int getIntCardRank(String stringCardRank) {
         int cardRank = -1;
 
-        if(stringCardRank.equals("2")) {
+        if(stringCardRank.equals("2") || stringCardRank.equals("Z")) {
             cardRank = 2;
         } else if(stringCardRank.equals("3")) {
             cardRank = 3;
@@ -1124,11 +1267,11 @@ public class PartyTableReader {
             cardRank = 8;
         } else if(stringCardRank.equals("9")) {
             cardRank = 9;
-        } else if(stringCardRank.equals("l0") || stringCardRank.equals("I0") || stringCardRank.equals("ll]")) {
+        } else if(stringCardRank.equals("10") || stringCardRank.equals("1C")) {
             cardRank = 10;
-        } else if(stringCardRank.equals("I") || stringCardRank.equals("l")) {
+        } else if(stringCardRank.equals("J")) {
             cardRank = 11;
-        } else if(stringCardRank.equals("0")) {
+        } else if(stringCardRank.equals("Q")) {
             cardRank = 12;
         } else if(stringCardRank.equals("K")) {
             cardRank = 13;
