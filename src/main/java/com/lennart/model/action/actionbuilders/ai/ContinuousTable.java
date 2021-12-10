@@ -100,9 +100,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
-                        PartyTableReader partyTableReader = new PartyTableReader();
-                        boolean botIsButton = partyTableReader.topPlayerIsButton();
-                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen(botIsButton);
+                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen2();
 
                         if(bigBlind < 0) {
                             System.out.println("Error in reading bb. Set it to previous value: " + previousBigBlind);
@@ -264,7 +262,7 @@ public class ContinuousTable implements ContinuousTableable {
         String suggestedAction = actionVariables.getAction();
         String sizing = String.valueOf(actionVariables.getSizing());
 
-        PrintWriter writer = new PrintWriter("/Users/LennartMac/Documents/logging/" + numberOfActionRequests + ".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("/Users/lennartmac/Documents/logging/" + numberOfActionRequests + ".txt", "UTF-8");
 
         writer.println("OpponentStack: " + opponentStack);
         writer.println("OpponentBetSize: " + opponentBetSize);
@@ -290,7 +288,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doRangeLogging(int numberOfActionRequests) throws Exception {
-        PrintWriter writer = new PrintWriter("/Users/LennartMac/Documents/logging/" + numberOfActionRequests + "-range.txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("/Users/lennartmac/Documents/logging/" + numberOfActionRequests + "-range.txt", "UTF-8");
 
         int counter = 1;
 

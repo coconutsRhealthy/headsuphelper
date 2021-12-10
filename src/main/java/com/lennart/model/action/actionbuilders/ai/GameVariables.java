@@ -54,7 +54,7 @@ public class GameVariables implements GameVariable {
         opponentStack = partyTableReader.getOpponentStackFromImage();
         botHoleCard1 = partyTableReader.getBotHoleCard1FromImage();
         botHoleCard2 = partyTableReader.getBotHoleCard2FromImage();
-        botIsButton = partyTableReader.topPlayerIsButton();
+        botIsButton = partyTableReader.bottomPlayerIsButton();
 
         botHoleCards.add(botHoleCard1);
         botHoleCards.add(botHoleCard2);
