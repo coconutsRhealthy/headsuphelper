@@ -100,7 +100,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
-                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen2();
+                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen();
 
                         if(bigBlind < 0) {
                             System.out.println("Error in reading bb. Set it to previous value: " + previousBigBlind);

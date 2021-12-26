@@ -189,14 +189,16 @@ public class PartyTableReader {
             char hc1Suit = partyTableReader.readFirstHoleCardSuit();
 
             if(hc1Rank == -1 || hc1Suit == 'x') {
-                String extraCheckHc1RankString = partyTableReader.readFirstHoleCardRank();
+                BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(452, 606, 1, 1);
+                int extraCheckSuitRgb1 = bufferedImage.getRGB(0, 0);
+                extraCheckSuitRgb1 = extraCheckSuitRgb1 / 1_000_000;
 
-                if(extraCheckHc1RankString.equals("rm’")) {
-                    System.out.println("sng indeed finished, you have no first holecard");
+                if(extraCheckSuitRgb1 == -9)  {
+                    System.out.println("sng indeed finished, you have no first holecard. hc1suit: " + extraCheckSuitRgb1);
                     saveScreenshotOfEntireScreen("sngFinished", new Date().getTime());
                     return true;
                 } else {
-                    System.out.println("not sure if sng finished, weird shit. hc1rank: " + extraCheckHc1RankString);
+                    System.out.println("not sure if sng finished, weird shit. hc1suit: " + extraCheckSuitRgb1);
                     saveScreenshotOfEntireScreen("sngFinishedExtraCheckNeeded", new Date().getTime());
                     TimeUnit.SECONDS.sleep(5);
                     return sngIsFinished(timeOfLastAction);
@@ -228,31 +230,31 @@ public class PartyTableReader {
     }
 
     public void closeSorryNoRematchPopUp() {
-        MouseKeyboard.click(647, 147);
+        MouseKeyboard.click(473, 473);
     }
 
     public void closeTableOfEndedSng() {
-        MouseKeyboard.click(13, 33);
+        MouseKeyboard.click(13, 52);
     }
 
     public void clickTopSngInList(String positionOnTop) {
         if(positionOnTop.equals("first")) {
-            MouseKeyboard.click(208, 403);
+            MouseKeyboard.click(208, 425);
         } else if(positionOnTop.equals("second")) {
-            MouseKeyboard.click(275, 422);
+            MouseKeyboard.click(275, 442);
         }
     }
 
     public void selectAndUnselect6PlayerPerTableFilter() throws Exception {
-        MouseKeyboard.click(586, 290);
+        MouseKeyboard.click(587, 310);
         TimeUnit.MILLISECONDS.sleep(2000);
-        MouseKeyboard.click(587, 292);
+        MouseKeyboard.click(587, 312);
 
         TimeUnit.MILLISECONDS.sleep(2000);
 
-        MouseKeyboard.click(305, 290);
+        MouseKeyboard.click(306, 312);
         TimeUnit.MILLISECONDS.sleep(2000);
-        MouseKeyboard.click(308, 293);
+        MouseKeyboard.click(308, 315);
     }
 
     public void registerNewSng(String positionOfSngInListOfClient, ContinuousTable continuousTable) throws Exception {
@@ -263,6 +265,7 @@ public class PartyTableReader {
             System.out.println("keep same buyin, both previous and new one are: " + continuousTable.getNewBuyInToSelect());
         }
 
+        clickTopSngInList(positionOfSngInListOfClient);
         clickTopSngInList(positionOfSngInListOfClient);
         TimeUnit.MILLISECONDS.sleep(2000);
 
@@ -292,13 +295,14 @@ public class PartyTableReader {
         }
 
         clickTopSngInList(positionOfSngInListOfClient);
+        clickTopSngInList(positionOfSngInListOfClient);
 
         //click register button
         TimeUnit.MILLISECONDS.sleep(250);
         System.out.println("registering new sng");
         saveScreenshotOfEntireScreen("registerEmptySng", new Date().getTime());
         TimeUnit.MILLISECONDS.sleep(1744);
-        MouseKeyboard.click(1095, 653);
+        MouseKeyboard.click(1095, 673);
         TimeUnit.MILLISECONDS.sleep(2000);
 
         if(dollarBuyInPopUpIsOpen()) {
@@ -306,15 +310,15 @@ public class PartyTableReader {
 
             //click dollar buy-in option
             TimeUnit.MILLISECONDS.sleep(2157);
-            MouseKeyboard.click(706, 354);
+            MouseKeyboard.click(706, 374);
             TimeUnit.MILLISECONDS.sleep(600);
-            MouseKeyboard.click(706, 354);
+            MouseKeyboard.click(706, 374);
 
             //click OK button on registration confirm pop-up
             TimeUnit.MILLISECONDS.sleep(2002);
-            MouseKeyboard.click(744, 153);
+            MouseKeyboard.click(566, 498);
             TimeUnit.MILLISECONDS.sleep(600);
-            MouseKeyboard.click(744, 153);
+            MouseKeyboard.click(566, 496);
 
             //hier nog een check dat je daadwerkelijk geregged bent.. anders opnieuw deze methode callen..
             TimeUnit.SECONDS.sleep(2);
@@ -333,15 +337,15 @@ public class PartyTableReader {
     private boolean dollarBuyInPopUpIsOpen() throws Exception {
         boolean buyInPopUpOpen = false;
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(641, 358, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(645, 377, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
         System.out.println("popup pixel: " + pixelRgb);
         long currentTime = new Date().getTime();
 
-        if(pixelRgb / 1_000_000 == -5) {
-            //expected rgb when popup opened: -5.232.375
-            //expected when not opened: -15.263.973
+        if(pixelRgb / 1_000_000 == -4) {
+            //expected rgb when popup opened: -4.178.939
+            //expected when not opened: -14.737.884
 
             System.out.println("dollarBuyInPopup opened. Time: " + currentTime);
             saveScreenshotOfEntireScreen("dollarBuyInPopupOpen_", currentTime);
@@ -350,9 +354,9 @@ public class PartyTableReader {
             for(int i = 0; i < 3; i++) {
                 TimeUnit.SECONDS.sleep(5);
                 System.out.println("another dollarBuyInPopup attempt: " + i);
-                bufferedImage = ImageProcessor.getBufferedImageScreenShot(641, 358, 1, 1);
+                bufferedImage = ImageProcessor.getBufferedImageScreenShot(645, 377, 1, 1);
                 pixelRgb = bufferedImage.getRGB(0, 0);
-                if(pixelRgb / 1_000_000 == -5) {
+                if(pixelRgb / 1_000_000 == -4) {
                     buyInPopUpOpen = true;
                     break;
                 }
@@ -370,19 +374,21 @@ public class PartyTableReader {
     public void checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt() throws Exception {
         TimeUnit.SECONDS.sleep(1);
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(452, 149, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(566, 495, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
         long currTime = new Date().getTime();
 
-        if(pixelRgb / 100_000 == -167 || pixelRgb / 100_000 == -38) {
+        if(pixelRgb / 100_000 == -38) {
+            //when closed: -657_931
+            //when still open: -3_815_994
             saveScreenshotOfEntireScreen(currTime);
             System.out.println("register confirm popup still open, gonna close it... RGB: " + pixelRgb + " currtime: " + currTime);
 
             TimeUnit.MILLISECONDS.sleep(2002);
-            MouseKeyboard.click(744, 153);
+            MouseKeyboard.click(566, 498);
             TimeUnit.MILLISECONDS.sleep(600);
-            MouseKeyboard.click(744, 153);
+            MouseKeyboard.click(566, 496);
             TimeUnit.SECONDS.sleep(1);
         } else {
             saveScreenshotOfEntireScreen(currTime);
@@ -392,17 +398,15 @@ public class PartyTableReader {
     }
 
     public static boolean notRegisteredForAnyTournament() {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1134, 161, 1, 1);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(1052, 192, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
-        if(pixelRgb == -15_263_973) {
-            //expected: -394.758
-            //expected new: -15.263.973
+        if(pixelRgb == -1) {
+            //expected: -1
             System.out.println("Not registered for any tournament... Pixel: " + pixelRgb);
             return true;
         } else {
-            //expected: -2.096.121
-            //expected new:
+            //expected: -1.498.367
             System.out.println("Registered for at least one tournament... Pixel: " + pixelRgb);
             return false;
         }
@@ -411,7 +415,7 @@ public class PartyTableReader {
     private boolean noPlayerIsReggedYet() throws Exception {
         boolean noPlayerIsReggedYet = false;
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(968, 453, 1012, 473);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(972, 476, 1010, 494);
 
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
@@ -431,8 +435,8 @@ public class PartyTableReader {
         BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(157, 284, 1, 1);
         int pixelRgb = bufferedImage.getRGB(0, 0);
 
-        if(pixelRgb / 1_000_000 == -15) {
-            //expected rgb when table opened: -15.395.563
+        if(pixelRgb / 1_000_000 == -16) {
+            //expected rgb when table opened: -16.448.251
             //expected when not opened: -1
             System.out.println("new sng table is opened a");
             return true;
@@ -450,6 +454,7 @@ public class PartyTableReader {
 
         fullPlayerName = fullPlayerName.replaceAll("'", "");
         fullPlayerName = fullPlayerName.replaceAll("1‘", "");
+        fullPlayerName = fullPlayerName.replaceAll("ﬂ", "");
 
         if(fullPlayerName.endsWith("_")) {
             fullPlayerName = fullPlayerName.substring(0, fullPlayerName.length() - 1);
@@ -458,6 +463,8 @@ public class PartyTableReader {
         while(fullPlayerName.endsWith("\\")) {
             fullPlayerName = fullPlayerName.substring(0, fullPlayerName.length() - 1);
         }
+
+        System.out.println("Oppname: " + fullPlayerName);
 
         return fullPlayerName;
     }
@@ -498,7 +505,8 @@ public class PartyTableReader {
         } else if(botAction.contains("raise")) {
             String rightActionButton = readRightActionButton();
 
-            if(StringUtils.containsIgnoreCase(rightActionButton, "raise")) {
+            if(StringUtils.containsIgnoreCase(rightActionButton, "raise") || StringUtils.containsIgnoreCase(rightActionButton, "allin") ||
+                    StringUtils.containsIgnoreCase(rightActionButton, "Alllrl")) {
                 clickRaiseActionButton();
             } else {
                 System.out.println("WTFzxz! Raise and right button does not contain raise!");
@@ -670,6 +678,9 @@ public class PartyTableReader {
             suitRgb2 = bufferedImage2.getRGB(0, 0);
         }
 
+        System.out.println("hc1suit rgb1: " + suitRgb1);
+        System.out.println("hc1suit rgb2: " + suitRgb2);
+
         return getHolecardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
@@ -689,6 +700,9 @@ public class PartyTableReader {
             bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(562, 576, 1, 1);
             suitRgb2 = bufferedImage2.getRGB(0, 0);
         }
+
+        System.out.println("hc2suit rgb1: " + suitRgb1);
+        System.out.println("hc2suit rgb2: " + suitRgb2);
 
         return getHolecardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
@@ -944,64 +958,7 @@ public class PartyTableReader {
         return totalPotSizeNonNumericRemoved;
     }
 
-    public double readBigBlindFromSngScreen(boolean botIsButton) {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(521, 524, 554, 546);
-        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
-        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
-        String botStartHandBetSizeString = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
-
-        System.out.println("read bot bigblind betsize: " + botStartHandBetSizeString + "...bot is button: " + false);
-
-        double bigBlind;
-
-        if(botIsButton) {
-            switch (botStartHandBetSizeString) {
-                case "10":
-                    bigBlind = 20;
-                    break;
-                case "15":
-                    bigBlind = 30;
-                    break;
-                case "20":
-                    bigBlind = 40;
-                    break;
-                case "'55":
-                    bigBlind = 50;
-                    break;
-                case "‘go":
-                    bigBlind = 60;
-                    break;
-                default:
-                    bigBlind = -1;
-                    break;
-            }
-        } else {
-            switch (botStartHandBetSizeString) {
-                case "20":
-                    bigBlind = 20;
-                    break;
-                case "‘go":
-                    bigBlind = 30;
-                    break;
-                case "‘Io":
-                    bigBlind = 40;
-                    break;
-                case "50":
-                    bigBlind = 50;
-                    break;
-                case "60":
-                    bigBlind = 60;
-                    break;
-                default:
-                    bigBlind = -1;
-                    break;
-            }
-        }
-
-        return bigBlind;
-    }
-
-    public double readBigBlindFromSngScreen2() throws Exception {
+    public double readBigBlindFromSngScreen() throws Exception {
         TimeUnit.MILLISECONDS.sleep(500);
         MouseKeyboard.click(107, 110);
         TimeUnit.MILLISECONDS.sleep(500);
@@ -1229,7 +1186,7 @@ public class PartyTableReader {
 
             if(rgb2_100k == -7 || rgb2_100k == -6) {
                 suit = 'h';
-            } else if(rgb2_100k == -2) {
+            } else if(rgb2_100k == -2 || rgb2_100k == -3) {
                 suit = 'd';
             }
         }
