@@ -656,6 +656,8 @@ public class ActionVariables {
         action = changeOpenFoldsToLimp(action, gameVariables.getOpponentAction(), botIsButtonInMethod, boardInMethod, gameVariables.getBigBlind());
 
         action = trickyCallWithMonstersOnFlopAndTurn(action, bluffOddsAreOk, boardInMethod, botHandStrengthInMethod);
+        action = adjustPlayAgainstDonkbets(action, boardInMethod, potSizeBb, botIsButtonInMethod, opponentBetsizeBb, botHandStrengthInMethod,
+                gameVariables.getOpponentAction(), botBetsizeBb);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
@@ -1424,6 +1426,29 @@ public class ActionVariables {
                             if(Math.random() > 0.65) {
                                 actionToReturn = "call";
                                 System.out.println("Postflop monster call instead of raise. Board size: " + board.size());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String adjustPlayAgainstDonkbets(String action, List<Card> board, double potsizeBb, boolean position,
+                                             double oppBetsizeBb, double handstrength, String opponentAction, double botBetSizeBb) {
+        String actionToReturn = action;
+
+        if(action.equals("fold") && opponentAction.equals("bet75pct") && botBetSizeBb == 0) {
+            if(board != null && board.size() == 3) {
+                if(position) {
+                    if(potsizeBb == 2) {
+                        if(oppBetsizeBb <= 2) {
+                            System.out.println("Facing flop limped pot donkbet yo. HS: " + handstrength);
+                            if(handstrength > 0.35) {
+                                actionToReturn = "call";
+                                System.out.println("Change fold against flop limped pot donkbet to call");
                             }
                         }
                     }
