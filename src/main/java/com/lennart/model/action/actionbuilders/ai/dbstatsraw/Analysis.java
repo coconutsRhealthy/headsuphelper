@@ -2,6 +2,7 @@ package com.lennart.model.action.actionbuilders.ai.dbstatsraw;
 
 import com.lennart.model.action.actionbuilders.ai.GameFlow;
 import com.lennart.model.action.actionbuilders.ai.dbsave.dbsave2_0.DbSaveBluff_2_0;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.boardevaluation.BoardEvaluator;
 import com.lennart.model.boardevaluation.draws.StraightDrawEvaluator;
 import com.lennart.model.botgame.MouseKeyboard;
@@ -2366,7 +2367,7 @@ public class Analysis {
     }
 
     public static void main(String[] args) throws Exception {
-        new Analysis().handstrengthsAtFlopOop();
+        new Analysis().flopHsShizzle();
     }
 
     private void flopHsShizzle() throws Exception {
@@ -2375,21 +2376,26 @@ public class Analysis {
         Statement st = con.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM dbstats_raw_9;");
 
-        List<Double> allHs = new ArrayList<>();
+        OpponentIdentifier opponentIdentifier = new OpponentIdentifier();
+        int numberOfHands = opponentIdentifier.getOpponentNumberOfHandsFromDb("50xn01");
 
-        while(rs.next()) {
-            List<Card> board = convertCardStringToCardList(rs.getString("board"));
+        System.out.println("BARRY! " + numberOfHands);
 
-            if(board.size() == 4) {
-                double hs = rs.getDouble("handstrength");
-
-                if(hs > 0.94 && hs < 0.95) {
-                    System.out.println(rs.getString("holecards") + "   " + rs.getString("board"));
-                }
-
-                //allHs.add(rs.getDouble("handstrength"));
-            }
-        }
+//        List<Double> allHs = new ArrayList<>();
+//
+//        while(rs.next()) {
+//            List<Card> board = convertCardStringToCardList(rs.getString("board"));
+//
+//            if(board.size() == 4) {
+//                double hs = rs.getDouble("handstrength");
+//
+//                if(hs > 0.94 && hs < 0.95) {
+//                    System.out.println(rs.getString("holecards") + "   " + rs.getString("board"));
+//                }
+//
+//                //allHs.add(rs.getDouble("handstrength"));
+//            }
+//        }
 
         //Collections.sort(allHs, Collections.reverseOrder());
 

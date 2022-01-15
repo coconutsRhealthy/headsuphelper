@@ -105,7 +105,7 @@ public class Sizing {
         sizingPercentage = 0.35;
         //raiseOddsToUseClassVar = 2.85;
         //raiseOddsToUseClassVar = 2.25;
-        raiseOddsToUseClassVar = 2.85;
+        raiseOddsToUseClassVar = 3.0;
     }
 
     public double getRuleBotSizing(double handStrength, double facingBetSize, double myBetSize, double facingStack,

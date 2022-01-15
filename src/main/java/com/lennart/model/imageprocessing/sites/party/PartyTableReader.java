@@ -330,6 +330,7 @@ public class PartyTableReader {
             }
         } else {
             System.out.println("Trying second top sng registration attempt, because pop up did not open...");
+            checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt();
             registerNewSng("second", continuousTable);
         }
     }
@@ -379,9 +380,10 @@ public class PartyTableReader {
 
         long currTime = new Date().getTime();
 
-        if(pixelRgb / 100_000 == -38) {
+        if(pixelRgb / 100_000 == -38 || pixelRgb / 100_000 == -151) {
             //when closed: -657_931
             //when still open: -3_815_994
+            //or when still open:... -15_169_537
             saveScreenshotOfEntireScreen(currTime);
             System.out.println("register confirm popup still open, gonna close it... RGB: " + pixelRgb + " currtime: " + currTime);
 
@@ -455,6 +457,10 @@ public class PartyTableReader {
         fullPlayerName = fullPlayerName.replaceAll("'", "");
         fullPlayerName = fullPlayerName.replaceAll("1‘", "");
         fullPlayerName = fullPlayerName.replaceAll("ﬂ", "");
+        fullPlayerName = fullPlayerName.replaceAll("ﬁ", "");
+        fullPlayerName = fullPlayerName.replaceAll("ﬀ", "");
+        fullPlayerName = fullPlayerName.replaceAll("ﬃ", "");
+        fullPlayerName = fullPlayerName.replaceAll("ﬄ", "");
 
         if(fullPlayerName.endsWith("_")) {
             fullPlayerName = fullPlayerName.substring(0, fullPlayerName.length() - 1);

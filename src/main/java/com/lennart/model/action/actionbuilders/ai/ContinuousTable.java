@@ -24,6 +24,8 @@ public class ContinuousTable implements ContinuousTableable {
     private boolean opponentHasInitiative = false;
     private boolean pre3betOrPostRaisedPot = false;
     private boolean opponentDidPreflop4betPot = false;
+    private double botStartOfHandStack = -1;
+    private double oppStartOfHandStack = -1;
     private List<String> allHandsPlayedAndPlayerNames = new ArrayList<>();
 
     private List<Set<Card>> top10percentFlopCombos;
@@ -58,6 +60,7 @@ public class ContinuousTable implements ContinuousTableable {
     private double lastBuyIn = 10;
     private double newBuyInToSelect = 10;
     private double bankroll = 265.66;
+    private List<String> sngResults = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -124,6 +127,7 @@ public class ContinuousTable implements ContinuousTableable {
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this);
                             new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
                             System.out.println("3.4 hours have passed, force quit");
+                            printSessionResults();
                             throw new RuntimeException();
                         }
                     }
@@ -161,6 +165,11 @@ public class ContinuousTable implements ContinuousTableable {
 
                     gameVariables = new GameVariables(bigBlind, game.equals("sng"));
                     bigBlind = gameVariables.getBigBlind();
+
+                    botStartOfHandStack = gameVariables.getBotStack() + gameVariables.getBotBetSize();
+                    oppStartOfHandStack = gameVariables.getOpponentStack() + gameVariables.getOpponentBetSize();
+                    System.out.println("Bot start stack: " + botStartOfHandStack);
+                    System.out.println("Opp start stack: " + oppStartOfHandStack);
 
                     allHandsPlayedAndPlayerNames.add(gameVariables.getOpponentName());
                 } else {
@@ -375,10 +384,12 @@ public class ContinuousTable implements ContinuousTableable {
 
     private void doSngContinuousLogic(long startTime) throws Exception {
         if(PartyTableReader.sngIsFinished(timeOfLastDoneAction)) {
+            didBotWinSng();
             long currentTime = new Date().getTime();
 
             if(currentTime - startTime > 19_920_000) {
                 System.out.println("3.4 hours have passed, force quit");
+                printSessionResults();
                 throw new RuntimeException();
             }
 
@@ -396,7 +407,7 @@ public class ContinuousTable implements ContinuousTableable {
             partyTableReader.selectAndUnselect6PlayerPerTableFilter();
 
             TimeUnit.MILLISECONDS.sleep(1500);
-            decideBuyIn();
+            //decideBuyIn();
             partyTableReader.registerNewSng("first", this);
 
             gonnaDoFirstActionOfNewSng = true;
@@ -514,6 +525,50 @@ public class ContinuousTable implements ContinuousTableable {
         } else {
             newBuyInToSelect = 1;
         }
+    }
+
+    private void didBotWinSng() {
+        String botWonSng;
+
+        if(botStartOfHandStack > oppStartOfHandStack) {
+            System.out.println("Bot won sng! botStartOfHandStack: " + botStartOfHandStack + " oppStartOfHandStack: " + oppStartOfHandStack);
+            botWonSng = "true";
+            sngResults.add("botWin");
+        } else if(botStartOfHandStack == oppStartOfHandStack) {
+            System.out.println("Unclear who won sng. Equal stacks. botStartOfHandStack: " + botStartOfHandStack + " oppStartOfHandStack: " + oppStartOfHandStack);
+            botWonSng = "maybe";
+            sngResults.add("unclear");
+        } else {
+            System.out.println("Opp won sng! botStartOfHandStack: " + botStartOfHandStack + " oppStartOfHandStack: " + oppStartOfHandStack);
+            botWonSng = "false";
+            sngResults.add("botLoss");
+        }
+
+        if(botWonSng.equals("true")) {
+            bankroll = bankroll + 4.8;
+        } else if(botWonSng.equals("maybe")) {
+            bankroll = bankroll - 0.1;
+        } else if(botWonSng.equals("false")) {
+            bankroll = bankroll - 5;
+        }
+
+        System.out.println("Estimated bankroll: " + bankroll);
+    }
+
+    private void printSessionResults() {
+        int wins = Collections.frequency(sngResults, "botWin");
+        int unclears = Collections.frequency(sngResults, "unclear");
+        int losses = Collections.frequency(sngResults, "botLoss");
+        int totalGames = wins + unclears + losses;
+
+        System.out.println();
+        System.out.println("************");
+        System.out.println("Games played: " + totalGames);
+        System.out.println("Bot wins: " + wins);
+        System.out.println("Unclears: " + unclears);
+        System.out.println("Bot losses: " + losses);
+        System.out.println("************");
+        System.out.println();
     }
 
     @Override
