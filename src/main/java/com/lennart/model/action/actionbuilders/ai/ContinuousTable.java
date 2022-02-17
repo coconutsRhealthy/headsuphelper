@@ -1,5 +1,6 @@
 package com.lennart.model.action.actionbuilders.ai;
 
+import com.lennart.model.action.actionbuilders.Logger;
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.equityrange.InputProvider;
 import com.lennart.model.action.actionbuilders.ai.equityrange.OpponentRangeSetter;
@@ -59,8 +60,14 @@ public class ContinuousTable implements ContinuousTableable {
 
     private double lastBuyIn = 10;
     private double newBuyInToSelect = 10;
-    private double bankroll = 265.66;
+    private double bankroll = 286.52;
     private List<String> sngResults = new ArrayList<>();
+    private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
+    private long sessionStartTime;
+
+    private List<Integer> allNumberOfHands = new ArrayList<>();
+    private List<String> oppTypes = new ArrayList<>();
+    private List<String> numberOfHandWithOppType = new ArrayList<>();
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -77,14 +84,14 @@ public class ContinuousTable implements ContinuousTableable {
         int milliSecondsTotal = 0;
         int printDotTotal = 0;
 
-        long startTime = new Date().getTime();
+        sessionStartTime = new Date().getTime();
 
         while(true) {
             TimeUnit.MILLISECONDS.sleep(100);
             milliSecondsTotal = milliSecondsTotal + 100;
 
             if(game.equals("sng") && milliSecondsTotal >= 4900) {
-                doSngContinuousLogic(startTime);
+                doSngContinuousLogic(sessionStartTime);
             }
 
             if(PartyTableReader.botIsToAct(gonnaDoFirstActionOfNewSng)) {
@@ -121,7 +128,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!game.equals("sng")) {
                         long currentTime = new Date().getTime();
 
-                        if(currentTime - startTime > 19_920_000) {
+                        if(currentTime - sessionStartTime > 25_400_000) {
                             new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this);
@@ -190,7 +197,8 @@ public class ContinuousTable implements ContinuousTableable {
 
                 double sizing = actionVariables.getSizing();
 
-                doLogging(gameVariables, actionVariables, numberOfActionRequests);
+                //doLogging(gameVariables, actionVariables, numberOfActionRequests);
+                Logger.doLogging(gameVariables, actionVariables, numberOfActionRequests);
 
                 System.out.println();
                 System.out.println("********************");
@@ -201,6 +209,8 @@ public class ContinuousTable implements ContinuousTableable {
                 System.out.println("Route: " + actionVariables.getRoute());
                 System.out.println("Table: " + actionVariables.getTable());
                 //System.out.println("OppType: " + new GameFlow().getOpponentGroup(gameVariables.getOpponentName()));
+                System.out.println("OppType: " + actionVariables.getOpponentType());
+                System.out.println("Hands: " + actionVariables.getOppNumberOfHands());
                 System.out.println("********************");
                 System.out.println();
 
@@ -208,7 +218,12 @@ public class ContinuousTable implements ContinuousTableable {
                     allHandStrenghts.add(actionVariables.getBotHandStrength());
                 }
 
-                PartyTableReader.performActionOnSite(action, sizing);
+                allNumberOfHands.add(actionVariables.getOppNumberOfHands());
+                oppTypes.add(actionVariables.getOpponentType());
+                numberOfHandWithOppType.add("" + actionVariables.getOppNumberOfHands() + "_" + actionVariables.getOpponentType());
+
+                PartyTableReader.performActionOnSite(action, sizing, gameVariables.getPot(),
+                        gameVariables.getBoard(), gameVariables.getBigBlind(), gameVariables.getBotStack());
 
                 timeOfLastDoneAction = new Date().getTime();
                 gonnaDoFirstActionOfNewSng = false;
@@ -216,6 +231,9 @@ public class ContinuousTable implements ContinuousTableable {
                 long botActEndtime = new Date().getTime();
                 long botActDuration = botActEndtime - botActStarttime;
                 System.out.println("**BOT ACTION DURATION: " + botActDuration + " **");
+                addActionDurationToMap(botActDuration, gameVariables.getBoard());
+                Logger.printActionDurationsToTextFile(botActionDurations, sessionStartTime);
+                Logger.printOppTypeData(allNumberOfHands, oppTypes, numberOfHandWithOppType, sessionStartTime);
 
                 TimeUnit.MILLISECONDS.sleep(1000);
             }
@@ -293,7 +311,7 @@ public class ContinuousTable implements ContinuousTableable {
 
         writer.close();
 
-        doRangeLogging(numberOfActionRequests);
+        //doRangeLogging(numberOfActionRequests);
     }
 
     private void doRangeLogging(int numberOfActionRequests) throws Exception {
@@ -384,10 +402,12 @@ public class ContinuousTable implements ContinuousTableable {
 
     private void doSngContinuousLogic(long startTime) throws Exception {
         if(PartyTableReader.sngIsFinished(timeOfLastDoneAction)) {
-            didBotWinSng();
+            String botWonSngString = getBotWonSngString();
+            adjustBankroll(botWonSngString, lastBuyIn);
+
             long currentTime = new Date().getTime();
 
-            if(currentTime - startTime > 19_920_000) {
+            if(currentTime - startTime > 25_400_000) {
                 System.out.println("3.4 hours have passed, force quit");
                 printSessionResults();
                 throw new RuntimeException();
@@ -442,16 +462,16 @@ public class ContinuousTable implements ContinuousTableable {
 
                 System.out.println(",");
 
-                if(counter2 >= 1350 && PartyTableReader.notRegisteredForAnyTournament()) {
-                    counterToQuit++;
-                    System.out.println("Something is wrong in registering sng part, might close session. Counter: " + counterToQuit);
-
-                    if(counterToQuit >= 5) {
-                        System.out.println("Something is wrong in registering sng part, close session.");
-                        PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
-                        throw new RuntimeException();
-                    }
-                }
+//                if(counter2 >= 1350 && PartyTableReader.notRegisteredForAnyTournament()) {
+//                    counterToQuit++;
+//                    System.out.println("Something is wrong in registering sng part, might close session. Counter: " + counterToQuit);
+//
+//                    if(counterToQuit >= 5) {
+//                        System.out.println("Something is wrong in registering sng part, close session.");
+//                        PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+//                        throw new RuntimeException();
+//                    }
+//                }
 
                 TimeUnit.MILLISECONDS.sleep(1100);
 
@@ -503,15 +523,7 @@ public class ContinuousTable implements ContinuousTableable {
         TimeUnit.SECONDS.sleep(6);
     }
 
-    private void decideBuyIn() throws Exception {
-        double bankrollReadFromScreen = PartyTableReader.readBankroll();
-
-        if((bankrollReadFromScreen < 0.88 * this.bankroll) || (bankrollReadFromScreen > 1.12 * this.bankroll)) {
-            System.out.println("read bankroll can't be right, too big diff with previous. Newly read: " + bankrollReadFromScreen + " previous: " + this.bankroll);
-        } else {
-            bankroll = bankrollReadFromScreen;
-        }
-
+    private void decideBuyIn() {
         if(bankroll > 800) {
             newBuyInToSelect = 20;
         } else if(bankroll > 300) {
@@ -527,38 +539,75 @@ public class ContinuousTable implements ContinuousTableable {
         }
     }
 
-    private void didBotWinSng() {
-        String botWonSng;
+    private String getBotWonSngString() {
+        String botWonSng = "";
 
         if(botStartOfHandStack > oppStartOfHandStack) {
             System.out.println("Bot won sng! botStartOfHandStack: " + botStartOfHandStack + " oppStartOfHandStack: " + oppStartOfHandStack);
-            botWonSng = "true";
-            sngResults.add("botWin");
+            botWonSng = "win";
+            sngResults.add("win");
         } else if(botStartOfHandStack == oppStartOfHandStack) {
             System.out.println("Unclear who won sng. Equal stacks. botStartOfHandStack: " + botStartOfHandStack + " oppStartOfHandStack: " + oppStartOfHandStack);
-            botWonSng = "maybe";
+            botWonSng = "unclear";
             sngResults.add("unclear");
         } else {
             System.out.println("Opp won sng! botStartOfHandStack: " + botStartOfHandStack + " oppStartOfHandStack: " + oppStartOfHandStack);
-            botWonSng = "false";
-            sngResults.add("botLoss");
+            botWonSng = "loss";
+            sngResults.add("loss");
         }
 
-        if(botWonSng.equals("true")) {
-            bankroll = bankroll + 4.8;
-        } else if(botWonSng.equals("maybe")) {
-            bankroll = bankroll - 0.1;
-        } else if(botWonSng.equals("false")) {
-            bankroll = bankroll - 5;
+        return botWonSng;
+    }
+
+    private void adjustBankroll(String winLossOrUnclear, double stake) throws Exception {
+        double adjustment = 0;
+
+        if(winLossOrUnclear.equals("win")) {
+            if(stake == 1) {
+                adjustment = 0.88;
+            } else if(stake == 2) {
+                adjustment = 1.8;
+            } else if(stake == 5) {
+                adjustment = 4.6;
+            } else if(stake == 10) {
+                adjustment = 9.2;
+            } else if(stake == 20) {
+                adjustment = 18.4;
+            }
+        } else if(winLossOrUnclear.equals("unclear")) {
+            if(stake == 1) {
+                adjustment = -0.06;
+            } else if(stake == 2) {
+                adjustment = -0.1;
+            } else if(stake == 5) {
+                adjustment = -0.2;
+            } else if(stake == 10) {
+                adjustment = -0.4;
+            } else if(stake == 20) {
+                adjustment = -0.8;
+            }
+        } else if(winLossOrUnclear.equals("loss")) {
+            if(stake == 1) {
+                adjustment = -1;
+            } else if(stake == 2) {
+                adjustment = -2;
+            } else if(stake == 5) {
+                adjustment = -5;
+            } else if(stake == 10) {
+                adjustment = -10;
+            } else if(stake == 20) {
+                adjustment = -20;
+            }
         }
 
+        bankroll = bankroll + adjustment;
         System.out.println("Estimated bankroll: " + bankroll);
     }
 
     private void printSessionResults() {
-        int wins = Collections.frequency(sngResults, "botWin");
+        int wins = Collections.frequency(sngResults, "win");
         int unclears = Collections.frequency(sngResults, "unclear");
-        int losses = Collections.frequency(sngResults, "botLoss");
+        int losses = Collections.frequency(sngResults, "loss");
         int totalGames = wins + unclears + losses;
 
         System.out.println();
@@ -569,6 +618,29 @@ public class ContinuousTable implements ContinuousTableable {
         System.out.println("Bot losses: " + losses);
         System.out.println("************");
         System.out.println();
+    }
+
+    private void addActionDurationToMap(long actionDuration, List<Card> board) {
+        if(board == null || board.isEmpty()) {
+            botActionDurations.get("preflop").add(actionDuration);
+        } else {
+            if(board.size() == 3) {
+                botActionDurations.get("flop").add(actionDuration);
+            } else if(board.size() == 4) {
+                botActionDurations.get("turn").add(actionDuration);
+            } else if(board.size() == 5) {
+                botActionDurations.get("river").add(actionDuration);
+            }
+        }
+    }
+
+    private Map<String, List<Long>> initialzeBotActionDurationsMap() {
+        return new HashMap<String, List<Long>>() {{
+            put("preflop", new ArrayList<>());
+            put("flop", new ArrayList<>());
+            put("turn", new ArrayList<>());
+            put("river", new ArrayList<>());
+        }};
     }
 
     @Override
@@ -723,5 +795,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setBankroll(double bankroll) {
         this.bankroll = bankroll;
+    }
+
+    public long getSessionStartTime() {
+        return sessionStartTime;
     }
 }

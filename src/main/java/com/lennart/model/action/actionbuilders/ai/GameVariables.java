@@ -104,7 +104,7 @@ public class GameVariables implements GameVariable {
 
         pot = topPotSize - opponentBetSize - botBetSize;
 
-        TimeUnit.SECONDS.sleep(1);
+        //TimeUnit.SECONDS.sleep(1);
         opponentName = partyTableReader.getOpponentPlayerNameFromImage();
     }
 

@@ -300,7 +300,7 @@ public class PartyTableReader {
         //click register button
         TimeUnit.MILLISECONDS.sleep(250);
         System.out.println("registering new sng");
-        saveScreenshotOfEntireScreen("registerEmptySng", new Date().getTime());
+        saveScreenshotOfEntireScreen("registerEmptySng__bankroll: " + continuousTable.getBankroll() + "__", new Date().getTime());
         TimeUnit.MILLISECONDS.sleep(1744);
         MouseKeyboard.click(1095, 673);
         TimeUnit.MILLISECONDS.sleep(2000);
@@ -475,27 +475,57 @@ public class PartyTableReader {
         return fullPlayerName;
     }
 
-    public static void performActionOnSite(String botAction, double sizing) throws Exception {
+    public static void performActionOnSite(String botAction, double sizing, double pot, List<Card> board, double bigBlind,
+                                           double botStack) throws Exception {
         if(botAction != null && sizing != 0) {
-            try {
-                MouseKeyboard.click(996, 665);
-                TimeUnit.MILLISECONDS.sleep(150);
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                MouseKeyboard.pressBackSpace();
-                TimeUnit.MILLISECONDS.sleep(150);
+            if(botAction.equals("bet75pct")) {
+                double currBotstack = botStack + sizing;
+                System.out.println("BS: " + currBotstack);
 
-                MouseKeyboard.enterText(String.valueOf(Precision.round(sizing, 2)));
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                if(sizing / pot < 0.4) {
+                    if(currBotstack < (0.35 * pot)) {
+                        System.out.println("Botstack too small for 35%bet. Press shove button");
+                        clickShoveSizingButton();
+                    }
+
+                    click35pctPotSizingButton();
+                } else if(sizing / pot < 0.6) {
+                    if(currBotstack < (0.5 * pot)) {
+                        System.out.println("Botstack too small for 50%bet. Press shove button");
+                        clickShoveSizingButton();
+                    }
+
+                    clickHalfPotSizingButton();
+                } else {
+                    if(currBotstack < (0.75 * pot)) {
+                        System.out.println("Botstack too small for 75%bet. Press shove button");
+                        clickShoveSizingButton();
+                    }
+
+                    click75pctPotSizingButton();
+                }
+            } else if(botAction.equals("raise")) {
+                if(board == null || board.isEmpty()) {
+                    if(sizing == 2 * bigBlind) {
+                        clickHalfPotSizingButton();
+                    } else if(sizing == 3 * bigBlind) {
+                        click75pctPotSizingButton();
+                    } else if(sizing > 500) {
+                        clickShoveSizingButton();
+                    } else {
+                        System.out.println("Should enter manual preflop raise amount...");
+                        manualEnterBetOrRaiseAmount(sizing);
+                    }
+                } else {
+                    if(sizing < 500) {
+                        clickHalfPotSizingButton();
+                    } else {
+                        clickShoveSizingButton();
+                    }
+                }
             }
+
+            TimeUnit.MILLISECONDS.sleep(100);
         }
 
         if(botAction == null) {
@@ -523,6 +553,28 @@ public class PartyTableReader {
         }
 
         MouseKeyboard.moveMouseToLocation(20, 20);
+    }
+
+    private static void manualEnterBetOrRaiseAmount(double sizing) {
+        try {
+            MouseKeyboard.click(996, 665);
+            TimeUnit.MILLISECONDS.sleep(150);
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            MouseKeyboard.pressBackSpace();
+            TimeUnit.MILLISECONDS.sleep(150);
+
+            MouseKeyboard.enterText(String.valueOf(Precision.round(sizing, 2)));
+            TimeUnit.MILLISECONDS.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isNewHand(List<Card> previousBotHoleCards, List<Card> previousBoard) {
@@ -557,6 +609,22 @@ public class PartyTableReader {
     }
 
     //helper methods
+    private static void click35pctPotSizingButton() {
+        MouseKeyboard.click(735, 625);
+    }
+
+    private static void clickHalfPotSizingButton() {
+        MouseKeyboard.click(816, 620);
+    }
+
+    private static void click75pctPotSizingButton() {
+        MouseKeyboard.click(901, 621);
+    }
+
+    private static void clickShoveSizingButton() {
+        MouseKeyboard.click(975, 624);
+    }
+
     private static void clickFoldActionButton() throws Exception {
         MouseKeyboard.click(709, 708);
     }
@@ -1069,35 +1137,43 @@ public class PartyTableReader {
 
         selectAndUnselect6PlayerPerTableFilter();
 
-        saveScreenshotOfEntireScreen("buyin_" + buyInToSelect + "__", new Date().getTime());
+        saveScreenshotOfEntireScreen("buyin_" + buyInToSelect + "__bankroll: " + continuousTable.getBankroll() + "__" , new Date().getTime());
 
         continuousTable.setLastBuyIn(buyInToSelect);
     }
 
     private void pressBuyInCheckBox(double buyInToSelect) {
         if(buyInToSelect == 1 || buyInToSelect == -1) {
-            MouseKeyboard.click(226, 408);
+            //MouseKeyboard.click(226, 408);
+            MouseKeyboard.click(225, 426);
         } else if(buyInToSelect == 2) {
-            MouseKeyboard.click(227, 438);
+            //MouseKeyboard.click(227, 438);
+            MouseKeyboard.click(224, 457);
         } else if(buyInToSelect == 5) {
-            MouseKeyboard.click(224, 468);
+            //MouseKeyboard.click(224, 468);
+            MouseKeyboard.click(226, 487);
         } else if(buyInToSelect == 10) {
-            MouseKeyboard.click(225, 497);
+            //MouseKeyboard.click(225, 497);
+            MouseKeyboard.click(226, 517);
         } else if(buyInToSelect == 20) {
-            MouseKeyboard.click(225, 526);
+            //MouseKeyboard.click(225, 526);
+            MouseKeyboard.click(225, 547);
         }
     }
 
     private void pressCategoryExpandButton() {
-        MouseKeyboard.click(597, 264);
+        //MouseKeyboard.click(597, 264);
+        MouseKeyboard.click(600, 286);
     }
 
     private void pressCategoryCollapseButton() {
-        MouseKeyboard.click(592, 330);
+        //MouseKeyboard.click(592, 330);
+        MouseKeyboard.click(604, 352);
     }
 
     private void pressBuyinDropdownButton() {
-        MouseKeyboard.click(565, 245);
+        //MouseKeyboard.click(565, 245);
+        MouseKeyboard.click(540, 264);
     }
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
