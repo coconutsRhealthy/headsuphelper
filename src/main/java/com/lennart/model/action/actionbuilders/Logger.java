@@ -250,4 +250,46 @@ public class Logger {
         }
         return cardListAsString;
     }
+
+    public static void printOpponentNames(Map<Double, Map<String, Integer>> handsOfOpponentsPerStake, long sessionStartTime) {
+        try {
+            PrintWriter writer = new PrintWriter("/Users/lennartmac/Documents/printedstats/oppnames/oppnames_" + sessionStartTime + ".txt", "UTF-8");
+
+            for(Map.Entry<Double, Map<String, Integer>> entryOuter : handsOfOpponentsPerStake.entrySet()) {
+                writer.println("BUYIN: " + entryOuter.getKey());
+
+                Map<String, Integer> handsPerOpponenent = entryOuter.getValue();
+                handsPerOpponenent = sortByValueHighToLow(handsPerOpponenent);
+                int oppCounter = 0;
+
+                for(Map.Entry<String, Integer> entryInner : handsPerOpponenent.entrySet()) {
+                    oppCounter++;
+                    writer.println("" + oppCounter + ") " + entryInner.getKey() + "   " + entryInner.getValue());
+                }
+
+                writer.println();
+            }
+
+            writer.close();
+        } catch (Exception e) {
+            System.out.println("Error in printOppNames to file...");
+            e.printStackTrace();
+        }
+    }
+
+    private static <K, V extends Comparable<? super V>> Map<K, V> sortByValueHighToLow(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>( map.entrySet() );
+        Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o2.getValue() ).compareTo( o1.getValue());
+            }
+        });
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
 }

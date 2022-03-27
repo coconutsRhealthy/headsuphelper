@@ -58,9 +58,9 @@ public class ContinuousTable implements ContinuousTableable {
     private long timeOfLastDoneAction = -1;
     private boolean gonnaDoFirstActionOfNewSng = false;
 
-    private double lastBuyIn = 10;
-    private double newBuyInToSelect = 10;
-    private double bankroll = 286.52;
+    private double lastBuyIn = 2;
+    private double newBuyInToSelect = 2;
+    private double bankroll = 54.74;
     private List<String> sngResults = new ArrayList<>();
     private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
     private long sessionStartTime;
@@ -68,6 +68,9 @@ public class ContinuousTable implements ContinuousTableable {
     private List<Integer> allNumberOfHands = new ArrayList<>();
     private List<String> oppTypes = new ArrayList<>();
     private List<String> numberOfHandWithOppType = new ArrayList<>();
+
+    private Map<Double, Map<String, Integer>> handsOfOpponentsPerStake = new HashMap<>();
+    private String lastOppName = "initial";
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -183,6 +186,8 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
+                lastOppName = gameVariables.getOpponentName();
+                System.out.println("lastOppName: " + lastOppName);
                 rangeConstructor = new RangeConstructor();
                 new OpponentRangeSetter(rangeConstructor, new InputProvider()).setOpponentRange(this, gameVariables);
 
@@ -221,6 +226,7 @@ public class ContinuousTable implements ContinuousTableable {
                 allNumberOfHands.add(actionVariables.getOppNumberOfHands());
                 oppTypes.add(actionVariables.getOpponentType());
                 numberOfHandWithOppType.add("" + actionVariables.getOppNumberOfHands() + "_" + actionVariables.getOpponentType());
+                updateHandsOfOpponentsPerStake(lastBuyIn, gameVariables.getOpponentName());
 
                 PartyTableReader.performActionOnSite(action, sizing, gameVariables.getPot(),
                         gameVariables.getBoard(), gameVariables.getBigBlind(), gameVariables.getBotStack());
@@ -234,6 +240,7 @@ public class ContinuousTable implements ContinuousTableable {
                 addActionDurationToMap(botActDuration, gameVariables.getBoard());
                 Logger.printActionDurationsToTextFile(botActionDurations, sessionStartTime);
                 Logger.printOppTypeData(allNumberOfHands, oppTypes, numberOfHandWithOppType, sessionStartTime);
+                Logger.printOpponentNames(handsOfOpponentsPerStake, sessionStartTime);
 
                 TimeUnit.MILLISECONDS.sleep(1000);
             }
@@ -427,7 +434,7 @@ public class ContinuousTable implements ContinuousTableable {
             partyTableReader.selectAndUnselect6PlayerPerTableFilter();
 
             TimeUnit.MILLISECONDS.sleep(1500);
-            //decideBuyIn();
+            decideBuyIn();
             partyTableReader.registerNewSng("first", this);
 
             gonnaDoFirstActionOfNewSng = true;
@@ -525,17 +532,24 @@ public class ContinuousTable implements ContinuousTableable {
 
     private void decideBuyIn() {
         if(bankroll > 800) {
-            newBuyInToSelect = 20;
-        } else if(bankroll > 300) {
-            newBuyInToSelect = 20;
-        } else if(bankroll > 100) {
             newBuyInToSelect = 10;
-        } else if(bankroll > 60) {
+        } else if(bankroll > 300) {
+            newBuyInToSelect = 10;
+        } else if(bankroll > 130) {
+            newBuyInToSelect = 10;
+        } else if(bankroll > 80) {
             newBuyInToSelect = 5;
-        } else if(bankroll > 30) {
+        } else if(bankroll > 50) {
             newBuyInToSelect = 2;
         } else {
             newBuyInToSelect = 1;
+        }
+
+        if(lastOppName != null && lastOppName.equals("Trickysleeps")) {
+            if(newBuyInToSelect >= 20) {
+                newBuyInToSelect = 10;
+                System.out.println("Don't play against Trickysleeps... switch to buyin $10");
+            }
         }
     }
 
@@ -641,6 +655,29 @@ public class ContinuousTable implements ContinuousTableable {
             put("turn", new ArrayList<>());
             put("river", new ArrayList<>());
         }};
+    }
+
+    private void updateHandsOfOpponentsPerStake(double stake, String oppName) {
+        try {
+            if(handsOfOpponentsPerStake.get(stake) == null) {
+                handsOfOpponentsPerStake.put(stake, new HashMap<>());
+            }
+
+            Map<String, Integer> handsPerOpponentForGivenStake = handsOfOpponentsPerStake.get(stake);
+
+            if(handsPerOpponentForGivenStake.get(oppName) == null) {
+                handsPerOpponentForGivenStake.put(oppName, 0);
+            }
+
+            int currentAmountOfHands = handsPerOpponentForGivenStake.get(oppName);
+            int newAmountOfHands = currentAmountOfHands + 1;
+
+            handsPerOpponentForGivenStake.put(oppName, newAmountOfHands);
+            handsOfOpponentsPerStake.put(stake, handsPerOpponentForGivenStake);
+        } catch (Exception e) {
+            System.out.println("Error in updateHandsOfOpponentsPerStake");
+            e.printStackTrace();
+        }
     }
 
     @Override

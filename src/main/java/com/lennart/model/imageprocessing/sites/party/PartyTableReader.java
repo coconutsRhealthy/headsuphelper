@@ -239,22 +239,22 @@ public class PartyTableReader {
 
     public void clickTopSngInList(String positionOnTop) {
         if(positionOnTop.equals("first")) {
-            MouseKeyboard.click(208, 425);
+            MouseKeyboard.click(208, 385);
         } else if(positionOnTop.equals("second")) {
-            MouseKeyboard.click(275, 442);
+            MouseKeyboard.click(275, 403);
         }
     }
 
     public void selectAndUnselect6PlayerPerTableFilter() throws Exception {
-        MouseKeyboard.click(587, 310);
+        MouseKeyboard.click(587, 271);
         TimeUnit.MILLISECONDS.sleep(2000);
-        MouseKeyboard.click(587, 312);
+        MouseKeyboard.click(587, 273);
 
         TimeUnit.MILLISECONDS.sleep(2000);
 
-        MouseKeyboard.click(306, 312);
+        MouseKeyboard.click(306, 272);
         TimeUnit.MILLISECONDS.sleep(2000);
-        MouseKeyboard.click(308, 315);
+        MouseKeyboard.click(308, 275);
     }
 
     public void registerNewSng(String positionOfSngInListOfClient, ContinuousTable continuousTable) throws Exception {
@@ -417,14 +417,14 @@ public class PartyTableReader {
     private boolean noPlayerIsReggedYet() throws Exception {
         boolean noPlayerIsReggedYet = false;
 
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(972, 476, 1010, 494);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(972, 436, 1010, 454);
 
         bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
         bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
         String playersRegged = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         playersRegged = ImageProcessor.removeEmptySpacesFromString(playersRegged);
 
-        if(playersRegged.startsWith("0")) {
+        if(playersRegged.startsWith("O") || playersRegged.startsWith("0")) {
             noPlayerIsReggedYet = true;
         } else {
             System.out.println("Already one player regged. String: " + playersRegged);
@@ -798,6 +798,9 @@ public class PartyTableReader {
             suitRgb2 = bufferedImage2.getRGB(0, 0);
         }
 
+        System.out.println("f1suit rgb1: " + suitRgb1);
+        System.out.println("f1suit rgb2: " + suitRgb2);
+
         return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
@@ -817,6 +820,9 @@ public class PartyTableReader {
             bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(436, 352, 1, 1);
             suitRgb2 = bufferedImage2.getRGB(0, 0);
         }
+
+        System.out.println("f2suit rgb1: " + suitRgb1);
+        System.out.println("f2suit rgb2: " + suitRgb2);
 
         return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
@@ -838,6 +844,9 @@ public class PartyTableReader {
             suitRgb2 = bufferedImage2.getRGB(0, 0);
         }
 
+        System.out.println("f3suit rgb1: " + suitRgb1);
+        System.out.println("f3suit rgb2: " + suitRgb2);
+
         return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
@@ -858,6 +867,9 @@ public class PartyTableReader {
             suitRgb2 = bufferedImage2.getRGB(0, 0);
         }
 
+        System.out.println("turnsuit rgb1: " + suitRgb1);
+        System.out.println("turnsuit rgb2: " + suitRgb2);
+
         return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
 
@@ -877,6 +889,9 @@ public class PartyTableReader {
             bufferedImage2 = ImageProcessor.getBufferedImageScreenShot(692, 352, 1, 1);
             suitRgb2 = bufferedImage2.getRGB(0, 0);
         }
+
+        System.out.println("riversuit rgb1: " + suitRgb1);
+        System.out.println("riversuit rgb2: " + suitRgb2);
 
         return getBoardcardSuitFromIntRgbs(suitRgb1, suitRgb2);
     }
@@ -925,9 +940,9 @@ public class PartyTableReader {
         }
 
         if(!bottomPlayerStack.equals(bottomPlayerStackNonNumericRemoved)) {
-            System.out.println("oppstack non numeric values removed!");
-            System.out.println("oppstack before remove: " + bottomPlayerStack);
-            System.out.println("oppstack after remove: " + bottomPlayerStackNonNumericRemoved);
+            System.out.println("bottomstack non numeric values removed!");
+            System.out.println("bottomstack before remove: " + bottomPlayerStack);
+            System.out.println("bottomstack after remove: " + bottomPlayerStackNonNumericRemoved);
         }
 
         return bottomPlayerStackNonNumericRemoved;
@@ -938,9 +953,9 @@ public class PartyTableReader {
         String topPlayerStackNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(topPlayerStack);
 
         if(!topPlayerStack.equals(topPlayerStackNonNumericRemoved)) {
-            System.out.println("botstack non numeric values removed!");
-            System.out.println("botstack before remove: "+ topPlayerStack);
-            System.out.println("botstack after remove: " + topPlayerStackNonNumericRemoved);
+            System.out.println("topstack non numeric values removed!");
+            System.out.println("topstack before remove: "+ topPlayerStack);
+            System.out.println("topstack after remove: " + topPlayerStackNonNumericRemoved);
         }
 
         return topPlayerStackNonNumericRemoved;
@@ -957,41 +972,46 @@ public class PartyTableReader {
 
         if(topPlayerStack.contains("B")) {
             topPlayerStack = topPlayerStack.replace("B", "8");
-            System.out.println("botstack contains 'B', new value: " + topPlayerStack);
+            System.out.println("topstack contains 'B', new value: " + topPlayerStack);
         }
 
         if(topPlayerStack.contains("a")) {
             topPlayerStack = topPlayerStack.replace("a", "8");
-            System.out.println("botstack contains 'a', new value: " + topPlayerStack);
+            System.out.println("topstack contains 'a', new value: " + topPlayerStack);
         }
 
         if(topPlayerStack.contains("D")) {
             topPlayerStack = topPlayerStack.replace("D", "0");
-            System.out.println("botstack contains 'D', new value: " + topPlayerStack);
+            System.out.println("topstack contains 'D', new value: " + topPlayerStack);
         }
 
         if(topPlayerStack.contains("o")) {
             topPlayerStack = topPlayerStack.replace("o", "0");
-            System.out.println("botstack contains 'o', new value: " + topPlayerStack);
+            System.out.println("topstack contains 'o', new value: " + topPlayerStack);
         }
 
         if(topPlayerStack.contains("O")) {
             topPlayerStack = topPlayerStack.replace("O", "0");
-            System.out.println("botstack contains 'O', new value: " + topPlayerStack);
+            System.out.println("topstack contains 'O', new value: " + topPlayerStack);
         }
 
         if(topPlayerStack.contains("s")) {
             topPlayerStack = topPlayerStack.replace("s", "8");
-            System.out.println("error botstack contains 's', new value: " + topPlayerStack);
+            System.out.println("topstack contains 's', new value: " + topPlayerStack);
+        }
+
+        if(topPlayerStack.contains("e")) {
+            topPlayerStack = topPlayerStack.replace("e", "6");
+            System.out.println("topstack contains 'e', new value: " + topPlayerStack);
         }
 
         if(topPlayerStack.toLowerCase().contains("all")) {
-            System.out.println("bottom: player allin!");
+            System.out.println("top: player allin!");
             topPlayerStack = "0";
         }
 
         if(topPlayerStack.toLowerCase().contains("sitting") || topPlayerStack.toLowerCase().contains("isconnect") || topPlayerStack.toLowerCase().contains("connecte")) {
-            System.out.println("bottom: bottom player sitting out!");
+            System.out.println("top: top player sitting out!");
             topPlayerStack = "1500";
         }
 
@@ -1019,6 +1039,11 @@ public class PartyTableReader {
         if(totalPotSize.contains("B")) {
             totalPotSize = totalPotSize.replace("B", "8");
             System.out.println("error exception Yo potsize contains B, what is it!?");
+        }
+
+        if(totalPotSize.contains("S")) {
+            totalPotSize = totalPotSize.replace("S", "8");
+            System.out.println("potsize contains 'S' instead of 8, new value: " + totalPotSize);
         }
 
         String totalPotSizeNonNumericRemoved = ImageProcessor.removeAllNonNumericCharacters(totalPotSize);
@@ -1145,35 +1170,35 @@ public class PartyTableReader {
     private void pressBuyInCheckBox(double buyInToSelect) {
         if(buyInToSelect == 1 || buyInToSelect == -1) {
             //MouseKeyboard.click(226, 408);
-            MouseKeyboard.click(225, 426);
+            MouseKeyboard.click(225, 386);
         } else if(buyInToSelect == 2) {
             //MouseKeyboard.click(227, 438);
-            MouseKeyboard.click(224, 457);
+            MouseKeyboard.click(224, 417);
         } else if(buyInToSelect == 5) {
             //MouseKeyboard.click(224, 468);
-            MouseKeyboard.click(226, 487);
+            MouseKeyboard.click(226, 447);
         } else if(buyInToSelect == 10) {
             //MouseKeyboard.click(225, 497);
-            MouseKeyboard.click(226, 517);
+            MouseKeyboard.click(226, 477);
         } else if(buyInToSelect == 20) {
             //MouseKeyboard.click(225, 526);
-            MouseKeyboard.click(225, 547);
+            MouseKeyboard.click(225, 507);
         }
     }
 
     private void pressCategoryExpandButton() {
         //MouseKeyboard.click(597, 264);
-        MouseKeyboard.click(600, 286);
+        MouseKeyboard.click(600, 246);
     }
 
     private void pressCategoryCollapseButton() {
         //MouseKeyboard.click(592, 330);
-        MouseKeyboard.click(604, 352);
+        MouseKeyboard.click(604, 312);
     }
 
     private void pressBuyinDropdownButton() {
         //MouseKeyboard.click(565, 245);
-        MouseKeyboard.click(540, 264);
+        MouseKeyboard.click(540, 224);
     }
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
@@ -1240,7 +1265,7 @@ public class PartyTableReader {
         } else if(rgb1 == -3) {
             rgb2 = rgb2 / 100_000;
 
-            if(rgb2 == -7) {
+            if(rgb2 == -7 || rgb2 == -6) {
                 suit = 'h';
             } else if(rgb2 == -3 || rgb2 == -2) {
                 suit = 'd';

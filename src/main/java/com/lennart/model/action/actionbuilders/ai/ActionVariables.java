@@ -635,8 +635,8 @@ public class ActionVariables {
         action = adjustPlayAgainstDonkbets(action, boardInMethod, potSizeBb, botIsButtonInMethod, opponentBetsizeBb, botHandStrengthInMethod,
                 gameVariables.getOpponentAction(), botBetsizeBb);
         //action = callLooseAgainst4betShovesPre(action, boardInMethod, botHandStrengthInMethod, botIsButtonInMethod, botBetsizeBb, eligibleActions);
-        action = fewerBetsIpOnTurn(action, boardInMethod, botIsButtonInMethod, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod);
-        action = moreIpRiverRaises(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), bluffOddsAreOk, botHandStrengthInMethod);
+        //action = fewerBetsIpOnTurn(action, boardInMethod, botIsButtonInMethod, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod);
+        //action = moreIpRiverRaises(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), bluffOddsAreOk, botHandStrengthInMethod);
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {
