@@ -7,6 +7,7 @@ import com.lennart.model.action.actionbuilders.ai.equityrange.OpponentRangeSette
 import com.lennart.model.action.actionbuilders.ai.equityrange.RangeConstructor;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
+import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0.RecentHandsPersister;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.party.PartyTableReader;
@@ -58,9 +59,9 @@ public class ContinuousTable implements ContinuousTableable {
     private long timeOfLastDoneAction = -1;
     private boolean gonnaDoFirstActionOfNewSng = false;
 
-    private double lastBuyIn = 2;
-    private double newBuyInToSelect = 2;
-    private double bankroll = 54.74;
+    private double lastBuyIn = 1;
+    private double newBuyInToSelect = 1;
+    private double bankroll = 82.30;
     private List<String> sngResults = new ArrayList<>();
     private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
     private long sessionStartTime;
@@ -171,6 +172,13 @@ public class ContinuousTable implements ContinuousTableable {
                         String opponentPlayerNameOfLastHand = allHandsPlayedAndPlayerNames.get(allHandsPlayedAndPlayerNames.size() - 1);
                         new OpponentIdentifier().updateCountsFromHandhistoryDbLogic(opponentPlayerNameOfLastHand, gameVariables.getAllActionRequestsOfHand());
                         new OpponentIdentifier2_0().updateOpponentIdentifier2_0_db(opponentPlayerNameOfLastHand, botWasButtonInLastHand, gameVariables.getAllActionRequestsOfHand());
+
+                        try {
+                            new RecentHandsPersister().updateRecentHands(opponentPlayerNameOfLastHand, botWasButtonInLastHand, gameVariables.getAllActionRequestsOfHand());
+                        } catch (Exception e) {
+                            System.out.println("Recent hands error...");
+                            e.printStackTrace();
+                        }
                     }
 
                     gameVariables = new GameVariables(bigBlind, game.equals("sng"));
@@ -193,7 +201,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 System.out.println("AAGG: size: " + oppRange.size());
 
-                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
+                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true, -1, null);
                 String action = actionVariables.getAction();
 
                 if(action.equals("bet75pct") || action.equals("raise")) {

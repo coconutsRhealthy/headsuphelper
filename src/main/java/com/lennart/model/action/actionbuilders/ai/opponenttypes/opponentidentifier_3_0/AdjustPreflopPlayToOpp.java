@@ -1,112 +1,147 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by LennartMac on 05/03/2022.
  */
 public class AdjustPreflopPlayToOpp {
 
-    //wat weet je allemaal?
+    private static final String WEAK_IP_2BET = "weakIp2bet";
+    private static final String WEAK_OOP_2BET = "weakOop2bet";
+    private static final String NON_TRASH_LIMP = "nonTrashLimp";
+    private static final String NON_WEAK_IP_2BET = "nonWeakIp2bet";
+    private static final String NON_WEAK_OOP_3BET = "nonWeakOop3bet";
+    private static final String NON_WEAK_IP_3BET = "nonWeakIp3bet";
 
-        //hoe vaak opp pre2bet
-
-        //hoe vaak opp preShoved
-
-        //hoe vaak opp IP raist
-
-        //hoe vaak opp OOP raist
-
-        //hoe vaak opp een pre2bet callt
-
-        //hoe vaak opp een shove callt
-
-
-//    absolutStatsForOpp.put("_2betRatioForPlayer", _2betRatioForPlayer);
-//    absolutStatsForOpp.put("shoveRatioForPlayer", shoveRatioForPlayer);
-//    absolutStatsForOpp.put("call2betRatioForPlayer", call2betRatioForPlayer);
-//    absolutStatsForOpp.put("ipRaiseRatioForPlayer", ipRaiseRatioForPlayer);
-//    absolutStatsForOpp.put("oopRaiseRatioForPlayer", oopRaiseRatioForPlayer);
-//    absolutStatsForOpp.put("overallRaiseRatioForPlayer", overallRaiseRatioForPlayer);
-//    absolutStatsForOpp.put("overallCallRatioForPlayer", overallCallRatioForPlayer);
-
-
-    private List<String> getPossibleAdjustments(Map<String, Double> oppRelativeStats) {
-        Set<String> possibleAdjustments = new HashSet<>();
-
-        double _2betDeviation = oppRelativeStats.get("_2betRatioForPlayer") - 0.5;
-        double shoveDeviation = oppRelativeStats.get("shoveRatioForPlayer") - 0.5;
-        double call2betDeviation = oppRelativeStats.get("call2betRatioForPlayer") - 0.5;
-        double ipRaiseDeviation = oppRelativeStats.get("ipRaiseRatioForPlayer") - 0.5;
-        double oopRaiseDeviation = oppRelativeStats.get("oopRaiseRatioForPlayer") - 0.5;
-        double overallRaiseDeviation = oppRelativeStats.get("overallRaiseRatioForPlayer") - 0.5;
-        double overallCallDeviation = oppRelativeStats.get("overallCallRatioForPlayer") - 0.5;
-
-        if(_2betDeviation > 0) {
-            //no changes needed
-        } else if(_2betDeviation < 0) {
-            double betDeviationAbsolute = _2betDeviation * -1;
-            double random = Math.random();
-
-            //weinig 3betten
-            possibleAdjustments.add("nonWeak3bet");
-
-        }
-
-        if(shoveDeviation > 0) {
-            //minder trash limpen
-            //minder weak 2betten
-            possibleAdjustments.add("nonTrashLimp");
-            possibleAdjustments.add("nonWeak2bet");
-
-        } else if(shoveDeviation < 0) {
-            //no changes needed
-
-        }
-
-        if(call2betDeviation > 0) {
-            //no changes needed
-
-        } else if(call2betDeviation < 0) {
-            //meer bluff 2betten
-
-        }
-
-        if(ipRaiseDeviation > 0) {
-            //no changes needed
-
-        } else if(ipRaiseDeviation < 0) {
-
-            possibleAdjustments.add("nonWeak3bet");
-        }
-
-        if(oopRaiseDeviation > 0) {
-            possibleAdjustments.add("nonTrashLimp");
-        } else if(oopRaiseDeviation < 0) {
-            //nothing
-
-
-        }
-
-
-        if(call2betDeviation < 0 && oopRaiseDeviation < 0) {
-            possibleAdjustments.add("weak2bet");
-        }
-
-
-
-
-
-
-
-
-
-
-        return null;
+    public String adjustPreflopAction(String currentAction, String opponentName, boolean position,
+                                      double handstrength, String opponentAction,
+                                      List<String> eligibleActions) throws Exception {
+        Map<String, Double> preOppStats = new StatsRetrieverPreflop().getPreflopStats(opponentName);
+        List<String> possibleAdjustments = getPossibleAdjustments(preOppStats);
+        String actionToReturn = changeActionIfNeeded(currentAction, possibleAdjustments, position,
+                handstrength, opponentAction, eligibleActions);
+        return actionToReturn;
     }
 
+    private String changeActionIfNeeded(String currentAction, List<String> possibleAdjustments,
+                                     boolean position, double handstrength, String opponentAction,
+                                     List<String> eligibleActions) {
+        String actionToReturn = currentAction;
 
+        if(position) {
+            if(currentAction.equals("call") && opponentAction.equals("bet")) {
+                if(possibleAdjustments.contains(NON_TRASH_LIMP)) {
+                    if(handstrength < 0.2) {
+                        actionToReturn = "fold";
+                    }
+                }
+
+                if(possibleAdjustments.contains(WEAK_IP_2BET)) {
+                    if(eligibleActions.contains("raise")) {
+                        if(handstrength < 0.5) {
+                            actionToReturn = "raise";
+                        }
+                    }
+                }
+            }
+
+            if(currentAction.equals("raise") && opponentAction.equals("bet")) {
+                if(possibleAdjustments.contains(NON_WEAK_IP_2BET)) {
+                    if(handstrength < 0.75) {
+                        actionToReturn = "call";
+                    }
+                }
+            }
+
+            if(currentAction.equals("raise") && opponentAction.equals("raise")) {
+                if(possibleAdjustments.contains(NON_WEAK_IP_3BET)) {
+                    if(handstrength < 0.9) {
+                        actionToReturn = "call";
+                    }
+                }
+            }
+        } else {
+            if(currentAction.equals("check")) {
+                if(possibleAdjustments.contains(WEAK_OOP_2BET)) {
+                    if(eligibleActions.contains("raise")) {
+                        if(handstrength < 0.65) {
+                            actionToReturn = "raise";
+                        }
+                    }
+                }
+            }
+
+            if(currentAction.equals("raise")) {
+                if(opponentAction.equals("raise")) {
+                    if(possibleAdjustments.contains(NON_WEAK_OOP_3BET)) {
+                        if(handstrength < 0.8) {
+                            actionToReturn = "call";
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    public static void main(String[] args) throws Exception {
+        ;
+        List<String> possibleAdjustments = new AdjustPreflopPlayToOpp()
+                .getPossibleAdjustments(new StatsRetrieverPreflop().getPreflopStats("Goingfishing"));
+        System.out.println("wacht");
+    }
+
+    private List<String> getPossibleAdjustments(Map<String, Double> oppRelativeStats) {
+        List<String> possibleAdjustments = new ArrayList<>();
+
+        double _2betDeviation = oppRelativeStats.get("relative2betRatio") - 0.5;
+        double shoveDeviation = oppRelativeStats.get("relativeShoveRatio") - 0.5;
+        double call2betDeviation = oppRelativeStats.get("relativeCall2betRatio") - 0.5;
+        double ipRaiseDeviation = oppRelativeStats.get("relativeIpRaiseRatio") - 0.5;
+        double oopRaiseDeviation = oppRelativeStats.get("relativeOopRaiseRatio") - 0.5;
+
+        //iets losser dit
+        if(oopRaiseDeviation < 0 && call2betDeviation < 0.07 && shoveDeviation < 0.07) {
+            if(Math.random() < (((oopRaiseDeviation * -1) + (call2betDeviation * -1) + (shoveDeviation * -1)) * 2)) {
+                possibleAdjustments.add(WEAK_IP_2BET);
+            }
+        }
+
+        if(call2betDeviation < 0 && shoveDeviation < 0.05) {
+            if(Math.random() < (((call2betDeviation * -1) + (shoveDeviation * -1)) * 2)) {
+                possibleAdjustments.add(WEAK_OOP_2BET);
+            }
+        }
+
+        if(oopRaiseDeviation > 0 || shoveDeviation > 0) {
+            if(Math.random() < ((oopRaiseDeviation + shoveDeviation) * 2)) {
+                possibleAdjustments.add(NON_TRASH_LIMP);
+                possibleAdjustments.add(NON_WEAK_IP_2BET);
+            }
+        }
+
+        if(_2betDeviation < 0 || ipRaiseDeviation < 0) {
+            if(_2betDeviation < 0) {
+                _2betDeviation = _2betDeviation * -1;
+            }
+
+            if(ipRaiseDeviation < 0) {
+                ipRaiseDeviation = ipRaiseDeviation * -1;
+            }
+
+            if(Math.random() < ((_2betDeviation + ipRaiseDeviation) * 2)) {
+                possibleAdjustments.add(NON_WEAK_OOP_3BET);
+            }
+        }
+
+        if(oopRaiseDeviation < 0) {
+            if(Math.random() < ((oopRaiseDeviation * -1) * 2)) {
+                possibleAdjustments.add(NON_WEAK_IP_3BET);
+            }
+        }
+
+        return possibleAdjustments;
+    }
 }

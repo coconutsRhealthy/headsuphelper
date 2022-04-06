@@ -8,173 +8,55 @@ import java.util.*;
  * Created by LennartMac on 01/03/2022.
  */
 public class AdjustPostflopPlayToOpp {
+    
+    private static final String BLUFF_BET = "bluffBet";
+    private static final String BIG_VALUE_BET = "bigValueBet";
+    private static final String NON_BLUFF_BET = "nonBluffBet";
+    private static final String VALUE_CHECK = "valueCheck";
+    private static final String BLUFF_RAISE = "bluffRaise";
+    private static final String BLUFF_3BET = "bluff3bet";
+    private static final String NON_BLUFF_RAISE = "nonBluffRaise";
+    private static final String NON_VALUE_RAISE = "nonValueRaise";
+    
+    private static final String NON_VALUE_CHECK = "nonValueCheck";
+    private static final String NON_BIG_VALUE_BET = "nonBigValueBet";
+    private static final String VALUE_RAISE = "valueRaise";
 
-
-    private void adjustPlay(String baseAction, String oppName) {
-
-        //get oppData
-            //for example: hands in the range of 20hands
-            //and then: where is opp in that subgroup regarding betting?
-                //lets say its on the 16 percentile... so 84% of the opps bet more than this opp
-                    //if its on the 50 percentile, action shouldnt change
-                        //if its on the 0 or 100 percentile, action should change with 100% certainty
-                            //so if its on the 16 percentile, action should change with: (50 - 16) * 2 = 68% certainty
-
-
-
+    public Map<String, Double> adjustPostflopActionAndSizing(String currentAction, List<String> eligbileActions,
+                                                    String opponentName, boolean defaultCheck, boolean bluffOddsAreOk,
+                                                    String oppAction, double handstrength, double pot, double currentSizing,
+                                                    List<Card> board, boolean position) throws Exception {
+        Map<String, Double> postOppStats = new StatsRetrieverPostflop().getPostflopStats(opponentName);
+        List<String> possibleAdjustments = getPossibleAdjustments(postOppStats);
+        Map<String, Double> actionAndSizingToReturn = changeActionAndSizingIfNeeded(currentAction, possibleAdjustments, eligbileActions,
+                defaultCheck, bluffOddsAreOk, oppAction, handstrength, pot, currentSizing, board, position);
+        return actionAndSizingToReturn;
     }
 
-
-    private String adjustBaseBetAction(double oppRelativeCallRatio, double oppRelativeRaiseRatio, double handstrength,
-                                 boolean strongdraw) {
-        String actionToReturn = "bet75pct";
-
-        if(handstrength < 0.5 && !strongdraw) {
-            if(oppRelativeCallRatio > 0.5) {
-                double diffToCallMedian = oppRelativeCallRatio - 0.5;
-                double changeBoundry = diffToCallMedian * 2;
-
-                if(Math.random() < changeBoundry) {
-                    actionToReturn = "check";
-                }
-            } else {
-                if(oppRelativeRaiseRatio > 0.5) {
-                    double diffToRaiseMedian = oppRelativeRaiseRatio - 0.5;
-                    double changeBoundry = diffToRaiseMedian * 2;
-
-                    if(Math.random() < changeBoundry) {
-                        actionToReturn = "check";
-                    }
-                }
-            }
-        }
-
-        return actionToReturn;
-    }
-
-    private String adjustBaseCheckAction() {
-        //misschien wil je wel gaan betten...
-            //maar je base bot die bet al heel veel... dus wellicht is dit niet nodig nu...
-
-
-        return null;
-    }
-
-    private String adjustBaseCallAction(String opponentAction, double oppRelativeBetRatio, double handstrength,
-                                        boolean strongdraw, double facingOods) {
-        String actionToReturn = "call";
-
-        if(opponentAction.equals("bet75pct")) {
-            if(oppRelativeBetRatio <= 0.2) {
-                if(handstrength < 0.7) {
-                    if(!strongdraw) {
-                        if(facingOods > 0.2) {
-                            actionToReturn = "fold";
-                        }
-                    }
-                }
-            }
-        }
-
-        return actionToReturn;
-    }
-
-    private String adjustBaseRaiseAction() {
-        //misschien minder raisen tegen hele loose gasten... en ook minder tegen gasten die weinig betten...
-
-        return null;
-    }
-
-    private String adjustBaseFoldAction(double oppRelativeBetRatio, double oppRelativeCallRatio, boolean bluffOddsAreOk,
-                                        List<String> eligibleActions, double facingOdds, double handstrength) {
-        //misschien meer bluffraisen tegen lui die heel veel betten en weinig callen...
-        //en ook meer callen tegen lui die veel betten...
-
-        String actionToReturn = "fold";
-
-        if(oppRelativeBetRatio > 0.7) {
-            if(oppRelativeCallRatio < 0.5) {
-                if(bluffOddsAreOk && eligibleActions.contains("raise")) {
-                    if(Math.random() < 0.18) {
-                        actionToReturn = "raise";
-                    }
-                }
-            }
-        }
-
-        if(oppRelativeBetRatio > 0.7) {
-            if(facingOdds <= 0.5) {
-                if(handstrength > 0.5) {
-                    actionToReturn = "call";
-                }
-            }
-        }
-
-        return actionToReturn;
-    }
-
-    private void bigValueBetting(double oppRelativeCallRatio, double handstrength, double pot) {
-        double sizing = -1;
-
-        if(oppRelativeCallRatio >= 0.75) {
-            if(handstrength > 0.82) {
-                sizing = 0.75 * pot;
-            }
-        }
-    }
-
-
-
-
-
-    /////////////////////////
-
-
-
-    //hoog raise?
-        //less likely to bluffbet
-        //more likely to call vs raise
-            //hs grens 67%
-
-    //hoog bet
-        //more likely to bluffraise
-        //more likely to call
-            //hs grens 50%
-        //more likely to check with valuehand
-
-    //hoog call
-        //more likely to valuebet, with bigger size
-        //less likely to bluff bet/raise
-
-    //laag raise
-        //more likely to bluffbet
-
-    //laag bet
-        //less likely to call
-            //hs grens 80%
-        //less likely to check with valuehand
-        //less likely to raise
-
-    //laag call
-        //more likely to bluffbet / raise
-
-
-    private Map<String, Double> adjustPostflopAction(String currentAction, List<String> possibleAdjustments, List<String> eligbileActions,
-                                boolean defaultCheck, boolean bluffOddsAreOk, double handstrength, double pot,
-                                double currentSizing, List<Card> board, boolean position) {
+    private Map<String, Double> changeActionAndSizingIfNeeded(String currentAction, List<String> possibleAdjustments, List<String> eligbileActions,
+                                                     boolean defaultCheck, boolean bluffOddsAreOk, String oppAction, double handstrength,
+                                                     double pot, double currentSizing, List<Card> board, boolean position) {
         Map<String, Double> actionAndSizingToReturn = new HashMap<>();
         String actionToReturn = currentAction;
         double sizingToReturn = currentSizing;
 
         if(currentAction.equals("check")) {
             if(!defaultCheck) {
-                if(possibleAdjustments.contains("bluffBet")) {
+                if(possibleAdjustments.contains(BLUFF_BET)) {
                     if(bluffOddsAreOk) {
+                        if(handstrength < 0.5) {
+                            actionToReturn = "bet75pct";
+                        }
+                    }
+                }
+
+                if(possibleAdjustments.contains(NON_VALUE_CHECK)) {
+                    if(handstrength > 0.83) {
                         actionToReturn = "bet75pct";
                     }
                 }
 
-                if(possibleAdjustments.contains("bigValueBet")) {
+                if(possibleAdjustments.contains(BIG_VALUE_BET)) {
                     if(handstrength > 0.83) {
                         actionToReturn = "bet75pct";
                         sizingToReturn = 0.75 * pot;
@@ -182,13 +64,13 @@ public class AdjustPostflopPlayToOpp {
                 }
             }
         } else if(currentAction.equals("bet75pct")) {
-            if(possibleAdjustments.contains("nonBluffBet")) {
+            if(possibleAdjustments.contains(NON_BLUFF_BET)) {
                 if(handstrength < 0.5) {
                     actionToReturn = "check";
                 }
             }
 
-            if(possibleAdjustments.contains("valueCheck")) {
+            if(possibleAdjustments.contains(VALUE_CHECK)) {
                 if(handstrength > 0.8) {
                     if(board != null && board.size() == 5) {
                         if(!position) {
@@ -200,28 +82,51 @@ public class AdjustPostflopPlayToOpp {
                 }
             }
 
-            if(possibleAdjustments.contains("bigValueBet")) {
+            if(possibleAdjustments.contains(BIG_VALUE_BET)) {
                 if(handstrength > 0.83) {
                     actionToReturn = "bet75pct";
                     sizingToReturn = 0.75 * pot;
                 }
             }
-        } else if(currentAction.equals("fold")) {
-            if(eligbileActions.contains("raise")) {
-                if(bluffOddsAreOk) {
-                    if(possibleAdjustments.contains("bluffRaise")) {
-                        actionToReturn = "raise";
+
+            if(possibleAdjustments.contains(NON_BIG_VALUE_BET)) {
+                if(handstrength > 0.83) {
+                    if(currentSizing > 0.5 * pot) {
+                        actionToReturn = "bet75pct";
+                        sizingToReturn = 0.5 * pot;
                     }
                 }
             }
+        } else if(currentAction.equals("fold")) {
+            if(eligbileActions.contains("raise")) {
+                if(bluffOddsAreOk) {
+                    if(possibleAdjustments.contains(BLUFF_RAISE)) {
+                        actionToReturn = "raise";
+                    }
+
+                    if(possibleAdjustments.contains(BLUFF_3BET)) {
+                        if(oppAction.equals("raise")) {
+                            actionToReturn = "raise";
+                        }
+                    }
+                }
+            }
+        } else if(currentAction.equals("call")) {
+            if(eligbileActions.contains("raise")) {
+              if(handstrength > 0.82) {
+                  if(possibleAdjustments.contains(VALUE_RAISE)) {
+                    actionToReturn = "raise";
+                  }
+              }
+            }
         } else if(currentAction.equals("raise")) {
-            if(possibleAdjustments.contains("nonBluffRaise")) {
+            if(possibleAdjustments.contains(NON_BLUFF_RAISE)) {
                 if(handstrength < 0.8) {
                     actionToReturn = "call";
                 }
             }
 
-            if(possibleAdjustments.contains("nonValueRaise")) {
+            if(possibleAdjustments.contains(NON_VALUE_RAISE)) {
                 if(handstrength > 0.83) {
                     if(board != null && board.size() == 5) {
                         if(!position) {
@@ -238,96 +143,159 @@ public class AdjustPostflopPlayToOpp {
         return actionAndSizingToReturn;
     }
 
+    public static void main(String[] args) throws Exception {
+        new AdjustPostflopPlayToOpp().getPossibleAdjustments(new StatsRetrieverPostflop().getPostflopStats("Goingfishing"));
+    }
+    
     private List<String> getPossibleAdjustments(Map<String, Double> oppRelativeStats) {
-        Set<String> possibleAdjustments = new HashSet<>();
+        List<String> possibleAdjustments = new ArrayList<>();
 
         double betDeviation = oppRelativeStats.get("relativeBetRatio") - 0.5;
         double callDeviation = oppRelativeStats.get("relativeCallRatio") - 0.5;
         double raiseDeviation = oppRelativeStats.get("relativeRaiseRatio") - 0.5;
 
         if(betDeviation > 0) {
-            double random = Math.random();
+            if(callDeviation > 0) {
+                if(raiseDeviation > 0) {
+                    //BuCuRu
+                    if(Math.random() < ((callDeviation + raiseDeviation) * 2)) {
+                        possibleAdjustments.add(NON_BLUFF_BET);
+                    }
 
-            if(random < (2 * betDeviation)) {
-                possibleAdjustments.add("valueCheck");
-            }
+                    if(Math.random() < (callDeviation * 2)) {
+                        possibleAdjustments.add(BIG_VALUE_BET);
+                        possibleAdjustments.add(NON_BLUFF_RAISE);
+                    }
 
-            if(betDeviation >= 0.15) {
-                if(random < (2 * betDeviation)) {
-                    possibleAdjustments.add("bluffRaise");
-                    possibleAdjustments.add("nonValueRaise");
+                    if(Math.random() < ((betDeviation + callDeviation) * 2)) {
+                        possibleAdjustments.add(VALUE_RAISE);
+                    }
+                } else {
+                    //BuCuRd
+                    if(Math.random() < (callDeviation * 2)) {
+                        possibleAdjustments.add(NON_BLUFF_BET);
+                        possibleAdjustments.add(BIG_VALUE_BET);
+                        possibleAdjustments.add(NON_BLUFF_RAISE);
+                    }
+
+                    if(Math.random() < ((betDeviation + callDeviation) * 2)) {
+                        possibleAdjustments.add(VALUE_RAISE);
+                    }
+                }
+            } else {
+                if(raiseDeviation > 0) {
+                    //BuCdRu
+                    if(Math.random() < ((betDeviation + (callDeviation * -1)) * 2)) {
+                        possibleAdjustments.add(VALUE_CHECK);
+                        possibleAdjustments.add(BLUFF_RAISE);
+                    }
+
+                    if(Math.random() < (((callDeviation * -1) - raiseDeviation) * 2)) {
+                        possibleAdjustments.add(BLUFF_BET);
+                    }
+
+                    if(Math.random() < (callDeviation * -1) * 2) {
+                        possibleAdjustments.add(NON_BIG_VALUE_BET);
+                        possibleAdjustments.add(NON_VALUE_RAISE);
+                    }
+
+                    if(Math.random() < (((betDeviation + raiseDeviation) + (callDeviation * -1)) * 2)) {
+                        possibleAdjustments.add(BLUFF_3BET);
+                    }
+                } else {
+                    //BuCdRd
+                    if(Math.random() < ((betDeviation + (callDeviation * -1)) * 2)) {
+                        possibleAdjustments.add(VALUE_CHECK);
+                        possibleAdjustments.add(BLUFF_RAISE);
+                    }
+
+                    if(Math.random() < (((callDeviation * -1) + (raiseDeviation * -1)) * 2)) {
+                        possibleAdjustments.add(BLUFF_BET);
+                    }
+
+                    if(Math.random() < (callDeviation * -1) * 2) {
+                        possibleAdjustments.add(NON_BIG_VALUE_BET);
+                        possibleAdjustments.add(NON_VALUE_RAISE);
+                    }
                 }
             }
-        } else if(betDeviation < 0) {
-            double betDeviationAbsolute = betDeviation * -1;
-            double random = Math.random();
+        } else {
+            if(callDeviation > 0) {
+                if(raiseDeviation > 0) {
+                    //BdCuRu
+                    if(Math.random() < (((betDeviation * -1) + callDeviation) * 2)) {
+                        possibleAdjustments.add(NON_VALUE_CHECK);
+                        possibleAdjustments.add(NON_BLUFF_RAISE);
+                    }
 
-            if(random < (2 * betDeviationAbsolute)) {
-                possibleAdjustments.add("nonValueCheck");
-                possibleAdjustments.add("nonBluffRaise");
-            }
-        }
+                    if(Math.random() < ((callDeviation + raiseDeviation) * 2)) {
+                        possibleAdjustments.add(NON_BLUFF_BET);
+                    }
 
-        if(callDeviation > 0) {
-            double random = Math.random();
+                    if(Math.random() < (callDeviation * 2)) {
+                        possibleAdjustments.add(BIG_VALUE_BET);
+                    }
 
-            if(random < (2 * callDeviation)) {
-                possibleAdjustments.add("bigValueBet");
-                possibleAdjustments.add("nonBluffBet");
-                possibleAdjustments.add("nonBluffRaise");
-            }
-        } else if(callDeviation < 0) {
-            double callDeviationAbsolute = callDeviation * -1;
-            double random = Math.random();
+                    if(Math.random() < (((betDeviation * -1) - callDeviation) * 2)) {
+                        possibleAdjustments.add(NON_VALUE_RAISE);
+                    }
+                } else {
+                    //BdCuRd
+                    if(Math.random() < (((betDeviation * -1) + callDeviation) * 2)) {
+                        possibleAdjustments.add(NON_VALUE_CHECK);
+                        possibleAdjustments.add(NON_BLUFF_RAISE);
+                    }
 
-            if(random < (2 * callDeviationAbsolute)) {
-                possibleAdjustments.add("bluffBet");
+                    if(Math.random() < (callDeviation * 2)) {
+                        possibleAdjustments.add(NON_BLUFF_BET);
+                        possibleAdjustments.add(BIG_VALUE_BET);
+                    }
 
-                if(callDeviationAbsolute >= 0.15) {
-                    possibleAdjustments.add("bluffRaise");
+                    if(Math.random() < (((betDeviation * -1) - callDeviation) * 2)) {
+                        possibleAdjustments.add(NON_VALUE_RAISE);
+                    }
+                }
+            } else {
+                if(raiseDeviation > 0) {
+                    //BdCdRu
+                    if(Math.random() < (betDeviation * -1) * 2) {
+                        possibleAdjustments.add(NON_VALUE_CHECK);
+                        possibleAdjustments.add(NON_BLUFF_RAISE);
+                    }
+
+                    if(Math.random() < (((callDeviation * -1) - raiseDeviation) * 2)) {
+                        possibleAdjustments.add(BLUFF_BET);
+                    }
+
+                    if(Math.random() < (callDeviation * -1) * 2) {
+                        possibleAdjustments.add(NON_BIG_VALUE_BET);
+                    }
+
+                    if(Math.random() < (((betDeviation * -1) + (callDeviation * -1)) * 2)) {
+                        possibleAdjustments.add(NON_VALUE_RAISE);
+                    }
+                } else {
+                    //BdCdRd
+                    if(Math.random() < (betDeviation * -1) * 2) {
+                        possibleAdjustments.add(NON_VALUE_CHECK);
+                        possibleAdjustments.add(NON_BLUFF_RAISE);
+                    }
+
+                    if(Math.random() < (((callDeviation * -1) + (raiseDeviation * -1)) * 2)) {
+                        possibleAdjustments.add(BLUFF_BET);
+                    }
+
+                    if(Math.random() < (callDeviation * -1) * 2) {
+                        possibleAdjustments.add(NON_BIG_VALUE_BET);
+                    }
+
+                    if(Math.random() < (((betDeviation * -1) + (callDeviation * -1)) * 2)) {
+                        possibleAdjustments.add(NON_VALUE_RAISE);
+                    }
                 }
             }
         }
-
-        if(raiseDeviation > 0) {
-            double random = Math.random();
-
-            if(random < (2 * raiseDeviation)) {
-                possibleAdjustments.add("nonBluffBet");
-            }
-        } else if(raiseDeviation < 0) {
-            double raiseDeviationAbsolute = raiseDeviation * -1;
-            double random = Math.random();
-
-            if(random < (2 * raiseDeviationAbsolute)) {
-                possibleAdjustments.add("bluffBet");
-            }
-        }
-
-        List<String> possibleAdjustmentsOppositesRemoved = removeOppositeAdjustments(possibleAdjustments);
-        return possibleAdjustmentsOppositesRemoved;
+        
+        return possibleAdjustments;
     }
-
-    private List<String> removeOppositeAdjustments(Set<String> possibleAdjustments) {
-        List<String> possibleAdjustmentsToReturn = new ArrayList<>();
-        possibleAdjustmentsToReturn.addAll(possibleAdjustments);
-
-        if(possibleAdjustments.contains("valueCheck") && possibleAdjustments.contains("nonValueCheck")) {
-            possibleAdjustmentsToReturn.remove("valueCheck");
-            possibleAdjustmentsToReturn.remove("nonValueCheck");
-        }
-
-        if(possibleAdjustments.contains("bluffBet") && possibleAdjustments.contains("nonBluffBet")) {
-            possibleAdjustmentsToReturn.remove("bluffBet");
-            possibleAdjustmentsToReturn.remove("nonBluffBet");
-        }
-
-        if(possibleAdjustments.contains("bluffRaise") && possibleAdjustments.contains("nonBluffRaise")) {
-            possibleAdjustmentsToReturn.remove("bluffRaise");
-            possibleAdjustmentsToReturn.remove("nonBluffRaise");
-        }
-
-        return possibleAdjustmentsToReturn;
-    }
-
 }
