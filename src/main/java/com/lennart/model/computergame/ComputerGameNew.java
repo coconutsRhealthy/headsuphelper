@@ -279,7 +279,7 @@ public class ComputerGameNew implements GameVariable, ContinuousTableable {
             gameVariables.setBotHoleCards(holeCards);
             gameVariables.setBoard(board);
 
-            ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false, -1, null);
+            ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
 
             actionToReturn = actionVariables.getAction();
 

@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.equityrange;
 
 import com.lennart.model.action.actionbuilders.ActionBuilderUtil;
+import com.lennart.model.action.actionbuilders.ai.ActionVariables;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.boardevaluation.draws.FlushDrawEvaluator;
@@ -27,6 +28,12 @@ public class EquityAction {
         this.inputProvider = inputProvider;
         this.preflopEquityHs = preflopEquityHs;
         this.rangeConstructor = rangeConstructor;
+
+        if(ActionVariables.getCallBoundryProvidedHs() != -1) {
+            botEquity = ActionVariables.getCallBoundryProvidedHs();
+        } else {
+            botEquity = -2;
+        }
     }
 
     public String getValueAction(ContinuousTable continuousTable, GameVariables gameVariables,
@@ -79,7 +86,9 @@ public class EquityAction {
     private String getPreflopFoldCallOrRaiseAction(GameVariables gameVariables, List<String> eligibleActions, double botSizing, double facingOdds) {
         String actionToReturn;
 
-        botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+        if(botEquity == -2) {
+            botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+        }
 
         String oppPfRaiseType = inputProvider.determineOppPreflopRaiseType(gameVariables.getOpponentBetSize(), gameVariables.getBigBlind());
 
@@ -238,7 +247,9 @@ public class EquityAction {
     private String getPreflopCheckOrRaiseAction(GameVariables gameVariables, double botSizing) {
         String actionToReturn;
 
-        botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+        if(botEquity == -2) {
+            botEquity = new EquityCalculator().getComboEquity(gameVariables.getBotHoleCards(), null);
+        }
 
         String botPfRaiseType = inputProvider.determinBotPreflopRaiseType(botSizing, gameVariables.getBigBlind());
 
@@ -285,7 +296,10 @@ public class EquityAction {
         List<List<Card>> oppCallingRange = rangeConstructor.getOppPostflopCallRange(currentOppRange,
                 allCombosPostflopEquitySorted, oppLooseness, botSizingGroup, board, botHoleCards);
 
-        botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
+        if(botEquity == -2) {
+            botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
+        }
+
         double oppAverageCallingEquity = new EquityCalculator().getAverageRangeEquity(oppCallingRange, board);
 
         System.out.println("3)botEquity: " + botEquity);
@@ -324,7 +338,10 @@ public class EquityAction {
                     allCombosPostflopEquitySorted, oppAggroness, oppSizingGroup, board, botHoleCards);
         }
 
-        botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
+        if(botEquity == -2) {
+            botEquity = new EquityCalculator().getComboEquity(botHoleCards, board);
+        }
+
         double oppAverageBetOrRaiseEquity = new EquityCalculator().getAverageRangeEquity(oppBetOrRaiseRange, board);
 
         System.out.println("4)botEquity: " + botEquity);

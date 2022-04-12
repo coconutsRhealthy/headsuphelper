@@ -96,7 +96,7 @@ public class StatsRetrieverPostflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop_party WHERE playerName = '" + oppName + "';");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop WHERE playerName = '" + oppName + "';");
 
 
         while(rs.next()) {
@@ -123,7 +123,7 @@ public class StatsRetrieverPostflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop;");
 
         List<Double> betRatios = new ArrayList<>();
         List<Double> callRatios = new ArrayList<>();
@@ -175,7 +175,7 @@ public class StatsRetrieverPostflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop;");
 
         while(rs.next()) {
             double betRatio = rs.getDouble("betCount") / (rs.getDouble("checkCount") + (rs.getDouble("betCount")));
@@ -197,7 +197,7 @@ public class StatsRetrieverPostflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop;");
 
         while(rs.next()) {
             double callToTotalRatio = rs.getDouble("callCount") / rs.getDouble("numberOfHands");
@@ -219,7 +219,7 @@ public class StatsRetrieverPostflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_postflop;");
 
         while(rs.next()) {
             double raiseToTotalRatio = rs.getDouble("raiseCount") / rs.getDouble("numberOfHands");

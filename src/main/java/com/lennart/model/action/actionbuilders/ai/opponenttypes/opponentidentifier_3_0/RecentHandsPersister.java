@@ -1,5 +1,8 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0;
 
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSave;
+import com.lennart.model.action.actionbuilders.ai.dbsave.DbSavePreflopStats;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
 
@@ -38,14 +41,8 @@ public class RecentHandsPersister {
         }
 
         updateRecentHandsPreflop(opponentPreflopActions, opponentPlayerNameOfLastHand, botWasButton);
+        updateRecentHandsPostflop(opponentPostflopActions, opponentPlayerNameOfLastHand);
     }
-
-    //opponentidentifier_2_0_postflop_party
-
-    //opponentidentifier_2_0_preflop_party
-
-    //opponentidentifier_2_0_preflopstats_party
-        //see: DbSavePersisterPreflopStats -> doDbSaveUpdate()
 
     private void updateRecentHandsPreflop(List<String> opponentPreflopActions, String oppName, boolean botWasButton) throws Exception {
         int callCount = Collections.frequency(opponentPreflopActions, "call");
@@ -86,6 +83,101 @@ public class RecentHandsPersister {
         closeDbConnection();
     }
 
+    public void updateRecentHandsPostflop(List<String> opponentPostflopActions, String oppName) throws Exception {
+        int checkCount = Collections.frequency(opponentPostflopActions, "check");
+        int callCount = Collections.frequency(opponentPostflopActions, "call");
+        int betCount = Collections.frequency(opponentPostflopActions, "bet75pct");
+        int raiseCount = Collections.frequency(opponentPostflopActions, "raise");
+
+        insertNewOppInTable(oppName, "playerName", "opponentidentifier_3_0_postflop_party_rh");
+
+        initializeDbConnection();
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_3_0_postflop_party_rh WHERE playerName = '" + oppName + "';");
+
+        rs.next();
+
+        String currentCheckString = rs.getString("checkCount");
+        String currentCallString = rs.getString("callCount");
+        String currentBetString = rs.getString("betCount");
+        String currentRaiseString = rs.getString("raiseCount");
+
+        rs.close();
+        st.close();
+
+        String newCheckString = updateRecentHandsString(currentCheckString, checkCount);
+        String newCallString = updateRecentHandsString(currentCallString, callCount);
+        String newBetString = updateRecentHandsString(currentBetString, betCount);
+        String newRaiseString = updateRecentHandsString(currentRaiseString, raiseCount);
+
+        Statement st2 = con.createStatement();
+
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_postflop_party_rh SET checkCount = '" + newCheckString + "' WHERE playerName = '" + oppName + "'");
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_postflop_party_rh SET callCount = '" + newCallString + "' WHERE playerName = '" + oppName + "'");
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_postflop_party_rh SET betCount = '" + newBetString + "' WHERE playerName = '" + oppName + "'");
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_postflop_party_rh SET raiseCount = '" + newRaiseString + "' WHERE playerName = '" + oppName + "'");
+
+        st2.close();
+        closeDbConnection();
+    }
+
+    public void updateRecentHandsPreflopStats(ContinuousTable continuousTable) throws Exception {
+        List<DbSave> dbSaveList = continuousTable.getDbSaveList();
+
+        double totalPre2betCountLastHand = 0;
+        double totalPre3betCountLastHand = 0;
+        double totalPre4bet_up_countLastHand = 0;
+        double totalPreCall2betCountLastHand = 0;
+
+        String opponentName = null;
+
+        for(DbSave dbSave : dbSaveList) {
+            if(dbSave instanceof DbSavePreflopStats) {
+                DbSavePreflopStats dbSavePreflopStats = (DbSavePreflopStats) dbSave;
+
+                totalPre2betCountLastHand = totalPre2betCountLastHand + dbSavePreflopStats.getOppPre2betCount();
+                totalPre3betCountLastHand = totalPre3betCountLastHand + dbSavePreflopStats.getOppPre3betCount();
+                totalPre4bet_up_countLastHand = totalPre4bet_up_countLastHand + dbSavePreflopStats.getOppPre4bet_up_count();
+                totalPreCall2betCountLastHand = totalPreCall2betCountLastHand + dbSavePreflopStats.getOppPreCall2betCount();
+
+                if(opponentName == null) {
+                    opponentName = dbSavePreflopStats.getOpponentName();
+                }
+            }
+        }
+
+        insertNewOppInTable(opponentName, "playerName", "opponentidentifier_3_0_preflopstats_party_rh");
+
+        initializeDbConnection();
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_3_0_preflopstats_party_rh WHERE playerName = '" + opponentName + "';");
+
+        rs.next();
+
+        String currentPre2betString = rs.getString("pre2bet");
+        String currentPre3betString = rs.getString("pre3bet");
+        String currentPre4betUpString = rs.getString("pre4bet_up");
+        String currentPreCall2betString = rs.getString("pre_call2bet");
+
+        rs.close();
+        st.close();
+
+        String newPre2betString = updateRecentHandsString(currentPre2betString, (int) totalPre2betCountLastHand);
+        String newPre3betString = updateRecentHandsString(currentPre3betString, (int) totalPre3betCountLastHand);
+        String newPre4betUpString = updateRecentHandsString(currentPre4betUpString, (int) totalPre4bet_up_countLastHand);
+        String newPreCall2betString = updateRecentHandsString(currentPreCall2betString,(int) totalPreCall2betCountLastHand);
+
+        Statement st2 = con.createStatement();
+
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_preflopstats_party_rh SET pre2bet = '" + newPre2betString + "' WHERE playerName = '" + opponentName + "'");
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_preflopstats_party_rh SET pre3bet = '" + newPre3betString + "' WHERE playerName = '" + opponentName + "'");
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_preflopstats_party_rh SET pre4bet_up = '" + newPre4betUpString + "' WHERE playerName = '" + opponentName + "'");
+        st2.executeUpdate("UPDATE opponentidentifier_3_0_preflopstats_party_rh SET pre_call2bet = '" + newPreCall2betString + "' WHERE playerName = '" + opponentName + "'");
+
+        st2.close();
+        closeDbConnection();
+    }
+
     private String updateRecentHandsString(String currentRecentHandsString, int newCount) {
         if(newCount > 9) {
             System.out.println("Very high action count in hand: " + newCount);
@@ -101,14 +193,6 @@ public class RecentHandsPersister {
         }
 
         return newRecentHandsString;
-    }
-
-    public void updateRecentHandsPostflop() {
-
-    }
-
-    public void updateRecentHandsPreflopStats() {
-
     }
 
     private void insertNewOppInTable(String oppName, String oppNameFieldInTable, String table) throws Exception {

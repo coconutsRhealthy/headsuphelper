@@ -84,7 +84,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats_party WHERE playerName = '" + oppName + "';");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats WHERE playerName = '" + oppName + "';");
 
         while(rs.next()) {
             _2betRatioForPlayer = rs.getDouble("pre2bet") / rs.getDouble("preTotal");
@@ -96,7 +96,7 @@ public class StatsRetrieverPreflop {
         st.close();
 
         Statement st2 = con.createStatement();
-        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop_party WHERE playerName = '" + oppName + "';");
+        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop WHERE playerName = '" + oppName + "';");
 
         while(rs2.next()) {
             ipRaiseRatioForPlayer = rs2.getDouble("ipRaiseCount") / rs2.getDouble("numberOfHands");
@@ -136,7 +136,7 @@ public class StatsRetrieverPreflop {
         List<Double> overallCallRatios = new ArrayList<>();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats;");
 
         while(rs.next()) {
             if(rs.getDouble("preTotal") >= handsPlayedAgainstUnknown) {
@@ -162,7 +162,7 @@ public class StatsRetrieverPreflop {
         st.close();
 
         Statement st2 = con.createStatement();
-        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop_party;");
+        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
 
         while(rs2.next()) {
             if(rs2.getDouble("numberOfHands") >= handsPlayedAgainstUnknown) {
@@ -228,7 +228,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats;");
 
         while(rs.next()) {
             double betRatio = rs.getDouble("pre2bet") / rs.getDouble("preTotal");
@@ -250,7 +250,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats;");
 
         while(rs.next()) {
             double shoveRatio = (rs.getDouble("pre3bet") + rs.getDouble("pre4bet_up")) / rs.getDouble("preTotal");
@@ -272,7 +272,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflopstats;");
 
         while(rs.next()) {
             double call2betRatio = rs.getDouble("pre_call2bet") / rs.getDouble("preTotal");
@@ -294,7 +294,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
 
         while(rs.next()) {
             double ipRaiseRatio = rs.getDouble("ipRaiseCount") / rs.getDouble("numberOfHands");
@@ -316,7 +316,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
 
         while(rs.next()) {
             double oopRaiseRatio = rs.getDouble("oopRaiseCount") / rs.getDouble("numberOfHands");
@@ -338,7 +338,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
 
         while(rs.next()) {
             double overallRaiseRatio = rs.getDouble("raiseCount") / rs.getDouble("numberOfHands");
@@ -360,7 +360,7 @@ public class StatsRetrieverPreflop {
         initializeDbConnection();
 
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop_party;");
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_2_0_preflop;");
 
         while(rs.next()) {
             double overallCallRatio = rs.getDouble("callCount") / rs.getDouble("numberOfHands");

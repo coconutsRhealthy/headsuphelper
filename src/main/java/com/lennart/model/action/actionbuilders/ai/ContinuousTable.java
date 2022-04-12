@@ -73,6 +73,8 @@ public class ContinuousTable implements ContinuousTableable {
     private Map<Double, Map<String, Integer>> handsOfOpponentsPerStake = new HashMap<>();
     private String lastOppName = "initial";
 
+    private static Map<String, Integer> actionAdjustments = new HashMap<>();
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -154,6 +156,14 @@ public class ContinuousTable implements ContinuousTableable {
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterRawData().doBigDbSaveUpdate(this);
                     new DbSavePersisterPreflopStats().doDbSaveUpdate(this);
+
+                    try {
+                        new RecentHandsPersister().updateRecentHandsPreflopStats(this);
+                    } catch (Exception e) {
+                        System.out.println("Recent hands error... pfstats");
+                        e.printStackTrace();
+                    }
+
                     //new DbSavePersisterPostflop_2_0().doDbSaveUpdate(this, bigBlind);
 
                     opponentDidPreflop4betPot = false;
@@ -176,7 +186,7 @@ public class ContinuousTable implements ContinuousTableable {
                         try {
                             new RecentHandsPersister().updateRecentHands(opponentPlayerNameOfLastHand, botWasButtonInLastHand, gameVariables.getAllActionRequestsOfHand());
                         } catch (Exception e) {
-                            System.out.println("Recent hands error...");
+                            System.out.println("Recent hands error... normal");
                             e.printStackTrace();
                         }
                     }
@@ -201,7 +211,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                 System.out.println("AAGG: size: " + oppRange.size());
 
-                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true, -1, null);
+                ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
                 String action = actionVariables.getAction();
 
                 if(action.equals("bet75pct") || action.equals("raise")) {
@@ -844,5 +854,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     public long getSessionStartTime() {
         return sessionStartTime;
+    }
+
+    public static Map<String, Integer> getActionAdjustments() {
+        return actionAdjustments;
     }
 }

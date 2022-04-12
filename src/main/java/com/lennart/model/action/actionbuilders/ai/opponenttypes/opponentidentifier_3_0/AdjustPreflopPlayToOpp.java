@@ -16,17 +16,17 @@ public class AdjustPreflopPlayToOpp {
 
     public String adjustPreflopAction(String currentAction, String opponentName, boolean position,
                                       double handstrength, String opponentAction,
-                                      List<String> eligibleActions) throws Exception {
+                                      List<String> eligibleActions, double effectiveStackBb) throws Exception {
         Map<String, Double> preOppStats = new StatsRetrieverPreflop().getPreflopStats(opponentName);
         List<String> possibleAdjustments = getPossibleAdjustments(preOppStats);
         String actionToReturn = changeActionIfNeeded(currentAction, possibleAdjustments, position,
-                handstrength, opponentAction, eligibleActions);
+                handstrength, opponentAction, eligibleActions, effectiveStackBb);
         return actionToReturn;
     }
 
     private String changeActionIfNeeded(String currentAction, List<String> possibleAdjustments,
                                      boolean position, double handstrength, String opponentAction,
-                                     List<String> eligibleActions) {
+                                     List<String> eligibleActions, double effectiveStackBb) {
         String actionToReturn = currentAction;
 
         if(position) {
@@ -49,7 +49,9 @@ public class AdjustPreflopPlayToOpp {
             if(currentAction.equals("raise") && opponentAction.equals("bet")) {
                 if(possibleAdjustments.contains(NON_WEAK_IP_2BET)) {
                     if(handstrength < 0.75) {
-                        actionToReturn = "call";
+                        if(effectiveStackBb > 10) {
+                            actionToReturn = "call";
+                        }
                     }
                 }
             }

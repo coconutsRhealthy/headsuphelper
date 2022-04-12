@@ -12,7 +12,7 @@ public class DbPartyMigrator {
     private Connection con;
 
     public static void main(String[] args) throws Exception {
-        new DbPartyMigrator().clearTableFromNonPartyNames("opponentidentifier_2_0_preflop_party");
+        new DbPartyMigrator().clearTableFromNonPartyNames("opponentidentifier_2_0_preflop");
     }
 
     private void clearTableFromNonPartyNames(String table) throws Exception {
@@ -48,7 +48,6 @@ public class DbPartyMigrator {
         for(String oppNameToRemove : allOppNames) {
             try {
                 Statement st2 = con.createStatement();
-                //st2.executeUpdate("DELETE FROM opponentidentifier_2_0_postflop_party WHERE playerName =  '" + oppNameToRemove + "';");
                 st2.executeUpdate("DELETE FROM " + table + " WHERE playerName =  '" + oppNameToRemove + "';");
                 System.out.println(counter++);
                 st2.close();
@@ -65,7 +64,7 @@ public class DbPartyMigrator {
 
         initializeDbConnection();
 
-        for(int i = 6; i <= 11; i++) {
+        for(int i = 6; i <= 15; i++) {
             String query;
 
             if(i == 6) {

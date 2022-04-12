@@ -18,10 +18,7 @@ import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
 import equitycalc.EquityCalculator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +51,9 @@ public class ActionVariables {
     private double botEquity;
 
     int oppNumberOfHands;
+
+    private static double callBoundryProvidedHs = -1;
+    private static BoardEvaluator callBoundryProvidedBoardEvaluator = null;
 
     public ActionVariables() {
         //default constructor
@@ -113,7 +113,7 @@ public class ActionVariables {
         gameVariables.setBotHoleCards(holeCards);
         gameVariables.setBoard(board);
 
-        ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false, -1, null);
+        ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
     }
 
     public String getDummyActionOppAllIn(ContinuousTable continuousTableInput, GameVariables gameVariablesInput) throws Exception {
@@ -145,17 +145,16 @@ public class ActionVariables {
         gameVariablesInMethod.setBotHoleCards(gameVariablesInput.getBotHoleCards());
         gameVariablesInMethod.setBoard(gameVariablesInput.getBoard());
 
-        ActionVariables actionVariables = new ActionVariables(gameVariablesInMethod, continuousTableInMethod, false, -1, null);
+        ActionVariables actionVariables = new ActionVariables(gameVariablesInMethod, continuousTableInMethod, false);
 
         return actionVariables.getAction();
     }
 
-    public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean realGame, double providedHs,
-                           BoardEvaluator providedBoardEvaluator) throws Exception {
+    public ActionVariables(GameVariables gameVariables, ContinuousTable continuousTable, boolean realGame) throws Exception {
         OpponentIdentifier opponentIdentifier = new OpponentIdentifier();
         int numberOfHands = opponentIdentifier.getOpponentNumberOfHandsFromDb(gameVariables.getOpponentName());
 
-        calculateHandStrengthAndDraws(gameVariables, continuousTable, providedHs, providedBoardEvaluator);
+        calculateHandStrengthAndDraws(gameVariables, continuousTable);
 
         List<String> eligibleActions = getEligibleActions(gameVariables);
         String streetInMethod = getStreet(gameVariables);
@@ -742,83 +741,80 @@ public class ActionVariables {
 
 
         ////
-//        if(boardInMethod == null || boardInMethod.isEmpty()) {
-//            action = new AdjustPreflopPlayToOpp().adjustPreflopAction(action,
-//                    gameVariables.getOpponentName(),
-//                    botIsButtonInMethod,
-//                    botHandStrengthInMethod,
-//                    gameVariables.getOpponentAction(),
-//                    eligibleActions);
-//
-//            if(action.equals("raise")) {
-//                getSizingForAction(gameVariables, action);
-//            }
-//        } else {
-//            Map<String, Double> adjustedActionAndSizing = new AdjustPostflopPlayToOpp().adjustPostflopActionAndSizing(action,
-//                    eligibleActions,
-//                    gameVariables.getOpponentName(),
-//                    defaultCheck,
-//                    bluffOddsAreOk,
-//                    gameVariables.getOpponentAction(),
-//                    botHandStrengthInMethod,
-//                    gameVariables.getPot(),
-//                    sizing,
-//                    boardInMethod,
-//                    botIsButtonInMethod);
-//
-//            String adjustedAction = adjustedActionAndSizing.keySet().stream().findFirst().get();
-//
-//            if(adjustedAction.equals("bet75pct") || adjustedAction.equals("raise")) {
-//                double suggestedAdjustedSizing = adjustedActionAndSizing.values().stream().findFirst().get();
-//
-//                if(suggestedAdjustedSizing != sizing) {
-//                    sizing = suggestedAdjustedSizing;
-//                }
-//            }
-//        }
-        ////
-
-        /////
-        if(action.equals("bet75pct") || action.equals("raise")) {
+        if(callBoundryProvidedBoardEvaluator == null && callBoundryProvidedHs == -1) {
             System.out.println();
-            System.out.println("START EXTRA SIZING METHOD");
-            System.out.println("action now: " + action + " sizing now: " + sizing);
+            System.out.println("START ACTION ADJUST SHIZZLE");
 
-            String startAction = action;
-            double sizingToUse = sizing;
-            sizing = 0;
-            getSizingForAction(gameVariables, action);
+            try {
+                String adjustedAction = "emptyadjust";
+                double suggestedAdjustedSizing = sizing;
 
-            System.out.println();
-            System.out.println("actual sizing: " + sizingToUse);
-            System.out.println("sizing new: " + sizing);
+                if(boardInMethod == null || boardInMethod.isEmpty()) {
+                    adjustedAction = new AdjustPreflopPlayToOpp().adjustPreflopAction(action,
+                            gameVariables.getOpponentName(),
+                            botIsButtonInMethod,
+                            botHandStrengthInMethod,
+                            gameVariables.getOpponentAction(),
+                            eligibleActions,
+                            effectiveStack);
 
-            if(sizingToUse != sizing) {
-                if(preflop) {
-                    System.out.println("sizing diff pre: " + (sizingToUse - sizing));
+                    if(action.equals("raise")) {
+                        //getSizingForAction(gameVariables, action);
+                    }
                 } else {
-                    System.out.println("sizing diff post: " + (sizingToUse - sizing));
+                    double callHsBoundary = -1;
+
+                    if(action.equals("fold") || action.equals("call")) {
+                        callHsBoundary = determineMinimumHsToCall(gameVariables, continuousTable, botHandStrengthInMethod, action);
+                    }
+
+                    Map<String, Double> adjustedActionAndSizing = new AdjustPostflopPlayToOpp().adjustPostflopActionAndSizing(action,
+                            eligibleActions,
+                            gameVariables.getOpponentName(),
+                            defaultCheck,
+                            bluffOddsAreOk,
+                            gameVariables.getOpponentAction(),
+                            botHandStrengthInMethod,
+                            gameVariables.getPot(),
+                            sizing,
+                            boardInMethod,
+                            botIsButtonInMethod,
+                            callHsBoundary);
+
+                    adjustedAction = adjustedActionAndSizing.keySet().stream().findFirst().get();
+
+                    if(adjustedAction.equals("bet75pct") || adjustedAction.equals("raise")) {
+                        suggestedAdjustedSizing = adjustedActionAndSizing.values().stream().findFirst().get();
+
+                        if(suggestedAdjustedSizing != sizing) {
+                            //sizing = suggestedAdjustedSizing;
+                        }
+                    }
                 }
-            } else {
-                if(preflop) {
-                    System.out.println("sizing pre equal");
-                } else {
-                    System.out.println("sizing post equal");
+
+                if(!adjustedAction.equals("emptyadjust") && !adjustedAction.equals(action)) {
+                    boolean unknownOpp = oppNumberOfHands < 15;
+                    System.out.println(unknownOpp + " Potential action adjustment: " + action + " to: " + adjustedAction);
+                    System.out.println("Board size: " + boardInMethod.size());
+                    System.out.println("Sizing diff: " + (suggestedAdjustedSizing != sizing));
+
+                    if(suggestedAdjustedSizing != sizing) {
+                        System.out.println("Adjusted sizing: " + suggestedAdjustedSizing + " was: " + sizing);
+                    }
+
+                    if(adjustedAction.equals("bet75pct") && boardInMethod != null && boardInMethod.size() == 3 && !botIsButtonInMethod) {
+                        System.out.println("flop donkbet adjusted action");
+                    }
                 }
+            } catch (Exception e) {
+                System.out.println("Action adjust error");
+                e.printStackTrace();
             }
 
-            if(!action.equals(startAction)) {
-                System.out.println("Wow wtf? Action diff");
-            }
-
+            System.out.println("END ACTION ADJUST SHIZZLE");
             System.out.println();
-            sizing = sizingToUse;
-
-            System.out.println();
-            System.out.println("END EXTRA SIZING METHOD");
-            System.out.println("action now: " + action + " sizing now: " + sizing);
         }
-        /////
+        ////
 
         if(realGame) {
             //fill dbsave
@@ -1235,12 +1231,11 @@ public class ActionVariables {
         }
     }
 
-    private void calculateHandStrengthAndDraws(GameVariables gameVariables, ContinuousTable continuousTable, double providedHs,
-                                               BoardEvaluator providedBoardEvaluator) {
+    private void calculateHandStrengthAndDraws(GameVariables gameVariables, ContinuousTable continuousTable) {
         if(gameVariables.getBoard().isEmpty()) {
-            if(providedHs != -1) {
+            if(callBoundryProvidedHs != -1) {
                 System.out.println("Provided call shizzle... pre 1");
-                botHandStrength = providedHs;
+                botHandStrength = callBoundryProvidedHs;
                 botHasStrongDraw = false;
             } else {
                 PreflopHandStength preflopHandStength = new PreflopHandStength();
@@ -1248,18 +1243,18 @@ public class ActionVariables {
                 botHasStrongDraw = false;
             }
         } else {
-            if(providedHs != -1) {
+            if(callBoundryProvidedHs != -1) {
                 System.out.println("Provided call shizzle... post 2");
-                if(providedBoardEvaluator == null) {
+                if(callBoundryProvidedBoardEvaluator == null) {
                     boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
                 } else {
                     System.out.println("Provided call shizzle... post 3");
-                    boardEvaluator = providedBoardEvaluator;
+                    boardEvaluator = callBoundryProvidedBoardEvaluator;
                 }
 
                 handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
-                botEquity = providedHs;
-                botHandStrength = providedHs;
+                botEquity = callBoundryProvidedHs;
+                botHandStrength = callBoundryProvidedHs;
             } else {
                 boardEvaluator = new BoardEvaluator(gameVariables.getBoard());
                 handEvaluator = new HandEvaluator(gameVariables.getBotHoleCards(), boardEvaluator);
@@ -2945,17 +2940,21 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private void determineMinimumHsToCall(GameVariables gameVariables, ContinuousTable continuousTable) throws Exception {
+    public double determineMinimumHsToCall(GameVariables gameVariables, ContinuousTable continuousTable, double trueHandstrength,
+                                           String currentAction) throws Exception {
+        System.out.println("Start call boundary method");
+        long startTime = new Date().getTime();
+
         double lowBoundry = 0;
         double highBoundry = 1;
         double hsAttempt = -1;
-        BoardEvaluator boardEvaluatorToUse = null;
 
         for(int i = 0; i < 5; i++) {
             hsAttempt = (lowBoundry + highBoundry) / 2;
+            callBoundryProvidedHs = hsAttempt;
 
-            ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false, hsAttempt, boardEvaluatorToUse);
-            boardEvaluatorToUse = actionVariables.getBoardEvaluator();
+            ActionVariables actionVariables = new ActionVariables(gameVariables, continuousTable, false);
+            callBoundryProvidedBoardEvaluator = actionVariables.getBoardEvaluator();
             String action = actionVariables.getAction();
 
             if(action.equals("fold")) {
@@ -2969,9 +2968,25 @@ public class ActionVariables {
 
         System.out.println();
         System.out.println();
-        System.out.println("BOUNDRY is something like: " + hsAttempt);
+        System.out.println("Call boundry is something like: " + hsAttempt);
         System.out.println("up: " + highBoundry);
         System.out.println("low: " + lowBoundry);
+        System.out.println("True hs: " + trueHandstrength);
+        System.out.println();
+
+        if(currentAction.equals("fold") && trueHandstrength >= hsAttempt) {
+            System.out.println("HS above callboundary but still fold...");
+        }
+
+        callBoundryProvidedHs = -1;
+        callBoundryProvidedBoardEvaluator = null;
+
+        long endTime = new Date().getTime();
+        long duration = endTime - startTime;
+        System.out.println("Method duration: " + duration);
+        System.out.println("End call boundary method");
+
+        return hsAttempt;
     }
 
     public void setAction(String action) {
@@ -3096,5 +3111,9 @@ public class ActionVariables {
 
     public int getOppNumberOfHands() {
         return oppNumberOfHands;
+    }
+
+    public static double getCallBoundryProvidedHs() {
+        return callBoundryProvidedHs;
     }
 }

@@ -1198,7 +1198,7 @@ public class PartyTableReader {
 
     private void pressBuyinDropdownButton() {
         //MouseKeyboard.click(565, 245);
-        MouseKeyboard.click(540, 224);
+        MouseKeyboard.click(561, 235);
     }
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
