@@ -741,7 +741,7 @@ public class ActionVariables {
 
 
         ////
-        if(callBoundryProvidedBoardEvaluator == null && callBoundryProvidedHs == -1) {
+        if(callBoundryProvidedBoardEvaluator == null && callBoundryProvidedHs == -1 && numberOfHands >= 15) {
             System.out.println();
             System.out.println("START ACTION ADJUST SHIZZLE");
 

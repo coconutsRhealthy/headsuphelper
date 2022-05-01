@@ -57,16 +57,16 @@ public class StatsRetrieverPostflop {
         if(numberOfHands < NUMBER_OF_HANDS_UNKNOWN_BOUNDRY) {
             unknownOpp = true;
             Map<String, Double> absoluteStatsForTypicalUnknown = getAbsoluteStatsForTypicalUnknown(numberOfHands);
-            relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForTypicalUnknown);
+            relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForTypicalUnknown, numberOfHands);
         } else {
-            relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForOpp);
+            relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForOpp, numberOfHands);
         }
 
         logRelativeStats(relativeStatsForOpp, opponentName, numberOfHands, unknownOpp);
         return relativeStatsForOpp;
     }
 
-    private Map<String, Double> getRelativeStatsForOpponent(Map<String, Double> absoluteStats) throws Exception {
+    private Map<String, Double> getRelativeStatsForOpponent(Map<String, Double> absoluteStats, double numberOfHands) throws Exception {
         List<Double> allBetRatios = getAllBetRatios();
         List<Double> allCallRatios = getAllCallRatios();
         List<Double> allRaiseRatios = getAllRaiseRatios();
@@ -83,6 +83,7 @@ public class StatsRetrieverPostflop {
         relativeStatsForOpp.put("relativeBetRatio", relativeBetRatio);
         relativeStatsForOpp.put("relativeCallRatio", relativeCallRatio);
         relativeStatsForOpp.put("relativeRaiseRatio", relativeRaiseRatio);
+        relativeStatsForOpp.put("numberOfHands", numberOfHands);
 
         return relativeStatsForOpp;
     }

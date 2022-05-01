@@ -1,5 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0;
 
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+
 import java.util.*;
 
 /**
@@ -20,13 +22,13 @@ public class AdjustPreflopPlayToOpp {
         Map<String, Double> preOppStats = new StatsRetrieverPreflop().getPreflopStats(opponentName);
         List<String> possibleAdjustments = getPossibleAdjustments(preOppStats);
         String actionToReturn = changeActionIfNeeded(currentAction, possibleAdjustments, position,
-                handstrength, opponentAction, eligibleActions, effectiveStackBb);
+                handstrength, opponentAction, eligibleActions, effectiveStackBb, preOppStats.get("numberOfHands"));
         return actionToReturn;
     }
 
     private String changeActionIfNeeded(String currentAction, List<String> possibleAdjustments,
                                      boolean position, double handstrength, String opponentAction,
-                                     List<String> eligibleActions, double effectiveStackBb) {
+                                     List<String> eligibleActions, double effectiveStackBb, double numberOfHands) {
         String actionToReturn = currentAction;
 
         if(position) {
@@ -34,6 +36,8 @@ public class AdjustPreflopPlayToOpp {
                 if(possibleAdjustments.contains(NON_TRASH_LIMP)) {
                     if(handstrength < 0.2) {
                         actionToReturn = "fold";
+                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_TRASH_LIMP, 0, numberOfHands < 15);
+                        System.out.println("PRE adj NON_TRASH_LIMP");
                     }
                 }
 
@@ -41,6 +45,8 @@ public class AdjustPreflopPlayToOpp {
                     if(eligibleActions.contains("raise")) {
                         if(handstrength < 0.5) {
                             actionToReturn = "raise";
+                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, WEAK_IP_2BET, 0, numberOfHands < 15);
+                            System.out.println("PRE adj WEAK_IP_2BET");
                         }
                     }
                 }
@@ -51,6 +57,8 @@ public class AdjustPreflopPlayToOpp {
                     if(handstrength < 0.75) {
                         if(effectiveStackBb > 10) {
                             actionToReturn = "call";
+                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_WEAK_IP_2BET, 0, numberOfHands < 15);
+                            System.out.println("PRE adj NON_WEAK_IP_2BET");
                         }
                     }
                 }
@@ -60,6 +68,8 @@ public class AdjustPreflopPlayToOpp {
                 if(possibleAdjustments.contains(NON_WEAK_IP_3BET)) {
                     if(handstrength < 0.9) {
                         actionToReturn = "call";
+                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_WEAK_IP_3BET, 0, numberOfHands < 15);
+                        System.out.println("PRE adj NON_WEAK_IP_3BET");
                     }
                 }
             }
@@ -69,6 +79,8 @@ public class AdjustPreflopPlayToOpp {
                     if(eligibleActions.contains("raise")) {
                         if(handstrength < 0.65) {
                             actionToReturn = "raise";
+                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, WEAK_OOP_2BET, 0, numberOfHands < 15);
+                            System.out.println("PRE adj WEAK_OOP_2BET");
                         }
                     }
                 }
@@ -79,6 +91,8 @@ public class AdjustPreflopPlayToOpp {
                     if(possibleAdjustments.contains(NON_WEAK_OOP_3BET)) {
                         if(handstrength < 0.8) {
                             actionToReturn = "call";
+                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_WEAK_OOP_3BET, 0, numberOfHands < 15);
+                            System.out.println("PRE adj NON_WEAK_OOP_3BET");
                         }
                     }
                 }
@@ -105,6 +119,7 @@ public class AdjustPreflopPlayToOpp {
         double oopRaiseDeviation = oppRelativeStats.get("relativeOopRaiseRatio") - 0.5;
 
         //iets losser dit
+        //wellicht hier geen focus op shoveDeviation
         if(oopRaiseDeviation < 0 && call2betDeviation < 0.07 && shoveDeviation < 0.07) {
             if(Math.random() < (((oopRaiseDeviation * -1) + (call2betDeviation * -1) + (shoveDeviation * -1)) * 2)) {
                 possibleAdjustments.add(WEAK_IP_2BET);
@@ -117,6 +132,7 @@ public class AdjustPreflopPlayToOpp {
             }
         }
 
+        //wellicht hier enkel focus op oopRaiseDeviation
         if(oopRaiseDeviation > 0 || shoveDeviation > 0) {
             if(Math.random() < ((oopRaiseDeviation + shoveDeviation) * 2)) {
                 possibleAdjustments.add(NON_TRASH_LIMP);

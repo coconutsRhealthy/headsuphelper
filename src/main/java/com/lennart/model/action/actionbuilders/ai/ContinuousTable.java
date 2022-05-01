@@ -73,7 +73,7 @@ public class ContinuousTable implements ContinuousTableable {
     private Map<Double, Map<String, Integer>> handsOfOpponentsPerStake = new HashMap<>();
     private String lastOppName = "initial";
 
-    private static Map<String, Integer> actionAdjustments = new HashMap<>();
+    private static Map<Long, Map<String, String>> actionAdjustments = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -259,6 +259,12 @@ public class ContinuousTable implements ContinuousTableable {
                 Logger.printActionDurationsToTextFile(botActionDurations, sessionStartTime);
                 Logger.printOppTypeData(allNumberOfHands, oppTypes, numberOfHandWithOppType, sessionStartTime);
                 Logger.printOpponentNames(handsOfOpponentsPerStake, sessionStartTime);
+
+                try {
+                    Logger.printAdjustedActions(sessionStartTime);
+                } catch (Exception e) {
+                    System.out.println("Print adjustedAction error");
+                }
 
                 TimeUnit.MILLISECONDS.sleep(1000);
             }
@@ -698,6 +704,18 @@ public class ContinuousTable implements ContinuousTableable {
         }
     }
 
+    public static void updateActionAdjustMap(String oldAction, String adjustedAction, String adjustmentType, int boardSize,
+                                       boolean unknownOpp) {
+        Map<String, String> newEntry = new HashMap<>();
+        newEntry.put("oldAction", oldAction);
+        newEntry.put("adjustedAction", adjustedAction);
+        newEntry.put("adjustmentType", adjustmentType);
+        newEntry.put("boardSize", "" + boardSize);
+        newEntry.put("unknownOpp", "" + unknownOpp);
+
+        actionAdjustments.put(new Date().getTime(), newEntry);
+    }
+
     @Override
     public boolean isOpponentHasInitiative() {
         return opponentHasInitiative;
@@ -856,7 +874,7 @@ public class ContinuousTable implements ContinuousTableable {
         return sessionStartTime;
     }
 
-    public static Map<String, Integer> getActionAdjustments() {
+    public static Map<Long, Map<String, String>> getActionAdjustments() {
         return actionAdjustments;
     }
 }

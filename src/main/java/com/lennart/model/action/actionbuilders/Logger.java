@@ -1,6 +1,7 @@
 package com.lennart.model.action.actionbuilders;
 
 import com.lennart.model.action.actionbuilders.ai.ActionVariables;
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.card.Card;
 import com.lennart.model.imageprocessing.sites.party.PartyTableReader;
@@ -273,6 +274,230 @@ public class Logger {
             writer.close();
         } catch (Exception e) {
             System.out.println("Error in printOppNames to file...");
+            e.printStackTrace();
+        }
+    }
+
+    public static void printAdjustedActions(long sessionStartTime) {
+        Map<Long, Map<String, String>> actionAdjustments = ContinuousTable.getActionAdjustments();
+
+        int checkToBetCounterTotal = 0;
+        int checkToBetAgainstUnknownCounter = 0;
+        int betToCheckCounterTotal = 0;
+        int betToCheckAgainstUnknownCounter = 0;
+
+        int foldToCallCounterTotal = 0;
+        int foldToCallPreflopCounter = 0;
+        int foldToCallPostflopCounter = 0;
+        int foldToCallAgainstUnknownCounter = 0;
+
+        int foldToRaiseCounterTotal = 0;
+        int foldToRaisePreflopCounter = 0;
+        int foldToRaisePostflopCounter = 0;
+        int foldToRaiseAgainstUnknownCounter = 0;
+
+        int callToFoldCounterTotal = 0;
+        int callToFoldPreflopCounter = 0;
+        int callToFoldPostflopCounter = 0;
+        int callToFoldAgainstUnknownCounter = 0;
+
+        int callToRaiseCounterTotal = 0;
+        int callToRaisePreflopCounter = 0;
+        int callToRaisePostflopCounter = 0;
+        int callToRaiseAgainstUnknownCounter = 0;
+
+        int raiseToFoldCounterTotal = 0;
+        int raiseToFoldPreflopCounter = 0;
+        int raiseToFoldPostflopCounter = 0;
+        int raiseToFoldAgainstUnknownCounter = 0;
+
+        int raiseToCallCounterTotal = 0;
+        int raiseToCallPreflopCounter = 0;
+        int raiseToCallPostflopCounter = 0;
+        int raiseToCallAgainstUnknownCounter = 0;
+
+        List<String> allAdjustmentTypes = new ArrayList<>();
+
+        for(Map.Entry<Long, Map<String, String>> entry : actionAdjustments.entrySet()) {
+           Map<String, String> actionRecordMap = entry.getValue();
+
+           String oldAction = actionRecordMap.get("oldAction");
+           String newAction = actionRecordMap.get("adjustedAction");
+           String adjustmentType = actionRecordMap.get("adjustmentType");
+           int boardSize = Integer.parseInt(actionRecordMap.get("boardSize"));
+           boolean unknownOpp = Boolean.parseBoolean(actionRecordMap.get("unknownOpp"));
+
+           allAdjustmentTypes.add(adjustmentType);
+
+           if(oldAction.equals("check") && newAction.equals("bet75pct")) {
+               checkToBetCounterTotal++;
+
+               if(unknownOpp) {
+                   checkToBetAgainstUnknownCounter++;
+               }
+           }
+
+           if(oldAction.equals("bet75pct") && newAction.equals("check")) {
+               betToCheckCounterTotal++;
+
+               if(unknownOpp) {
+                   betToCheckAgainstUnknownCounter++;
+               }
+           }
+
+           if(oldAction.equals("fold")) {
+               if(newAction.equals("call")) {
+                   foldToCallCounterTotal++;
+
+                   if(boardSize >= 3) {
+                       foldToCallPostflopCounter++;
+                   } else {
+                       foldToCallPreflopCounter++;
+                   }
+
+                   if(unknownOpp) {
+                       foldToCallAgainstUnknownCounter++;
+                   }
+               }
+
+               if(newAction.equals("raise")) {
+                   foldToRaiseCounterTotal++;
+
+                   if(boardSize >= 3) {
+                       foldToRaisePostflopCounter++;
+                   } else {
+                       foldToRaisePreflopCounter++;
+                   }
+
+                   if(unknownOpp) {
+                       foldToRaiseAgainstUnknownCounter++;
+                   }
+               }
+           }
+
+           if(oldAction.equals("call")) {
+               if(newAction.equals("fold")) {
+                   callToFoldCounterTotal++;
+
+                   if(boardSize >= 3) {
+                       callToFoldPostflopCounter++;
+                   } else {
+                       callToFoldPreflopCounter++;
+                   }
+
+                   if(unknownOpp) {
+                       callToFoldAgainstUnknownCounter++;
+                   }
+               }
+
+               if(newAction.equals("raise")) {
+                   callToRaiseCounterTotal++;
+
+                   if(boardSize >= 3) {
+                       callToRaisePostflopCounter++;
+                   } else {
+                       callToRaisePreflopCounter++;
+                   }
+
+                   if(unknownOpp) {
+                       callToRaiseAgainstUnknownCounter++;
+                   }
+               }
+           }
+
+           if(oldAction.equals("raise")) {
+               if (newAction.equals("fold")) {
+                   raiseToFoldCounterTotal++;
+
+                   if (boardSize >= 3) {
+                       raiseToFoldPostflopCounter++;
+                   } else {
+                       raiseToFoldPreflopCounter++;
+                   }
+
+                   if (unknownOpp) {
+                       raiseToFoldAgainstUnknownCounter++;
+                   }
+               }
+
+               if (newAction.equals("call")) {
+                   raiseToCallCounterTotal++;
+
+                   if (boardSize >= 3) {
+                       raiseToCallPostflopCounter++;
+                   } else {
+                       raiseToCallPreflopCounter++;
+                   }
+
+                   if (unknownOpp) {
+                       raiseToCallAgainstUnknownCounter++;
+                   }
+               }
+           }
+        }
+
+        Collections.sort(allAdjustmentTypes);
+
+        try {
+            PrintWriter writer = new PrintWriter("/Users/lennartmac/Documents/printedstats/actionadjustments/actionadjustments_" + sessionStartTime + ".txt", "UTF-8");
+
+            writer.println("check to bet");
+            writer.println("total: " + checkToBetCounterTotal);
+            writer.println("against unknown: " + checkToBetAgainstUnknownCounter);
+            writer.println();
+            writer.println("bet to check");
+            writer.println("total: " + betToCheckCounterTotal);
+            writer.println("against unknown: " + betToCheckAgainstUnknownCounter);
+            writer.println();
+            writer.println("fold to call");
+            writer.println("total: " + foldToCallCounterTotal);
+            writer.println("preflop: " + foldToCallPreflopCounter);
+            writer.println("postflop: " + foldToCallPostflopCounter);
+            writer.println("against unknown: " + foldToCallAgainstUnknownCounter);
+            writer.println();
+            writer.println("fold to raise");
+            writer.println("total: " + foldToRaiseCounterTotal);
+            writer.println("preflop: " + foldToRaisePreflopCounter);
+            writer.println("postflop: " + foldToRaisePostflopCounter);
+            writer.println("against unknown: " + foldToRaiseAgainstUnknownCounter);
+            writer.println();
+            writer.println("call to fold");
+            writer.println("total: " + callToFoldCounterTotal);
+            writer.println("preflop: " + callToFoldPreflopCounter);
+            writer.println("postflop: " + callToFoldPostflopCounter);
+            writer.println("against unknown: " + callToFoldAgainstUnknownCounter);
+            writer.println();
+            writer.println("call to raise");
+            writer.println("total: " + callToRaiseCounterTotal);
+            writer.println("preflop: " + callToRaisePreflopCounter);
+            writer.println("postflop: " + callToRaisePostflopCounter);
+            writer.println("against unknown: " + callToRaiseAgainstUnknownCounter);
+            writer.println();
+            writer.println("raise to fold");
+            writer.println("total: " + raiseToFoldCounterTotal);
+            writer.println("preflop: " + raiseToFoldPreflopCounter);
+            writer.println("postflop: " + raiseToFoldPostflopCounter);
+            writer.println("against unknown: " + raiseToFoldAgainstUnknownCounter);
+            writer.println();
+            writer.println("raise to call");
+            writer.println("total: " + raiseToCallCounterTotal);
+            writer.println("preflop: " + raiseToCallPreflopCounter);
+            writer.println("postflop: " + raiseToCallPostflopCounter);
+            writer.println("against unknown: " + raiseToCallAgainstUnknownCounter);
+            writer.println();
+            writer.println();
+            writer.println();
+            writer.println("ADJUSTMENT TYPES:");
+            writer.println();
+
+            for(String adjustmentType : allAdjustmentTypes) {
+                writer.println(adjustmentType);
+            }
+
+            writer.println();
+            writer.close();
+        } catch (Exception e) {
+            System.out.println("Error in printAdjustedActions to file...");
             e.printStackTrace();
         }
     }
