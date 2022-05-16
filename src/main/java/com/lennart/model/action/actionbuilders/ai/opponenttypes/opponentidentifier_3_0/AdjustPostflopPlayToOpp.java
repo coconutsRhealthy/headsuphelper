@@ -24,6 +24,16 @@ public class AdjustPostflopPlayToOpp {
 
     //shoves...
 
+
+
+    //iets met draws bij non_bluff_bet
+    //raisen tegen overbets?
+    //bluff best niet als donk
+
+
+    //kijk naar opp raise amount bij postflop value checks..
+
+
     private static final String BLUFF_BET = "bluffBet";
     private static final String BIG_VALUE_BET = "bigValueBet";
     private static final String NON_BLUFF_BET = "nonBluffBet";
@@ -46,24 +56,28 @@ public class AdjustPostflopPlayToOpp {
     public Map<String, Double> adjustPostflopActionAndSizing(String currentAction, List<String> eligbileActions,
                                                      String opponentName, boolean defaultCheck, boolean bluffOddsAreOk,
                                                      String oppAction, double handstrength, double pot, double currentSizing,
-                                                     List<Card> board, boolean position, double callHsBoundry) throws Exception {
+                                                     List<Card> board, boolean position, double callHsBoundry, double bigBlind,
+                                                     boolean strongFd, boolean strongOosd, boolean strongGutshot, double opponentBetSize) throws Exception {
         Map<String, Double> postOppStats = new StatsRetrieverPostflop().getPostflopStats(opponentName);
         List<String> possibleAdjustments = getPossibleAdjustments(postOppStats, handstrength, callHsBoundry);
         Map<String, Double> actionAndSizingToReturn = changeActionAndSizingIfNeeded(currentAction, possibleAdjustments, eligbileActions,
-                defaultCheck, bluffOddsAreOk, oppAction, handstrength, pot, currentSizing, board, position, postOppStats.get("numberOfHands"));
+                defaultCheck, bluffOddsAreOk, oppAction, handstrength, pot, currentSizing, board, position, postOppStats.get("numberOfHands"),
+                bigBlind, strongFd, strongOosd, strongGutshot, opponentBetSize);
         return actionAndSizingToReturn;
     }
 
     private Map<String, Double> changeActionAndSizingIfNeeded(String currentAction, List<String> possibleAdjustments, List<String> eligbileActions,
                                                       boolean defaultCheck, boolean bluffOddsAreOk, String oppAction, double handstrength,
-                                                      double pot, double currentSizing, List<Card> board, boolean position, double numberOfHands) {
+                                                      double pot, double currentSizing, List<Card> board, boolean position, double numberOfHands,
+                                                      double bigBlind, boolean strongFd, boolean strongOosd, boolean strongGutshot, double opponentBetSize) {
         Map<String, Double> actionAndSizingToReturn = new HashMap<>();
         String actionToReturn = currentAction;
         double sizingToReturn = currentSizing;
 
         if(currentAction.equals("check")) {
-            if(!defaultCheck) {
-                //hier mogelijk ook nog check op of je zou gaan donken oop op flop in limped pot...
+            boolean limpedPotFlopOop = board.size() == 3 && !position && pot / bigBlind == 2;
+
+            if(!defaultCheck && !limpedPotFlopOop) {
                 if(possibleAdjustments.contains(BLUFF_BET)) {
                     if(bluffOddsAreOk) {
                         if(handstrength < 0.5) {
@@ -74,7 +88,6 @@ public class AdjustPostflopPlayToOpp {
                     }
                 }
 
-                //hier mogelijk ook nog check op of je zou gaan donken oop op flop in limped pot...
                 if(possibleAdjustments.contains(NON_VALUE_CHECK)) {
                     if(handstrength > 0.83) {
                         actionToReturn = "bet75pct";
@@ -83,7 +96,6 @@ public class AdjustPostflopPlayToOpp {
                     }
                 }
 
-                //check op donking
                 if(possibleAdjustments.contains(BIG_VALUE_BET)) {
                     if(handstrength > 0.83) {
                         actionToReturn = "bet75pct";
@@ -95,7 +107,7 @@ public class AdjustPostflopPlayToOpp {
             }
         } else if(currentAction.equals("bet75pct")) {
             if(possibleAdjustments.contains(NON_BLUFF_BET)) {
-                if(handstrength < 0.5) {
+                if(handstrength < 0.5 && !strongFd && !strongOosd && !(strongGutshot && board.size() == 3)) {
                     actionToReturn = "check";
                     ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_BLUFF_BET, board.size(), numberOfHands < 15);
                     System.out.println("POST adj NON_BLUFF_BET");
@@ -118,12 +130,10 @@ public class AdjustPostflopPlayToOpp {
                 }
             }
 
-            //check op donking
             if(possibleAdjustments.contains(BIG_VALUE_BET)) {
                 if(handstrength > 0.83) {
                     actionToReturn = "bet75pct";
                     sizingToReturn = 0.75 * pot;
-                    //hier iets...
                     ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, BIG_VALUE_BET, board.size(), numberOfHands < 15);
                     System.out.println("POST adj BIG_VALUE_BET");
                 }
@@ -134,7 +144,6 @@ public class AdjustPostflopPlayToOpp {
                     if(currentSizing > 0.5 * pot) {
                         actionToReturn = "bet75pct";
                         sizingToReturn = 0.5 * pot;
-                        //hier iets...
                         ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_BIG_VALUE_BET, board.size(), numberOfHands < 15);
                         System.out.println("POST adj NON_BIG_VALUE_BET");
                     }
@@ -144,9 +153,11 @@ public class AdjustPostflopPlayToOpp {
             if(eligbileActions.contains("raise")) {
                 if(bluffOddsAreOk) {
                     if(possibleAdjustments.contains(BLUFF_RAISE)) {
-                        actionToReturn = "raise";
-                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, BLUFF_RAISE, board.size(), numberOfHands < 15);
-                        System.out.println("POST adj BLUFF_RAISE");
+                        if(opponentBetSize <= pot) {
+                            actionToReturn = "raise";
+                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, BLUFF_RAISE, board.size(), numberOfHands < 15);
+                            System.out.println("POST adj BLUFF_RAISE");
+                        }
                     }
 
                     if(possibleAdjustments.contains(BLUFF_3BET)) {
@@ -162,9 +173,11 @@ public class AdjustPostflopPlayToOpp {
             if(actionToReturn.equals("fold")) {
                 if(oppAction.equals("bet75pct")) {
                     if(possibleAdjustments.contains(LOOSE_VALUE_CALL_VS_BET)) {
-                        actionToReturn = "call";
-                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, LOOSE_VALUE_CALL_VS_BET, board.size(), numberOfHands < 15);
-                        System.out.println("POST adj LOOSE_VALUE_CALL_VS_BET");
+                        if(opponentBetSize <= pot) {
+                            actionToReturn = "call";
+                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, LOOSE_VALUE_CALL_VS_BET, board.size(), numberOfHands < 15);
+                            System.out.println("POST adj LOOSE_VALUE_CALL_VS_BET");
+                        }
                     }
                 }
 
@@ -180,9 +193,11 @@ public class AdjustPostflopPlayToOpp {
             if(eligbileActions.contains("raise")) {
               if(handstrength > 0.82) {
                   if(possibleAdjustments.contains(VALUE_RAISE)) {
-                      actionToReturn = "raise";
-                      ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, VALUE_RAISE, board.size(), numberOfHands < 15);
-                      System.out.println("POST adj VALUE_RAISE");
+                      if(opponentBetSize <= pot) {
+                          actionToReturn = "raise";
+                          ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, VALUE_RAISE, board.size(), numberOfHands < 15);
+                          System.out.println("POST adj VALUE_RAISE");
+                      }
                   }
               }
             }
@@ -190,9 +205,11 @@ public class AdjustPostflopPlayToOpp {
             if(actionToReturn.equals("call")) {
                 if(oppAction.equals("bet75pct")) {
                     if(possibleAdjustments.contains(TIGHT_VALUE_FOLD_VS_BET)) {
-                        actionToReturn = "fold";
-                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, TIGHT_VALUE_FOLD_VS_BET, board.size(), numberOfHands < 15);
-                        System.out.println("POST adj TIGHT_VALUE_FOLD_VS_BET");
+                        if(handstrength < 0.87) {
+                            actionToReturn = "fold";
+                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, TIGHT_VALUE_FOLD_VS_BET, board.size(), numberOfHands < 15);
+                            System.out.println("POST adj TIGHT_VALUE_FOLD_VS_BET");
+                        }
                     }
                 }
 

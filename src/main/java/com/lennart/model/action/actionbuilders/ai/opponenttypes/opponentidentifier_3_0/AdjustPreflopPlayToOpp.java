@@ -9,6 +9,12 @@ import java.util.*;
  */
 public class AdjustPreflopPlayToOpp {
 
+    //wanneer wil je trash limpen?
+        //om postflop te komen
+            //-> laag opp oop 2bet %
+        //om postflop je opp van de hand te bluffen of evt value te halen
+            //-> laag opp bet en raise %
+
     private static final String WEAK_IP_2BET = "weakIp2bet";
     private static final String WEAK_OOP_2BET = "weakOop2bet";
     private static final String NON_TRASH_LIMP = "nonTrashLimp";
@@ -126,6 +132,7 @@ public class AdjustPreflopPlayToOpp {
             }
         }
 
+        //kijk hier ook naar overall call ratio
         if(call2betDeviation < 0 && shoveDeviation < 0.05) {
             if(Math.random() < (((call2betDeviation * -1) + (shoveDeviation * -1)) * 2)) {
                 possibleAdjustments.add(WEAK_OOP_2BET);

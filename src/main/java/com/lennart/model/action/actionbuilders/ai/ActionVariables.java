@@ -745,6 +745,8 @@ public class ActionVariables {
             System.out.println();
             System.out.println("START ACTION ADJUST SHIZZLE");
 
+            boolean neededToRecalculateNewSizing = true;
+
             try {
                 String adjustedAction = "emptyadjust";
                 double suggestedAdjustedSizing = sizing;
@@ -779,7 +781,12 @@ public class ActionVariables {
                             sizing,
                             boardInMethod,
                             botIsButtonInMethod,
-                            callHsBoundary);
+                            callHsBoundary,
+                            gameVariables.getBigBlind(),
+                            strongFdInMethod,
+                            strongOosdInMethod,
+                            strongGutshotInMethod,
+                            gameVariables.getOpponentBetSize());
 
                     adjustedAction = adjustedActionAndSizing.keySet().stream().findFirst().get();
 
@@ -788,22 +795,23 @@ public class ActionVariables {
 
                         if(suggestedAdjustedSizing != sizing) {
                             //sizing = suggestedAdjustedSizing;
+                            System.out.println("Postflop action sizing adjustment. From: " + sizing + " to: " + suggestedAdjustedSizing);
+                            neededToRecalculateNewSizing = false;
+                            sizing = suggestedAdjustedSizing;
                         }
                     }
                 }
 
                 if(!adjustedAction.equals("emptyadjust") && !adjustedAction.equals(action)) {
-                    boolean unknownOpp = oppNumberOfHands < 15;
-                    System.out.println(unknownOpp + " Potential action adjustment: " + action + " to: " + adjustedAction);
-                    System.out.println("Board size: " + boardInMethod.size());
-                    System.out.println("Sizing diff: " + (suggestedAdjustedSizing != sizing));
+                    if(boardInMethod != null && !boardInMethod.isEmpty()) {
+                        if(!action.equals("raise")) {
+                            System.out.println("Actual postflop action adjustment. From: " + action + " to: " + adjustedAction);
+                            action = adjustedAction;
 
-                    if(suggestedAdjustedSizing != sizing) {
-                        System.out.println("Adjusted sizing: " + suggestedAdjustedSizing + " was: " + sizing);
-                    }
-
-                    if(adjustedAction.equals("bet75pct") && boardInMethod != null && boardInMethod.size() == 3 && !botIsButtonInMethod) {
-                        System.out.println("flop donkbet adjusted action");
+                            if((adjustedAction.equals("bet75pct") || adjustedAction.equals("raise")) && neededToRecalculateNewSizing) {
+                                getSizingForAction(gameVariables, action);
+                            }
+                        }
                     }
                 }
             } catch (Exception e) {
