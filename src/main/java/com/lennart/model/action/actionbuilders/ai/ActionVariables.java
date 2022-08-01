@@ -752,16 +752,18 @@ public class ActionVariables {
                 double suggestedAdjustedSizing = sizing;
 
                 if(boardInMethod == null || boardInMethod.isEmpty()) {
-                    adjustedAction = new AdjustPreflopPlayToOpp().adjustPreflopAction(action,
+                    String actionBeforeAdjust = action;
+                    action = new AdjustPreflopPlayToOpp().adjustPreflopAction(action,
                             gameVariables.getOpponentName(),
                             botIsButtonInMethod,
                             botHandStrengthInMethod,
                             gameVariables.getOpponentAction(),
                             eligibleActions,
-                            effectiveStack);
+                            effectiveStack,
+                            continuousTable);
 
-                    if(action.equals("raise")) {
-                        //getSizingForAction(gameVariables, action);
+                    if(action.equals("raise") && !actionBeforeAdjust.equals("raise")) {
+                        getSizingForAction(gameVariables, action);
                     }
                 } else {
                     double callHsBoundary = -1;
@@ -769,6 +771,9 @@ public class ActionVariables {
                     if(action.equals("fold") || action.equals("call")) {
                         callHsBoundary = determineMinimumHsToCall(gameVariables, continuousTable, botHandStrengthInMethod, action);
                     }
+
+                    double hypotheticalSizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+                    hypotheticalSizing = adjustRaiseSizingToSng(hypotheticalSizing, action, gameVariables, effectiveStack);
 
                     Map<String, Double> adjustedActionAndSizing = new AdjustPostflopPlayToOpp().adjustPostflopActionAndSizing(action,
                             eligibleActions,
@@ -786,7 +791,9 @@ public class ActionVariables {
                             strongFdInMethod,
                             strongOosdInMethod,
                             strongGutshotInMethod,
-                            gameVariables.getOpponentBetSize());
+                            gameVariables.getOpponentBetSize(),
+                            hypotheticalSizing,
+                            continuousTable);
 
                     adjustedAction = adjustedActionAndSizing.keySet().stream().findFirst().get();
 
@@ -2434,7 +2441,7 @@ public class ActionVariables {
 
         if(action.equals("call") || action.equals("fold")) {
             if(board != null && !board.isEmpty()) {
-                if(opponentAction.equals("bet75pct") || opponentAction.equals("raise")) {
+                if(opponentAction.equals("bet75pct")) {
                     if(bluffOddsAreOk) {
                         if(board.size() == 3 || board.size() == 4) {
                             if((handstrength > 0.82 && opponentAction.equals("bet75pct") || handstrength > 0.86 && opponentAction.equals("raise"))

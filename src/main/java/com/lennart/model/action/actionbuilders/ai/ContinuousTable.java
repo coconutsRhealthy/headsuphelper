@@ -59,9 +59,9 @@ public class ContinuousTable implements ContinuousTableable {
     private long timeOfLastDoneAction = -1;
     private boolean gonnaDoFirstActionOfNewSng = false;
 
-    private double lastBuyIn = 1;
-    private double newBuyInToSelect = 1;
-    private double bankroll = 82.30;
+    private double lastBuyIn = 10;
+    private double newBuyInToSelect = 10;
+    private double bankroll = 448.52;
     private List<String> sngResults = new ArrayList<>();
     private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
     private long sessionStartTime;
@@ -74,6 +74,9 @@ public class ContinuousTable implements ContinuousTableable {
     private String lastOppName = "initial";
 
     private static Map<Long, Map<String, String>> actionAdjustments = new HashMap<>();
+
+    private Map<String, Double> postOppStats = null;
+    private Map<String, Double> preflopOppStats = null;
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -110,6 +113,8 @@ public class ContinuousTable implements ContinuousTableable {
                 if(isNewHand) {
                     oppRange = null;
                     allCombosPostflopEquitySorted = null;
+                    postOppStats = null;
+                    preflopOppStats = null;
 
                     flopHandstrength = -1;
                     turnHandstrength = -1;
@@ -559,11 +564,11 @@ public class ContinuousTable implements ContinuousTableable {
             newBuyInToSelect = 10;
         } else if(bankroll > 300) {
             newBuyInToSelect = 10;
-        } else if(bankroll > 130) {
+        } else if(bankroll > 230) {
             newBuyInToSelect = 10;
-        } else if(bankroll > 80) {
+        } else if(bankroll > 180) {
             newBuyInToSelect = 5;
-        } else if(bankroll > 50) {
+        } else if(bankroll > 150) {
             newBuyInToSelect = 2;
         } else {
             newBuyInToSelect = 1;
@@ -876,5 +881,21 @@ public class ContinuousTable implements ContinuousTableable {
 
     public static Map<Long, Map<String, String>> getActionAdjustments() {
         return actionAdjustments;
+    }
+
+    public Map<String, Double> getPostOppStats() {
+        return postOppStats;
+    }
+
+    public void setPostOppStats(Map<String, Double> postOppStats) {
+        this.postOppStats = postOppStats;
+    }
+
+    public Map<String, Double> getPreflopOppStats() {
+        return preflopOppStats;
+    }
+
+    public void setPreflopOppStats(Map<String, Double> preflopOppStats) {
+        this.preflopOppStats = preflopOppStats;
     }
 }

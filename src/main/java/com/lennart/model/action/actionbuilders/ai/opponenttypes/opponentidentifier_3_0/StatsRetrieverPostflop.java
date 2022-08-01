@@ -1,5 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0;
 
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+
 import java.sql.*;
 import java.util.*;
 
@@ -43,27 +45,39 @@ public class StatsRetrieverPostflop {
 //
 //        System.out.println("sdf");
 
-        new StatsRetrieverPreflop().getPreflopStats("ovalis");
-        new StatsRetrieverPostflop().getPostflopStats("ovalis");
+        //new StatsRetrieverPreflop().getPreflopStats("ovalis");
+        //new StatsRetrieverPostflop().getPostflopStats("ovalis", null);
+
+        Map<String, Double> eije = new StatsRetrieverPostflop().getPostflopStats("bawssss", null);
+        System.out.println("wacht");
     }
 
+    public Map<String, Double> getPostflopStats(String opponentName, ContinuousTable continuousTable) throws Exception {
+        if(continuousTable == null || continuousTable.getPostOppStats() == null) {
+            Map<String, Double> absoluteStatsForOpp = getAbsoluteStatsForOpponent(opponentName);
+            Map<String, Double> relativeStatsForOpp;
+            double numberOfHands = absoluteStatsForOpp.get("numberOfHands");
+            boolean unknownOpp = false;
 
-    public Map<String, Double> getPostflopStats(String opponentName) throws Exception {
-        Map<String, Double> absoluteStatsForOpp = getAbsoluteStatsForOpponent(opponentName);
-        Map<String, Double> relativeStatsForOpp;
-        double numberOfHands = absoluteStatsForOpp.get("numberOfHands");
-        boolean unknownOpp = false;
+            //if(numberOfHands < NUMBER_OF_HANDS_UNKNOWN_BOUNDRY) {
+            //    unknownOpp = true;
+            //    Map<String, Double> absoluteStatsForTypicalUnknown = getAbsoluteStatsForTypicalUnknown(numberOfHands);
+            //    relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForTypicalUnknown, numberOfHands);
+            //} else {
+                relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForOpp, numberOfHands);
+            //}
 
-        if(numberOfHands < NUMBER_OF_HANDS_UNKNOWN_BOUNDRY) {
-            unknownOpp = true;
-            Map<String, Double> absoluteStatsForTypicalUnknown = getAbsoluteStatsForTypicalUnknown(numberOfHands);
-            relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForTypicalUnknown, numberOfHands);
-        } else {
-            relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForOpp, numberOfHands);
+            logRelativeStats(relativeStatsForOpp, opponentName, numberOfHands, unknownOpp);
+
+            if(continuousTable != null) {
+                continuousTable.setPostOppStats(relativeStatsForOpp);
+            }
+
+            return relativeStatsForOpp;
         }
 
-        logRelativeStats(relativeStatsForOpp, opponentName, numberOfHands, unknownOpp);
-        return relativeStatsForOpp;
+        logRelativeStats(continuousTable.getPostOppStats(), opponentName, continuousTable.getPostOppStats().get("numberOfHands"), false);
+        return continuousTable.getPostOppStats();
     }
 
     private Map<String, Double> getRelativeStatsForOpponent(Map<String, Double> absoluteStats, double numberOfHands) throws Exception {
@@ -89,6 +103,67 @@ public class StatsRetrieverPostflop {
     }
 
     private Map<String, Double> getAbsoluteStatsForOpponent(String oppName) throws Exception {
+        Map<String, Double> absoluteStats = getShortTermAbsoluteStatsForOpponent(oppName);
+
+        double numberOfHands = absoluteStats.get("numberOfHands");
+
+        if(numberOfHands < 15) {
+            System.out.println("Bzrk postflop long term stats needed");
+            absoluteStats = getLongTermAbsoluteStatsForOpponent(oppName);
+        }
+
+        return absoluteStats;
+    }
+
+    private Map<String, Double> getShortTermAbsoluteStatsForOpponent(String oppName) throws Exception {
+        initializeDbConnection();
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_3_0_postflop_party_rh WHERE playerName = '" + oppName + "';");
+
+        String rhCheckString = "";
+        String rhCallString = "";
+        String rhBetString = "";
+        String rhRaiseString = "";
+
+        while(rs.next()) {
+            rhCheckString = rs.getString("checkCount").replace("_", "");
+            rhCallString = rs.getString("callCount").replace("_", "");
+            rhBetString = rs.getString("betCount").replace("_", "");
+            rhRaiseString = rs.getString("raiseCount").replace("_", "");
+        }
+
+        rs.close();
+        st.close();
+
+        closeDbConnection();
+
+        char[] check = rhCheckString.toCharArray();
+        char[] call = rhCallString.toCharArray();
+        char[] bet = rhBetString.toCharArray();
+        char[] raise = rhRaiseString.toCharArray();
+
+        double checkAmount = getTotalAmountOfActionsFromCharActionArray(check);
+        double callAmount = getTotalAmountOfActionsFromCharActionArray(call);
+        double betAmount = getTotalAmountOfActionsFromCharActionArray(bet);
+        double raiseAmount = getTotalAmountOfActionsFromCharActionArray(raise);
+        double totalAmount = rhRaiseString.length();
+
+        double betRatioForPlayer = betAmount / (checkAmount + betAmount);
+        double callRatioForPlayer = callAmount / totalAmount;
+        double raiseRatioForPlayer = raiseAmount / totalAmount;
+        double numberOfHands = totalAmount;
+
+        Map<String, Double> statsForOpp = new HashMap<>();
+        statsForOpp.put("betRatio", betRatioForPlayer);
+        statsForOpp.put("callRatio", callRatioForPlayer);
+        statsForOpp.put("raiseRatio", raiseRatioForPlayer);
+        statsForOpp.put("numberOfHands", numberOfHands);
+
+        return statsForOpp;
+    }
+
+    private Map<String, Double> getLongTermAbsoluteStatsForOpponent(String oppName) throws Exception {
         double numberOfHands = -1;
         double betRatioForPlayer = -1;
         double callRatioForPlayer = -1;
@@ -271,6 +346,16 @@ public class StatsRetrieverPostflop {
         }
 
         return counter;
+    }
+
+    private double getTotalAmountOfActionsFromCharActionArray(char[] actionArray) {
+        double total = 0;
+
+        for(char c : actionArray) {
+            total = total + Character.getNumericValue(c);
+        }
+
+        return total;
     }
 
     private void initializeDbConnection() throws Exception {

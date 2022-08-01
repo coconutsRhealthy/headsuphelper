@@ -64,7 +64,7 @@ public class DbPartyMigrator {
 
         initializeDbConnection();
 
-        for(int i = 6; i <= 15; i++) {
+        for(int i = 6; i <= 17; i++) {
             String query;
 
             if(i == 6) {

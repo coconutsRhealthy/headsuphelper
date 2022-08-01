@@ -152,6 +152,7 @@ public class PartyTableReader {
             System.out.println("Start waiting a bit for first action in new sng");
             TimeUnit.SECONDS.sleep(3);
             System.out.println("End waiting a bit for first action in new sng");
+            saveScreenshotOfEntireScreen("botToActFirstActionNewSng", new Date().getTime());
         }
 
         BufferedImage bufferedImage1 = ImageProcessor.getBufferedImageScreenShot(870, 707, 1, 1);
@@ -1094,6 +1095,7 @@ public class PartyTableReader {
                 bigBlind = 80;
                 break;
             case "7":
+            case "i\"":
                 bigBlind = 100;
                 break;
             case "8":
@@ -1282,10 +1284,11 @@ public class PartyTableReader {
 
         if(rgb1 == -15 || rgb1 == -16) {
             int rgb2_100k = rgb2 / 100_000;
+            int rgb2_1k = rgb2 / 1000;
 
-            if(rgb2_100k == -3) {
+            if(rgb2_100k == -3 || rgb2_100k == -4 || rgb2_100k == -23 || rgb2_1k == -2434) {
                 suit = 'c';
-            } else if(rgb2_100k == -25 || rgb2_100k == -24 || rgb2_100k == -7) {
+            } else if(rgb2_100k == -25 || rgb2_100k == -24 || rgb2_100k == -7 || rgb2_100k == -27 || rgb2_100k == -28) {
                 suit = 's';
             }
         } else if(rgb1 == -3) {
@@ -1320,7 +1323,7 @@ public class PartyTableReader {
             cardRank = 8;
         } else if(stringCardRank.equals("9")) {
             cardRank = 9;
-        } else if(stringCardRank.equals("10") || stringCardRank.equals("1C")) {
+        } else if(stringCardRank.equals("10") || stringCardRank.equals("1O") || stringCardRank.equals("1C")) {
             cardRank = 10;
         } else if(stringCardRank.equals("J")) {
             cardRank = 11;

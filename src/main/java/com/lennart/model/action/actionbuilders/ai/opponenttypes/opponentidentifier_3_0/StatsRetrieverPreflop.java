@@ -1,5 +1,7 @@
 package com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0;
 
+import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
+
 import java.sql.*;
 import java.util.*;
 
@@ -13,25 +15,35 @@ public class StatsRetrieverPreflop {
     private final int NUMBER_OF_HANDS_UNKNOWN_BOUNDRY = 15;
 
     public static void main(String[] args) throws Exception {
-        new StatsRetrieverPreflop().getPreflopStats("zdsdsdfds");
+        new StatsRetrieverPreflop().getPreflopStats("zdsdsdfds", null);
     }
 
-    public Map<String, Double> getPreflopStats(String opponentName) throws Exception {
-        Map<String, Double> absoluteStatsForOpp = getAbsoluteStatsForOpponent(opponentName);
-        Map<String, Double> relativeStatsForOpp;
-        double numberOfHands = absoluteStatsForOpp.get("numberOfHands");
-        boolean unknownOpp = false;
+    public Map<String, Double> getPreflopStats(String opponentName, ContinuousTable continuousTable) throws Exception {
+        if(continuousTable == null || continuousTable.getPostOppStats() == null) {
+            Map<String, Double> absoluteStatsForOpp = getAbsoluteStatsForOpponent(opponentName);
+            Map<String, Double> relativeStatsForOpp;
+            double numberOfHands = absoluteStatsForOpp.get("numberOfHands");
+            boolean unknownOpp = false;
 
-        if(numberOfHands < NUMBER_OF_HANDS_UNKNOWN_BOUNDRY) {
-            unknownOpp = true;
-            Map<String, Double> absoluteStatsForTypicalUnknown = getAbsoluteStatsForTypicalUnknown(numberOfHands);
-            relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForTypicalUnknown, numberOfHands);
-        } else {
+            //if(numberOfHands < NUMBER_OF_HANDS_UNKNOWN_BOUNDRY) {
+            //    unknownOpp = true;
+            //    Map<String, Double> absoluteStatsForTypicalUnknown = getAbsoluteStatsForTypicalUnknown(numberOfHands);
+            //    relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForTypicalUnknown, numberOfHands);
+            //} else {
             relativeStatsForOpp = getRelativeStatsForOpponent(absoluteStatsForOpp, numberOfHands);
+            //}
+
+            logRelativeStats(relativeStatsForOpp, opponentName, numberOfHands, unknownOpp);
+
+            if(continuousTable != null) {
+                continuousTable.setPreflopOppStats(relativeStatsForOpp);
+            }
+
+            return relativeStatsForOpp;
         }
 
-        logRelativeStats(relativeStatsForOpp, opponentName, numberOfHands, unknownOpp);
-        return relativeStatsForOpp;
+        logRelativeStats(continuousTable.getPreflopOppStats(), opponentName, continuousTable.getPreflopOppStats().get("numberOfHands"), false);
+        return continuousTable.getPreflopOppStats();
     }
 
     private Map<String, Double> getRelativeStatsForOpponent(Map<String, Double> absoluteStats, double numberOfHands) throws Exception {
@@ -73,6 +85,98 @@ public class StatsRetrieverPreflop {
     }
 
     private Map<String, Double> getAbsoluteStatsForOpponent(String oppName) throws Exception {
+        Map<String, Double> absoluteStats = getShortTermAbsoluteStatsForOpponent(oppName);
+
+        double numberOfHands = absoluteStats.get("numberOfHands");
+
+        if(numberOfHands < 15) {
+            System.out.println("Bzrk preflop long term stats needed");
+            absoluteStats = getLongTermAbsoluteStatsForOpponent(oppName);
+        }
+
+        return absoluteStats;
+    }
+
+    private Map<String, Double> getShortTermAbsoluteStatsForOpponent(String oppName) throws Exception {
+        initializeDbConnection();
+
+        String rhIpRaiseString = "";
+        String rhOopRaiseString = "";
+        String overallRaiseString = "";
+        String rhOverallCallString = "";
+
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM opponentidentifier_3_0_preflop_party_rh WHERE playerName = '" + oppName + "';");
+
+        while(rs.next()) {
+            rhIpRaiseString = rs.getString("ipRaiseCount").replace("_", "");
+            rhOopRaiseString = rs.getString("oopRaiseCount").replace("_", "");
+            overallRaiseString = rs.getString("raiseCount").replace("_", "");
+            rhOverallCallString = rs.getString("callCount").replace("_", "");
+        }
+
+        rs.close();
+        st.close();
+
+        String rh2betString = "";
+        String rhShoveString = "";
+        String rhCall2betString = "";
+
+        Statement st2 = con.createStatement();
+        ResultSet rs2 = st2.executeQuery("SELECT * FROM opponentidentifier_3_0_preflopstats_party_rh WHERE playerName = '" + oppName + "';");
+
+        while(rs2.next()) {
+            rh2betString = rs2.getString("pre2bet").replace("_", "");
+            rhShoveString = rs2.getString("pre3bet").replace("_", "") + rs2.getString("pre4bet_up").replace("_", "");
+            rhCall2betString = rs2.getString("pre_call2bet").replace("_", "");
+        }
+
+        rs2.close();
+        st2.close();
+
+        closeDbConnection();
+
+        char[] ipRaise = rhIpRaiseString.toCharArray();
+        char[] oopRaise = rhOopRaiseString.toCharArray();
+        char[] overallRaise = overallRaiseString.toCharArray();
+        char[] overallCall = rhOverallCallString.toCharArray();
+        char[] _2bet = rh2betString.toCharArray();
+        char[] shove = rhShoveString.toCharArray();
+        char[] call2bet = rhCall2betString.toCharArray();
+
+        double ipRaiseAmount = getTotalAmountOfActionsFromCharActionArray(ipRaise);
+        double oopRaiseAmount = getTotalAmountOfActionsFromCharActionArray(oopRaise);
+        double overallRaiseAmount = getTotalAmountOfActionsFromCharActionArray(overallRaise);
+        double overallCallAmount = getTotalAmountOfActionsFromCharActionArray(overallCall);
+        double _2betAmount = getTotalAmountOfActionsFromCharActionArray(_2bet);
+        double shoveAmount = getTotalAmountOfActionsFromCharActionArray(shove);
+        double call2betAmount = getTotalAmountOfActionsFromCharActionArray(call2bet);
+        double totalAmount = rhCall2betString.length();
+
+        double _2betRatioForPlayer = _2betAmount / totalAmount;
+        double shoveRatioForPlayer = shoveAmount / totalAmount;
+        double call2betRatioForPlayer = call2betAmount / totalAmount;
+        double ipRaiseRatioForPlayer = ipRaiseAmount / totalAmount;
+        double oopRaiseRatioForPlayer = oopRaiseAmount / totalAmount;
+        double overallRaiseRatioForPlayer = overallRaiseAmount / totalAmount;
+        double overallCallRatioForPlayer = overallCallAmount / totalAmount;
+
+        double numberOfHands = totalAmount;
+
+        Map<String, Double> statsForOpp = new HashMap<>();
+        statsForOpp.put("_2betRatioForPlayer", _2betRatioForPlayer);
+        statsForOpp.put("shoveRatioForPlayer", shoveRatioForPlayer);
+        statsForOpp.put("call2betRatioForPlayer", call2betRatioForPlayer);
+        statsForOpp.put("ipRaiseRatioForPlayer", ipRaiseRatioForPlayer);
+        statsForOpp.put("oopRaiseRatioForPlayer", oopRaiseRatioForPlayer);
+        statsForOpp.put("overallRaiseRatioForPlayer", overallRaiseRatioForPlayer);
+        statsForOpp.put("overallCallRatioForPlayer", overallCallRatioForPlayer);
+        statsForOpp.put("numberOfHands", numberOfHands);
+
+        return statsForOpp;
+    }
+
+    private Map<String, Double> getLongTermAbsoluteStatsForOpponent(String oppName) throws Exception {
         double numberOfHands = -1;
         double _2betRatioForPlayer = -1;
         double shoveRatioForPlayer = -1;
@@ -415,6 +519,16 @@ public class StatsRetrieverPreflop {
         }
 
         return counter;
+    }
+
+    private double getTotalAmountOfActionsFromCharActionArray(char[] actionArray) {
+        double total = 0;
+
+        for(char c : actionArray) {
+            total = total + Character.getNumericValue(c);
+        }
+
+        return total;
     }
 
     private void initializeDbConnection() throws Exception {

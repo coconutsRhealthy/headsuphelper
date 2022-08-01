@@ -9,98 +9,75 @@ import java.util.*;
  */
 public class AdjustPreflopPlayToOpp {
 
-    //wanneer wil je trash limpen?
-        //om postflop te komen
-            //-> laag opp oop 2bet %
-        //om postflop je opp van de hand te bluffen of evt value te halen
-            //-> laag opp bet en raise %
-
     private static final String WEAK_IP_2BET = "weakIp2bet";
-    private static final String WEAK_OOP_2BET = "weakOop2bet";
+    private static final String WEAK_OOP_2BET = "weaOop2bet";
     private static final String NON_TRASH_LIMP = "nonTrashLimp";
-    private static final String NON_WEAK_IP_2BET = "nonWeakIp2bet";
     private static final String NON_WEAK_OOP_3BET = "nonWeakOop3bet";
-    private static final String NON_WEAK_IP_3BET = "nonWeakIp3bet";
+    private static final String VALUE_LIMP_INSTEAD_OF_SHOVE = "valueLimpInsteadOfShove";
+    private static final String TRASH_LIMP_INSTEAD_OF_SHOVE = "trashLimpInsteadOfShove";
 
     public String adjustPreflopAction(String currentAction, String opponentName, boolean position,
                                       double handstrength, String opponentAction,
-                                      List<String> eligibleActions, double effectiveStackBb) throws Exception {
-        Map<String, Double> preOppStats = new StatsRetrieverPreflop().getPreflopStats(opponentName);
-        List<String> possibleAdjustments = getPossibleAdjustments(preOppStats);
+                                      List<String> eligibleActions, double effectiveStackBb, ContinuousTable continuousTable) throws Exception {
+        Map<String, Double> preOppStats = new StatsRetrieverPreflop().getPreflopStats(opponentName, continuousTable);
+        List<String> possibleAdjustments = getPossibleAdjustments(preOppStats, position, handstrength, effectiveStackBb);
         String actionToReturn = changeActionIfNeeded(currentAction, possibleAdjustments, position,
-                handstrength, opponentAction, eligibleActions, effectiveStackBb, preOppStats.get("numberOfHands"));
+                opponentAction, eligibleActions, preOppStats.get("numberOfHands"));
         return actionToReturn;
     }
 
     private String changeActionIfNeeded(String currentAction, List<String> possibleAdjustments,
-                                     boolean position, double handstrength, String opponentAction,
-                                     List<String> eligibleActions, double effectiveStackBb, double numberOfHands) {
+                                     boolean position, String opponentAction,
+                                     List<String> eligibleActions, double numberOfHands) {
         String actionToReturn = currentAction;
 
         if(position) {
             if(currentAction.equals("call") && opponentAction.equals("bet")) {
                 if(possibleAdjustments.contains(NON_TRASH_LIMP)) {
-                    if(handstrength < 0.2) {
-                        actionToReturn = "fold";
-                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_TRASH_LIMP, 0, numberOfHands < 15);
-                        System.out.println("PRE adj NON_TRASH_LIMP");
-                    }
+                    actionToReturn = "fold";
+                    ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_TRASH_LIMP, 0, numberOfHands < 15);
+                    System.out.println("PRE adj NON_TRASH_LIMP");
                 }
 
                 if(possibleAdjustments.contains(WEAK_IP_2BET)) {
                     if(eligibleActions.contains("raise")) {
-                        if(handstrength < 0.5) {
-                            actionToReturn = "raise";
-                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, WEAK_IP_2BET, 0, numberOfHands < 15);
-                            System.out.println("PRE adj WEAK_IP_2BET");
-                        }
+                        actionToReturn = "raise";
+                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, WEAK_IP_2BET, 0, numberOfHands < 15);
+                        System.out.println("PRE adj WEAK_IP_2BET");
                     }
                 }
             }
 
             if(currentAction.equals("raise") && opponentAction.equals("bet")) {
-                if(possibleAdjustments.contains(NON_WEAK_IP_2BET)) {
-                    if(handstrength < 0.75) {
-                        if(effectiveStackBb > 10) {
-                            actionToReturn = "call";
-                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_WEAK_IP_2BET, 0, numberOfHands < 15);
-                            System.out.println("PRE adj NON_WEAK_IP_2BET");
-                        }
-                    }
+                if(possibleAdjustments.contains(VALUE_LIMP_INSTEAD_OF_SHOVE)) {
+                    actionToReturn = "call";
+                    ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, VALUE_LIMP_INSTEAD_OF_SHOVE, 0, numberOfHands < 15);
+                    System.out.println("PRE adj VALUE_LIMP_INSTEAD_OF_SHOVE");
                 }
-            }
 
-            if(currentAction.equals("raise") && opponentAction.equals("raise")) {
-                if(possibleAdjustments.contains(NON_WEAK_IP_3BET)) {
-                    if(handstrength < 0.9) {
-                        actionToReturn = "call";
-                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_WEAK_IP_3BET, 0, numberOfHands < 15);
-                        System.out.println("PRE adj NON_WEAK_IP_3BET");
-                    }
+                if(possibleAdjustments.contains(TRASH_LIMP_INSTEAD_OF_SHOVE)) {
+                    actionToReturn = "call";
+                    ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, TRASH_LIMP_INSTEAD_OF_SHOVE, 0, numberOfHands < 15);
+                    System.out.println("PRE adj TRASH_LIMP_INSTEAD_OF_SHOVE");
                 }
+
             }
         } else {
-            if(currentAction.equals("check")) {
-                if(possibleAdjustments.contains(WEAK_OOP_2BET)) {
-                    if(eligibleActions.contains("raise")) {
-                        if(handstrength < 0.65) {
-                            actionToReturn = "raise";
-                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, WEAK_OOP_2BET, 0, numberOfHands < 15);
-                            System.out.println("PRE adj WEAK_OOP_2BET");
-                        }
-                    }
-                }
-            }
-
             if(currentAction.equals("raise")) {
                 if(opponentAction.equals("raise")) {
                     if(possibleAdjustments.contains(NON_WEAK_OOP_3BET)) {
-                        if(handstrength < 0.8) {
-                            actionToReturn = "call";
-                            ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_WEAK_OOP_3BET, 0, numberOfHands < 15);
-                            System.out.println("PRE adj NON_WEAK_OOP_3BET");
-                        }
+                        actionToReturn = "call";
+                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_WEAK_OOP_3BET, 0, numberOfHands < 15);
+                        System.out.println("PRE adj NON_WEAK_OOP_3BET");
                     }
+                }
+            }
+
+            if(currentAction.equals("check")) {
+                if(possibleAdjustments.contains(WEAK_OOP_2BET)) {
+                    actionToReturn = "raise";
+                    ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, WEAK_OOP_2BET, 0, numberOfHands < 15);
+                    System.out.println("PRE adj WEAK_OOP_2BET");
                 }
             }
         }
@@ -108,62 +85,108 @@ public class AdjustPreflopPlayToOpp {
         return actionToReturn;
     }
 
-    public static void main(String[] args) throws Exception {
-        ;
-        List<String> possibleAdjustments = new AdjustPreflopPlayToOpp()
-                .getPossibleAdjustments(new StatsRetrieverPreflop().getPreflopStats("Goingfishing"));
-        System.out.println("wacht");
-    }
+//    public static void main(String[] args) throws Exception {
+//        ;
+//        List<String> possibleAdjustments = new AdjustPreflopPlayToOpp()
+//                .getPossibleAdjustments(new StatsRetrieverPreflop().getPreflopStats("Goingfishing"));
+//        System.out.println("wacht");
+//    }
 
-    private List<String> getPossibleAdjustments(Map<String, Double> oppRelativeStats) {
+
+//    private static final String WEAK_IP_2BET = "weakIp2bet";
+//    private static final String WEAK_OOP_2BET = "weakOop2bet";
+//    private static final String NON_TRASH_LIMP = "nonTrashLimp";
+//    private static final String NON_WEAK_IP_2BET = "nonWeakIp2bet";
+//    private static final String NON_WEAK_OOP_3BET = "nonWeakOop3bet";
+//    private static final String NON_WEAK_IP_3BET = "nonWeakIp3bet";
+
+
+
+    //actions to adjust
+        //IP
+            //bluff open 2bets
+                //tegen iemand die weinig oop3bet en die veel fold pre
+                //
+
+            //non trash limps
+                //tegen iemand die veel raist pre oop
+
+
+            //limp instead of shove
+                //bij zwakke hand
+                    //tegen iemand met een hoge call amount en een lage oop raise amount
+
+                //bij sterke hand
+                    //tegen iemand met een lage call amount
+
+
+        //OOP
+            //non weak oop3bets
+                //tegen iemand met een lage ip raise amount
+
+    private List<String> getPossibleAdjustments(Map<String, Double> oppRelativeStats, boolean position, double handstrength,
+                                                double effStackBb) {
         List<String> possibleAdjustments = new ArrayList<>();
 
-        double _2betDeviation = oppRelativeStats.get("relative2betRatio") - 0.5;
-        double shoveDeviation = oppRelativeStats.get("relativeShoveRatio") - 0.5;
         double call2betDeviation = oppRelativeStats.get("relativeCall2betRatio") - 0.5;
         double ipRaiseDeviation = oppRelativeStats.get("relativeIpRaiseRatio") - 0.5;
         double oopRaiseDeviation = oppRelativeStats.get("relativeOopRaiseRatio") - 0.5;
+        double overallCallDeviation = oppRelativeStats.get("relativeOverallCallRatio") - 0.5;
+        double shoveDeviation = oppRelativeStats.get("relativeShoveRatio") - 0.5;
 
-        //iets losser dit
-        //wellicht hier geen focus op shoveDeviation
-        if(oopRaiseDeviation < 0 && call2betDeviation < 0.07 && shoveDeviation < 0.07) {
-            if(Math.random() < (((oopRaiseDeviation * -1) + (call2betDeviation * -1) + (shoveDeviation * -1)) * 2)) {
-                possibleAdjustments.add(WEAK_IP_2BET);
-            }
-        }
-
-        //kijk hier ook naar overall call ratio
-        if(call2betDeviation < 0 && shoveDeviation < 0.05) {
-            if(Math.random() < (((call2betDeviation * -1) + (shoveDeviation * -1)) * 2)) {
-                possibleAdjustments.add(WEAK_OOP_2BET);
-            }
-        }
-
-        //wellicht hier enkel focus op oopRaiseDeviation
-        if(oopRaiseDeviation > 0 || shoveDeviation > 0) {
-            if(Math.random() < ((oopRaiseDeviation + shoveDeviation) * 2)) {
-                possibleAdjustments.add(NON_TRASH_LIMP);
-                possibleAdjustments.add(NON_WEAK_IP_2BET);
-            }
-        }
-
-        if(_2betDeviation < 0 || ipRaiseDeviation < 0) {
-            if(_2betDeviation < 0) {
-                _2betDeviation = _2betDeviation * -1;
+        if(position) {
+            if(handstrength < 0.5) {
+                if(oopRaiseDeviation < 0 && call2betDeviation < 0) {
+                    if(effStackBb >= 14) {
+                        if(Math.random() < (((oopRaiseDeviation * -1) + (call2betDeviation * -1)) * 2)) {
+                            possibleAdjustments.add(WEAK_IP_2BET);
+                        }
+                    }
+                }
             }
 
-            if(ipRaiseDeviation < 0) {
-                ipRaiseDeviation = ipRaiseDeviation * -1;
+            if(handstrength < 0.2) {
+                if(oopRaiseDeviation > 0) {
+                    if(Math.random() < (oopRaiseDeviation * 2)) {
+                        possibleAdjustments.add(NON_TRASH_LIMP);
+                    }
+                }
             }
 
-            if(Math.random() < ((_2betDeviation + ipRaiseDeviation) * 2)) {
-                possibleAdjustments.add(NON_WEAK_OOP_3BET);
+            if(effStackBb < 12) {
+                if(handstrength > 0.7) {
+                    if(overallCallDeviation < 0) {
+                        if(Math.random() < ((overallCallDeviation * -1) * 2)) {
+                            //possibleAdjustments.add(VALUE_LIMP_INSTEAD_OF_SHOVE);
+                        }
+                    }
+                } else {
+                    if(overallCallDeviation > 0 && oopRaiseDeviation < 0) {
+                        if(Math.random() < (overallCallDeviation + (oopRaiseDeviation * -1)) * 2) {
+                            //possibleAdjustments.add(TRASH_LIMP_INSTEAD_OF_SHOVE);
+                        }
+                    }
+                }
             }
-        }
+        } else {
+            if(handstrength < 0.8) {
+                if(ipRaiseDeviation < 0) {
+                    if(Math.random() < ((ipRaiseDeviation * -1) * 2)) {
+                        possibleAdjustments.add(NON_WEAK_OOP_3BET);
+                    }
+                }
+            }
 
-        if(oopRaiseDeviation < 0) {
-            if(Math.random() < ((oopRaiseDeviation * -1) * 2)) {
-                possibleAdjustments.add(NON_WEAK_IP_3BET);
+
+            if(handstrength < 0.55) {
+                //if(effStackBb >= 15) {
+                if(effStackBb >= 20) {
+                    if(call2betDeviation < 0 && shoveDeviation < 0) {
+                        if(Math.random() < (((call2betDeviation * -1) + (shoveDeviation * -1)) * 2)) {
+                            possibleAdjustments.add(WEAK_OOP_2BET);
+                        }
+                    }
+                }
             }
         }
 
