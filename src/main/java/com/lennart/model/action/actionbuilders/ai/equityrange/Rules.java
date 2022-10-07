@@ -48,8 +48,13 @@ public class Rules {
                     if(gameVariables.isBotIsButton()) {
                         actionToReturn = currentAction;
                     } else {
-                        actionToReturn = valueTrapActionToUse;
-                        valueTrap = true;
+                        if(valueTrapActionToUse.equals("check")) {
+                            actionToReturn = valueTrapActionToUse;
+                            valueTrap = true;
+                        } else {
+                            actionToReturn = currentAction;
+                            System.out.println("non value trap oop river because would be call!");
+                        }
                     }
                 } else {
                     actionToReturn = valueTrapActionToUse;
