@@ -78,6 +78,8 @@ public class ContinuousTable implements ContinuousTableable {
     private Map<String, Double> postOppStats = null;
     private Map<String, Double> preflopOppStats = null;
 
+    Map<String, Double> sessionResults = new HashMap<>();
+
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
         continuousTable.setBigBlind(100);
@@ -440,6 +442,7 @@ public class ContinuousTable implements ContinuousTableable {
         if(PartyTableReader.sngIsFinished(timeOfLastDoneAction)) {
             String botWonSngString = getBotWonSngString();
             adjustBankroll(botWonSngString, lastBuyIn);
+            updateSessionResults(botWonSngString, lastBuyIn);
 
             long currentTime = new Date().getTime();
 
@@ -464,6 +467,7 @@ public class ContinuousTable implements ContinuousTableable {
 
             TimeUnit.MILLISECONDS.sleep(1500);
             decideBuyIn();
+            takeShotAt20();
             partyTableReader.registerNewSng("first", this);
 
             gonnaDoFirstActionOfNewSng = true;
@@ -573,12 +577,36 @@ public class ContinuousTable implements ContinuousTableable {
         } else {
             newBuyInToSelect = 1;
         }
+    }
 
-        if(lastOppName != null && lastOppName.equals("Trickysleeps")) {
-            if(newBuyInToSelect >= 20) {
-                newBuyInToSelect = 10;
-                System.out.println("Don't play against Trickysleeps... switch to buyin $10");
+    private void takeShotAt20() {
+        boolean couldTakeShotAt20 = false;
+
+        if(bankroll > 1000) {
+            Double _20losses = sessionResults.get("20_loss");
+            Double _20unknowns = sessionResults.get("20_unknown");
+            Double _20wins = sessionResults.get("20_win");
+
+            if(_20losses == null) {
+                _20losses = 0.0;
             }
+
+            if(_20unknowns == null) {
+                _20unknowns = 0.0;
+            }
+
+            if(_20wins == null) {
+                _20wins = 0.0;
+            }
+
+            if(_20wins >= (_20losses + _20unknowns)) {
+                couldTakeShotAt20 = true;
+                System.out.println("Take shot at 20. Wins: " + _20wins + " Unknowns: " + _20unknowns + " Losses: " + _20losses);
+            }
+        }
+
+        if(couldTakeShotAt20) {
+            newBuyInToSelect = 20;
         }
     }
 
@@ -645,6 +673,18 @@ public class ContinuousTable implements ContinuousTableable {
 
         bankroll = bankroll + adjustment;
         System.out.println("Estimated bankroll: " + bankroll);
+    }
+
+    private void updateSessionResults(String winLossOrUnclear, double stake) {
+        String key = stake + "_" + winLossOrUnclear;
+
+        if(sessionResults.get(key) == null) {
+            sessionResults.put(key, 1.0);
+        } else {
+            double valueBeforeUpdate = sessionResults.get(key);
+            double newValue = valueBeforeUpdate + 1;
+            sessionResults.put(key, newValue);
+        }
     }
 
     private void printSessionResults() {
