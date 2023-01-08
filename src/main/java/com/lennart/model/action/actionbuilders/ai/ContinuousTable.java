@@ -61,7 +61,7 @@ public class ContinuousTable implements ContinuousTableable {
 
     private double lastBuyIn = 10;
     private double newBuyInToSelect = 10;
-    private double bankroll = 448.52;
+    private double bankroll = 962.30;
     private List<String> sngResults = new ArrayList<>();
     private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
     private long sessionStartTime;
@@ -79,6 +79,10 @@ public class ContinuousTable implements ContinuousTableable {
     private Map<String, Double> preflopOppStats = null;
 
     Map<String, Double> sessionResults = new HashMap<>();
+
+    private long noPlayAgainstTrickySleepsTimer = -1;
+
+    private List<String> twentiesRegsList = initiateTwentiesRegsList();
 
     public static void main(String[] args) throws Exception {
         ContinuousTable continuousTable = new ContinuousTable();
@@ -467,7 +471,7 @@ public class ContinuousTable implements ContinuousTableable {
 
             TimeUnit.MILLISECONDS.sleep(1500);
             decideBuyIn();
-            takeShotAt20();
+            //takeShotAt20();
             partyTableReader.registerNewSng("first", this);
 
             gonnaDoFirstActionOfNewSng = true;
@@ -564,8 +568,25 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void decideBuyIn() {
-        if(bankroll > 800) {
-            newBuyInToSelect = 10;
+        if(bankroll > 1140) {
+            newBuyInToSelect = 20;
+        } else if(bankroll > 1010) {
+            //if(new Date().getTime() - sessionStartTime > 9_000_000) {
+//                if(noPlayAgainstTrickySleepsTimer == -1) {
+//                    newBuyInToSelect = 20;
+//                } else {
+//                    if(new Date().getTime() - noPlayAgainstTrickySleepsTimer > 5_400_000) {
+//                        newBuyInToSelect = 20;
+//                        System.out.println("90 minutes passed since last TrickySleeps game, new attempt on 20");
+//                    } else {
+//                        newBuyInToSelect = 10;
+//                        System.out.println("Less than 90 minutes passed since last TrickySleeps game, remain at 10 even though BR above 800");
+//                    }
+//                }
+            //} else {
+            //    newBuyInToSelect = 10;
+            //}
+            newBuyInToSelect = 20;
         } else if(bankroll > 300) {
             newBuyInToSelect = 10;
         } else if(bankroll > 230) {
@@ -577,31 +598,41 @@ public class ContinuousTable implements ContinuousTableable {
         } else {
             newBuyInToSelect = 1;
         }
+
+//        if(lastOppName != null && (lastOppName.equals("Trickysleeps") || lastOppName.equals("WhiteMagic") ||
+//                lastOppName.equals("SitYourNan") || lastOppName.equals("WherelsTheLuck")) && lastBuyIn == 20) {
+//            noPlayAgainstTrickySleepsTimer = new Date().getTime();
+//
+//            if(newBuyInToSelect >= 20) {
+//                newBuyInToSelect = 10;
+//                System.out.println("Don't play against Trickysleeps... switch to buyin $10");
+//            }
+//        }
     }
 
     private void takeShotAt20() {
         boolean couldTakeShotAt20 = false;
 
-        if(bankroll > 1000) {
-            Double _20losses = sessionResults.get("20_loss");
-            Double _20unknowns = sessionResults.get("20_unknown");
-            Double _20wins = sessionResults.get("20_win");
+        if(bankroll > 800) {
+            Double _20losses = sessionResults.get("20.0_loss");
+            Double _20unclears = sessionResults.get("20.0_unclear");
+            Double _20wins = sessionResults.get("20.0_win");
 
             if(_20losses == null) {
                 _20losses = 0.0;
             }
 
-            if(_20unknowns == null) {
-                _20unknowns = 0.0;
+            if(_20unclears == null) {
+                _20unclears = 0.0;
             }
 
             if(_20wins == null) {
                 _20wins = 0.0;
             }
 
-            if(_20wins >= (_20losses + _20unknowns)) {
+            if(_20wins >= (_20losses + _20unclears)) {
                 couldTakeShotAt20 = true;
-                System.out.println("Take shot at 20. Wins: " + _20wins + " Unknowns: " + _20unknowns + " Losses: " + _20losses);
+                System.out.println("Take shot at 20. Wins: " + _20wins + " Unclears: " + _20unclears + " Losses: " + _20losses);
             }
         }
 
@@ -644,6 +675,8 @@ public class ContinuousTable implements ContinuousTableable {
                 adjustment = 9.2;
             } else if(stake == 20) {
                 adjustment = 18.4;
+            } else if(stake == 50) {
+                adjustment = 46.0;
             }
         } else if(winLossOrUnclear.equals("unclear")) {
             if(stake == 1) {
@@ -656,6 +689,8 @@ public class ContinuousTable implements ContinuousTableable {
                 adjustment = -0.4;
             } else if(stake == 20) {
                 adjustment = -0.8;
+            } else if(stake == 50) {
+                adjustment = -2.0;
             }
         } else if(winLossOrUnclear.equals("loss")) {
             if(stake == 1) {
@@ -668,6 +703,8 @@ public class ContinuousTable implements ContinuousTableable {
                 adjustment = -10;
             } else if(stake == 20) {
                 adjustment = -20;
+            } else if(stake == 50) {
+                adjustment = -50;
             }
         }
 
@@ -759,6 +796,13 @@ public class ContinuousTable implements ContinuousTableable {
         newEntry.put("unknownOpp", "" + unknownOpp);
 
         actionAdjustments.put(new Date().getTime(), newEntry);
+    }
+
+    private List<String> initiateTwentiesRegsList() {
+//        if(lastOppName != null && (lastOppName.equals("Trickysleeps") || lastOppName.equals("WhiteMagic") ||
+//                lastOppName.equals("SitYourNan") || lastOppName.equals("WherelsTheLuck")) && lastBuyIn == 20) {
+
+        return Arrays.asList("Trickysleeps", "WhiteMagic", "SitYourNan", "WherelsTheLuck");
     }
 
     @Override
@@ -937,5 +981,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     public void setPreflopOppStats(Map<String, Double> preflopOppStats) {
         this.preflopOppStats = preflopOppStats;
+    }
+
+    public List<String> getTwentiesRegsList() {
+        return twentiesRegsList;
     }
 }

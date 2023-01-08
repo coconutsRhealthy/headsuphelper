@@ -3,6 +3,8 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.equityrange.BotActionBuilder;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
+import com.lennart.model.action.actionbuilders.ai.oppdependent.TrickySleeps;
+import com.lennart.model.action.actionbuilders.ai.oppdependent.TwentiesRegs;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0.AdjustPostflopPlayToOpp;
@@ -830,6 +832,37 @@ public class ActionVariables {
             System.out.println();
         }
         ////
+
+//        if(gameVariables.getOpponentName().equals("Trickysleeps") || gameVariables.getOpponentName().equals("WhiteMagic") ||
+//                gameVariables.getOpponentName().equals("SitYourNan") || gameVariables.getOpponentName().equals("WherelsTheLuck")) {
+//            if(Math.random() < 0.5) {
+//                try {
+//                    action = new TrickySleeps().adjustActionAgainstTrickySleeps(action, gameVariables.getBotHoleCards(), sizing,
+//                            botIsButtonInMethod, effectiveStack, gameVariables.getOpponentAction(), boardInMethod, botHandStrengthInMethod,
+//                            strongFdInMethod, strongOosdInMethod, strongGutshotInMethod);
+//                } catch (Exception e) {
+//                    System.out.println("Error in TrickySleeps adjustment");
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+
+        //if(continuousTable.getTwentiesRegsList().contains(gameVariables.getOpponentAction())) {
+//        if(continuousTable.getTwentiesRegsList().contains(gameVariables.getOpponentName())) {
+//            if(Math.random() < 0.9) {
+//                try {
+//                    AbstractMap.SimpleEntry<String, Double> twentiesRegsAdjustment =
+//                            new TwentiesRegs().adjustActionAgainstTwentiesRegs(action, sizing, botIsButtonInMethod,
+//                                    gameVariables.getOpponentAction(), boardInMethod, eligibleActions, gameVariables.getBigBlind(),
+//                                    botHandStrengthInMethod);
+//                    action = twentiesRegsAdjustment.getKey();
+//                    sizing = twentiesRegsAdjustment.getValue();
+//                } catch (Exception e) {
+//                    System.out.println("Error in TwentiesRegs adjustment");
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 
         if(realGame) {
             //fill dbsave

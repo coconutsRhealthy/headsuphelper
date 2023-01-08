@@ -150,7 +150,15 @@ public class PartyTableReader {
     public static boolean botIsToAct(boolean gonnaDoFirstActionOfNewSng) throws Exception {
         if(gonnaDoFirstActionOfNewSng) {
             System.out.println("Start waiting a bit for first action in new sng");
-            TimeUnit.SECONDS.sleep(3);
+            //TimeUnit.SECONDS.sleep(3);
+
+            MouseKeyboard.moveMouseToLocation(1565, 909);
+            TimeUnit.MILLISECONDS.sleep(300);
+            MouseKeyboard.click(1565, 909);
+            TimeUnit.MILLISECONDS.sleep(500);
+            MouseKeyboard.moveMouseToLocation(20, 20);
+            TimeUnit.MILLISECONDS.sleep(2200);
+
             System.out.println("End waiting a bit for first action in new sng");
             saveScreenshotOfEntireScreen("botToActFirstActionNewSng", new Date().getTime());
         }
@@ -1185,6 +1193,8 @@ public class PartyTableReader {
         } else if(buyInToSelect == 20) {
             //MouseKeyboard.click(225, 526);
             MouseKeyboard.click(225, 507);
+        } else if(buyInToSelect == 50) {
+            MouseKeyboard.click(240, 529);
         }
     }
 
