@@ -3,8 +3,8 @@ package com.lennart.model.action.actionbuilders.ai;
 import com.lennart.model.action.actionbuilders.ai.dbsave.*;
 import com.lennart.model.action.actionbuilders.ai.equityrange.BotActionBuilder;
 import com.lennart.model.action.actionbuilders.ai.foldstats.FoldStatsKeeper;
-import com.lennart.model.action.actionbuilders.ai.oppdependent.TrickySleeps;
-import com.lennart.model.action.actionbuilders.ai.oppdependent.TwentiesRegs;
+//import com.lennart.model.action.actionbuilders.ai.oppdependent.TrickySleeps;
+//import com.lennart.model.action.actionbuilders.ai.oppdependent.TwentiesRegs;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.OpponentIdentifier;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_2_0.OpponentIdentifier2_0;
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0.AdjustPostflopPlayToOpp;
@@ -644,6 +644,8 @@ public class ActionVariables {
         //action = callLooseAgainst4betShovesPre(action, boardInMethod, botHandStrengthInMethod, botIsButtonInMethod, botBetsizeBb, eligibleActions);
         //action = fewerBetsIpOnTurn(action, boardInMethod, botIsButtonInMethod, botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod, strongGutshotInMethod);
         //action = moreIpRiverRaises(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), bluffOddsAreOk, botHandStrengthInMethod);
+
+        action = RiverRegBluffRaiser.bluffRaiseRiverVsRegs(action, boardInMethod, continuousTable.getBotActionsOfHand(), numberOfHands, bluffOddsAreOk, gameVariables.getOpponentAction(), botIsButtonInMethod, continuousTable.getLastBuyIn());
 
         if(action.equals("bet75pct") || action.equals("raise")) {
             if(sizing == 0) {

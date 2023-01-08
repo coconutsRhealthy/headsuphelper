@@ -82,6 +82,8 @@ public class ContinuousTable implements ContinuousTableable {
 
     private long noPlayAgainstTrickySleepsTimer = -1;
 
+    private Map<String, List<String>> botActionsOfHand = new HashMap<>();
+
     private List<String> twentiesRegsList = initiateTwentiesRegsList();
 
     public static void main(String[] args) throws Exception {
@@ -124,6 +126,9 @@ public class ContinuousTable implements ContinuousTableable {
 
                     flopHandstrength = -1;
                     turnHandstrength = -1;
+
+                    printBotActionsOfLastHand(gameVariables.isBotIsButton(), gameVariables.getBoard());
+                    botActionsOfHand = new HashMap<>();
 
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
@@ -256,6 +261,7 @@ public class ContinuousTable implements ContinuousTableable {
                 oppTypes.add(actionVariables.getOpponentType());
                 numberOfHandWithOppType.add("" + actionVariables.getOppNumberOfHands() + "_" + actionVariables.getOpponentType());
                 updateHandsOfOpponentsPerStake(lastBuyIn, gameVariables.getOpponentName());
+                updateBotActionsInHandMap(gameVariables.getBoard(), gameVariables.isBotIsButton(), action);
 
                 PartyTableReader.performActionOnSite(action, sizing, gameVariables.getPot(),
                         gameVariables.getBoard(), gameVariables.getBigBlind(), gameVariables.getBotStack());
@@ -805,6 +811,68 @@ public class ContinuousTable implements ContinuousTableable {
         return Arrays.asList("Trickysleeps", "WhiteMagic", "SitYourNan", "WherelsTheLuck");
     }
 
+    private void updateBotActionsInHandMap(List<Card> board, boolean position, String action) {
+        try {
+            String positionPrefix = position ? "IP_" : "OOP_";
+            String street = "unknown";
+
+            if(board == null || board.isEmpty()) {
+                street = "preflop";
+            } else if(board.size() == 3) {
+                street = "flop";
+            } else if(board.size() == 4) {
+                street = "turn";
+            } else if(board.size() == 5) {
+                street = "river";
+            }
+
+            String mapKey = positionPrefix + street;
+
+            if(botActionsOfHand.get(mapKey) == null) {
+                botActionsOfHand.put(mapKey, new ArrayList<>());
+            }
+
+            List<String> actionsForKey = botActionsOfHand.get(mapKey);
+            actionsForKey.add(action);
+            botActionsOfHand.put(mapKey, actionsForKey);
+        } catch (Exception e) {
+            System.out.println("Error in updating bot actions map");
+            e.printStackTrace();
+        }
+    }
+
+    private void printBotActionsOfLastHand(boolean position, List<Card> board) {
+        try {
+            if(!botActionsOfHand.isEmpty()) {
+                String positionPrefix = position ? "IP_" : "OOP_";
+
+                System.out.print("Bot actions of last hand: ");
+                System.out.print("Preflop: ");
+                botActionsOfHand.get(positionPrefix + "preflop").forEach(action -> System.out.print(action + " "));
+
+                if(board != null && board.size() >= 3) {
+                    System.out.print("Flop: ");
+                    botActionsOfHand.get(positionPrefix + "flop").forEach(action -> System.out.print(action + " "));
+
+                    if(board.size() >= 4) {
+                        System.out.print("Turn: ");
+                        botActionsOfHand.get(positionPrefix + "turn").forEach(action -> System.out.print(action + " "));
+
+                        if(board.size() == 5) {
+                            System.out.print("River: ");
+                            botActionsOfHand.get(positionPrefix + "river").forEach(action -> System.out.print(action + " "));
+                        }
+                    }
+                }
+
+                System.out.println();
+            }
+        } catch (Exception e) {
+            System.out.println("Error in printin bot actions");
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean isOpponentHasInitiative() {
         return opponentHasInitiative;
@@ -985,5 +1053,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     public List<String> getTwentiesRegsList() {
         return twentiesRegsList;
+    }
+
+    public Map<String, List<String>> getBotActionsOfHand() {
+        return botActionsOfHand;
     }
 }
