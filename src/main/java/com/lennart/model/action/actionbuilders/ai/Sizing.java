@@ -428,7 +428,8 @@ public class Sizing {
 
             if(myBetSize < 5) {
                 //raiseOddsToUse = 2.85;
-                raiseOddsToUse = raiseOddsToUseClassVar;
+                //raiseOddsToUse = raiseOddsToUseClassVar;
+                raiseOddsToUse = 2.45;
             } else {
                 raiseOddsToUse = 2.1;
             }

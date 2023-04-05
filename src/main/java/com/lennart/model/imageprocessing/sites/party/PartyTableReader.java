@@ -527,7 +527,15 @@ public class PartyTableReader {
                     }
                 } else {
                     if(sizing < 500) {
-                        clickHalfPotSizingButton();
+                        if(board.size() < 5) {
+                            clickHalfPotSizingButton();
+                        } else {
+                            //click75pctPotSizingButton();
+
+                            manualEnterBetOrRaiseAmount(sizing);
+
+                            System.out.println("river raise sizing action tablereader. Sizing, entered manually: " + sizing);
+                        }
                     } else {
                         clickShoveSizingButton();
                     }
