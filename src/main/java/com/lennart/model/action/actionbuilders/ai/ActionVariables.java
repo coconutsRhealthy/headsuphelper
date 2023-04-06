@@ -732,7 +732,7 @@ public class ActionVariables {
         setShoveSizingForCertainPre3betsAndPostCheckRaises(action, botIsButtonInMethod, gameVariables.getOpponentAction(), boardInMethod, gameVariables.getBigBlind());
         nonShovePre3betWithPremiums(action, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod,
                 gameVariables.getOpponentAction(), gameVariables.getOpponentBetSize(), effectiveStack,
-                gameVariables.getBotBetSize(), gameVariables.getBigBlind(), continuousTable.getLastBuyIn(), oppNumberOfHands);
+                gameVariables.getBotBetSize(), gameVariables.getBigBlind(), continuousTable);
         dontShoveBut3xRaiseVsLimpsDeep(action, effectiveStack, botIsButtonInMethod, boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
         dontOpenShoveIpDeep(action, effectiveStack, botIsButtonInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
         getValueFromPremiums(action, botHandStrengthInMethod, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), effectiveStack, gameVariables.getBigBlind());
@@ -765,7 +765,7 @@ public class ActionVariables {
                             continuousTable);
 
                     if(action.equals("raise") && !actionBeforeAdjust.equals("raise")) {
-                        getSizingForAction(gameVariables, action, continuousTable.getLastBuyIn());
+                        getSizingForAction(gameVariables, action, continuousTable);
                     }
                 } else {
                     double callHsBoundary = -1;
@@ -818,7 +818,7 @@ public class ActionVariables {
                             action = adjustedAction;
 
                             if((adjustedAction.equals("bet75pct") || adjustedAction.equals("raise")) && neededToRecalculateNewSizing) {
-                                getSizingForAction(gameVariables, action, continuousTable.getLastBuyIn());
+                                getSizingForAction(gameVariables, action, continuousTable);
                             }
                         }
                     }
@@ -833,68 +833,7 @@ public class ActionVariables {
         }
         ////
 
-//        if(gameVariables.getOpponentName().equals("Trickysleeps") || gameVariables.getOpponentName().equals("WhiteMagic") ||
-//                gameVariables.getOpponentName().equals("SitYourNan") || gameVariables.getOpponentName().equals("WherelsTheLuck")) {
-//            if(Math.random() < 0.5) {
-//                try {
-//                    action = new TrickySleeps().adjustActionAgainstTrickySleeps(action, gameVariables.getBotHoleCards(), sizing,
-//                            botIsButtonInMethod, effectiveStack, gameVariables.getOpponentAction(), boardInMethod, botHandStrengthInMethod,
-//                            strongFdInMethod, strongOosdInMethod, strongGutshotInMethod);
-//                } catch (Exception e) {
-//                    System.out.println("Error in TrickySleeps adjustment");
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-
-        //if(continuousTable.getTwentiesRegsList().contains(gameVariables.getOpponentAction())) {
-//        if(continuousTable.getTwentiesRegsList().contains(gameVariables.getOpponentName())) {
-//            if(Math.random() < 0.9) {
-//                try {
-//                    AbstractMap.SimpleEntry<String, Double> twentiesRegsAdjustment =
-//                            new TwentiesRegs().adjustActionAgainstTwentiesRegs(action, sizing, botIsButtonInMethod,
-//                                    gameVariables.getOpponentAction(), boardInMethod, eligibleActions, gameVariables.getBigBlind(),
-//                                    botHandStrengthInMethod);
-//                    action = twentiesRegsAdjustment.getKey();
-//                    sizing = twentiesRegsAdjustment.getValue();
-//                } catch (Exception e) {
-//                    System.out.println("Error in TwentiesRegs adjustment");
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-
-//        if(continuousTable.getLastBuyIn() >= 20) {
-//            String actionBefore = action;
-//            try {
-//                action = raiseMoreAgainstRegsRiver(action, boardInMethod, bluffOddsAreOk, numberOfHands, continuousTable.getLastBuyIn());
-//
-//                if(action.equals("raise") && !actionBefore.equals("raise")) {
-//                    System.out.println("Setting river bluff raise sizing");
-//                    sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
-//                    sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
-//                }
-//            } catch (Exception e) {
-//                System.out.println("Error in river reg bluff shizzle");
-//                e.printStackTrace();
-//                action = actionBefore;
-//            }
-//        }
-//
-//        if(numberOfHands > 200 && continuousTable.getLastBuyIn() >= 20) {
-//            if(Math.random() > 0.2) {
-//                String actionBefore = action;
-//                action = new RegAdjuster().adjustActionToReg(action, botIsButtonInMethod, boardInMethod, botHandStrengthInMethod, gameVariables.getOpponentAction(), this, continuousTable, gameVariables);
-//                if(!actionBefore.equals(action)) {
-//                    if(!action.equals("bet75pct") && !action.equals("raise")) {
-//                        sizing = 0;
-//                        System.out.println("RegAdjuster set sizing to zero");
-//                    }
-//                }
-//            }
-//        }
-
-        if(realGame && continuousTable.getBankroll() > 900) {
+        if(realGame && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
             String actionBefore = action;
             action = fuckingRaiseRivers(action, boardInMethod, botHandStrengthInMethod, bluffOddsAreOk, eligibleActions, gameVariables.getOpponentAction(), botIsButtonInMethod);
 
@@ -906,11 +845,14 @@ public class ActionVariables {
             }
         }
 
-        shoveWayLessAgainstLimpsVsRegs(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), effectiveStack, gameVariables.getBigBlind(), continuousTable.getLastBuyIn(), oppNumberOfHands);
-        action = neverFoldAfter3betNotAllInPreVsRegs(action, boardInMethod, botIsButtonInMethod, botBetsizeBb, continuousTable.getLastBuyIn(), oppNumberOfHands);
-        action = funkyRaise2xInsteadOfShoveShallowVsRegs(action, botIsButtonInMethod, boardInMethod, continuousTable.getLastBuyIn(), oppNumberOfHands, opponentBetsizeBb, effectiveStack, gameVariables.getBigBlind());
-        action = fewerOpenFoldsVsRegs(action, boardInMethod, botIsButtonInMethod, oppNumberOfHands, gameVariables.getOpponentAction(), continuousTable.getLastBuyIn());
-        action = funkyOpenRaisesWithWeakerHands(action, boardInMethod, botIsButtonInMethod, effectiveStack, botHandStrengthInMethod, gameVariables.getOpponentAction(), continuousTable.getLastBuyIn(), gameVariables.getBigBlind());
+        if(continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
+            shoveWayLessAgainstLimpsVsRegs(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), effectiveStack, gameVariables.getBigBlind());
+            action = neverFoldAfter3betNotAllInPreVsRegs(action, boardInMethod, botIsButtonInMethod, botBetsizeBb);
+            action = funkyRaise2xInsteadOfShoveShallowVsRegs(action, botIsButtonInMethod, boardInMethod, opponentBetsizeBb, effectiveStack, gameVariables.getBigBlind());
+            action = fewerOpenFoldsVsRegs(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction());
+            action = funkyOpenRaisesWithWeakerHands(action, boardInMethod, botIsButtonInMethod, effectiveStack, botHandStrengthInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
+            action = funkyRaiseNonShoveVsLimpsWithWeakerHands(action, boardInMethod, effectiveStack, botHandStrengthInMethod, botIsButtonInMethod, gameVariables.getBigBlind());
+        }
 
         if(realGame) {
             //fill dbsave
@@ -1165,7 +1107,7 @@ public class ActionVariables {
         }
     }
 
-    public void getSizingForAction(GameVariables gameVariables, String action, double lastBuyin) {
+    public void getSizingForAction(GameVariables gameVariables, String action, ContinuousTable continuousTable) {
         List<String> eligibleActions = getEligibleActions(gameVariables);
         boolean botIsButtonInMethod = gameVariables.isBotIsButton();
         double potSizeBb = gameVariables.getPot() / gameVariables.getBigBlind();
@@ -1246,7 +1188,7 @@ public class ActionVariables {
         setShoveSizingForCertainPre3betsAndPostCheckRaises(action, botIsButtonInMethod, gameVariables.getOpponentAction(), boardInMethod, gameVariables.getBigBlind());
         nonShovePre3betWithPremiums(action, gameVariables.getBotHoleCards(), boardInMethod, botIsButtonInMethod,
                 gameVariables.getOpponentAction(), gameVariables.getOpponentBetSize(), effectiveStack,
-                gameVariables.getBotBetSize(), gameVariables.getBigBlind(), lastBuyin, oppNumberOfHands);
+                gameVariables.getBotBetSize(), gameVariables.getBigBlind(), continuousTable);
         dontShoveBut3xRaiseVsLimpsDeep(action, effectiveStack, botIsButtonInMethod, boardInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
         System.out.println("method_sizing_5: " + sizing);
         dontOpenShoveIpDeep(action, effectiveStack, botIsButtonInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
@@ -1976,14 +1918,14 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String raiseMoreAgainstRegsRiver(String action, List<Card> board, boolean bluffOddsAreOk, double oppNumberOfHands, double buyIn) {
+    private String raiseMoreAgainstRegsRiver(String action, List<Card> board, boolean bluffOddsAreOk, double oppNumberOfHands, ContinuousTable continuousTable) {
         String actionToReturn = action;
 
         if(action.equals("fold")) {
             if(board != null && board.size() == 5) {
                 if(bluffOddsAreOk) {
                     if(oppNumberOfHands > 200) {
-                        if(buyIn >= 20) {
+                        if(continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
                             if(Math.random() < 0.1) {
                                 actionToReturn = "raise";
                                 System.out.println("River bluff raise against reg!");
@@ -2005,22 +1947,22 @@ public class ActionVariables {
                 if(board != null && board.size() == 5) {
                     if(opponentAction.equals("bet75pct")) {
                         if(action.equals("fold")) {
-                            if(bluffOddsAreOk) {
-                                //if(Math.random() < 0.163) {
-                                if(position) {
-                                    if(Math.random() < 0.205) {
-                                        actionToReturn = "raise";
-                                        System.out.println("River f-in bluff raise IP!");
-                                    }
-                                } else {
-                                    if(Math.random() < 0.125) {
-                                        actionToReturn = "raise";
-                                        System.out.println("River f-in bluff raise OOP!");
-                                    }
-                                }
-                            }
+//                            if(bluffOddsAreOk) {
+//                                //if(Math.random() < 0.163) {
+//                                if(position) {
+//                                    if(Math.random() < 0.205) {
+//                                        actionToReturn = "raise";
+//                                        System.out.println("River f-in bluff raise IP!");
+//                                    }
+//                                } else {
+//                                    if(Math.random() < 0.125) {
+//                                        actionToReturn = "raise";
+//                                        System.out.println("River f-in bluff raise OOP!");
+//                                    }
+//                                }
+//                            }
                         } else if(action.equals("call")) {
-                            if(handstrength > 0.83) {
+                            if(handstrength > 0.86) {
                                 actionToReturn = "raise";
                                 System.out.println("River f-in value raise! HS: " +handstrength);
                             }
@@ -2037,59 +1979,48 @@ public class ActionVariables {
         }
     }
 
-    private void shoveWayLessAgainstLimpsVsRegs(String action, List<Card> board, boolean position, String opponentAction, double effStackBb, double bigBlind, double buyIn, double oppNumberOfHands) {
-        try {
-            //if(buyIn >= 20 && oppNumberOfHands > 350) {
-            if(buyIn >= 20 && oppNumberOfHands > 0) {
-                if(action.equals("raise")) {
-                    if(board == null || board.isEmpty()) {
-                        if(!position) {
-                            if(opponentAction.equals("call")) {
-                                if(sizing > 500) {
-                                    if(Math.random() < 0.82) {
-                                        if(effStackBb >= 15) {
-                                            sizing = 2.7 * bigBlind;
-                                            System.out.println("Non shove but 2.7x vs limp");
-                                        } else if(effStackBb >= 10) {
-                                            sizing = 2.35 * bigBlind;
-                                            System.out.println("Non shove but 2.35x vs limp");
-                                        } else if(effStackBb > 4) {
-                                            sizing = (2 * bigBlind) + 1;
-                                            System.out.println("Non shove but 2x vs limp");
-                                        }
-                                    }
+    private void shoveWayLessAgainstLimpsVsRegs(String action, List<Card> board, boolean position, String opponentAction, double effStackBb, double bigBlind) {
+        if(action.equals("raise")) {
+            if(board == null || board.isEmpty()) {
+                if(!position) {
+                    if(opponentAction.equals("call")) {
+                        if(sizing > 500) {
+                            if(Math.random() < 0.82) {
+                                if(effStackBb >= 15) {
+                                    sizing = 2.7 * bigBlind;
+                                    System.out.println("Non shove but 2.7x vs limp");
+                                } else if(effStackBb >= 10) {
+                                    sizing = 2.35 * bigBlind;
+                                    System.out.println("Non shove but 2.35x vs limp");
+                                } else if(effStackBb > 4) {
+                                    sizing = (2 * bigBlind) + 1;
+                                    System.out.println("Non shove but 2x vs limp");
                                 }
                             }
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            System.out.println("Non shove vs limps error");
-            e.printStackTrace();
         }
     }
 
-    private String funkyRaise2xInsteadOfShoveShallowVsRegs(String action, boolean position, List<Card> board, double buyIn, double oppNumberOfHands, double opponentBetsizeBb, double effStackBb, double bigBlind) {
+    private String funkyRaise2xInsteadOfShoveShallowVsRegs(String action, boolean position, List<Card> board, double opponentBetsizeBb, double effStackBb, double bigBlind) {
         try {
             String actionToReturn = action;
 
-            //if(buyIn >= 20 && oppNumberOfHands > 350) {
-            if(buyIn >= 20 && oppNumberOfHands > 0) {
-                if(position) {
-                    if(board == null || board.isEmpty()) {
-                        if(opponentBetsizeBb == 1) {
-                            if(effStackBb >= 4) {
-                                if(action.equals("raise")) {
-                                    if(sizing >= 500) {
-                                        if(Math.random() < 0.7) {
-                                            if(effStackBb > 11) {
-                                                sizing = (2 * bigBlind);
-                                                System.out.println("A-funkyRaise2xInsteadOfShoveShallowVsRegs");
-                                            } else {
-                                                sizing = (2 * bigBlind) + 1;
-                                                System.out.println("B-funkyRaise2xInsteadOfShoveShallowVsRegs");
-                                            }
+            if(position) {
+                if(board == null || board.isEmpty()) {
+                    if(opponentBetsizeBb == 1) {
+                        if(effStackBb >= 4) {
+                            if(action.equals("raise")) {
+                                if(sizing >= 500) {
+                                    if(Math.random() < 0.7) {
+                                        if(effStackBb > 11) {
+                                            sizing = (2 * bigBlind);
+                                            System.out.println("A-funkyRaise2xInsteadOfShoveShallowVsRegs");
+                                        } else {
+                                            sizing = (2 * bigBlind) + 1;
+                                            System.out.println("B-funkyRaise2xInsteadOfShoveShallowVsRegs");
                                         }
                                     }
                                 }
@@ -2107,18 +2038,16 @@ public class ActionVariables {
         }
     }
 
-    private String fewerOpenFoldsVsRegs(String action, List<Card> board, boolean position, int oppNumberOfHands, String opponentAction, double buyIn) {
+    private String fewerOpenFoldsVsRegs(String action, List<Card> board, boolean position, String opponentAction) {
         String actionToReturn = action;
 
         if(action.equals("fold")) {
             if(board == null || board.isEmpty()) {
                 if(position) {
                     if(opponentAction.equals("bet")) {
-                        if(buyIn >= 20 && oppNumberOfHands > 350) {
-                            if(Math.random() < 0.58) {
-                                actionToReturn = "call";
-                                System.out.println("Less openfolding vs regs -> limp");
-                            }
+                        if(Math.random() < 0.58) {
+                            actionToReturn = "call";
+                            System.out.println("Less openfolding vs regs -> limp");
                         }
                     }
                 }
@@ -2128,28 +2057,26 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String funkyOpenRaisesWithWeakerHands(String action, List<Card> board, boolean position, double effStackBb, double handstrength, String opponentAction, double buyIn, double bigBlind) {
+    private String funkyOpenRaisesWithWeakerHands(String action, List<Card> board, boolean position, double effStackBb, double handstrength, String opponentAction, double bigBlind) {
         String actionToReturn = action;
 
-        if(buyIn >= 20) {
-            if(action.equals("fold") || action.equals("call")) {
-                if(board == null || board.isEmpty()) {
-                    if(position) {
-                        if(opponentAction.equals("bet")) {
-                            if(handstrength < 0.5) {
-                                if(effStackBb >= 4) {
-                                    if(action.equals("call")) {
-                                        if(Math.random() < 0.3) {
-                                            actionToReturn = "raise";
-                                            System.out.println("Openraise instead of limp with weak holding " + (effStackBb > 11));
-                                        }
+        if(action.equals("fold") || action.equals("call")) {
+            if(board == null || board.isEmpty()) {
+                if(position) {
+                    if(opponentAction.equals("bet")) {
+                        if(handstrength < 0.5) {
+                            if(effStackBb >= 4) {
+                                if(action.equals("call")) {
+                                    if(Math.random() < 0.35) {
+                                        actionToReturn = "raise";
+                                        System.out.println("Openraise instead of limp with weak holding " + (effStackBb > 11));
                                     }
+                                }
 
-                                    if(action.equals("fold")) {
-                                        if(Math.random() < 0.3) {
-                                            actionToReturn = "raise";
-                                            System.out.println("Openraise instead of openfold with weak holding " + (effStackBb > 11));
-                                        }
+                                if(action.equals("fold")) {
+                                    if(Math.random() < 0.35) {
+                                        actionToReturn = "raise";
+                                        System.out.println("Openraise instead of openfold with weak holding " + (effStackBb > 11));
                                     }
                                 }
                             }
@@ -2157,12 +2084,43 @@ public class ActionVariables {
                     }
                 }
             }
+        }
 
-            if(!action.equals("raise") && actionToReturn.equals("raise")) {
-                if(effStackBb > 11) {
-                    sizing = (2 * bigBlind);
-                } else {
-                    sizing = (2 * bigBlind) + 1;
+        if(!action.equals("raise") && actionToReturn.equals("raise")) {
+            if(effStackBb > 11) {
+                sizing = (2 * bigBlind);
+            } else {
+                sizing = (2 * bigBlind) + 1;
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String funkyRaiseNonShoveVsLimpsWithWeakerHands(String action, List<Card> board, double effStackBb, double handstrength, boolean position, double bigBlind) {
+        String actionToReturn = action;
+
+        if(action.equals("check")) {
+            if(board == null || board.isEmpty()) {
+                if(!position) {
+                    if(effStackBb > 4) {
+                        if(handstrength < 0.5) {
+                            if(Math.random() < 0.18) {
+                                actionToReturn = "raise";
+                                System.out.println("Extra non shove bluff raise vs limp");
+
+                                if(effStackBb >= 20) {
+                                    sizing = 3 * bigBlind;
+                                } else if(effStackBb >= 15) {
+                                    sizing = 2.7 * bigBlind;
+                                } else if(effStackBb >= 10) {
+                                    sizing = 2.35 * bigBlind;
+                                } else {
+                                    sizing = (2 * bigBlind) + 1;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -2170,19 +2128,16 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String neverFoldAfter3betNotAllInPreVsRegs(String action, List<Card> board, boolean position, double botBetSizeBb, double buyIn, double oppNumberOfHands) {
+    private String neverFoldAfter3betNotAllInPreVsRegs(String action, List<Card> board, boolean position, double botBetSizeBb) {
         try {
             String actionToReturn = action;
 
-            //if(buyIn >= 20 && oppNumberOfHands > 350) {
-            if(buyIn >= 20 && oppNumberOfHands > 0) {
-                if(action.equals("fold")) {
-                    if(board == null || board.isEmpty()) {
-                        if(!position) {
-                            if(botBetSizeBb >= 5) {
-                                actionToReturn = "call";
-                                System.out.println("Never fold after Oop pre3bet not allin, call");
-                            }
+            if(action.equals("fold")) {
+                if(board == null || board.isEmpty()) {
+                    if(!position) {
+                        if(botBetSizeBb >= 5) {
+                            actionToReturn = "call";
+                            System.out.println("Never fold after Oop pre3bet not allin, call");
                         }
                     }
                 }
@@ -2809,10 +2764,10 @@ public class ActionVariables {
 
     private void nonShovePre3betWithPremiums(String action, List<Card> botHoleCards, List<Card> board, boolean position,
                                              String opponentAction, double opponentBetSize, double effectiveStackBb, double botBetSize,
-                                             double bigBlind, double buyIn, int oppNumberOfHands) {
+                                             double bigBlind, ContinuousTable continuousTable) {
         double effStackBoundry;
 
-        if(buyIn < 20) {
+        if(continuousTable.getBankroll() < continuousTable.getBankrollLimit20Nl()) {
             effStackBoundry = 10;
         } else {
             effStackBoundry = 4;
@@ -2829,8 +2784,7 @@ public class ActionVariables {
                                 //System.out.println("potential low 3bet opp 2");
                                 String combo = new DbSave().getComboLogic(botHoleCards);
 
-                                //if((buyIn >= 20 && oppNumberOfHands > 350) || combo.equals("AA") || combo.equals("KK") || combo.equals("JJ") || combo.equals("TT")
-                                if((buyIn >= 20 && oppNumberOfHands > 0) || combo.equals("AA") || combo.equals("KK") || combo.equals("JJ") || combo.equals("TT")
+                                if((continuousTable.getBankroll() >= continuousTable.getBankrollLimit20Nl()) || combo.equals("AA") || combo.equals("KK") || combo.equals("JJ") || combo.equals("TT")
                                         || combo.equals("AKs") || combo.equals("AKo") || combo.equals("AQs") || combo.equals("AQo")
                                         || combo.equals("AJs") || combo.equals("87s")) {
                                         if(Math.random() > 0.35) {

@@ -63,7 +63,7 @@ public class AdjustPostflopPlayToOpp {
         List<String> possibleAdjustments = getPossibleAdjustments(postOppStats, handstrength, callHsBoundry, hypotheticalSizing, board);
         Map<String, Double> actionAndSizingToReturn = changeActionAndSizingIfNeeded(currentAction, possibleAdjustments, eligbileActions,
                 defaultCheck, bluffOddsAreOk, oppAction, handstrength, pot, currentSizing, board, position, postOppStats.get("numberOfHands"),
-                bigBlind, strongFd, strongOosd, strongGutshot, opponentBetSize, hypotheticalSizing);
+                bigBlind, strongFd, strongOosd, strongGutshot, opponentBetSize, hypotheticalSizing, continuousTable);
         return actionAndSizingToReturn;
     }
 
@@ -71,7 +71,7 @@ public class AdjustPostflopPlayToOpp {
                                                       boolean defaultCheck, boolean bluffOddsAreOk, String oppAction, double handstrength,
                                                       double pot, double currentSizing, List<Card> board, boolean position, double numberOfHands,
                                                       double bigBlind, boolean strongFd, boolean strongOosd, boolean strongGutshot, double opponentBetSize,
-                                                      double hypotheticalSizing) {
+                                                      double hypotheticalSizing, ContinuousTable continuousTable) {
         Map<String, Double> actionAndSizingToReturn = new HashMap<>();
         String actionToReturn = currentAction;
         double sizingToReturn = currentSizing;
@@ -110,9 +110,13 @@ public class AdjustPostflopPlayToOpp {
         } else if(currentAction.equals("bet75pct")) {
             if(possibleAdjustments.contains(NON_BLUFF_BET)) {
                 if(handstrength < 0.5 && !strongFd && !strongOosd && !(strongGutshot && board.size() == 3)) {
-                    actionToReturn = "check";
-                    ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_BLUFF_BET, board.size(), numberOfHands < 15);
-                    System.out.println("POST adj NON_BLUFF_BET");
+                    if(Math.random() > 0.28 && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
+                        actionToReturn = "check";
+                        ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_BLUFF_BET, board.size(), numberOfHands < 15);
+                        System.out.println("POST adj NON_BLUFF_BET");
+                    } else {
+                        System.out.println("Post adj NON_BLUFF_BET ignored");
+                    }
                 }
             }
 

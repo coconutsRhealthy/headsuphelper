@@ -62,6 +62,7 @@ public class ContinuousTable implements ContinuousTableable {
     private double lastBuyIn = 10;
     private double newBuyInToSelect = 10;
     private double bankroll = 962.30;
+    private double bankrollLimit20Nl = 900;
     private List<String> sngResults = new ArrayList<>();
     private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
     private long sessionStartTime;
@@ -1057,5 +1058,9 @@ public class ContinuousTable implements ContinuousTableable {
 
     public Map<String, List<String>> getBotActionsOfHand() {
         return botActionsOfHand;
+    }
+
+    public double getBankrollLimit20Nl() {
+        return bankrollLimit20Nl;
     }
 }
