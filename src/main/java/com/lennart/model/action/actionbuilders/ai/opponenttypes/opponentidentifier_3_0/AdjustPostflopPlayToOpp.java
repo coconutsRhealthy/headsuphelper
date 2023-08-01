@@ -110,7 +110,10 @@ public class AdjustPostflopPlayToOpp {
         } else if(currentAction.equals("bet75pct")) {
             if(possibleAdjustments.contains(NON_BLUFF_BET)) {
                 if(handstrength < 0.5 && !strongFd && !strongOosd && !(strongGutshot && board.size() == 3)) {
-                    if(Math.random() > 0.28 && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
+                    //if(Math.random() > 0.51 && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
+                    //if(Math.random() > 0.76 && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
+                    //if(Math.random() > 0.83 && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
+                    if(Math.random() > 0.51 && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
                         actionToReturn = "check";
                         ContinuousTable.updateActionAdjustMap(currentAction, actionToReturn, NON_BLUFF_BET, board.size(), numberOfHands < 15);
                         System.out.println("POST adj NON_BLUFF_BET");

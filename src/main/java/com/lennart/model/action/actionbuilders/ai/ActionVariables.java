@@ -833,17 +833,15 @@ public class ActionVariables {
         }
         ////
 
-        if(realGame && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
-            String actionBefore = action;
-            action = fuckingRaiseRivers(action, boardInMethod, botHandStrengthInMethod, bluffOddsAreOk, eligibleActions, gameVariables.getOpponentAction(), botIsButtonInMethod);
-
-            if(action.equals("raise") && !actionBefore.equals("raise")) {
-                System.out.println("Setting river f-in raise sizing");
-                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
-                sizing = adjustRaiseSizingToSng(sizing, action, gameVariables, effectiveStack);
-            //    sizing = sizing * 1.275;
-            }
-        }
+//        if(realGame && continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
+//            String actionBefore = action;
+//            action = fuckingRaiseRivers(action, boardInMethod, botHandStrengthInMethod, bluffOddsAreOk, eligibleActions, gameVariables.getOpponentAction(), botIsButtonInMethod, gameVariables);
+//
+//            if(action.equals("raise") && !actionBefore.equals("raise")) {
+//                System.out.println("Setting river f-in raise sizing");
+//                sizing = sizingYo.getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), botHandStrengthInMethod, strongFdInMethod, strongOosdInMethod);
+//            }
+//        }
 
         if(continuousTable.getBankroll() > continuousTable.getBankrollLimit20Nl()) {
             shoveWayLessAgainstLimpsVsRegs(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction(), effectiveStack, gameVariables.getBigBlind());
@@ -852,6 +850,7 @@ public class ActionVariables {
             action = fewerOpenFoldsVsRegs(action, boardInMethod, botIsButtonInMethod, gameVariables.getOpponentAction());
             action = funkyOpenRaisesWithWeakerHands(action, boardInMethod, botIsButtonInMethod, effectiveStack, botHandStrengthInMethod, gameVariables.getOpponentAction(), gameVariables.getBigBlind());
             action = funkyRaiseNonShoveVsLimpsWithWeakerHands(action, boardInMethod, effectiveStack, botHandStrengthInMethod, botIsButtonInMethod, gameVariables.getBigBlind());
+            action = extraNonShoveOopPre3bets(action, boardInMethod, botIsButtonInMethod, eligibleActions, effectiveStack, gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBigBlind());
         }
 
         if(realGame) {
@@ -1939,32 +1938,35 @@ public class ActionVariables {
         return actionToReturn;
     }
 
-    private String fuckingRaiseRivers(String action, List<Card> board, double handstrength, boolean bluffOddsAreOk, List<String> eligibleActions, String opponentAction, boolean position) {
+    private String fuckingRaiseRivers(String action, List<Card> board, double handstrength, boolean bluffOddsAreOk, List<String> eligibleActions, String opponentAction, boolean position, GameVariables gameVariables) {
         try {
             String actionToReturn = action;
 
             if(eligibleActions.contains("raise")) {
                 if(board != null && board.size() == 5) {
                     if(opponentAction.equals("bet75pct")) {
-                        if(action.equals("fold")) {
-//                            if(bluffOddsAreOk) {
-//                                //if(Math.random() < 0.163) {
-//                                if(position) {
-//                                    if(Math.random() < 0.205) {
-//                                        actionToReturn = "raise";
-//                                        System.out.println("River f-in bluff raise IP!");
-//                                    }
-//                                } else {
-//                                    if(Math.random() < 0.125) {
-//                                        actionToReturn = "raise";
-//                                        System.out.println("River f-in bluff raise OOP!");
-//                                    }
-//                                }
-//                            }
-                        } else if(action.equals("call")) {
-                            if(handstrength > 0.86) {
-                                actionToReturn = "raise";
-                                System.out.println("River f-in value raise! HS: " +handstrength);
+                        double potentialRiverRaiseSizing = new Sizing().getAiBotSizing(gameVariables.getOpponentBetSize(), gameVariables.getBotBetSize(), gameVariables.getBotStack(), gameVariables.getOpponentStack(), gameVariables.getPot(), gameVariables.getBigBlind(), gameVariables.getBoard(), handstrength, false, false);
+
+                        if(potentialRiverRaiseSizing <= 200) {
+                            if(action.equals("fold")) {
+                                if(bluffOddsAreOk) {
+                                    if(position) {
+                                        if(Math.random() < 0.205) {
+                                            actionToReturn = "raise";
+                                            System.out.println("River f-in bluff raise IP!");
+                                        }
+                                    } else {
+                                        if(Math.random() < 0.105) {
+                                            actionToReturn = "raise";
+                                            System.out.println("River f-in bluff raise OOP!");
+                                        }
+                                    }
+                                }
+                            } else if(action.equals("call")) {
+                                if(handstrength > 0.82) {
+                                    actionToReturn = "raise";
+                                    System.out.println("River f-in value raise! HS: " +handstrength);
+                                }
                             }
                         }
                     }
@@ -2067,14 +2069,22 @@ public class ActionVariables {
                         if(handstrength < 0.5) {
                             if(effStackBb >= 4) {
                                 if(action.equals("call")) {
-                                    if(Math.random() < 0.35) {
-                                        actionToReturn = "raise";
-                                        System.out.println("Openraise instead of limp with weak holding " + (effStackBb > 11));
+                                    if(handstrength < 0.2) {
+                                        if(Math.random() < 0.42) {
+                                            actionToReturn = "raise";
+                                            System.out.println("Openraise instead of limp with very weak holding " + (effStackBb > 11));
+                                        }
+                                    } else {
+                                        if(Math.random() < 0.35) {
+                                            actionToReturn = "raise";
+                                            System.out.println("Openraise instead of limp with weak holding " + (effStackBb > 11));
+                                        }
                                     }
                                 }
 
                                 if(action.equals("fold")) {
-                                    if(Math.random() < 0.35) {
+                                    //if(Math.random() < 0.35) {
+                                    if(Math.random() < 0.45) {
                                         actionToReturn = "raise";
                                         System.out.println("Openraise instead of openfold with weak holding " + (effStackBb > 11));
                                     }
@@ -2105,7 +2115,8 @@ public class ActionVariables {
                 if(!position) {
                     if(effStackBb > 4) {
                         if(handstrength < 0.5) {
-                            if(Math.random() < 0.18) {
+                            //if(Math.random() < 0.18) {
+                            if(Math.random() < 0.23) {
                                 actionToReturn = "raise";
                                 System.out.println("Extra non shove bluff raise vs limp");
 
@@ -2117,6 +2128,33 @@ public class ActionVariables {
                                     sizing = 2.35 * bigBlind;
                                 } else {
                                     sizing = (2 * bigBlind) + 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return actionToReturn;
+    }
+
+    private String extraNonShoveOopPre3bets(String action, List<Card> board, boolean position, List<String> eligibleActions, double effStackBb,
+                                            double opponentBetSize, double botBetSize, double bigBlind) {
+        String actionToReturn = action;
+
+        if(action.equals("call")) {
+            if(board == null || board.isEmpty()) {
+                if(!position) {
+                    if(eligibleActions.contains("raise")) {
+                        if(effStackBb > 10) {
+                            if(botBetSize / bigBlind == 1 && opponentBetSize / bigBlind <= 3) {
+                                //if(Math.random() < 0.14) {
+                                //if(Math.random() < 0.1879) {
+                                if(Math.random() < 0.067) {
+                                    actionToReturn = "raise";
+                                    sizing = 2.5 * opponentBetSize;
+                                    System.out.println("Extra pre 3bet non shove oop, changed from call2bet to 3bet");
                                 }
                             }
                         }

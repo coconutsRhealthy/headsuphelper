@@ -575,25 +575,40 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void decideBuyIn() {
-        if(bankroll > 1140) {
-            newBuyInToSelect = 20;
-        } else if(bankroll > 1010) {
+        //if(bankroll > 1140) {
+        //    newBuyInToSelect = 20;
+        //} else if(bankroll > 1010) {
+        if(bankroll > 1010) {
             //if(new Date().getTime() - sessionStartTime > 9_000_000) {
-//                if(noPlayAgainstTrickySleepsTimer == -1) {
-//                    newBuyInToSelect = 20;
-//                } else {
-//                    if(new Date().getTime() - noPlayAgainstTrickySleepsTimer > 5_400_000) {
-//                        newBuyInToSelect = 20;
-//                        System.out.println("90 minutes passed since last TrickySleeps game, new attempt on 20");
-//                    } else {
-//                        newBuyInToSelect = 10;
-//                        System.out.println("Less than 90 minutes passed since last TrickySleeps game, remain at 10 even though BR above 800");
-//                    }
-//                }
+
+                //if(new Date().getTime() - sessionStartTime > 5_400_000) {
+                    if(noPlayAgainstTrickySleepsTimer == -1) {
+                        newBuyInToSelect = 20;
+                    } else {
+                        //if(new Date().getTime() - noPlayAgainstTrickySleepsTimer > 2_000_000) {
+                        if(new Date().getTime() - noPlayAgainstTrickySleepsTimer > 880_000) {
+                            //if(new Date().getTime() - sessionStartTime < 18_000_000) {
+                            //    newBuyInToSelect = 10;
+                            //    System.out.println("Kept going for 10NL, cause of TrickyS");
+                            //} else {
+                                newBuyInToSelect = 20;
+                                //System.out.println("90 minutes passed since last TrickySleeps game, new attempt on 20");
+                                System.out.println("40 something minutes passed since last TrickySleeps game, new attempt on 20");
+                            //}
+                        } else {
+                            newBuyInToSelect = 10;
+                            //System.out.println("Less than 90 minutes passed since last TrickySleeps game, remain at 10 even though BR above 800");
+                            System.out.println("Less than 40 something minutes passed since last TrickySleeps game, remain at 10 even though BR above 800");
+                        }
+                    }
+                //} else {
+                //    newBuyInToSelect = 10;
+                //}
+
             //} else {
             //    newBuyInToSelect = 10;
             //}
-            newBuyInToSelect = 20;
+            //newBuyInToSelect = 20;
         } else if(bankroll > 300) {
             newBuyInToSelect = 10;
         } else if(bankroll > 230) {
@@ -606,15 +621,14 @@ public class ContinuousTable implements ContinuousTableable {
             newBuyInToSelect = 1;
         }
 
-//        if(lastOppName != null && (lastOppName.equals("Trickysleeps") || lastOppName.equals("WhiteMagic") ||
-//                lastOppName.equals("SitYourNan") || lastOppName.equals("WherelsTheLuck")) && lastBuyIn == 20) {
-//            noPlayAgainstTrickySleepsTimer = new Date().getTime();
-//
-//            if(newBuyInToSelect >= 20) {
-//                newBuyInToSelect = 10;
-//                System.out.println("Don't play against Trickysleeps... switch to buyin $10");
-//            }
-//        }
+        if(lastOppName != null && (lastOppName.equals("Trickysleeps") && lastBuyIn == 20)) {
+            noPlayAgainstTrickySleepsTimer = new Date().getTime();
+
+            if(newBuyInToSelect >= 20) {
+                newBuyInToSelect = 10;
+                System.out.println("Don't play against Trickysleeps... switch to buyin $10");
+            }
+        }
     }
 
     private void takeShotAt20() {
