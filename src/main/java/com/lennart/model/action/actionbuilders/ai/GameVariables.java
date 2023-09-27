@@ -5,7 +5,7 @@ import com.lennart.model.card.Card;
 import com.lennart.model.handtracker.ActionRequest;
 import com.lennart.model.handtracker.PlayerActionRound;
 import com.lennart.model.imageprocessing.sites.netbet.NetBetTableReader;
-import com.lennart.model.imageprocessing.sites.party.PartyTableReader;
+import com.lennart.model.imageprocessing.sites.hollandcasino.HollandTableReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,18 +48,18 @@ public class GameVariables implements GameVariable {
     }
 
     public GameVariables(double givenBigBlind, boolean sng) throws Exception {
-        PartyTableReader partyTableReader = new PartyTableReader();
+        HollandTableReader hollandTableReader = new HollandTableReader();
 
-        botStack = partyTableReader.getBotStackFromImage();
-        opponentStack = partyTableReader.getOpponentStackFromImage();
-        botHoleCard1 = partyTableReader.getBotHoleCard1FromImage();
-        botHoleCard2 = partyTableReader.getBotHoleCard2FromImage();
-        botIsButton = partyTableReader.bottomPlayerIsButton();
+        botStack = hollandTableReader.getBotStackFromImage();
+        opponentStack = hollandTableReader.getOpponentStackFromImage();
+        botHoleCard1 = hollandTableReader.getBotHoleCard1FromImage();
+        botHoleCard2 = hollandTableReader.getBotHoleCard2FromImage();
+        botIsButton = hollandTableReader.bottomPlayerIsButton();
 
         botHoleCards.add(botHoleCard1);
         botHoleCards.add(botHoleCard2);
 
-        double topPotSize = partyTableReader.getTopPotsizeFromImage();
+        double topPotSize = hollandTableReader.getTopPotsizeFromImage();
 
         if(sng) {
             if(botIsButton) {
@@ -105,20 +105,20 @@ public class GameVariables implements GameVariable {
         pot = topPotSize - opponentBetSize - botBetSize;
 
         //TimeUnit.SECONDS.sleep(1);
-        opponentName = partyTableReader.getOpponentPlayerNameFromImage();
+        opponentName = hollandTableReader.getOpponentPlayerNameFromImage();
     }
 
     public void fillFieldsSubsequent(boolean stars) throws Exception {
-        PartyTableReader partyTableReader = new PartyTableReader();
+        HollandTableReader hollandTableReader = new HollandTableReader();
 
-        opponentStack = partyTableReader.getOpponentStackFromImage();
+        opponentStack = hollandTableReader.getOpponentStackFromImage();
 
         List<Card> oldBoard = new ArrayList<>();
         oldBoard.addAll(board);
 
         fillThePartyBoard();
 
-        double topPotSize = partyTableReader.getTopPotsizeFromImage();
+        double topPotSize = hollandTableReader.getTopPotsizeFromImage();
 
         List<ActionRequest> copyOfAllActionRequests = new ArrayList<>();
         copyOfAllActionRequests.addAll(allActionRequestsOfHand);
@@ -277,11 +277,11 @@ public class GameVariables implements GameVariable {
     }
 
     private void fillThePartyBoard() throws Exception {
-        PartyTableReader partyTableReader = new PartyTableReader();
+        HollandTableReader hollandTableReader = new HollandTableReader();
 
         if(flopCard1 == null) {
             for(int i = 0; i < 10; i++) {
-                flopCard1 = partyTableReader.getFlopCard1FromImage();
+                flopCard1 = hollandTableReader.getFlopCard1FromImage();
                 if(flopCard1 != null) {
                     break;
                 }
@@ -290,11 +290,11 @@ public class GameVariables implements GameVariable {
 
             if(flopCard1 != null) {
                 while(flopCard2 == null) {
-                    flopCard2 = partyTableReader.getFlopCard2FromImage();
+                    flopCard2 = hollandTableReader.getFlopCard2FromImage();
                 }
 
                 while(flopCard3 == null) {
-                    flopCard3 = partyTableReader.getFlopCard3FromImage();
+                    flopCard3 = hollandTableReader.getFlopCard3FromImage();
                 }
 
                 board.add(flopCard1);
@@ -303,14 +303,14 @@ public class GameVariables implements GameVariable {
             }
         } else if(turnCard == null) {
             TimeUnit.MILLISECONDS.sleep(300);
-            turnCard = partyTableReader.getTurnCardFromImage();
+            turnCard = hollandTableReader.getTurnCardFromImage();
 
             if(turnCard != null) {
                 board.add(turnCard);
             }
         } else if(riverCard == null) {
             TimeUnit.MILLISECONDS.sleep(300);
-            riverCard = partyTableReader.getRiverCardFromImage();
+            riverCard = hollandTableReader.getRiverCardFromImage();
 
             if(riverCard != null) {
                 board.add(riverCard);

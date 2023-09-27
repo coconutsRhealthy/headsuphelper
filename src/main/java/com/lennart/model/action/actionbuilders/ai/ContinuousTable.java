@@ -10,7 +10,7 @@ import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifi
 import com.lennart.model.action.actionbuilders.ai.opponenttypes.opponentidentifier_3_0.RecentHandsPersister;
 import com.lennart.model.botgame.MouseKeyboard;
 import com.lennart.model.card.Card;
-import com.lennart.model.imageprocessing.sites.party.PartyTableReader;
+import com.lennart.model.imageprocessing.sites.hollandcasino.HollandTableReader;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -59,9 +59,9 @@ public class ContinuousTable implements ContinuousTableable {
     private long timeOfLastDoneAction = -1;
     private boolean gonnaDoFirstActionOfNewSng = false;
 
-    private double lastBuyIn = 10;
-    private double newBuyInToSelect = 10;
-    private double bankroll = 962.30;
+    private double lastBuyIn = 0.5;
+    private double newBuyInToSelect = 0.5;
+    private double bankroll = 10;
     private double bankrollLimit20Nl = 900;
     private List<String> sngResults = new ArrayList<>();
     private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
@@ -95,7 +95,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     public void runTableContinously() throws Exception {
-        doSngStartSessionLogic();
+        //doSngStartSessionLogic();
 
         GameVariables gameVariables = new GameVariables();
         int numberOfActionRequests = 0;
@@ -112,7 +112,7 @@ public class ContinuousTable implements ContinuousTableable {
                 doSngContinuousLogic(sessionStartTime);
             }
 
-            if(PartyTableReader.botIsToAct(gonnaDoFirstActionOfNewSng)) {
+            if(HollandTableReader.botIsToAct(gonnaDoFirstActionOfNewSng)) {
                 long botActStarttime = new Date().getTime();
 
                 numberOfActionRequests++;
@@ -133,7 +133,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     if(game.equals("sng")) {
                         double previousBigBlind = bigBlind;
-                        bigBlind = new PartyTableReader().readBigBlindFromSngScreen();
+                        bigBlind = new HollandTableReader().readBigBlindFromSngScreen();
 
                         if(bigBlind < 0) {
                             System.out.println("Error in reading bb. Set it to previous value: " + previousBigBlind);
@@ -264,7 +264,7 @@ public class ContinuousTable implements ContinuousTableable {
                 updateHandsOfOpponentsPerStake(lastBuyIn, gameVariables.getOpponentName());
                 updateBotActionsInHandMap(gameVariables.getBoard(), gameVariables.isBotIsButton(), action);
 
-                PartyTableReader.performActionOnSite(action, sizing, gameVariables.getPot(),
+                HollandTableReader.performActionOnSite(action, sizing, gameVariables.getPot(),
                         gameVariables.getBoard(), gameVariables.getBigBlind(), gameVariables.getBotStack());
 
                 timeOfLastDoneAction = new Date().getTime();
@@ -293,7 +293,7 @@ public class ContinuousTable implements ContinuousTableable {
                 printDotTotal++;
 
                 if(printDotTotal == 30) {
-                    PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                    HollandTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
 
                     MouseKeyboard.moveMouseToLocation(1565, 909);
                     TimeUnit.MILLISECONDS.sleep(300);
@@ -305,7 +305,7 @@ public class ContinuousTable implements ContinuousTableable {
                     System.out.println();
                 }
 
-                if(PartyTableReader.botIsSittingOut()) {
+                if(HollandTableReader.botIsSittingOut()) {
                     botSittingOutCounter++;
 
                     if(botSittingOutCounter >= 15) {
@@ -315,7 +315,7 @@ public class ContinuousTable implements ContinuousTableable {
 
                     System.out.println("bot is SittingOut!");
                     TimeUnit.MILLISECONDS.sleep(300);
-                    PartyTableReader.endBotIsSittingOut();
+                    HollandTableReader.endBotIsSittingOut();
                     TimeUnit.MILLISECONDS.sleep(500);
                 }
             }
@@ -323,7 +323,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
-        PartyTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
+        HollandTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
 
         String opponentStack = String.valueOf(gameVariables.getOpponentStack());
         String opponentBetSize = String.valueOf(gameVariables.getOpponentBetSize());
@@ -409,7 +409,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private boolean isNewHand(List<Card> previousBotHoleCards, List<Card> previousBoard) {
-        return new PartyTableReader().isNewHand(previousBotHoleCards, previousBoard);
+        return new HollandTableReader().isNewHand(previousBotHoleCards, previousBoard);
     }
 
     private void printBigPotValue(String line) {
@@ -450,7 +450,7 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doSngContinuousLogic(long startTime) throws Exception {
-        if(PartyTableReader.sngIsFinished(timeOfLastDoneAction)) {
+        if(HollandTableReader.sngIsFinished(timeOfLastDoneAction)) {
             String botWonSngString = getBotWonSngString();
             adjustBankroll(botWonSngString, lastBuyIn);
             updateSessionResults(botWonSngString, lastBuyIn);
@@ -465,21 +465,21 @@ public class ContinuousTable implements ContinuousTableable {
 
             System.out.println("SNG is finished, staring new game");
 
-            PartyTableReader partyTableReader = new PartyTableReader();
+            HollandTableReader hollandTableReader = new HollandTableReader();
 
             TimeUnit.MILLISECONDS.sleep(100);
-            partyTableReader.closeSorryNoRematchPopUp();
+            hollandTableReader.closeSorryNoRematchPopUp();
             TimeUnit.MILLISECONDS.sleep(1200);
-            partyTableReader.closeTableOfEndedSng();
+            hollandTableReader.closeTableOfEndedSng();
             TimeUnit.MILLISECONDS.sleep(2800);
-            partyTableReader.checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt();
+            hollandTableReader.checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt();
             TimeUnit.MILLISECONDS.sleep(1200);
-            partyTableReader.selectAndUnselect6PlayerPerTableFilter();
+            hollandTableReader.selectAndUnselect6PlayerPerTableFilter();
 
             TimeUnit.MILLISECONDS.sleep(1500);
-            decideBuyIn();
+            //decideBuyIn();
             //takeShotAt20();
-            partyTableReader.registerNewSng("first", this);
+            hollandTableReader.registerNewSng("first", this);
 
             gonnaDoFirstActionOfNewSng = true;
             timeOfLastDoneAction = -1;
@@ -493,10 +493,10 @@ public class ContinuousTable implements ContinuousTableable {
 
             while(newTableNotYetOpened) {
                 if(counter % 5 == 0) {
-                    if(PartyTableReader.botIsSittingOut()) {
+                    if(HollandTableReader.botIsSittingOut()) {
                         System.out.println("Weird bot sitting out! sitting back in...");
                         TimeUnit.MILLISECONDS.sleep(300);
-                        PartyTableReader.endBotIsSittingOut();
+                        HollandTableReader.endBotIsSittingOut();
                         TimeUnit.MILLISECONDS.sleep(500);
                         weirdBotSittingOut = true;
                         break;
@@ -508,25 +508,25 @@ public class ContinuousTable implements ContinuousTableable {
                     MouseKeyboard.click(7, 100);
                     System.out.println();
                     counter = 0;
-                    PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+                    HollandTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
                 }
 
                 System.out.println(",");
 
-//                if(counter2 >= 1350 && PartyTableReader.notRegisteredForAnyTournament()) {
+//                if(counter2 >= 1350 && HollandTableReader.notRegisteredForAnyTournament()) {
 //                    counterToQuit++;
 //                    System.out.println("Something is wrong in registering sng part, might close session. Counter: " + counterToQuit);
 //
 //                    if(counterToQuit >= 5) {
 //                        System.out.println("Something is wrong in registering sng part, close session.");
-//                        PartyTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
+//                        HollandTableReader.saveScreenshotOfEntireScreen(new Date().getTime());
 //                        throw new RuntimeException();
 //                    }
 //                }
 
                 TimeUnit.MILLISECONDS.sleep(1100);
 
-                if(partyTableReader.newSngTableIsOpened()) {
+                if(hollandTableReader.newSngTableIsOpened()) {
                     newTableNotYetOpened = false;
                     System.out.println("New sng table is opened b");
                 } else {
@@ -543,8 +543,8 @@ public class ContinuousTable implements ContinuousTableable {
     }
 
     private void doSngStartSessionLogic() throws Exception {
-        PartyTableReader partyTableReader = new PartyTableReader();
-        partyTableReader.registerNewSng("first", this);
+        HollandTableReader hollandTableReader = new HollandTableReader();
+        hollandTableReader.registerNewSng("first", this);
         gonnaDoFirstActionOfNewSng = true;
 
         int counter = 0;
@@ -562,7 +562,7 @@ public class ContinuousTable implements ContinuousTableable {
 
             TimeUnit.MILLISECONDS.sleep(1100);
 
-            if(partyTableReader.newSngTableIsOpened()) {
+            if(hollandTableReader.newSngTableIsOpened()) {
                 newTableNotYetOpened = false;
                 System.out.println("New sng table is opened b");
             } else {

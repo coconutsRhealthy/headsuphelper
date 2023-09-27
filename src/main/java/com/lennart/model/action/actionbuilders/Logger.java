@@ -4,7 +4,7 @@ import com.lennart.model.action.actionbuilders.ai.ActionVariables;
 import com.lennart.model.action.actionbuilders.ai.ContinuousTable;
 import com.lennart.model.action.actionbuilders.ai.GameVariables;
 import com.lennart.model.card.Card;
-import com.lennart.model.imageprocessing.sites.party.PartyTableReader;
+import com.lennart.model.imageprocessing.sites.hollandcasino.HollandTableReader;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -12,7 +12,7 @@ import java.util.*;
 public class Logger {
 
     public static void doLogging(GameVariables gameVariables, ActionVariables actionVariables, int numberOfActionRequests) throws Exception {
-        PartyTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
+        HollandTableReader.saveScreenshotOfEntireScreen(numberOfActionRequests);
 
         String opponentStack = String.valueOf(gameVariables.getOpponentStack());
         String opponentBetSize = String.valueOf(gameVariables.getOpponentBetSize());
