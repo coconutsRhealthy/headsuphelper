@@ -61,8 +61,8 @@ public class ContinuousTable implements ContinuousTableable {
 
     private double lastBuyIn = 0.5;
     private double newBuyInToSelect = 0.5;
-    private double bankroll = 10;
-    private double bankrollLimit20Nl = 900;
+    private double bankroll = 17.66;
+    private double bankrollLimit20Nl = 9;
     private List<String> sngResults = new ArrayList<>();
     private Map<String, List<Long>> botActionDurations = initialzeBotActionDurationsMap();
     private long sessionStartTime;
@@ -151,7 +151,7 @@ public class ContinuousTable implements ContinuousTableable {
                     if(!game.equals("sng")) {
                         long currentTime = new Date().getTime();
 
-                        if(currentTime - sessionStartTime > 25_400_000) {
+                        if(currentTime - sessionStartTime > 18_400_000) {
                             new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
                             new DbSavePersisterRawData().doBigDbSaveUpdate(this);
@@ -168,6 +168,8 @@ public class ContinuousTable implements ContinuousTableable {
                     top10percentFlopCombos = new ArrayList<>();
                     top10percentTurnCombos = new ArrayList<>();
                     top10percentRiverCombos = new ArrayList<>();
+
+                    long dbSaveStartTime = new Date().getTime();
 
                     new DbSavePersister().doDbSaveUpdate(this, bigBlind);
                     new DbSavePersisterPreflop().doDbSaveUpdate(this, bigBlind);
@@ -208,6 +210,10 @@ public class ContinuousTable implements ContinuousTableable {
                         }
                     }
 
+                    long dbSaveEndTime = new Date().getTime();
+                    long dbSaveDuration = dbSaveEndTime - dbSaveStartTime;
+                    System.out.println("DB SAVE DURATION: " + dbSaveDuration);
+
                     gameVariables = new GameVariables(bigBlind, game.equals("sng"));
                     bigBlind = gameVariables.getBigBlind();
 
@@ -221,6 +227,8 @@ public class ContinuousTable implements ContinuousTableable {
                     gameVariables.fillFieldsSubsequent(true);
                 }
 
+                long actionAndGameVariablesStartTime = new Date().getTime();
+
                 lastOppName = gameVariables.getOpponentName();
                 System.out.println("lastOppName: " + lastOppName);
                 rangeConstructor = new RangeConstructor();
@@ -230,6 +238,10 @@ public class ContinuousTable implements ContinuousTableable {
 
                 ActionVariables actionVariables = new ActionVariables(gameVariables, this, true);
                 String action = actionVariables.getAction();
+
+                long actionAndGameVariablesEndTime = new Date().getTime();
+                long actionAndGameVariablesDuration = actionAndGameVariablesEndTime - actionAndGameVariablesStartTime;
+                System.out.println("ACTION_AND_GAMEVARIABLES DURATION: " + actionAndGameVariablesDuration);
 
                 if(action.equals("bet75pct") || action.equals("raise")) {
                     opponentHasInitiative = false;
@@ -303,20 +315,6 @@ public class ContinuousTable implements ContinuousTableable {
 
                     printDotTotal = 0;
                     System.out.println();
-                }
-
-                if(HollandTableReader.botIsSittingOut()) {
-                    botSittingOutCounter++;
-
-                    if(botSittingOutCounter >= 15) {
-                        System.out.println("too many bot sitting outs. Something wrong. Quit program.");
-                        throw new RuntimeException();
-                    }
-
-                    System.out.println("bot is SittingOut!");
-                    TimeUnit.MILLISECONDS.sleep(300);
-                    HollandTableReader.endBotIsSittingOut();
-                    TimeUnit.MILLISECONDS.sleep(500);
                 }
             }
         }
@@ -457,7 +455,7 @@ public class ContinuousTable implements ContinuousTableable {
 
             long currentTime = new Date().getTime();
 
-            if(currentTime - startTime > 25_400_000) {
+            if(currentTime - startTime > 18_400_000) {
                 System.out.println("3.4 hours have passed, force quit");
                 printSessionResults();
                 throw new RuntimeException();
@@ -471,15 +469,11 @@ public class ContinuousTable implements ContinuousTableable {
             hollandTableReader.closeSorryNoRematchPopUp();
             TimeUnit.MILLISECONDS.sleep(1200);
             hollandTableReader.closeTableOfEndedSng();
-            TimeUnit.MILLISECONDS.sleep(2800);
-            hollandTableReader.checkIfRegistrationConfirmPopUpIsGoneAndIfNotClickOkToRemoveIt();
-            TimeUnit.MILLISECONDS.sleep(1200);
-            hollandTableReader.selectAndUnselect6PlayerPerTableFilter();
 
             TimeUnit.MILLISECONDS.sleep(1500);
             //decideBuyIn();
             //takeShotAt20();
-            hollandTableReader.registerNewSng("first", this);
+            hollandTableReader.registerNewSng();
 
             gonnaDoFirstActionOfNewSng = true;
             timeOfLastDoneAction = -1;
@@ -492,17 +486,6 @@ public class ContinuousTable implements ContinuousTableable {
             boolean weirdBotSittingOut = false;
 
             while(newTableNotYetOpened) {
-                if(counter % 5 == 0) {
-                    if(HollandTableReader.botIsSittingOut()) {
-                        System.out.println("Weird bot sitting out! sitting back in...");
-                        TimeUnit.MILLISECONDS.sleep(300);
-                        HollandTableReader.endBotIsSittingOut();
-                        TimeUnit.MILLISECONDS.sleep(500);
-                        weirdBotSittingOut = true;
-                        break;
-                    }
-                }
-
                 if(counter == 30) {
                     MouseKeyboard.moveMouseToLocation(7, 100);
                     MouseKeyboard.click(7, 100);
@@ -544,7 +527,7 @@ public class ContinuousTable implements ContinuousTableable {
 
     private void doSngStartSessionLogic() throws Exception {
         HollandTableReader hollandTableReader = new HollandTableReader();
-        hollandTableReader.registerNewSng("first", this);
+        hollandTableReader.registerNewSng();
         gonnaDoFirstActionOfNewSng = true;
 
         int counter = 0;
