@@ -207,7 +207,7 @@ public class HollandTableReader {
                 System.out.println("EXTRA SUIT RGB: " + extraCheckSuitRgb1);
                 extraCheckSuitRgb1 = extraCheckSuitRgb1 / 1000;
 
-                if(extraCheckSuitRgb1 == -51 || extraCheckSuitRgb1 == -14209)  {
+                if(extraCheckSuitRgb1 == -51 || extraCheckSuitRgb1 == -14209 || extraCheckSuitRgb1 == -16771)  {
                     System.out.println("sng indeed finished, you have no first holecard. hc1suit: " + extraCheckSuitRgb1);
                     saveScreenshotOfEntireScreen("sngFinished", new Date().getTime());
                     return true;
@@ -242,6 +242,8 @@ public class HollandTableReader {
         clickTopSngInList();
 
         TimeUnit.MILLISECONDS.sleep(2000);
+        chooseCorrectBuyInForSng();
+        TimeUnit.MILLISECONDS.sleep(300);
 
         while(!noPlayerIsReggedYet()) {
             regNewSngWaitCouner++;
@@ -260,6 +262,60 @@ public class HollandTableReader {
 
         clickTopSngInList();
 
+        clickRegisterSngButton();
+
+        if(!readRegisterSngButtonText().contains("Unregist")) {
+            System.out.println("Clicked register sng but not registerd, re-registering attempt 1");
+            clickRegisterSngButton();
+        }
+
+        TimeUnit.MILLISECONDS.sleep(200);
+
+        if(!readRegisterSngButtonText().contains("Unregist")) {
+            System.out.println("Clicked register sng but not registerd, re-registering attempt 2");
+            clickRegisterSngButton();
+        }
+    }
+
+    private void chooseCorrectBuyInForSng() throws Exception {
+        String buyInLevel = readBuyinLevel();
+
+        if(buyInLevel.contains("0.50") || buyInLevel.contains("E050")) {
+            return;
+        } else {
+            //click sort buy-in column
+            System.out.println("Wrong buyin, gonna sort attempt 1");
+            MouseKeyboard.click(466, 331);
+            TimeUnit.MILLISECONDS.sleep(300);
+
+            if(readBuyinLevel().contains("0.50") || readBuyinLevel().contains("E050")) {
+                return;
+            } else {
+                //click sort buy-in column
+                System.out.println("Wrong buyin, gonna sort attempt 2");
+                MouseKeyboard.click(466, 331);
+                TimeUnit.MILLISECONDS.sleep(300);
+
+                if(readBuyinLevel().contains("0.50") || readBuyinLevel().contains("E050")) {
+                    return;
+                } else {
+                    System.out.println("Cannot select correct buyin...");
+                }
+            }
+        }
+    }
+
+    private String readBuyinLevel() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(402, 349, 444, 365);
+        bufferedImage = ImageProcessor.zoomInImage(bufferedImage, 2);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String rightActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        String buyInLevel = ImageProcessor.removeEmptySpacesFromString(rightActionButton);
+        System.out.println("read buyinLevel: " + buyInLevel);
+        return buyInLevel;
+    }
+
+    private void clickRegisterSngButton() throws Exception {
         //click register button
         TimeUnit.MILLISECONDS.sleep(250);
         System.out.println("registering new sng");
@@ -267,10 +323,15 @@ public class HollandTableReader {
         TimeUnit.MILLISECONDS.sleep(1744);
         MouseKeyboard.click(922, 749);
         TimeUnit.MILLISECONDS.sleep(2000);
+    }
 
-        //click OK button on registration confirm pop-up
-        TimeUnit.MILLISECONDS.sleep(890);
-        MouseKeyboard.click(535, 565);
+    private static String readRegisterSngButtonText() {
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShotCoordinates(791, 730, 945, 763);
+        bufferedImage = ImageProcessor.makeBufferedImageBlackAndWhite(bufferedImage);
+        String rightActionButton = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
+        String registerButtonText = ImageProcessor.removeEmptySpacesFromString(rightActionButton);
+        System.out.println("RegisterButtonText: " + registerButtonText);
+        return registerButtonText;
     }
 
     private boolean noPlayerIsReggedYet() {
@@ -283,7 +344,7 @@ public class HollandTableReader {
         String playersRegged = ImageProcessor.getStringFromBufferedImageWithTesseract(bufferedImage);
         playersRegged = ImageProcessor.removeEmptySpacesFromString(playersRegged);
 
-        if(playersRegged.startsWith("O") || playersRegged.startsWith("0")) {
+        if(playersRegged.startsWith("O") || playersRegged.startsWith("0") || playersRegged.startsWith("o")) {
             noPlayerIsReggedYet = true;
         } else {
             System.out.println("Already one player regged. String: " + playersRegged);
@@ -293,44 +354,55 @@ public class HollandTableReader {
     }
 
     public boolean newSngTableIsOpened() {
+        //BufferedImage bufferedImageLeftTop = ImageProcessor.getBufferedImageScreenShot(89, 168, 1, 1);
         BufferedImage bufferedImageLeftTop = ImageProcessor.getBufferedImageScreenShot(89, 168, 1, 1);
         int pixelRgbLeftTop = bufferedImageLeftTop.getRGB(0, 0);
 
-        BufferedImage bufferedImageLeftBottom = ImageProcessor.getBufferedImageScreenShot(89, 189, 1, 1);
+        //BufferedImage bufferedImageLeftBottom = ImageProcessor.getBufferedImageScreenShot(89, 228, 1, 1);
+        BufferedImage bufferedImageLeftBottom = ImageProcessor.getBufferedImageScreenShot(89, 228, 1, 1);
         int pixelRgbLeftBottom = bufferedImageLeftBottom.getRGB(0, 0);
 
-        BufferedImage bufferedImageRightTop = ImageProcessor.getBufferedImageScreenShot(341, 160, 1, 1);
+        //BufferedImage bufferedImageRightTop = ImageProcessor.getBufferedImageScreenShot(405, 167, 1, 1);
+        BufferedImage bufferedImageRightTop = ImageProcessor.getBufferedImageScreenShot(572, 167, 1, 1);
         int pixelRgbRightTop = bufferedImageRightTop.getRGB(0, 0);
 
-        BufferedImage bufferedImageRightBottom = ImageProcessor.getBufferedImageScreenShot(344, 189, 1, 1);
+        //BufferedImage bufferedImageRightBottom = ImageProcessor.getBufferedImageScreenShot(405, 228, 1, 1);
+        BufferedImage bufferedImageRightBottom = ImageProcessor.getBufferedImageScreenShot(573, 237, 1, 1);
         int pixelRgbRightBottom = bufferedImageRightBottom.getRGB(0, 0);
 
         boolean sngTableIsOpened = false;
 
         if(pixelRgbLeftTop / 1000 == -31) {
             //expected table open left top: -31915
+                //expected table open left top: -31915
             System.out.println("new sng table is opened left top");
             sngTableIsOpened = true;
         }
 
         if(pixelRgbLeftBottom / 1000 == -31) {
             //expected table open left bottom: -31915
+                //expected table open left bottom: -31915
             System.out.println("new sng table is opened left bottom");
-            MouseKeyboard.click(912, 115);
+            //MouseKeyboard.click(912, 151);
+            MouseKeyboard.click(912, 159);
             sngTableIsOpened = true;
         }
 
         if(pixelRgbRightTop / 1000 == -32) {
             //expected table open right top: -32425
+                //expected table open right top: -32681
             System.out.println("new sng table is opened right top");
-            MouseKeyboard.click(1168, 91);
+            //MouseKeyboard.click(1231, 91);
+            MouseKeyboard.click(1399, 91);
             sngTableIsOpened = true;
         }
 
-        if(pixelRgbRightBottom / 1000 == -31) {
-            //expected table open right bottom: -31915
+        if(pixelRgbRightBottom / 1000 == -32) {
+            //expected table open right bottom: -32425
+                //expected table open right bottom: -32425
             System.out.println("new sng table is opened right bottom");
-            MouseKeyboard.click(1169, 116);
+            //MouseKeyboard.click(1231, 151);
+            MouseKeyboard.click(1399, 160);
             sngTableIsOpened = true;
         }
 
@@ -452,7 +524,7 @@ public class HollandTableReader {
 
             if(StringUtils.containsIgnoreCase(rightActionButton, "raise") || StringUtils.containsIgnoreCase(rightActionButton, "all-in")
                     || StringUtils.containsIgnoreCase(rightActionButton, "allin") || StringUtils.containsIgnoreCase(rightActionButton, "all") ||
-                    StringUtils.containsIgnoreCase(rightActionButton, "Alllrl")) {
+                    StringUtils.containsIgnoreCase(rightActionButton, "Alllrl") || StringUtils.containsIgnoreCase(rightActionButton, "muse")) {
                 clickRaiseActionButton();
             } else {
                 System.out.println("WTFzxz! Raise and right button does not contain raise!");
@@ -971,6 +1043,8 @@ public class HollandTableReader {
 
         System.out.println("read base bigblind level: " + bigBlindLevel);
 
+        bigBlindLevel = bigBlindLevel.length() == 2 && bigBlindLevel.charAt(1) == '1' ? bigBlindLevel.substring(0, 1) : bigBlindLevel;
+
         double bigBlind;
 
         switch (bigBlindLevel) {
@@ -994,6 +1068,7 @@ public class HollandTableReader {
                 break;
             case "7":
             case "i\"":
+            case "T":
                 bigBlind = 100;
                 break;
             case "8":
@@ -1016,17 +1091,17 @@ public class HollandTableReader {
     }
 
     public static void saveScreenshotOfEntireScreen(int numberOfActionRequests) throws Exception {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 1700, 1250);
         ImageProcessor.saveBufferedImage(bufferedImage, "/Users/lennartmac/Documents/logging/" + numberOfActionRequests + ".png");
     }
 
     public static void saveScreenshotOfEntireScreen(long time) throws Exception {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 1700, 1250);
         ImageProcessor.saveBufferedImage(bufferedImage, "/Users/lennartmac/Documents/logging/" + time + ".png");
     }
 
     public static void saveScreenshotOfEntireScreen(String prefix, long time) throws Exception {
-        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 3000, 1250);
+        BufferedImage bufferedImage = ImageProcessor.getBufferedImageScreenShot(0, 0, 1700, 1250);
         ImageProcessor.saveBufferedImage(bufferedImage, "/Users/lennartmac/Documents/logging/" + prefix + "__" + time + ".png");
     }
 
@@ -1123,7 +1198,7 @@ public class HollandTableReader {
             cardRank = 12;
         } else if(stringCardRank.equals("K")) {
             cardRank = 13;
-        } else if(stringCardRank.equals("A")) {
+        } else if(stringCardRank.equals("A") || stringCardRank.equals("A\\")) {
             cardRank = 14;
         }
         return cardRank;
